@@ -17313,6 +17313,15 @@
                 ]
               },
               {
+                "name": "$params.allowed named by n",
+                "value": [
+                  1
+                ],
+                "locations": [
+                  "$params:/allowed/a"
+                ]
+              },
+              {
                 "name": "n",
                 "value": "a",
                 "locations": [

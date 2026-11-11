@@ -775,7 +775,7 @@
         "rules": ["sentence.phrase.one_of", "sentence.value.path", "value.ref", "value.refs", "path.inputs"],
         "input": {"things": [{"id": "t1", "x": "b"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b", "locations": ["/things/0/x"]}, {"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}
         ],
         "expressions": {"s": {"c": "x is in $params.k"}},
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
@@ -785,7 +785,7 @@
         "rules": ["sentence.phrase.one_of", "sentence.value.path", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": "c"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"c\", and $params.k is [\"a\", \"b\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "c", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"c\", and $params.k is [\"a\", \"b\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "c", "locations": ["/things/0/x"]}, {"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
       },
@@ -794,7 +794,7 @@
         "rules": ["sentence.phrase.one_of", "sentence.value.path", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is 1, which isn't text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is 1, which isn't text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}, {"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
       },
@@ -803,7 +803,7 @@
         "rules": ["sentence.phrase.one_of", "sentence.value.path", "value.ref", "value.refs", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}, {"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
       },
@@ -812,7 +812,7 @@
         "rules": ["sentence.phrase.one_of", "sentence.value.path", "value.ref", "value.refs", "path.null"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is null", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null, "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is null", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null, "locations": ["/things/0/x"]}, {"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
       }
@@ -828,7 +828,7 @@
         "rules": ["sentence.phrase.one_of", "in.fail", "value.refs"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\", and $params.k is []", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\", and $params.k is []", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}, {"name": "$params.k", "value": [], "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": [], "locations": ["$params:/k"]}]}}
       }
@@ -844,7 +844,7 @@
         "rules": ["sentence.phrase.one_of", "in.values", "value.refs"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is \"a\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is \"a\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}, {"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
       }
@@ -860,7 +860,7 @@
         "rules": ["sentence.phrase.one_of", "value.ref", "value.refs", "path.absent"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}, {"name": "$params.k", "value": null, "locations": ["$params:"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": null, "locations": ["$params:"]}]}}
       }
@@ -876,7 +876,7 @@
         "rules": ["sentence.phrase.one_of", "value.ref", "value.refs", "path.null"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is null", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is null", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}, {"name": "$params.k", "value": null, "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": null, "locations": ["$params:/k"]}]}}
       }
@@ -891,7 +891,7 @@
         "rules": ["sentence.phrase.one_of", "sentence.path.start", "value.refs"],
         "input": {"things": [{"id": "t1", "x": "a"}], "allowed": ["a", "b"]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}, {"name": "$input.allowed", "value": ["a", "b"], "locations": ["/allowed"]}]}
         ],
         "expressions": {"s": {"c": "x is in $input.allowed"}},
         "refs": {"s": {"c": [{"name": "$input.allowed", "value": ["a", "b"], "locations": ["/allowed"]}]}}
@@ -901,7 +901,7 @@
         "rules": ["sentence.phrase.one_of", "sentence.path.start", "value.refs"],
         "input": {"things": [{"id": "t1", "x": "z"}], "allowed": ["a", "b"]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"z\", and $input.allowed is [\"a\", \"b\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "z", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"z\", and $input.allowed is [\"a\", \"b\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "z", "locations": ["/things/0/x"]}, {"name": "$input.allowed", "value": ["a", "b"], "locations": ["/allowed"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$input.allowed", "value": ["a", "b"], "locations": ["/allowed"]}]}}
       }
@@ -1190,7 +1190,7 @@
         "rules": ["sentence.phrase.contains", "sentence.value.path", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": ["b", "a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b", "a"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b", "a"], "locations": ["/things/0/x"]}, {"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}
         ],
         "expressions": {"s": {"c": "x contains $params.k"}},
         "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
@@ -1200,7 +1200,7 @@
         "rules": ["sentence.phrase.contains", "sentence.value.path", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": ["b"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"b\"], and $params.k is \"a\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"b\"], and $params.k is \"a\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}, {"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
       },
@@ -1209,7 +1209,7 @@
         "rules": ["sentence.phrase.contains", "sentence.value.path", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}, {"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
       }
@@ -1225,7 +1225,7 @@
         "rules": ["sentence.phrase.contains", "value.ref", "value.refs", "path.absent"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}, {"name": "$params.k", "value": null, "locations": ["$params:"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": null, "locations": ["$params:"]}]}}
       }
@@ -1296,7 +1296,7 @@
         "rules": ["sentence.phrase.contains", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": ["b"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}, {"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}
         ],
         "expressions": {"s": {"c": "x does not contain $params.k"}},
         "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
@@ -1306,7 +1306,7 @@
         "rules": ["sentence.phrase.contains", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"a\"], and $params.k is \"a\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"a\"], and $params.k is \"a\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}, {"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
       }
@@ -1377,7 +1377,7 @@
         "rules": ["sentence.phrase.contains_all", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": ["a", "b", "c"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["a", "b", "c"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["a", "b", "c"], "locations": ["/things/0/x"]}, {"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}
         ],
         "expressions": {"s": {"c": "x contains all of $params.k"}},
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
@@ -1387,7 +1387,7 @@
         "rules": ["sentence.phrase.contains_all", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"a\"], and $params.k is [\"a\", \"b\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"a\"], and $params.k is [\"a\", \"b\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}, {"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
       }
@@ -1403,7 +1403,7 @@
         "rules": ["sentence.phrase.contains_all", "contains.value", "value.refs"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is [], which isn't a list with at least one value", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is [], which isn't a list with at least one value", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}, {"name": "$params.k", "value": [], "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": [], "locations": ["$params:/k"]}]}}
       }
@@ -1419,7 +1419,7 @@
         "rules": ["sentence.phrase.contains_all", "contains.value", "value.refs"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is \"a\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.k is \"a\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}, {"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
       }
@@ -1490,7 +1490,7 @@
         "rules": ["sentence.phrase.contains_all", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": ["c"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["c"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["c"], "locations": ["/things/0/x"]}, {"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}
         ],
         "expressions": {"s": {"c": "x contains none of $params.k"}},
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
@@ -1500,7 +1500,7 @@
         "rules": ["sentence.phrase.contains_all", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": ["b"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"b\"], and $params.k is [\"a\", \"b\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"b\"], and $params.k is [\"a\", \"b\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}, {"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
       }
@@ -1725,7 +1725,7 @@
         "rules": ["sentence.phrase.matches", "value.ref", "value.refs", "patterns.list"],
         "input": {"things": [{"id": "t1", "x": "abc"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}, {"name": "$params.p", "value": ["^a", "^b"], "locations": ["$params:/p"]}]}
         ],
         "expressions": {"s": {"c": "x matches $params.p"}},
         "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a", "^b"], "locations": ["$params:/p"]}]}}
@@ -1735,7 +1735,7 @@
         "rules": ["sentence.phrase.matches", "value.ref", "value.refs", "patterns.list"],
         "input": {"things": [{"id": "t1", "x": "zzz"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"zzz\", and $params.p is [\"^a\", \"^b\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "zzz", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"zzz\", and $params.p is [\"^a\", \"^b\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "zzz", "locations": ["/things/0/x"]}, {"name": "$params.p", "value": ["^a", "^b"], "locations": ["$params:/p"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a", "^b"], "locations": ["$params:/p"]}]}}
       }
@@ -1751,7 +1751,7 @@
         "rules": ["sentence.phrase.matches", "patterns.list", "value.refs"],
         "input": {"things": [{"id": "t1", "x": "abc"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.p is [\"(\"], which isn't a list of patterns", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.p is [\"(\"], which isn't a list of patterns", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}, {"name": "$params.p", "value": ["("], "locations": ["$params:/p"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.p", "value": ["("], "locations": ["$params:/p"]}]}}
       }
@@ -1767,7 +1767,7 @@
         "rules": ["sentence.phrase.matches", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": "zzz"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "zzz", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "zzz", "locations": ["/things/0/x"]}, {"name": "$params.p", "value": ["^a"], "locations": ["$params:/p"]}]}
         ],
         "expressions": {"s": {"c": "x does not match $params.p"}},
         "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a"], "locations": ["$params:/p"]}]}}
@@ -1777,7 +1777,7 @@
         "rules": ["sentence.phrase.matches", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": "abc"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"abc\", and $params.p is [\"^a\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"abc\", and $params.p is [\"^a\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}, {"name": "$params.p", "value": ["^a"], "locations": ["$params:/p"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a"], "locations": ["$params:/p"]}]}}
       }
@@ -3343,7 +3343,7 @@
         "rules": ["sentence.phrase.one_of", "sentence.phrase.aliases", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}, {"name": "$params.k", "value": ["a"], "locations": ["$params:/k"]}]}
         ],
         "expressions": {"s": {"c": "x is in $params.k"}},
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a"], "locations": ["$params:/k"]}]}}
@@ -4182,7 +4182,7 @@
         "rules": ["sentence.phrase.one_of", "not_in.pass", "value.refs"],
         "input": {"things": [{"id": "t1", "x": "dev"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "dev", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "dev", "locations": ["/things/0/x"]}, {"name": "$params.blocked", "value": ["prod"], "locations": ["$params:/blocked"]}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.blocked", "value": ["prod"], "locations": ["$params:/blocked"]}]}}
       },
@@ -4191,7 +4191,7 @@
         "rules": ["sentence.phrase.one_of", "not_in.fail"],
         "input": {"things": [{"id": "t1", "x": "prod"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"prod\", and $params.blocked is [\"prod\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "prod", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"prod\", and $params.blocked is [\"prod\"]", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "prod", "locations": ["/things/0/x"]}, {"name": "$params.blocked", "value": ["prod"], "locations": ["$params:/blocked"]}]}
         ]
       }
     ]
@@ -4206,7 +4206,7 @@
         "rules": ["sentence.phrase.one_of", "not_in.fail"],
         "input": {"things": [{"id": "t1", "x": "dev"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.blocked is \"prod\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "dev", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.blocked is \"prod\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "dev", "locations": ["/things/0/x"]}, {"name": "$params.blocked", "value": "prod", "locations": ["$params:/blocked"]}]}
         ]
       }
     ]
@@ -4221,7 +4221,7 @@
         "rules": ["sentence.phrase.one_of", "not_in.pass"],
         "input": {"things": [{"id": "t1", "x": "dev"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "dev", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "dev", "locations": ["/things/0/x"]}, {"name": "$params.blocked", "value": [], "locations": ["$params:/blocked"]}]}
         ]
       }
     ]
@@ -4236,7 +4236,7 @@
         "rules": ["sentence.phrase.one_of", "not_in.fail", "value.ref"],
         "input": {"things": [{"id": "t1", "x": "dev"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.blocked is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "dev", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.blocked is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "dev", "locations": ["/things/0/x"]}, {"name": "$params.blocked", "value": null, "locations": ["$params:"]}]}
         ]
       }
     ]
@@ -4251,7 +4251,7 @@
         "rules": ["sentence.phrase.one_of", "not_in.fail", "value.ref"],
         "input": {"things": [{"id": "t1", "x": "dev"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.blocked is null", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "dev", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.blocked is null", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "dev", "locations": ["/things/0/x"]}, {"name": "$params.blocked", "value": null, "locations": ["$params:/blocked"]}]}
         ]
       }
     ]
@@ -4266,7 +4266,7 @@
         "rules": ["sentence.phrase.one_of", "not_in.pass"],
         "input": {"things": [{"id": "t1", "x": ["prod"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"prod\"], which isn't text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["prod"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"prod\"], which isn't text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["prod"], "locations": ["/things/0/x"]}, {"name": "$params.blocked", "value": ["prod"], "locations": ["$params:/blocked"]}]}
         ]
       },
       {
@@ -4274,7 +4274,7 @@
         "rules": ["sentence.phrase.one_of", "not_in.pass"],
         "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is {\"a\": 1}, which isn't text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": {"a": 1}, "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is {\"a\": 1}, which isn't text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": {"a": 1}, "locations": ["/things/0/x"]}, {"name": "$params.blocked", "value": ["prod"], "locations": ["$params:/blocked"]}]}
         ]
       }
     ]
@@ -5382,6 +5382,16 @@
                 "locations": [
                   "/things/0/x"
                 ]
+              },
+              {
+                "name": "$params.lists named by $params.k",
+                "value": [
+                  "p",
+                  "q"
+                ],
+                "locations": [
+                  "$params:/lists/a"
+                ]
               }
             ]
           }
@@ -5420,6 +5430,16 @@
                 "value": "r",
                 "locations": [
                   "/things/0/x"
+                ]
+              },
+              {
+                "name": "$params.lists named by $params.k",
+                "value": [
+                  "p",
+                  "q"
+                ],
+                "locations": [
+                  "$params:/lists/a"
                 ]
               }
             ]
@@ -5489,6 +5509,13 @@
                 "locations": [
                   "/things/0/x"
                 ]
+              },
+              {
+                "name": "$params.lists named by $params.k",
+                "value": null,
+                "locations": [
+                  "$params:/lists"
+                ]
               }
             ]
           }
@@ -5556,6 +5583,16 @@
                 "locations": [
                   "/things/0/x"
                 ]
+              },
+              {
+                "name": "$params.pats named by $params.k",
+                "value": [
+                  "^a",
+                  "^b"
+                ],
+                "locations": [
+                  "$params:/pats/a"
+                ]
               }
             ]
           }
@@ -5594,6 +5631,16 @@
                 "value": "zzz",
                 "locations": [
                   "/things/0/x"
+                ]
+              },
+              {
+                "name": "$params.pats named by $params.k",
+                "value": [
+                  "^a",
+                  "^b"
+                ],
+                "locations": [
+                  "$params:/pats/a"
                 ]
               }
             ]
@@ -5676,6 +5723,16 @@
             "check": "allowed",
             "inputs": [
               {
+                "name": "$params.allowed_licenses",
+                "value": [
+                  "BSD-3-Clause",
+                  "Apache-2.0"
+                ],
+                "locations": [
+                  "$params:/allowed_licenses"
+                ]
+              },
+              {
                 "name": "$params.known_package_licenses named by name",
                 "value": null,
                 "locations": [
@@ -5724,6 +5781,16 @@
             "check": "allowed",
             "inputs": [
               {
+                "name": "$params.allowed_licenses",
+                "value": [
+                  "BSD-3-Clause",
+                  "Apache-2.0"
+                ],
+                "locations": [
+                  "$params:/allowed_licenses"
+                ]
+              },
+              {
                 "name": "$params.known_package_licenses named by name",
                 "value": "Apache-2.0",
                 "locations": [
@@ -5740,9 +5807,7 @@
               {
                 "name": "licenses.license.id",
                 "value": [],
-                "locations": [
-
-                ]
+                "locations": []
               },
               {
                 "name": "name",
@@ -5763,6 +5828,16 @@
             "cause": "absent",
             "check": "allowed",
             "inputs": [
+              {
+                "name": "$params.allowed_licenses",
+                "value": [
+                  "BSD-3-Clause",
+                  "Apache-2.0"
+                ],
+                "locations": [
+                  "$params:/allowed_licenses"
+                ]
+              },
               {
                 "name": "$params.known_package_licenses named by name",
                 "value": null,
@@ -5866,6 +5941,13 @@
             "check": "allowed",
             "inputs": [
               {
+                "name": "$params.allowed_licenses",
+                "value": "BSD-3-Clause",
+                "locations": [
+                  "$params:/allowed_licenses"
+                ]
+              },
+              {
                 "name": "$params.known_package_licenses named by name",
                 "value": null,
                 "locations": [
@@ -5882,9 +5964,7 @@
               {
                 "name": "licenses.license.id",
                 "value": [],
-                "locations": [
-
-                ]
+                "locations": []
               },
               {
                 "name": "name",
@@ -8743,12 +8823,12 @@
         "rules": ["sentence.phrase.contains_all", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "l": ["a", "c"]}, {"id": "t1", "l": ["c"]}, {"id": "t1", "l": ["a", "b"]}]},
         "results": [
-          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "c"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "c"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": ["c"]}], "message": "l is [\"c\"], and $params.p is [\"a\", \"b\"]", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": ["c"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/2/l"], "name": "l", "value": ["a", "b"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/2/l"], "name": "l", "value": ["a", "b"]}], "message": "l is [\"a\", \"b\"], and $params.p is [\"a\", \"b\"]", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "c"]}, {"locations": ["$params:/p"], "name": "$params.p", "value": ["a", "b"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "c"]}, {"locations": ["$params:/p"], "name": "$params.p", "value": ["a", "b"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": ["c"]}, {"locations": ["$params:/p"], "name": "$params.p", "value": ["a", "b"]}], "message": "l is [\"c\"], and $params.p is [\"a\", \"b\"]", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": ["c"]}, {"locations": ["$params:/p"], "name": "$params.p", "value": ["a", "b"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/2/l"], "name": "l", "value": ["a", "b"]}, {"locations": ["$params:/p"], "name": "$params.p", "value": ["a", "b"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/2/l"], "name": "l", "value": ["a", "b"]}, {"locations": ["$params:/p"], "name": "$params.p", "value": ["a", "b"]}], "message": "l is [\"a\", \"b\"], and $params.p is [\"a\", \"b\"]", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
@@ -8763,8 +8843,8 @@
         "rules": ["sentence.phrase.contains_all", "contains_some.values", "value.refs"],
         "input": {"things": [{"id": "t1", "l": ["a"]}]},
         "results": [
-          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}], "message": "$params.p is [], which isn't a list with at least one value", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}], "message": "$params.p is [], which isn't a list with at least one value", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["$params:/p"], "name": "$params.p", "value": []}], "message": "$params.p is [], which isn't a list with at least one value", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["$params:/p"], "name": "$params.p", "value": []}], "message": "$params.p is [], which isn't a list with at least one value", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]

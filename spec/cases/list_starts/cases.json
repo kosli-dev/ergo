@@ -227,7 +227,7 @@
         "results": [
           {"cause": "satisfied", "check": "every", "failed_items": [], "inputs": [{"locations": ["/0/id"], "name": "$input[].id", "value": ["a"]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "t"}},
           {"cause": "not_an_object", "check": "exists", "inputs": [{"locations": [""], "name": "$input.id", "value": null}], "message": "$input is [{\"id\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "t"}},
-          {"cause": "satisfied", "check": "in", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "t"}},
+          {"cause": "satisfied", "check": "in", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}, {"locations": ["/0/id"], "name": "$input[].id", "value": ["a"]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "t"}},
           {"cause": "not_an_object", "check": "is", "inputs": [{"locations": [""], "name": "$input.id", "value": null}], "message": "$input is [{\"id\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "t"}},
           {"cause": "not_an_object", "check": "right", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}, {"locations": [""], "name": "$input.id", "value": null}], "message": "$input is [{\"id\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "t"}}
         ]

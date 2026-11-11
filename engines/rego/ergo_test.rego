@@ -2990,11 +2990,11 @@ test_a_path_can_start_at_params if {
 
 test_params_that_are_missing_fail_closed if {
 	check := "licences does not contain $params.banned"
-	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"], "locations": ["/items/0/licences"]}]]]
-	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"], "locations": ["/items/0/licences"]}]]] with data.params as {}
-	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"], "locations": ["/items/0/licences"]}]]] with data.params as null
-	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "unusable", [{"name": "licences", "value": ["MIT"], "locations": ["/items/0/licences"]}]]] with data.params as "not an object"
-	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "null", [{"name": "licences", "value": ["MIT"], "locations": ["/items/0/licences"]}]]] with data.params as {"banned": null}
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"], "locations": ["/items/0/licences"]}, {"name": "$params.banned", "value": null, "locations": ["$params:"]}]]]
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"], "locations": ["/items/0/licences"]}, {"name": "$params.banned", "value": null, "locations": ["$params:"]}]]] with data.params as {}
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"], "locations": ["/items/0/licences"]}, {"name": "$params.banned", "value": null, "locations": ["$params:"]}]]] with data.params as null
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "unusable", [{"name": "licences", "value": ["MIT"], "locations": ["/items/0/licences"]}, {"name": "$params.banned", "value": null, "locations": ["$params:"]}]]] with data.params as "not an object"
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "null", [{"name": "licences", "value": ["MIT"], "locations": ["/items/0/licences"]}, {"name": "$params.banned", "value": null, "locations": ["$params:/banned"]}]]] with data.params as {"banned": null}
 }
 
 test_a_present_check_on_a_param_fails_as_absent_with_no_params_and_as_unusable_with_params_that_are_not_an_object if {
@@ -5238,7 +5238,7 @@ test_null_params_read_by_a_key_from_the_item_say_what_params_that_are_missing_sa
 
 test_a_for_line_whose_param_cant_be_used_fails_as_unusable_and_keeps_its_inputs if {
 	rows := _for_rows({"for": "every xs as x", "assert": "x is one of $params.l"}, [{"id": 1, "xs": [1]}, "s"], {"l": "text"})
-	rows == [[1, "unusable", [{"cause": "unusable", "failed_assertions": [{"assertion": "x is in $params.l", "cause": "unusable"}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": 1}], [{"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}]], ["s", "unusable", [], [{"name": "xs", "value": [], "locations": []}]]]
+	rows == [[1, "unusable", [{"cause": "unusable", "failed_assertions": [{"assertion": "x is in $params.l", "cause": "unusable"}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": 1}], [{"name": "$params.l", "value": "text", "locations": ["$params:/l"]}, {"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}]], ["s", "unusable", [], [{"name": "$params.l", "value": "text", "locations": ["$params:/l"]}, {"name": "xs", "value": [], "locations": []}]]]
 	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [{"x": 1}]}], {"l": "text"})] == ["unusable"]
 	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [1]}], {"l": "text"})] == ["unusable"]
 }
@@ -7199,13 +7199,85 @@ test_a_field_after_a_list_phrase_passes_and_fails_by_what_the_list_holds if {
 	}
 }
 
-test_a_field_after_a_list_phrase_lists_both_fields_in_the_row_inputs_and_keeps_the_sentence_as_written if {
+test_a_field_or_a_ref_after_a_list_phrase_lists_both_sides_in_the_row_inputs_and_keeps_the_sentence_as_written if {
 	doc := {"things": [{"id": "t1", "files": ["a", "b"], "gaps": ["a"]}]}
 	r := ergo.report(doc, _sentence_policy({"c": "files contains all of gaps"}), {})
 	[row.inputs | some row in r.results; row.check == "c"] == [[{"name": "files", "value": ["a", "b"], "locations": ["/things/0/files"]}, {"name": "gaps", "value": ["a"], "locations": ["/things/0/gaps"]}]]
 	r.requirements.s.checks.c == {"description": "", "meta": {}, "expression": "files contains all of gaps"}
 	r2 := ergo.report(doc, _sentence_policy({"c": "files contains all of $params.k"}), {"k": ["a"]})
-	[row.inputs | some row in r2.results; row.check == "c"] == [[{"name": "files", "value": ["a", "b"], "locations": ["/things/0/files"]}]]
+	[row.inputs | some row in r2.results; row.check == "c"] == [[{"name": "files", "value": ["a", "b"], "locations": ["/things/0/files"]}, {"name": "$params.k", "value": ["a"], "locations": ["$params:/k"]}]]
+}
+
+_ref_list_phrases := ["is in", "is not in", "contains", "does not contain", "contains all of", "contains none of", "contains some of", "does not contain all of", "matches", "does not match"]
+
+test_a_ref_after_a_list_phrase_is_listed_after_the_field_whatever_the_cause if {
+	every phrase in _ref_list_phrases {
+		every pair in [
+			[{"id": "t", "x": "a"}, {"k": ["a"]}],
+			[{"id": "t", "x": "a"}, {"k": "text"}],
+			[{"id": "t", "x": ["a"]}, {}],
+			[{"id": "t", "x": ["a"]}, {"k": null}],
+			[{"id": "t"}, {"k": ["a"]}],
+			[{"id": "t", "x": null}, {"k": ["a"]}],
+			[{"id": "t", "x": 1}, {"k": 1}],
+		] {
+			r := ergo.report({"things": [pair[0]]}, _sentence_policy({"c": concat(" ", ["x", phrase, "$params.k"])}), pair[1])
+			[[i.name | some i in row.inputs] | some row in r.results; row.check == "c"] == [["x", "$params.k"]]
+		}
+	}
+}
+
+test_a_ref_after_a_list_phrase_shows_what_it_read_and_where if {
+	doc := {"things": [{"id": "t", "x": "z"}]}
+	every pair in [
+		[{"k": ["a"]}, ["a"], ["$params:/k"]],
+		[{"k": "text"}, "text", ["$params:/k"]],
+		[{}, null, ["$params:"]],
+		[{"k": null}, null, ["$params:/k"]],
+	] {
+		r := ergo.report(doc, _sentence_policy({"c": "x is in $params.k"}), pair[0])
+		[row.inputs[1] | some row in r.results; row.check == "c"] == [{"name": "$params.k", "value": pair[1], "locations": pair[2]}]
+	}
+	r := ergo.report({"things": [{"id": "t", "x": "z"}], "ks": [{"n": "a"}, {"n": "b"}]}, _sentence_policy({"c": "x is not in $input.ks.n"}), {})
+	[row.inputs | some row in r.results; row.check == "c"] == [[
+		{"name": "x", "value": "z", "locations": ["/things/0/x"]},
+		{"name": "$input.ks[].n", "value": ["a", "b"], "locations": ["/ks/0/n", "/ks/1/n"]},
+	]]
+}
+
+test_every_some_count_and_for_rows_list_a_ref_after_a_list_phrase_where_is_at_least_lists_its_right_side if {
+	doc := {"things": [{"id": "t", "xs": [{"n": 1, "s": "a"}]}], "l": [2], "p": ["^a"], "z": 5}
+	every pair in [
+		["every xs.n is in $input.l", "every xs.n is at least $input.z"],
+		["every xs.n is not in $params.l", "every xs.n is at least $params.z"],
+		["some xs.s matches $input.p", "some xs.s is at least $input.z"],
+		["count of xs whose n is in $input.l is 1", "count of xs whose n is at least $input.z is 1"],
+		["count of xs whose s matches $params.p is 1", "count of xs whose n is at least $params.z is 1"],
+		[{"for": "every xs as x", "assert": "x.n is in $params.l"}, {"for": "every xs as x", "assert": "x.n is at least $params.z"}],
+		[{"for": "every xs as x", "assert": "x.s does not match $input.p"}, {"for": "every xs as x", "assert": "x.n is at least $input.z"}],
+		[{"for": "every xs as x", "assert": "every xs.n is in $input.l"}, {"for": "every xs as x", "assert": "every xs.n is at least $input.z"}],
+	] {
+		r := ergo.report(doc, _sentence_policy({"a": pair[0], "b": pair[1]}), {"l": [2], "p": ["^a"], "z": 5})
+		names := {row.check: [_twin_name(i.name) | some i in row.inputs] | some row in r.results; row.check in {"a", "b"}}
+		names.a == names.b
+	}
+}
+
+_twin_name(name) := "count" if startswith(name, "count of")
+
+_twin_name(name) := "right" if name in {"$input.l", "$input.p", "$input.z", "$params.l", "$params.p", "$params.z"}
+
+_twin_name(name) := name if {
+	not startswith(name, "count of")
+	not name in {"$input.l", "$input.p", "$input.z", "$params.l", "$params.p", "$params.z"}
+}
+
+test_a_violation_lists_a_ref_once_when_the_row_lists_it_already if {
+	rep := ergo.report({"things": [{"id": "t", "x": "z"}]}, _sentence_policy({"c": "x is in $params.k"}), {"k": ["a"]})
+	[v.inputs | some v in ergo.violations(rep)] == [[
+		{"name": "x", "value": "z", "locations": ["/things/0/x"]},
+		{"name": "$params.k", "value": ["a"], "locations": ["$params:/k"]},
+	]]
 }
 
 test_a_field_of_the_input_before_a_list_phrase_reads_a_field_of_the_subject_after_it if {
@@ -9258,15 +9330,15 @@ _named_params := {"lists": {"a": ["p", "q"], "b": "text", "c": null}, "pats": {"
 
 _named_things := {"things": [{"id": "t1", "x": "p", "kind": "a"}, {"id": "t2", "x": "z", "kind": "b"}, {"id": "t3", "x": "p", "kind": "c"}, {"id": "t4", "x": "p", "kind": "zz"}, {"id": "t5", "x": "p"}, {"id": "t6", "x": 3, "kind": "a"}]}
 
-test_a_list_read_with_named_by_a_params_key_shows_only_the_field if {
+test_a_list_read_with_named_by_a_params_key_shows_the_field_and_the_list_it_read if {
 	rows := _sentence_rows({"c": "x is in $params.lists named by $params.k"}, _named_things, _named_params)
 	[[r[1], r[2], r[3]] | some r in rows] == [
-		[true, "satisfied", [{"name": "x", "value": "p", "locations": ["/things/0/x"]}]],
-		[false, "value", [{"name": "x", "value": "z", "locations": ["/things/1/x"]}]],
-		[true, "satisfied", [{"name": "x", "value": "p", "locations": ["/things/2/x"]}]],
-		[true, "satisfied", [{"name": "x", "value": "p", "locations": ["/things/3/x"]}]],
-		[true, "satisfied", [{"name": "x", "value": "p", "locations": ["/things/4/x"]}]],
-		[false, "unusable", [{"name": "x", "value": 3, "locations": ["/things/5/x"]}]],
+		[true, "satisfied", [{"name": "x", "value": "p", "locations": ["/things/0/x"]}, {"name": "$params.lists named by $params.k", "value": ["p", "q"], "locations": ["$params:/lists/a"]}]],
+		[false, "value", [{"name": "x", "value": "z", "locations": ["/things/1/x"]}, {"name": "$params.lists named by $params.k", "value": ["p", "q"], "locations": ["$params:/lists/a"]}]],
+		[true, "satisfied", [{"name": "x", "value": "p", "locations": ["/things/2/x"]}, {"name": "$params.lists named by $params.k", "value": ["p", "q"], "locations": ["$params:/lists/a"]}]],
+		[true, "satisfied", [{"name": "x", "value": "p", "locations": ["/things/3/x"]}, {"name": "$params.lists named by $params.k", "value": ["p", "q"], "locations": ["$params:/lists/a"]}]],
+		[true, "satisfied", [{"name": "x", "value": "p", "locations": ["/things/4/x"]}, {"name": "$params.lists named by $params.k", "value": ["p", "q"], "locations": ["$params:/lists/a"]}]],
+		[false, "unusable", [{"name": "x", "value": 3, "locations": ["/things/5/x"]}, {"name": "$params.lists named by $params.k", "value": ["p", "q"], "locations": ["$params:/lists/a"]}]],
 	]
 }
 
@@ -10093,12 +10165,12 @@ named_by_rows(subjects, subject, check, inp) := [[r.passed, r.inputs] |
 
 test_a_part_read_with_named_by_on_the_right_side_shows_the_parts_value if {
 	subjects := {"t": {"from": "things", "identified_by": "id", "has": {"cov": "d.b"}}}
-	named_by_rows(subjects, "t", "cov.x is one of $params.allowed named by id", {"things": [{"id": "a", "d": {"b": {"x": 1}}}]}) == [[true, [{"name": "cov.x", "part": {"id": null, "name": "cov"}, "value": 1, "locations": ["/things/0/d/b/x"]}, {"name": "id", "value": "a", "locations": ["/things/0/id"]}]]]
+	named_by_rows(subjects, "t", "cov.x is one of $params.allowed named by id", {"things": [{"id": "a", "d": {"b": {"x": 1}}}]}) == [[true, [{"name": "cov.x", "part": {"id": null, "name": "cov"}, "value": 1, "locations": ["/things/0/d/b/x"]}, {"name": "$params.allowed named by id", "value": [1], "locations": ["$params:/allowed/a"]}, {"name": "id", "value": "a", "locations": ["/things/0/id"]}]]]
 }
 
 test_a_parent_read_with_named_by_on_the_right_side_shows_the_parents_value if {
 	subjects := {"t": {"from": "ts", "identified_by": "id"}, "kid": {"from": "every t.kids"}}
-	named_by_rows(subjects, "kid", "t.x is one of $params.allowed named by n", {"ts": [{"id": "a", "x": 1, "kids": [{"n": "a"}]}]}) == [[true, [{"name": "t.x", "value": 1, "locations": ["/ts/0/x"]}, {"name": "n", "value": "a", "locations": ["/ts/0/kids/0/n"]}]]]
+	named_by_rows(subjects, "kid", "t.x is one of $params.allowed named by n", {"ts": [{"id": "a", "x": 1, "kids": [{"n": "a"}]}]}) == [[true, [{"name": "t.x", "value": 1, "locations": ["/ts/0/x"]}, {"name": "$params.allowed named by n", "value": [1], "locations": ["$params:/allowed/a"]}, {"name": "n", "value": "a", "locations": ["/ts/0/kids/0/n"]}]]]
 }
 
 test_a_check_named_like_one_of_ergos_own_rows_that_does_not_parse_is_listed_once if {
@@ -10271,6 +10343,10 @@ test_a_child_subject_starts_at_its_parent_and_a_grandchild_at_its_own_parent if 
 test_a_ref_in_refs_has_its_location_and_a_violation_copies_it if {
 	rep := ergo.report({"things": [{"id": "t1", "x": "z"}]}, _sentence_policy({"c": "x is in $params.allowed"}), {"allowed": ["p", "q"]})
 	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.allowed", "value": ["p", "q"], "locations": ["$params:/allowed"]}]
+	[r.inputs | some r in rep.results; r.check == "c"] == [[
+		{"name": "x", "value": "z", "locations": ["/things/0/x"]},
+		{"name": "$params.allowed", "value": ["p", "q"], "locations": ["$params:/allowed"]},
+	]]
 	[v.inputs | some v in ergo.violations(rep)] == [[
 		{"name": "x", "value": "z", "locations": ["/things/0/x"]},
 		{"name": "$params.allowed", "value": ["p", "q"], "locations": ["$params:/allowed"]},
@@ -10446,8 +10522,8 @@ test_subject_is_the_subject_itself_when_the_subject_is_a_string if {
 		"s is one of $params.allowed_regions",
 		{"allowed_regions": ["eu-west-1"]},
 	) == [
-		["eu-west-1", true, "satisfied", [{"name": "s", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}]],
-		["us-east-1", false, "value", [{"name": "s", "value": "us-east-1", "locations": ["/deployment/regions/1"]}]],
+		["eu-west-1", true, "satisfied", [{"name": "s", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}, {"name": "$params.allowed_regions", "value": ["eu-west-1"], "locations": ["$params:/allowed_regions"]}]],
+		["us-east-1", false, "value", [{"name": "s", "value": "us-east-1", "locations": ["/deployment/regions/1"]}, {"name": "$params.allowed_regions", "value": ["eu-west-1"], "locations": ["$params:/allowed_regions"]}]],
 	]
 	rep := _subject_report({"deployment": {"regions": ["eu-west-1"]}}, "every deployment.regions", {"c": "s is one of $params.allowed_regions"}, {"allowed_regions": ["eu-west-1"]})
 	rep.requirements.r.checks.c.expression == "s is in $params.allowed_regions"
@@ -12937,4 +13013,18 @@ test_a_part_that_is_an_object_with_a_list_still_works_in_a_count_of_whose_under_
 	rows := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": {"z": [2]}, "xs": [{"v": 1, "ys": [{"v": 1}]}]}]}, {})
 	rows.xs == ["satisfied", null]
 	rows.at_least == ["satisfied", null]
+}
+
+test_a_model_check_with_an_inputs_list_echoes_each_path_in_its_row_inputs if {
+	check := {"op": "present", "path": ["x"], "inputs": [["y"], ["x"]]}
+	[i.name | some i in ergo._check_inputs({"x": 1, "y": 2}, check)] == ["y", "x"]
+}
+
+test_a_model_check_with_an_inputs_list_does_not_echo_an_entry_that_is_not_a_path if {
+	check := {"op": "present", "path": ["x"], "inputs": [{"z": 1}, ["x"]]}
+	[i.name | some i in ergo._check_inputs({"x": 1}, check)] == ["x"]
+}
+
+test_the_paths_of_an_inputs_list_are_the_paths_a_model_check_reads_for_its_names if {
+	ergo._own_paths({"op": "present", "path": ["x"], "inputs": [["y"], ["$zz", "c"], {"z": 1}]}, "inputs") == [["y"], ["$zz", "c"]]
 }

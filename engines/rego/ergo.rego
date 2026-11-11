@@ -4750,7 +4750,16 @@ _ref_label(r) := _ref_walk(r).name if _ref_walks(r)
 
 _ref_label(r) := _ref_name(r) if not _ref_walks(r)
 
-_ref_inputs(check) := [{"name": pair[0], "value": pair[1], "locations": pair[2]} | some pair in sort({[_ref_label(r), _ref_shown(r), _ref_locations(r)] | some r in _check_refs(check)})]
+_ref_inputs(check) := _ref_entries(_check_refs(check))
+
+_ref_entries(refs) := [{"name": pair[0], "value": pair[1], "locations": pair[2]} | some pair in sort({[_ref_label(r), _ref_shown(r), _ref_locations(r)] | some r in refs})]
+
+_input_ref_inputs(conds) := _ref_entries({r |
+	some c in conds
+	c.op in _right_ref_ops
+	some r in _check_refs(object.remove(c, ["path"]))
+	r[0] in {"$$input", "$$input[]"}
+})
 
 _ref_locations(r) := [_ref_at(r)] if {
 	_builtin(r)
@@ -4867,11 +4876,17 @@ _check_inputs(subj, check) := _derived_eval(check, subj).inputs if {
 	_derived_once(check)
 }
 
-_check_inputs(subj, check) := [_path_input(subj, check.path)] if {
+_check_inputs(subj, check) := array.concat([_path_input(subj, check.path)], _right_ref_inputs(check)) if {
 	not check.inputs
 	not _two_sided(check)
 	is_array(check.path)
 }
+
+_right_ref_ops := {"in", "not_in", "includes", "excludes", "includes_some", "not_includes_all", "matches_any", "not_matches_any"}
+
+_right_ref_inputs(check) := _ref_inputs(object.remove(check, ["path"])) if check.op in _right_ref_ops
+
+_right_ref_inputs(check) := [] if not check.op in _right_ref_ops
 
 _leaf_paths(leaf) := [side | some side in [leaf.left, leaf.right]; is_array(side)] if _two_sided(leaf)
 
@@ -6324,7 +6339,7 @@ _violations(report, shadowing) := [object.union(
 		"check": row.check,
 		"description": _definition_field(report.requirements, row, "description"),
 		"expression": _definition_field(report.requirements, row, "expression"),
-		"inputs": array.concat(row.inputs, _recorded_refs(report.requirements, row)),
+		"inputs": array.concat(row.inputs, [r | some r in _recorded_refs(report.requirements, row); not r in row.inputs]),
 		"cause": row.cause,
 	},
 	object.union(object.union(_failed_items_of(row), _failed_assertions_of(row)), _message_of(row)),
@@ -6702,7 +6717,7 @@ _tally_inputs(subj, side, t) := array.concat(
 	],
 	_merged_inputs(array.concat(
 		_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)]),
-		_field_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)]),
+		array.concat(_field_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)]), _input_ref_inputs(object.get(side, "whose", []))),
 	)),
 )
 
@@ -9714,11 +9729,7 @@ _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(
 	not _s_field_arg(a.phrase)
 }
 
-_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))}, _s_shown_inputs(a)) if _s_field_arg(a.phrase)
-
-_s_shown_inputs(a) := {"inputs": [_s_model_path(a.path)]} if _s_named_arg(a.phrase)
-
-_s_shown_inputs(a) := {} if not _s_named_arg(a.phrase)
+_s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))} if _s_field_arg(a.phrase)
 
 _s_field_arg(ph) if {
 	ph.op in _s_list_ops
@@ -9925,7 +9936,7 @@ _walk_flawed(check) if _param_broken(check, set())
 
 _walk_flawed(_) if _unreadable_input
 
-_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": []}], array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check))))), "failed": _walk_failed(state, _null_prefix_fails(check, subj), check.path)} if {
+_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": []}], _walk_side_inputs(subj, check))), "failed": _walk_failed(state, _null_prefix_fails(check, subj), check.path)} if {
 	state := _walk_read_state(subj, check.path)
 	not _walk_keys(check, subj)
 }
@@ -9937,7 +9948,18 @@ _walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": fail
 	fails := array.concat(array.concat(w.fails, [j.failure | some j in judged; j.failure != null]), _walk_stop(w))
 	cause := _walk_cause(check, w, judged, fails)
 	failed := _walk_failed(cause, fails, check.path)
-	inputs := _merged_inputs(array.concat(_walk_inputs(check, w), array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check)))))
+	inputs := _merged_inputs(array.concat(_walk_inputs(check, w), _walk_side_inputs(subj, check)))
+}
+
+_walk_side_inputs(subj, check) := array.concat(array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check))), _input_ref_inputs(array.concat([check.check], check.whose))) if _walk_list_ref(check)
+
+else := array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check)))
+
+_walk_list_ref(check) if check.check.op in _right_ref_ops
+
+_walk_list_ref(check) if {
+	some c in check.whose
+	c.op in _right_ref_ops
 }
 
 _walk_judged(check, w) := [_walk_judge(check, w, e) | some e in w.items] if object.get(check, "distinct", false) != true
@@ -11331,7 +11353,7 @@ _for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check,
 
 _for_inputs(check, subj, names, item, w) := _merged_inputs([{"name": t[0], "value": t[1], "locations": t[2]} | some t in _for_input_pairs(check, subj, names, item, w)])
 
-_for_input_pairs(check, subj, names, item, w) := ((((((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_input_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
+_for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_input_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
 	some p in _leaf_paths(c)
@@ -11364,7 +11386,7 @@ _for_input_pairs(check, subj, names, item, w) := ((((((((({object.get(w, "input"
 	some c in check.checks
 	_walks(c)
 	_for_alias_path(check, c.path)
-	some i in array.concat(_named_inputs(subj, [p | some p in _walk_condition_paths(c); not _for_alias_path(check, p)]), _field_named_inputs(subj, [p | some p in _walk_condition_paths(c); not _for_alias_path(check, p)]))
+	some i in array.concat(array.concat(_named_inputs(subj, [p | some p in _walk_condition_paths(c); not _for_alias_path(check, p)]), _field_named_inputs(subj, [p | some p in _walk_condition_paths(c); not _for_alias_path(check, p)])), _input_ref_inputs(array.concat([c.check], c.whose)))
 }) | {[_input_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
 	some c in check.checks
 	_walks(c)
@@ -11375,6 +11397,10 @@ _for_input_pairs(check, subj, names, item, w) := ((((((((({object.get(w, "input"
 	some i in _named_inputs(subj, [shown | some p in _walk_condition_paths(c); shown := _before_alias_name(check, subj, p)])
 }) | {[_input_name([f]), _value_at(subj, [f]), _locations_of(subj, [f])] |
 	some f in _for_key_fields(check)
+}) | {[i.name, i.value, i.locations] |
+	some c in check.checks
+	c.op in _right_ref_ops
+	some i in _ref_inputs(object.remove(c, ["path"]))
 }
 
 _for_alias_path(check, p) if p[0] in {concat("", ["$", item.as]) | some item in check.items}
@@ -11492,7 +11518,7 @@ _tally_kept_inputs(check, subj, part) := array.concat(
 			[p | some c in part.whose; some p in _condition_paths(c); not _for_alias_path(check, p)],
 			[shown | some c in part.whose; some p in _condition_paths(c); shown := _before_alias_name(check, subj, p)],
 		)),
-		_field_named_inputs(subj, [p | some c in part.whose; some p in _condition_paths(c); not _for_alias_path(check, p)]),
+		array.concat(_field_named_inputs(subj, [p | some c in part.whose; some p in _condition_paths(c); not _for_alias_path(check, p)]), _input_ref_inputs(part.whose)),
 	)),
 ) if _tally_named(check, part)
 

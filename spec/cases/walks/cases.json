@@ -718,7 +718,7 @@
         "rules": ["sentence.resolve.root", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "staff": ["zed"]}]}], "staff": ["zed"]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "i", "message": "item 1 of approvers: username is \"ann\", and $input.staff is [\"zed\"]", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "ann", "locations": ["/releases/0/approvers/0/username"]}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "i", "message": "item 1 of approvers: username is \"ann\", and $input.staff is [\"zed\"]", "passed": false, "cause": "value", "inputs": [{"name": "$input.staff", "value": ["zed"], "locations": ["/staff"]}, {"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "ann", "locations": ["/releases/0/approvers/0/username"]}]},
           {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "p", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": []}
         ]
       }

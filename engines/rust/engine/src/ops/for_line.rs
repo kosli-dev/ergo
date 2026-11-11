@@ -1505,10 +1505,18 @@ impl For {
         let mut in_walk: Vec<*const Path> = Vec::new();
         let mut in_whose: Vec<*const Path> = Vec::new();
         for sentence in &self.sentences {
-            let (found, whose) = match &sentence.check {
+            let (mut found, mut whose) = match &sentence.check {
                 Check::Tally(tally) => tally_paths(tally, &hidden),
                 other => (all_paths(other), Vec::new()),
             };
+            let named = nested_checks(&sentence.check)
+                .into_iter()
+                .flat_map(super::lists::named_refs);
+            if matches!(sentence.check, Check::Tally(_)) {
+                whose.extend(named);
+            } else {
+                found.extend(named);
+            }
             if matches!(sentence.check, Check::Walk(_)) {
                 in_walk.extend(found.iter().map(|path| std::ptr::from_ref(*path)));
             }
@@ -1564,6 +1572,10 @@ impl For {
         for sentence in &self.sentences {
             if let Check::Tally(tally) = &sentence.check {
                 inputs.extend(tally.unaliased_entries(ctx, &hidden));
+            }
+            inputs.extend(super::lists::ref_inputs(&sentence.check, ctx, true));
+            for inner in nested_checks(&sentence.check).into_iter().skip(1) {
+                inputs.extend(super::lists::ref_inputs(inner, ctx, false));
             }
         }
         inputs

@@ -670,13 +670,19 @@ fn outside_inputs(walk: &Walk, ctx: &Ctx) -> Vec<Input> {
 pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
     let mut inputs = Vec::new();
     for check in checks {
-        for path in check.paths().into_iter().filter(|p| {
-            reads_outside(p)
-                || (matches!(p.start, Start::Params | Start::Subject | Start::Own)
-                    && has_root_field(p))
-        }) {
+        for path in check
+            .paths()
+            .into_iter()
+            .chain(super::lists::named_refs(check))
+            .filter(|p| {
+                reads_outside(p)
+                    || (matches!(p.start, Start::Params | Start::Subject | Start::Own)
+                        && has_root_field(p))
+            })
+        {
             inputs.extend(path_inputs(path, ctx, &[], true));
         }
+        inputs.extend(super::lists::ref_inputs(check, ctx, false));
     }
     inputs
 }

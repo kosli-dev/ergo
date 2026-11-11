@@ -990,7 +990,8 @@ pub fn violations(report: &Value) -> Value {
             .and_then(|def| def.get("$refs"))
             .and_then(Value::as_array)
         {
-            inputs.extend(refs.iter().cloned());
+            let listed = inputs.clone();
+            inputs.extend(refs.iter().filter(|r| !listed.contains(r)).cloned());
         }
         let mut violation = Map::new();
         violation.insert("requirement".to_string(), requirement);
@@ -2150,6 +2151,78 @@ mod tests {
         assert!(first.get("passed").is_none());
         assert!(first.get("failed_assertions").is_none());
         assert_eq!(first["subject"], json!({"type": "thing", "id": 1}));
+    }
+
+    #[test]
+    fn a_violation_lists_a_ref_once_when_its_row_lists_it_already() {
+        let report = crate::report(
+            &json!({"things": [{"id": "t", "x": "z"}]}),
+            &json!({
+                "ergo_spec": crate::SPEC,
+                "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+                "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}
+            }),
+            &json!({"k": ["a"]}),
+        );
+        assert_eq!(
+            violations(&report)[0]["inputs"],
+            json!([
+                {"name": "x", "value": "z", "locations": ["/things/0/x"]},
+                {"name": "$params.k", "value": ["a"], "locations": ["$params:/k"]}
+            ])
+        );
+    }
+
+    #[test]
+    fn every_count_and_for_rows_list_a_ref_after_a_list_phrase_as_is_at_least_lists_its_right_side()
+    {
+        let report = crate::report(
+            &json!({"things": [{"id": "t", "xs": [{"n": 1}]}], "l": [2], "z": 5}),
+            &json!({
+                "ergo_spec": crate::SPEC,
+                "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+                "requirements": {"s": {"subject": "thing", "checks": {
+                    "every_in": "every xs.n is in $input.l",
+                    "every_least": "every xs.n is at least $input.z",
+                    "every_params": "every xs.n is in $params.l",
+                    "count_in": "count of xs whose n is in $input.l is 1",
+                    "count_least": "count of xs whose n is at least $input.z is 1",
+                    "for_in": {"for": "every xs as x", "assert": "x.n is in $params.l"},
+                    "for_least": {"for": "every xs as x", "assert": "x.n is at least $params.z"}
+                }}}
+            }),
+            &json!({"l": [2], "z": 5}),
+        );
+        let names = |check: &str| -> Vec<String> {
+            report["results"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|row| row["check"] == check)
+                .unwrap()["inputs"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|input| input["name"].as_str().unwrap().to_string())
+                .collect()
+        };
+        assert_eq!(names("every_in"), ["$input.l", "xs[].n"]);
+        assert_eq!(names("every_least"), ["$input.z", "xs[].n"]);
+        assert_eq!(names("every_params"), ["xs[].n"]);
+        assert_eq!(
+            names("count_in"),
+            ["count of xs whose n is in $input.l", "xs[]", "$input.l"]
+        );
+        assert_eq!(
+            names("count_least"),
+            [
+                "count of xs whose n is at least $input.z",
+                "xs[]",
+                "$input.z"
+            ]
+        );
+        assert_eq!(names("for_in"), ["$params.l", "xs[]"]);
+        assert_eq!(names("for_least"), ["$params.z", "xs[]"]);
     }
 
     #[test]

@@ -40056,6 +40056,13 @@
               ],
               "name": "x",
               "value": 1
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.k",
+              "value": null
             }
           ],
           "passed": false,
@@ -40088,6 +40095,13 @@
               ],
               "name": "x",
               "value": 2
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.k",
+              "value": null
             }
           ],
           "passed": false,

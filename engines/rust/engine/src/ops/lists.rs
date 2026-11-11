@@ -321,6 +321,48 @@ fn walked_read(walk: Walked, inputs: Vec<Input>) -> RightRead {
     }
 }
 
+fn read_list_right(check: &Check) -> Option<(&Right, bool)> {
+    match check {
+        Check::In(check) => Some((&check.values, true)),
+        Check::Contains(check) => match &check.wanted {
+            Wanted::One(right) => Some((right, false)),
+            Wanted::All(right) | Wanted::Some(right) => Some((right, true)),
+        },
+        Check::Matches(check) => Some((&check.patterns, true)),
+        _ => None,
+    }
+}
+
+fn named(path: &Path) -> bool {
+    path.steps.iter().any(|step| match step {
+        Step::Field(_) => true,
+        Step::Ref(reference) => matches!(reference.start, Start::Alias(_)),
+        _ => false,
+    })
+}
+
+pub(super) fn ref_inputs(check: &Check, ctx: &Ctx, params_too: bool) -> Vec<Input> {
+    let Some((right, walks)) = read_list_right(check) else {
+        return Vec::new();
+    };
+    right
+        .ref_paths()
+        .into_iter()
+        .filter(|path| !named(path) && (params_too || matches!(path.start, Start::Input)))
+        .flat_map(|path| read_right(&Right::Ref(path.clone()), ctx, walks).inputs)
+        .collect()
+}
+
+pub(super) fn named_refs(check: &Check) -> Vec<&Path> {
+    read_list_right(check).map_or_else(Vec::new, |(right, _)| {
+        right
+            .ref_paths()
+            .into_iter()
+            .filter(|path| named(path))
+            .collect()
+    })
+}
+
 fn read_right(right: &Right, ctx: &Ctx, walks: bool) -> RightRead {
     match right {
         Right::Written(value) => RightRead {
@@ -329,32 +371,21 @@ fn read_right(right: &Right, ctx: &Ctx, walks: bool) -> RightRead {
             inputs: Vec::new(),
             forced: None,
         },
-        Right::Ref(path) => match walked(path, ctx).filter(|_| walks) {
-            Some(walk) => walked_read(walk, Vec::new()),
-            None => {
-                let read = read_path(path, ctx);
-                let outcome = if !walks && input_one_path(path, ctx) {
-                    Outcome::NotAnObject
-                } else {
-                    read.outcome
-                };
-                RightRead {
-                    outcome,
-                    value: read.value,
-                    inputs: read.inputs.into_iter().skip(1).collect(),
-                    forced: None,
-                }
-            }
-        },
-        Right::Field(path) => match walked(path, ctx).filter(|_| walks) {
+        Right::Ref(path) | Right::Field(path) => match walked(path, ctx).filter(|_| walks) {
             Some(walk) => {
                 let input = walk.input();
                 walked_read(walk, vec![input])
             }
             None => {
                 let read = read_path(path, ctx);
+                let outcome =
+                    if matches!(right, Right::Ref(_)) && !walks && input_one_path(path, ctx) {
+                        Outcome::NotAnObject
+                    } else {
+                        read.outcome
+                    };
                 RightRead {
-                    outcome: read.outcome,
+                    outcome,
                     value: read.value,
                     inputs: read.inputs,
                     forced: None,
@@ -1262,7 +1293,7 @@ mod tests {
     }
 
     #[test]
-    fn a_field_on_the_right_is_an_input_and_a_ref_is_not() {
+    fn a_field_and_a_ref_on_the_right_are_both_inputs() {
         let field = In {
             path: x(),
             values: Right::Field(key_path(Start::Subject, &["ys"])),
@@ -1284,7 +1315,7 @@ mod tests {
             run_in(&reference, ctx)
         });
         assert_eq!(v.cause, Cause::Satisfied);
-        assert_eq!(names(v), ["x"]);
+        assert_eq!(names(v), ["x", "$params.k"]);
     }
 
     #[test]
@@ -1305,6 +1336,51 @@ mod tests {
             .cause,
             Cause::Null
         );
+    }
+
+    #[test]
+    fn a_ref_after_in_contains_and_matches_is_listed_after_the_field_whatever_the_cause() {
+        let ref_k = || Right::Ref(key_path(Start::Params, &["k"]));
+        let names = |v: Verdict| v.inputs.into_iter().map(|i| i.name).collect::<Vec<_>>();
+        let subjects_and_params = [
+            (json!({"x": "a"}), json!({"k": ["a"]})),
+            (json!({"x": "a"}), json!({"k": "text"})),
+            (json!({"x": ["a"]}), json!({})),
+            (json!({"x": ["a"]}), json!({"k": null})),
+            (json!({}), json!({"k": ["a"]})),
+            (json!({"x": null}), json!({"k": ["a"]})),
+        ];
+        for (subject, params) in subjects_and_params {
+            let in_check = In {
+                path: x(),
+                values: ref_k(),
+                not: false,
+            };
+            let contains_check = Contains {
+                path: x(),
+                wanted: Wanted::All(ref_k()),
+                not: false,
+            };
+            let matches_check = Matches {
+                path: x(),
+                patterns: ref_k(),
+                not: false,
+            };
+            let verdicts = [
+                on(subject.clone(), Some(params.clone()), |ctx| {
+                    run_in(&in_check, ctx)
+                }),
+                on(subject.clone(), Some(params.clone()), |ctx| {
+                    run_contains(&contains_check, ctx)
+                }),
+                on(subject.clone(), Some(params.clone()), |ctx| {
+                    run_matches(&matches_check, ctx)
+                }),
+            ];
+            for verdict in verdicts {
+                assert_eq!(names(verdict), ["x", "$params.k"]);
+            }
+        }
     }
 
     fn contains(subject: Value, wanted: Wanted, not: bool) -> Cause {
