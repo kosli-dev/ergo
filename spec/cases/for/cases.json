@@ -30049,5 +30049,547 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line whose second item is a list from the params and whose whose reads the first item: with a list item with no v",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "s": {
+          "from": "rows",
+          "identified_by": "name"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "c": {
+              "for": "every items as i, every $params.l whose v is at least i.t as x",
+              "assert": "x.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "l": [
+        {
+          "w": 1
+        }
+      ]
+    },
+    "cases": [
+      {
+        "description": "an item whose t can't be read and a list whose item has no v: the cause is unusable, not absent",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "rows": [
+            {
+              "name": "n",
+              "items": [
+                {
+                  "t": "s"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of $params.l",
+                    "locations": [
+                      "$params:/l/0"
+                    ],
+                    "path": "item 1 of $params.l",
+                    "value": {
+                      "w": 1
+                    }
+                  }
+                ],
+                "item": "item 1 of items",
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "t": "s"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l/0"
+                ],
+                "name": "$params.l[]",
+                "value": [
+                  {
+                    "w": 1
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "t": "s"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of items: i.t is \"s\", which isn't a number; item 1 of items: item 1 of $params.l is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "n",
+              "type": "s"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an item whose t can be read and a list whose item has no v: the cause stays absent",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "rows": [
+            {
+              "name": "n",
+              "items": [
+                {
+                  "t": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of $params.l",
+                    "locations": [
+                      "$params:/l/0"
+                    ],
+                    "path": "item 1 of $params.l",
+                    "value": {
+                      "w": 1
+                    }
+                  }
+                ],
+                "item": "item 1 of items",
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "t": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l/0"
+                ],
+                "name": "$params.l[]",
+                "value": [
+                  {
+                    "w": 1
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "t": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of items: item 1 of $params.l is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "n",
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose second item is a list from the params and whose whose reads the first item: with a list item whose v is null",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "s": {
+          "from": "rows",
+          "identified_by": "name"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "c": {
+              "for": "every items as i, every $params.l whose v is at least i.t as x",
+              "assert": "x.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "l": [
+        {
+          "v": null
+        }
+      ]
+    },
+    "cases": [
+      {
+        "description": "an item whose t can't be read and a list whose item has a null v: the cause is unusable, not null",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "rows": [
+            {
+              "name": "n",
+              "items": [
+                {
+                  "t": "s"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "null",
+                    "item": "item 1 of $params.l",
+                    "locations": [
+                      "$params:/l/0"
+                    ],
+                    "path": "item 1 of $params.l",
+                    "value": {
+                      "v": null
+                    }
+                  }
+                ],
+                "item": "item 1 of items",
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "t": "s"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l/0"
+                ],
+                "name": "$params.l[]",
+                "value": [
+                  {
+                    "v": null
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "t": "s"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of items: i.t is \"s\", which isn't a number; item 1 of items: item 1 of $params.l is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "n",
+              "type": "s"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an item whose t can be read and a list whose item has a null v: the cause stays null",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "rows": [
+            {
+              "name": "n",
+              "items": [
+                {
+                  "t": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "null",
+                    "item": "item 1 of $params.l",
+                    "locations": [
+                      "$params:/l/0"
+                    ],
+                    "path": "item 1 of $params.l",
+                    "value": {
+                      "v": null
+                    }
+                  }
+                ],
+                "item": "item 1 of items",
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "t": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l/0"
+                ],
+                "name": "$params.l[]",
+                "value": [
+                  {
+                    "v": null
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "t": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of items: item 1 of $params.l is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "n",
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose second item is a list from the params and whose whose reads the first item: with an empty list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "s": {
+          "from": "rows",
+          "identified_by": "name"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "c": {
+              "for": "every items as i, every $params.l whose v is at least i.t as x",
+              "assert": "x.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "l": []
+    },
+    "cases": [
+      {
+        "description": "an item whose t can't be read and an empty list: the cause is unusable",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "rows": [
+            {
+              "name": "n",
+              "items": [
+                {
+                  "t": "s"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "$params.l",
+                "locations": [
+                  "$params:/l"
+                ],
+                "path": "$params.l",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.l[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "t": "s"
+                  }
+                ]
+              }
+            ],
+            "message": "$params.l is []; item 1 of items: i.t is \"s\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "n",
+              "type": "s"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an item whose t can be read and an empty list: the cause stays value",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "rows": [
+            {
+              "name": "n",
+              "items": [
+                {
+                  "t": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "$params.l",
+                "locations": [
+                  "$params:/l"
+                ],
+                "path": "$params.l",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.l[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "t": 1
+                  }
+                ]
+              }
+            ],
+            "message": "$params.l is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "n",
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

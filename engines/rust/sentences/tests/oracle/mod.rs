@@ -947,6 +947,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("q.x", "q.x"),
     ("r.x", "r.x"),
     ("releases", "releases"),
+    ("rows", "rows"),
     (
         "releases whose every files.path matches \"^docs/\"",
         "releases whose every files.path matches \"^docs/\"",

@@ -11798,6 +11798,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every items as i, every $params.l whose v is at least i.t as x",
+        "every items as i, every $params.l whose v is at least i.t as x",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
