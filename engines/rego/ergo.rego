@@ -10687,7 +10687,7 @@ _for_second_rooted(rr, xs) := object.union(rr, {"cause": _worst_of({rr.cause} | 
 	rr.cause == "value"
 } else := object.union(rr, {"root_msgs": [m | some x in xs; some m in x.ms]}) if {
 	rr.cause == _worst_of({x.fl | some x in xs})
-} else := object.union(rr, {"other_roots": [m | some x in xs; some m in x.ms]})
+} else := object.union(rr, {"cause": _worst_of({rr.cause} | {x.fl | some x in xs}), "other_roots": [m | some x in xs; some m in x.ms]})
 
 _for_list_failures(r) if {
 	r.cause != "satisfied"
@@ -10704,7 +10704,13 @@ _for_rooted_row(check, subj, r) := object.union(r, {"cause": _worst_of({flaw, r.
 	flaw != ""
 	ms := _walk_root_msgs(check, subj)
 	ms != []
-} else := _rooted_row(check, subj, r)
+} else := _for_worse_root(check, subj, _rooted_row(check, subj, r))
+
+_for_worse_root(check, subj, rr) := object.union(rr, {"cause": _worst_of({rr.cause, flaw})}) if {
+	"other_roots" in object.keys(rr)
+	flaw := _walk_root_flaw(check, subj)
+	flaw != ""
+} else := rr
 
 _for_second_roots(check, subj) := [{"fl": fl, "ms": ms, "raw": [_m_aliased(m) | some m in _m_cond_root_texts(subj, c) with input as {"ergo/names": names}]} |
 	count(check.items) == 2
@@ -10727,7 +10733,7 @@ _for_second_roots(check, subj) := [{"fl": fl, "ms": ms, "raw": [_m_aliased(m) | 
 _for_row_message(check, subj, r) := _m_joined(array.concat(once, [t | some t in split(_for_item_text(check, subj, r, once), "; "); t != ""; not t in once])) if {
 	rs := object.get(r, "root_msgs", object.get(r, "other_roots", []))
 	second := {m | some x in _for_second_roots(check, subj); some m in x.ms}
-	once := _once(array.concat(array.concat(array.concat([m | some m in rs; not m in second], _for_free_texts(check, r)), _for_hoisted_texts(check, r)), [m | some m in rs; m in second]))
+	once := _once(array.concat(array.concat(array.concat([m | some m in rs; not m in second], [t | some p in _for_free_texts(check, r); t := _m_unskipped(p, rs); t != ""]), _for_hoisted_texts(check, r)), [m | some m in rs; m in second]))
 	once != []
 } else := _for_message(check, subj, r)
 
@@ -13188,7 +13194,7 @@ else := object.union(r, {"ergo/keys": _for_root_keys(r)}) if {
 
 _for_rooted_part(p) := _rooted_side(p) if is_array(p)
 
-else := object.union(object.remove(p, ["whose"]), object.union({f: _rooted_side(p[f]) | some f in ["count_of", "sum_of"]; is_array(object.get(p, f, null))}, {"ergo/whose": count(object.get(p, "whose", [])) > 0})) if is_object(p)
+else := object.union(object.remove(p, ["whose"]), {f: _rooted_side(p[f]) | some f in ["count_of", "sum_of"]; is_array(object.get(p, f, null))}) if is_object(p)
 
 else := p
 
@@ -13215,30 +13221,27 @@ _for_root_key(step) := [concat("", ["$", step.named_by])] if {
 	not startswith(step.named_by, "$")
 }
 
-_tally_root(c, p) := ys[0] if {
+_tally_root(c, p) if {
 	object.get(c, "ergo/for", false) == true
-	ys := [y |
-		some f in ["left", "right"]
-		y := object.get(c, f, null)
-		is_object(y)
-		some g in ["count_of", "sum_of"]
-		object.get(y, g, null) == p
-	]
-	count(ys) > 0
+	some f in ["left", "right"]
+	y := object.get(c, f, null)
+	is_object(y)
+	some g in ["count_of", "sum_of"]
+	object.get(y, g, null) == p
 }
 
-_tally_root_fault(subj, c, p) := [x | some x in _tally_steps(subj, _as_subject_part(p), object.get(y, "ergo/whose", false)); not x.go][0] if {
-	y := _tally_root(c, p)
+_tally_root_fault(subj, c, p) := [x | some x in _tally_steps(subj, _as_subject_part(p)); not x.go][0] if {
+	_tally_root(c, p)
 	p[0] == _root_marker
 } else := {"state": "unusable", "msg": _m_isnt(_root_label(p), v, k)} if {
-	y := _tally_root(c, p)
+	_tally_root(c, p)
 	v := _root_value(subj, p)
-	k := _tally_kind(v, object.get(y, "ergo/whose", false), true)
+	k := _tally_kind(v, true)
 }
 
-_tally_steps(subj, shown, whose) := [_tally_step(subj, array.slice(shown, 0, j), j == count(shown), whose) | some j in numbers.range(2, count(shown))]
+_tally_steps(subj, shown) := [_tally_step(subj, array.slice(shown, 0, j), j == count(shown)) | some j in numbers.range(2, count(shown))]
 
-_tally_step(subj, pre, last, whose) := {"state": "", "go": false} if {
+_tally_step(subj, pre, last) := {"state": "", "go": false} if {
 	not type_name(pre[count(pre) - 1]) in {"string", "number"}
 } else := {"state": st, "msg": concat("", [_input_name(pre), " is ", _m_state_word(st)]), "go": false} if {
 	st := _any_read_state(subj, pre)
@@ -13247,16 +13250,15 @@ _tally_step(subj, pre, last, whose) := {"state": "", "go": false} if {
 	is_array(_value_at(subj, pre))
 } else := {"state": "unusable", "msg": _m_isnt(_input_name(pre), v, k), "go": false} if {
 	v := _value_at(subj, pre)
-	k := _tally_kind(v, whose, last)
+	k := _tally_kind(v, last)
 } else := {"state": "", "go": false} if last
 
 else := {"state": "", "go": true}
 
-_tally_kind(v, whose, last) := "a list or an object" if not type_name(v) in {"array", "object"}
+_tally_kind(v, last) := "a list or an object" if not type_name(v) in {"array", "object"}
 
 else := "a list" if {
 	is_object(v)
-	whose == true
 	last == true
 }
 

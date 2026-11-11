@@ -19957,7 +19957,7 @@
         "compliant": false,
         "results": [
           {
-            "cause": "absent",
+            "cause": "unusable",
             "check": "c",
             "failed_items": [
               {
@@ -23909,6 +23909,17 @@
           {"cause": "unusable", "check": "key_z", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "message": "z is 3, which isn't text", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "sum_z", "failed_items": [], "inputs": [{"locations": [], "name": "sum of z", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": [], "name": "z", "value": []}], "message": "z is 3, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
         ]
+      },
+      {
+        "description": "fails on an empty list when the field is an object, and says what it says with items",
+        "rules": ["for.roots", "for.flaws"],
+        "input": {"prs": [{"id": "p0", "z": {"a": 1}, "xs": []}]},
+        "results": [
+          {"cause": "unusable", "check": "count_z", "failed_items": [], "inputs": [{"locations": [], "name": "count of z", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": [], "name": "z", "value": []}], "message": "z is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "is_z", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "key_z", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't text", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "sum_z", "failed_items": [], "inputs": [{"locations": [], "name": "sum of z", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": [], "name": "z", "value": []}], "message": "z is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
       }
     ]
   },
@@ -23939,6 +23950,17 @@
         ]
       },
       {
+        "description": "names a field that is an object once, with no item in front",
+        "rules": ["for.roots", "for.flaws"],
+        "input": {"prs": [{"id": "p0", "z": {"a": 1}, "xs": [{"v": 1, "t": {"a": 1}}, {"v": 2, "t": {"a": 2}}]}]},
+        "results": [
+          {"cause": "unusable", "check": "count_z", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of z is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "count of z", "value": null}, {"locations": [], "name": "z", "value": []}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"t": {"a": 1}, "v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "count of z is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "count of z", "value": null}, {"locations": [], "name": "z", "value": []}]}], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"t": {"a": 2}, "v": 2}}], "inputs": [{"locations": [], "name": "count of z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"t": {"a": 1}, "v": 1}, {"t": {"a": 2}, "v": 2}]}, {"locations": [], "name": "z", "value": []}], "message": "z is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "is_z", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "z is 1", "cause": "unusable", "inputs": [{"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"t": {"a": 1}, "v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "z is 1", "cause": "unusable", "inputs": [{"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}]}], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"t": {"a": 2}, "v": 2}}], "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"t": {"a": 1}, "v": 1}, {"t": {"a": 2}, "v": 2}]}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "key_z", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m.t named by z is 1", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/0/t"], "name": "m.t named by z", "value": null}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"t": {"a": 1}, "v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "m.t named by z is 1", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/1/t"], "name": "m.t named by z", "value": null}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}]}], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"t": {"a": 2}, "v": 2}}], "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"t": {"a": 1}, "v": 1}, {"t": {"a": 2}, "v": 2}]}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't text", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "sum_z", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "sum of z is 3", "cause": "unusable", "inputs": [{"locations": [], "name": "sum of z", "value": null}, {"locations": [], "name": "z", "value": []}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"t": {"a": 1}, "v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "sum of z is 3", "cause": "unusable", "inputs": [{"locations": [], "name": "sum of z", "value": null}, {"locations": [], "name": "z", "value": []}]}], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"t": {"a": 2}, "v": 2}}], "inputs": [{"locations": [], "name": "sum of z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"t": {"a": 1}, "v": 1}, {"t": {"a": 2}, "v": 2}]}, {"locations": [], "name": "z", "value": []}], "message": "z is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
         "description": "names the field first and then the empty list, with the worse cause",
         "rules": ["for.roots", "for.flaws"],
         "input": {"prs": [{"id": "p0", "z": 3, "xs": []}]},
@@ -23947,6 +23969,17 @@
           {"cause": "value", "check": "is_z", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "xs", "locations": ["/prs/0/xs"], "path": "xs", "value": []}], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "message": "xs is []", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "key_z", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "xs", "locations": ["/prs/0/xs"], "path": "xs", "value": []}], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "message": "z is 3, which isn't text; xs is []", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "sum_z", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "xs", "locations": ["/prs/0/xs"], "path": "xs", "value": []}], "inputs": [{"locations": [], "name": "sum of z", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": [], "name": "z", "value": []}], "message": "z is 3, which isn't a list or an object; xs is []", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "names a field that is an object first and then the empty list",
+        "rules": ["for.roots", "for.flaws"],
+        "input": {"prs": [{"id": "p0", "z": {"a": 1}, "xs": []}]},
+        "results": [
+          {"cause": "unusable", "check": "count_z", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "xs", "locations": ["/prs/0/xs"], "path": "xs", "value": []}], "inputs": [{"locations": [], "name": "count of z", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": [], "name": "z", "value": []}], "message": "z is {\"a\": 1}, which isn't a list; xs is []", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "is_z", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "xs", "locations": ["/prs/0/xs"], "path": "xs", "value": []}], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't a number; xs is []", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "key_z", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "xs", "locations": ["/prs/0/xs"], "path": "xs", "value": []}], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't text; xs is []", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "sum_z", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "xs", "locations": ["/prs/0/xs"], "path": "xs", "value": []}], "inputs": [{"locations": [], "name": "sum of z", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": [], "name": "z", "value": []}], "message": "z is {\"a\": 1}, which isn't a list; xs is []", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
         ]
       }
     ]
@@ -23978,6 +24011,19 @@
           {"cause": "null", "check": "count_p", "failed_items": [], "inputs": [{"locations": [], "name": "count of pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": [], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": []}, {"locations": [], "name": "xs[]", "value": []}], "message": "pl.z is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "absent", "check": "is_i", "failed_items": [], "inputs": [{"locations": ["/top"], "name": "$input.top.q", "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "$input.top.q is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "null", "check": "is_p", "failed_items": [], "inputs": [{"locations": ["/prs/0/c/z"], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "pl.z is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "is_q", "failed_items": [], "inputs": [{"locations": ["$params:/q"], "name": "$params.q", "value": "s"}, {"locations": [], "name": "xs[]", "value": []}], "message": "$params.q is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "sum_q", "failed_items": [], "inputs": [{"locations": [], "name": "$params.q", "value": []}, {"locations": [], "name": "sum of $params.q", "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "$params.q is \"s\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "fails on an empty list when the part's field or $input's is an object",
+        "rules": ["for.roots", "for.flaws"],
+        "input": {"prs": [{"id": "p0", "c": {"z": {"a": 1}}, "xs": []}], "top": {"q": {"a": 1}}},
+        "results": [
+          {"cause": "unusable", "check": "count_i", "failed_items": [], "inputs": [{"locations": [], "name": "$input.top.q", "value": []}, {"locations": [], "name": "count of $input.top.q", "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "$input.top.q is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "count_p", "failed_items": [], "inputs": [{"locations": [], "name": "count of pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": [], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": []}, {"locations": [], "name": "xs[]", "value": []}], "message": "pl.z is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "is_i", "failed_items": [], "inputs": [{"locations": ["/top/q"], "name": "$input.top.q", "value": {"a": 1}}, {"locations": [], "name": "xs[]", "value": []}], "message": "$input.top.q is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "is_p", "failed_items": [], "inputs": [{"locations": ["/prs/0/c/z"], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": {"a": 1}}, {"locations": [], "name": "xs[]", "value": []}], "message": "pl.z is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "is_q", "failed_items": [], "inputs": [{"locations": ["$params:/q"], "name": "$params.q", "value": "s"}, {"locations": [], "name": "xs[]", "value": []}], "message": "$params.q is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "sum_q", "failed_items": [], "inputs": [{"locations": [], "name": "$params.q", "value": []}, {"locations": [], "name": "sum of $params.q", "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "$params.q is \"s\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
         ]
@@ -24038,6 +24084,67 @@
           {"cause": "satisfied", "check": "count_whose", "failed_items": [], "inputs": [{"locations": ["/prs/0/w/0"], "name": "count of w whose z is 1", "value": 1}, {"locations": ["/prs/0/w/0"], "name": "w[]", "value": [{"z": 1}]}, {"locations": [], "name": "xs[]", "value": []}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "satisfied", "check": "count_wz", "failed_items": [], "inputs": [{"locations": ["/prs/0/w/0/z"], "name": "count of w.z", "value": 1}, {"locations": ["/prs/0/w/0/z"], "name": "w[].z", "value": [1]}, {"locations": [], "name": "xs[]", "value": []}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "satisfied", "check": "sum_wz", "failed_items": [], "inputs": [{"locations": ["/prs/0/w/0/z"], "name": "sum of w.z", "value": 1}, {"locations": ["/prs/0/w/0/z"], "name": "w[].z", "value": [1]}, {"locations": [], "name": "xs[]", "value": []}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "names an object at the end of the path, with or without a whose",
+        "rules": ["for.roots", "for.flaws"],
+        "input": {"prs": [{"id": "p0", "w": {"z": {"a": 1}}, "xs": []}]},
+        "results": [
+          {"cause": "unusable", "check": "count_whose", "failed_items": [], "inputs": [{"locations": [], "name": "count of w whose z is 1", "value": null}, {"locations": [], "name": "w", "value": []}, {"locations": [], "name": "xs[]", "value": []}], "message": "w is {\"z\": {\"a\": 1}}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "count_wz", "failed_items": [], "inputs": [{"locations": [], "name": "count of w.z", "value": null}, {"locations": [], "name": "w.z", "value": []}, {"locations": [], "name": "xs[]", "value": []}], "message": "w.z is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "sum_wz", "failed_items": [], "inputs": [{"locations": [], "name": "sum of w.z", "value": null}, {"locations": [], "name": "w.z", "value": []}, {"locations": [], "name": "xs[]", "value": []}], "message": "w.z is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with if any whose sentence counts an object read from $params or from an alias of an earlier line",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"count_q": {"for": "every xs, if any, as m", "assert": "count of $params.q is 1"}, "sum_q": {"for": "every xs, if any, as m", "assert": "sum of $params.q is 1"}, "count_k": {"for": "every ks as k, every xs, if any, as m", "assert": "count of k is 1"}}}}},
+    "params": {"q": {"a": 1}},
+    "cases": [
+      {
+        "description": "fails on an empty list, as it does with items",
+        "rules": ["for.roots", "for.flaws"],
+        "input": {"prs": [{"id": "p0", "ks": [{"a": 1}], "xs": []}]},
+        "results": [
+          {"cause": "unusable", "check": "count_k", "failed_items": [], "inputs": [{"locations": ["/prs/0/ks/0"], "name": "ks[]", "value": [{"a": 1}]}, {"locations": [], "name": "xs[]", "value": []}], "message": "item 1 of ks: k is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "count_q", "failed_items": [], "inputs": [{"locations": [], "name": "$params.q", "value": []}, {"locations": [], "name": "count of $params.q", "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "$params.q is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "sum_q", "failed_items": [], "inputs": [{"locations": [], "name": "$params.q", "value": []}, {"locations": [], "name": "sum of $params.q", "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "$params.q is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "with items",
+        "rules": ["for.roots", "for.flaws"],
+        "input": {"prs": [{"id": "p0", "ks": [{"a": 1}], "xs": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "unusable", "check": "count_k", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of k is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "count of k", "value": null}, {"locations": [], "name": "k", "value": []}]}], "item": "item 1 of ks", "locations": ["/prs/0/ks/0"], "path": "item 1 of ks", "value": {"a": 1}}], "inputs": [{"locations": ["/prs/0/ks/0"], "name": "ks[]", "value": [{"a": 1}]}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "item 1 of ks: k is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "count_q", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of $params.q is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "count of $params.q", "value": null}, {"locations": [], "name": "$params.q", "value": []}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "count of $params.q is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "count of $params.q", "value": null}, {"locations": [], "name": "$params.q", "value": []}]}], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"v": 2}}], "inputs": [{"locations": [], "name": "$params.q", "value": []}, {"locations": [], "name": "count of $params.q", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "$params.q is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "sum_q", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "sum of $params.q is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "sum of $params.q", "value": null}, {"locations": [], "name": "$params.q", "value": []}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "sum of $params.q is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "sum of $params.q", "value": null}, {"locations": [], "name": "$params.q", "value": []}]}], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"v": 2}}], "inputs": [{"locations": [], "name": "$params.q", "value": []}, {"locations": [], "name": "sum of $params.q", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "$params.q is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose sentence counts two subject fields that can't be counted",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"both": {"for": "every ys as m", "assert": "count of zb is count of za"}, "both_if_any": {"for": "every ys, if any, as m", "assert": "count of zb is count of za"}}}}},
+    "cases": [
+      {
+        "description": "names each field once, and not again after them, with items",
+        "rules": ["for.roots", "for.flaws"],
+        "input": {"prs": [{"id": "p0", "zb": "s", "za": 3, "ys": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "unusable", "check": "both", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of zb equals count of za", "cause": "unusable", "inputs": [{"locations": [], "name": "count of zb", "value": null}, {"locations": [], "name": "zb", "value": []}, {"locations": [], "name": "count of za", "value": null}, {"locations": [], "name": "za", "value": []}]}], "item": "item 1 of ys", "locations": ["/prs/0/ys/0"], "path": "item 1 of ys", "value": {"v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "count of zb equals count of za", "cause": "unusable", "inputs": [{"locations": [], "name": "count of zb", "value": null}, {"locations": [], "name": "zb", "value": []}, {"locations": [], "name": "count of za", "value": null}, {"locations": [], "name": "za", "value": []}]}], "item": "item 2 of ys", "locations": ["/prs/0/ys/1"], "path": "item 2 of ys", "value": {"v": 2}}], "inputs": [{"locations": [], "name": "count of za", "value": null}, {"locations": [], "name": "count of zb", "value": null}, {"locations": ["/prs/0/ys/0", "/prs/0/ys/1"], "name": "ys[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": [], "name": "za", "value": []}, {"locations": [], "name": "zb", "value": []}], "message": "za is 3, which isn't a list or an object; zb is \"s\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "both_if_any", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of zb equals count of za", "cause": "unusable", "inputs": [{"locations": [], "name": "count of zb", "value": null}, {"locations": [], "name": "zb", "value": []}, {"locations": [], "name": "count of za", "value": null}, {"locations": [], "name": "za", "value": []}]}], "item": "item 1 of ys", "locations": ["/prs/0/ys/0"], "path": "item 1 of ys", "value": {"v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "count of zb equals count of za", "cause": "unusable", "inputs": [{"locations": [], "name": "count of zb", "value": null}, {"locations": [], "name": "zb", "value": []}, {"locations": [], "name": "count of za", "value": null}, {"locations": [], "name": "za", "value": []}]}], "item": "item 2 of ys", "locations": ["/prs/0/ys/1"], "path": "item 2 of ys", "value": {"v": 2}}], "inputs": [{"locations": [], "name": "count of za", "value": null}, {"locations": [], "name": "count of zb", "value": null}, {"locations": ["/prs/0/ys/0", "/prs/0/ys/1"], "name": "ys[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": [], "name": "za", "value": []}, {"locations": [], "name": "zb", "value": []}], "message": "za is 3, which isn't a list or an object; zb is \"s\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "names each field once on an empty list",
+        "rules": ["for.roots", "for.flaws"],
+        "input": {"prs": [{"id": "p0", "zb": "s", "za": 3, "ys": []}]},
+        "results": [
+          {"cause": "unusable", "check": "both", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "ys", "locations": ["/prs/0/ys"], "path": "ys", "value": []}], "inputs": [{"locations": [], "name": "count of za", "value": null}, {"locations": [], "name": "count of zb", "value": null}, {"locations": [], "name": "ys[]", "value": []}, {"locations": [], "name": "za", "value": []}, {"locations": [], "name": "zb", "value": []}], "message": "za is 3, which isn't a list or an object; zb is \"s\", which isn't a list or an object; ys is []", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "both_if_any", "failed_items": [], "inputs": [{"locations": [], "name": "count of za", "value": null}, {"locations": [], "name": "count of zb", "value": null}, {"locations": [], "name": "ys[]", "value": []}, {"locations": [], "name": "za", "value": []}, {"locations": [], "name": "zb", "value": []}], "message": "za is 3, which isn't a list or an object; zb is \"s\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
         ]
       }
     ]
@@ -24113,6 +24220,14 @@
         "input": {"prs": [{"id": "p0", "xs": [{"v": 1}, {"v": 3}]}]},
         "results": [
           {"cause": "absent", "check": "line", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "m.v is 2", "cause": "value", "inputs": [{"locations": ["/prs/0/xs/0/v"], "name": "m.v", "value": 1}]}, {"assertion": "m.v is at least z", "cause": "absent", "inputs": [{"locations": ["/prs/0/xs/0/v"], "name": "m.v", "value": 1}, {"locations": ["/prs/0"], "name": "z", "value": null}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}, {"cause": "absent", "failed_assertions": [{"assertion": "m.v is 2", "cause": "value", "inputs": [{"locations": ["/prs/0/xs/1/v"], "name": "m.v", "value": 3}]}, {"assertion": "m.v is at least z", "cause": "absent", "inputs": [{"locations": ["/prs/0/xs/1/v"], "name": "m.v", "value": 3}, {"locations": ["/prs/0"], "name": "z", "value": null}]}], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"v": 3}}], "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 3}]}, {"locations": ["/prs/0"], "name": "z", "value": null}], "message": "z is missing; item 1 of xs: m.v is 1; item 2 of xs: m.v is 3", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "fails as unusable when the root is of the wrong type and the item's field is null, since unusable is the worse cause",
+        "rules": ["for.flaws", "message.items"],
+        "input": {"prs": [{"id": "p0", "z": "s", "xs": [{"v": null}]}]},
+        "results": [
+          {"cause": "unusable", "check": "line", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "m.v is 2", "cause": "null", "inputs": [{"locations": ["/prs/0/xs/0/v"], "name": "m.v", "value": null}]}, {"assertion": "m.v is at least z", "cause": "null", "inputs": [{"locations": ["/prs/0/xs/0/v"], "name": "m.v", "value": null}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": null}}], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": null}]}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number; item 1 of xs: m.v is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
         ]
       }
     ]

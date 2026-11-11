@@ -7923,6 +7923,20 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("sum of $params.q is 3", "sum of $params.q is 3", &[], &[]),
     ("sum of w.z is 1", "sum of w.z is 1", &[], &[]),
     ("sum of z is 3", "sum of z is 3", &[], &[]),
+    (
+        "count of $params.q is 1",
+        "count of $params.q is 1",
+        &[],
+        &[],
+    ),
+    ("count of k is 1", "count of k is 1", &[], &[]),
+    (
+        "count of zb is count of za",
+        "count of zb equals count of za",
+        &[],
+        &[],
+    ),
+    ("sum of $params.q is 1", "sum of $params.q is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -11717,6 +11731,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every xs, if any, as m", "every xs, if any, as m", &[], &[]),
+    ("every ys, if any, as m", "every ys, if any, as m", &[], &[]),
     (
         "every ks as k, every xs, if any, as m",
         "every ks as k, every xs, if any, as m",
