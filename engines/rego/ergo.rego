@@ -12966,7 +12966,9 @@ _m_root_texts_all(subj, c) := _once([m |
 	some m in _m_root_texts(subj, c, st)
 ])
 
-_m_for_root_text(subj, c, p, st) := _m_isnt(_root_label(p), _root_value(subj, p), k) if k := _root_kind(subj, c, p)
+_m_for_root_text(subj, c, p, st) := f.msg if {
+	f := _tally_root_fault(subj, c, p)
+} else := _m_isnt(_root_label(p), _root_value(subj, p), k) if k := _root_kind(subj, c, p)
 
 else := _message({"op": "present", "path": _as_subject_part(p)}, subj, st)
 
@@ -13033,6 +13035,8 @@ _presence_path(c, x) if {
 _root_state(subj, c, p, lists) := "not_an_object" if {
 	_input_one_root(c, p)
 	is_array(data.ergo_document)
+} else := f.state if {
+	f := _tally_root_fault(subj, c, p)
 } else := "unusable" if {
 	_root_kind(subj, c, p)
 } else := _any_read_state(subj, _as_subject_part(p)) if {
@@ -13071,6 +13075,16 @@ _root_kind(subj, c, p) := _m_right_kind(cmp, v) if {
 	_keys_by(c, p)
 	_ref_state(p) == "value"
 	not is_string(_ref_read(p))
+} else := "text" if {
+	p in object.get(c, "ergo/keys", [])
+	not is_string(_root_value(subj, p))
+} else := _m_kind(w) if {
+	object.get(c, "ergo/for", false) == true
+	c.op == "equals"
+	c.path == p
+	w := _arg(c.value)
+	w != null
+	type_name(_root_value(subj, p)) != type_name(w)
 }
 
 _keys_by(c, p) if {
@@ -13168,13 +13182,83 @@ _for_read_once(_, path) if {
 
 _for_root_form(x, path) := object.union(x, {"ergo/for": true}) if "check" in path
 
-else := object.union(x, object.union(object.union({"ergo/for": true}, {f: _for_rooted_part(x[f]) | some f in ["left", "right", "path"]; f in object.keys(x)}), {f: {"ref": _root_fields(x[f].ref)} | some f in ["values", "patterns"]; _is_ref(object.get(x, f, null))}))
+else := object.union(r, {"ergo/keys": _for_root_keys(r)}) if {
+	r := object.union(x, object.union(object.union({"ergo/for": true}, {f: _for_rooted_part(x[f]) | some f in ["left", "right", "path"]; f in object.keys(x)}), {f: {"ref": _root_fields(x[f].ref)} | some f in ["values", "patterns"]; _is_ref(object.get(x, f, null))}))
+}
 
 _for_rooted_part(p) := _rooted_side(p) if is_array(p)
 
-else := object.remove(p, ["whose"]) if is_object(p)
+else := object.union(object.remove(p, ["whose"]), object.union({f: _rooted_side(p[f]) | some f in ["count_of", "sum_of"]; is_array(object.get(p, f, null))}, {"ergo/whose": count(object.get(p, "whose", [])) > 0})) if is_object(p)
 
 else := p
+
+_for_root_keys(x) := sort({k |
+	walk(x, [at, p])
+	not "whose" in at
+	is_array(p)
+	_for_keyed_path(at, p)
+	some step in p
+	k := _for_root_key(step)
+})
+
+_for_keyed_path(_, p) if _alias_start(p)
+
+_for_keyed_path(at, _) if at[count(at) - 1] in {"count_of", "sum_of"}
+
+_for_root_key(step) := [_root_marker, _fk(step)] if {
+	_field_step(step)
+	startswith(step.named_by_field, _root_key)
+}
+
+_for_root_key(step) := [concat("", ["$", step.named_by])] if {
+	_name_step(step)
+	not startswith(step.named_by, "$")
+}
+
+_tally_root(c, p) := ys[0] if {
+	object.get(c, "ergo/for", false) == true
+	ys := [y |
+		some f in ["left", "right"]
+		y := object.get(c, f, null)
+		is_object(y)
+		some g in ["count_of", "sum_of"]
+		object.get(y, g, null) == p
+	]
+	count(ys) > 0
+}
+
+_tally_root_fault(subj, c, p) := [x | some x in _tally_steps(subj, _as_subject_part(p), object.get(y, "ergo/whose", false)); not x.go][0] if {
+	y := _tally_root(c, p)
+	p[0] == _root_marker
+} else := {"state": "unusable", "msg": _m_isnt(_root_label(p), v, k)} if {
+	y := _tally_root(c, p)
+	v := _root_value(subj, p)
+	k := _tally_kind(v, object.get(y, "ergo/whose", false), true)
+}
+
+_tally_steps(subj, shown, whose) := [_tally_step(subj, array.slice(shown, 0, j), j == count(shown), whose) | some j in numbers.range(2, count(shown))]
+
+_tally_step(subj, pre, last, whose) := {"state": "", "go": false} if {
+	not type_name(pre[count(pre) - 1]) in {"string", "number"}
+} else := {"state": st, "msg": concat("", [_input_name(pre), " is ", _m_state_word(st)]), "go": false} if {
+	st := _any_read_state(subj, pre)
+	st in {"absent", "null"}
+} else := {"state": "", "go": false} if {
+	is_array(_value_at(subj, pre))
+} else := {"state": "unusable", "msg": _m_isnt(_input_name(pre), v, k), "go": false} if {
+	v := _value_at(subj, pre)
+	k := _tally_kind(v, whose, last)
+} else := {"state": "", "go": false} if last
+
+else := {"state": "", "go": true}
+
+_tally_kind(v, whose, last) := "a list or an object" if not type_name(v) in {"array", "object"}
+
+else := "a list" if {
+	is_object(v)
+	whose == true
+	last == true
+}
 
 _m_ref_first(m) if {
 	startswith(m, "$")

@@ -929,7 +929,7 @@
         "rules": ["path.field_step", "missing.pass", "message.alias"],
         "input": {"things": [{"id": "t", "ws": [[]]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "w[0] named by zz does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/ws/0"], "name": "w[0] named by zz", "value": null}, {"locations": ["/things/0"], "name": "zz", "value": null}]}], "item": "item 1 of ws", "locations": ["/things/0/ws/0"], "path": "item 1 of ws", "value": []}], "inputs": [{"locations": ["/things/0/ws/0"], "name": "ws[]", "value": [[]]}, {"locations": ["/things/0"], "name": "zz", "value": null}], "message": "item 1 of ws: zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "w[0] named by zz does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/ws/0"], "name": "w[0] named by zz", "value": null}, {"locations": ["/things/0"], "name": "zz", "value": null}]}], "item": "item 1 of ws", "locations": ["/things/0/ws/0"], "path": "item 1 of ws", "value": []}], "inputs": [{"locations": ["/things/0/ws/0"], "name": "ws[]", "value": [[]]}, {"locations": ["/things/0"], "name": "zz", "value": null}], "message": "zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
         ]
       },
       {
@@ -937,7 +937,7 @@
         "rules": ["path.field_step", "missing.pass", "message.alias"],
         "input": {"things": [{"id": "t", "ws": [[]], "zz": 3}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "w[0] named by zz does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/ws/0"], "name": "w[0] named by zz", "value": null}, {"locations": ["/things/0/zz"], "name": "zz", "value": 3}]}], "item": "item 1 of ws", "locations": ["/things/0/ws/0"], "path": "item 1 of ws", "value": []}], "inputs": [{"locations": ["/things/0/ws/0"], "name": "ws[]", "value": [[]]}, {"locations": ["/things/0/zz"], "name": "zz", "value": 3}], "message": "item 1 of ws: w[0] named by zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "w[0] named by zz does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/ws/0"], "name": "w[0] named by zz", "value": null}, {"locations": ["/things/0/zz"], "name": "zz", "value": 3}]}], "item": "item 1 of ws", "locations": ["/things/0/ws/0"], "path": "item 1 of ws", "value": []}], "inputs": [{"locations": ["/things/0/ws/0"], "name": "ws[]", "value": [[]]}, {"locations": ["/things/0/zz"], "name": "zz", "value": 3}], "message": "zz is 3, which isn't text; item 1 of ws: w[0] named by zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
         ]
       },
       {
