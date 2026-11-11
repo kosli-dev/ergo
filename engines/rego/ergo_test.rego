@@ -12668,7 +12668,7 @@ test_a_for_line_compares_a_bare_params_before_any_item_and_names_the_empty_list_
 	is_3 := {"c": {"for": "every xs as m", "assert": "$params is 3"}}
 	_root_rows(is_3, {"id": "p", "xs": []}, null).c == ["absent", "$params is missing; xs is []"]
 	_root_rows(is_3, {"id": "p", "xs": [{"v": 1}]}, null).c == ["absent", "$params is missing"]
-	_root_rows(is_3, {"id": "p", "xs": []}, {}).c == ["value", "xs is []"]
+	_root_rows(is_3, {"id": "p", "xs": []}, {}).c == ["unusable", "$params is {}, which isn't a number; xs is []"]
 	_root_rows(is_3, {"id": "p", "xs": []}, 3).c == ["unusable", "$params is 3, which isn't an object"]
 }
 

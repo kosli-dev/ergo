@@ -7901,6 +7901,42 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("$input.top.q is 1", "$input.top.q is 1", &[], &[]),
+    ("$params.q is 1", "$params.q is 1", &[], &[]),
+    (
+        "count of $input.top.q is 1",
+        "count of $input.top.q is 1",
+        &[],
+        &[],
+    ),
+    ("count of pl.z is 1", "count of pl.z is 1", &[], &[]),
+    (
+        "count of w whose z is 1 is 1",
+        "count of w whose z is 1 is 1",
+        &[],
+        &[],
+    ),
+    ("count of w.z is 1", "count of w.z is 1", &[], &[]),
+    ("count of z is 1", "count of z is 1", &[], &[]),
+    ("m.t named by k is 1", "m.t named by k is 1", &[], &[]),
+    ("m.t named by z is 1", "m.t named by z is 1", &[], &[]),
+    ("sum of $params.q is 3", "sum of $params.q is 3", &[], &[]),
+    ("sum of w.z is 1", "sum of w.z is 1", &[], &[]),
+    ("sum of z is 3", "sum of z is 3", &[], &[]),
+    (
+        "count of $params.q is 1",
+        "count of $params.q is 1",
+        &[],
+        &[],
+    ),
+    ("count of k is 1", "count of k is 1", &[], &[]),
+    (
+        "count of zb is count of za",
+        "count of zb equals count of za",
+        &[],
+        &[],
+    ),
+    ("sum of $params.q is 1", "sum of $params.q is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -11695,6 +11731,13 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every xs, if any, as m", "every xs, if any, as m", &[], &[]),
+    ("every ys, if any, as m", "every ys, if any, as m", &[], &[]),
+    (
+        "every ks as k, every xs, if any, as m",
+        "every ks as k, every xs, if any, as m",
+        &[],
+        &[],
+    ),
     (
         "every xs as m, every $params.q as x",
         "every xs as m, every $params.q as x",
@@ -11752,6 +11795,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every xs as p, first of xs whose k is p.k sorted by v as m",
         "every xs as p, first of xs whose k equals p.k sorted by v as m",
+        &[],
+        &[],
+    ),
+    (
+        "every items as i, every $params.l whose v is at least i.t as x",
+        "every items as i, every $params.l whose v is at least i.t as x",
         &[],
         &[],
     ),

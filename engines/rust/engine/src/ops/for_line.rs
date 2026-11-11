@@ -1590,11 +1590,16 @@ impl For {
             Named::Ahead(texts) => (texts, true),
         };
         let failed = !run.failed_items.is_empty();
+        let free: Vec<String> = if failed {
+            free.iter()
+                .map(|text| unskipped(text, &roots))
+                .filter(|text| !text.is_empty())
+                .collect()
+        } else {
+            Vec::new()
+        };
         let mut once: Vec<String> = Vec::new();
-        for text in roots
-            .into_iter()
-            .chain(if failed { free } else { Vec::new() })
-        {
+        for text in roots.into_iter().chain(free) {
             if !once.contains(&text) {
                 once.push(text);
             }
@@ -1666,7 +1671,7 @@ impl For {
             .collect();
         let outer = outer_ctx(ctx);
         let outer_flaw = super::message::root_flaw_in_for(&whose, &outer, &counted, &nested);
-        let forms: Vec<Check> = self
+        let forms: Vec<(Check, bool)> = self
             .sentences
             .iter()
             .flat_map(|s| root_forms(&s.check))
@@ -1727,6 +1732,7 @@ impl For {
             run.failed_items = Vec::new();
             Named::Roots(texts)
         } else {
+            run.verdict.cause = Cause::worst([cause, row]).unwrap_or(cause);
             Named::Ahead(texts)
         }
     }
@@ -1766,6 +1772,7 @@ impl For {
                 run.failed_items = Vec::new();
                 mode = Named::Roots(texts);
             } else {
+                run.verdict.cause = Cause::worst([cause, row]).unwrap_or(cause);
                 mode = Named::Ahead(texts);
             }
         }
@@ -1797,7 +1804,10 @@ impl For {
                     Named::Roots(second_texts)
                 }
                 Named::Plain if row == second => Named::Roots(second_texts),
-                Named::Plain => Named::Ahead(second_texts),
+                Named::Plain => {
+                    run.verdict.cause = Cause::worst([row, second]).unwrap_or(second);
+                    Named::Ahead(second_texts)
+                }
             };
         }
         if flawed {
@@ -1808,7 +1818,7 @@ impl For {
     }
 
     fn reads_a_flawed_root(&self, outer: &Ctx) -> bool {
-        let forms: Vec<Check> = self
+        let forms: Vec<(Check, bool)> = self
             .sentences
             .iter()
             .flat_map(|s| root_forms(&s.check))
@@ -1833,7 +1843,7 @@ impl For {
             return None;
         };
         let outer = outer_ctx(ctx);
-        let forms: Vec<Check> = self
+        let forms: Vec<(Check, bool)> = self
             .sentences
             .iter()
             .flat_map(|s| root_forms(&s.check))
@@ -2768,7 +2778,7 @@ fn rooted_right(right: &super::lists::Right) -> super::lists::Right {
     }
 }
 
-fn root_forms(check: &Check) -> Vec<Check> {
+fn root_forms(check: &Check) -> Vec<(Check, bool)> {
     use super::lists::{Contains, In, Matches, Wanted};
     let form = match check {
         Check::Compare(c) => Check::Compare(super::compare::Compare {
@@ -2825,7 +2835,7 @@ fn root_forms(check: &Check) -> Vec<Check> {
             right: t.right.as_ref().map(rooted_tally_side),
             ..t.clone()
         }),
-        Check::Walk(w) => (*w.check).clone(),
+        Check::Walk(w) => return vec![((*w.check).clone(), false)],
         Check::AnyOf(any) => {
             return any.options.iter().flatten().flat_map(root_forms).collect();
         }
@@ -2835,14 +2845,115 @@ fn root_forms(check: &Check) -> Vec<Check> {
         }),
         Check::For(_) => return Vec::new(),
     };
-    vec![form]
+    vec![(form, true)]
 }
 
 fn rooted_tally_side(side: &Side) -> Side {
     match side {
         Side::Plain(plain) => Side::Plain(rooted_side(plain)),
+        Side::Derived(derived) if derived.terms.len() == 1 => {
+            Side::Derived(super::tally::Derived {
+                terms: derived
+                    .terms
+                    .iter()
+                    .map(|term| match term {
+                        Term::Counted(counted) => Term::Counted(super::tally::Counted {
+                            path: rooted_path(&counted.path),
+                            ..counted.clone()
+                        }),
+                        other => other.clone(),
+                    })
+                    .collect(),
+                ..derived.clone()
+            })
+        }
         other => other.clone(),
     }
+}
+
+fn counts_root(check: &Check, root: &Path) -> bool {
+    let Check::Tally(tally) = check else {
+        return false;
+    };
+    std::iter::once(&tally.left)
+        .chain(tally.right.as_ref())
+        .filter_map(|side| match side {
+            Side::Derived(derived) if derived.terms.len() == 1 => Some(derived),
+            _ => None,
+        })
+        .flat_map(|derived| derived.terms.iter())
+        .any(|term| matches!(term, Term::Counted(counted) if counted.path == *root))
+}
+
+fn equals_kind_fault(check: &Check, root: &Path, read: &path::Read) -> Option<String> {
+    let Check::Equals(equals) = check else {
+        return None;
+    };
+    let value = read
+        .value
+        .filter(|_| read.outcome == path::Outcome::Found)?;
+    (equals.path == *root
+        && !equals.value.is_null()
+        && !value.is_null()
+        && crate::value::type_name(value) != crate::value::type_name(&equals.value))
+    .then(|| {
+        super::message::isnt(
+            &crate::name::name(root),
+            value,
+            super::message::kind(&equals.value),
+        )
+    })
+}
+
+fn counted_kind(value: &Value, last: bool) -> Option<&'static str> {
+    if !value.is_array() && !value.is_object() {
+        Some("a list or an object")
+    } else if value.is_object() && last {
+        Some("a list")
+    } else {
+        None
+    }
+}
+
+fn counted_root_fault(root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
+    if !path::is_root(&root.start) {
+        let read = path::read(root, ctx);
+        let value = read
+            .value
+            .filter(|_| read.outcome == path::Outcome::Found)?;
+        return counted_kind(value, true).map(|kind| {
+            (
+                Cause::Unusable,
+                super::message::isnt(&crate::name::name(root), value, kind),
+            )
+        });
+    }
+    for end in 1..=root.steps.len() {
+        if !matches!(root.steps[end - 1], Step::Key(_) | Step::Index(_)) {
+            return None;
+        }
+        let prefix = Path {
+            start: root.start.clone(),
+            steps: root.steps[..end].to_vec(),
+        };
+        let last = end == root.steps.len();
+        let read = path::read(&prefix, ctx);
+        let name = crate::name::name(&prefix);
+        match (read.outcome, read.value) {
+            (path::Outcome::Absent, _) => {
+                return Some((Cause::Absent, format!("{name} is missing")));
+            }
+            (path::Outcome::Null, _) => return Some((Cause::Null, format!("{name} is null"))),
+            (path::Outcome::Found, Some(value)) if value.is_array() => return None,
+            (path::Outcome::Found, Some(value)) => {
+                if let Some(kind) = counted_kind(value, last) {
+                    return Some((Cause::Unusable, super::message::isnt(&name, value, kind)));
+                }
+            }
+            _ => return None,
+        }
+    }
+    None
 }
 
 fn bound_key(path: &Path, ctx: &Ctx) -> bool {
@@ -2875,18 +2986,25 @@ fn root_rank(path: &Path) -> (u8, String) {
     }
 }
 
-fn sentence_root_flaw(forms: &[Check], ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
+fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
     let mut texts: Vec<String> = Vec::new();
     let mut causes: Vec<Cause> = Vec::new();
-    for check in forms {
+    for (check, keyed_form) in forms {
         let mut roots: Vec<&Path> = check.paths();
         roots.extend(walk::listed_refs(check));
         let keys: Vec<&Path> = roots
             .iter()
-            .flat_map(|root| root.steps.iter())
-            .filter_map(|step| match step {
-                Step::Ref(key) if matches!(key.start, Start::Params | Start::Input) => Some(&**key),
-                _ => None,
+            .flat_map(|root| {
+                let keyed = *keyed_form
+                    && (matches!(root.start, Start::Alias(_)) || counts_root(check, root));
+                root.steps.iter().filter_map(move |step| match step {
+                    Step::Ref(key) if matches!(key.start, Start::Params | Start::Input) => {
+                        Some(&**key)
+                    }
+                    Step::Ref(key) if keyed && matches!(key.start, Start::Alias(_)) => Some(&**key),
+                    Step::Field(key) if keyed && path::is_root(&key.start) => Some(&**key),
+                    _ => None,
+                })
             })
             .collect();
         if matches!(check, Check::Present(_)) {
@@ -2898,6 +3016,15 @@ fn sentence_root_flaw(forms: &[Check], ctx: &Ctx) -> Option<(Cause, Vec<String>)
         roots.dedup();
         let mut found: Vec<(Cause, String)> = Vec::new();
         for root in roots {
+            if counts_root(check, root) {
+                if let Some(fault) = counted_root_fault(root, ctx) {
+                    found.push(fault);
+                    continue;
+                }
+                if path::is_root(&root.start) {
+                    continue;
+                }
+            }
             let read = path::read(root, ctx);
             let part = matches!(&root.start, Start::Part(part) if !part.steps.is_empty());
             if super::lists::right_paths(check).contains(&root)
@@ -2908,6 +3035,7 @@ fn sentence_root_flaw(forms: &[Check], ctx: &Ctx) -> Option<(Cause, Vec<String>)
             }
             if !(part && read.outcome.cause().is_some())
                 && let Some(text) = super::message::root_kind_fault(check, root, ctx)
+                    .or_else(|| equals_kind_fault(check, root, &read))
             {
                 found.push((Cause::Unusable, text));
                 continue;
