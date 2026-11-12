@@ -81,7 +81,6 @@ _listed_right(subj, c) if {
 _listed_path(subj, p) if {
 	_read_off_item(p)
 	not _builtin(p)
-	not _alias_start(p)
 	_rwalks(subj, p)
 }
 

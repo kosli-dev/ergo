@@ -8186,6 +8186,26 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("r.v is in rel.os.name", "r.v is in rel.os.name", &[], &[]),
+    ("$params.who is in pn", "$params.who is in pn", &[], &[]),
+    ("every rows.v is in pn", "every rows.v is in pn", &[], &[]),
+    (
+        "count of rows whose v is in pn is 1",
+        "count of rows whose v is in pn is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of $input.lst.name is 2",
+        "count of $input.lst.name is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose n is count of $input.lst.name is 1",
+        "count of rows whose n equals count of $input.lst.name is 1",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

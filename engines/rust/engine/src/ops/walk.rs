@@ -647,7 +647,7 @@ fn outside_inputs(walk: &Walk, ctx: &Ctx) -> Vec<Input> {
         .iter()
         .chain(std::iter::once(&*walk.check))
         .collect();
-    outside_inputs_of(&checks, ctx, &walk.for_aliases)
+    outside_inputs_of(&checks, ctx)
         .into_iter()
         .filter(|input| {
             !walk.for_aliases.iter().any(|alias| {
@@ -667,11 +667,7 @@ fn outside_inputs(walk: &Walk, ctx: &Ctx) -> Vec<Input> {
         .collect()
 }
 
-pub(super) fn outside_inputs_of(
-    checks: &[&Check],
-    ctx: &Ctx,
-    for_aliases: &[String],
-) -> Vec<Input> {
+pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
     let mut inputs = Vec::new();
     for check in checks {
         for path in check
@@ -684,7 +680,7 @@ pub(super) fn outside_inputs_of(
                         && has_root_field(p))
             })
         {
-            match listed_input(check, path, ctx, for_aliases) {
+            match listed_input(check, path, ctx) {
                 Some(input) => inputs.push(input),
                 None => inputs.extend(path_inputs(path, ctx, &[], true)),
             }
@@ -694,13 +690,8 @@ pub(super) fn outside_inputs_of(
     inputs
 }
 
-pub(super) fn listed_input(
-    check: &Check,
-    path: &Path,
-    ctx: &Ctx,
-    for_aliases: &[String],
-) -> Option<Input> {
-    if matches!(&path.start, Start::Alias(name) if for_aliases.contains(name)) {
+pub(super) fn listed_input(check: &Check, path: &Path, ctx: &Ctx) -> Option<Input> {
+    if matches!(path.start, Start::Input | Start::Params) {
         return None;
     }
     if super::lists::walked_right(check).is_some_and(|right| std::ptr::eq(right, path)) {

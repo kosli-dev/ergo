@@ -61,7 +61,6 @@ pub struct Counted {
     pub path: Path,
     pub distinct: bool,
     pub whose: Vec<Check>,
-    pub for_aliases: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -542,7 +541,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             null_at: None,
         };
         let whose: Vec<&Check> = counted.whose.iter().collect();
-        let mut outside = walk::outside_inputs_of(&whose, &outer, &counted.for_aliases);
+        let mut outside = walk::outside_inputs_of(&whose, &outer);
         outside.sort_by(|a, b| a.name.cmp(&b.name));
         let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
         return Worked {
@@ -560,7 +559,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         },
     );
     let whose: Vec<&Check> = counted.whose.iter().collect();
-    let mut outside = walk::outside_inputs_of(&whose, &outer, &counted.for_aliases);
+    let mut outside = walk::outside_inputs_of(&whose, &outer);
     outside.sort_by(|a, b| a.name.cmp(&b.name));
     if let Some(outcome) = walked.unreadable {
         let result = Err(outcome.cause().unwrap_or(Cause::Unusable));
@@ -959,7 +958,6 @@ fn lower_counted(
             path,
             distinct: derived.distinct,
             whose,
-            for_aliases: scope.for_aliases(),
         })
     }))
 }
