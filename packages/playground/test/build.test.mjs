@@ -102,9 +102,9 @@ test("the Wasm inside the page reads a number a JavaScript number can't hold as 
   const policy = {
     ergo_spec: /ergo_spec: (v[0-9.]+(?:-dev)?)/.exec(readFileSync(join(casesDir, "baking", "policy.ergo.md"), "utf8"))[1],
     subjects: { item: { from: "items", identified_by: "id" } },
-    requirements: { r: { subject: "item", checks: { exact: "n is 9007199254740993", cap: "n is at most $params.max" } } },
+    requirements: { r: { subject: "item", checks: { exact: "n is $params.n", cap: "n is at most $params.max" } } },
   };
-  const report = await runErgoText('{"items": [{"id": "a", "n": 9007199254740993}]}', policy, '{"max": 9007199254740992}');
+  const report = await runErgoText('{"items": [{"id": "a", "n": 9007199254740993}]}', policy, '{"max": 9007199254740992, "n": 9007199254740993}');
   const cells = Object.fromEntries(report.results.filter((r) => r.subject.id === "a").map((r) => [r.check, r.passed]));
   assert.deepEqual(cells, { cap: false, exact: true });
 });
@@ -113,11 +113,11 @@ test("the Rust Wasm inside the page reads a number a JavaScript number can't hol
   const policy = {
     ergo_spec: /^_spec := "(v[0-9.]+(?:-dev)?)"/m.exec(readFileSync(join(casesDir, "..", "..", "..", "dist", "ergo.rego"), "utf8"))[1],
     subjects: { item: { from: "items", identified_by: "id" } },
-    requirements: { r: { subject: "item", checks: { exact: "n is 9007199254740993", cap: "n is at most $params.max" } } },
+    requirements: { r: { subject: "item", checks: { exact: "n is $params.n", cap: "n is at most $params.max" } } },
   };
   const glue = await import("../../../engines/rust/wasm/pkg/ergo_policy_wasm.js");
   await runRust({}, policy, {});
-  const text = glue.report('{"items": [{"id": "a", "n": 9007199254740993}]}', JSON.stringify(policy), '{"max": 9007199254740992}');
+  const text = glue.report('{"items": [{"id": "a", "n": 9007199254740993}]}', JSON.stringify(policy), '{"max": 9007199254740992, "n": 9007199254740993}');
   assert.ok(text.includes("9007199254740993"));
   const report = JSON.parse(text);
   const cells = Object.fromEntries(report.results.filter((r) => r.subject.id === "a").map((r) => [r.check, r.passed]));

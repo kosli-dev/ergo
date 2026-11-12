@@ -73,28 +73,28 @@ _unwhosed_refs(check) := {x.ref |
 _derived_eval(check, subj) := {"passed": passed, "cause": cause, "inputs": array.concat(l.inputs, r.inputs)} if {
 	l := _side_eval(subj, check.left)
 	r := _side_eval(subj, check.right)
-	passed := _eval_compared(check, l.v, r.v)
-	states := _eval_states(check, l, r)
+	passed := _eval_compared(check, l.v, r.v, subj)
+	states := _eval_states(check, l, r, subj)
 	cause := _eval_cause(passed, _ref_cause(check), states)
 }
 
-_eval_states(check, _, r) := r.states if {
+_eval_states(check, _, r, _) := r.states if {
 	_side_form(check.right) == "join"
 	count(r.states) > 0
 }
 
-_eval_states(check, l, r) := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf)} if {
+_eval_states(check, l, r, subj) := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf, subj)} if {
 	not _side_form(check.right) == "join"
 }
 
-_eval_states(check, l, r) := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf)} if {
+_eval_states(check, l, r, subj) := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf, subj)} if {
 	_side_form(check.right) == "join"
 	count(r.states) == 0
 }
 
-_eval_compared(check, [lv], [rv]) if _compared(check, lv, rv)
+_eval_compared(check, [lv], [rv], subj) if _compared(check, lv, rv, subj)
 
-default _eval_compared(_, _, _) := false
+default _eval_compared(_, _, _, _) := false
 
 _eval_cause(true, _, _) := "satisfied"
 

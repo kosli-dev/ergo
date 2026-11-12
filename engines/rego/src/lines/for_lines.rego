@@ -337,7 +337,7 @@ _for_shared(check, fails, pre, names) := array.concat([trimmed[i] | some i, f in
 
 _for_free_undecided(check, _, _) := [] if _for_whose_reads(check.items[1].whose, check.items[0].as)
 
-_for_free_undecided(check, pre, names) := [{"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_shown(e.v), "lines": [], "at": _walk_at(pre, e)} |
+_for_free_undecided(check, pre, names) := [{"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_value(e.v, e, pre), "lines": [], "at": _walk_at(pre, e)} |
 	some e in pre.items
 	wh := _for_whose(check.items[1], e, names)
 	wh.undecided != []
@@ -401,7 +401,7 @@ _for_picked(item, w, names) := _for_pick_sorted(item, object.union(w, {"items": 
 	"pick" in object.keys(item)
 	w.walked != set()
 	judged := [[e, _for_whose(item, e, names)] | some e in w.items]
-	whose_fails := [{"path": j[0].i, "item": j[0].i, "cause": j[1].undecided[0], "value": _walk_shown(j[0].v), "at": _walk_at(w, j[0])} | some j in judged; j[1].undecided != []]
+	whose_fails := [{"path": j[0].i, "item": j[0].i, "cause": j[1].undecided[0], "value": _walk_value(j[0].v, j[0], w), "at": _walk_at(w, j[0])} | some j in judged; j[1].undecided != []]
 	kept := [j[0] | some j in judged; j[1].undecided == []; j[1].kept]
 	_for_no_fails(w, whose_fails)
 }
@@ -409,7 +409,7 @@ _for_picked(item, w, names) := _for_pick_sorted(item, object.union(w, {"items": 
 _for_picked(item, w, names) := object.union(w, {"items": [], "fails": array.concat(w.fails, whose_fails), "input": _for_list_input(item, w)}) if {
 	"pick" in object.keys(item)
 	w.walked != set()
-	whose_fails := [object.union({"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_shown(e.v), "at": _walk_at(w, e)}, _for_raw(e)) | some e in w.items; wh := _for_whose(item, e, names); wh.undecided != []]
+	whose_fails := [object.union({"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_value(e.v, e, w), "at": _walk_at(w, e)}, _for_raw(e)) | some e in w.items; wh := _for_whose(item, e, names); wh.undecided != []]
 	not _for_no_fails(w, whose_fails)
 }
 
@@ -426,7 +426,7 @@ _for_pick_sorted(item, w, read, names) := object.union(w, {"items": [], "fails":
 } else := object.union(w, {"items": [], "fails": tied, "input": _for_list_input(item, object.union(w, {"items": read}))}) if {
 	tied := _for_tied(item, w, names)
 	count(tied) > 1
-} else := object.union(w, {"items": [e], "input": [_path_name(e.i), _walk_shown(e.v), [_walk_at(w, e)]]}) if {
+} else := object.union(w, {"items": [e], "input": [_path_name(e.i), _walk_value(e.v, e, w), [_walk_at(w, e)]]}) if {
 	e := w.items[_for_pick_index(item, w.items, names)]
 }
 
@@ -437,14 +437,18 @@ else := _walk_worst(fails) if {
 	fails != []
 }
 
-_for_list_input(item, w) := [_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items], _walk_locations(w)]
+_for_list_input(item, w) := [_walk_name(item.path, w.walked), [_walk_value(e.v, e, w) | some e in w.items], _walk_locations(w)]
 
-_for_sort_key(item, x, names) := _for_sortable(v, object.get(item.pick, "alphabetically", false)) if {
+_for_sort_key(item, x, names) := _for_sortable_exact(_for_sortable(v, object.get(item.pick, "alphabetically", false)), [json.marshal(v) | is_number(v)]) if {
 	"by" in object.keys(item.pick)
 	e := _focus_entry(x)
 	is_object(e.iv)
 	v := _resolved(e.iv, item.pick.by) with input as {"ergo/names": names}
 }
+
+_for_sortable_exact(k, []) := k
+
+_for_sortable_exact(k, [t]) := [k[0], json.unmarshal(t)]
 
 _for_sortable(v, false) := ["number", v] if is_number(v)
 
@@ -523,7 +527,12 @@ _for_sort_shown(item, x, names) := _walk_shown(v) if {
 
 else := null
 
-_for_order(item, items, names) := [pair[2] | some pair in sort([[_for_sort_key(item, e, names)[1], i, i] | some i, e in items])] if "by" in object.keys(item.pick)
+_for_order(item, items, names) := [pair[2] | some pair in sort([[k, _tie_rank(keys, i), i] | some i, k in keys])] if {
+	"by" in object.keys(item.pick)
+	keys := [_for_sort_key(item, e, names)[1] | some e in items]
+}
+
+_tie_rank(keys, i) := count([j | some j, k in keys; k == keys[i]; is_number(k); _text_order(json.marshal(k), json.marshal(keys[i])) < 0])
 
 _for_order(item, items, _) := numbers.range(0, count(items) - 1) if not "by" in object.keys(item.pick)
 
@@ -546,7 +555,9 @@ _for_tied(item, _, _) := [] if not "by" in object.keys(item.pick)
 
 _for_tied(item, w, names) := [{"path": e.i, "item": e.i, "cause": "ambiguous", "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names)} |
 	some e in w.items
-	_for_sort_key(item, e, names)[1] == key
+	k := _for_sort_key(item, e, names)[1]
+	k == key
+	_same_texts(json.marshal(k), json.marshal(key))
 ] if {
 	"by" in object.keys(item.pick)
 	key := _for_sort_key(item, w.items[_for_pick_index(item, w.items, names)], names)[1]
@@ -668,9 +679,9 @@ _for_inner_next(check, subj, bound, [], true) := _for_lines(check, subj, bound)
 
 _for_failure(_, [], false, _, _) := null
 
-_for_failure(e, undecided, _, res, at) := object.union({"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at}, _for_raw(e)) if undecided != []
+_for_failure(e, undecided, _, res, at) := object.union({"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": res.cause, "value": _walk_value(e.v, e, at), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at}, _for_raw(e)) if undecided != []
 
-_for_failure(e, [], true, res, at) := {"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at, "nothing_picked": object.get(res, "nothing_picked", false)} if not res.passed
+_for_failure(e, [], true, res, at) := {"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": res.cause, "value": _walk_value(e.v, e, at), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at, "nothing_picked": object.get(res, "nothing_picked", false)} if not res.passed
 
 _for_failure(_, [], true, res, _) := null if res.passed
 
@@ -971,11 +982,11 @@ _for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check, check.i
 		wh.kept
 	]
 	walked := {i | some iw in inner; some i in iw.walked}
-	values := [_walk_shown(e2.v) | some iw in inner; some e2 in iw.items]
+	values := [_walk_value(e2.v, e2, iw) | some iw in inner; some e2 in iw.items]
 	locations := [_walk_at(iw, e2) | some iw in inner; some e2 in iw.items]
 }
 
-_for_inner_pairs(check, subj, names, item, w) := {object.get(iw, "input", [_for_list_name(check, check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items], _walk_locations(iw)]) | some iw in inner} if {
+_for_inner_pairs(check, subj, names, item, w) := {object.get(iw, "input", [_for_list_name(check, check.items[1].path, iw.walked), [_walk_value(e.v, e, iw) | some e in iw.items], _walk_locations(iw)]) | some iw in inner} if {
 	count(check.items) == 2
 	not _for_from_first(check)
 	_for_pick_reads_first(check)
@@ -988,9 +999,12 @@ _for_dropped(item, _, _) := set() if object.get(item, "distinct", false) != true
 
 _for_dropped(item, names, w) := _for_copies(item, names, w).dropped if object.get(item, "distinct", false) == true
 
-_for_copies(item, names, w) := _copies_of([[e.v, i] | some i, e in w.items; wh := _for_whose(item, e, names); wh.kept; wh.undecided == []; not _walk_marked(e.v)])
+_for_copies(item, names, w) := _copies_of([[keys[i], i] | some i, e in w.items; wh := _for_whose(item, e, names); wh.kept; wh.undecided == []; not _walk_marked(e.v)]) if {
+	vs := [e.v | some e in w.items]
+	keys := _exact_keys(vs, json.marshal(vs))
+}
 
-_for_inner_pairs(check, subj, names, _, w) := {object.get(pw, "input", [_for_list_name(check, check.items[1].path, pw.walked), [_walk_shown(e.v) | some e in pw.items], _walk_locations(pw)])} if {
+_for_inner_pairs(check, subj, names, _, w) := {object.get(pw, "input", [_for_list_name(check, check.items[1].path, pw.walked), [_walk_value(e.v, e, pw) | some e in pw.items], _walk_locations(pw)])} if {
 	count(check.items) == 2
 	not _for_from_first(check)
 	_for_pick_reads_first(check)
@@ -998,7 +1012,7 @@ _for_inner_pairs(check, subj, names, _, w) := {object.get(pw, "input", [_for_lis
 	pw := _for_plain_walk(check, subj, names)
 }
 
-_for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_list_name(check, check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items], _walk_locations(iw)])} if {
+_for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_list_name(check, check.items[1].path, iw.walked), [_walk_value(e.v, e, iw) | some e in iw.items], _walk_locations(iw)])} if {
 	count(check.items) == 2
 	not _for_from_first(check)
 	not _for_pick_reads_first(check)

@@ -4,9 +4,10 @@ import rego.v1
 
 _messaged(raw, _, _, _) := raw if raw.passed == true
 
-_messaged(raw, check, req, subj) := object.union(raw, {"message": _row_message(_labelled_for(check, req, subj), subj, raw)}) if {
+_messaged(raw, check, req, subj) := object.union(raw, {"message": m}) if {
 	raw.passed == false
 	not "message" in object.keys(raw)
+	m := _row_message(_labelled_for(check, req, subj), subj, raw)
 }
 
 _messaged(raw, _, _, _) := raw if {
@@ -245,11 +246,12 @@ _m_tally(subj, side) := array.concat(
 	roots := _dotted_roots([side[f]])
 }
 
-_m_tally_items(subj, side) := [x | some e in w.items; some x in array.concat(_m_whose_undecided(subj, side, e, flaws, roots), [y | _tally_judge(side, e, flaws).read; some y in _m_tally_item(f, e, roots)])] if {
+_m_tally_items(subj, side) := [x | some e in w.items; some x in array.concat(_m_whose_undecided(subj, side, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	flaws := [_cond_flaw(c) | some c in side.whose]
 	roots := _dotted_roots([side[f]])
+	long := _long_text(json.marshal([e.iv | some e in w.items]))
 }
 
 _m_whose_undecided(subj, side, e, flaws, roots) := [[_m_focus_state(e, c, cause), _m_focus_text(subj, c, e, cause, roots)] |

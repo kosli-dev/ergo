@@ -631,8 +631,9 @@ test_a_number_out_of_range_is_written_wrong_without_opa_comparing_it if {
 	_read(`x is one of 1, 2e400`) == {"problems": ["number out of range: 2e400"]}
 	_read(`x is 1 within 1e999`) == {"problems": ["number out of range: 1e999"]}
 	_read(`count of y plus 1e-9999999 is 3`) == {"problems": ["number out of range: 1e-9999999"]}
-	_read(`x is 1.7976931348623157e308`).assertions[0].phrase.value == 1.7976931348623157e308
-	_read(`x is 2.2250738585072014e-308`).assertions[0].phrase.value == 2.2250738585072014e-308
+	_read(`x is 1.79769313486231e308`).assertions[0].phrase.value == 1.79769313486231e308
+	_read(`x is 2.22507385850721e-308`).assertions[0].phrase.value == 2.22507385850721e-308
+	_read(`x is 1.7976931348623157e308`) == {"problems": ["number with more than 15 significant digits: 1.7976931348623157e308"]}
 	_read(`x is 0.0e-9999999`).assertions[0].phrase.value == 0
 }
 
@@ -673,7 +674,7 @@ test_a_number_just_past_the_largest_float_is_written_wrong_before_opa_reads_it i
 		count(_sentence_problems(text)) == 1
 		startswith(_sentence_problems(text)[0], "number out of range: ")
 	}
-	every text in [`x is 1.7976931348623157e308`, `x is 17976931348623157e292`, `x is 179769313486231570000e288`, `x is 1e308`] {
+	every text in [`x is 1.79769313486231e308`, `x is 179769313486231e294`, `x is 17976931348623100000e289`, `x is 1e308`] {
 		ergo.report({"things": [{"id": "t1", "x": 1}]}, _sentence_policy({"c": text}), {}).results[0].passed
 	}
 }

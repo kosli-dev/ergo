@@ -359,5 +359,50 @@
         ]
       }
     ]
+  },
+  {
+    "description": "compare_time with lte and gte",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"after": ".a is on or after b", "before": ".a is on or before b"}}}},
+    "cases": [
+      {
+        "description": "passes on two equal dates and on two times that name the same moment",
+        "rules": ["time.pass", "time.format"],
+        "input": {"things": [{"a": "2024-01-01", "b": "2024-01-01", "id": "t1"}, {"a": "2024-01-01T01:00:00+01:00", "b": "2024-01-01T00:00:00Z", "id": "t2"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "after",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": ".a", "value": "2024-01-01", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-01-01", "locations": ["/things/0/b"]}]
+          },
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "before",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": ".a", "value": "2024-01-01", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-01-01", "locations": ["/things/0/b"]}]
+          },
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t2"},
+            "check": "after",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": ".a", "value": "2024-01-01T01:00:00+01:00", "locations": ["/things/1/a"]}, {"name": "b", "value": "2024-01-01T00:00:00Z", "locations": ["/things/1/b"]}]
+          },
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t2"},
+            "check": "before",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": ".a", "value": "2024-01-01T01:00:00+01:00", "locations": ["/things/1/a"]}, {"name": "b", "value": "2024-01-01T00:00:00Z", "locations": ["/things/1/b"]}]
+          }
+        ]
+      }
+    ]
   }
 ]

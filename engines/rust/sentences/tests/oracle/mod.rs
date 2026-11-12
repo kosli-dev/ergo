@@ -999,6 +999,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("teams", "teams"),
     ("things", "things"),
     (
+        "things[9007199254740991]",
+        "item 9007199254740992 of things",
+    ),
+    (
         "things named by each of $params.k",
         "things named by each of $params.k",
     ),
@@ -1304,10 +1308,6 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("x whose aa is -0.5e1", "x whose aa is -5"),
     ("x whose aa is -1e2", "x whose aa is -100"),
     ("x whose aa is 0.0", "x whose aa is 0"),
-    (
-        "x whose aa is 0.1000000000000000000001",
-        "x whose aa is 0.1000000000000000000001",
-    ),
     ("x whose aa is 0.5", "x whose aa is 0.5"),
     ("x whose aa is 0e5", "x whose aa is 0"),
     ("x whose aa is 1", "x whose aa is 1"),
@@ -1340,10 +1340,6 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("x whose aa is 10", "x whose aa is 10"),
     ("x whose aa is 100e-2", "x whose aa is 1"),
-    (
-        "x whose aa is 12345678901234567890",
-        "x whose aa is 12345678901234567890",
-    ),
     ("x whose aa is 123e-5", "x whose aa is 0.00123"),
     ("x whose aa is 1E+2", "x whose aa is 100"),
     ("x whose aa is 1e-7", "x whose aa is 0.0000001"),
@@ -2799,6 +2795,14 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    (
+        "x whose aa is 0.1000000000000000000001",
+        &["number with more than 15 significant digits: 0.1000000000000000000001"],
+    ),
+    (
+        "x whose aa is 12345678901234567890",
+        &["number with more than 15 significant digits: 12345678901234567890"],
+    ),
     ("x[$other.k]", &["unknown name $other"]),
     ("x[$aa]", &["unknown name $aa"]),
     ("x whose aa is 1 and whose $b exists", &["unknown name $b"]),

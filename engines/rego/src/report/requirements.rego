@@ -269,12 +269,6 @@ _requirement_checks_written_or_added(req) := object.union(
 	object.union(_applies_def(req), _well_formed_def),
 )
 
-_subject_row_groups(matching, req, req_name, flaws, prepared) := [rows |
-	some entry in matching
-	ref := _entry_ref(entry, req)
-	rows := _subject_rows(entry, ref, req, req_name, flaws, prepared)
-]
-
 _anchored(row, at) := object.union(row, {"inputs": _tie_sorted(_anchored_all(row.inputs, at))}) if not "failed_items" in object.keys(row)
 
 else := object.union(row, {"inputs": _tie_sorted(_anchored_all(row.inputs, at)), "failed_items": [_anchored_failed(f, at) | some f in row.failed_items]})
@@ -401,10 +395,11 @@ _unique_ids_row(raw, refs, req, req_name) := {
 	"requirement": req_name,
 	"subject": _req_subject_ref(req),
 	"check": "$unique_ids",
-	"inputs": [{"name": _repeated_ids_name(req), "value": repeated, "locations": [l |
-		some id in repeated
+	"inputs": [{"name": _repeated_ids_name(req), "value": [p[1] | some p in repeated], "locations": [l |
+		some p in repeated
 		some i, entry in raw
-		refs[i].id == id
+		refs[i].id == p[1]
+		_exact_key(refs[i].id, [json.marshal(refs[i].id) | p[2]; _has_number(refs[i].id)]) == p[0]
 		some l in _copied_id_locations(entry, req)
 	]}],
 	"passed": count(repeated) == 0,
@@ -424,12 +419,16 @@ _id_input(entry, req) := scope if {
 	scope := _scope_of(req, entry.subject) with input as _row_input(entry.at)
 } else := _row_input(entry.at)
 
-_repeated_ids(refs) := [pair[1] | some pair in sort({[_literal_text(id), id] | some id in _repeats(sort([ref.id | some ref in refs]))})]
+_repeated_ids(refs) := [] if count({ref.id | some ref in refs}) == count(refs)
+
+else := _repeated_keys(refs, [x | some x in {ref.id | some ref in refs}; _has_number(x)] != [])
+
+_repeated_keys(refs, exact) := [[t[1], t[2], exact] | some t in sort({[_literal_text(p[1]), p[0], p[1]] | some p in _repeats(sort([[_exact_key(ref.id, [json.marshal(ref.id) | exact; _has_number(ref.id)]), ref.id] | some ref in refs]))})]
 
 _repeats(sorted) := {x |
 	some i, x in sorted
 	i > 0
-	x == sorted[i - 1]
+	x[0] == sorted[i - 1][0]
 }
 
 _applies_rows(raw, refs, evals, req, req_name) := [row |

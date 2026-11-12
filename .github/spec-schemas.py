@@ -4,8 +4,8 @@ import jsonschema
 query = '[{"where": concat(" / ", [t, g.description, c.description]), "policy": g.policy, "report": data.ergo.report(c.input, g.policy, object.get(g, "params", {}))} | some t, gs in input; some g in gs; some c in g.cases]'
 spec = re.search(r'^_spec := "(v[^"]+)"$', open("engines/rego/src/shared/basics.rego").read(), re.M).group(1)
 subprocess.run([".github/build-ergo.sh"], check=True)
-topics = {os.path.basename(os.path.dirname(f)): json.loads(open(f).read().replace("{{spec}}", spec)) for f in sorted(glob.glob("spec/cases/*/cases.json"))}
-opa = subprocess.run(["opa", "eval", "-d", "dist/ergo.rego", "-I", "--format", "json", query], input=json.dumps(topics), stdout=subprocess.PIPE, text=True)
+topics = "{" + ",".join(json.dumps(os.path.basename(os.path.dirname(f))) + ": " + open(f).read().replace("{{spec}}", spec) for f in sorted(glob.glob("spec/cases/*/cases.json"))) + "}"
+opa = subprocess.run(["opa", "eval", "-d", "dist/ergo.rego", "-I", "--format", "json", query], input=topics, stdout=subprocess.PIPE, text=True)
 if opa.returncode != 0:
     sys.exit(f"opa eval failed:\n{opa.stdout}")
 cases = json.loads(opa.stdout)["result"][0]["expressions"][0]["value"]

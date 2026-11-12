@@ -104,7 +104,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bad_index" in object.keys(node)
-}) | {concat("", ["number out of range: ", node.out_of_range]) |
+}) | {concat("", [_s_number_problem(object.get(node, "too_long", false)), node.out_of_range]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"out_of_range" in object.keys(node)
@@ -394,3 +394,7 @@ _s_parsed_anyway(text, pat) := {"assertions": assertions} if {
 	count(items) == count(pieces)
 	count(pieces) in {1, 2}
 } else := _s_from_plain(text, pat)
+
+_s_number_problem(false) := "number out of range: "
+
+_s_number_problem(true) := concat("", [_too_long_problem, ": "])

@@ -539,8 +539,13 @@ _s_number(text) := 0 if {
 } else := n if {
 	not _s_above_max(text)
 	not _s_below_min(text)
+	count(_s_significant(text)) <= 15
 	n := to_number(text)
 	_fits_a_float(n)
+} else := {"out_of_range": text, "too_long": true} if {
+	not _s_above_max(text)
+	not _s_below_min(text)
+	count(_s_significant(text)) > 15
 } else := {"out_of_range": text}
 
 _s_magnitude(text) := (count(m[1]) + _exponent(m[3])) - (count(digits) - count(trim_left(digits, "0"))) if {

@@ -61,7 +61,7 @@ _first_seen(xs) := [p[1] | some p in sort([[s[1], s[0]] | some j, s in sorted; _
 
 _once(xs) := [x | some i, x in xs; not x in array.slice(xs, 0, i)]
 
-version := "0.6.1-dev"
+version := "0.7.0-dev"
 
 _engine := {"name": "ergo-rego", "version": version}
 

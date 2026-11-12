@@ -227,19 +227,53 @@ fn between_is_min_above_max_compared_on_the_digits() {
     assert_eq!(problems("x is between -2 and -1"), none());
     assert_eq!(problems("x is between -0 and 0"), none());
     assert_eq!(
-        problems("x is between 0.5 and 0.49999999999999999999"),
+        problems("x is between 0.5 and 0.499999999999999"),
         one("min above max")
     );
     assert_eq!(
-        problems("x is between 12345678901234567891 and 12345678901234567890"),
+        problems("x is between 123456789012346 and 123456789012345"),
         one("min above max")
     );
     assert_eq!(
-        problems("x is between 12345678901234567890 and 12345678901234567891"),
+        problems("x is between 123456789012345 and 123456789012346"),
         none()
     );
     assert_eq!(problems("x is between 1e-5 and 1e-6"), one("min above max"));
     assert_eq!(problems("x is between -1e5 and 1e-6"), none());
+}
+
+#[test]
+fn a_number_with_more_than_15_significant_digits_is_written_wrong() {
+    for written in [
+        "1234567890.1209567890",
+        "1234567890123456",
+        "12345678901234567890",
+        "1234567890123456000000",
+        "-0.1234567890123456",
+        "1.7976931348623157e308",
+        "2.2250738585072014e-308",
+    ] {
+        assert_eq!(
+            problems(&format!("x is {written}")),
+            one(&format!(
+                "number with more than 15 significant digits: {written}"
+            )),
+            "{written}"
+        );
+    }
+    for written in [
+        "123456789012345",
+        "1.50000000000000000000",
+        "1e20",
+        "0.000000000000000000001",
+        "123456789012345000",
+    ] {
+        assert_eq!(problems(&format!("x is {written}")), none(), "{written}");
+    }
+    assert_eq!(
+        problems("x is at least 1.2345678901234567e400"),
+        one("number out of range: 1.2345678901234567e400")
+    );
 }
 
 #[test]
@@ -260,8 +294,8 @@ fn a_number_outside_what_a_float_holds_is_out_of_range() {
         );
     }
     for written in [
-        "1.7976931348623157e308",
-        "2.2250738585072014e-308",
+        "1.79769313486231e308",
+        "2.22507385850721e-308",
         "1e308",
         "1e-307",
         "0e999",

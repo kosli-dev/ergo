@@ -122,31 +122,32 @@ _number_states(x, path) := set() if {
 	is_number(_value_at(x, path))
 }
 
-_usable_sides(check, l, r) if {
+_usable_sides(check, l, r, _) if {
 	not "within" in object.keys(check)
 	_usable_pair(check.cmp, l, r)
 }
 
-_usable_sides(check, l, r) if {
+_usable_sides(check, l, r, subj) if {
 	"within" in object.keys(check)
-	_within_usable(check, l, r)
+	_within_usable(check, l, r, subj)
 }
 
-_usable_sides(check, l, r) if {
+_usable_sides(check, l, r, _) if {
 	check.cmp in {"includes", "excludes"}
 	is_array(l)
 	is_string(r)
 	_items_fit(l, [r])
 }
 
-_within_usable(check, l, r) if {
+_within_usable(check, l, r, subj) if {
+	_ = subj
 	_numbers(l, r)
 	is_number(check.within)
 	_within_spread([json.marshal(l), json.marshal(r), json.marshal(check.within)]) <= 4096
 }
 
-_within_gap(l, r, w) if {
-	texts := [json.marshal(l), json.marshal(r), json.marshal(w)]
+_within_gap(l_text, r_text, w_text) if {
+	texts := [l_text, r_text, w_text]
 	_within_spread(texts) <= 4096
 	_within_texts(texts)
 }
@@ -293,14 +294,24 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	flaws := [_cond_flaw(c) | some c in side.whose]
-	judged := [_tally_judge(side, e, flaws) | some e in w.items]
+	long := _long_text(json.marshal([e.iv | some e in w.items]))
+	judged := [_tally_judge(side, e, flaws, w, long) | some e in w.items]
 	kept := [e.v | some i, e in w.items; judged[i].kept]
 	read := [e.v | some i, e in w.items; judged[i].read]
-	states := (((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, _tally_distinct(side, read))) | {fl | some fl in flaws; fl != ""}) | {fl | some c in side.whose; fl := _root_read_flaw(subj, c); fl != ""}
-	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_shown(e.v) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept), states))
+	states := (((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | {fl | some fl in flaws; fl != ""}) | {fl | some c in side.whose; fl := _root_read_flaw(subj, c); fl != ""}
+	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states))
 }
 
-_tally_judge(side, e, flaws) := {"kept": kept, "read": read, "states": (undecided | _tally_mark(read, e))} if {
+_tally_judge(side, e, flaws, w, true) := j if {
+	_holds_numbers(e.iv)
+	t := json.marshal(e.iv)
+	_long_text(t)
+	j := _tally_judgement(side, e, flaws) with data.ergo_item as [t, w]
+} else := _tally_judgement(side, e, flaws)
+
+_tally_judge(side, e, flaws, _, false) := _tally_judgement(side, e, flaws)
+
+_tally_judgement(side, e, flaws) := {"kept": kept, "read": read, "states": (undecided | _tally_mark(read, e))} if {
 	causes := [_tally_focus_cause(c, e, flaws[i]) | some i, c in side.whose]
 	undecided := {c | some c in causes; not c in {"satisfied", "value", "missing"}}
 	kept := count([c | some c in causes; c in {"value", "missing"}]) == 0
@@ -319,8 +330,8 @@ _tally_cond_cause(c, item, "") := _eval_cause(passed, _ref_cause(c), states) if 
 	_derived_once(c)
 	l := _cond_side(item, c.left)
 	r := _cond_side(item, c.right)
-	passed := _eval_compared(c, l.v, r.v)
-	states := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(c, lf, rf)}
+	passed := _eval_compared(c, l.v, r.v, item)
+	states := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(c, lf, rf, item)}
 }
 
 _cond_side(item, side) := {"v": v, "found": v, "states": _elapsed_states(item, side)} if {
@@ -345,7 +356,7 @@ _cond_tally(item, side) := {"states": {"not_an_object"}} if {
 	w := _walk(_walk_start({"path": side.count_of}, item), _walk_keys({"path": side.count_of}, item), true)
 	kept := [e.v | some e in w.items]
 	states := ({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some e in w.items; some c in _tally_mark(true, e)}
-	r := object.union({"states": states}, _tally_value("count_of", _tally_distinct(side, kept), states))
+	r := object.union({"states": states}, _tally_value("count_of", _tally_distinct(side, kept, item, "kept"), states))
 }
 
 _cond_side(item, side) := {"v": [x | x := _value_at(item, side)], "found": [x | x := _simple_found(item, side)], "states": {_read_state(item, side)}} if _basic_form(side) == "path"
@@ -378,15 +389,24 @@ _tally_mark(_, e) := set() if not _walk_marked(e.v)
 
 _tally_mark(false, e) := set() if _walk_marked(e.v)
 
-_tally_distinct(side, kept) := kept if object.get(side, "distinct", false) != true
+_tally_distinct(side, kept, subj, part) := kept if {
+	object.get(side, "distinct", false) != true
+	_ = subj
+	_ = part
+}
 
-else := [v | some j, v in sorted; _first_of_kind(sorted, j)] if sorted := sort(kept)
+else := [x[2] | some j, x in sorted; _first_of_kind(sorted, j)] if {
+	keys := _exact_keys(kept, json.marshal(kept))
+	others := [[0, keys[i], v] | some i, v in kept; not is_number(v)]
+	nums := [[1, _decimal_parts(json.marshal(v)), v] | some v in kept; is_number(v)]
+	sorted := sort(array.concat(others, nums))
+}
 
 _first_of_kind(_, 0)
 
 _first_of_kind(sorted, j) if {
 	j > 0
-	sorted[j] != sorted[j - 1]
+	array.slice(sorted[j], 0, 2) != array.slice(sorted[j - 1], 0, 2)
 }
 
 _tally_value(_, _, states) := {} if states != set()

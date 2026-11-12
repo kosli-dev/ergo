@@ -176,7 +176,7 @@ _every_walk(doc, keys) := {"subjects": [{"subject": e.v, "at": _walk_at(w, e)} |
 	last := count(keys) in w.walked
 }
 
-_every_end_fail(e) := {"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_shown(e.v)}
+_every_end_fail(e) := {"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_value(e.v, e, null)}
 
 _fl_walk(doc, keys) := {"subjects": [{"subject": x, "at": concat("", [base, "/", format_int(i, 10)])} | some i, x in end], "fails": [], "notes": []} if {
 	end := _fl_simple_end(doc, keys)
@@ -270,7 +270,7 @@ _fl_list_item_read(x, keys, i) if {
 
 _fl_step(x, keys, i) := x if i >= count(keys)
 
-_fl_step(x, keys, i) := {"c": array.concat(x.c, [keys[i]]), "i": x.i, "v": _walk_read(x.v, keys[i]), "x": false, "w": _fl_why(x, keys[i])} if i < count(keys)
+_fl_step(x, keys, i) := {"c": array.concat(x.c, [keys[i]]), "i": x.i, "v": _walk_read(x.v, keys[i], x, null), "x": false, "w": _fl_why(x, keys[i])} if i < count(keys)
 
 _fl_why(x, k) := x.w if {
 	_walk_marked(x.v)
@@ -294,7 +294,7 @@ _fl_readable(v, k) if {
 	is_array(v)
 }
 
-_fl_fail(e, cause) := {"path": e.c, "item": e.c, "cause": cause, "value": _walk_shown(e.v), "why": e.w}
+_fl_fail(e, cause) := {"path": e.c, "item": e.c, "cause": cause, "value": _walk_value(e.v, e, null), "why": e.w}
 
 _fl_item_fail(x) := {"path": x.c, "item": x.c, "cause": _fl_item_cause(x.v), "value": x.v, "why": {"path": x.c, "value": x.v, "kind": "an object"}}
 
@@ -641,7 +641,9 @@ _distinct_from(req) if {
 }
 
 _copies_merged(entries) := [_with_copies(entries, i, copies) | some i, e in entries; not i in copies.dropped] if {
-	copies := _copies_of([[e.subject, i] | some i, e in entries])
+	subjects := [e.subject | some e in entries]
+	keys := _exact_keys(subjects, json.marshal(subjects))
+	copies := _copies_of([[keys[i], i] | some i, _ in entries])
 }
 
 _with_copies(entries, i, copies) := object.union(entries[i], {"ats": [entries[k].at | some k in copies.groups[i]]}) if i in object.keys(copies.groups)

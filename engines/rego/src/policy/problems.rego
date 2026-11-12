@@ -12,7 +12,7 @@ _json_problems(v) := {"holds a key that isn't a string" |
 	is_set(x)
 }
 
-_meta_problems(m) := _json_problems(m) | {"number out of range" | _out_of_range(m)}
+_meta_problems(m) := _json_problems(m) | _number_flaws(m)
 
 _meta_shaped(v) if {
 	is_object(v)
@@ -183,9 +183,18 @@ _min_subjects_out_of_range(req, "min_subjects") if {
 	_out_of_range(req.min_subjects)
 }
 
+_min_subjects_out_of_range(req, "min_subjects") if {
+	is_number(req.min_subjects)
+	_number_flaw(req.min_subjects, json.marshal(req.min_subjects)) == _too_long_problem
+}
+
 _range_problems(req) := {["min_subjects", "number out of range"] |
 	is_number(_min_subjects_of(req))
 	_out_of_range(_min_subjects_of(req))
+} | {["min_subjects", _too_long_problem] |
+	m := _req_field(req, "min_subjects", null)
+	is_number(m)
+	_number_flaw(m, json.marshal(m)) == _too_long_problem
 }
 
 _unknown_problems(req) := {[f, "unknown field"] | some f in _unknown_req_fields(req)}
@@ -433,7 +442,7 @@ _compare_max_problem(node) := ({"invalid max" |
 	"within" in object.keys(node)
 }
 
-_wording_problem(node) := ({"invalid description" |
+_wording_problem(node) := (({"invalid description" |
 	"description" in object.keys(node)
 	not _has_type("description", node.description)
 } | {"invalid meta" |
@@ -442,7 +451,11 @@ _wording_problem(node) := ({"invalid description" |
 }) | {concat("", ["meta ", p]) |
 	"meta" in object.keys(node)
 	is_object(node.meta)
-	some p in (_meta_problems(node.meta) - {"number out of range"})
+	some p in (_meta_problems(node.meta) - {"number out of range", _too_long_problem})
+}) | {_too_long_problem |
+	"meta" in object.keys(node)
+	is_object(node.meta)
+	_too_long_problem in _meta_problems(node.meta)
 }
 
 _op_fields := object.union(_required_fields, {
@@ -676,5 +689,5 @@ _op_passed(check, subj) if {
 	_derived_sides(check) != []
 	l := _side_value(subj, check.left)
 	r := _side_value(subj, check.right)
-	_compared(check, l, r)
+	_compared(check, l, r, subj)
 }

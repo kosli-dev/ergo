@@ -9,15 +9,44 @@ _m_print(v) := _m_item(v) if {
 	not is_array(v)
 }
 
-_m_print(v) := concat("", ["[", concat(", ", [_m_item(x) | some x in array.slice(v, 0, 3)]), ", and ", _literal_text(count(v) - 3), " more]"]) if {
+_m_print_at(v, at, row) := _m_print(v) if {
+	not _holds_numbers(v)
+	_ = at
+	_ = row
+}
+
+_m_print_at(v, _, _) := _m_item_of(v, [json.marshal(v)]) if is_object(v)
+
+_m_print_at(v, _, _) := _m_number_text(v, json.marshal(v)) if is_number(v)
+
+_m_print_at(v, _, _) := concat("", ["[", concat(", ", [_m_item_of(x, [json.marshal(x) | _holds_numbers(x)]) | some x in array.slice(v, 0, 3)]), ", and ", _literal_text(count(v) - 3), " more]"]) if {
 	is_array(v)
 	count(v) > 3
 }
 
-_m_print(v) := concat("", ["[", concat(", ", [_m_item(x) | some x in v]), "]"]) if {
+_m_print_at(v, _, _) := concat("", ["[", concat(", ", [_m_item_of(x, [json.marshal(x) | _holds_numbers(x)]) | some x in v]), "]"]) if {
 	is_array(v)
 	count(v) <= 3
 }
+
+_m_item_of(x, [t]) := _m_number_text(x, t) if is_number(x)
+
+_m_item_of(x, [t]) := _m_item(x) if {
+	not is_number(x)
+	not _long_text(t)
+}
+
+_m_item_of(x, [t]) := s if {
+	not is_number(x)
+	_long_text(t)
+	s := _m_item(x) with data.ergo_item as t
+}
+
+_m_item_of(x, []) := _m_item(x)
+
+_m_number_text(v, _) := "<number out of range>" if _out_of_range(v)
+
+_m_number_text(v, t) := _number_text(t) if not _out_of_range(v)
 
 _m_item(v) := _m_text(v) if is_string(v)
 
@@ -110,9 +139,9 @@ _m_plural(v) := "lists" if is_array(v)
 
 _m_plural(v) := "objects" if is_object(v)
 
-_m_is(name, v) := concat("", [name, " is ", _m_print(v)])
+_m_is(name, v) := concat("", [name, " is ", _m_print_at(v, name, null)])
 
-_m_isnt(name, v, kind) := concat("", [name, " is ", _m_print(v), ", which isn't ", kind])
+_m_isnt(name, v, kind) := concat("", [name, " is ", _m_print_at(v, name, null), ", which isn't ", kind])
 
 _m_state_word("absent") := "missing"
 
@@ -270,24 +299,24 @@ _m_shown(subj, side) := {"name": side.text, "state": "value", "value": v} if {
 
 _m_value_clauses(subj, side) := [c] if {
 	s := _m_shown(subj, side)
-	c := _m_value_clause(s)
-} else := [c | some p in [side.elapsed_from, side.elapsed_to]; c := _m_value_clause(_m_shown(subj, p))] if _side_form(side) == "elapsed"
+	c := _m_value_clause(s, subj)
+} else := [c | some p in [side.elapsed_from, side.elapsed_to]; c := _m_value_clause(_m_shown(subj, p), subj)] if _side_form(side) == "elapsed"
 
-else := [c | some e in sort({x | walk(side, [_, x]); _side_form(x) == "elapsed"}); some p in [e.elapsed_from, e.elapsed_to]; c := _m_value_clause(_m_shown(subj, p))] if _side_form(side) == "add"
+else := [c | some e in sort({x | walk(side, [_, x]); _side_form(x) == "elapsed"}); some p in [e.elapsed_from, e.elapsed_to]; c := _m_value_clause(_m_shown(subj, p), subj)] if _side_form(side) == "add"
 
 else := []
 
-_m_value_clause(s) := _m_is(s.name, s.value) if {
+_m_value_clause(s, subj) := concat("", [s.name, " is ", _m_print_at(s.value, s, subj)]) if {
 	s.state == "value"
 	not "text" in object.keys(s)
 }
 
-_m_value_clause(s) := s.text if {
+_m_value_clause(s, _) := s.text if {
 	s.state == "value"
 	"text" in object.keys(s)
 }
 
-_m_value_clause(s) := _m_state_clause(s) if s.state in {"absent", "null"}
+_m_value_clause(s, _) := _m_state_clause(s) if s.state in {"absent", "null"}
 
 _m_sources(subj, check) := _once([x | some side in _m_sides(check); some x in _m_side_sources(subj, side)])
 

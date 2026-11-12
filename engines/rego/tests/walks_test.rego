@@ -2106,6 +2106,15 @@ test_a_named_by_key_that_is_null_or_missing_or_not_text_keeps_saying_each_item_o
 	rows.every == ["unusable", "item 1 of xs: k is null; m is {\"k\": null}, which isn't text; item 2 of xs: m is {}, which isn't text; item 3 of xs: m is {\"k\": 1}, which isn't text"]
 }
 
+test_a_walk_judges_an_item_with_short_numbers_beside_an_item_with_long_ones if {
+	subjects := [
+		{"id": "over", "limit": 1234567890.1209567890, "prs": [{"commits": [{"n": 1}]}, {"commits": [{"n": 1234567890.1209567990}]}]},
+		{"id": "equal", "limit": 1234567890.1209567890, "prs": [{"commits": [{"n": 1}]}, {"commits": [{"n": 1234567890.1209567890}]}]},
+	]
+	policy := {"s": {"subject_type": "thing", "from": "items", "identified_by": "id", "checks": {"c": "every prs.commits.n is at most limit"}}}
+	{[x.subject.id, x.passed] | some x in report({"items": subjects}, policy).results; x.check == "c"} == {["over", false], ["equal", true]}
+}
+
 test_missing_or_empty_params_leave_items_that_arent_objects_as_not_an_object if {
 	every params in [null, {}] {
 		rows := _item_rows(_params_cause_policy, {"prs": [{"id": "p0", "xs": ["s", {"v": "x"}]}]}, params)

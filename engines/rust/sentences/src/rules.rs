@@ -1,4 +1,7 @@
-use crate::numbers::{Decimal, above_list_position, out_of_range, valid_pattern, written_time};
+use crate::numbers::{
+    Decimal, above_list_position, out_of_range, too_long, unusable_number, valid_pattern,
+    written_time,
+};
 use crate::print::{increment, json_string, number_text, print_path};
 use crate::tree::*;
 use crate::words::is_word;
@@ -234,7 +237,7 @@ fn comparable(phrase: &Phrase) -> bool {
 }
 
 fn in_range_number(value: &Value) -> bool {
-    matches!(value, Value::Number(n) if !out_of_range(n))
+    matches!(value, Value::Number(n) if !unusable_number(n))
 }
 
 #[derive(Default)]
@@ -294,6 +297,10 @@ impl Walk {
     fn number(&mut self, text: &str) {
         if out_of_range(text) {
             self.out.insert(format!("number out of range: {text}"));
+        } else if too_long(text) {
+            self.out.insert(format!(
+                "number with more than 15 significant digits: {text}"
+            ));
         }
     }
 
@@ -396,7 +403,7 @@ impl Walk {
                             .insert("\"within\" only compares numbers".to_string());
                     }
                     if let Some(decimal) = Decimal::read(within)
-                        && !decimal.out_of_range()
+                        && !decimal.unusable()
                         && decimal.is_negative()
                     {
                         self.out
@@ -458,8 +465,8 @@ impl Walk {
                 self.number(min);
                 self.number(max);
                 if let (Some(low), Some(high)) = (Decimal::read(min), Decimal::read(max))
-                    && !low.out_of_range()
-                    && !high.out_of_range()
+                    && !low.unusable()
+                    && !high.unusable()
                     && low.compare(&high) == Ordering::Greater
                 {
                     self.out.insert("min above max".to_string());
@@ -478,7 +485,7 @@ impl Walk {
                         let text = match value {
                             Value::String(text) if valid_pattern(text) => continue,
                             Value::String(text) => json_string(text),
-                            Value::Number(text) if out_of_range(text) => continue,
+                            Value::Number(text) if unusable_number(text) => continue,
                             Value::Number(text) => number_text(text),
                             Value::True => "true".to_string(),
                             Value::False => "false".to_string(),
@@ -534,7 +541,7 @@ impl Walk {
             ));
         }
         if let [Term::Number(text)] = terms
-            && !out_of_range(text)
+            && !unusable_number(text)
         {
             self.out
                 .insert("a number can't start a sentence".to_string());

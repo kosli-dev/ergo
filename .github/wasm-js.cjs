@@ -52,7 +52,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     process.exit(1);
   }
 
-  policy.setData(JSON.parse(fs.readFileSync(path.join(runtimeDir, "data.json"))));
+  policy.setData(JSON.parse(fs.readFileSync(path.join(runtimeDir, "data.json"), "utf8"), (_, v, context) => (typeof v === "number" ? JSON.rawJSON(context.source) : v)));
   const failed = tests.filter((test) => {
     try {
       return policy.evaluate({}, test)[0]?.result !== true;
@@ -108,19 +108,36 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
       },
     },
   };
-  const measure = async (name, policy, rows, matching, budgetMB, params = {}) => {
+  const numbers = { rows: Array.from({ length: 100 }, (_, i) => ({ id: `r-${i}`, n: 1000 + i, m: 1000 + i, f: 0.5 + i / 1000 })) };
+  const numbersPolicy = {
+    ergo_spec: "v0.7-dev",
+    subjects: { row: { from: "rows", identified_by: "id" } },
+    requirements: {
+      approved: {
+        subject: "row",
+        checks: {
+          same: "n equals m",
+          small: "n is at most 5000",
+          close: "f equals 0.5 within 1",
+          listed: "n is one of 1000, 1001, 1002",
+        },
+      },
+    },
+  };
+  const measure = async (name, policy, rows, matching, budgetMB, params = {}, doc = document) => {
     const fresh = await load(ergoDir);
-    const report = fresh.evaluate({ document, policy, params }, "entrypoint/report")[0].result;
+    const report = fresh.evaluate({ document: doc, policy, params }, "entrypoint/report")[0].result;
     const usedMB = (fresh.wasmInstance.exports.opa_heap_ptr_get() - fresh.baseHeapPtr) / 1e6;
     const sound = report.results.length === rows && report.requirements.approved.subjects.matching === matching;
-    console.log(`A report on 100 deployments ${name} used ${usedMB.toFixed(1)} MB of Wasm memory (budget ${budgetMB} MB)`);
+    console.log(`A report on 100 ${name} used ${usedMB.toFixed(1)} MB of Wasm memory (budget ${budgetMB} MB)`);
     if (!sound) console.error("The memory budget's report didn't come out as expected, so its measurement can't be trusted");
     if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row, or a large regular expression compiled for every report, or for every parent of a subject read from another subject.`);
     return sound && usedMB <= budgetMB;
   };
-  const withEvery = await measure("with a check on every test", budgetPolicy, 338, 66, 26);
-  const withSentences = await measure("with three checks on each deployment", sentencePolicy, 301, 66, 19);
-  const withChain = await measure("with the tests of each prod deployment as subjects", chainPolicy, 266, 132, 43);
-  const withFor = await measure("with two for checks on each deployment", forPolicy, 235, 66, 116, { ok: true });
-  process.exit(failed.length > 0 || !withEvery || !withSentences || !withChain || !withFor ? 1 : 0);
+  const withEvery = await measure("deployments with a check on every test", budgetPolicy, 338, 66, 26);
+  const withSentences = await measure("deployments with three checks on each deployment", sentencePolicy, 301, 66, 19);
+  const withChain = await measure("deployments with the tests of each prod deployment as subjects", chainPolicy, 266, 132, 43);
+  const withFor = await measure("deployments with two for checks on each deployment", forPolicy, 235, 66, 116, { ok: true });
+  const withNumbers = await measure("rows with four checks that compare numbers", numbersPolicy, 403, 100, 52, {}, numbers);
+  process.exit(failed.length > 0 || !withEvery || !withSentences || !withChain || !withFor || !withNumbers ? 1 : 0);
 });

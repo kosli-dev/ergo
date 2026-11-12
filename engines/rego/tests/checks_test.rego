@@ -390,8 +390,8 @@ test_a_number_a_float_cannot_hold_in_the_input_is_compared_exactly if {
 }
 
 test_a_number_at_the_edge_of_a_float_still_works if {
-	verdict({"id": 1, "n": 1.7976931348623157e308}, "n is 1.7976931348623157e308") == true
-	verdict({"id": 1, "n": 2.2250738585072014e-308}, "n is 2.2250738585072014e-308") == true
+	verdict({"id": 1, "n": 1.79769313486231e308}, "n is 1.79769313486231e308") == true
+	verdict({"id": 1, "n": 2.22507385850721e-308}, "n is 2.22507385850721e-308") == true
 	verdict({"id": 1, "n": 0}, "n is 0") == true
 	stopped(solo({"id": 1, "n": 2.2250738585072e-308}, "n is 2.2250738585072e-308"))
 }
