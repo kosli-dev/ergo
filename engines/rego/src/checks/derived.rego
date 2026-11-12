@@ -122,31 +122,31 @@ _number_states(x, path) := set() if {
 	is_number(_value_at(x, path))
 }
 
-_usable_sides(check, l, r) if {
+_usable_sides(check, l, r, _, _) if {
 	not "within" in object.keys(check)
 	_usable_pair(check.cmp, l, r)
 }
 
-_usable_sides(check, l, r) if {
+_usable_sides(check, l, r, lt, rt) if {
 	"within" in object.keys(check)
-	_within_usable(check, l, r)
+	_within_usable(check, l, r, lt, rt)
 }
 
-_usable_sides(check, l, r) if {
+_usable_sides(check, l, r, _, _) if {
 	check.cmp in {"includes", "excludes"}
 	is_array(l)
 	is_string(r)
 	_items_fit(l, [r])
 }
 
-_within_usable(check, l, r) if {
+_within_usable(check, l, r, lt, rt) if {
 	_numbers(l, r)
 	is_number(check.within)
-	_within_spread([json.marshal(l), json.marshal(r), json.marshal(check.within)]) <= 4096
+	_within_spread([lt, rt, json.marshal(check.within)]) <= 4096
 }
 
-_within_gap(l, r, w) if {
-	texts := [json.marshal(l), json.marshal(r), json.marshal(w)]
+_within_gap(lt, rt, wt) if {
+	texts := [lt, rt, wt]
 	_within_spread(texts) <= 4096
 	_within_texts(texts)
 }
@@ -319,8 +319,8 @@ _tally_cond_cause(c, item, "") := _eval_cause(passed, _ref_cause(c), states) if 
 	_derived_once(c)
 	l := _cond_side(item, c.left)
 	r := _cond_side(item, c.right)
-	passed := _eval_compared(c, l.v, r.v)
-	states := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(c, lf, rf)}
+	passed := _eval_compared(c, l.v, r.v, json.marshal(l.v), json.marshal(r.v))
+	states := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(c, lf, rf, json.marshal(lf), json.marshal(rf))}
 }
 
 _cond_side(item, side) := {"v": v, "found": v, "states": _elapsed_states(item, side)} if {

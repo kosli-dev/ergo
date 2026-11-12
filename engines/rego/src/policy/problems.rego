@@ -676,5 +676,5 @@ _op_passed(check, subj) if {
 	_derived_sides(check) != []
 	l := _side_value(subj, check.left)
 	r := _side_value(subj, check.right)
-	_compared(check, l, r)
+	_compared(check, l, r, json.marshal(l), json.marshal(r))
 }
