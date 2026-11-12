@@ -97,10 +97,17 @@ _for_list_item(item, subj) if {
 	_list_start(item.path, subj)
 }
 
-_for_rooted(check, subj, r) := _for_second_rooted(_for_rooted_row(check, subj, r), xs) if {
+_for_rooted(check, subj, r) := _for_second_rooted(rr, xs) if {
+	rr := _for_rooted_row(check, subj, r)
+	not _for_some_passed(check, rr)
 	xs := _for_second_roots(check, subj)
 	xs != []
 } else := _for_rooted_row(check, subj, r)
+
+_for_some_passed(check, rr) if {
+	check.items[0].q == "some"
+	rr.cause == "satisfied"
+}
 
 _for_second_rooted(rr, xs) := object.union(rr, {"cause": _worst_of({rr.cause} | {x.fl | some x in xs}), "root_msgs": array.concat(rr.root_msgs, [m | some x in xs; some m in x.ms])}) if {
 	"root_msgs" in object.keys(rr)

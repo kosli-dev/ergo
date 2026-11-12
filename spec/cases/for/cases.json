@@ -10899,6 +10899,3412 @@
     ]
   },
   {
+    "description": "a for line that starts with some passes when one of its items passes, whatever item comes after it",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pull_request": {
+          "from": "pull_requests",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "checks": {
+            "every_after": {
+              "for": "some approvers as approver, every commits as commit",
+              "assert": "approver.state is \"APPROVED\""
+            },
+            "some_after": {
+              "for": "some approvers as approver, some commits as commit",
+              "assert": "approver.state is \"APPROVED\""
+            },
+            "first_after": {
+              "for": "some approvers as approver, first of commits as commit",
+              "assert": "approver.state is \"APPROVED\""
+            },
+            "last_after": {
+              "for": "some approvers as approver, last of commits sorted by timestamp as last_commit",
+              "assert": "approver.state is \"APPROVED\""
+            },
+            "whose_after": {
+              "for": "some approvers as approver, every commits whose author does not equal approver.u as commit",
+              "assert": "commit.signed is true"
+            },
+            "swapped": {
+              "for": "every commits as commit, some approvers as approver",
+              "assert": "approver.state is \"APPROVED\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when the first approver has no state and the second approved, whatever item comes after",
+        "rules": [
+          "for.pass",
+          "for.try",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada"
+                },
+                {
+                  "username": "grace",
+                  "u": "grace",
+                  "state": "APPROVED"
+                }
+              ],
+              "commits": [
+                {
+                  "author": "ada",
+                  "timestamp": 1,
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "every_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "first_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "last_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "some_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "swapped",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when the first approver approved and the second has no state",
+        "rules": [
+          "for.pass",
+          "for.try",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "grace",
+                  "u": "grace",
+                  "state": "APPROVED"
+                },
+                {
+                  "username": "ada"
+                }
+              ],
+              "commits": [
+                {
+                  "author": "ada",
+                  "timestamp": 1,
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "every_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  },
+                  {
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "first_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  },
+                  {
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "last_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  },
+                  {
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "some_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  },
+                  {
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "swapped",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  },
+                  {
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  },
+                  {
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when one approver's state is null and another approved",
+        "rules": [
+          "for.pass",
+          "for.try",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada",
+                  "u": "ada",
+                  "state": null
+                },
+                {
+                  "username": "grace",
+                  "u": "grace",
+                  "state": "APPROVED"
+                }
+              ],
+              "commits": [
+                {
+                  "author": "ada",
+                  "timestamp": 1,
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "every_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": null,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "first_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": null,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "last_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": null,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "some_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": null,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "swapped",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": null,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": null,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when one approver's state is a number and another approved",
+        "rules": [
+          "for.pass",
+          "for.try",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada",
+                  "u": "ada",
+                  "state": 1
+                },
+                {
+                  "username": "grace",
+                  "u": "grace",
+                  "state": "APPROVED"
+                }
+              ],
+              "commits": [
+                {
+                  "author": "ada",
+                  "timestamp": 1,
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "every_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": 1,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "first_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": 1,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "last_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": 1,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "some_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": 1,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "swapped",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": 1,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": 1,
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when one approver isn't an object and another approved",
+        "rules": [
+          "for.pass",
+          "for.try",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                1,
+                {
+                  "username": "grace",
+                  "u": "grace",
+                  "state": "APPROVED"
+                }
+              ],
+              "commits": [
+                {
+                  "author": "ada",
+                  "timestamp": 1,
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "every_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  1,
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "first_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  1,
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "last_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  1,
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "some_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  1,
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "swapped",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  1,
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  1,
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails when no approver has a state, and names each approver as before",
+        "rules": [
+          "for.pass",
+          "for.try",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada"
+                },
+                {
+                  "username": "linus"
+                }
+              ],
+              "commits": [
+                {
+                  "author": "ada",
+                  "timestamp": 1,
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "every_after",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "username": "ada"
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "username": "linus"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "username": "linus"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing; item 2 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "first_after",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "username": "ada"
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "username": "linus"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "username": "linus"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing; item 2 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "last_after",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "username": "ada"
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "username": "linus"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "username": "linus"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing; item 2 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some_after",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "username": "ada"
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "username": "linus"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "username": "linus"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing; item 2 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "swapped",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "items": [
+                      {
+                        "cause": "absent",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/0"
+                            ],
+                            "name": "approver.state",
+                            "value": null
+                          }
+                        ],
+                        "item": "item 1 of approvers"
+                      },
+                      {
+                        "cause": "absent",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/1"
+                            ],
+                            "name": "approver.state",
+                            "value": null
+                          }
+                        ],
+                        "item": "item 2 of approvers"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of commits",
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "path": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "username": "linus"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of commits: item 1 of approvers: state is missing; item 1 of commits: item 2 of approvers: state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose_after",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of commits",
+                    "locations": [
+                      "/pull_requests/0/commits/0"
+                    ],
+                    "path": "item 1 of commits",
+                    "value": {
+                      "author": "ada",
+                      "signed": true,
+                      "timestamp": 1
+                    }
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "username": "ada"
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of commits",
+                    "locations": [
+                      "/pull_requests/0/commits/0"
+                    ],
+                    "path": "item 1 of commits",
+                    "value": {
+                      "author": "ada",
+                      "signed": true,
+                      "timestamp": 1
+                    }
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "username": "linus"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "username": "linus"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: approver.u is missing; item 2 of approvers: approver.u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails when no approver approved, with a state that's missing, null or not text, and names each approver as before",
+        "rules": [
+          "for.pass",
+          "for.try",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada"
+                },
+                {
+                  "username": "linus",
+                  "u": "linus",
+                  "state": null
+                },
+                {
+                  "username": "x",
+                  "u": "x",
+                  "state": 1
+                }
+              ],
+              "commits": [
+                {
+                  "author": "ada",
+                  "timestamp": 1,
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every_after",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "username": "ada"
+                }
+              },
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1/state"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "state": null,
+                  "u": "linus",
+                  "username": "linus"
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/2/state"
+                        ],
+                        "name": "approver.state",
+                        "value": 1
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 3 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/2"
+                ],
+                "path": "item 3 of approvers",
+                "value": {
+                  "state": 1,
+                  "u": "x",
+                  "username": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1",
+                  "/pull_requests/0/approvers/2"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": null,
+                    "u": "linus",
+                    "username": "linus"
+                  },
+                  {
+                    "state": 1,
+                    "u": "x",
+                    "username": "x"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing; item 2 of approvers: approver.state is null; item 3 of approvers: approver.state is 1, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "first_after",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "username": "ada"
+                }
+              },
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1/state"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "state": null,
+                  "u": "linus",
+                  "username": "linus"
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/2/state"
+                        ],
+                        "name": "approver.state",
+                        "value": 1
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 3 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/2"
+                ],
+                "path": "item 3 of approvers",
+                "value": {
+                  "state": 1,
+                  "u": "x",
+                  "username": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1",
+                  "/pull_requests/0/approvers/2"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": null,
+                    "u": "linus",
+                    "username": "linus"
+                  },
+                  {
+                    "state": 1,
+                    "u": "x",
+                    "username": "x"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing; item 2 of approvers: approver.state is null; item 3 of approvers: approver.state is 1, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "last_after",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "username": "ada"
+                }
+              },
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1/state"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "state": null,
+                  "u": "linus",
+                  "username": "linus"
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/2/state"
+                        ],
+                        "name": "approver.state",
+                        "value": 1
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 3 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/2"
+                ],
+                "path": "item 3 of approvers",
+                "value": {
+                  "state": 1,
+                  "u": "x",
+                  "username": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1",
+                  "/pull_requests/0/approvers/2"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": null,
+                    "u": "linus",
+                    "username": "linus"
+                  },
+                  {
+                    "state": 1,
+                    "u": "x",
+                    "username": "x"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing; item 2 of approvers: approver.state is null; item 3 of approvers: approver.state is 1, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some_after",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "username": "ada"
+                }
+              },
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1/state"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "state": null,
+                  "u": "linus",
+                  "username": "linus"
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/2/state"
+                        ],
+                        "name": "approver.state",
+                        "value": 1
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 3 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/2"
+                ],
+                "path": "item 3 of approvers",
+                "value": {
+                  "state": 1,
+                  "u": "x",
+                  "username": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1",
+                  "/pull_requests/0/approvers/2"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": null,
+                    "u": "linus",
+                    "username": "linus"
+                  },
+                  {
+                    "state": 1,
+                    "u": "x",
+                    "username": "x"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing; item 2 of approvers: approver.state is null; item 3 of approvers: approver.state is 1, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "swapped",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "unusable",
+                    "items": [
+                      {
+                        "cause": "absent",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/0"
+                            ],
+                            "name": "approver.state",
+                            "value": null
+                          }
+                        ],
+                        "item": "item 1 of approvers"
+                      },
+                      {
+                        "cause": "null",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/1/state"
+                            ],
+                            "name": "approver.state",
+                            "value": null
+                          }
+                        ],
+                        "item": "item 2 of approvers"
+                      },
+                      {
+                        "cause": "unusable",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/2/state"
+                            ],
+                            "name": "approver.state",
+                            "value": 1
+                          }
+                        ],
+                        "item": "item 3 of approvers"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of commits",
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "path": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1",
+                  "/pull_requests/0/approvers/2"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": null,
+                    "u": "linus",
+                    "username": "linus"
+                  },
+                  {
+                    "state": 1,
+                    "u": "x",
+                    "username": "x"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of commits: item 1 of approvers: state is missing; item 1 of commits: item 2 of approvers: state is null; item 1 of commits: item 3 of approvers: state is 1, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1",
+                  "/pull_requests/0/approvers/2"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": null,
+                    "u": "linus",
+                    "username": "linus"
+                  },
+                  {
+                    "state": 1,
+                    "u": "x",
+                    "username": "x"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails on an empty list of approvers",
+        "rules": [
+          "for.pass",
+          "for.try",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [],
+              "commits": [
+                {
+                  "author": "ada",
+                  "timestamp": 1,
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "every_after",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0/approvers"
+                ],
+                "path": "approvers",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "message": "approvers is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "first_after",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0/approvers"
+                ],
+                "path": "approvers",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "message": "approvers is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "last_after",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0/approvers"
+                ],
+                "path": "approvers",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "signed": true,
+                  "timestamp": 1
+                }
+              }
+            ],
+            "message": "approvers is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "some_after",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0/approvers"
+                ],
+                "path": "approvers",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "message": "approvers is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "swapped",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0/approvers"
+                ],
+                "path": "approvers",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "message": "approvers is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "whose_after",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0/approvers"
+                ],
+                "path": "approvers",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "signed": true,
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "message": "approvers is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails when the approver who approved has an empty list of commits to go with it",
+        "rules": [
+          "for.pass",
+          "for.try",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada"
+                },
+                {
+                  "username": "grace",
+                  "u": "grace",
+                  "state": "APPROVED"
+                }
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "every_after",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "commits is []; item 1 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "first_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "last_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some_after",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "commits is []; item 1 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "swapped",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "commits is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose_after",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "commits is []; item 1 of approvers: approver.u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "every over the subs of the first item that whose kept",
     "policy": {
       "ergo_spec": "{{spec}}",

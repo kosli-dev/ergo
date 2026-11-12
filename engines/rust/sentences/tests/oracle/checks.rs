@@ -11080,8 +11080,26 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "some approvers as approver, first of commits as commit",
+        "some approvers as approver, first of commits as commit",
+        &[],
+        &[],
+    ),
+    (
         "some approvers as approver, last of commits sorted by timestamp as last_commit",
         "some approvers as approver, last of commits sorted by timestamp as last_commit",
+        &[],
+        &[],
+    ),
+    (
+        "some approvers as approver, some commits as commit",
+        "some approvers as approver, some commits as commit",
+        &[],
+        &[],
+    ),
+    (
+        "every commits as commit, some approvers as approver",
+        "every commits as commit, some approvers as approver",
         &[],
         &[],
     ),

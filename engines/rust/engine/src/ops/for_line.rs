@@ -1776,7 +1776,9 @@ impl For {
                 mode = Named::Ahead(texts);
             }
         }
-        if let Some((second, second_texts, _)) = self.second_roots(ctx) {
+        if !self.some_passed(run)
+            && let Some((second, second_texts, _)) = self.second_roots(ctx)
+        {
             let row = run.verdict.cause;
             mode = match mode {
                 Named::Roots(mut texts) => {
@@ -1836,6 +1838,10 @@ impl For {
         sentence_root_flaw(&forms, outer).is_some()
             || super::message::root_flaw_in_for(&nested, outer, &[], &[]).is_some()
             || super::message::root_flaw_in_for(&whose, outer, &[], &[]).is_some()
+    }
+
+    fn some_passed(&self, run: &Run) -> bool {
+        matches!(self.items[0].how, How::Some { .. }) && run.verdict.cause == Cause::Satisfied
     }
 
     fn second_roots(&self, ctx: &Ctx) -> Option<(Cause, Vec<String>, Vec<String>)> {
