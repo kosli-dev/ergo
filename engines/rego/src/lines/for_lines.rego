@@ -185,19 +185,29 @@ _for_hoisted_texts(check, r) := [p |
 _for_item_text(check, subj, r, once) := "" if {
 	"root_msgs" in object.keys(r)
 	r.failed == []
+} else := "" if {
+	"free_lines" in object.keys(r)
+	r.failed == []
 } else := _for_message(check, subj, r) if {
 	r.failed == []
 } else := _for_message(check, subj, object.union(r, {"failed": [object.union(f, {"skip": skip}) | some f in r.failed]})) if {
 	skip := array.concat(once, [m | some x in _for_second_roots(check, subj); some m in x.raw])
 }
 
-_for_free_texts(check, r) := [p |
-	some f in r.failed
-	some l in object.get(f, "failed_assertions", [])
-	_for_free_line(check, l)
-	some m in _m_line_msg(l, f)
-	some p in split(m, "; ")
-]
+_for_free_texts(check, r) := array.concat(
+	[p |
+		some f in r.failed
+		some l in object.get(f, "failed_assertions", [])
+		_for_free_line(check, l)
+		some m in _m_line_msg(l, f)
+		some p in split(m, "; ")
+	],
+	[p |
+		some l in object.get(r, "free_lines", [])
+		some m in l.msg
+		some p in split(m, "; ")
+	],
+)
 
 _for_free_line(check, l) if {
 	not "items" in object.keys(l)
@@ -211,7 +221,46 @@ _for_reads_an_alias(check, c) if {
 	_reads_name(c, item.as)
 }
 
-_for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(check, subj, names, check.items[0], w), "failed": _for_failed(check, w.unread, [object.union(f, {"lines": []}) | some f in w.fails])} if {
+_for_outer(check, subj, names) := object.union(_for_outer_of(_for_after_first(check), subj, names), {"inputs": _for_inputs(check, subj, names, check.items[0], w), "said_items": [check.items[1]]}) if {
+	count(check.items) == 2
+	object.get(check.items[0], "if_any", false) == true
+	not _for_needs_first(check)
+	_for_after_first(check).checks != []
+	w := _for_walk(check.items[0], subj, names)
+	_for_none_kept(check.items[0], w, names)
+} else := _for_outer_of(check, subj, names)
+
+_for_none_kept(item, w, names) if {
+	object.get(item, "if_any", false) == true
+	not "unread" in object.keys(w)
+	w.fails == []
+	_walk_stop(w) == []
+	every e in w.items {
+		wh := _for_whose(item, e, names)
+		wh.undecided == []
+		wh.kept == false
+	}
+}
+
+_for_needs_first(check) if _for_from_first(check)
+
+_for_needs_first(check) if _for_whose_reads(object.get(check.items[1], "whose", []), check.items[0].as)
+
+_for_after_first(check) := object.union(_for_without(check, check.items[0].as), {"items": [check.items[1]]})
+
+_for_unaliased(check) := object.union(check, {
+	"checks": [x | some x in check.checks; not _for_reads_an_alias(check, x)],
+	"assertions": [check.assertions[i] | some i, x in check.checks; not _for_reads_an_alias(check, x)],
+})
+
+_for_with_free(check, subj, names, item, w, r) := object.union(r, {"cause": free.cause, "free_lines": free.lines}) if {
+	r.cause == "satisfied"
+	_for_none_kept(item, w, names)
+	free := _for_lines(_for_unaliased(check), subj, names)
+	not free.passed
+} else := r
+
+_for_outer_of(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(check, subj, names, check.items[0], w), "failed": _for_failed(check, w.unread, [object.union(f, {"lines": []}) | some f in w.fails])} if {
 	w := _for_walk(check.items[0], subj, names)
 	"unread" in object.keys(w)
 } else := {"cause": cause, "inputs": _for_inputs(check, subj, names, check.items[0], _for_walk(check.items[0], subj, names)), "failed": _for_failed(check, cause, [object.union(f, {"lines": []}) | some f in _for_pick_fails(check, pre)])} if {
@@ -220,7 +269,7 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 	"pick" in object.keys(check.items[1])
 	not _for_pick_reads_first(check)
 	cause := _for_pick_failure(pre)
-} else := {"cause": cause, "inputs": inputs, "failed": failed, "passed_items": passed} if {
+} else := _for_with_free(check, subj, names, item, w, {"cause": cause, "inputs": inputs, "failed": failed, "passed_items": passed}) if {
 	item := check.items[0]
 	w := _for_walk(item, subj, names)
 	pre := _for_pre(check, subj, names)
@@ -654,13 +703,26 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 } else := {"passed": false, "cause": w.unread, "lines": [], "unchecked": u} if {
 	"unread" in object.keys(w)
 	u := [object.union(f, _m_unread_names(check.items[1].path, subj, f)) | some f in _for_unwalked(check, w)] with input as {"ergo/names": names}
-} else := {"passed": cause == "satisfied", "cause": cause, "lines": lines, "unchecked": [f | some f in fails; f.lines == []]} if {
+} else := res if {
 	item := check.items[1]
 	judged := _for_copies_merged(item, names, w, [_for_judge_inner(check, subj, names, item, e, w) | some e in w.items])
 	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
 	cause := _for_verdict(item, w, judged, fails)
-	lines := _for_merge_lines(check, cause, fails)
+	res := _for_inner_result(check, subj, names, judged, fails, cause)
 }
+
+_for_inner_result(check, subj, names, judged, fails, cause) := _for_lines(_for_without(check, check.items[1].as), subj, names) if {
+	cause == "satisfied"
+	check.items[1].if_any == true
+	every j in judged {
+		j.kept == false
+	}
+} else := {"passed": cause == "satisfied", "cause": cause, "lines": _for_merge_lines(check, cause, fails), "unchecked": [f | some f in fails; f.lines == []]}
+
+_for_without(check, name) := object.union(check, {
+	"checks": [c | some c in check.checks; not _reads_name(c, name)],
+	"assertions": [check.assertions[i] | some i, c in check.checks; not _reads_name(c, name)],
+})
 
 _for_lines(check, subj, names) := {"passed": count(lines) == 0, "cause": _all_of_cause(lines), "lines": lines} if {
 	lines := [object.union({"assertion": check.assertions[i], "cause": cause, "inputs": _for_line_inputs(check, c, read), "msg": [_m_aliased(x) | some x in m]}, _m_own_msg(check, c, m, count(read) == 1)) |

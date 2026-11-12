@@ -340,21 +340,29 @@ test_the_derived_cases_pass_compiled_part_5_of_6 if _differences_compiled("deriv
 
 test_the_derived_cases_pass_compiled_part_6_of_6 if _differences_compiled("derived", _part("derived", 5, 6)) == set()
 
-test_the_for_cases_pass_part_1_of_4 if _part_passes("for", 0, 4)
+test_the_for_cases_pass_part_1_of_6 if _part_passes("for", 0, 6)
 
-test_the_for_cases_pass_part_2_of_4 if _part_passes("for", 1, 4)
+test_the_for_cases_pass_part_2_of_6 if _part_passes("for", 1, 6)
 
-test_the_for_cases_pass_part_3_of_4 if _part_passes("for", 2, 4)
+test_the_for_cases_pass_part_3_of_6 if _part_passes("for", 2, 6)
 
-test_the_for_cases_pass_part_4_of_4 if _part_passes("for", 3, 4)
+test_the_for_cases_pass_part_4_of_6 if _part_passes("for", 3, 6)
 
-test_the_for_cases_pass_compiled_part_1_of_4 if _differences_compiled("for", _part("for", 0, 4)) == set()
+test_the_for_cases_pass_part_5_of_6 if _part_passes("for", 4, 6)
 
-test_the_for_cases_pass_compiled_part_2_of_4 if _differences_compiled("for", _part("for", 1, 4)) == set()
+test_the_for_cases_pass_part_6_of_6 if _part_passes("for", 5, 6)
 
-test_the_for_cases_pass_compiled_part_3_of_4 if _differences_compiled("for", _part("for", 2, 4)) == set()
+test_the_for_cases_pass_compiled_part_1_of_6 if _differences_compiled("for", _part("for", 0, 6)) == set()
 
-test_the_for_cases_pass_compiled_part_4_of_4 if _differences_compiled("for", _part("for", 3, 4)) == set()
+test_the_for_cases_pass_compiled_part_2_of_6 if _differences_compiled("for", _part("for", 1, 6)) == set()
+
+test_the_for_cases_pass_compiled_part_3_of_6 if _differences_compiled("for", _part("for", 2, 6)) == set()
+
+test_the_for_cases_pass_compiled_part_4_of_6 if _differences_compiled("for", _part("for", 3, 6)) == set()
+
+test_the_for_cases_pass_compiled_part_5_of_6 if _differences_compiled("for", _part("for", 4, 6)) == set()
+
+test_the_for_cases_pass_compiled_part_6_of_6 if _differences_compiled("for", _part("for", 5, 6)) == set()
 
 test_the_walks_cases_pass if {
 	_topic_failures("walks") == _known_in("walks")
