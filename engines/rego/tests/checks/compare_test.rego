@@ -217,3 +217,92 @@ test_a_long_number_outside_a_check_is_written_wrong if {
 	from := object.union(_sentence_policy({"c": "l exists"}), {"subjects": {"thing": {"from": "things whose l is 1234567890.1209567890", "identified_by": "id"}}})
 	[r.message | some r in ergo.report({"things": [{"id": "a", "l": 1}]}, from, {}).results; r.check == "$well_formed"] == ["subjects.thing.from: number with more than 15 significant digits: 1234567890.1209567890"]
 }
+
+test_objects_in_a_list_compare_by_their_own_digits_in_any_order if {
+	checks := {
+		"every": "every xs.v is at most $params.r",
+		"some": "some xs.v is more than $params.r",
+		"count": "count of xs whose v is more than $params.r equals 1",
+		"distinct_v": "count of distinct xs.v equals 2",
+		"distinct_xs": "count of distinct xs equals 2",
+	}
+	rows := [{"id": "a", "xs": [{"v": _low}, {"v": _high}]}, {"id": "b", "xs": [{"v": _high}, {"v": _low}]}]
+	_long_in_both_orders(checks, rows, {"r": _low}, {
+		["a", "every", "value"], ["a", "some", "satisfied"], ["a", "count", "satisfied"], ["a", "distinct_v", "satisfied"], ["a", "distinct_xs", "satisfied"],
+		["b", "every", "value"], ["b", "some", "satisfied"], ["b", "count", "satisfied"], ["b", "distinct_v", "satisfied"], ["b", "distinct_xs", "satisfied"],
+	})
+}
+
+test_an_item_message_quotes_the_digits_of_its_own_item if {
+	_long_messages({"c": "every xs.v is at most $params.r"}, [{"id": "a", "xs": [{"v": _low}, {"v": _high}]}], {"r": _low}) == {["a", "c", "item 2 of xs: v is 1234567890.120956799, and $params.r is 1234567890.120956789"]}
+}
+
+_rows_by_digits(rows, ident) := {[json.marshal(r.subject.id), r.check, r.cause] |
+	policy := {"ergo_spec": ergo._spec, "subjects": {"thing": ident}, "requirements": {"s": {"subject": "thing", "checks": {"c": "l is at most r"}}}}
+	some r in ergo.report({"things": rows}, policy, {}).results
+	r.check in {"c", "$unique_ids"}
+}
+
+test_subjects_that_differ_only_past_15_digits_keep_their_own_answers if {
+	_rows_by_digits([{"l": _high, "r": _low}, {"l": _low, "r": _low}], {"from": "things"}) == {
+		[`{"l":1234567890.120956799,"r":1234567890.120956789}`, "c", "value"],
+		[`{"l":1234567890.120956789,"r":1234567890.120956789}`, "c", "satisfied"],
+		["null", "$unique_ids", "satisfied"],
+	}
+	_rows_by_digits([{"l": 2234567890.1209567890, "r": 2234567890.1209567890}, {"l": 2234567890.1209567990, "r": 2234567890.1209567890}], {"from": "things"}) == {
+		[`{"l":2234567890.120956799,"r":2234567890.120956789}`, "c", "value"],
+		[`{"l":2234567890.120956789,"r":2234567890.120956789}`, "c", "satisfied"],
+		["null", "$unique_ids", "satisfied"],
+	}
+}
+
+test_ids_that_differ_only_past_15_digits_are_not_repeated if {
+	_rows_by_digits([{"id": _high, "l": _high, "r": _low}, {"id": _low, "l": _low, "r": _low}], {"from": "things", "identified_by": "id"}) == {
+		["1234567890.120956799", "c", "value"],
+		["1234567890.120956789", "c", "satisfied"],
+		["null", "$unique_ids", "satisfied"],
+	}
+	_rows_by_digits([{"id": 2234567890.1209567890, "l": 1, "r": 2}, {"id": 2234567890.1209567890, "l": 1, "r": 2}], {"from": "things", "identified_by": "id"}) == {
+		["2234567890.120956789", "c", "satisfied"],
+		["null", "$unique_ids", "value"],
+	}
+}
+
+test_objects_and_lists_compare_by_every_digit_in_any_order if {
+	checks := {
+		"o_equals_p": "o equals p",
+		"o_is_not_p": "o is not p",
+		"ls_equals_ms": "ls equals ms",
+		"o_equals_param": "o equals $params.o",
+		"lls_contains_m": "lls contains m",
+		"m_is_in_lls": "m is in lls",
+		"same": "o equals q",
+	}
+	rows := [
+		{"id": "a", "o": {"v": _low}, "p": {"v": _high}, "q": {"v": 1234567890.12095678900}, "ls": [_low], "ms": [_high], "m": [_high], "lls": [[_low]]},
+		{"id": "b", "o": {"v": _high}, "p": {"v": _low}, "q": {"v": _high}, "ls": [_high], "ms": [_low], "m": [_low], "lls": [[_high]]},
+	]
+	_long_in_both_orders(checks, rows, {"o": {"v": _high}}, {
+		["a", "o_equals_p", "value"], ["a", "o_is_not_p", "satisfied"], ["a", "ls_equals_ms", "value"], ["a", "o_equals_param", "value"], ["a", "lls_contains_m", "value"], ["a", "m_is_in_lls", "value"], ["a", "same", "satisfied"],
+		["b", "o_equals_p", "value"], ["b", "o_is_not_p", "satisfied"], ["b", "ls_equals_ms", "value"], ["b", "o_equals_param", "satisfied"], ["b", "lls_contains_m", "value"], ["b", "m_is_in_lls", "value"], ["b", "same", "satisfied"],
+	})
+}
+
+test_a_message_quotes_each_object_by_its_own_digits if {
+	_long_messages({"c": "o equals p"}, [{"id": "a", "o": {"v": _low}, "p": {"v": _high}}], {}) == {["a", "c", `o is {"v": 1234567890.120956789}, and p is {"v": 1234567890.120956799}`]}
+}
+
+test_for_lines_keep_and_sort_items_by_every_digit_in_any_order if {
+	checks := {
+		"distinct": {"for": "every distinct ws as w", "assert": "w.z is at most $params.r"},
+		"first": {"for": "first of ys sorted by z as y", "assert": "y.k is \"low\""},
+	}
+	rows := [
+		{"id": "a", "ys": [{"z": _low, "k": "low"}, {"z": _high, "k": "high"}], "ws": [{"z": _low}, {"z": _high}]},
+		{"id": "b", "ys": [{"z": _high, "k": "high"}, {"z": _low, "k": "low"}], "ws": [{"z": _high}, {"z": _low}]},
+	]
+	_long_in_both_orders(checks, rows, {"r": _low}, {
+		["a", "distinct", "value"], ["a", "first", "satisfied"],
+		["b", "distinct", "value"], ["b", "first", "satisfied"],
+	})
+}

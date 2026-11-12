@@ -270,7 +270,7 @@ _fl_list_item_read(x, keys, i) if {
 
 _fl_step(x, keys, i) := x if i >= count(keys)
 
-_fl_step(x, keys, i) := {"c": array.concat(x.c, [keys[i]]), "i": x.i, "v": _walk_read(x.v, keys[i], x), "x": false, "w": _fl_why(x, keys[i])} if i < count(keys)
+_fl_step(x, keys, i) := {"c": array.concat(x.c, [keys[i]]), "i": x.i, "v": _walk_read(x.v, keys[i], x, null), "x": false, "w": _fl_why(x, keys[i])} if i < count(keys)
 
 _fl_why(x, k) := x.w if {
 	_walk_marked(x.v)
@@ -641,7 +641,7 @@ _distinct_from(req) if {
 }
 
 _copies_merged(entries) := [_with_copies(entries, i, copies) | some i, e in entries; not i in copies.dropped] if {
-	copies := _copies_of([[e.subject, i] | some i, e in entries])
+	copies := _copies_of([[_exact_key(e.subject, [json.marshal(e.subject) | _holds_numbers(e.subject)]), i] | some i, e in entries])
 }
 
 _with_copies(entries, i, copies) := object.union(entries[i], {"ats": [entries[k].at | some k in copies.groups[i]]}) if i in object.keys(copies.groups)

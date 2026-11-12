@@ -390,12 +390,16 @@ else := _walk_worst(fails) if {
 
 _for_list_input(item, w) := [_walk_name(item.path, w.walked), [_walk_value(e.v, e, w) | some e in w.items], _walk_locations(w)]
 
-_for_sort_key(item, x, names) := _for_sortable(v, object.get(item.pick, "alphabetically", false)) if {
+_for_sort_key(item, x, names) := _for_sortable_exact(_for_sortable(v, object.get(item.pick, "alphabetically", false)), [json.marshal(v) | is_number(v)]) if {
 	"by" in object.keys(item.pick)
 	e := _focus_entry(x)
 	is_object(e.iv)
 	v := _resolved(e.iv, item.pick.by) with input as {"ergo/names": names}
 }
+
+_for_sortable_exact(k, []) := k
+
+_for_sortable_exact(k, [t]) := [k[0], json.unmarshal(t)]
 
 _for_sortable(v, false) := ["number", v] if is_number(v)
 
@@ -474,7 +478,12 @@ _for_sort_shown(item, x, names) := _walk_shown(v) if {
 
 else := null
 
-_for_order(item, items, names) := [pair[2] | some pair in sort([[_for_sort_key(item, e, names)[1], i, i] | some i, e in items])] if "by" in object.keys(item.pick)
+_for_order(item, items, names) := [pair[2] | some pair in sort([[k, _tie_rank(keys, i), i] | some i, k in keys])] if {
+	"by" in object.keys(item.pick)
+	keys := [_for_sort_key(item, e, names)[1] | some e in items]
+}
+
+_tie_rank(keys, i) := count([j | some j, k in keys; k == keys[i]; is_number(k); _text_order(json.marshal(k), json.marshal(keys[i])) < 0])
 
 _for_order(item, items, _) := numbers.range(0, count(items) - 1) if not "by" in object.keys(item.pick)
 
@@ -497,7 +506,9 @@ _for_tied(item, _, _) := [] if not "by" in object.keys(item.pick)
 
 _for_tied(item, w, names) := [{"path": e.i, "item": e.i, "cause": "ambiguous", "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names)} |
 	some e in w.items
-	_for_sort_key(item, e, names)[1] == key
+	k := _for_sort_key(item, e, names)[1]
+	k == key
+	_same_texts(json.marshal(k), json.marshal(key))
 ] if {
 	"by" in object.keys(item.pick)
 	key := _for_sort_key(item, w.items[_for_pick_index(item, w.items, names)], names)[1]
@@ -926,7 +937,7 @@ _for_dropped(item, _, _) := set() if object.get(item, "distinct", false) != true
 
 _for_dropped(item, names, w) := _for_copies(item, names, w).dropped if object.get(item, "distinct", false) == true
 
-_for_copies(item, names, w) := _copies_of([[e.v, i] | some i, e in w.items; wh := _for_whose(item, e, names); wh.kept; wh.undecided == []; not _walk_marked(e.v)])
+_for_copies(item, names, w) := _copies_of([[_exact_key(e.v, [json.marshal(e.v) | _holds_numbers(e.v)]), i] | some i, e in w.items; wh := _for_whose(item, e, names); wh.kept; wh.undecided == []; not _walk_marked(e.v)])
 
 _for_inner_pairs(check, subj, names, _, w) := {object.get(pw, "input", [_for_list_name(check, check.items[1].path, pw.walked), [_walk_value(e.v, e, pw) | some e in pw.items], _walk_locations(pw)])} if {
 	count(check.items) == 2

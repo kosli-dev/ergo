@@ -6,13 +6,13 @@ default _cmp(_, _, _, _, _) := false
 
 _cmp("eq", l, r, _, _) if {
 	l == r
-	not is_number(l)
+	not _holds_numbers(l)
 }
 
 _cmp("eq", l, r, check, subj) if {
 	l == r
-	is_number(l)
-	_text_order(json.marshal(l), json.marshal(r)) == 0
+	_holds_numbers(l)
+	_same_texts(json.marshal(l), json.marshal(r))
 	_ = check
 	_ = subj
 }
@@ -21,9 +21,44 @@ _cmp("ne", l, r, _, _) if l != r
 
 _cmp("ne", l, r, _, _) if {
 	l == r
-	is_number(l)
-	_text_order(json.marshal(l), json.marshal(r)) != 0
+	_holds_numbers(l)
+	not _same_texts(json.marshal(l), json.marshal(r))
 }
+
+_holds_numbers(x) if is_number(x)
+
+_holds_numbers(x) if is_object(x)
+
+_holds_numbers(x) if is_array(x)
+
+_same_texts(a, b) if a == b
+
+_same_texts(a, b) if {
+	a != b
+	x := json.unmarshal(a)
+	y := json.unmarshal(b)
+	x == y
+	xs := {p: json.marshal(n) | walk(x, [p, n]); is_number(n)}
+	ys := {p: json.marshal(n) | walk(y, [p, n]); is_number(n)}
+	every p, t in xs {
+		_text_order(t, ys[p]) == 0
+	}
+}
+
+_has_number(x) if is_number(x)
+
+_has_number(x) if {
+	_holds_numbers(x)
+	not is_number(x)
+	walk(x, [_, n])
+	is_number(n)
+}
+
+_exact_key(x, []) := x
+
+_exact_key(_, [t]) := [v, {p: _decimal_parts(json.marshal(n)) | walk(v, [p, n]); is_number(n)}] if v := json.unmarshal(t)
+
+_long_text(t) if regex.match(`[0-9.]{16}`, t)
 
 _cmp("gt", l, r, _, _) if l > r
 
@@ -105,13 +140,13 @@ _ordered(x, y) := 1 if x > y
 _ordered(x, y) := 0 if x == y
 
 _member(list, x, _) if {
-	not is_number(x)
+	not _holds_numbers(x)
 	x in list
 }
 
 _member(_, _, pairs) if {
 	some p in pairs
-	_text_order(p[0], p[1]) == 0
+	_same_texts(p[0], p[1])
 }
 
 _cmp("starts_with", l, r, _, _) if {
@@ -166,28 +201,28 @@ _cmp("in", l, r, _, _) if {
 	l != null
 	is_array(r)
 	_fits_list(l, r)
-	_member(r, l, [[json.marshal(y), json.marshal(l)] | some y in r; y == l; is_number(y)])
+	_member(r, l, [[json.marshal(y), json.marshal(l)] | some y in r; y == l; _holds_numbers(y)])
 }
 
 _cmp("not_in", l, r, _, _) if {
 	l != null
 	is_array(r)
 	_fits_list(l, r)
-	not _member(r, l, [[json.marshal(y), json.marshal(l)] | some y in r; y == l; is_number(y)])
+	not _member(r, l, [[json.marshal(y), json.marshal(l)] | some y in r; y == l; _holds_numbers(y)])
 }
 
 _cmp("includes", l, r, _, _) if {
 	is_array(l)
 	r != null
 	_items_fit(l, [r])
-	_member(l, r, [[json.marshal(y), json.marshal(r)] | some y in l; y == r; is_number(y)])
+	_member(l, r, [[json.marshal(y), json.marshal(r)] | some y in l; y == r; _holds_numbers(y)])
 }
 
 _cmp("excludes", l, r, _, _) if {
 	is_array(l)
 	r != null
 	_items_fit(l, [r])
-	not _member(l, r, [[json.marshal(y), json.marshal(r)] | some y in l; y == r; is_number(y)])
+	not _member(l, r, [[json.marshal(y), json.marshal(r)] | some y in l; y == r; _holds_numbers(y)])
 }
 
 _cmp("includes_all", l, r, _, _) if {
@@ -195,7 +230,7 @@ _cmp("includes_all", l, r, _, _) if {
 	_wanted(r)
 	_items_fit(l, r)
 	every want in r {
-		_member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; is_number(y)])
+		_member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; _holds_numbers(y)])
 	}
 }
 
@@ -204,7 +239,7 @@ _cmp("excludes_all", l, r, _, _) if {
 	_wanted(r)
 	_items_fit(l, r)
 	every want in r {
-		not _member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; is_number(y)])
+		not _member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; _holds_numbers(y)])
 	}
 }
 
@@ -213,7 +248,7 @@ _cmp("includes_some", l, r, _, _) if {
 	_wanted(r)
 	_items_fit(l, r)
 	some want in r
-	_member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; is_number(y)])
+	_member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; _holds_numbers(y)])
 }
 
 _cmp("not_includes_all", l, r, _, _) if {
@@ -221,7 +256,7 @@ _cmp("not_includes_all", l, r, _, _) if {
 	_wanted(r)
 	_items_fit(l, r)
 	some want in r
-	not _member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; is_number(y)])
+	not _member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; _holds_numbers(y)])
 }
 
 _cmp("matches_any", l, r, _, _) if {

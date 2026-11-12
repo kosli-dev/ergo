@@ -10,25 +10,37 @@ _m_print(v) := _m_item(v) if {
 }
 
 _m_print_at(v, at, row) := _m_print(v) if {
-	not is_number(v)
-	not is_array(v)
+	not _holds_numbers(v)
 	_ = at
 	_ = row
 }
 
+_m_print_at(v, _, _) := _m_item_of(v, [json.marshal(v)]) if is_object(v)
+
 _m_print_at(v, _, _) := _m_number_text(v, json.marshal(v)) if is_number(v)
 
-_m_print_at(v, _, _) := concat("", ["[", concat(", ", [_m_item_of(x, [json.marshal(x) | is_number(x)]) | some x in array.slice(v, 0, 3)]), ", and ", _literal_text(count(v) - 3), " more]"]) if {
+_m_print_at(v, _, _) := concat("", ["[", concat(", ", [_m_item_of(x, [json.marshal(x) | _holds_numbers(x)]) | some x in array.slice(v, 0, 3)]), ", and ", _literal_text(count(v) - 3), " more]"]) if {
 	is_array(v)
 	count(v) > 3
 }
 
-_m_print_at(v, _, _) := concat("", ["[", concat(", ", [_m_item_of(x, [json.marshal(x) | is_number(x)]) | some x in v]), "]"]) if {
+_m_print_at(v, _, _) := concat("", ["[", concat(", ", [_m_item_of(x, [json.marshal(x) | _holds_numbers(x)]) | some x in v]), "]"]) if {
 	is_array(v)
 	count(v) <= 3
 }
 
-_m_item_of(x, [t]) := _m_number_text(x, t)
+_m_item_of(x, [t]) := _m_number_text(x, t) if is_number(x)
+
+_m_item_of(x, [t]) := _m_item(x) if {
+	not is_number(x)
+	not _long_text(t)
+}
+
+_m_item_of(x, [t]) := s if {
+	not is_number(x)
+	_long_text(t)
+	s := _m_item(x) with data.ergo_item as t
+}
 
 _m_item_of(x, []) := _m_item(x)
 

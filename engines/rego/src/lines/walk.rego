@@ -54,7 +54,7 @@ _walk_judged(check, w) := [_walk_judge(check, w, e) | some e in w.items] if obje
 
 else := [_walk_copied(j, i, w, copies) | some i, j in judged; not i in copies.dropped] if {
 	judged := [object.union(_walk_judge(check, w, e), {"decided": _walk_decided(check, e)}) | some e in w.items]
-	copies := _copies_of([[w.items[i].v, i] | some i, j in judged; j.kept; j.decided; not _walk_marked(w.items[i].v)])
+	copies := _copies_of([[_exact_key(w.items[i].v, [json.marshal(w.items[i].v) | _holds_numbers(w.items[i].v)]), i] | some i, j in judged; j.kept; j.decided; not _walk_marked(w.items[i].v)])
 }
 
 default _walk_decided(_, _) := false
@@ -268,9 +268,10 @@ _walk_empty_ok(_, true)
 
 _walk_step(e, keys, i, _) := e if i >= count(keys)
 
-_walk_step(e, keys, i, start) := {"c": array.concat(e.c, [keys[i]]), "v": _walk_read(e.v, keys[i], start), "i": e.i, "iv": e.iv, "r": array.concat(e.r, [keys[i]])} if i < count(keys)
+_walk_step(e, keys, i, start) := {"c": array.concat(e.c, [keys[i]]), "v": _walk_read(e.v, keys[i], e, start), "i": e.i, "iv": e.iv, "r": array.concat(e.r, [keys[i]])} if i < count(keys)
 
-_walk_read(v, k, start) := object.get(v, k, _absent) if {
+_walk_read(v, k, at, start) := object.get(v, k, _absent) if {
+	_ = at
 	_ = start
 	is_object(v)
 	is_string(k)
@@ -313,12 +314,12 @@ _walk_marked(v) if v == _absent
 
 _walk_marked(v) if v == _unusable_mark
 
-_walk_judge(check, w, e) := _walk_judgement(check, w, e) if not is_number(e.iv)
-
 _walk_judge(check, w, e) := j if {
-	is_number(e.iv)
-	j := _walk_judgement(check, w, e) with data.ergo_item as json.marshal(e.iv)
-}
+	_holds_numbers(e.iv)
+	t := json.marshal(e.iv)
+	_long_text(t)
+	j := _walk_judgement(check, w, e) with data.ergo_item as t
+} else := _walk_judgement(check, w, e)
 
 _walk_judgement(check, w, e) := {"kept": kept, "passed": passed, "failure": failure} if {
 	undecided := [[c, cause] | some c in check.whose; cause := _focus_cause(c, e); not cause in {"satisfied", "value"}]

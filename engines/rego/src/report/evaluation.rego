@@ -163,13 +163,36 @@ _evaluation_with(doc, written, name, fixed) := {
 } if {
 	req := _with_fixed(written)
 	raw := _raw_entries(doc, req)
-	refs := {i: _entry_ref(entry, req) | some i, entry in raw}
-	evals := {i: _applies_evals(req, entry.subject, fixed.filter_flaws) | some i, entry in raw}
+	longs := _long_subjects(raw)
+	refs := {i: _entry_ref_alone(entry, req, i in longs) | some i, entry in raw}
+	evals := {i: _applies_evals_alone(req, entry, fixed.filter_flaws, i in longs) | some i, entry in raw}
 	matches := {i: _subject_matches(evals[i], req) | some i, _ in raw}
 	applies := _applies_rows(raw, refs, evals, req, name)
 	matching := [raw[i] | some i, _ in raw; matches[i]]
-	groups := _subject_row_groups(matching, req, name, fixed.check_flaws, fixed.prepared)
+	groups := [rows |
+		some i, entry in raw
+		matches[i]
+		rows := _subject_rows_alone(entry, refs[i], req, name, fixed, i in longs)
+	]
 }
+
+_long_subjects(raw) := set() if count({entry.subject | some entry in raw}) == count(raw)
+
+else := set() if [s | some s in {entry.subject | some entry in raw}; _has_number(s)] == []
+
+else := {i | some i, entry in raw; _has_number(entry.subject); _long_text(json.marshal(entry.subject))}
+
+_entry_ref_alone(entry, req, false) := _entry_ref(entry, req)
+
+_entry_ref_alone(entry, req, true) := r if r := _entry_ref(entry, req) with data.ergo_item as entry
+
+_applies_evals_alone(req, entry, flaws, false) := _applies_evals(req, entry.subject, flaws)
+
+_applies_evals_alone(req, entry, flaws, true) := r if r := _applies_evals(req, entry.subject, flaws) with data.ergo_item as entry
+
+_subject_rows_alone(entry, ref, req, name, fixed, false) := _subject_rows(entry, ref, req, name, fixed.check_flaws, fixed.prepared)
+
+_subject_rows_alone(entry, ref, req, name, fixed, true) := r if r := _subject_rows(entry, ref, req, name, fixed.check_flaws, fixed.prepared) with data.ergo_item as entry
 
 _with_ref_answer(check) := _ref_answered_compare(check) if {
 	is_object(check)

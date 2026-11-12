@@ -68,7 +68,7 @@ _leaf_op_passed("includes_some", check, subj) if {
 	_wanted(wants)
 	_items_fit(v, wants)
 	some want in wants
-	_member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
+	_member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; _holds_numbers(y)])
 }
 
 _leaf_op_passed("not_includes_all", check, subj) if {
@@ -78,7 +78,7 @@ _leaf_op_passed("not_includes_all", check, subj) if {
 	_wanted(wants)
 	_items_fit(v, wants)
 	some want in wants
-	not _member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
+	not _member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; _holds_numbers(y)])
 }
 
 _leaf_op_passed("excludes", check, subj) if {
@@ -86,7 +86,7 @@ _leaf_op_passed("excludes", check, subj) if {
 	is_array(v)
 	want := _arg(check.value)
 	_items_fit(v, [want])
-	not _member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
+	not _member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; _holds_numbers(y)])
 }
 
 _leaf_op_passed("includes", check, subj) if {
@@ -94,7 +94,7 @@ _leaf_op_passed("includes", check, subj) if {
 	is_array(v)
 	want := _arg(check.value)
 	_items_fit(v, [want])
-	_member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
+	_member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; _holds_numbers(y)])
 }
 
 _leaf_op_passed("excludes", check, subj) if {
@@ -104,7 +104,7 @@ _leaf_op_passed("excludes", check, subj) if {
 	_wanted(wants)
 	_items_fit(v, wants)
 	every want in wants {
-		not _member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
+		not _member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; _holds_numbers(y)])
 	}
 }
 
@@ -115,7 +115,7 @@ _leaf_op_passed("includes", check, subj) if {
 	_wanted(wants)
 	_items_fit(v, wants)
 	every want in wants {
-		_member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
+		_member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; _holds_numbers(y)])
 	}
 }
 
@@ -125,7 +125,7 @@ _leaf_op_passed("in", check, subj) if {
 	vals := _wants(check.values)
 	_value_list(vals)
 	_fits_list(v, vals)
-	_member(vals, v, [[json.marshal(y), json.marshal(v)] | some y in vals; y == v; is_number(y)])
+	_member(vals, v, [[json.marshal(y), json.marshal(v)] | some y in vals; y == v; _holds_numbers(y)])
 }
 
 _leaf_op_passed("has_type", check, subj) if {
@@ -148,7 +148,7 @@ _leaf_op_passed("not_in", check, subj) if {
 	vals := _wants(check.values)
 	_value_list(vals)
 	_fits_list(v, vals)
-	not _member(vals, v, [[json.marshal(y), json.marshal(v)] | some y in vals; y == v; is_number(y)])
+	not _member(vals, v, [[json.marshal(y), json.marshal(v)] | some y in vals; y == v; _holds_numbers(y)])
 }
 
 _leaf_op_passed("equals", check, subj) if {
