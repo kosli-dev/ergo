@@ -50,11 +50,17 @@ _walk_list_ref(check) if {
 	c.op in _right_ref_ops
 }
 
-_walk_judged(check, w) := [_walk_judge(check, w, e) | some e in w.items] if object.get(check, "distinct", false) != true
+_walk_judged(check, w) := [_walk_judge(check, w, e, long) | some e in w.items] if {
+	object.get(check, "distinct", false) != true
+	long := _long_text(json.marshal([e.iv | some e in w.items]))
+}
 
 else := [_walk_copied(j, i, w, copies) | some i, j in judged; not i in copies.dropped] if {
-	judged := [object.union(_walk_judge(check, w, e), {"decided": _walk_decided(check, e)}) | some e in w.items]
-	copies := _copies_of([[_exact_key(w.items[i].v, [json.marshal(w.items[i].v) | _holds_numbers(w.items[i].v)]), i] | some i, j in judged; j.kept; j.decided; not _walk_marked(w.items[i].v)])
+	long := _long_text(json.marshal([e.iv | some e in w.items]))
+	judged := [object.union(_walk_judge(check, w, e, long), {"decided": _walk_decided(check, e)}) | some e in w.items]
+	vs := [e.v | some e in w.items]
+	keys := _exact_keys(vs, json.marshal(vs))
+	copies := _copies_of([[keys[i], i] | some i, j in judged; j.kept; j.decided; not _walk_marked(w.items[i].v)])
 }
 
 default _walk_decided(_, _) := false
@@ -314,12 +320,14 @@ _walk_marked(v) if v == _absent
 
 _walk_marked(v) if v == _unusable_mark
 
-_walk_judge(check, w, e) := j if {
+_walk_judge(check, w, e, true) := j if {
 	_holds_numbers(e.iv)
 	t := json.marshal(e.iv)
 	_long_text(t)
 	j := _walk_judgement(check, w, e) with data.ergo_item as t
 } else := _walk_judgement(check, w, e)
+
+_walk_judge(check, w, e, false) := _walk_judgement(check, w, e)
 
 _walk_judgement(check, w, e) := {"kept": kept, "passed": passed, "failure": failure} if {
 	undecided := [[c, cause] | some c in check.whose; cause := _focus_cause(c, e); not cause in {"satisfied", "value"}]

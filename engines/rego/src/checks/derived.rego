@@ -294,19 +294,22 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	flaws := [_cond_flaw(c) | some c in side.whose]
-	judged := [_tally_judge(side, e, flaws, w) | some e in w.items]
+	long := _long_text(json.marshal([e.iv | some e in w.items]))
+	judged := [_tally_judge(side, e, flaws, w, long) | some e in w.items]
 	kept := [e.v | some i, e in w.items; judged[i].kept]
 	read := [e.v | some i, e in w.items; judged[i].read]
 	states := (((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | {fl | some fl in flaws; fl != ""}) | {fl | some c in side.whose; fl := _root_read_flaw(subj, c); fl != ""}
 	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states))
 }
 
-_tally_judge(side, e, flaws, w) := j if {
+_tally_judge(side, e, flaws, w, true) := j if {
 	_holds_numbers(e.iv)
 	t := json.marshal(e.iv)
 	_long_text(t)
 	j := _tally_judgement(side, e, flaws) with data.ergo_item as [t, w]
 } else := _tally_judgement(side, e, flaws)
+
+_tally_judge(side, e, flaws, _, false) := _tally_judgement(side, e, flaws)
 
 _tally_judgement(side, e, flaws) := {"kept": kept, "read": read, "states": (undecided | _tally_mark(read, e))} if {
 	causes := [_tally_focus_cause(c, e, flaws[i]) | some i, c in side.whose]
@@ -393,7 +396,8 @@ _tally_distinct(side, kept, subj, part) := kept if {
 }
 
 else := [x[2] | some j, x in sorted; _first_of_kind(sorted, j)] if {
-	others := [[0, _exact_key(v, [json.marshal(v) | _holds_numbers(v)]), v] | some v in kept; not is_number(v)]
+	keys := _exact_keys(kept, json.marshal(kept))
+	others := [[0, keys[i], v] | some i, v in kept; not is_number(v)]
 	nums := [[1, _decimal_parts(json.marshal(v)), v] | some v in kept; is_number(v)]
 	sorted := sort(array.concat(others, nums))
 }

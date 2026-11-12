@@ -58,7 +58,15 @@ _exact_key(x, []) := x
 
 _exact_key(_, [t]) := [v, {p: _decimal_parts(json.marshal(n)) | walk(v, [p, n]); is_number(n)}] if v := json.unmarshal(t)
 
-_long_text(t) if regex.match(`[0-9.]{16}`, t)
+default _long_text(_) := false
+
+_long_text(t) if contains(strings.replace_n(_digit_marks, t), "0000000000000000")
+
+_digit_marks := {"1": "0", "2": "0", "3": "0", "4": "0", "5": "0", "6": "0", "7": "0", "8": "0", "9": "0", ".": "0"}
+
+_exact_keys(vs, t) := vs if not _long_text(t)
+
+else := [_exact_key(v, [json.marshal(v) | _holds_numbers(v)]) | some v in vs]
 
 _cmp("gt", l, r, _, _) if l > r
 

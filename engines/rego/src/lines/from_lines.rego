@@ -641,7 +641,9 @@ _distinct_from(req) if {
 }
 
 _copies_merged(entries) := [_with_copies(entries, i, copies) | some i, e in entries; not i in copies.dropped] if {
-	copies := _copies_of([[_exact_key(e.subject, [json.marshal(e.subject) | _holds_numbers(e.subject)]), i] | some i, e in entries])
+	subjects := [e.subject | some e in entries]
+	keys := _exact_keys(subjects, json.marshal(subjects))
+	copies := _copies_of([[keys[i], i] | some i, _ in entries])
 }
 
 _with_copies(entries, i, copies) := object.union(entries[i], {"ats": [entries[k].at | some k in copies.groups[i]]}) if i in object.keys(copies.groups)

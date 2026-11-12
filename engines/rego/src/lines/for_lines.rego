@@ -937,7 +937,10 @@ _for_dropped(item, _, _) := set() if object.get(item, "distinct", false) != true
 
 _for_dropped(item, names, w) := _for_copies(item, names, w).dropped if object.get(item, "distinct", false) == true
 
-_for_copies(item, names, w) := _copies_of([[_exact_key(e.v, [json.marshal(e.v) | _holds_numbers(e.v)]), i] | some i, e in w.items; wh := _for_whose(item, e, names); wh.kept; wh.undecided == []; not _walk_marked(e.v)])
+_for_copies(item, names, w) := _copies_of([[keys[i], i] | some i, e in w.items; wh := _for_whose(item, e, names); wh.kept; wh.undecided == []; not _walk_marked(e.v)]) if {
+	vs := [e.v | some e in w.items]
+	keys := _exact_keys(vs, json.marshal(vs))
+}
 
 _for_inner_pairs(check, subj, names, _, w) := {object.get(pw, "input", [_for_list_name(check, check.items[1].path, pw.walked), [_walk_value(e.v, e, pw) | some e in pw.items], _walk_locations(pw)])} if {
 	count(check.items) == 2

@@ -224,12 +224,14 @@ test_objects_in_a_list_compare_by_their_own_digits_in_any_order if {
 		"some": "some xs.v is more than $params.r",
 		"count": "count of xs whose v is more than $params.r equals 1",
 		"distinct_v": "count of distinct xs.v equals 2",
+		"distinct_v_one": "count of distinct xs.v equals 1",
 		"distinct_xs": "count of distinct xs equals 2",
 	}
-	rows := [{"id": "a", "xs": [{"v": _low}, {"v": _high}]}, {"id": "b", "xs": [{"v": _high}, {"v": _low}]}]
+	rows := [{"id": "a", "xs": [{"v": _low}, {"v": _high}]}, {"id": "b", "xs": [{"v": _high}, {"v": _low}]}, {"id": "c", "xs": [{"v": _low}, {"v": _low}]}]
 	_long_in_both_orders(checks, rows, {"r": _low}, {
-		["a", "every", "value"], ["a", "some", "satisfied"], ["a", "count", "satisfied"], ["a", "distinct_v", "satisfied"], ["a", "distinct_xs", "satisfied"],
-		["b", "every", "value"], ["b", "some", "satisfied"], ["b", "count", "satisfied"], ["b", "distinct_v", "satisfied"], ["b", "distinct_xs", "satisfied"],
+		["a", "every", "value"], ["a", "some", "satisfied"], ["a", "count", "satisfied"], ["a", "distinct_v", "satisfied"], ["a", "distinct_v_one", "value"], ["a", "distinct_xs", "satisfied"],
+		["b", "every", "value"], ["b", "some", "satisfied"], ["b", "count", "satisfied"], ["b", "distinct_v", "satisfied"], ["b", "distinct_v_one", "value"], ["b", "distinct_xs", "satisfied"],
+		["c", "every", "satisfied"], ["c", "some", "value"], ["c", "count", "value"], ["c", "distinct_v", "value"], ["c", "distinct_v_one", "satisfied"], ["c", "distinct_xs", "value"],
 	})
 }
 
