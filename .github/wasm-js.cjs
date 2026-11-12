@@ -52,7 +52,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     process.exit(1);
   }
 
-  policy.setData(JSON.parse(fs.readFileSync(path.join(runtimeDir, "data.json"))));
+  policy.setData(JSON.parse(fs.readFileSync(path.join(runtimeDir, "data.json"), "utf8"), (_, v, context) => (typeof v === "number" ? JSON.rawJSON(context.source) : v)));
   const failed = tests.filter((test) => {
     try {
       return policy.evaluate({}, test)[0]?.result !== true;
