@@ -61,6 +61,7 @@ pub struct Counted {
     pub path: Path,
     pub distinct: bool,
     pub whose: Vec<Check>,
+    pub for_aliases: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -541,7 +542,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             null_at: None,
         };
         let whose: Vec<&Check> = counted.whose.iter().collect();
-        let mut outside = walk::outside_inputs_of(&whose, &outer);
+        let mut outside = walk::outside_inputs_of(&whose, &outer, &counted.for_aliases);
         outside.sort_by(|a, b| a.name.cmp(&b.name));
         let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
         return Worked {
@@ -559,7 +560,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         },
     );
     let whose: Vec<&Check> = counted.whose.iter().collect();
-    let mut outside = walk::outside_inputs_of(&whose, &outer);
+    let mut outside = walk::outside_inputs_of(&whose, &outer, &counted.for_aliases);
     outside.sort_by(|a, b| a.name.cmp(&b.name));
     if let Some(outcome) = walked.unreadable {
         let result = Err(outcome.cause().unwrap_or(Cause::Unusable));
@@ -620,7 +621,17 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         Some(cause) => Err(cause),
         None => total,
     };
-    let list = Input {
+    let list = walked_list(&walked, &counted.path, &outer);
+    let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
+    Worked {
+        entries,
+        located,
+        result,
+    }
+}
+
+fn walked_list(walked: &walk::Walked, path: &Path, outer: &Ctx) -> Input {
+    Input {
         name: walked.name.clone(),
         value: Value::Array(walked.items.iter().map(walk::WalkItem::shown).collect()),
         locations: walked
@@ -628,16 +639,23 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             .iter()
             .map(|item| item.end_location.render())
             .collect(),
-        part: path::part_tag(&counted.path, &outer).map(|(name, id)| Part { name, id }),
+        part: path::part_tag(path, outer).map(|(name, id)| Part { name, id }),
         state: crate::path::Outcome::Found,
         null_at: None,
-    };
-    let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
-    Worked {
-        entries,
-        located,
-        result,
     }
+}
+
+pub(super) fn counted_list(path: &Path, ctx: &Ctx) -> Input {
+    let outer = outer_ctx(ctx);
+    let walked = walk::walk(
+        path,
+        &outer,
+        Options {
+            if_any: false,
+            empty_adds_nothing: true,
+        },
+    );
+    walked_list(&walked, path, &outer)
 }
 
 fn summed(values: &[Value]) -> Result<Number, Cause> {
@@ -941,6 +959,7 @@ fn lower_counted(
             path,
             distinct: derived.distinct,
             whose,
+            for_aliases: scope.for_aliases(),
         })
     }))
 }

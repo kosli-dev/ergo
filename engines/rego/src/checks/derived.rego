@@ -258,8 +258,8 @@ _tally_inputs(subj, side, t) := array.concat(
 		_tally_list_input(t),
 	],
 	_merged_inputs(array.concat(
-		_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)]),
-		array.concat(_field_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)]), _input_ref_inputs(object.get(side, "whose", []))),
+		_conds_named_inputs(subj, object.get(side, "whose", [])),
+		_input_ref_inputs(object.get(side, "whose", [])),
 	)),
 )
 

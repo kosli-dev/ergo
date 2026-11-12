@@ -353,6 +353,13 @@ pub(super) fn ref_inputs(check: &Check, ctx: &Ctx, params_too: bool) -> Vec<Inpu
         .collect()
 }
 
+pub(super) fn walked_right(check: &Check) -> Option<&Path> {
+    match read_list_right(check) {
+        Some((Right::Ref(path) | Right::Field(path), true)) => Some(path),
+        _ => None,
+    }
+}
+
 pub(super) fn named_refs(check: &Check) -> Vec<&Path> {
     read_list_right(check).map_or_else(Vec::new, |(right, _)| {
         right

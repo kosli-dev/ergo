@@ -133,6 +133,22 @@ fn tally_paths<'a>(tally: &'a Tally, hidden: &[&str]) -> (Vec<&'a Path>, Vec<&'a
     (paths, whose)
 }
 
+fn listed_walk(path: &Path, listed: &[*const Path], ctx: &Ctx, hidden: &[&str]) -> Option<Input> {
+    if !listed.contains(&std::ptr::from_ref(path)) {
+        return None;
+    }
+    let walks = match &path.start {
+        Start::Subject | Start::Own => true,
+        start @ Start::Part(_) => path::is_root(start) || ctx.subject.value.is_array(),
+        Start::Alias(name) => !hidden.contains(&name.as_str()),
+        _ => false,
+    };
+    walks
+        .then(|| super::lists::walked(path, ctx))
+        .flatten()
+        .map(|walked| walked.input())
+}
+
 fn walked_paths(check: &Check) -> Vec<(&Path, bool)> {
     match check {
         Check::Walk(walk) => vec![(&walk.path, walk.if_any)],
@@ -1568,6 +1584,18 @@ impl For {
             .iter()
             .flat_map(|sentence| walked_paths(&sentence.check))
             .collect();
+        let listed: Vec<*const Path> = self
+            .sentences
+            .iter()
+            .flat_map(|sentence| match &sentence.check {
+                Check::Walk(walk) => std::iter::once(&*walk.check)
+                    .chain(walk.whose.iter())
+                    .collect::<Vec<_>>(),
+                other => vec![other],
+            })
+            .filter_map(super::lists::walked_right)
+            .map(std::ptr::from_ref)
+            .collect();
         for path in paths {
             let own = walked.iter().find(|(p, _)| std::ptr::eq(*p, path));
             if matches!(path.start, Start::Params)
@@ -1593,7 +1621,10 @@ impl For {
                     } else {
                         ctx.clone()
                     };
-                    inputs.extend(walk::path_inputs(path, &at, &hidden, on_items));
+                    match listed_walk(path, &listed, &at, &hidden) {
+                        Some(input) => inputs.push(input),
+                        None => inputs.extend(walk::path_inputs(path, &at, &hidden, on_items)),
+                    }
                 }
             }
         }

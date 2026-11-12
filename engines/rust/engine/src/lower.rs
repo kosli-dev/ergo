@@ -379,6 +379,10 @@ impl Scope {
         }
     }
 
+    pub fn for_aliases(&self) -> Vec<String> {
+        self.for_aliases.iter().cloned().collect()
+    }
+
     pub fn in_tally_item(&self) -> Scope {
         Scope {
             item: true,
