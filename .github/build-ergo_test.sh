@@ -205,6 +205,7 @@ for kind in default release; do
   if [ "$kind" = default ]; then
     sh "$script" "$rdir"
   else
+    sed 's/^_spec := "\(v[0-9][0-9.]*\)-dev"$/_spec := "\1"/' "$root/engines/rego/src/shared/basics.rego" > "$rdir/engines/rego/src/shared/basics.rego"
     sh "$script" --release "$real" abc123 "$rdir"
   fi
   opa check --strict --schema "$root/.github/closed-input-schema.json" "$rdir/dist/ergo.rego" || fail "opa check failed on the $kind build"

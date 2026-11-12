@@ -10,6 +10,11 @@ test_an_every_leaf_compared_with_a_plain_value_reads_no_root if {
 }
 
 test_a_right_side_that_is_a_ref_is_the_root_it_reads if {
-	ergo._right_root({"right": {"ref": ["$$params", "q"]}}, ["$$params", "q"])
-	ergo._right_root({"right": ["$$params", "q"]}, ["$$params", "q"])
+	ergo._side_root({"right": {"ref": ["$$params", "q"]}}, ["$$params", "q"])
+	ergo._side_root({"right": ["$$params", "q"]}, ["$$params", "q"])
+}
+
+test_a_left_side_is_a_root_as_much_as_a_right_side if {
+	ergo._side_root({"left": ["$$params", "q"], "right": 1}, ["$$params", "q"])
+	not ergo._side_root({"left": ["v"], "right": 1}, ["$$params", "q"])
 }
