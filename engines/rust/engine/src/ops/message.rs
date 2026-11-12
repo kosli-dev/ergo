@@ -1454,12 +1454,15 @@ pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<S
         });
         return root_kind_fault(&compare, root, ctx);
     }
-    let right = match check {
-        Check::Compare(c) => &c.right,
-        Check::CompareTime(c) => &c.right,
+    let sides = match check {
+        Check::Compare(c) => [&c.left, &c.right],
+        Check::CompareTime(c) => [&c.left, &c.right],
         _ => return None,
     };
-    if !matches!(right, super::compare::Side::Path(path) if path == root) {
+    if !sides
+        .iter()
+        .any(|side| matches!(side, super::compare::Side::Path(path) if path == root))
+    {
         return None;
     }
     let read = path::read(root, ctx);

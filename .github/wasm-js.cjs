@@ -66,7 +66,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
 
   const document = { deployments: Array.from({ length: 100 }, (_, i) => ({ id: `d-${i}`, environment: i % 3 ? "prod" : "staging", ...(i % 2 ? { approved_by: "a" } : {}), tests: [{ ok: i % 5 > 0 }, { ok: true }] })) };
   const budgetPolicy = {
-    ergo_spec: "v0.6",
+    ergo_spec: "v0.7-dev",
     subjects: { deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" } },
     requirements: {
       approved: { subject: "deployment", checks: { approved: "approved_by is a non-empty string" } },
@@ -74,7 +74,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     },
   };
   const sentencePolicy = {
-    ergo_spec: "v0.6",
+    ergo_spec: "v0.7-dev",
     subjects: budgetPolicy.subjects,
     requirements: {
       approved: {
@@ -88,7 +88,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     },
   };
   const chainPolicy = {
-    ergo_spec: "v0.6",
+    ergo_spec: "v0.7-dev",
     subjects: {
       deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" },
       test: { from: "every deployment.tests" },
@@ -96,7 +96,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     requirements: { approved: { subject: "test", checks: { ok: "ok is true and deployment.approved_by exists" } } },
   };
   const forPolicy = {
-    ergo_spec: "v0.6",
+    ergo_spec: "v0.7-dev",
     subjects: budgetPolicy.subjects,
     requirements: {
       approved: {

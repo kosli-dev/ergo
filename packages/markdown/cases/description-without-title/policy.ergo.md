@@ -1,5 +1,5 @@
 ---
-ergo_spec: v0.6
+ergo_spec: v0.7-dev
 ---
 
 Every batch that leaves the bakery is safe to eat.

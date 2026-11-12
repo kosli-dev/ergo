@@ -3,7 +3,7 @@ use serde_json::{Map, Value};
 use std::collections::{BTreeMap, BTreeSet};
 
 /// The version of the spec this engine implements, in the form a policy's `ergo_spec` and a report's `ergo` use.
-pub const SPEC: &str = "v0.6";
+pub const SPEC: &str = "v0.7-dev";
 
 pub use crate::names::written_name_problems;
 

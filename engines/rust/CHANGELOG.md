@@ -4,6 +4,10 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ## 0.4.1 (not released yet)
 
+### Fixed
+
+- A root of the wrong type on the left of a compare, like `z` in `z is at least 1` under `every xs, if any, as m` with `z` holding `"s"`, fails the check as `unusable` with `z is "s", which isn't a number` on an empty list too, as in `ergo.rego` 0.6.1 and spec 0.7 ([for.roots](../../spec/semantics.md#for)), where it passed. The same goes for `is at most`, `is more than`, `is less than`, a text or time compare, and a root on the left in a `whose`, like `count of xs whose $params.q is at least v is 0` ([tally.whose](../../spec/semantics.md#counts-and-sums)). With items, the root is named once with no item in front, like a root on the right: `z is at least m.v` says `z is "s", which isn't a number` where it said it for each item, and `z is at least $params.q` with no `q` says `z is "s", which isn't a number; $params.q is missing` where it said only `$params.q is missing`.
+
 ## 0.4.0
 
 ### New
