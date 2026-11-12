@@ -284,7 +284,7 @@ _m_undecided_text(subj, c, e, cause, roots) := _m_isnt(_m_item_name(e.i, roots),
 } else := _m_leaf_in(e.i, _m_cond_message(c, e.iv, cause), roots)
 
 _m_off_path(p) if {
-	_subject_part(p)
+	_part_start(p)
 	not _item_keyed(p)
 }
 

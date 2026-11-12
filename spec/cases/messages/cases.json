@@ -2553,5 +2553,149 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a parent's part read in a whose, on a for line and in a count of",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"g": {"from": "gs", "identified_by": "id", "has": {"gc": "c"}}, "art": {"from": "every g.arts", "identified_by": "id", "has": {"cov": "c"}}, "ch": {"from": "every art.xs"}}, "requirements": {"r": {"subject": "ch", "checks": {"for": {"for": "every ys whose n is at least art.cov.z as x", "assert": "x.n is 1"}, "grandparent": {"for": "some ys whose n is at least g.gc.z as x", "assert": "x.n is 1"}, "count": "count of ys whose n is at least art.cov.z is 2"}}}},
+    "cases": [
+      {
+        "description": "names the missing part once with no item, as it names a part of the subject",
+        "rules": ["message.items", "for.roots", "sentence.resolve.clause"],
+        "input": {"gs": [{"id": "g1", "c": {}, "arts": [{"id": "a1", "c": {}, "xs": [{"ys": [{"n": 1}, {"n": 2}]}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "count", "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "count of ys whose n is at least art.cov.z", "value": null}, {"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}, {"locations": ["/gs/0/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}], "message": "art.cov.z is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}},
+          {"cause": "absent", "check": "for", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": {"n": 1}}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": {"n": 2}}], "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "message": "art.cov.z is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}},
+          {"cause": "absent", "check": "grandparent", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": {"n": 1}}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": {"n": 2}}], "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "message": "g.gc.z is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a null part once with no item",
+        "rules": ["message.items", "for.roots", "path.null"],
+        "input": {"gs": [{"id": "g1", "c": {"z": null}, "arts": [{"id": "a1", "c": {"z": null}, "xs": [{"ys": [{"n": 1}, {"n": 2}]}]}]}]},
+        "results": [
+          {"cause": "null", "check": "count", "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "count of ys whose n is at least art.cov.z", "value": null}, {"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}, {"locations": ["/gs/0/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}], "message": "art.cov.z is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}},
+          {"cause": "null", "check": "for", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": {"n": 1}}, {"cause": "null", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": {"n": 2}}], "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "message": "art.cov.z is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}},
+          {"cause": "null", "check": "grandparent", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": {"n": 1}}, {"cause": "null", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": {"n": 2}}], "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "message": "g.gc.z is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a part of the wrong type once with no item",
+        "rules": ["message.items", "for.roots", "walk.flaws"],
+        "input": {"gs": [{"id": "g1", "c": {"z": "s"}, "arts": [{"id": "a1", "c": {"z": "s"}, "xs": [{"ys": [{"n": 1}, {"n": 2}]}]}]}]},
+        "results": [
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "count of ys whose n is at least art.cov.z", "value": null}, {"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}, {"locations": ["/gs/0/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}},
+          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": {"n": 1}}, {"cause": "unusable", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": {"n": 2}}], "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}},
+          {"cause": "unusable", "check": "grandparent", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": {"n": 1}}, {"cause": "unusable", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": {"n": 2}}], "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "message": "g.gc.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "reads the part when it is there, and names the item that fails",
+        "rules": ["message.items", "for.roots"],
+        "input": {"gs": [{"id": "g1", "c": {"z": 1}, "arts": [{"id": "a1", "c": {"z": 1}, "xs": [{"ys": [{"n": 1}, {"n": 2}]}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "count", "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "count of ys whose n is at least art.cov.z", "value": 2}, {"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}, {"locations": ["/gs/0/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}},
+          {"cause": "value", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "x.n is 1", "cause": "value", "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/1/n"], "name": "x.n", "value": 2}]}], "item": "item 2 of ys", "locations": ["/gs/0/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": {"n": 2}}], "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "message": "item 2 of ys: n is 2", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}},
+          {"cause": "satisfied", "check": "grandparent", "failed_items": [], "inputs": [{"locations": ["/gs/0/arts/0/xs/0/ys/0", "/gs/0/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "passed": true, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1", "g": "g1"}, "type": "ch"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's part read in a that on a for line",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"art": {"from": "arts", "identified_by": "id", "has": {"cov": "c"}}, "ch": {"from": "every art.xs"}}, "requirements": {"r": {"subject": "ch", "checks": {"that": {"for": "every ys that is at least art.cov.z as x", "assert": "x is 1"}, "count": "count of ys that is at least art.cov.z is 2"}}}},
+    "cases": [
+      {
+        "description": "names the missing part once with no item",
+        "rules": ["message.items", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"id": "a1", "c": {}, "xs": [{"ys": [1, 2]}]}]},
+        "results": [
+          {"cause": "absent", "check": "count", "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "count of ys that is at least art.cov.z", "value": null}, {"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [1, 2]}, {"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}], "message": "art.cov.z is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": [1, 2]}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "absent", "check": "that", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": 1}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": 2}], "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [1, 2]}], "message": "art.cov.z is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": [1, 2]}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a null part once with no item",
+        "rules": ["message.items", "for.roots", "path.null"],
+        "input": {"arts": [{"id": "a1", "c": {"z": null}, "xs": [{"ys": [1, 2]}]}]},
+        "results": [
+          {"cause": "null", "check": "count", "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "count of ys that is at least art.cov.z", "value": null}, {"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [1, 2]}, {"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}], "message": "art.cov.z is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": [1, 2]}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "null", "check": "that", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": 1}, {"cause": "null", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": 2}], "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [1, 2]}], "message": "art.cov.z is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": [1, 2]}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a part of the wrong type once, before what each item says",
+        "rules": ["message.items", "for.roots", "walk.flaws"],
+        "input": {"arts": [{"id": "a1", "c": {"z": "s"}, "xs": [{"ys": [1, "b"]}]}]},
+        "results": [
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "count of ys that is at least art.cov.z", "value": null}, {"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [1, "b"]}, {"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": [1, "b"]}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "unusable", "check": "that", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": 1}, {"cause": "unusable", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": "b"}], "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [1, "b"]}], "message": "art.cov.z is \"s\", which isn't a number; item 2 of ys is \"b\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": [1, "b"]}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "reads the part when it is there",
+        "rules": ["message.items", "for.roots"],
+        "input": {"arts": [{"id": "a1", "c": {"z": 1}, "xs": [{"ys": [1, 2]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "count", "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "count of ys that is at least art.cov.z", "value": 2}, {"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [1, 2]}, {"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"ys": [1, 2]}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "value", "check": "that", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "x is 1", "cause": "value", "inputs": [{"locations": ["/arts/0/xs/0/ys/1"], "name": "x", "value": 2}]}], "item": "item 2 of ys", "locations": ["/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": 2}], "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [1, 2]}], "message": "item 2 of ys is 2", "passed": false, "requirement": "r", "subject": {"id": {"ys": [1, 2]}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's part read in a whose, on an empty list",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"art": {"from": "arts", "identified_by": "id", "has": {"cov": "c"}}, "ch": {"from": "every art.xs"}}, "requirements": {"r": {"subject": "ch", "checks": {"every": "every ys whose n is at least art.cov.z, if any, exists", "count": "count of ys whose n is at least art.cov.z is 0", "for": {"for": "every ys whose n is at least art.cov.z, if any, as y", "assert": "y.n is 1"}}}}},
+    "cases": [
+      {
+        "description": "fails when the part is missing, because no item could ever pass, and names it once",
+        "rules": ["message.items", "walk.flaws", "for.roots"],
+        "input": {"arts": [{"id": "a1", "c": {}, "xs": [{"ys": []}]}]},
+        "results": [
+          {"cause": "absent", "check": "count", "inputs": [{"locations": [], "name": "count of ys whose n is at least art.cov.z", "value": null}, {"locations": [], "name": "ys[]", "value": []}, {"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}], "message": "art.cov.z is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "absent", "check": "every", "failed_items": [], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys[]", "value": []}], "message": "art.cov.z is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "absent", "check": "for", "failed_items": [], "inputs": [{"locations": [], "name": "ys[]", "value": []}], "message": "art.cov.z is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "fails when the part is null",
+        "rules": ["message.items", "walk.flaws", "for.roots", "path.null"],
+        "input": {"arts": [{"id": "a1", "c": {"z": null}, "xs": [{"ys": []}]}]},
+        "results": [
+          {"cause": "null", "check": "count", "inputs": [{"locations": [], "name": "count of ys whose n is at least art.cov.z", "value": null}, {"locations": [], "name": "ys[]", "value": []}, {"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}], "message": "art.cov.z is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "null", "check": "every", "failed_items": [], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys[]", "value": []}], "message": "art.cov.z is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "null", "check": "for", "failed_items": [], "inputs": [{"locations": [], "name": "ys[]", "value": []}], "message": "art.cov.z is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "fails when the part is of the wrong type",
+        "rules": ["message.items", "walk.flaws", "for.roots"],
+        "input": {"arts": [{"id": "a1", "c": {"z": "s"}, "xs": [{"ys": []}]}]},
+        "results": [
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": [], "name": "count of ys whose n is at least art.cov.z", "value": null}, {"locations": [], "name": "ys[]", "value": []}, {"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}, {"locations": [], "name": "ys[]", "value": []}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "unusable", "check": "for", "failed_items": [], "inputs": [{"locations": [], "name": "ys[]", "value": []}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "fails when the parent's part is a list, which isn't walked",
+        "rules": ["message.items", "walk.flaws", "for.roots"],
+        "input": {"arts": [{"id": "a1", "c": [{"z": 1}], "xs": [{"ys": []}]}]},
+        "results": [
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": [], "name": "count of ys whose n is at least art.cov.z", "value": null}, {"locations": [], "name": "ys[]", "value": []}, {"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}], "message": "art.cov is [{\"z\": 1}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys[]", "value": []}], "message": "art.cov is [{\"z\": 1}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "unusable", "check": "for", "failed_items": [], "inputs": [{"locations": [], "name": "ys[]", "value": []}], "message": "art.cov is [{\"z\": 1}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "passes when the part can be read",
+        "rules": ["message.items", "walk.flaws", "for.roots"],
+        "input": {"arts": [{"id": "a1", "c": {"z": 1}, "xs": [{"ys": []}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "count", "inputs": [{"locations": [], "name": "count of ys whose n is at least art.cov.z", "value": 0}, {"locations": [], "name": "ys[]", "value": []}, {"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "satisfied", "check": "every", "failed_items": [], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": 1}, {"locations": [], "name": "ys[]", "value": []}], "passed": true, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "satisfied", "check": "for", "failed_items": [], "inputs": [{"locations": [], "name": "ys[]", "value": []}], "passed": true, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      }
+    ]
   }
 ]
