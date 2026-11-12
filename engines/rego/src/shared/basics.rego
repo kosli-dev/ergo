@@ -65,6 +65,6 @@ version := "0.6.1-dev"
 
 _engine := {"name": "ergo-rego", "version": version}
 
-_spec := "v0.6"
+_spec := "v0.7-dev"
 
 _is_version(v) if regex.match(`^v[0-9]+\.[0-9]+(-dev)?$`, v)

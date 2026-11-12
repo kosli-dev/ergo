@@ -2886,21 +2886,38 @@ fn counts_root(check: &Check, root: &Path) -> bool {
 }
 
 fn equals_kind_fault(check: &Check, root: &Path, read: &path::Read) -> Option<String> {
-    let Check::Equals(equals) = check else {
-        return None;
-    };
     let value = read
         .value
         .filter(|_| read.outcome == path::Outcome::Found)?;
-    (equals.path == *root
-        && !equals.value.is_null()
+    let (path, wanted, within) = match check {
+        Check::Equals(equals) => (&equals.path, &equals.value, false),
+        Check::Compare(super::compare::Compare {
+            left: super::compare::Side::Path(path),
+            right,
+            cmp: super::compare::Cmp::Eq | super::compare::Cmp::Ne,
+            within,
+        }) => match (right, within) {
+            (_, Some(_)) => (path, &Value::Null, true),
+            (super::compare::Side::Value(wanted), None) => (path, wanted, false),
+            _ => return None,
+        },
+        _ => return None,
+    };
+    if path != root {
+        return None;
+    }
+    if within {
+        return (!value.is_number())
+            .then(|| super::message::isnt(&crate::name::name(root), value, "a number"));
+    }
+    (!wanted.is_null()
         && !value.is_null()
-        && crate::value::type_name(value) != crate::value::type_name(&equals.value))
+        && crate::value::type_name(value) != crate::value::type_name(wanted))
     .then(|| {
         super::message::isnt(
             &crate::name::name(root),
             value,
-            super::message::kind(&equals.value),
+            super::message::kind(wanted),
         )
     })
 }

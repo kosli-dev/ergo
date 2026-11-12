@@ -131,7 +131,7 @@ _root_kind(subj, c, p) := _m_right_kind(cmp, v) if {
 } else := k if {
 	c.op in {"compare", "compare_time"}
 	not _list_cmp(c)
-	_right_root(c, p)
+	_side_root(c, p)
 	k := _m_right_needs(c, _root_value(subj, p))
 } else := "text" if {
 	object.get(c, "ergo/for", false) == true
@@ -149,6 +149,22 @@ _root_kind(subj, c, p) := _m_right_kind(cmp, v) if {
 	w := _arg(c.value)
 	w != null
 	type_name(_root_value(subj, p)) != type_name(w)
+} else := "a number" if {
+	object.get(c, "ergo/for", false) == true
+	c.op == "compare"
+	c.cmp in {"eq", "ne"}
+	"within" in object.keys(c)
+	c.left == p
+	not is_number(_root_value(subj, p))
+} else := _m_kind(w) if {
+	object.get(c, "ergo/for", false) == true
+	c.op == "compare"
+	c.cmp in {"eq", "ne"}
+	not "within" in object.keys(c)
+	c.left == p
+	w := c.right.literal
+	w != null
+	type_name(_root_value(subj, p)) != type_name(w)
 }
 
 _keys_by(c, p) if {
@@ -158,9 +174,11 @@ _keys_by(c, p) if {
 	step == {"ref": p}
 }
 
-_right_root(c, p) if c.right == p
+_side_root(c, p) if c.right == p
 
-_right_root(c, p) if c.right == {"ref": p}
+_side_root(c, p) if c.right == {"ref": p}
+
+_side_root(c, p) if c.left == p
 
 _root_value(subj, p) := _ref_read(p) if {
 	_builtin(p)
