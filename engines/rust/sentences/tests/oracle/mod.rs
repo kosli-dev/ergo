@@ -2154,6 +2154,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("every pr.cms", "every pr.cms"),
     ("every prs.c.z", "every prs.c.z"),
     ("prs whose c.z is 1", "prs whose c.z is 1"),
+    ("c.os", "c.os"),
+    ("c.names", "c.names"),
+    ("every objs", "every objs"),
+    ("every teams", "every teams"),
+    ("every rel.kids", "every rel.kids"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -3276,6 +3281,8 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("it.x", "it.x"),
     ("v", "v"),
     ("c", "c"),
+    ("c.os", "c.os"),
+    ("c.names", "c.names"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[

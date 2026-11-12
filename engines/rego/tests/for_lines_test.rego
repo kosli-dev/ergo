@@ -439,7 +439,7 @@ test_a_for_alias_named_like_a_part_of_a_subject_with_a_space_in_its_name_quotes_
 test_a_for_line_item_keeps_its_alias_when_the_right_side_reads_a_field_called_like_it if {
 	rows := _dot_plain_rows({"for": "every items as p", "assert": "p.name is in .p.name"}, {"repos": [{"id": "r", "p": [], "items": [{"name": "a"}]}]})
 	rows[0].message == "item 1 of items: p.name is \"a\", and .p is []"
-	rows[0].names == [".p.name", "items[]"]
+	rows[0].names == [".p[].name", "items[]"]
 }
 
 test_a_for_line_keeps_the_dot_of_a_right_side_when_an_item_of_the_field_is_not_an_object if {

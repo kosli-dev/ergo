@@ -39,9 +39,50 @@ _walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": fail
 	inputs := _merged_inputs(array.concat(_walk_inputs(check, w), _walk_side_inputs(subj, check)))
 }
 
-_walk_side_inputs(subj, check) := array.concat(array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check))), _input_ref_inputs(array.concat([check.check], check.whose))) if _walk_list_ref(check)
+_walk_side_inputs(subj, check) := array.concat(_conds_named_inputs(subj, array.concat([check.check], check.whose)), _input_ref_inputs(array.concat([check.check], check.whose))) if _walk_list_ref(check)
 
-else := array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check)))
+else := _conds_named_inputs(subj, array.concat([check.check], check.whose))
+
+_conds_named_inputs(subj, conds) := _conds_named_inputs_but(subj, conds, set())
+
+_conds_named_inputs_but(subj, conds, skip) := _conds_inputs(subj, conds, skip, false)
+
+_for_conds_named_inputs(subj, conds, skip) := _conds_inputs(subj, conds, skip, true)
+
+_conds_inputs(subj, conds, skip, false) := array.concat(array.concat(_named_inputs(subj, paths), _field_named_inputs(subj, paths)), [x[1] | some x in reads]) if {
+	reads := {x | some x in _listed_reads(subj, conds); not x[0] in skip}
+	listed := {x[0] | some x in reads}
+	paths := [p | some c in conds; some p in _condition_paths(c); not p in listed; not p in skip]
+}
+
+_conds_inputs(subj, conds, skip, true) := array.concat(_named_inputs(subj, paths), _field_named_inputs(subj, paths)) if {
+	paths := [p | some c in conds; some p in _condition_paths(c); not p in skip]
+}
+
+_listed_reads(subj, conds) := {[c.right, {"name": w.name, "value": w.value, "locations": w.locations}] |
+	some c in conds
+	_listed_right(subj, c)
+	w := _rwalk(subj, c.right)
+} | {[t[f], _tally_list_input(_tally(subj, t))] |
+	some c in conds
+	some side in _derived_sides(c)
+	some t in _tally_parts(side)
+	f := _basic_form(t)
+	_listed_path(subj, t[f])
+}
+
+_listed_right(subj, c) if {
+	_list_cmp(c)
+	not _one_right(c)
+	is_array(c.right)
+	_listed_path(subj, c.right)
+}
+
+_listed_path(subj, p) if {
+	_read_off_item(p)
+	not _builtin(p)
+	_rwalks(subj, p)
+}
 
 _walk_list_ref(check) if check.check.op in _right_ref_ops
 

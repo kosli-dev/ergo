@@ -74,6 +74,17 @@ _walking_root(c, p) if {
 }
 
 _walking_root(c, p) if {
+	object.get(c, "ergo/for", false) == true
+	_list_cmp(c)
+	not _one_right(c)
+	_rpath(c.right) == p
+	subj := object.get(input, ["ergo/names", "ergo/subject"], null)
+	_list_start(p, subj)
+	_part_of(p).old == false
+	_rwalks(subj, p)
+}
+
+_walking_root(c, p) if {
 	walk(c, [_, y])
 	_basic_form(y) in {"count_of", "sum_of"}
 	y[_basic_form(y)] == p

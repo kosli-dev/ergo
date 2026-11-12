@@ -95,6 +95,7 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
     };
     let mut out = match &path.start {
         Start::Subject | Start::Own => String::new(),
+        Start::Alias(alias) if alias == crate::path::OUTER => String::new(),
         Start::Input => "$input".to_string(),
         Start::Params => "$params".to_string(),
         Start::Alias(alias) => parent_key_text(alias),
@@ -186,6 +187,21 @@ mod tests {
             steps: vec![k("items")],
         };
         assert_eq!(name(&child), "\"empty\".items");
+    }
+
+    #[test]
+    fn the_subject_read_from_inside_an_item_is_named_like_the_subject() {
+        let outer = |steps| Path {
+            start: Start::Alias(crate::path::OUTER.to_string()),
+            steps,
+        };
+        assert_eq!(name(&outer(vec![k("c"), k("names")])), "c.names");
+        assert_eq!(name(&outer(vec![k("count")])), ".count");
+        assert_eq!(name(&outer(vec![])), "the subject");
+        assert_eq!(
+            marked_name(&outer(vec![k("c"), k("names")]), &BTreeSet::from([1])),
+            "c[].names"
+        );
     }
 
     #[test]

@@ -8124,6 +8124,88 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("$params.who is in name", "$params.who is in name", &[], &[]),
+    (
+        "$params.who is in os.name",
+        "$params.who is in os.name",
+        &[],
+        &[],
+    ),
+    (
+        "$params.who is in pos.name",
+        "$params.who is in pos.name",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v is in .os.name is 1",
+        "count of rows whose v is in os.name is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v is in pos.name is 1",
+        "count of rows whose v is in pos.name is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.v is in os.name",
+        "every rows.v is in os.name",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.v is in pos.name",
+        "every rows.v is in pos.name",
+        &[],
+        &[],
+    ),
+    ("r.v is in name", "r.v is in name", &[], &[]),
+    ("r.v is in os.name", "r.v is in os.name", &[], &[]),
+    ("r.v is in pl.z", "r.v is in pl.z", &[], &[]),
+    ("r.v is name", "r.v equals name", &[], &[]),
+    ("r.v is os.name", "r.v equals os.name", &[], &[]),
+    ("some rows.v is in name", "some rows.v is in name", &[], &[]),
+    (
+        "some rows.v is in os.name",
+        "some rows.v is in os.name",
+        &[],
+        &[],
+    ),
+    (
+        "$params.who is in rel.os.name",
+        "$params.who is in rel.os.name",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.v is in rel.os.name",
+        "every rows.v is in rel.os.name",
+        &[],
+        &[],
+    ),
+    ("r.v is in rel.os.name", "r.v is in rel.os.name", &[], &[]),
+    ("$params.who is in pn", "$params.who is in pn", &[], &[]),
+    ("every rows.v is in pn", "every rows.v is in pn", &[], &[]),
+    (
+        "count of rows whose v is in pn is 1",
+        "count of rows whose v is in pn is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of $input.lst.name is 2",
+        "count of $input.lst.name is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose n is count of $input.lst.name is 1",
+        "count of rows whose n equals count of $input.lst.name is 1",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -12160,6 +12242,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("every rows as r", "every rows as r", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

@@ -680,11 +680,35 @@ pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
                         && has_root_field(p))
             })
         {
-            inputs.extend(path_inputs(path, ctx, &[], true));
+            match listed_input(check, path, ctx) {
+                Some(input) => inputs.push(input),
+                None => inputs.extend(path_inputs(path, ctx, &[], true)),
+            }
         }
         inputs.extend(super::lists::ref_inputs(check, ctx, false));
     }
     inputs
+}
+
+pub(super) fn listed_input(check: &Check, path: &Path, ctx: &Ctx) -> Option<Input> {
+    if matches!(path.start, Start::Input | Start::Params) {
+        return None;
+    }
+    if super::lists::walked_right(check).is_some_and(|right| std::ptr::eq(right, path)) {
+        return super::lists::walked(path, ctx).map(|walked| walked.input());
+    }
+    match check {
+        Check::Tally(tally)
+            if tally
+                .counted_paths()
+                .into_iter()
+                .any(|counted| std::ptr::eq(counted, path))
+                && super::lists::walked(path, ctx).is_some() =>
+        {
+            Some(super::tally::counted_list(path, ctx))
+        }
+        _ => None,
+    }
 }
 
 fn hides(path: &Path, hidden: &[&str]) -> bool {
