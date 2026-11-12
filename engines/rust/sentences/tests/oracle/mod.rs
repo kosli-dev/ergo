@@ -999,6 +999,14 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("teams", "teams"),
     ("things", "things"),
     (
+        "things that does not equal l[9007199254740991]",
+        "things that does not equal item 9007199254740992 of l",
+    ),
+    (
+        "things whose l[9007199254740991] is 1",
+        "things whose item 9007199254740992 of l is 1",
+    ),
+    (
         "things[9007199254740991]",
         "item 9007199254740992 of things",
     ),
@@ -2924,6 +2932,14 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     (
         "releases whose some files.path, if any, matches \"x\"",
         &["if any can't go with some"],
+    ),
+    (
+        "things that does not equal l[9007199254740992]",
+        &["9007199254740992 can't be a list position"],
+    ),
+    (
+        "things whose l[9007199254740992] is 1",
+        &["9007199254740992 can't be a list position"],
     ),
     ("x named by empty", &["empty can't be an alias"]),
     ("x named by input", &["input can't be an alias"]),

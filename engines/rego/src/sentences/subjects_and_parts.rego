@@ -192,15 +192,45 @@ _s_from_filter(name, c, names, keep, pc) := object.union(_rooted(_p_applied(_s_p
 	not _s_that(c)
 	keep_named := keep | {name}
 	pc_named := _s_whose_context(name, c, pc)
-	t := _s_cond_body(_s_from_cond(_s_left_dotted(c, name), names, keep_named))
+	t := _s_cond_body(_s_from_cond(_s_left_dotted(_s_brackets_kept(c), name), names, keep_named))
 }
 
 _s_from_filter(name, c, names, keep, pc) := _p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc_named), keep_named), names), pc_named) if {
 	_s_that(c)
 	keep_named := keep | {name}
 	pc_named := object.union(pc, {"own": object.union(pc.own, {name: []})})
-	t := concat(" ", [_s_path_text({"steps": [name], "quoted": true}, "left"), _s_phrase_text(c.phrase)])
+	t := concat(" ", [_s_path_text({"steps": [name], "quoted": true}, "left"), _s_phrase_text(_s_phrase_brackets_kept(c.phrase))])
 }
+
+_s_brackets_kept(c) := object.union(object.remove(c, ["path", "every", "some", "phrase"]), object.union(
+	{f: _p_as_written(c[f]) | some f in ["path", "every", "some"]; is_object(object.get(c, f, null))},
+	object.union(
+		{"terms": [_s_term_brackets_kept(t) | some t in c.terms] | is_array(object.get(c, "terms", null))},
+		{"phrase": _s_phrase_brackets_kept(c.phrase) | is_object(object.get(c, "phrase", null))},
+	),
+))
+
+_s_phrase_brackets_kept(ph) := object.union(object.remove(ph, ["path"]), object.union(
+	{"path": _p_as_written(ph.path) | is_object(object.get(ph, "path", null))},
+	object.union(
+		{"terms": [_s_term_brackets_kept(t) | some t in ph.terms] | is_array(object.get(ph, "terms", null))},
+		{"join": [_s_piece_brackets_kept(piece) | some piece in ph.join] | is_array(object.get(ph, "join", null))},
+	),
+))
+
+_s_piece_brackets_kept(piece) := object.union(piece, {"terms": [_s_term_brackets_kept(t) | some t in piece.terms]}) if is_array(object.get(piece, "terms", null))
+
+else := piece
+
+_s_term_brackets_kept(t) := object.union(object.remove(t, ["count", "sum", "elapsed_from", "elapsed_to"]), {f: _p_as_written(t[f]) |
+	some f in ["count", "sum", "elapsed_from", "elapsed_to"]
+	is_object(object.get(t, f, null))
+}) if {
+	is_object(t)
+	not "steps" in object.keys(t)
+} else := _p_as_written(t) if is_object(t)
+
+else := t
 
 _s_left_dotted(c, name) := object.union(c, object.union(
 	{k: _s_name_dotted(c[k], name) | some k in ["path", "every", "some"]; is_object(object.get(c, k, null))},
