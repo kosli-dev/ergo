@@ -234,16 +234,123 @@
     ]
   },
   {
-    "description": "a count of a list from $input inside a whose that can't read it item by item lists the path as it read it",
+    "description": "a count of a list from $input inside a whose reads it item by item, as it does on its own",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"u": {"from": "every objs"}}, "requirements": {"r": {"subject": "u", "checks": {"plain": "count of $input.lst.name is 2", "whose": "count of rows whose n is count of $input.lst.name is 1"}}}},
     "cases": [
       {
-        "description": "the whose lists $input.lst.name as null, at the list, and not the values of its items",
-        "rules": ["tally.inputs", "walk.inputs"],
+        "description": "the whose lists $input.lst[].name with the value of each item",
+        "rules": ["tally.inputs", "walk.inputs", "tally.walk", "tally.whose"],
         "input": {"objs": [{"rows": [{"v": "bob", "n": 2}]}], "lst": [{"name": "bob"}, {"name": "x"}]},
         "results": [
           {"cause": "satisfied", "check": "plain", "inputs": [{"locations": ["/lst/0/name", "/lst/1/name"], "name": "count of $input.lst.name", "value": 2}, {"locations": ["/lst/0/name", "/lst/1/name"], "name": "$input.lst[].name", "value": ["bob", "x"]}], "passed": true, "requirement": "r", "subject": {"id": {"rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
-          {"cause": "unusable", "check": "whose", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $input.lst.name", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/lst"], "name": "$input.lst.name", "value": null}], "message": "$input.lst is [{\"name\": \"bob\"}, {\"name\": \"x\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"rows": [{"n": 2, "v": "bob"}]}, "type": "u"}}
+          {"cause": "satisfied", "check": "whose", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $input.lst.name", "value": 1}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/lst/0/name", "/lst/1/name"], "name": "$input.lst[].name", "value": ["bob", "x"]}], "passed": true, "requirement": "r", "subject": {"id": {"rows": [{"n": 2, "v": "bob"}]}, "type": "u"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of or a sum of inside a whose reads its path as it does on its own",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"u": {"from": "every objs", "has": {"pl": "os"}}}, "requirements": {"r": {"subject": "u", "checks": {"input": "count of rows whose n is count of $input.lst.name is 1", "params": "count of rows whose n is count of $params.lst.name is 1", "part": "count of rows whose n is count of pl.name is 1", "sum": "every rows whose n is sum of $input.lst.k exists"}}}},
+    "params": {"lst": [{"name": "bob", "k": 1}, {"name": "x", "k": 1}]},
+    "cases": [
+      {
+        "description": "each item of the list is read, and the entry lists each value",
+        "rules": ["tally.walk", "tally.whose", "walk.lists", "walk.inputs"],
+        "input": {"objs": [{"rows": [{"v": "bob", "n": 2}], "os": [{"name": "bob", "k": 1}, {"name": "x", "k": 1}]}], "lst": [{"name": "bob", "k": 1}, {"name": "x", "k": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "input", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $input.lst.name", "value": 1}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/lst/0/name", "/lst/1/name"], "name": "$input.lst[].name", "value": ["bob", "x"]}], "passed": true, "requirement": "r", "subject": {"id": {"os": [{"k": 1, "name": "bob"}, {"k": 1, "name": "x"}], "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "satisfied", "check": "params", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $params.lst.name", "value": 1}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "passed": true, "requirement": "r", "subject": {"id": {"os": [{"k": 1, "name": "bob"}, {"k": 1, "name": "x"}], "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "satisfied", "check": "part", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of pl.name", "value": 1}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/objs/0/os/0/name", "/objs/0/os/1/name"], "name": "pl[].name", "part": {"id": null, "name": "pl"}, "value": ["bob", "x"]}], "passed": true, "requirement": "r", "subject": {"id": {"os": [{"k": 1, "name": "bob"}, {"k": 1, "name": "x"}], "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "satisfied", "check": "sum", "failed_items": [], "inputs": [{"locations": ["/lst/0/k", "/lst/1/k"], "name": "$input.lst[].k", "value": [1, 1]}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "passed": true, "requirement": "r", "subject": {"id": {"os": [{"k": 1, "name": "bob"}, {"k": 1, "name": "x"}], "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}}
+        ]
+      },
+      {
+        "description": "an empty list adds nothing",
+        "rules": ["tally.walk", "tally.whose", "walk.lists", "walk.inputs"],
+        "input": {"objs": [{"rows": [{"v": "bob", "n": 2}], "os": []}], "lst": []},
+        "results": [
+          {"cause": "value", "check": "input", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $input.lst.name", "value": 0}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": [], "name": "$input.lst[].name", "value": []}], "message": "count of rows whose n equals count of $input.lst.name is 0", "passed": false, "requirement": "r", "subject": {"id": {"os": [], "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "satisfied", "check": "params", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $params.lst.name", "value": 1}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "passed": true, "requirement": "r", "subject": {"id": {"os": [], "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "value", "check": "part", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of pl.name", "value": 0}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": [], "name": "pl[].name", "part": {"id": null, "name": "pl"}, "value": []}], "message": "count of rows whose n equals count of pl.name is 0", "passed": false, "requirement": "r", "subject": {"id": {"os": [], "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "value", "check": "sum", "failed_items": [], "inputs": [{"locations": [], "name": "$input.lst[].k", "value": []}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "rows is [{\"n\": 2, \"v\": \"bob\"}]", "passed": false, "requirement": "r", "subject": {"id": {"os": [], "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}}
+        ]
+      },
+      {
+        "description": "a missing list fails as absent",
+        "rules": ["tally.walk", "tally.whose", "walk.lists", "walk.inputs"],
+        "input": {"objs": [{"rows": [{"v": "bob", "n": 2}]}]},
+        "results": [
+          {"cause": "absent", "check": "input", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $input.lst.name", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": [""], "name": "$input.lst.name", "value": null}], "message": "$input.lst.name is missing", "passed": false, "requirement": "r", "subject": {"id": {"rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "satisfied", "check": "params", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $params.lst.name", "value": 1}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "passed": true, "requirement": "r", "subject": {"id": {"rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "absent", "check": "part", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of pl.name", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/objs/0"], "name": "pl.name", "part": {"id": null, "name": "pl"}, "value": null}], "message": "pl.name is missing", "passed": false, "requirement": "r", "subject": {"id": {"rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "absent", "check": "sum", "failed_items": [{"cause": "absent", "item": "item 1 of rows", "locations": [""], "path": "$input.lst.k", "value": null}], "inputs": [{"locations": [""], "name": "$input.lst.k", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "$input.lst.k is missing", "passed": false, "requirement": "r", "subject": {"id": {"rows": [{"n": 2, "v": "bob"}]}, "type": "u"}}
+        ]
+      },
+      {
+        "description": "a null list fails as null",
+        "rules": ["tally.walk", "tally.whose", "walk.lists", "walk.inputs"],
+        "input": {"objs": [{"rows": [{"v": "bob", "n": 2}], "os": null}], "lst": null},
+        "results": [
+          {"cause": "null", "check": "input", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $input.lst.name", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/lst"], "name": "$input.lst.name", "value": null}], "message": "$input.lst is null", "passed": false, "requirement": "r", "subject": {"id": {"os": null, "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "satisfied", "check": "params", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $params.lst.name", "value": 1}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "passed": true, "requirement": "r", "subject": {"id": {"os": null, "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "null", "check": "part", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of pl.name", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/objs/0/os"], "name": "pl.name", "part": {"id": null, "name": "pl"}, "value": null}], "message": "pl is null", "passed": false, "requirement": "r", "subject": {"id": {"os": null, "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "null", "check": "sum", "failed_items": [{"cause": "null", "item": "item 1 of rows", "locations": ["/lst"], "path": "$input.lst.k", "value": null}], "inputs": [{"locations": ["/lst"], "name": "$input.lst.k", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "$input.lst is null", "passed": false, "requirement": "r", "subject": {"id": {"os": null, "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}}
+        ]
+      },
+      {
+        "description": "a list that is text fails as unusable",
+        "rules": ["tally.walk", "tally.whose", "walk.lists", "walk.inputs"],
+        "input": {"objs": [{"rows": [{"v": "bob", "n": 2}], "os": "s"}], "lst": "s"},
+        "results": [
+          {"cause": "unusable", "check": "input", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $input.lst.name", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/lst"], "name": "$input.lst.name", "value": null}], "message": "$input.lst is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"os": "s", "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "satisfied", "check": "params", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $params.lst.name", "value": 1}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "passed": true, "requirement": "r", "subject": {"id": {"os": "s", "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "unusable", "check": "part", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of pl.name", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/objs/0/os"], "name": "pl.name", "part": {"id": null, "name": "pl"}, "value": null}], "message": "pl is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"os": "s", "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
+          {"cause": "unusable", "check": "sum", "failed_items": [{"cause": "unusable", "item": "item 1 of rows", "locations": ["/lst"], "path": "$input.lst.k", "value": null}], "inputs": [{"locations": ["/lst"], "name": "$input.lst.k", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "$input.lst is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"os": "s", "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of $params inside a whose, with a list that is missing",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"u": {"from": "every objs"}}, "requirements": {"r": {"subject": "u", "checks": {"params": "count of rows whose n is count of $params.lst.name is 1"}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "it fails before any item is read",
+        "rules": ["tally.walk", "tally.whose", "walk.lists", "walk.inputs"],
+        "input": {"objs": [{"rows": [{"v": "bob", "n": 2}]}]},
+        "results": [
+          {"cause": "absent", "check": "params", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $params.lst.name", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "$params.lst.name is missing", "passed": false, "requirement": "r", "subject": {"id": {"rows": [{"n": 2, "v": "bob"}]}, "type": "u"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of $params inside a whose, with a list that is null",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"u": {"from": "every objs"}}, "requirements": {"r": {"subject": "u", "checks": {"params": "count of rows whose n is count of $params.lst.name is 1"}}}},
+    "params": {"lst": null},
+    "cases": [
+      {
+        "description": "it fails before any item is read",
+        "rules": ["tally.walk", "tally.whose", "walk.lists", "walk.inputs"],
+        "input": {"objs": [{"rows": [{"v": "bob", "n": 2}]}]},
+        "results": [
+          {"cause": "null", "check": "params", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $params.lst.name", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "$params.lst is null", "passed": false, "requirement": "r", "subject": {"id": {"rows": [{"n": 2, "v": "bob"}]}, "type": "u"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of $params inside a whose, with a list that is text",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"u": {"from": "every objs"}}, "requirements": {"r": {"subject": "u", "checks": {"params": "count of rows whose n is count of $params.lst.name is 1"}}}},
+    "params": {"lst": "s"},
+    "cases": [
+      {
+        "description": "it fails before any item is read",
+        "rules": ["tally.walk", "tally.whose", "walk.lists", "walk.inputs"],
+        "input": {"objs": [{"rows": [{"v": "bob", "n": 2}]}]},
+        "results": [
+          {"cause": "unusable", "check": "params", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $params.lst.name", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "$params.lst is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"rows": [{"n": 2, "v": "bob"}]}, "type": "u"}}
         ]
       }
     ]

@@ -691,10 +691,13 @@ pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
 }
 
 pub(super) fn listed_input(check: &Check, path: &Path, ctx: &Ctx) -> Option<Input> {
-    if matches!(path.start, Start::Input | Start::Params) {
+    if matches!(path.start, Start::Params) {
         return None;
     }
     if super::lists::walked_right(check).is_some_and(|right| std::ptr::eq(right, path)) {
+        if matches!(path.start, Start::Input) {
+            return None;
+        }
         return super::lists::walked(path, ctx).map(|walked| walked.input());
     }
     match check {

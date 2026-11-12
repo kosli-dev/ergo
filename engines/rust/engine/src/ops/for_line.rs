@@ -139,7 +139,7 @@ fn listed_walk(path: &Path, listed: &[*const Path], ctx: &Ctx, hidden: &[&str]) 
     }
     let walks = match &path.start {
         Start::Subject | Start::Own => true,
-        start @ Start::Part(_) => path::is_root(start) || ctx.subject.value.is_array(),
+        Start::Part(_) => true,
         Start::Alias(name) => !hidden.contains(&name.as_str()),
         _ => false,
     };
@@ -1591,9 +1591,19 @@ impl For {
                 Check::Walk(walk) => std::iter::once(&*walk.check)
                     .chain(walk.whose.iter())
                     .collect::<Vec<_>>(),
-                other => vec![other],
+                other => nested_checks(other),
             })
             .filter_map(super::lists::walked_right)
+            .map(std::ptr::from_ref)
+            .collect();
+        let counted: Vec<*const Path> = self
+            .sentences
+            .iter()
+            .flat_map(|sentence| nested_checks(&sentence.check).into_iter().skip(1))
+            .flat_map(|check| match check {
+                Check::Tally(tally) => tally.counted_paths(),
+                _ => Vec::new(),
+            })
             .map(std::ptr::from_ref)
             .collect();
         for path in paths {
@@ -1612,7 +1622,18 @@ impl For {
                     inputs.extend(super::field_inputs(path, ctx));
                 }
                 _ if in_whose.contains(&std::ptr::from_ref(path)) => {
-                    inputs.extend(walk::path_inputs(path, &outer_ctx(ctx), &hidden, true));
+                    let outer = outer_ctx(ctx);
+                    if counted.contains(&std::ptr::from_ref(path))
+                        && !hides(path)
+                        && super::lists::walked(path, &outer).is_some()
+                    {
+                        inputs.push(super::tally::counted_list(path, &outer));
+                        continue;
+                    }
+                    match listed_walk(path, &listed, &outer, &hidden) {
+                        Some(input) => inputs.push(input),
+                        None => inputs.extend(walk::path_inputs(path, &outer, &hidden, true)),
+                    }
                 }
                 _ => {
                     let on_items = in_walk.contains(&std::ptr::from_ref(path));
@@ -1729,7 +1750,7 @@ impl For {
             .flat_map(|s| nested_whose(&s.check, false))
             .collect();
         let outer = outer_ctx(ctx);
-        let outer_flaw = super::message::root_flaw_in_for(&whose, &outer, &counted, &nested);
+        let outer_flaw = super::message::root_flaw_ordered(&whose, &outer, &counted, &nested);
         let forms: Vec<(Check, bool)> = self
             .sentences
             .iter()
@@ -1895,8 +1916,8 @@ impl For {
             .flat_map(|item| item.whose.iter())
             .collect();
         sentence_root_flaw(&forms, outer).is_some()
-            || super::message::root_flaw_in_for(&nested, outer, &[], &[]).is_some()
-            || super::message::root_flaw_in_for(&whose, outer, &[], &[]).is_some()
+            || super::message::root_flaw_ordered(&nested, outer, &[], &[]).is_some()
+            || super::message::root_flaw_ordered(&whose, outer, &[], &[]).is_some()
     }
 
     fn some_passed(&self, run: &Run, ctx: &Ctx, unread: &[String]) -> bool {
@@ -3217,14 +3238,15 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
                     found.push(fault);
                     continue;
                 }
-                if path::is_root(&root.start) {
+                if path::is_root(&root.start)
+                    || (!ctx.subject.value.is_array() && super::lists::walked(root, ctx).is_some())
+                {
                     continue;
                 }
             }
             let read = path::read(root, ctx);
             let part = matches!(&root.start, Start::Part(part) if !part.steps.is_empty());
             if super::lists::right_paths(check).contains(&root)
-                && !part
                 && super::lists::walked_in(check, root, ctx).is_some()
             {
                 continue;
@@ -4772,55 +4794,68 @@ mod tests {
     }
 
     #[test]
-    fn a_part_that_is_not_an_object_on_the_right_of_a_list_phrase_fails_as_unusable_and_names_the_part()
-     {
-        for assertion in [
-            "m.v is in pl.z",
-            "m.v matches pl.z",
-            "pl.z contains m.v",
-            "m.v is at least pl.z",
+    fn an_empty_part_is_walked_on_the_right_of_a_list_phrase_and_named_as_not_an_object_elsewhere()
+    {
+        for (assertion, cause, message) in [
+            (
+                "m.v is in pl.z",
+                "value",
+                "item 1 of xs: m.v is 1, and pl is []",
+            ),
+            (
+                "m.v matches pl.z",
+                "value",
+                "item 1 of xs: m.v is 1, and pl is []",
+            ),
+            (
+                "pl.z contains m.v",
+                "unusable",
+                "pl is [], which isn't an object",
+            ),
+            (
+                "m.v is at least pl.z",
+                "unusable",
+                "pl is [], which isn't an object",
+            ),
         ] {
-            let (cause, message) = pr_row(
+            let found = pr_row(
                 json!({"pl": "c"}),
                 "every xs as m",
                 json!(assertion),
                 json!({"c": [], "xs": [{"v": 1}]}),
                 json!({}),
             );
-            assert_eq!(cause, "unusable", "{assertion}");
-            assert_eq!(message, "pl is [], which isn't an object", "{assertion}");
+            assert_eq!(found, (cause.to_string(), json!(message)), "{assertion}");
         }
     }
 
     #[test]
-    fn a_part_that_is_a_list_of_objects_is_not_walked_on_the_right_of_a_list_phrase() {
-        let fields = json!({"c": [{"z": 1}], "xs": [{"v": 1}]});
-        for assertion in ["m.v is in pl.z", "pl.z contains m.v"] {
-            let (cause, message) = pr_row(
+    fn a_part_that_is_a_list_of_objects_is_walked_on_the_right_of_a_list_phrase_but_not_before_contains()
+     {
+        for (assertion, cause, message) in [
+            ("m.v is in pl.z", "satisfied", Value::Null),
+            (
+                "pl.z contains m.v",
+                "unusable",
+                json!("pl is [{\"z\": 1}], which isn't an object"),
+            ),
+            (
+                "m.v matches pl.z",
+                "unusable",
+                json!(
+                    "item 1 of xs: m.v is 1, which isn't text, and pl[].z is [1], which isn't a list of patterns"
+                ),
+            ),
+        ] {
+            let found = pr_row(
                 json!({"pl": "c"}),
                 "every xs as m",
                 json!(assertion),
-                fields.clone(),
+                json!({"c": [{"z": 1}], "xs": [{"v": 1}]}),
                 json!({}),
             );
-            assert_eq!(cause, "unusable", "{assertion}");
-            assert_eq!(
-                message, "pl is [{\"z\": 1}], which isn't an object",
-                "{assertion}"
-            );
+            assert_eq!(found, (cause.to_string(), message), "{assertion}");
         }
-        let (cause, message) = pr_row(
-            json!({"pl": "c"}),
-            "every xs as m",
-            json!("m.v matches pl.z"),
-            fields,
-            json!({}),
-        );
-        assert_eq!(cause, "unusable");
-        assert_eq!(
-            message,
-            "pl is [{\"z\": 1}], which isn't an object; item 1 of xs: m.v is 1, which isn't text, and pl[].z is [1], which isn't a list of patterns"
-        );
     }
 
     #[test]
@@ -5027,31 +5062,43 @@ mod tests {
     }
 
     #[test]
-    fn a_part_that_holds_a_list_fails_a_count_of_whose_under_a_for_line_as_unusable() {
-        for (part, shown) in [(json!([]), "[]"), (json!([{"z": 1}]), "[{\"z\": 1}]")] {
-            for xs in [json!([{"v": 1, "ys": [{"v": 1}]}]), json!([])] {
-                for assertion in [
-                    "count of xs whose v is in pl.z is 0",
-                    "count of m.ys whose v is in pl.z is 0",
-                    "count of xs whose v is in pl.z is at least 0",
-                ] {
-                    let (cause, message) = pr_row(
-                        json!({"pl": "c"}),
-                        "every xs as m",
-                        json!(assertion),
-                        json!({"c": part, "xs": xs}),
-                        json!({}),
-                    );
-                    assert_eq!(cause, "unusable");
-                    assert!(
-                        message
-                            .as_str()
-                            .unwrap()
-                            .starts_with(&format!("pl is {shown}, which isn't an object")),
-                        "{message}"
-                    );
-                }
-            }
+    fn a_part_that_holds_a_list_is_walked_by_a_count_of_whose_under_a_for_line() {
+        let xs = json!([{"v": 1, "ys": [{"v": 1}]}]);
+        for (part, assertion, cause) in [
+            (
+                json!([]),
+                "count of xs whose v is in pl.z is 0",
+                "satisfied",
+            ),
+            (
+                json!([]),
+                "count of m.ys whose v is in pl.z is 0",
+                "satisfied",
+            ),
+            (
+                json!([{"z": 1}]),
+                "count of xs whose v is in pl.z is 0",
+                "value",
+            ),
+            (
+                json!([{"z": 1}]),
+                "count of m.ys whose v is in pl.z is 0",
+                "value",
+            ),
+            (
+                json!([{"z": 1}]),
+                "count of xs whose v is in pl.z is at least 0",
+                "satisfied",
+            ),
+        ] {
+            let (found, _) = pr_row(
+                json!({"pl": "c"}),
+                "every xs as m",
+                json!(assertion),
+                json!({"c": part, "xs": xs}),
+                json!({}),
+            );
+            assert_eq!(found, cause, "{assertion}");
         }
     }
 

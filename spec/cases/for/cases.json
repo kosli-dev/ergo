@@ -31904,7 +31904,7 @@
     ]
   },
   {
-    "description": "a part read as a list on the right of a phrase that isn't an object",
+    "description": "a part that holds a list is read item by item on the right of a phrase on a for line",
     "policy": {
       "ergo_spec": "{{spec}}",
       "subjects": {
@@ -31935,10 +31935,12 @@
     "params": {},
     "cases": [
       {
-        "description": "an empty list fails as unusable and names the part",
+        "description": "an empty list fails as value",
         "rules": [
           "for.roots",
-          "for.flaws"
+          "for.flaws",
+          "walk.right",
+          "walk.right.fail"
         ],
         "input": {
           "prs": [
@@ -31955,20 +31957,54 @@
         },
         "results": [
           {
-            "cause": "unusable",
+            "cause": "value",
             "check": "in",
-            "failed_items": [],
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v is in pl.z",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "m.v",
+                        "value": 1
+                      },
+                      {
+                        "locations": [],
+                        "name": "pl[].z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": []
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              }
+            ],
             "inputs": [
               {
-                "locations": [
-                  "/prs/0/c"
-                ],
-                "name": "pl.z",
+                "locations": [],
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": []
               },
               {
                 "locations": [
@@ -31982,7 +32018,7 @@
                 ]
               }
             ],
-            "message": "pl is [], which isn't an object",
+            "message": "item 1 of xs: m.v is 1, and pl is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -31991,20 +32027,54 @@
             }
           },
           {
-            "cause": "unusable",
+            "cause": "value",
             "check": "matches",
-            "failed_items": [],
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v matches pl.z",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "m.v",
+                        "value": 1
+                      },
+                      {
+                        "locations": [],
+                        "name": "pl[].z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": []
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              }
+            ],
             "inputs": [
               {
-                "locations": [
-                  "/prs/0/c"
-                ],
-                "name": "pl.z",
+                "locations": [],
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": []
               },
               {
                 "locations": [
@@ -32018,7 +32088,7 @@
                 ]
               }
             ],
-            "message": "pl is [], which isn't an object",
+            "message": "item 1 of xs: m.v is 1, and pl is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -32029,10 +32099,12 @@
         ]
       },
       {
-        "description": "a list of objects is not walked",
+        "description": "a list of objects is walked",
         "rules": [
           "for.roots",
-          "for.flaws"
+          "for.flaws",
+          "walk.right",
+          "walk.right.fail"
         ],
         "input": {
           "prs": [
@@ -32099,14 +32171,16 @@
             "inputs": [
               {
                 "locations": [
-                  "/prs/0/c"
+                  "/prs/0/c/0/z"
                 ],
-                "name": "pl.z",
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": [
+                  "a"
+                ]
               },
               {
                 "locations": [
@@ -32120,7 +32194,7 @@
                 ]
               }
             ],
-            "message": "pl is [{\"z\": \"a\"}], which isn't an object; item 1 of xs: m.v is 1, which isn't text",
+            "message": "item 1 of xs: m.v is 1, which isn't text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -32175,14 +32249,16 @@
             "inputs": [
               {
                 "locations": [
-                  "/prs/0/c"
+                  "/prs/0/c/0/z"
                 ],
-                "name": "pl.z",
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": [
+                  "a"
+                ]
               },
               {
                 "locations": [
@@ -32196,7 +32272,7 @@
                 ]
               }
             ],
-            "message": "pl is [{\"z\": \"a\"}], which isn't an object; item 1 of xs: m.v is 1, which isn't text",
+            "message": "item 1 of xs: m.v is 1, which isn't text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -32210,7 +32286,9 @@
         "description": "a null part fails as null",
         "rules": [
           "for.roots",
-          "for.flaws"
+          "for.flaws",
+          "walk.right",
+          "walk.right.fail"
         ],
         "input": {
           "prs": [
@@ -33749,7 +33827,7 @@
     ]
   },
   {
-    "description": "a part that holds a list isn't walked by a whose in `count of xs whose v is in pl.z is 0`",
+    "description": "a part that holds a list is walked by a whose in `count of xs whose v is in pl.z is 0`",
     "policy": {
       "ergo_spec": "{{spec}}",
       "subjects": {
@@ -33778,7 +33856,9 @@
       {
         "description": "the part holds a list of objects and the list has an item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -33804,9 +33884,70 @@
         },
         "results": [
           {
-            "cause": "unusable",
+            "cause": "value",
             "check": "c",
-            "failed_items": [],
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of xs whose v is in pl.z is 0",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "count of xs whose v is in pl.z",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "xs[]",
+                        "value": [
+                          {
+                            "v": 1,
+                            "ys": [
+                              {
+                                "v": 1
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c/0/z"
+                        ],
+                        "name": "pl[].z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": [
+                          1
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            ],
             "inputs": [
               {
                 "locations": [
@@ -33817,14 +33958,16 @@
               },
               {
                 "locations": [
-                  "/prs/0/c"
+                  "/prs/0/c/0/z"
                 ],
-                "name": "pl.z",
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": [
+                  1
+                ]
               },
               {
                 "locations": [
@@ -33843,7 +33986,7 @@
                 ]
               }
             ],
-            "message": "pl is [{\"z\": 1}], which isn't an object",
+            "message": "count of xs whose v is in pl.z is 1",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -33856,7 +33999,9 @@
       {
         "description": "the part holds a list of objects and the list has no item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -33873,7 +34018,7 @@
         },
         "results": [
           {
-            "cause": "unusable",
+            "cause": "value",
             "check": "c",
             "failed_items": [
               {
@@ -33895,14 +34040,16 @@
               },
               {
                 "locations": [
-                  "/prs/0/c"
+                  "/prs/0/c/0/z"
                 ],
-                "name": "pl.z",
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": [
+                  1
+                ]
               },
               {
                 "locations": [],
@@ -33910,7 +34057,7 @@
                 "value": []
               }
             ],
-            "message": "pl is [{\"z\": 1}], which isn't an object; xs is []",
+            "message": "xs is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -33923,7 +34070,9 @@
       {
         "description": "the part holds an empty list and the list has an item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -33945,7 +34094,7 @@
         },
         "results": [
           {
-            "cause": "unusable",
+            "cause": "satisfied",
             "check": "c",
             "failed_items": [],
             "inputs": [
@@ -33957,15 +34106,13 @@
                 "value": 0
               },
               {
-                "locations": [
-                  "/prs/0/c"
-                ],
-                "name": "pl.z",
+                "locations": [],
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": []
               },
               {
                 "locations": [
@@ -33984,8 +34131,7 @@
                 ]
               }
             ],
-            "message": "pl is [], which isn't an object",
-            "passed": false,
+            "passed": true,
             "requirement": "r",
             "subject": {
               "id": "p0",
@@ -33997,7 +34143,9 @@
       {
         "description": "the part holds an empty list and the list has no item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -34010,7 +34158,7 @@
         },
         "results": [
           {
-            "cause": "unusable",
+            "cause": "value",
             "check": "c",
             "failed_items": [
               {
@@ -34031,15 +34179,13 @@
                 "value": 0
               },
               {
-                "locations": [
-                  "/prs/0/c"
-                ],
-                "name": "pl.z",
+                "locations": [],
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": []
               },
               {
                 "locations": [],
@@ -34047,7 +34193,7 @@
                 "value": []
               }
             ],
-            "message": "pl is [], which isn't an object; xs is []",
+            "message": "xs is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -34060,7 +34206,9 @@
       {
         "description": "the part holds null and the list has an item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -34193,7 +34341,9 @@
       {
         "description": "the part holds null and the list has no item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -34256,7 +34406,9 @@
       {
         "description": "the part holds text and the list has an item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -34389,7 +34541,9 @@
       {
         "description": "the part holds text and the list has no item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -34452,7 +34606,9 @@
       {
         "description": "the part holds an object with a list and the list has an item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -34593,7 +34749,9 @@
       {
         "description": "the part holds an object with a list and the list has no item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -34662,7 +34820,9 @@
       {
         "description": "the part is missing",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -34794,7 +34954,7 @@
     ]
   },
   {
-    "description": "a part that holds a list isn't walked by a whose in `count of m.ys whose v is in pl.z is 0`",
+    "description": "a part that holds a list is walked by a whose in `count of m.ys whose v is in pl.z is 0`",
     "policy": {
       "ergo_spec": "{{spec}}",
       "subjects": {
@@ -34823,7 +34983,9 @@
       {
         "description": "the part holds a list of objects and the list has an item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -34849,20 +35011,78 @@
         },
         "results": [
           {
-            "cause": "unusable",
+            "cause": "value",
             "check": "c",
-            "failed_items": [],
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of m.ys whose v is in pl.z is 0",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
+                        "name": "count of m.ys whose v is in pl.z",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
+                        "name": "m.ys[]",
+                        "value": [
+                          {
+                            "v": 1
+                          }
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c/0/z"
+                        ],
+                        "name": "pl[].z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": [
+                          1
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            ],
             "inputs": [
               {
                 "locations": [
-                  "/prs/0/c"
+                  "/prs/0/c/0/z"
                 ],
-                "name": "pl.z",
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": [
+                  1
+                ]
               },
               {
                 "locations": [
@@ -34881,7 +35101,7 @@
                 ]
               }
             ],
-            "message": "pl is [{\"z\": 1}], which isn't an object",
+            "message": "item 1 of xs: count of m.ys whose v is in pl.z is 1",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -34894,7 +35114,9 @@
       {
         "description": "the part holds a list of objects and the list has no item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -34911,7 +35133,7 @@
         },
         "results": [
           {
-            "cause": "unusable",
+            "cause": "value",
             "check": "c",
             "failed_items": [
               {
@@ -34928,14 +35150,16 @@
             "inputs": [
               {
                 "locations": [
-                  "/prs/0/c"
+                  "/prs/0/c/0/z"
                 ],
-                "name": "pl.z",
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": [
+                  1
+                ]
               },
               {
                 "locations": [],
@@ -34943,7 +35167,7 @@
                 "value": []
               }
             ],
-            "message": "pl is [{\"z\": 1}], which isn't an object; xs is []",
+            "message": "xs is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -34956,7 +35180,9 @@
       {
         "description": "the part holds an empty list and the list has an item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -34978,20 +35204,18 @@
         },
         "results": [
           {
-            "cause": "unusable",
+            "cause": "satisfied",
             "check": "c",
             "failed_items": [],
             "inputs": [
               {
-                "locations": [
-                  "/prs/0/c"
-                ],
-                "name": "pl.z",
+                "locations": [],
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": []
               },
               {
                 "locations": [
@@ -35010,8 +35234,7 @@
                 ]
               }
             ],
-            "message": "pl is [], which isn't an object",
-            "passed": false,
+            "passed": true,
             "requirement": "r",
             "subject": {
               "id": "p0",
@@ -35023,7 +35246,9 @@
       {
         "description": "the part holds an empty list and the list has no item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -35036,7 +35261,7 @@
         },
         "results": [
           {
-            "cause": "unusable",
+            "cause": "value",
             "check": "c",
             "failed_items": [
               {
@@ -35052,15 +35277,13 @@
             ],
             "inputs": [
               {
-                "locations": [
-                  "/prs/0/c"
-                ],
-                "name": "pl.z",
+                "locations": [],
+                "name": "pl[].z",
                 "part": {
                   "id": null,
                   "name": "pl"
                 },
-                "value": null
+                "value": []
               },
               {
                 "locations": [],
@@ -35068,7 +35291,7 @@
                 "value": []
               }
             ],
-            "message": "pl is [], which isn't an object; xs is []",
+            "message": "xs is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -35081,7 +35304,9 @@
       {
         "description": "the part holds null and the list has an item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -35202,7 +35427,9 @@
       {
         "description": "the part holds null and the list has no item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -35260,7 +35487,9 @@
       {
         "description": "the part holds text and the list has an item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -35381,7 +35610,9 @@
       {
         "description": "the part holds text and the list has no item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -35439,7 +35670,9 @@
       {
         "description": "the part holds an object with a list and the list has an item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -35568,7 +35801,9 @@
       {
         "description": "the part holds an object with a list and the list has no item",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -35632,7 +35867,9 @@
       {
         "description": "the part is missing",
         "rules": [
-          "for.roots"
+          "for.roots",
+          "walk.right",
+          "tally.whose"
         ],
         "input": {
           "prs": [
@@ -35747,6 +35984,279 @@
               "type": "pr"
             }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of on a for line walks a list in the middle of a part, a parent or $input",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "pr", "checks": {"part": {"for": "every xs as m", "assert": "count of pl.z is 2"}, "input": {"for": "every xs as m", "assert": "count of $input.lst.z is 2"}}}}},
+    "cases": [
+      {
+        "description": "each item of the list is counted",
+        "rules": ["for.roots", "tally.walk", "walk.lists"],
+        "input": {"prs": [{"id": "p0", "xs": [{"v": 1}], "c": [{"z": 1}, {"z": 2}]}], "lst": [{"z": 1}, {"z": 2}]},
+        "results": [
+          {"cause": "satisfied", "check": "input", "failed_items": [], "inputs": [{"locations": ["/lst/0/z", "/lst/1/z"], "name": "$input.lst[].z", "value": [1, 2]}, {"locations": ["/lst/0/z", "/lst/1/z"], "name": "count of $input.lst.z", "value": 2}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "satisfied", "check": "part", "failed_items": [], "inputs": [{"locations": ["/prs/0/c/0/z", "/prs/0/c/1/z"], "name": "count of pl.z", "part": {"id": null, "name": "pl"}, "value": 2}, {"locations": ["/prs/0/c/0/z", "/prs/0/c/1/z"], "name": "pl[].z", "part": {"id": null, "name": "pl"}, "value": [1, 2]}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "an empty list counts nothing",
+        "rules": ["for.roots", "tally.walk", "walk.lists"],
+        "input": {"prs": [{"id": "p0", "xs": [{"v": 1}], "c": []}], "lst": []},
+        "results": [
+          {"cause": "value", "check": "input", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of $input.lst.z is 2", "cause": "value", "inputs": [{"locations": [], "name": "count of $input.lst.z", "value": 0}, {"locations": [], "name": "$input.lst[].z", "value": []}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": [], "name": "$input.lst[].z", "value": []}, {"locations": [], "name": "count of $input.lst.z", "value": 0}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "count of $input.lst.z is 0", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "value", "check": "part", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of pl.z is 2", "cause": "value", "inputs": [{"locations": [], "name": "count of pl.z", "part": {"id": null, "name": "pl"}, "value": 0}, {"locations": [], "name": "pl[].z", "part": {"id": null, "name": "pl"}, "value": []}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": [], "name": "count of pl.z", "part": {"id": null, "name": "pl"}, "value": 0}, {"locations": [], "name": "pl[].z", "part": {"id": null, "name": "pl"}, "value": []}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "count of pl.z is 0", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "an item without the name fails as absent",
+        "rules": ["for.roots", "tally.walk", "walk.lists"],
+        "input": {"prs": [{"id": "p0", "xs": [{"v": 1}], "c": [{"z": 1}, {}]}], "lst": [{"z": 1}, {}]},
+        "results": [
+          {"cause": "absent", "check": "input", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of $input.lst.z is 2", "cause": "absent", "inputs": [{"locations": ["/lst/0/z", "/lst/1"], "name": "count of $input.lst.z", "value": null}, {"locations": ["/lst/0/z", "/lst/1"], "name": "$input.lst[].z", "value": [1, null]}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/lst/0/z", "/lst/1"], "name": "$input.lst[].z", "value": [1, null]}, {"locations": ["/lst/0/z", "/lst/1"], "name": "count of $input.lst.z", "value": null}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "item 2 of $input.lst: z is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "absent", "check": "part", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of pl.z is 2", "cause": "absent", "inputs": [{"locations": ["/prs/0/c/0/z", "/prs/0/c/1"], "name": "count of pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": ["/prs/0/c/0/z", "/prs/0/c/1"], "name": "pl[].z", "part": {"id": null, "name": "pl"}, "value": [1, null]}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/c/0/z", "/prs/0/c/1"], "name": "count of pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": ["/prs/0/c/0/z", "/prs/0/c/1"], "name": "pl[].z", "part": {"id": null, "name": "pl"}, "value": [1, null]}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "item 2 of pl: z is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "a null part fails as null, and a missing $input list as absent",
+        "rules": ["for.roots", "tally.walk", "walk.lists"],
+        "input": {"prs": [{"id": "p0", "xs": [{"v": 1}], "c": null}]},
+        "results": [
+          {"cause": "absent", "check": "input", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of $input.lst.z is 2", "cause": "absent", "inputs": [{"locations": [], "name": "count of $input.lst.z", "value": null}, {"locations": [], "name": "$input.lst.z", "value": []}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": [], "name": "$input.lst.z", "value": []}, {"locations": [], "name": "count of $input.lst.z", "value": null}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "$input.lst.z is missing; $input.lst is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "null", "check": "part", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "count of pl.z is 2", "cause": "null", "inputs": [{"locations": [], "name": "count of pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": [], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": []}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": [], "name": "count of pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": [], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": []}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part that holds a list is walked on the right of is in on a for line",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "cs", "identified_by": "id", "has": {"pos": "os"}}}, "requirements": {"r": {"subject": "c", "checks": {"sentence": {"for": "every rows as r", "assert": "r.v is in pos.name"}, "whose": {"for": "every rows whose v is in pos.name as r", "assert": "r.v is \"bob\""}, "every": {"for": "every ms as m", "assert": "every m.ys.v is in pos.name"}}}}},
+    "cases": [
+      {
+        "description": "each item of the part is read, and the entry lists each value with its part tag",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs"],
+        "input": {"cs": [{"id": "c1", "rows": [{"v": "bob", "ws": [{"x": "bob"}]}], "ms": [{"ys": [{"v": "bob"}]}], "os": [{"name": "ann"}, {"name": "bob"}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "every", "failed_items": [], "inputs": [{"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ys": [{"v": "bob"}]}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["ann", "bob"]}], "passed": true, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "satisfied", "check": "sentence", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["ann", "bob"]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "passed": true, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "satisfied", "check": "whose", "failed_items": [], "inputs": [{"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "passed": true, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
+        ]
+      },
+      {
+        "description": "an item without the name fails as absent and names the item",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs"],
+        "input": {"cs": [{"id": "c1", "rows": [{"v": "bob", "ws": [{"x": "bob"}]}], "ms": [{"ys": [{"v": "bob"}]}], "os": [{"name": "ann"}, {}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "every m.ys.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/ms/0/ys/0/v"], "name": "m.ys[].v", "value": ["bob"]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["ann", null]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ys": [{"v": "bob"}]}}], "inputs": [{"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ys": [{"v": "bob"}]}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["ann", null]}], "message": "item 1 of ms: item 2 of pos: name is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "absent", "check": "sentence", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["ann", null]}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["ann", null]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "message": "item 1 of rows: item 2 of pos: name is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "absent", "check": "whose", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}], "inputs": [{"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "message": "item 1 of rows: item 2 of pos: name is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
+        ]
+      },
+      {
+        "description": "a missing part fails as absent",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs"],
+        "input": {"cs": [{"id": "c1", "rows": [{"v": "bob", "ws": [{"x": "bob"}]}], "ms": [{"ys": [{"v": "bob"}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "every m.ys.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/ms/0/ys/0/v"], "name": "m.ys[].v", "value": ["bob"]}, {"locations": ["/cs/0"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ys": [{"v": "bob"}]}}], "inputs": [{"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ys": [{"v": "bob"}]}]}, {"locations": ["/cs/0"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}], "message": "pos.name is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "absent", "check": "sentence", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}], "inputs": [{"locations": ["/cs/0"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "message": "pos.name is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "absent", "check": "whose", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}], "inputs": [{"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "message": "pos.name is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
+        ]
+      },
+      {
+        "description": "a null part fails as null",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs"],
+        "input": {"cs": [{"id": "c1", "rows": [{"v": "bob", "ws": [{"x": "bob"}]}], "ms": [{"ys": [{"v": "bob"}]}], "os": null}]},
+        "results": [
+          {"cause": "null", "check": "every", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "every m.ys.v is in pos.name", "cause": "null", "inputs": [{"locations": ["/cs/0/ms/0/ys/0/v"], "name": "m.ys[].v", "value": ["bob"]}, {"locations": ["/cs/0/os"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ys": [{"v": "bob"}]}}], "inputs": [{"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ys": [{"v": "bob"}]}]}, {"locations": ["/cs/0/os"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}], "message": "pos is null", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "null", "check": "sentence", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "null", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0/os"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}], "inputs": [{"locations": ["/cs/0/os"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "message": "pos is null", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "null", "check": "whose", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}], "inputs": [{"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "message": "pos is null", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
+        ]
+      },
+      {
+        "description": "a part that is text fails as unusable",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs"],
+        "input": {"cs": [{"id": "c1", "rows": [{"v": "bob", "ws": [{"x": "bob"}]}], "ms": [{"ys": [{"v": "bob"}]}], "os": "s"}]},
+        "results": [
+          {"cause": "unusable", "check": "every", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every m.ys.v is in pos.name", "cause": "unusable", "inputs": [{"locations": ["/cs/0/ms/0/ys/0/v"], "name": "m.ys[].v", "value": ["bob"]}, {"locations": ["/cs/0/os"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ys": [{"v": "bob"}]}}], "inputs": [{"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ys": [{"v": "bob"}]}]}, {"locations": ["/cs/0/os"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}], "message": "pos is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "unusable", "check": "sentence", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "unusable", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0/os"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}], "inputs": [{"locations": ["/cs/0/os"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "message": "pos is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "unusable", "check": "whose", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}], "inputs": [{"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "message": "pos is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part that holds a list is walked in the whose of a for line and in a whose under it",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "pr", "checks": {"every_if_any": {"for": "every xs whose v is in pl.z, if any, as m", "assert": "m.v is 1"}, "every": {"for": "every xs whose v is in pl.z as m", "assert": "m.v is 1"}, "some": {"for": "some xs whose v is in pl.z as m", "assert": "m.v is 1"}, "some_exists": {"for": "every xs as m", "assert": "some xs whose v is in pl.z exists"}}}}},
+    "cases": [
+      {
+        "description": "each item of the part is read",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "for.walk"],
+        "input": {"prs": [{"id": "p0", "xs": [{"v": 1}], "c": [{"z": 1}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "every", "failed_items": [], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "satisfied", "check": "every_if_any", "failed_items": [], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "satisfied", "check": "some", "failed_items": [], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "satisfied", "check": "some_exists", "failed_items": [], "inputs": [{"locations": ["/prs/0/c/0/z"], "name": "pl[].z", "part": {"id": null, "name": "pl"}, "value": [1]}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "an empty part leaves every item out",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "for.walk"],
+        "input": {"prs": [{"id": "p0", "xs": [{"v": 1}], "c": []}]},
+        "results": [
+          {"cause": "value", "check": "every", "failed_items": [], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "xs is [{\"v\": 1}]", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "satisfied", "check": "every_if_any", "failed_items": [], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "value", "check": "some", "failed_items": [], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "xs is [{\"v\": 1}]", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "value", "check": "some_exists", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "some xs whose v is in pl.z exists", "cause": "value", "inputs": [{"locations": [], "name": "pl[].z", "part": {"id": null, "name": "pl"}, "value": []}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": [], "name": "pl[].z", "part": {"id": null, "name": "pl"}, "value": []}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "xs is [{\"v\": 1}]", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "a missing part fails as absent",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "for.walk"],
+        "input": {"prs": [{"id": "p0", "xs": [{"v": 1}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl.z is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "absent", "check": "every_if_any", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl.z is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "absent", "check": "some", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl.z is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "absent", "check": "some_exists", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "some xs whose v is in pl.z exists", "cause": "absent", "inputs": [{"locations": ["/prs/0"], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0"], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl.z is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "a null part fails as null",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "for.walk"],
+        "input": {"prs": [{"id": "p0", "xs": [{"v": 1}], "c": null}]},
+        "results": [
+          {"cause": "null", "check": "every", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "null", "check": "every_if_any", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "null", "check": "some", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "null", "check": "some_exists", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "some xs whose v is in pl.z exists", "cause": "null", "inputs": [{"locations": ["/prs/0/c"], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/c"], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "a part that is text fails as unusable",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "for.walk"],
+        "input": {"prs": [{"id": "p0", "xs": [{"v": 1}], "c": "s"}]},
+        "results": [
+          {"cause": "unusable", "check": "every", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "every_if_any", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "some", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "some_exists", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "some xs whose v is in pl.z exists", "cause": "unusable", "inputs": [{"locations": ["/prs/0/c"], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}], "inputs": [{"locations": ["/prs/0/c"], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": null}, {"locations": ["/prs/0/xs/0"], "name": "xs[]", "value": [{"v": 1}]}], "message": "pl is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part of a subject that is a list is walked in the whose of a count of on a for line",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every teams", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"c": {"for": "every rows as r", "assert": "count of r.ws whose x is in pl.z is 1"}}}}},
+    "cases": [
+      {
+        "description": "each item of the subject is read, and the entry is t[].c.z",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "walk.start", "tally.whose"],
+        "input": {"teams": [[{"c": {"z": "bob"}, "rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, {"c": {"z": "x"}, "rows": [{"v": "x", "ws": [{"x": "x"}]}]}]]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/teams/0/0/c/z", "/teams/0/1/c/z"], "name": "t[].c.z", "value": ["bob", "x"]}, {"locations": ["/teams/0/0/rows/0", "/teams/0/1/rows/0"], "name": "t[].rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}, {"v": "x", "ws": [{"x": "x"}]}]}], "passed": true, "requirement": "r", "subject": {"id": [{"c": {"z": "bob"}, "rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, {"c": {"z": "x"}, "rows": [{"v": "x", "ws": [{"x": "x"}]}]}], "type": "t"}}
+        ]
+      },
+      {
+        "description": "an item without the part fails as absent",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "walk.start", "tally.whose"],
+        "input": {"teams": [[{"c": {"z": "bob"}, "rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, {"rows": [{"v": "x", "ws": [{"x": "x"}]}]}]]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of r.ws whose x is in pl.z is 1", "cause": "absent", "inputs": [{"locations": ["/teams/0/0/rows/0/ws/0"], "name": "count of r.ws whose x is in pl.z", "value": null}, {"locations": ["/teams/0/0/rows/0/ws/0"], "name": "r.ws[]", "value": [{"x": "bob"}]}, {"locations": ["/teams/0/0/c/z", "/teams/0/1"], "name": "t[].c.z", "value": ["bob", null]}]}], "item": "item 1 of t[0].rows", "locations": ["/teams/0/0/rows/0"], "path": "item 1 of t[0].rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}, {"cause": "absent", "failed_assertions": [{"assertion": "count of r.ws whose x is in pl.z is 1", "cause": "absent", "inputs": [{"locations": ["/teams/0/1/rows/0/ws/0"], "name": "count of r.ws whose x is in pl.z", "value": null}, {"locations": ["/teams/0/1/rows/0/ws/0"], "name": "r.ws[]", "value": [{"x": "x"}]}, {"locations": ["/teams/0/0/c/z", "/teams/0/1"], "name": "t[].c.z", "value": ["bob", null]}]}], "item": "item 1 of t[1].rows", "locations": ["/teams/0/1/rows/0"], "path": "item 1 of t[1].rows", "value": {"v": "x", "ws": [{"x": "x"}]}}], "inputs": [{"locations": ["/teams/0/0/c/z", "/teams/0/1"], "name": "t[].c.z", "value": ["bob", null]}, {"locations": ["/teams/0/0/rows/0", "/teams/0/1/rows/0"], "name": "t[].rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}, {"v": "x", "ws": [{"x": "x"}]}]}], "message": "item 1 of t: item 1 of rows: item 2 of t: c.z is missing; item 2 of t: item 1 of rows: item 2 of t: c.z is missing", "passed": false, "requirement": "r", "subject": {"id": [{"c": {"z": "bob"}, "rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, {"rows": [{"v": "x", "ws": [{"x": "x"}]}]}], "type": "t"}}
+        ]
+      },
+      {
+        "description": "an item whose part holds null fails as null",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "walk.start", "tally.whose"],
+        "input": {"teams": [[{"c": {"z": "bob"}, "rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, {"c": {"z": null}, "rows": [{"v": "x", "ws": [{"x": "x"}]}]}]]},
+        "results": [
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "count of r.ws whose x is in pl.z is 1", "cause": "null", "inputs": [{"locations": ["/teams/0/0/rows/0/ws/0"], "name": "count of r.ws whose x is in pl.z", "value": null}, {"locations": ["/teams/0/0/rows/0/ws/0"], "name": "r.ws[]", "value": [{"x": "bob"}]}, {"locations": ["/teams/0/0/c/z", "/teams/0/1/c/z"], "name": "t[].c.z", "value": ["bob", null]}]}], "item": "item 1 of t[0].rows", "locations": ["/teams/0/0/rows/0"], "path": "item 1 of t[0].rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}, {"cause": "null", "failed_assertions": [{"assertion": "count of r.ws whose x is in pl.z is 1", "cause": "null", "inputs": [{"locations": ["/teams/0/1/rows/0/ws/0"], "name": "count of r.ws whose x is in pl.z", "value": null}, {"locations": ["/teams/0/1/rows/0/ws/0"], "name": "r.ws[]", "value": [{"x": "x"}]}, {"locations": ["/teams/0/0/c/z", "/teams/0/1/c/z"], "name": "t[].c.z", "value": ["bob", null]}]}], "item": "item 1 of t[1].rows", "locations": ["/teams/0/1/rows/0"], "path": "item 1 of t[1].rows", "value": {"v": "x", "ws": [{"x": "x"}]}}], "inputs": [{"locations": ["/teams/0/0/c/z", "/teams/0/1/c/z"], "name": "t[].c.z", "value": ["bob", null]}, {"locations": ["/teams/0/0/rows/0", "/teams/0/1/rows/0"], "name": "t[].rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}, {"v": "x", "ws": [{"x": "x"}]}]}], "message": "item 1 of t: item 1 of rows: item 2 of t: c.z is null; item 2 of t: item 1 of rows: item 2 of t: c.z is null", "passed": false, "requirement": "r", "subject": {"id": [{"c": {"z": "bob"}, "rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, {"c": {"z": null}, "rows": [{"v": "x", "ws": [{"x": "x"}]}]}], "type": "t"}}
+        ]
+      },
+      {
+        "description": "an item whose part is text fails as unusable",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "walk.start", "tally.whose"],
+        "input": {"teams": [[{"c": {"z": "bob"}, "rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, {"c": "s", "rows": [{"v": "x", "ws": [{"x": "x"}]}]}]]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of r.ws whose x is in pl.z is 1", "cause": "unusable", "inputs": [{"locations": ["/teams/0/0/rows/0/ws/0"], "name": "count of r.ws whose x is in pl.z", "value": null}, {"locations": ["/teams/0/0/rows/0/ws/0"], "name": "r.ws[]", "value": [{"x": "bob"}]}, {"locations": ["/teams/0/0/c/z", "/teams/0/1/c"], "name": "t[].c.z", "value": ["bob", null]}]}], "item": "item 1 of t[0].rows", "locations": ["/teams/0/0/rows/0"], "path": "item 1 of t[0].rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}, {"cause": "unusable", "failed_assertions": [{"assertion": "count of r.ws whose x is in pl.z is 1", "cause": "unusable", "inputs": [{"locations": ["/teams/0/1/rows/0/ws/0"], "name": "count of r.ws whose x is in pl.z", "value": null}, {"locations": ["/teams/0/1/rows/0/ws/0"], "name": "r.ws[]", "value": [{"x": "x"}]}, {"locations": ["/teams/0/0/c/z", "/teams/0/1/c"], "name": "t[].c.z", "value": ["bob", null]}]}], "item": "item 1 of t[1].rows", "locations": ["/teams/0/1/rows/0"], "path": "item 1 of t[1].rows", "value": {"v": "x", "ws": [{"x": "x"}]}}], "inputs": [{"locations": ["/teams/0/0/c/z", "/teams/0/1/c"], "name": "t[].c.z", "value": ["bob", null]}, {"locations": ["/teams/0/0/rows/0", "/teams/0/1/rows/0"], "name": "t[].rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}, {"v": "x", "ws": [{"x": "x"}]}]}], "message": "item 1 of t: item 1 of rows: item 2 of t: c is \"s\", which isn't an object; item 2 of t: item 1 of rows: item 2 of t: c is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [{"c": {"z": "bob"}, "rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, {"c": "s", "rows": [{"v": "x", "ws": [{"x": "x"}]}]}], "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's list is walked in the whose of a count of on a for line",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"rel": {"from": "every rels"}, "kid": {"from": "every rel.kids"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": {"for": "every rows as r", "assert": "count of r.ws whose x is in rel.os.name is 1"}}}}},
+    "cases": [
+      {
+        "description": "each item of the parent's list is read, and the entry is rel.os[].name",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "tally.whose"],
+        "input": {"rels": [{"kids": [{"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "os": [{"name": "ann"}, {"name": "bob"}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/rels/0/os/0/name", "/rels/0/os/1/name"], "name": "rel.os[].name", "value": ["ann", "bob"]}, {"locations": ["/rels/0/kids/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "passed": true, "requirement": "r", "subject": {"id": {"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, "in": {"rel": {"kids": [{"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "os": [{"name": "ann"}, {"name": "bob"}]}}, "type": "kid"}}
+        ]
+      },
+      {
+        "description": "a missing list fails as absent",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "tally.whose"],
+        "input": {"rels": [{"kids": [{"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of r.ws whose x is in rel.os.name is 1", "cause": "absent", "inputs": [{"locations": ["/rels/0/kids/0/rows/0/ws/0"], "name": "count of r.ws whose x is in rel.os.name", "value": null}, {"locations": ["/rels/0/kids/0/rows/0/ws/0"], "name": "r.ws[]", "value": [{"x": "bob"}]}, {"locations": ["/rels/0"], "name": "rel.os.name", "value": null}]}], "item": "item 1 of rows", "locations": ["/rels/0/kids/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}], "inputs": [{"locations": ["/rels/0"], "name": "rel.os.name", "value": null}, {"locations": ["/rels/0/kids/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "message": "rel.os.name is missing", "passed": false, "requirement": "r", "subject": {"id": {"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, "in": {"rel": {"kids": [{"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}]}}, "type": "kid"}}
+        ]
+      },
+      {
+        "description": "a null list fails as null",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "tally.whose"],
+        "input": {"rels": [{"kids": [{"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "os": null}]},
+        "results": [
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "count of r.ws whose x is in rel.os.name is 1", "cause": "null", "inputs": [{"locations": ["/rels/0/kids/0/rows/0/ws/0"], "name": "count of r.ws whose x is in rel.os.name", "value": null}, {"locations": ["/rels/0/kids/0/rows/0/ws/0"], "name": "r.ws[]", "value": [{"x": "bob"}]}, {"locations": ["/rels/0/os"], "name": "rel.os.name", "value": null}]}], "item": "item 1 of rows", "locations": ["/rels/0/kids/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}], "inputs": [{"locations": ["/rels/0/os"], "name": "rel.os.name", "value": null}, {"locations": ["/rels/0/kids/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "message": "rel.os is null", "passed": false, "requirement": "r", "subject": {"id": {"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, "in": {"rel": {"kids": [{"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "os": null}}, "type": "kid"}}
+        ]
+      },
+      {
+        "description": "a list that is text fails as unusable",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "tally.whose"],
+        "input": {"rels": [{"kids": [{"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "os": "s"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of r.ws whose x is in rel.os.name is 1", "cause": "unusable", "inputs": [{"locations": ["/rels/0/kids/0/rows/0/ws/0"], "name": "count of r.ws whose x is in rel.os.name", "value": null}, {"locations": ["/rels/0/kids/0/rows/0/ws/0"], "name": "r.ws[]", "value": [{"x": "bob"}]}, {"locations": ["/rels/0/os"], "name": "rel.os.name", "value": null}]}], "item": "item 1 of rows", "locations": ["/rels/0/kids/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "ws": [{"x": "bob"}]}}], "inputs": [{"locations": ["/rels/0/os"], "name": "rel.os.name", "value": null}, {"locations": ["/rels/0/kids/0/rows/0"], "name": "rows[]", "value": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "message": "rel.os is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}, "in": {"rel": {"kids": [{"rows": [{"v": "bob", "ws": [{"x": "bob"}]}]}], "os": "s"}}, "type": "kid"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's part that holds a list is walked in the whose of a for line",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"art": {"from": "arts", "identified_by": "id", "has": {"cov": "c"}}, "ch": {"from": "every art.xs"}}, "requirements": {"r": {"subject": "ch", "checks": {"c": {"for": "every ys whose n is in art.cov.z as x", "assert": "x.n is 1"}}}}},
+    "cases": [
+      {
+        "description": "each item of the part is read",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "for.walk"],
+        "input": {"arts": [{"id": "a1", "xs": [{"ys": [{"n": 1}, {"n": 2}]}], "c": [{"z": 1}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "passed": true, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "a missing part fails as absent",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "for.walk"],
+        "input": {"arts": [{"id": "a1", "xs": [{"ys": [{"n": 1}, {"n": 2}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": {"n": 1}}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": {"n": 2}}], "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "message": "art.cov.z is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "a null part fails as null",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "for.walk"],
+        "input": {"arts": [{"id": "a1", "xs": [{"ys": [{"n": 1}, {"n": 2}]}], "c": null}]},
+        "results": [
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": {"n": 1}}, {"cause": "null", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": {"n": 2}}], "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "message": "art.cov is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "a part that is text fails as unusable",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs", "for.roots", "for.inputs", "for.walk"],
+        "input": {"arts": [{"id": "a1", "xs": [{"ys": [{"n": 1}, {"n": 2}]}], "c": "s"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/arts/0/xs/0/ys/0"], "path": "item 1 of ys", "value": {"n": 1}}, {"cause": "unusable", "failed_assertions": [], "item": "item 2 of ys", "locations": ["/arts/0/xs/0/ys/1"], "path": "item 2 of ys", "value": {"n": 2}}], "inputs": [{"locations": ["/arts/0/xs/0/ys/0", "/arts/0/xs/0/ys/1"], "name": "ys[]", "value": [{"n": 1}, {"n": 2}]}], "message": "art.cov is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"n": 1}, {"n": 2}]}, "in": {"art": "a1"}, "type": "ch"}}
         ]
       }
     ]

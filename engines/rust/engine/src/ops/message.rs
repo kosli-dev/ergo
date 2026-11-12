@@ -1484,25 +1484,6 @@ pub fn root_flaw_ordered(
     refs_first: &[&Check],
     keys_left: &[&Check],
 ) -> Option<(Cause, String)> {
-    root_flaw_with(checks, ctx, refs_first, keys_left, false)
-}
-
-pub fn root_flaw_in_for(
-    checks: &[&Check],
-    ctx: &Ctx,
-    refs_first: &[&Check],
-    keys_left: &[&Check],
-) -> Option<(Cause, String)> {
-    root_flaw_with(checks, ctx, refs_first, keys_left, true)
-}
-
-fn root_flaw_with(
-    checks: &[&Check],
-    ctx: &Ctx,
-    refs_first: &[&Check],
-    keys_left: &[&Check],
-    parts_fail: bool,
-) -> Option<(Cause, String)> {
     let mut found: Vec<(usize, Cause, String, bool)> = Vec::new();
     let mut refs: Vec<String> = Vec::new();
     for (at, check) in checks.iter().enumerate() {
@@ -1538,9 +1519,7 @@ fn root_flaw_with(
                 }) {
                     continue;
                 }
-                let part = matches!(&root.start, Start::Part(part) if !part.steps.is_empty());
                 if lists::right_paths(check).contains(&&root)
-                    && !(part && parts_fail)
                     && lists::walked_in(check, &root, ctx).is_some()
                 {
                     continue;
@@ -1549,7 +1528,10 @@ fn root_flaw_with(
                     Check::Tally(tally) => tally.counted_paths().contains(&path),
                     _ => false,
                 };
-                if counted && !is_key && lists::starts_at_a_list(&root, ctx) {
+                if counted
+                    && !is_key
+                    && (lists::starts_at_a_list(&root, ctx) || lists::walked(&root, ctx).is_some())
+                {
                     continue;
                 }
                 if counted && let Some(found) = first_null_step(&root, ctx) {

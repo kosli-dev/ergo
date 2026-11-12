@@ -902,6 +902,12 @@ _for_listed(subj, c, p) if {
 	_rwalks(subj, p)
 }
 
+_for_listed(subj, c, p) if {
+	_for_listed_right(c, p)
+	_part_start(p)
+	_rwalks(subj, p)
+}
+
 _for_listed_right(c, p) if {
 	_list_cmp(c)
 	not _one_right(c)
@@ -926,7 +932,7 @@ _for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input
 	some c in check.checks
 	some side in _derived_sides(c)
 	not _tally_named(check, side)
-	some i in _for_side_inputs(subj, side)
+	some i in _side_inputs(subj, side)
 }) | {[i.name, i.value, i.locations] |
 	some c in check.checks
 	some side in _derived_sides(c)
@@ -958,11 +964,6 @@ _for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input
 	some c in check.checks
 	c.op in _right_ref_ops
 	some i in _ref_inputs(object.remove(c, ["path"]))
-}
-
-_for_side_inputs(subj, side) := array.concat([i | some i in _side_inputs(subj, side); not i in held], [_path_input(subj, x[0]) | some x in xs]) if {
-	xs := [x | some t in _tally_parts(side); some x in _listed_reads(subj, t.whose)]
-	held := {x[1] | some x in xs}
 }
 
 _for_alias_path(check, p) if p[0] in {concat("", ["$", item.as]) | some item in check.items}
@@ -1080,7 +1081,7 @@ _tally_kept_inputs(check, subj, part) := array.concat(
 	),
 	_merged_inputs(array.concat(
 		array.concat(
-			_for_conds_named_inputs(subj, part.whose, {p | some c in part.whose; some p in _condition_paths(c); _for_alias_path(check, p)}),
+			_conds_named_inputs_but(subj, part.whose, {p | some c in part.whose; some p in _condition_paths(c); _for_alias_path(check, p)}),
 			_named_inputs(subj, [shown | some c in part.whose; some p in _condition_paths(c); shown := _before_alias_name(check, subj, p)]),
 		),
 		_input_ref_inputs(part.whose),

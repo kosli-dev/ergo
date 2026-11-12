@@ -45,18 +45,10 @@ else := _conds_named_inputs(subj, array.concat([check.check], check.whose))
 
 _conds_named_inputs(subj, conds) := _conds_named_inputs_but(subj, conds, set())
 
-_conds_named_inputs_but(subj, conds, skip) := _conds_inputs(subj, conds, skip, false)
-
-_for_conds_named_inputs(subj, conds, skip) := _conds_inputs(subj, conds, skip, true)
-
-_conds_inputs(subj, conds, skip, false) := array.concat(array.concat(_named_inputs(subj, paths), _field_named_inputs(subj, paths)), [x[1] | some x in reads]) if {
+_conds_named_inputs_but(subj, conds, skip) := array.concat(array.concat(_named_inputs(subj, paths), _field_named_inputs(subj, paths)), [x[1] | some x in reads]) if {
 	reads := {x | some x in _listed_reads(subj, conds); not x[0] in skip}
 	listed := {x[0] | some x in reads}
 	paths := [p | some c in conds; some p in _condition_paths(c); not p in listed; not p in skip]
-}
-
-_conds_inputs(subj, conds, skip, true) := array.concat(_named_inputs(subj, paths), _field_named_inputs(subj, paths)) if {
-	paths := [p | some c in conds; some p in _condition_paths(c); not p in skip]
 }
 
 _listed_reads(subj, conds) := {[c.right, {"name": w.name, "value": w.value, "locations": w.locations}] |
@@ -68,7 +60,14 @@ _listed_reads(subj, conds) := {[c.right, {"name": w.name, "value": w.value, "loc
 	some side in _derived_sides(c)
 	some t in _tally_parts(side)
 	f := _basic_form(t)
-	_listed_path(subj, t[f])
+	_listed_tally_path(subj, t[f])
+}
+
+_listed_tally_path(subj, p) if _listed_path(subj, p)
+
+_listed_tally_path(subj, p) if {
+	p[0] == "$$input"
+	_rwalks(subj, p)
 }
 
 _listed_right(subj, c) if {

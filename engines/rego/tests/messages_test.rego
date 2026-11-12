@@ -957,18 +957,18 @@ _part_policy := _item_policy({"has": {"pl": "c"}}, {
 	"contains": {"for": "every xs as m", "assert": "pl.z contains m.v"},
 })
 
-test_a_part_that_isnt_an_object_on_the_right_of_a_list_phrase_fails_as_unusable_and_names_the_part if {
+test_an_empty_part_is_walked_on_the_right_of_a_list_phrase_and_named_as_not_an_object_before_contains if {
 	rows := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": [], "xs": [{"v": 1}]}]}, {})
-	every check in ["in", "matches", "contains"] {
-		rows[check] == ["unusable", "pl is [], which isn't an object"]
-	}
+	rows["in"] == ["value", "item 1 of xs: m.v is 1, and pl is []"]
+	rows.matches == ["value", "item 1 of xs: m.v is 1, and pl is []"]
+	rows.contains == ["unusable", "pl is [], which isn't an object"]
 }
 
-test_a_part_that_is_a_list_of_objects_is_not_walked_on_the_right_of_a_list_phrase if {
+test_a_part_that_is_a_list_of_objects_is_walked_on_the_right_of_a_list_phrase_but_not_before_contains if {
 	rows := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": [{"z": 1}], "xs": [{"v": 1}]}]}, {})
-	rows.in == ["unusable", "pl is [{\"z\": 1}], which isn't an object"]
+	rows["in"] == ["satisfied", null]
 	rows.contains == ["unusable", "pl is [{\"z\": 1}], which isn't an object"]
-	rows.matches == ["unusable", "pl is [{\"z\": 1}], which isn't an object; item 1 of xs: m.v is 1, which isn't text, and pl[].z is [1], which isn't a list of patterns"]
+	rows.matches == ["unusable", "item 1 of xs: m.v is 1, which isn't text, and pl[].z is [1], which isn't a list of patterns"]
 }
 
 test_a_part_that_is_text_or_null_on_the_right_of_a_list_phrase_says_so if {

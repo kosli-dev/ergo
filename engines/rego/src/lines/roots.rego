@@ -58,10 +58,11 @@ _walking_root(_, p) if {
 }
 
 _walking_root(c, p) if {
-	_list_cmp(c)
-	not _one_right(c)
-	_rpath(c.right) == p
-	_rwalks(null, p)
+	walk(c, [_, y])
+	_list_cmp(y)
+	not _one_right(y)
+	_rpath(y.right) == p
+	_root_walks(p)
 }
 
 _walking_root(c, p) if {
@@ -74,21 +75,26 @@ _walking_root(c, p) if {
 }
 
 _walking_root(c, p) if {
-	object.get(c, "ergo/for", false) == true
-	_list_cmp(c)
-	not _one_right(c)
-	_rpath(c.right) == p
-	subj := object.get(input, ["ergo/names", "ergo/subject"], null)
-	_list_start(p, subj)
-	_part_of(p).old == false
-	_rwalks(subj, p)
+	walk(c, [_, y])
+	_basic_form(y) in {"count_of", "sum_of"}
+	y[_basic_form(y)] == p
+	_walks_list_start(p)
 }
 
 _walking_root(c, p) if {
 	walk(c, [_, y])
 	_basic_form(y) in {"count_of", "sum_of"}
 	y[_basic_form(y)] == p
-	_walks_list_start(p)
+	_root_walks(p)
+	not is_array(object.get(input, ["ergo/names", "ergo/subject"], null))
+}
+
+_root_walks(p) if _rwalks(null, p)
+
+_root_walks(p) if {
+	_part_start(p)
+	_part_of(p).old == false
+	_rwalks(object.get(input, ["ergo/names", "ergo/subject"], null), p)
 }
 
 _walks_list_start(p) if {
