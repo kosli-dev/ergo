@@ -15357,6 +15357,86 @@
     ]
   },
   {
+    "description": "a for line that starts with some passes through an item that isn't an object when the item after it is empty and tolerated",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pull_request": {
+          "from": "pull_requests",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "checks": {
+            "if_any_after": {
+              "for": "some approvers as approver, every commits, if any, as commit",
+              "assert": "approver.state is \"APPROVED\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes through an approver that isn't an object, though another approver has no state",
+        "rules": [
+          "for.pass",
+          "for.roots",
+          "walk.some"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                "str",
+                {
+                  "u": "b"
+                }
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "if_any_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  "str",
+                  {
+                    "u": "b"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "every over the subs of the first item that whose kept",
     "policy": {
       "ergo_spec": "{{spec}}",

@@ -97,12 +97,12 @@ _for_list_item(item, subj) if {
 	_list_start(item.path, subj)
 }
 
-_for_rooted(check, subj, r) := _for_second_rooted(rr, xs) if {
-	rr := _for_rooted_row(check, subj, r)
-	xs := _for_second_roots(check, subj)
+_for_rooted(check, subj, r) := _for_rooted_second(check, _for_rooted_row(check, subj, r), _for_second_roots(check, subj))
+
+_for_rooted_second(check, rr, xs) := _for_second_rooted(rr, xs) if {
 	xs != []
 	not _for_some_passed(check, rr, xs)
-} else := _for_rooted_row(check, subj, r)
+} else := rr
 
 _for_some_passed(check, rr, xs) if {
 	check.items[0].q == "some"
@@ -224,14 +224,18 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 	item := check.items[0]
 	w := _for_walk(item, subj, names)
 	pre := _for_pre(check, subj, names)
-	pairs := [[e.i, _for_judge_outer(check, subj, names, item, e, pre, w)] | some e in w.items]
-	judged := _for_copies_merged(item, names, w, [p[1] | some p in pairs])
-	passed := {p[0] | item.q == "some"; some p in pairs; p[1].passed}
+	raw := [_for_judge_outer(check, subj, names, item, e, pre, w) | some e in w.items]
+	judged := _for_copies_merged(item, names, w, raw)
+	passed := _for_passed_items(item, w, raw)
 	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
 	cause := _for_verdict(item, w, judged, fails)
 	failed := _for_failed(check, cause, _for_shared(check, fails, pre, names))
 	inputs := _for_inputs(check, subj, names, item, w)
 }
+
+_for_passed_items(item, w, raw) := {w.items[k].i | some k, j in raw; j.passed} if item.q == "some"
+
+else := set()
 
 _for_unwalked(check, w) := [f | some f in array.concat(w.fails, _walk_stop(w))] if not "unread" in object.keys(w)
 
