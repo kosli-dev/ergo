@@ -554,6 +554,13 @@ test_the_largest_position_a_float_holds_exactly_is_well_written if {
 	rep.compliant == true
 }
 
+test_a_from_lines_whose_takes_the_largest_list_position_a_sentence_takes if {
+	got := [problem_inputs(ergo.report({"things": [{"items": [1]}]}, filter_policy({"b": {"from": concat("", ["things whose items[", n, "] does not exist"])}}), {})) |
+		some n in ["9007199254740991", "9007199254740992"]
+	]
+	got == [[], [{"name": "subjects.b.from", "value": ["9007199254740992 can't be a list position"], "locations": []}]]
+}
+
 test_an_identified_by_with_an_index_that_cannot_be_a_key_is_written_wrong if {
 	rep := ergo.report({"things": [{"items": [1]}]}, filter_policy({"b": {"from": "things", "identified_by": "items[99999999999999999999]"}}), {})
 	rows_for(rep, "s", "$well_formed")[0].passed == false
