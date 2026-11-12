@@ -21,6 +21,8 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 - A `whose` or a `that` on a `from` line takes the list position `9007199254740991` in brackets, as a sentence does ([sentence.path.brackets](spec/syntax.md#paths)), where it was written wrong with `9007199254740992 can't be a list position`. With `from: things whose l[9007199254740991] is 1` and no `l` that long, the report has the subject, and its `$applies` row fails as `absent` with `item 9007199254740992 of l is missing`. A position above it is still written wrong with the number as written, like `9007199254740992 can't be a list position` for `l[9007199254740992]`. The Rust engine already did this.
 
+- A `followed by` piece read from `$input` on an input that is a list fails as `not_an_object` with `$input is [...], which isn't an object`, as a path on its own does and as spec 0.7 says ([compare.join](spec/semantics.md#compare)), where the message was `k is $input.k followed by "" is false`. After `contains` and `does not contain`, an `unusable` row names the left side only when it isn't a list of text: `tags contains $input.o.a.b followed by ""` with `tags` holding `["a"]` and `$input.o.a` holding `1` says `$input.o.a is 1, which isn't an object`, where it added `tags is ["a"], which isn't a number`, and `p contains "a" followed by v` with `p` holding `5` says `p is 5, which isn't a list`, where it said `"a" followed by v is "ax", which isn't a number`. Changes the message of such rows.
+
 ## 0.6.0
 
 ### Changed

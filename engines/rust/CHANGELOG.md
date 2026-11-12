@@ -20,6 +20,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A part whose own path walks a list, like `pn` from `c.names` with `c` a list, read by `every` or in a `whose`, is named from the subject in messages, as in `ergo.rego`: `every rows.v is in pn` with `c` holding `[{"x": 1}, {"names": ["bob"]}]` says `item 1 of c: names is missing`, where it said `item 1 of "$outer".c: names is missing`.
 
+- A `followed by` piece read from `$input` on an input that is a list says `$input is [...], which isn't an object` after `is`, `starts with` and the other phrases too, as in `ergo.rego` 0.7.0 and spec 0.7 ([compare.join](../../spec/semantics.md#compare)), where only `contains` did. After `contains` and `does not contain`, an `unusable` row names the left side only when it isn't a list of text, and names a piece that can't be read before it, as `ergo.rego` does: `tags contains $input.o.a.b followed by ""` with `tags` holding `["a"]` and `$input.o.a` holding `1` says `$input.o.a is 1, which isn't an object`, where it said `tags is ["a"], which isn't a number, and $input.o.a is 1, which isn't an object`, and `p contains "a" followed by v` with `p` holding `5` says `p is 5, which isn't a list`, where it said `"a" followed by v is "ax", which isn't a number`. Changes the message of such rows.
+
 ## 0.4.0
 
 ### New

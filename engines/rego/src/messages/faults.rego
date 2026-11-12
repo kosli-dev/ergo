@@ -85,6 +85,15 @@ _reads_input_one(check) if {
 	not _index_step(p[1])
 }
 
+_reads_input_one(check) if {
+	some side in _m_sides(check)
+	_side_form(side) == "join"
+	some p in _side_paths(side)
+	count(p) > 1
+	p[0] == "$$input"
+	not _index_step(p[1])
+}
+
 _m_label(check) := check.label if {
 	is_object(check)
 	is_string(object.get(check, "label", null))
@@ -490,7 +499,19 @@ _m_side_kind(_, check, _) := "text" if {
 _m_side_kind(_, check, _) := "a number" if {
 	not "within" in object.keys(check)
 	not check.cmp in _text_cmps
-	not check.cmp in {"eq", "ne"}
+	not check.cmp in {"eq", "ne", "includes", "excludes"}
+}
+
+_m_side_kind(subj, check, side) := _m_contain_kind(_m_side_value(subj, side)) if {
+	check.cmp in {"includes", "excludes"}
+	side == check.left
+}
+
+_m_contain_kind(v) := "a list" if not is_array(v)
+
+_m_contain_kind(v) := _m_list_of([""]) if {
+	is_array(v)
+	not _items_fit(v, [""])
 }
 
 _m_side_kind(subj, check, side) := _m_kind(o) if {
