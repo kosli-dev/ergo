@@ -145,6 +145,13 @@ test_cmp_trusts_opa_when_it_tells_two_numbers_apart if {
 	not ergo._cmp("ne", -0, 0, {}, {})
 }
 
+test_equal_dates_are_on_or_before_and_on_or_after_each_other if {
+	checks := {"lte": "t is on or before u", "gte": "t is on or after u"}
+	_long_causes(checks, [{"id": "a", "t": "2024-01-01", "u": "2024-01-01"}], {}) == {["a", "lte", "satisfied"], ["a", "gte", "satisfied"]}
+	ergo._cmp("lte", "2024-01-01", "2024-01-01", {}, {})
+	ergo._cmp("gte", "2024-01-01", "2024-01-01", {}, {})
+}
+
 test_text_order_reads_every_digit if {
 	ergo._text_order("1234567890.1209567890", "1234567890.1209567990") == -1
 	ergo._text_order("1234567890.1209567990", "1234567890.1209567890") == 1
@@ -176,6 +183,28 @@ test_significant_digits_are_counted_on_the_value if {
 	_well_formed_message({"c": "l is at most 1e20"}) == []
 	_well_formed_message({"c": "l is at most 0.000000000000000000001"}) == []
 	_well_formed_message({"c": "l is at most 1234567890123456000000"}) == ["checks.c: number with more than 15 significant digits: 1234567890123456000000"]
+}
+
+test_a_long_number_in_the_meta_of_a_check_is_written_wrong if {
+	_well_formed_message({"c": {"assert": "l exists", "meta": {"n": [1234567890.1209567890]}}}) == ["checks.c: number with more than 15 significant digits"]
+	_well_formed_message({"c": {"assert": "l exists", "meta": {"n": 1e400, "m": 1234567890.1209567890}}}) == ["checks.c: number out of range; checks.c: number with more than 15 significant digits"]
+	_well_formed_message({"c": {"assert": "l exists", "meta": {"n": 123456789012345}}}) == []
+}
+
+test_a_list_position_with_more_than_15_digits_is_not_a_policy_number if {
+	every subj in [
+		{"from": "things[9007199254740991]", "identified_by": "id"},
+		{"from": "things[1234567890123456]", "identified_by": "id"},
+		{"from": "things", "identified_by": "ids[9007199254740991]"},
+		{"from": "things", "identified_by": "ids[1234567890123456]"},
+	] {
+		policy := object.union(_sentence_policy({"c": "l exists"}), {"subjects": {"thing": subj}})
+		[r.cause | some r in ergo.report({"things": [{"id": "a", "l": 1}]}, policy, {}).results; r.check == "$well_formed"] == ["satisfied"]
+	}
+	_well_formed_message({"c": "l[1234567890123456] exists"}) == []
+	_well_formed_message({"c": "item 9007199254740991 of l exists"}) == []
+	_well_formed_message({"c": "m named by ids[1234567890123456] is 1"}) == []
+	_well_formed_message({"c": {"for": "every kids[1234567890123456] as k", "assert": "k.n is 1"}}) == []
 }
 
 test_a_number_out_of_range_is_named_before_its_digits if {

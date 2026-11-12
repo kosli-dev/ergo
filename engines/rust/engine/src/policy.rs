@@ -162,6 +162,28 @@ fn reported_description(map: &Map<String, Value>) -> String {
     }
 }
 
+fn number_flaws(value: &Value, flaws: &mut BTreeSet<&'static str>) {
+    match value {
+        Value::Number(number) if !fits_a_float(number) => {
+            flaws.insert("number out of range");
+        }
+        Value::Number(number) if too_long(number) => {
+            flaws.insert("number with more than 15 significant digits");
+        }
+        Value::Array(items) => items.iter().for_each(|item| number_flaws(item, flaws)),
+        Value::Object(map) => map.values().for_each(|item| number_flaws(item, flaws)),
+        _ => {}
+    }
+}
+
+fn meta_number_flaws(map: &Map<String, Value>) -> BTreeSet<&'static str> {
+    let mut flaws = BTreeSet::new();
+    if let Some(meta @ Value::Object(_)) = map.get("meta") {
+        number_flaws(meta, &mut flaws);
+    }
+    flaws
+}
+
 fn reported_meta(map: &Map<String, Value>) -> Value {
     match map.get("meta") {
         Some(meta @ Value::Object(_)) => meta.clone(),
@@ -218,6 +240,9 @@ fn policy_problems(map: &Map<String, Value>) -> Problems {
         None | Some(Value::Null) | Some(Value::Object(_))
     ) {
         add_problem(&mut problems, "policy meta".to_string(), "not an object");
+    }
+    for flaw in meta_number_flaws(map) {
+        add_problem(&mut problems, "policy meta".to_string(), flaw);
     }
     problems
 }
@@ -477,6 +502,9 @@ fn read_check(value: &Value) -> Check {
     ) {
         problems.insert("invalid meta".to_string());
     }
+    for flaw in meta_number_flaws(map) {
+        problems.insert(flaw.to_string());
+    }
     let any_of_form = map.contains_key("any_of") && !map.contains_key("assert");
     let allowed: &[&str] = if any_of_form {
         &["any_of", "description", "meta"]
@@ -627,6 +655,9 @@ fn read_requirement(value: &Value, subjects: &Subjects) -> Requirement {
         None | Some(Value::Null) | Some(Value::Object(_))
     ) {
         add_problem(&mut problems, "meta".to_string(), "not an object");
+    }
+    for flaw in meta_number_flaws(map) {
+        add_problem(&mut problems, "meta".to_string(), flaw);
     }
     for key in map.keys() {
         if ![
@@ -1465,6 +1496,30 @@ mod tests {
         let check = read_check(&json!({"assert": "x", "description": 5, "meta": "m"}));
         assert_eq!(check.description, "");
         assert_eq!(check.meta, json!({}));
+    }
+
+    #[test]
+    fn a_number_out_of_range_or_too_long_in_meta_is_written_wrong_at_every_level() {
+        let meta: Value =
+            serde_json::from_str(r#"{"a": [1e400], "b": {"c": 1234567890.1209567890}, "d": 1.5}"#)
+                .unwrap();
+        let both = [
+            "number out of range",
+            "number with more than 15 significant digits",
+        ];
+        assert_eq!(
+            check_problems(json!({"assert": "x", "meta": meta.clone()})),
+            both
+        );
+        let mut v = valid();
+        v["meta"] = meta.clone();
+        assert_eq!(requirement_problems(one(v), "s"), [problem("meta", &both)]);
+        let mut policy = one(valid());
+        policy["meta"] = meta;
+        assert_eq!(
+            read(policy).problems["policy meta"],
+            BTreeSet::from(both.map(String::from))
+        );
     }
 
     #[test]

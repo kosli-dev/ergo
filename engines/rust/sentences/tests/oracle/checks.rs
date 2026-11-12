@@ -666,6 +666,23 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (".a is before b", ".a is before b", &[], &[]),
+    (".a is on or after b", ".a is on or after b", &[], &[]),
+    (".a is on or before b", ".a is on or before b", &[], &[]),
+    (".id exists", "id exists", &[], &[]),
+    ("l exists", "l exists", &[], &[]),
+    ("k.n is 1", "k.n is 1", &[], &[]),
+    (
+        "item 9007199254740991 of l equals 1",
+        "item 9007199254740991 of l is 1",
+        &[],
+        &[],
+    ),
+    (
+        "l[1234567890123456] equals 1",
+        "item 1234567890123457 of l is 1",
+        &[],
+        &[],
+    ),
     (
         ".a is less than $input.limit",
         ".a is less than $input.limit",
@@ -10529,6 +10546,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every commits as c", "every commits as c", &[], &[]),
+    (
+        "every kids[1234567890123456] as k",
+        "every item 1234567890123457 of kids as k",
+        &[],
+        &[],
+    ),
     (
         "every commits as c, every ap as ap",
         "every commits as c, every ap as ap",

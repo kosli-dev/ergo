@@ -257,7 +257,7 @@ _edge_chars := {"\u0009", "\u000a", "\u000b", "\u000c", "\u000d", "\u0020", "\u0
 
 _require_problems(req) := {["require", "neither every nor some"] | is_object(req); not _require_of(req) in {"every", "some"}}
 
-_path_problems(req, f) := {[f, p] | is_array(_req_field(req, f, null)); some p in _number_flaws(req[f])}
+_path_problems(req, f) := {[f, "number out of range"] | is_array(_req_field(req, f, null)); _out_of_range(req[f])}
 
 _field_problem_inputs(req) := [{"name": _field_key_name(k), "value": sort({p[1] | some p in problems; _field_sort_key(p[0]) == k}), "locations": []} | some k in sort({_field_sort_key(p[0]) | some p in problems; p[0] != "require"})] if {
 	problems := _req_problems(req)
@@ -442,7 +442,7 @@ _compare_max_problem(node) := ({"invalid max" |
 	"within" in object.keys(node)
 }
 
-_wording_problem(node) := ({"invalid description" |
+_wording_problem(node) := (({"invalid description" |
 	"description" in object.keys(node)
 	not _has_type("description", node.description)
 } | {"invalid meta" |
@@ -452,6 +452,10 @@ _wording_problem(node) := ({"invalid description" |
 	"meta" in object.keys(node)
 	is_object(node.meta)
 	some p in (_meta_problems(node.meta) - {"number out of range", _too_long_problem})
+}) | {_too_long_problem |
+	"meta" in object.keys(node)
+	is_object(node.meta)
+	_too_long_problem in _meta_problems(node.meta)
 }
 
 _op_fields := object.union(_required_fields, {

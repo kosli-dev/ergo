@@ -37,6 +37,11 @@ _cmp("gte", l, r, _, _) if l > r
 
 _cmp("gte", l, r, _, _) if {
 	l == r
+	not is_number(l)
+}
+
+_cmp("gte", l, r, _, _) if {
+	l == r
 	is_number(l)
 	_text_order(json.marshal(l), json.marshal(r)) >= 0
 }
@@ -50,6 +55,11 @@ _cmp("lt", l, r, _, _) if {
 }
 
 _cmp("lte", l, r, _, _) if l < r
+
+_cmp("lte", l, r, _, _) if {
+	l == r
+	not is_number(l)
+}
 
 _cmp("lte", l, r, _, _) if {
 	l == r

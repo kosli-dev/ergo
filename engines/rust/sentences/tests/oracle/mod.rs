@@ -999,6 +999,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("teams", "teams"),
     ("things", "things"),
     (
+        "things[9007199254740991]",
+        "item 9007199254740992 of things",
+    ),
+    (
         "things named by each of $params.k",
         "things named by each of $params.k",
     ),
