@@ -8326,6 +8326,32 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("commit.a is 1", "commit.a is 1", &[], &[]),
+    (
+        "count of ys that is at least art.cov.z is 2",
+        "count of ys that is at least art.cov.z is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys whose n is at least art.cov.z is 2",
+        "count of ys whose n is at least art.cov.z is 2",
+        &[],
+        &[],
+    ),
+    ("x.n is 1", "x.n is 1", &[], &[]),
+    (
+        "count of ys whose n is at least art.cov.z is 0",
+        "count of ys whose n is at least art.cov.z is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every ys whose n is at least art.cov.z, if any, exists",
+        "every ys whose n is at least art.cov.z, if any, exists",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -12363,6 +12389,54 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every rows as r", "every rows as r", &[], &[]),
+    (
+        "every xs that is at least c as x",
+        "every xs that is at least c as x",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose n is at least c as x",
+        "every xs whose n is at least c as x",
+        &[],
+        &[],
+    ),
+    (
+        "every ys that is at least art.cov.z as x",
+        "every ys that is at least art.cov.z as x",
+        &[],
+        &[],
+    ),
+    (
+        "every ys whose n is at least art.cov.z as x",
+        "every ys whose n is at least art.cov.z as x",
+        &[],
+        &[],
+    ),
+    (
+        "first of approvers as approver, every approver.lists named by k as commit",
+        "first of approvers as approver, every approver.lists named by k as commit",
+        &[],
+        &[],
+    ),
+    (
+        "last of approvers sorted by t as approver, some approver.lists.subs as commit",
+        "last of approvers sorted by t as approver, some approver.lists.subs as commit",
+        &[],
+        &[],
+    ),
+    (
+        "some ys whose n is at least g.gc.z as x",
+        "some ys whose n is at least g.gc.z as x",
+        &[],
+        &[],
+    ),
+    (
+        "every ys whose n is at least art.cov.z, if any, as y",
+        "every ys whose n is at least art.cov.z, if any, as y",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

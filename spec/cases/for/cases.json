@@ -47581,5 +47581,29 @@
   ]},
   {"description": "for items that differ past 15 significant digits, in the other order", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"distinct": {"for": "every distinct ws as w", "assert": "w.z is at most $params.r"}, "first": {"for": "first of ys sorted by z as y", "assert": "y.k is \"p\""}}}}}, "params": {"r": 2234567890.1209567890}, "cases": [
       {"description": "keeps them apart and sorts them on every digit, in the other order", "rules": ["for.distinct", "for.pick", "value.number"], "input": {"things": [{"id": "a", "ys": [{"z": 2234567890.1209567990, "k": "p"}, {"z": 2234567890.1209567890, "k": "q"}], "ws": [{"z": 2234567890.1209567990}, {"z": 2234567890.1209567890}]}]}, "results": [{"cause": "value", "check": "distinct", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "w.z is at most $params.r", "cause": "value", "inputs": [{"locations": ["/things/0/ws/0/z"], "name": "w.z", "value": 2234567890.120956799}, {"locations": ["$params:/r"], "name": "$params.r", "value": 2234567890.120956789}]}], "item": "item 1 of ws", "locations": ["/things/0/ws/0"], "path": "item 1 of ws", "value": {"z": 2234567890.120956799}}], "inputs": [{"locations": ["$params:/r"], "name": "$params.r", "value": 2234567890.120956789}, {"locations": ["/things/0/ws/0", "/things/0/ws/1"], "name": "ws[]", "value": [{"z": 2234567890.120956799}, {"z": 2234567890.120956789}]}], "message": "item 1 of ws: w.z is 2234567890.120956799, and $params.r is 2234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}, {"cause": "value", "check": "first", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "y.k is \"p\"", "cause": "value", "inputs": [{"locations": ["/things/0/ys/1/k"], "name": "y.k", "value": "q"}]}], "item": "item 2 of ys", "locations": ["/things/0/ys/1"], "path": "item 2 of ys", "value": {"k": "q", "z": 2234567890.120956789}}], "inputs": [{"locations": ["/things/0/ys/1"], "name": "item 2 of ys", "value": {"k": "q", "z": 2234567890.120956789}}], "message": "item 2 of ys: k is \"q\"", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}]}
-  ]}
+  ]},
+  {
+    "description": "an alias that a pick on an empty list leaves without a value, read on a later line",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"last": {"for": "last of approvers sorted by t as approver, some approver.lists.subs as commit", "assert": "commit.a is 1"}, "first": {"for": "first of approvers as approver, every approver.lists named by k as commit", "assert": "commit.a is 1"}}}}},
+    "cases": [
+      {
+        "description": "names the alias as the policy writes it, with no $",
+        "rules": ["message.alias", "for.walk"],
+        "input": {"prs": [{"id": "p", "k": "subs", "approvers": []}]},
+        "results": [
+          {"cause": "absent", "check": "first", "failed_items": [], "inputs": [{"locations": [], "name": "approver.lists named by k", "value": []}, {"locations": [], "name": "approvers[]", "value": []}, {"locations": ["/prs/0/k"], "name": "k", "value": "subs"}], "message": "approver.lists named by k is missing", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
+          {"cause": "absent", "check": "last", "failed_items": [], "inputs": [{"locations": [], "name": "approver.lists.subs", "value": []}, {"locations": [], "name": "approvers[]", "value": []}], "message": "approver.lists.subs is missing", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "reads the alias when the pick finds an item",
+        "rules": ["message.alias", "for.walk"],
+        "input": {"prs": [{"id": "p", "k": "subs", "approvers": [{"t": 1, "lists": {"subs": [{"a": 1}]}}, {"t": 2, "lists": {"subs": [{"a": 2}, {"a": 1}]}}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "first", "failed_items": [], "inputs": [{"locations": ["/prs/0/approvers/0/lists/subs/0"], "name": "approver.lists named by k[]", "value": [{"a": 1}]}, {"locations": ["/prs/0/approvers/0"], "name": "item 1 of approvers", "value": {"lists": {"subs": [{"a": 1}]}, "t": 1}}, {"locations": ["/prs/0/k"], "name": "k", "value": "subs"}], "passed": true, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
+          {"cause": "satisfied", "check": "last", "failed_items": [], "inputs": [{"locations": ["/prs/0/approvers/1/lists/subs/0", "/prs/0/approvers/1/lists/subs/1"], "name": "approver.lists.subs[]", "value": [{"a": 2}, {"a": 1}]}, {"locations": ["/prs/0/approvers/1"], "name": "item 2 of approvers", "value": {"lists": {"subs": [{"a": 2}, {"a": 1}]}, "t": 2}}], "passed": true, "requirement": "r", "subject": {"id": "p", "type": "pr"}}
+        ]
+      }
+    ]
+  }
 ]

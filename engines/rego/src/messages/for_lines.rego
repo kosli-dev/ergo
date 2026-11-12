@@ -54,7 +54,7 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": [_
 } else := object.union(failure, {"why": [ms[0]]}) if {
 	failure != null
 	wh.undecided != []
-	pairs := [[_m_why_text(_m_item_name(fe.i, set()), c, _m_aliased(said)), _m_own_said(said, roots)] |
+	pairs := [[_m_why_text(_m_item_name(fe.i, set()), _m_aliased(said)), _m_own_said(said, roots)] |
 		some c in item.whose
 		fe := _focus_of(e, c)
 		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
@@ -91,15 +91,9 @@ _m_keyed_roots(subj, c, cause) := ms if ms := _m_keyed_off(subj, c, cause)
 
 else := []
 
-_m_why_text(name, c, m) := concat("", [name, " ", trim_prefix(m, "the subject ")]) if _m_itself(c)
-
-else := concat("", [name, " ", trim_prefix(m, "the subject ")]) if startswith(m, "the subject ")
+_m_why_text(name, m) := concat("", [name, " ", trim_prefix(m, "the subject ")]) if startswith(m, "the subject ")
 
 else := concat("", [name, ": ", m])
-
-_m_itself(c) if object.get(c, "path", null) == []
-
-_m_itself(c) if object.get(c, "left", null) == []
 
 _m_strip(f) := object.union(object.remove(f, ["msg", "said", "raw", "bare", "hoisted"]), object.union({"failed_assertions": [_m_strip_line(l) | some l in f.failed_assertions]}, _m_strip_items(f))) if "failed_assertions" in object.keys(f)
 
@@ -129,7 +123,7 @@ _m_for_empty(check, subj, cause) := cs if {
 	cs != []
 } else := cs if {
 	cause in {"absent", "null"}
-	cs := _once([concat("", [s.name, " is ", _m_state_word(cause)]) | some item in check.items; some s in _m_sources(subj, _m_for_item(item)); s.state == cause])
+	cs := _once([concat("", [_m_unbound_name(check, s), " is ", _m_state_word(cause)]) | some item in check.items; some s in _m_sources(subj, _m_for_item(item)); s.state == cause])
 	cs != []
 } else := cs if {
 	cause == "unusable"
@@ -145,6 +139,11 @@ _m_for_empty(check, subj, cause) := cs if {
 	cs := _once([c | some item in check.items; some c in _m_list_found(subj, item.path)])
 	cs != []
 } else := [_m_fallback(check)]
+
+_m_unbound_name(check, s) := _input_name(array.concat([{"plain": substring(s.side[0], 1, -1)}], array.slice(s.side, 1, count(s.side)))) if {
+	s.state == "absent"
+	s.side[0] in {concat("", ["$", item.as]) | some item in check.items}
+} else := s.name
 
 _m_narrows(_, item) if count(object.get(item, "whose", [])) > 0
 
