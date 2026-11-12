@@ -6,7 +6,7 @@ Each version says whether reports changed, so that anyone who only stores report
 
 ### Changed
 
-- A root on the left of a compare is read before any item, as one on the right is ([for.roots](semantics.md#for), [tally.whose](semantics.md#counts-and-sums)). Under `every xs, if any, as m` with `z` holding `"s"`, `z is at least 1` fails as `unusable` with `z is "s", which isn't a number` on an empty list, where it passed, and `count of xs whose $params.q is at least v is 0` with `q` holding `"s"` fails the same way. With items, the root is named once with no item in front, and next to the other roots of the sentence, worst cause first.
+- A root on the left of a compare is read before any item, as one on the right is ([for.roots](semantics.md#for), [tally.whose](semantics.md#counts-and-sums)). Under `every xs, if any, as m` with `z` holding `"s"`, `z is at least 1`, `z is not 1` and `z is 1 within 1` fail as `unusable` with `z is "s", which isn't a number` on an empty list, where they passed, and `count of xs whose $params.q is at least v is 0` with `q` holding `"s"` fails the same way. With items, the root is named once with no item in front, and next to the other roots of the sentence, worst cause first.
 
 ## 0.6
 
