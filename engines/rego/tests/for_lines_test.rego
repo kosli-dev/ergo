@@ -48,6 +48,70 @@ test_a_for_list_fails_closed_as_a_walk_does if {
 	[row[1] | some row in _for_rows({"for": "every xs, if any, as x", "assert": "x is 1"}, [{"id": 1, "xs": []}, {"id": 2}], {})] == ["satisfied", "absent"]
 }
 
+test_an_empty_list_a_for_line_tolerates_still_runs_the_sentences_that_dont_read_it if {
+	approvers := [{"u": "ada", "subs": []}, {"u": "g", "state": "REJECTED"}]
+	failed := [
+		{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "absent", "value": approvers[0], "failed_assertions": [{"assertion": "ap.state is \"APPROVED\"", "cause": "absent"}], "locations": ["/things/0/approvers/0"]},
+		{"path": "item 2 of approvers", "item": "item 2 of approvers", "cause": "value", "value": approvers[1], "failed_assertions": [{"assertion": "ap.state is \"APPROVED\"", "cause": "value"}], "locations": ["/things/0/approvers/1"]},
+	]
+	things := [{"id": 1, "approvers": approvers, "commits": []}]
+	[[row[1], row[2]] | some row in _for_rows({"for": "some approvers as ap, every commits, if any, as c", "assert": "ap.state is \"APPROVED\""}, things, {})] == [["absent", failed]]
+	[[row[1], row[2]] | some row in _for_rows({"for": "every approvers as ap, every commits, if any, as c", "assert": "ap.state is \"APPROVED\""}, things, {})] == [["absent", failed]]
+	[[row[1], row[2]] | some row in _for_rows({"for": "every approvers as ap, every commits whose author is ap.u, if any, as c", "assert": "ap.state is \"APPROVED\""}, [{"id": 1, "approvers": approvers, "commits": [{"author": "bob"}]}], {})] == [["absent", failed]]
+}
+
+test_a_sentence_that_reads_the_alias_of_an_empty_list_a_for_line_tolerates_has_nothing_to_check if {
+	check := {"for": "some approvers as ap, every commits, if any, as c", "assert": ["ap.state is \"APPROVED\"", "c.author does not equal ap.u"]}
+	things := [
+		{"id": 1, "approvers": [{"u": "ada", "state": "APPROVED"}], "commits": []},
+		{"id": 2, "approvers": [{"u": "ada", "state": "APPROVED"}], "commits": [{"author": "ada"}]},
+		{"id": 3, "approvers": [{"u": "ada", "state": "REJECTED"}], "commits": []},
+	]
+	[[row[0], row[1]] | some row in _for_rows(check, things, {})] == [[1, "satisfied"], [2, "value"], [3, "value"]]
+	[row[1] | some row in _for_rows({"for": "some approvers as ap, every commits, if any, as c", "assert": "c.author does not equal ap.u"}, [things[2]], {})] == ["satisfied"]
+}
+
+test_a_list_a_for_line_tolerates_still_fails_when_it_is_missing_null_or_not_a_list if {
+	check := {"for": "some approvers as ap, every commits, if any, as c", "assert": "ap.state is \"APPROVED\""}
+	approvers := [{"u": "ada", "state": "APPROVED"}]
+	things := [{"id": 1, "approvers": approvers}, {"id": 2, "approvers": approvers, "commits": null}, {"id": 3, "approvers": approvers, "commits": "s"}, {"id": 4, "approvers": approvers, "commits": []}]
+	[[row[0], row[1]] | some row in _for_rows(check, things, {})] == [[1, "absent"], [2, "null"], [3, "unusable"], [4, "satisfied"]]
+}
+
+_said_rows(check, things) := [[r.subject.id, r.cause, object.get(r, "message", null), _bare_failed(r.failed_items)] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), {}).results; r.check == "c"]
+
+test_an_empty_first_list_a_for_line_tolerates_still_runs_the_sentences_that_dont_read_it if {
+	approvers := [{"u": "ada"}, {"u": "g", "state": "REJECTED"}]
+	failed := [
+		{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "absent", "value": approvers[0], "failed_assertions": [{"assertion": "ap.state is \"APPROVED\"", "cause": "absent"}], "locations": ["/things/0/approvers/0"]},
+		{"path": "item 2 of approvers", "item": "item 2 of approvers", "cause": "value", "value": approvers[1], "failed_assertions": [{"assertion": "ap.state is \"APPROVED\"", "cause": "value"}], "locations": ["/things/0/approvers/1"]},
+	]
+	said := "item 1 of approvers: state is missing; item 2 of approvers: state is \"REJECTED\""
+	every line in ["every commits, if any, as c, some approvers as ap", "every commits, if any, as c, every approvers as ap"] {
+		_said_rows({"for": line, "assert": ["ap.state is \"APPROVED\"", "c.author is ap.u"]}, [{"id": 1, "approvers": approvers, "commits": []}]) == [[1, "absent", said, failed]]
+		_said_rows({"for": line, "assert": ["c.author is ap.u", "ap.state is \"APPROVED\""]}, [{"id": 1, "approvers": approvers, "commits": []}]) == [[1, "absent", said, failed]]
+	}
+	_said_rows({"for": "every commits whose n is 1, if any, as c, some approvers as ap", "assert": "ap.state is \"APPROVED\""}, [{"id": 1, "approvers": approvers, "commits": [{"n": 2}]}]) == [[1, "absent", said, failed]]
+}
+
+test_an_empty_first_list_a_for_line_tolerates_skips_only_the_sentences_that_read_it if {
+	line := "every commits, if any, as c, some approvers as ap"
+	approved := [{"u": "ada", "state": "APPROVED"}]
+	[row[1] | some row in _for_rows({"for": line, "assert": "c.author is ap.u"}, [{"id": 1, "approvers": [{"u": "ada"}], "commits": []}, {"id": 2, "commits": []}, {"id": 3, "approvers": [], "commits": []}], {})] == ["satisfied", "satisfied", "satisfied"]
+	[[row[0], row[1]] | some row in _for_rows({"for": line, "assert": ["ap.state is \"APPROVED\"", "c.author is ap.u"]}, [{"id": 1, "approvers": approved, "commits": []}, {"id": 2, "approvers": approved}, {"id": 3, "approvers": approved, "commits": null}, {"id": 4, "approvers": approved, "commits": "s"}, {"id": 5, "commits": []}], {})] == [[1, "satisfied"], [2, "absent"], [3, "null"], [4, "unusable"], [5, "absent"]]
+	_said_rows({"for": "every commits, if any, as c, every c.files as f", "assert": ["f.n is 1", "z is 1"]}, [{"id": 1, "commits": [], "z": 3}]) == [[1, "value", "z is 3", []]]
+}
+
+test_an_empty_list_a_one_item_for_line_tolerates_still_runs_the_sentences_that_dont_read_it if {
+	things := [{"id": 1, "xs": [], "z": 3}, {"id": 2, "xs": [], "z": 1}, {"id": 3, "z": 3}]
+	every line in ["every xs, if any, as m", "every xs whose k is 1, if any, as m"] {
+		_said_rows({"for": line, "assert": ["m.v is 1", "z is 1"]}, things) == [[1, "value", "z is 3", []], [2, "satisfied", null, []], [3, "absent", "xs is missing", [{"path": "xs", "item": "xs", "cause": "absent", "value": null, "failed_assertions": [], "locations": ["/things/2"]}]]]
+	}
+	_said_rows({"for": "every xs whose k is 1, if any, as m", "assert": ["m.v is 1", "z is 1"]}, [{"id": 1, "xs": [{"k": 2}], "z": 3}]) == [[1, "value", "z is 3", []]]
+	[row[1] | some row in _for_rows({"for": "every xs, if any, as m", "assert": "m.v is 1"}, [things[0]], {})] == ["satisfied"]
+	_said_rows({"for": "every xs, if any, as m", "assert": ["w exists", "y is at least 1", "z is 1"]}, [{"id": 1, "xs": [], "z": 3, "y": "s"}]) == [[1, "unusable", "y is \"s\", which isn't a number; w is missing; z is 3", []]]
+}
+
 test_a_for_line_can_walk_a_param if {
 	check := {"for": "some $params.allowed as ok", "assert": "k equals ok"}
 	rows := _for_rows(check, [{"id": 1, "k": "a"}, {"id": 2, "k": "z"}], {"allowed": ["a", "b"]})
