@@ -996,3 +996,117 @@ test_a_part_that_holds_text_or_null_or_nothing_still_says_so_for_a_count_of_whos
 	missing := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "xs": xs}]}, {})
 	missing.at_least == ["absent", "pl.z is missing"]
 }
+
+_clause_parent_part_policy := {
+	"ergo_spec": ergo._spec,
+	"subjects": {
+		"g": {"from": "gs", "identified_by": "id", "has": {"gc": "c"}},
+		"art": {"from": "every g.arts", "identified_by": "id", "has": {"cov": "c"}},
+		"ch": {"from": "every art.xs"},
+	},
+	"requirements": {"r": {"subject": "ch", "checks": {
+		"that": {"for": "every ys that is at least art.cov.z as x", "assert": "x is 1"},
+		"whose": {"for": "every ys whose n is at least art.cov.z as x", "assert": "x.n is 1"},
+		"grandparent": {"for": "some ys whose n is at least g.gc.z as x", "assert": "x.n is 1"},
+		"count": "count of ys whose n is at least art.cov.z is 2",
+	}}},
+}
+
+_parent_part_doc(c, ys) := {"gs": [{"id": "g1", "c": c, "arts": [{"id": "a1", "c": c, "xs": [{"ys": ys}]}]}]}
+
+test_a_parent_part_in_a_relative_clause_that_is_missing_is_named_once_with_no_item if {
+	rows := _item_rows(_clause_parent_part_policy, _parent_part_doc({}, [{"n": 1}, {"n": 2}]), {})
+	rows.whose == ["absent", "art.cov.z is missing"]
+	rows.grandparent == ["absent", "g.gc.z is missing"]
+	rows.count == ["absent", "art.cov.z is missing"]
+	bare := _item_rows(_clause_parent_part_policy, _parent_part_doc({}, [1, 2]), {})
+	bare.that == ["absent", "art.cov.z is missing"]
+}
+
+test_a_parent_part_in_a_relative_clause_that_is_null_is_named_once_with_no_item if {
+	rows := _item_rows(_clause_parent_part_policy, _parent_part_doc({"z": null}, [{"n": 1}, {"n": 2}]), {})
+	rows.whose == ["null", "art.cov.z is null"]
+	rows.grandparent == ["null", "g.gc.z is null"]
+	rows.count == ["null", "art.cov.z is null"]
+	bare := _item_rows(_clause_parent_part_policy, _parent_part_doc({"z": null}, [1, 2]), {})
+	bare.that == ["null", "art.cov.z is null"]
+}
+
+test_a_parent_part_in_a_relative_clause_of_the_wrong_type_is_named_once_before_the_items if {
+	rows := _item_rows(_clause_parent_part_policy, _parent_part_doc({"z": "s"}, [{"n": 1}, {"n": 2}]), {})
+	rows.whose == ["unusable", "art.cov.z is \"s\", which isn't a number"]
+	rows.grandparent == ["unusable", "g.gc.z is \"s\", which isn't a number"]
+	rows.count == ["unusable", "art.cov.z is \"s\", which isn't a number"]
+	bare := _item_rows(_clause_parent_part_policy, _parent_part_doc({"z": "s"}, [1, "b"]), {})
+	bare.that == ["unusable", "art.cov.z is \"s\", which isn't a number; item 2 of ys is \"b\", which isn't a number"]
+}
+
+test_a_parent_part_in_a_relative_clause_that_is_there_still_lets_each_item_decide if {
+	rows := _item_rows(_clause_parent_part_policy, _parent_part_doc({"z": 1}, [{"n": 1}, {"n": 2}]), {})
+	rows.whose == ["value", "item 2 of ys: n is 2"]
+	rows.grandparent == ["satisfied", null]
+	rows.count == ["satisfied", null]
+	bare := _item_rows(_clause_parent_part_policy, _parent_part_doc({"z": 1}, [1, 2]), {})
+	bare.that == ["value", "item 2 of ys is 2"]
+}
+
+_empty_parent_part_policy := {
+	"ergo_spec": ergo._spec,
+	"subjects": {
+		"art": {"from": "arts", "identified_by": "id", "has": {"cov": "c"}},
+		"ch": {"from": "every art.xs"},
+	},
+	"requirements": {"r": {"subject": "ch", "checks": {
+		"every": "every ys whose n is at least art.cov.z, if any, exists",
+		"count": "count of ys whose n is at least art.cov.z is 0",
+		"for": {"for": "every ys whose n is at least art.cov.z, if any, as y", "assert": "y.n is 1"},
+	}}},
+}
+
+test_a_parent_part_in_a_whose_that_cant_be_read_fails_on_an_empty_list_too if {
+	every c, want in {
+		"{}": ["absent", "art.cov.z is missing"],
+		"{\"z\": null}": ["null", "art.cov.z is null"],
+		"{\"z\": \"s\"}": ["unusable", "art.cov.z is \"s\", which isn't a number"],
+		"[{\"z\": 1}]": ["unusable", "art.cov is [{\"z\": 1}], which isn't an object"],
+	} {
+		rows := _item_rows(_empty_parent_part_policy, {"arts": [{"id": "a1", "c": json.unmarshal(c), "xs": [{"ys": []}]}]}, {})
+		rows == {"every": want, "count": want, "for": want}
+	}
+	readable := _item_rows(_empty_parent_part_policy, {"arts": [{"id": "a1", "c": {"z": 1}, "xs": [{"ys": []}]}]}, {})
+	readable == {"every": ["satisfied", null], "count": ["satisfied", null], "for": ["satisfied", null]}
+}
+
+_that_name_policy := _item_policy({}, {
+	"that": {"for": "every xs that is at least c as x", "assert": "x.n is 1"},
+	"whose": {"for": "every xs whose n is at least c as x", "assert": "x.n is 1"},
+})
+
+test_a_name_after_that_on_a_for_line_is_named_after_its_item_and_a_colon if {
+	missing := _item_rows(_that_name_policy, {"prs": [{"id": "p0", "c": 0, "xs": [{"n": 1}, {"n": 2}]}]}, {})
+	missing.that == ["absent", "item 1 of xs: c is missing; item 2 of xs: c is missing"]
+	missing.whose == missing.that
+	null_name := _item_rows(_that_name_policy, {"prs": [{"id": "p0", "xs": [{"n": 1, "c": null}]}]}, {})
+	null_name.that == ["null", "item 1 of xs: c is null"]
+	null_name.whose == null_name.that
+}
+
+test_an_item_after_that_on_a_for_line_that_isnt_what_the_phrase_reads_is_named_with_no_colon if {
+	rows := _item_rows(_that_name_policy, {"prs": [{"id": "p0", "xs": [1, {"n": 1, "c": "s"}]}]}, {})
+	rows.that == ["not_an_object", "item 1 of xs is 1, which isn't an object; item 2 of xs is {\"c\": \"s\", \"n\": 1}, which isn't a number, and c is \"s\", which isn't a number"]
+}
+
+_empty_pick_policy := _item_policy({}, {
+	"last": {"for": "last of approvers sorted by t as approver, some approver.subs as commit", "assert": "commit.a is 1"},
+	"keyed": {"for": "first of approvers as approver, every approver.lists named by k as commit", "assert": "commit.a is 1"},
+	"alias": {"for": "first of approvers as approver, every approver as commit", "assert": "commit.a is 1"},
+	"field": {"for": "first of approvers as approver, every subs as commit", "assert": "commit.a is 1"},
+})
+
+test_an_alias_a_pick_on_an_empty_list_leaves_unset_is_named_without_a_dollar if {
+	rows := _item_rows(_empty_pick_policy, {"prs": [{"id": "p0", "k": "subs", "approvers": []}]}, {})
+	rows.last == ["absent", "approver.subs is missing"]
+	rows.keyed == ["absent", "approver.lists named by k is missing"]
+	rows.alias == ["absent", "approver is missing"]
+	rows.field == ["absent", "subs is missing"]
+}

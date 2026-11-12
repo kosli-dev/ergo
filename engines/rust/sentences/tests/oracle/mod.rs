@@ -2159,6 +2159,9 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("every objs", "every objs"),
     ("every teams", "every teams"),
     ("every rel.kids", "every rel.kids"),
+    ("every art.xs", "every art.xs"),
+    ("every g.arts", "every g.arts"),
+    ("gs", "gs"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

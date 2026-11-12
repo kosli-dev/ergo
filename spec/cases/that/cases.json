@@ -555,5 +555,47 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a name after that on a for line, read on each item",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "ts", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"that": {"for": "every xs that is at least c as x", "assert": "x.n is 1"}, "whose": {"for": "every xs whose n is at least c as x", "assert": "x.n is 1"}}}}},
+    "cases": [
+      {
+        "description": "names each item, then what it lacks after a colon, as a whose does",
+        "rules": ["message.items", "sentence.resolve.clause"],
+        "input": {"ts": [{"id": "t1", "c": 0, "xs": [{"n": 1}, {"n": 2}]}]},
+        "results": [
+          {"cause": "absent", "check": "that", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/ts/0/xs/0"], "path": "item 1 of xs", "value": {"n": 1}}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of xs", "locations": ["/ts/0/xs/1"], "path": "item 2 of xs", "value": {"n": 2}}], "inputs": [{"locations": ["/ts/0/xs/0", "/ts/0/xs/1"], "name": "xs[]", "value": [{"n": 1}, {"n": 2}]}], "message": "item 1 of xs: c is missing; item 2 of xs: c is missing", "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "t"}},
+          {"cause": "absent", "check": "whose", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/ts/0/xs/0"], "path": "item 1 of xs", "value": {"n": 1}}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of xs", "locations": ["/ts/0/xs/1"], "path": "item 2 of xs", "value": {"n": 2}}], "inputs": [{"locations": ["/ts/0/xs/0", "/ts/0/xs/1"], "name": "xs[]", "value": [{"n": 1}, {"n": 2}]}], "message": "item 1 of xs: c is missing; item 2 of xs: c is missing", "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "t"}}
+        ]
+      },
+      {
+        "description": "names a null name of each item after a colon",
+        "rules": ["message.items", "sentence.resolve.clause", "path.null"],
+        "input": {"ts": [{"id": "t1", "xs": [{"n": 1, "c": null}, {"n": 2, "c": null}]}]},
+        "results": [
+          {"cause": "null", "check": "that", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/ts/0/xs/0"], "path": "item 1 of xs", "value": {"c": null, "n": 1}}, {"cause": "null", "failed_assertions": [], "item": "item 2 of xs", "locations": ["/ts/0/xs/1"], "path": "item 2 of xs", "value": {"c": null, "n": 2}}], "inputs": [{"locations": ["/ts/0/xs/0", "/ts/0/xs/1"], "name": "xs[]", "value": [{"c": null, "n": 1}, {"c": null, "n": 2}]}], "message": "item 1 of xs: c is null; item 2 of xs: c is null", "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "t"}},
+          {"cause": "null", "check": "whose", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/ts/0/xs/0"], "path": "item 1 of xs", "value": {"c": null, "n": 1}}, {"cause": "null", "failed_assertions": [], "item": "item 2 of xs", "locations": ["/ts/0/xs/1"], "path": "item 2 of xs", "value": {"c": null, "n": 2}}], "inputs": [{"locations": ["/ts/0/xs/0", "/ts/0/xs/1"], "name": "xs[]", "value": [{"c": null, "n": 1}, {"c": null, "n": 2}]}], "message": "item 1 of xs: c is null; item 2 of xs: c is null", "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "t"}}
+        ]
+      },
+      {
+        "description": "names a name of each item of the wrong type after a colon",
+        "rules": ["message.items", "sentence.resolve.clause"],
+        "input": {"ts": [{"id": "t1", "xs": [{"n": 1, "c": "s"}, {"n": 2, "c": "s"}]}]},
+        "results": [
+          {"cause": "unusable", "check": "that", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/ts/0/xs/0"], "path": "item 1 of xs", "value": {"c": "s", "n": 1}}, {"cause": "unusable", "failed_assertions": [], "item": "item 2 of xs", "locations": ["/ts/0/xs/1"], "path": "item 2 of xs", "value": {"c": "s", "n": 2}}], "inputs": [{"locations": ["/ts/0/xs/0", "/ts/0/xs/1"], "name": "xs[]", "value": [{"c": "s", "n": 1}, {"c": "s", "n": 2}]}], "message": "item 1 of xs is {\"c\": \"s\", \"n\": 1}, which isn't a number, and c is \"s\", which isn't a number; item 2 of xs is {\"c\": \"s\", \"n\": 2}, which isn't a number, and c is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "t"}},
+          {"cause": "unusable", "check": "whose", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/ts/0/xs/0"], "path": "item 1 of xs", "value": {"c": "s", "n": 1}}, {"cause": "unusable", "failed_assertions": [], "item": "item 2 of xs", "locations": ["/ts/0/xs/1"], "path": "item 2 of xs", "value": {"c": "s", "n": 2}}], "inputs": [{"locations": ["/ts/0/xs/0", "/ts/0/xs/1"], "name": "xs[]", "value": [{"c": "s", "n": 1}, {"c": "s", "n": 2}]}], "message": "item 1 of xs: c is \"s\", which isn't a number; item 2 of xs: c is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "t"}}
+        ]
+      },
+      {
+        "description": "names an item that isn't an object with no colon",
+        "rules": ["message.items", "sentence.resolve.clause"],
+        "input": {"ts": [{"id": "t1", "xs": [1, {"n": 1, "c": 0}]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "that", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/ts/0/xs/0"], "path": "item 1 of xs", "value": 1}, {"cause": "unusable", "failed_assertions": [], "item": "item 2 of xs", "locations": ["/ts/0/xs/1"], "path": "item 2 of xs", "value": {"c": 0, "n": 1}}], "inputs": [{"locations": ["/ts/0/xs/0", "/ts/0/xs/1"], "name": "xs[]", "value": [1, {"c": 0, "n": 1}]}], "message": "item 1 of xs is 1, which isn't an object; item 2 of xs is {\"c\": 0, \"n\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "t"}},
+          {"cause": "not_an_object", "check": "whose", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/ts/0/xs/0"], "path": "item 1 of xs", "value": 1}], "inputs": [{"locations": ["/ts/0/xs/0", "/ts/0/xs/1"], "name": "xs[]", "value": [1, {"c": 0, "n": 1}]}], "message": "item 1 of xs is 1, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "t"}}
+        ]
+      }
+    ]
   }
 ]
