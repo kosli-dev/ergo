@@ -560,7 +560,7 @@ _sentence_cmp(node, here) if {
 	_s_read(node, here)
 }
 
-_out_of_range_problem(node) := _number_flaws(_own_fields(node))
+_out_of_range_problem(node) := {"number out of range" | _out_of_range(_own_fields(node))}
 
 _refs_problem(node) := {"invalid ref" |
 	some r in _check_refs(_own_fields(node))

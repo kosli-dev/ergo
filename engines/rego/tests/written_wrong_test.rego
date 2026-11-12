@@ -674,7 +674,7 @@ test_a_number_just_past_the_largest_float_is_written_wrong_before_opa_reads_it i
 		count(_sentence_problems(text)) == 1
 		startswith(_sentence_problems(text)[0], "number out of range: ")
 	}
-	every text in [`x is 1.7976931348623157e308`, `x is 17976931348623157e292`, `x is 179769313486231570000e288`, `x is 1e308`] {
+	every text in [`x is 1.79769313486231e308`, `x is 179769313486231e294`, `x is 17976931348623100000e289`, `x is 1e308`] {
 		ergo.report({"things": [{"id": "t1", "x": 1}]}, _sentence_policy({"c": text}), {}).results[0].passed
 	}
 }

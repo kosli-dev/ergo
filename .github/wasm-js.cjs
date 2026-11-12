@@ -138,6 +138,6 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
   const withSentences = await measure("deployments with three checks on each deployment", sentencePolicy, 301, 66, 19);
   const withChain = await measure("deployments with the tests of each prod deployment as subjects", chainPolicy, 266, 132, 43);
   const withFor = await measure("deployments with two for checks on each deployment", forPolicy, 235, 66, 116, { ok: true });
-  const withNumbers = await measure("rows with four checks that compare numbers", numbersPolicy, 403, 100, 57, {}, numbers);
+  const withNumbers = await measure("rows with four checks that compare numbers", numbersPolicy, 403, 100, 52, {}, numbers);
   process.exit(failed.length > 0 || !withEvery || !withSentences || !withChain || !withFor || !withNumbers ? 1 : 0);
 });

@@ -290,13 +290,13 @@ test_within_passes_the_float_noise_of_a_cost_and_its_total if {
 }
 
 test_within_carries_across_chunk_boundaries if {
-	_within_cause(99999999999999999999, -1, "100000000000000000000") == "satisfied"
-	_within_cause(99999999999999999999, -1, "99999999999999999999") == "value"
-	_within_cause(-1, 99999999999999999999, "100000000000000000000") == "satisfied"
-	_within_cause(9999999999999999999999999999, 1, "9999999999999999999999999998") == "satisfied"
-	_within_cause(9999999999999999999999999999, 1, "9999999999999999999999999997") == "value"
-	_within_cause(10000000000000000000000000000, 1, "9999999999999999999999999999") == "satisfied"
-	_within_cause(10000000000000000000000000000, 1, "9999999999999999999999999998") == "value"
+	_within_cause(99999999999999999999, -1, "1e20") == "satisfied"
+	_within_cause(99999999999999999999, -2, "1e20") == "value"
+	_within_cause(-1, 99999999999999999999, "1e20") == "satisfied"
+	_within_cause(9999999999999999999999999999, -1, "1e28") == "satisfied"
+	_within_cause(9999999999999999999999999999, -2, "1e28") == "value"
+	_within_cause(10000000000000000000000000000, 1, "1e28") == "satisfied"
+	_within_cause(10000000000000000000000000001, 0, "1e28") == "value"
 }
 
 test_within_adds_the_sizes_when_the_signs_differ_and_takes_the_difference_when_they_match if {
@@ -310,7 +310,7 @@ test_within_adds_the_sizes_when_the_signs_differ_and_takes_the_difference_when_t
 test_within_treats_zero_and_negative_zero_as_having_no_sign if {
 	_within_cause(0, -0, "0") == "satisfied"
 	_within_cause(-0, -1e20, "100000000000000000000") == "satisfied"
-	_within_cause(0, -1e20, "99999999999999999999") == "value"
+	_within_cause(0, -100000000000000000001, "1e20") == "value"
 	_within_cause(1e20, 0, "100000000000000000000") == "satisfied"
 	_within_cause(-1e-30, 0, "0.000000000000000000000000000001") == "satisfied"
 }

@@ -2,7 +2,11 @@
 
 Each release names the version of the spec it follows. The spec's own changes are in [spec/CHANGELOG.md](../../spec/CHANGELOG.md), and those of `ergo.rego` in [CHANGELOG.md](../../CHANGELOG.md).
 
-## 0.4.1 (not released yet)
+## 0.5.0 (not released yet)
+
+### Changed
+
+- A number in the policy with more than 15 significant digits is written wrong, as in `ergo.rego` 0.7.0 and spec 0.7 ([sentence.value.scalar](../../spec/syntax.md#values)). `l equals 1234567890.1209567890` fails `$well_formed` with `number with more than 15 significant digits: 1234567890.1209567890`, and a `min_subjects` like `9007199254740993` says `number with more than 15 significant digits`, where it said `not a whole number from 0 to 1000000`. Digits are counted on the value, so `1.50` has 2 and `1e20` has 1. Numbers in the input and the params were already compared on every digit. Changes the report of every policy that writes such a number.
 
 ### Fixed
 

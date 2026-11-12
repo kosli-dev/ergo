@@ -324,4 +324,4 @@ _unusable_mark := {"ergo/unusable": set()}
 
 _walk_stop(w) := [] if w.walked != set()
 
-_walk_stop(w) := [{"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_shown(e.v), "at": _walk_at(w, e), "msg": _m_walk_kind(e.v)} | e := _walk_stopped_at(w.trail)] if w.walked == set()
+_walk_stop(w) := [{"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "msg": _m_walk_kind(e.v)} | e := _walk_stopped_at(w.trail)] if w.walked == set()

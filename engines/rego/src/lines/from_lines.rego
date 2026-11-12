@@ -176,7 +176,7 @@ _every_walk(doc, keys) := {"subjects": [{"subject": e.v, "at": _walk_at(w, e)} |
 	last := count(keys) in w.walked
 }
 
-_every_end_fail(e) := {"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_shown(e.v)}
+_every_end_fail(e) := {"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_value(e.v, e, null)}
 
 _fl_walk(doc, keys) := {"subjects": [{"subject": x, "at": concat("", [base, "/", format_int(i, 10)])} | some i, x in end], "fails": [], "notes": []} if {
 	end := _fl_simple_end(doc, keys)
@@ -294,7 +294,7 @@ _fl_readable(v, k) if {
 	is_array(v)
 }
 
-_fl_fail(e, cause) := {"path": e.c, "item": e.c, "cause": cause, "value": _walk_shown(e.v), "why": e.w}
+_fl_fail(e, cause) := {"path": e.c, "item": e.c, "cause": cause, "value": _walk_value(e.v, e, null), "why": e.w}
 
 _fl_item_fail(x) := {"path": x.c, "item": x.c, "cause": _fl_item_cause(x.v), "value": x.v, "why": {"path": x.c, "value": x.v, "kind": "an object"}}
 

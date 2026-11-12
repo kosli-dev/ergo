@@ -296,6 +296,10 @@ _walk_shown(v) := null if _walk_marked(v)
 
 _walk_shown(v) := v if not _walk_marked(v)
 
+_walk_value(v, _, _) := null if _walk_marked(v)
+
+_walk_value(v, _, _) := v if not _walk_marked(v)
+
 _walk_marked(v) if v == _absent
 
 _walk_marked(v) if v == _unusable_mark
@@ -348,7 +352,7 @@ default _walk_passed(_, _, _, _) := false
 
 _walk_passed([], true, leaf, v) if _op_passed(leaf, v)
 
-_walk_failure(path, w, e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": cause, "value": _walk_shown(e.v), "at": _walk_at(w, e), "msg": _m_leaf_message(e, leaf, cause, path)} if cause := _row_cause(leaf, e.iv, "")
+_walk_failure(path, w, e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": cause, "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "msg": _m_leaf_message(e, leaf, cause, path)} if cause := _row_cause(leaf, e.iv, "")
 
 _walk_failure(path, w, e, undecided, _, _, _) := {"path": e.c, "item": e.i, "cause": undecided[0][1], "value": null, "at": _walk_at(w, e), "msg": _m_walk_leaf(e, {"op": "present", "path": e.r}, undecided[0][1], _dotted_roots([path]))} if {
 	undecided != []
@@ -468,7 +472,7 @@ _walk_failed(cause, fails, path) := [{"path": _failed_name(f.path, _dotted_roots
 	f.path == p
 ] if cause != "satisfied"
 
-_walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": [_walk_shown(e.v) | some e in w.items], "locations": _walk_locations(w)}]
+_walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}]
 
 _walk_name(path, walked) := _walk_shown_name(_walk_unaliased(path, _walk_crossed(path, walked)), walked)
 
