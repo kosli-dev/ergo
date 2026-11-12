@@ -153,15 +153,53 @@ test_the_in_cases_pass if {
 	_compiled_differences("in") == set()
 }
 
-test_the_list_items_cases_pass if {
-	_topic_failures("list_items") == _known_in("list_items")
-	_compiled_differences("list_items") == set()
-}
+test_the_list_items_cases_pass_part_1_of_6 if _case_part_passes("list_items", 0, 6)
 
-test_the_list_starts_cases_pass if {
-	_topic_failures("list_starts") == _known_in("list_starts")
-	_compiled_differences("list_starts") == set()
-}
+test_the_list_items_cases_pass_part_2_of_6 if _case_part_passes("list_items", 1, 6)
+
+test_the_list_items_cases_pass_part_3_of_6 if _case_part_passes("list_items", 2, 6)
+
+test_the_list_items_cases_pass_part_4_of_6 if _case_part_passes("list_items", 3, 6)
+
+test_the_list_items_cases_pass_part_5_of_6 if _case_part_passes("list_items", 4, 6)
+
+test_the_list_items_cases_pass_part_6_of_6 if _case_part_passes("list_items", 5, 6)
+
+test_the_list_items_cases_pass_compiled_part_1_of_6 if _differences_compiled("list_items", _case_part("list_items", 0, 6)) == set()
+
+test_the_list_items_cases_pass_compiled_part_2_of_6 if _differences_compiled("list_items", _case_part("list_items", 1, 6)) == set()
+
+test_the_list_items_cases_pass_compiled_part_3_of_6 if _differences_compiled("list_items", _case_part("list_items", 2, 6)) == set()
+
+test_the_list_items_cases_pass_compiled_part_4_of_6 if _differences_compiled("list_items", _case_part("list_items", 3, 6)) == set()
+
+test_the_list_items_cases_pass_compiled_part_5_of_6 if _differences_compiled("list_items", _case_part("list_items", 4, 6)) == set()
+
+test_the_list_items_cases_pass_compiled_part_6_of_6 if _differences_compiled("list_items", _case_part("list_items", 5, 6)) == set()
+
+test_the_list_starts_cases_pass_part_1_of_6 if _case_part_passes("list_starts", 0, 6)
+
+test_the_list_starts_cases_pass_part_2_of_6 if _case_part_passes("list_starts", 1, 6)
+
+test_the_list_starts_cases_pass_part_3_of_6 if _case_part_passes("list_starts", 2, 6)
+
+test_the_list_starts_cases_pass_part_4_of_6 if _case_part_passes("list_starts", 3, 6)
+
+test_the_list_starts_cases_pass_part_5_of_6 if _case_part_passes("list_starts", 4, 6)
+
+test_the_list_starts_cases_pass_part_6_of_6 if _case_part_passes("list_starts", 5, 6)
+
+test_the_list_starts_cases_pass_compiled_part_1_of_6 if _differences_compiled("list_starts", _case_part("list_starts", 0, 6)) == set()
+
+test_the_list_starts_cases_pass_compiled_part_2_of_6 if _differences_compiled("list_starts", _case_part("list_starts", 1, 6)) == set()
+
+test_the_list_starts_cases_pass_compiled_part_3_of_6 if _differences_compiled("list_starts", _case_part("list_starts", 2, 6)) == set()
+
+test_the_list_starts_cases_pass_compiled_part_4_of_6 if _differences_compiled("list_starts", _case_part("list_starts", 3, 6)) == set()
+
+test_the_list_starts_cases_pass_compiled_part_5_of_6 if _differences_compiled("list_starts", _case_part("list_starts", 4, 6)) == set()
+
+test_the_list_starts_cases_pass_compiled_part_6_of_6 if _differences_compiled("list_starts", _case_part("list_starts", 5, 6)) == set()
 
 test_the_subject_name_cases_pass_part_1_of_4 if _part_passes("subject_name", 0, 4)
 
