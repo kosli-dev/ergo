@@ -342,11 +342,14 @@ fn blocked(check: &Check, ctx: &Ctx, late: bool) -> Vec<String> {
         other => side_paths(other),
     };
     let rights = lists::right_paths(check);
+    let pieces = lists::join_pieces(check);
     once_of(
         paths
             .into_iter()
             .filter(|path| {
-                (rights.contains(path) && matches!(path.start, Start::Input | Start::Params))
+                (rights.contains(path)
+                    && !pieces.contains(path)
+                    && matches!(path.start, Start::Input | Start::Params))
                     == late
             })
             .filter(|path| !rights.contains(path) || lists::walked_in(check, path, ctx).is_none())

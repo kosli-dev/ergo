@@ -983,6 +983,10 @@ pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
     let mut paths: Vec<&Path> = match check {
         super::Check::Compare(c) => [&c.left, &c.right]
             .into_iter()
+            .flat_map(|side| match side {
+                super::compare::Side::Join(pieces) => pieces.iter().collect(),
+                side => vec![side],
+            })
             .filter_map(|side| match side {
                 super::compare::Side::Path(path) => Some(path),
                 _ => None,
@@ -1072,43 +1076,44 @@ pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<String> {
     out
 }
 
-fn join_name(pieces: &[Right]) -> String {
-    pieces
-        .iter()
-        .map(|piece| match piece {
-            Right::Written(value) => super::message::print(value),
-            Right::Ref(path) | Right::Field(path) => crate::name::name(path),
-            Right::Join(inner) => join_name(inner),
-        })
-        .collect::<Vec<_>>()
-        .join(" followed by ")
-}
-
 fn join_faults(check: &Contains, pieces: &[Right], ctx: &Ctx) -> Vec<String> {
     let mut out = Vec::new();
-    if let Some((name, found)) = left_found(&check.path, ctx)
-        && !found.is_number()
-    {
-        out.push(super::message::isnt(&name, &found, "a number"));
+    if let Some((name, found)) = left_found(&check.path, ctx) {
+        let text = [Value::String(String::new())];
+        match &found {
+            Value::Array(items) => {
+                if one_type(items.iter().chain(text.iter())).is_err() {
+                    out.push(super::message::isnt(&name, &found, &list_of(&text)));
+                }
+            }
+            _ => out.push(super::message::isnt(&name, &found, "a list")),
+        }
     }
-    let mut broken = Vec::new();
     for piece in pieces {
         if let Right::Ref(path) | Right::Field(path) = piece
             && let Some((name, value)) = left_found(path, ctx)
             && !value.is_string()
         {
-            broken.push(super::message::isnt(&name, &value, "text"));
+            out.push(super::message::isnt(&name, &value, "text"));
         }
-    }
-    if broken.is_empty() {
-        let joined = Right::Join(pieces.to_vec());
-        if let Some(value @ Value::String(_)) = right_value(&joined, ctx, false) {
-            out.push(super::message::isnt(&join_name(pieces), &value, "a number"));
-        }
-    } else {
-        out.extend(broken);
     }
     out
+}
+
+pub fn join_pieces(check: &super::Check) -> Vec<&Path> {
+    match check {
+        super::Check::Contains(Contains {
+            wanted: Wanted::One(Right::Join(pieces)),
+            ..
+        }) => pieces
+            .iter()
+            .filter_map(|piece| match piece {
+                Right::Ref(path) | Right::Field(path) => Some(path),
+                _ => None,
+            })
+            .collect(),
+        _ => Vec::new(),
+    }
 }
 
 pub fn contains_faults(check: &Contains, ctx: &Ctx) -> Vec<String> {
