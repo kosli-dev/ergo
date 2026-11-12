@@ -270,7 +270,7 @@ _fl_list_item_read(x, keys, i) if {
 
 _fl_step(x, keys, i) := x if i >= count(keys)
 
-_fl_step(x, keys, i) := {"c": array.concat(x.c, [keys[i]]), "i": x.i, "v": _walk_read(x.v, keys[i]), "x": false, "w": _fl_why(x, keys[i])} if i < count(keys)
+_fl_step(x, keys, i) := {"c": array.concat(x.c, [keys[i]]), "i": x.i, "v": _walk_read(x.v, keys[i], x), "x": false, "w": _fl_why(x, keys[i])} if i < count(keys)
 
 _fl_why(x, k) := x.w if {
 	_walk_marked(x.v)

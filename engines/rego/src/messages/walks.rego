@@ -4,9 +4,10 @@ import rego.v1
 
 _messaged(raw, _, _, _) := raw if raw.passed == true
 
-_messaged(raw, check, req, subj) := object.union(raw, {"message": _row_message(_labelled_for(check, req, subj), subj, raw)}) if {
+_messaged(raw, check, req, subj) := object.union(raw, {"message": m}) if {
 	raw.passed == false
 	not "message" in object.keys(raw)
+	m := _row_message(_labelled_for(check, req, subj), subj, raw)
 }
 
 _messaged(raw, _, _, _) := raw if {

@@ -536,6 +536,10 @@ _s_value_of(text) := concat("", [_s_sq_char(m[0]) | some m in regex.find_all_str
 
 _s_number(text) := 0 if {
 	regex.match(`^-?[0.]+[eE]`, text)
+} else := {"too_long": text} if {
+	not _s_above_max(text)
+	not _s_below_min(text)
+	count(_s_significant(text)) > 15
 } else := n if {
 	not _s_above_max(text)
 	not _s_below_min(text)

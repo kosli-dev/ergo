@@ -4,34 +4,66 @@ import rego.v1
 
 default _cmp(_, _, _, _, _) := false
 
-_cmp("eq", l, r, lt, rt) if _same(l, r, lt, rt)
-
-_cmp("ne", l, r, lt, rt) if not _same(l, r, lt, rt)
-
-_cmp("gt", l, r, lt, rt) if _order(l, r, lt, rt) == 1
-
-_cmp("gte", l, r, lt, rt) if _order(l, r, lt, rt) >= 0
-
-_cmp("lt", l, r, lt, rt) if _order(l, r, lt, rt) == -1
-
-_cmp("lte", l, r, lt, rt) if _order(l, r, lt, rt) <= 0
-
-_same(l, r, _, _) if {
+_cmp("eq", l, r, _, _) if {
 	l == r
-	not _numbers(l, r)
+	not is_number(l)
 }
 
-_same(l, r, lt, rt) if {
+_cmp("eq", l, r, _, _) if {
 	l == r
-	_numbers(l, r)
-	_text_order(lt, rt) == 0
+	is_number(l)
+	_text_order(json.marshal(l), json.marshal(r)) == 0
 }
 
-_order(l, r, _, _) := -1 if l < r
+_cmp("ne", l, r, _, _) if l != r
 
-_order(l, r, _, _) := 1 if l > r
+_cmp("ne", l, r, _, _) if {
+	l == r
+	is_number(l)
+	_text_order(json.marshal(l), json.marshal(r)) != 0
+}
 
-_order(l, r, lt, rt) := _text_order(lt, rt) if l == r
+_cmp("gt", l, r, _, _) if l > r
+
+_cmp("gt", l, r, _, _) if {
+	l == r
+	is_number(l)
+	_text_order(json.marshal(l), json.marshal(r)) == 1
+}
+
+_cmp("gte", l, r, _, _) if l > r
+
+_cmp("gte", l, r, _, _) if {
+	l == r
+	not is_number(l)
+}
+
+_cmp("gte", l, r, _, _) if {
+	l == r
+	is_number(l)
+	_text_order(json.marshal(l), json.marshal(r)) >= 0
+}
+
+_cmp("lt", l, r, _, _) if l < r
+
+_cmp("lt", l, r, _, _) if {
+	l == r
+	is_number(l)
+	_text_order(json.marshal(l), json.marshal(r)) == -1
+}
+
+_cmp("lte", l, r, _, _) if l < r
+
+_cmp("lte", l, r, _, _) if {
+	l == r
+	not is_number(l)
+}
+
+_cmp("lte", l, r, _, _) if {
+	l == r
+	is_number(l)
+	_text_order(json.marshal(l), json.marshal(r)) <= 0
+}
 
 _text_order(t, t) := 0
 
@@ -70,10 +102,14 @@ _ordered(x, y) := 1 if x > y
 
 _ordered(x, x) := 0
 
-_has_exactly(list, x, _, xt) if {
-	some y in list
-	y == x
-	_same(y, x, json.marshal(y), xt)
+_member(list, x, _) if {
+	not is_number(x)
+	x in list
+}
+
+_member(_, _, pairs) if {
+	some p in pairs
+	_text_order(p[0], p[1]) == 0
 }
 
 _cmp("starts_with", l, r, _, _) if {
@@ -124,66 +160,66 @@ _cmp("alphabetically_after", l, r, _, _) if {
 	l > r
 }
 
-_cmp("in", l, r, lt, rt) if {
+_cmp("in", l, r, _, _) if {
 	l != null
 	is_array(r)
 	_fits_list(l, r)
-	_has_exactly(r, l, rt, lt)
+	_member(r, l, [[json.marshal(y), json.marshal(l)] | some y in r; y == l; is_number(y)])
 }
 
-_cmp("not_in", l, r, lt, rt) if {
+_cmp("not_in", l, r, _, _) if {
 	l != null
 	is_array(r)
 	_fits_list(l, r)
-	not _has_exactly(r, l, rt, lt)
+	not _member(r, l, [[json.marshal(y), json.marshal(l)] | some y in r; y == l; is_number(y)])
 }
 
-_cmp("includes", l, r, lt, rt) if {
+_cmp("includes", l, r, _, _) if {
 	is_array(l)
 	r != null
 	_items_fit(l, [r])
-	_has_exactly(l, r, lt, rt)
+	_member(l, r, [[json.marshal(y), json.marshal(r)] | some y in l; y == r; is_number(y)])
 }
 
-_cmp("excludes", l, r, lt, rt) if {
+_cmp("excludes", l, r, _, _) if {
 	is_array(l)
 	r != null
 	_items_fit(l, [r])
-	not _has_exactly(l, r, lt, rt)
+	not _member(l, r, [[json.marshal(y), json.marshal(r)] | some y in l; y == r; is_number(y)])
 }
 
-_cmp("includes_all", l, r, lt, _) if {
+_cmp("includes_all", l, r, _, _) if {
 	is_array(l)
 	_wanted(r)
 	_items_fit(l, r)
 	every want in r {
-		_has_exactly(l, want, lt, json.marshal(want))
+		_member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; is_number(y)])
 	}
 }
 
-_cmp("excludes_all", l, r, lt, _) if {
+_cmp("excludes_all", l, r, _, _) if {
 	is_array(l)
 	_wanted(r)
 	_items_fit(l, r)
 	every want in r {
-		not _has_exactly(l, want, lt, json.marshal(want))
+		not _member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; is_number(y)])
 	}
 }
 
-_cmp("includes_some", l, r, lt, _) if {
+_cmp("includes_some", l, r, _, _) if {
 	is_array(l)
 	_wanted(r)
 	_items_fit(l, r)
 	some want in r
-	_has_exactly(l, want, lt, json.marshal(want))
+	_member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; is_number(y)])
 }
 
-_cmp("not_includes_all", l, r, lt, _) if {
+_cmp("not_includes_all", l, r, _, _) if {
 	is_array(l)
 	_wanted(r)
 	_items_fit(l, r)
 	some want in r
-	not _has_exactly(l, want, lt, json.marshal(want))
+	not _member(l, want, [[json.marshal(y), json.marshal(want)] | some y in l; y == want; is_number(y)])
 }
 
 _cmp("matches_any", l, r, _, _) if {

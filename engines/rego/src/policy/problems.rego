@@ -12,7 +12,7 @@ _json_problems(v) := {"holds a key that isn't a string" |
 	is_set(x)
 }
 
-_meta_problems(m) := _json_problems(m) | {"number out of range" | _out_of_range(m)}
+_meta_problems(m) := (_json_problems(m) | {"number out of range" | _out_of_range(m)}) | {_too_long_problem | _too_long(m)}
 
 _meta_shaped(v) if {
 	is_object(v)
@@ -183,9 +183,17 @@ _min_subjects_out_of_range(req, "min_subjects") if {
 	_out_of_range(req.min_subjects)
 }
 
+_min_subjects_out_of_range(req, "min_subjects") if {
+	is_number(req.min_subjects)
+	_too_long(req.min_subjects)
+}
+
 _range_problems(req) := {["min_subjects", "number out of range"] |
 	is_number(_min_subjects_of(req))
 	_out_of_range(_min_subjects_of(req))
+} | {["min_subjects", _too_long_problem] |
+	is_number(_min_subjects_of(req))
+	_too_long(_min_subjects_of(req))
 }
 
 _unknown_problems(req) := {[f, "unknown field"] | some f in _unknown_req_fields(req)}
@@ -248,7 +256,7 @@ _edge_chars := {"\u0009", "\u000a", "\u000b", "\u000c", "\u000d", "\u0020", "\u0
 
 _require_problems(req) := {["require", "neither every nor some"] | is_object(req); not _require_of(req) in {"every", "some"}}
 
-_path_problems(req, f) := {[f, "number out of range"] | is_array(_req_field(req, f, null)); _out_of_range(req[f])}
+_path_problems(req, f) := {[f, "number out of range"] | is_array(_req_field(req, f, null)); _out_of_range(req[f])} | {[f, _too_long_problem] | is_array(_req_field(req, f, null)); _too_long(req[f])}
 
 _field_problem_inputs(req) := [{"name": _field_key_name(k), "value": sort({p[1] | some p in problems; _field_sort_key(p[0]) == k}), "locations": []} | some k in sort({_field_sort_key(p[0]) | some p in problems; p[0] != "require"})] if {
 	problems := _req_problems(req)
@@ -442,7 +450,7 @@ _wording_problem(node) := ({"invalid description" |
 }) | {concat("", ["meta ", p]) |
 	"meta" in object.keys(node)
 	is_object(node.meta)
-	some p in (_meta_problems(node.meta) - {"number out of range"})
+	some p in (_meta_problems(node.meta) - {"number out of range", _too_long_problem})
 }
 
 _op_fields := object.union(_required_fields, {
@@ -551,7 +559,7 @@ _sentence_cmp(node, here) if {
 	_s_read(node, here)
 }
 
-_out_of_range_problem(node) := {"number out of range" | _out_of_range(_own_fields(node))}
+_out_of_range_problem(node) := {"number out of range" | _out_of_range(_own_fields(node))} | {_too_long_problem | _too_long(_own_fields(node))}
 
 _refs_problem(node) := {"invalid ref" |
 	some r in _check_refs(_own_fields(node))
@@ -676,5 +684,5 @@ _op_passed(check, subj) if {
 	_derived_sides(check) != []
 	l := _side_value(subj, check.left)
 	r := _side_value(subj, check.right)
-	_compared(check, l, r, json.marshal(l), json.marshal(r))
+	_compared(check, l, r, subj)
 }

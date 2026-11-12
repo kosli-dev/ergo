@@ -8,6 +8,15 @@ _out_of_range(x) if {
 	not _fits_a_float(n)
 }
 
+_too_long(x) if {
+	walk(x, [_, n])
+	is_number(n)
+	_fits_a_float(n)
+	count(_decimal_parts(json.marshal(n)).digits) > 15
+}
+
+_too_long_problem := "number with more than 15 significant digits"
+
 _fits_a_float(0)
 
 _fits_a_float(n) if {
@@ -26,9 +35,8 @@ _leaf_op_passed("range", check, subj) if {
 	hi := _arg(check.max)
 	is_number(lo)
 	is_number(hi)
-	vt := json.marshal(v)
-	_order(v, lo, vt, json.marshal(lo)) >= 0
-	_order(v, hi, vt, json.marshal(hi)) <= 0
+	_cmp("gte", v, lo, check, subj)
+	_cmp("lte", v, hi, check, subj)
 }
 
 _leaf_op_passed("outside_range", check, subj) if {
@@ -38,7 +46,7 @@ _leaf_op_passed("outside_range", check, subj) if {
 	hi := _arg(check.max)
 	is_number(lo)
 	is_number(hi)
-	_order(v, lo, json.marshal(v), json.marshal(lo)) == -1
+	_cmp("lt", v, lo, check, subj)
 }
 
 _leaf_op_passed("outside_range", check, subj) if {
@@ -48,7 +56,7 @@ _leaf_op_passed("outside_range", check, subj) if {
 	hi := _arg(check.max)
 	is_number(lo)
 	is_number(hi)
-	_order(v, hi, json.marshal(v), json.marshal(hi)) == 1
+	_cmp("gt", v, hi, check, subj)
 }
 
 _leaf_op_passed("includes_some", check, subj) if {
@@ -58,7 +66,7 @@ _leaf_op_passed("includes_some", check, subj) if {
 	_wanted(wants)
 	_items_fit(v, wants)
 	some want in wants
-	_has_exactly(v, want, json.marshal(v), json.marshal(want))
+	_member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
 }
 
 _leaf_op_passed("not_includes_all", check, subj) if {
@@ -68,7 +76,7 @@ _leaf_op_passed("not_includes_all", check, subj) if {
 	_wanted(wants)
 	_items_fit(v, wants)
 	some want in wants
-	not _has_exactly(v, want, json.marshal(v), json.marshal(want))
+	not _member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
 }
 
 _leaf_op_passed("excludes", check, subj) if {
@@ -76,7 +84,7 @@ _leaf_op_passed("excludes", check, subj) if {
 	is_array(v)
 	want := _arg(check.value)
 	_items_fit(v, [want])
-	not _has_exactly(v, want, json.marshal(v), json.marshal(want))
+	not _member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
 }
 
 _leaf_op_passed("includes", check, subj) if {
@@ -84,7 +92,7 @@ _leaf_op_passed("includes", check, subj) if {
 	is_array(v)
 	want := _arg(check.value)
 	_items_fit(v, [want])
-	_has_exactly(v, want, json.marshal(v), json.marshal(want))
+	_member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
 }
 
 _leaf_op_passed("excludes", check, subj) if {
@@ -93,9 +101,8 @@ _leaf_op_passed("excludes", check, subj) if {
 	wants := _wants(check.values)
 	_wanted(wants)
 	_items_fit(v, wants)
-	vt := json.marshal(v)
 	every want in wants {
-		not _has_exactly(v, want, vt, json.marshal(want))
+		not _member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
 	}
 }
 
@@ -105,9 +112,8 @@ _leaf_op_passed("includes", check, subj) if {
 	wants := _wants(check.values)
 	_wanted(wants)
 	_items_fit(v, wants)
-	vt := json.marshal(v)
 	every want in wants {
-		_has_exactly(v, want, vt, json.marshal(want))
+		_member(v, want, [[json.marshal(y), json.marshal(want)] | some y in v; y == want; is_number(y)])
 	}
 }
 
@@ -117,7 +123,7 @@ _leaf_op_passed("in", check, subj) if {
 	vals := _wants(check.values)
 	_value_list(vals)
 	_fits_list(v, vals)
-	_has_exactly(vals, v, json.marshal(vals), json.marshal(v))
+	_member(vals, v, [[json.marshal(y), json.marshal(v)] | some y in vals; y == v; is_number(y)])
 }
 
 _leaf_op_passed("has_type", check, subj) if {
@@ -140,13 +146,11 @@ _leaf_op_passed("not_in", check, subj) if {
 	vals := _wants(check.values)
 	_value_list(vals)
 	_fits_list(v, vals)
-	not _has_exactly(vals, v, json.marshal(vals), json.marshal(v))
+	not _member(vals, v, [[json.marshal(y), json.marshal(v)] | some y in vals; y == v; is_number(y)])
 }
 
 _leaf_op_passed("equals", check, subj) if {
-	v := _field(subj, check.path)
-	w := _arg(check.value)
-	_same(v, w, json.marshal(v), json.marshal(w))
+	_cmp("eq", _field(subj, check.path), _arg(check.value), check, subj)
 }
 
 _leaf_op_passed("present", check, subj) if {
@@ -254,7 +258,7 @@ _leaf_op_passed("not_matches_any", check, subj) if {
 _leaf_op_passed("compare", check, subj) if {
 	l := _simple_value(subj, check.left)
 	r := _right_value(subj, check)
-	_compared(check, l, r, json.marshal(l), json.marshal(r))
+	_compared(check, l, r, subj)
 }
 
 _right_value(subj, check) := _lvalue(check, subj) if {
@@ -264,66 +268,66 @@ _right_value(subj, check) := _lvalue(check, subj) if {
 
 _right_value(subj, check) := _simple_value(subj, check.right) if not _list_cmp(check)
 
-_compared(check, l, r, lt, rt) if {
+_compared(check, l, r, subj) if {
 	not "within" in object.keys(check)
 	not check.cmp in _list_cmps
 	check.cmp != "outside"
 	_comparable(l, r)
 	_orderable(check.cmp, l)
-	_cmp(check.cmp, l, r, lt, rt)
-	_at_most_max(check, l, lt)
+	_cmp(check.cmp, l, r, check, subj)
+	_at_most_max(check, l, subj)
 }
 
 default _at_most_max(_, _, _) := false
 
 _at_most_max(check, _, _) if not "max" in object.keys(check)
 
-_at_most_max(check, l, lt) if {
+_at_most_max(check, l, subj) if {
 	is_number(l)
 	is_number(check.max)
-	_order(l, check.max, lt, json.marshal(check.max)) <= 0
+	_cmp("lte", l, check.max, check, subj)
 }
 
-_compared(check, l, r, lt, rt) if {
+_compared(check, l, r, subj) if {
 	not "within" in object.keys(check)
 	check.cmp in _list_cmps
 	not "max" in object.keys(check)
-	_cmp(check.cmp, l, r, lt, rt)
+	_cmp(check.cmp, l, r, check, subj)
 }
 
-_compared(check, l, r, lt, rt) if {
+_compared(check, l, r, _) if {
 	"within" in object.keys(check)
 	check.cmp == "eq"
 	is_number(l)
 	is_number(r)
 	not "max" in object.keys(check)
-	_within_gap(lt, rt, json.marshal(check.within))
+	_within_gap(json.marshal(l), json.marshal(r), json.marshal(check.within))
 }
 
-_compared(check, l, r, lt, rt) if {
+_compared(check, l, r, subj) if {
 	"within" in object.keys(check)
 	check.cmp == "ne"
-	_within_usable(check, l, r, lt, rt)
+	_within_usable(check, l, r, subj)
 	not "max" in object.keys(check)
-	not _within_gap(lt, rt, json.marshal(check.within))
+	not _within_gap(json.marshal(l), json.marshal(r), json.marshal(check.within))
 }
 
-_compared(check, l, r, lt, rt) if {
+_compared(check, l, r, subj) if {
 	not "within" in object.keys(check)
 	check.cmp == "outside"
 	_comparable(l, r)
 	_orderable(check.cmp, l)
 	is_number(check.max)
-	_order(l, r, lt, rt) == -1
+	_cmp("lt", l, r, check, subj)
 }
 
-_compared(check, l, r, lt, _) if {
+_compared(check, l, r, subj) if {
 	not "within" in object.keys(check)
 	check.cmp == "outside"
 	_comparable(l, r)
 	_orderable(check.cmp, l)
 	is_number(check.max)
-	_order(l, check.max, lt, json.marshal(check.max)) == 1
+	_cmp("gt", l, check.max, check, subj)
 }
 
 _leaf_op_passed("compare_time", check, subj) if {
@@ -333,7 +337,7 @@ _leaf_op_passed("compare_time", check, subj) if {
 	_rfc3339_shaped(r)
 	ln := time.parse_rfc3339_ns(l)
 	rn := time.parse_rfc3339_ns(r)
-	_cmp(check.cmp, ln, rn, json.marshal(ln), json.marshal(rn))
+	_cmp(check.cmp, ln, rn, check, subj)
 }
 
 _leaf_op_passed("compare_time", check, subj) if {
@@ -341,7 +345,7 @@ _leaf_op_passed("compare_time", check, subj) if {
 	r := _simple_value(subj, check.right)
 	is_number(l)
 	is_number(r)
-	_cmp(check.cmp, l, r, json.marshal(l), json.marshal(r))
+	_cmp(check.cmp, l, r, check, subj)
 }
 
 _leaf_op_passed("compare_time", check, subj) if {
@@ -349,7 +353,7 @@ _leaf_op_passed("compare_time", check, subj) if {
 	r := _simple_value(subj, check.right)
 	_date_shaped(l)
 	_date_shaped(r)
-	_cmp(check.cmp, l, r, l, r)
+	_cmp(check.cmp, l, r, check, subj)
 }
 
 _wants(values) := _arg(values) if not _value_list(values)
@@ -515,7 +519,7 @@ _unusable(leaf, x) if {
 	"within" in object.keys(leaf)
 	l := _simple_found(x, leaf.left)
 	r := _simple_found(x, leaf.right)
-	not _within_usable(leaf, l, r, json.marshal(l), json.marshal(r))
+	not _within_usable(leaf, l, r, x)
 }
 
 _numbers(l, r) if {

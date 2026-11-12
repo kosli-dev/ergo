@@ -175,17 +175,17 @@ _walk_root(path) := [path[0]] if _named(path)
 _walk_root(path) := [] if not _named(path)
 
 _walk(start, keys, if_any) := {"items": items, "fails": fails, "walked": walked, "trail": trail} if {
-	r0 := _walk_level([start], keys, 0, if_any)
-	r1 := _walk_level(r0.entries, keys, 1, if_any)
-	r2 := _walk_level(r1.entries, keys, 2, if_any)
-	r3 := _walk_level(r2.entries, keys, 3, if_any)
-	r4 := _walk_level(r3.entries, keys, 4, if_any)
-	r5 := _walk_level(r4.entries, keys, 5, if_any)
-	r6 := _walk_level(r5.entries, keys, 6, if_any)
-	r7 := _walk_level(r6.entries, keys, 7, if_any)
-	r8 := _walk_level(r7.entries, keys, 8, if_any)
-	r9 := _walk_level(r8.entries, keys, 9, if_any)
-	r10 := _walk_level(r9.entries, keys, 10, if_any)
+	r0 := _walk_level([start], keys, 0, if_any, start)
+	r1 := _walk_level(r0.entries, keys, 1, if_any, start)
+	r2 := _walk_level(r1.entries, keys, 2, if_any, start)
+	r3 := _walk_level(r2.entries, keys, 3, if_any, start)
+	r4 := _walk_level(r3.entries, keys, 4, if_any, start)
+	r5 := _walk_level(r4.entries, keys, 5, if_any, start)
+	r6 := _walk_level(r5.entries, keys, 6, if_any, start)
+	r7 := _walk_level(r6.entries, keys, 7, if_any, start)
+	r8 := _walk_level(r7.entries, keys, 8, if_any, start)
+	r9 := _walk_level(r8.entries, keys, 9, if_any, start)
+	r10 := _walk_level(r9.entries, keys, 10, if_any, start)
 	levels := [r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10]
 	fails := [object.union(f, {"at": _pointer(start.a, start.v, array.slice(f.path, count(start.c), count(f.path)))}) | some r in levels; some f in r.fails]
 	walked := {i | some i, r in levels; r.walked}
@@ -193,13 +193,13 @@ _walk(start, keys, if_any) := {"items": items, "fails": fails, "walked": walked,
 	trail := array.concat([start], [r.entries[0] | some i, r in levels; i < count(keys); count(r.entries) == 1])
 }
 
-_walk_level(entries, keys, i, _) := {"entries": entries, "fails": [], "walked": false} if i > count(keys)
+_walk_level(entries, keys, i, _, _) := {"entries": entries, "fails": [], "walked": false} if i > count(keys)
 
-_walk_level(entries, keys, i, if_any) := {"entries": [_walk_step(e, keys, i) | some e in expanded], "fails": fails, "walked": walked} if {
+_walk_level(entries, keys, i, if_any, start) := {"entries": [_walk_step(e, keys, i, start) | some e in expanded], "fails": fails, "walked": walked} if {
 	i <= count(keys)
 	walked := _walks_here(entries, keys, i)
-	expanded := [x | some e in entries; some x in _walk_expand(e, walked, i)]
-	fails := [f | some e in entries; some f in _walk_expand_fail(e, walked, if_any)]
+	expanded := [x | some e in entries; some x in _walk_expand(e, walked, i, start)]
+	fails := [f | some e in entries; some f in _walk_expand_fail(e, walked, if_any, start)]
 }
 
 _walks_here(entries, keys, i) if {
@@ -212,11 +212,11 @@ _walks_here(entries, keys, i) if {
 	not is_number(keys[i])
 } else := false
 
-_walk_expand(e, false, _) := [e]
+_walk_expand(e, false, _, _) := [e]
 
-_walk_expand(e, true, i) := [{"c": array.concat(_walk_unaliased(e.c, i), [j]), "v": x, "i": array.concat(_walk_unaliased(e.c, i), [j]), "iv": x, "r": []} | some j, x in e.v] if is_array(e.v)
+_walk_expand(e, true, i, _) := [{"c": array.concat(_walk_unaliased(e.c, i), [j]), "v": x, "i": array.concat(_walk_unaliased(e.c, i), [j]), "iv": x, "r": []} | some j, x in e.v] if is_array(e.v)
 
-_walk_expand(e, true, _) := [] if not is_array(e.v)
+_walk_expand(e, true, _, _) := [] if not is_array(e.v)
 
 _walk_unaliased(c, i) := array.concat([_p_marker(m.alias, -1, m.of, m.old)], array.slice(c, 1, count(c))) if {
 	_part_start(c)
@@ -236,29 +236,37 @@ _walk_inside_part(c, i) if {
 	i < m.n
 }
 
-_walk_expand_fail(_, false, _) := []
+_walk_expand_fail(_, false, _, _) := []
 
-_walk_expand_fail(e, true, if_any) := [] if {
+_walk_expand_fail(e, true, if_any, _) := [] if {
 	is_array(e.v)
 	_walk_empty_ok(e.v, if_any)
 }
 
-_walk_expand_fail(e, true, if_any) := [{"path": e.c, "item": e.c, "cause": "value", "value": [], "msg": ""}] if {
+_walk_expand_fail(e, true, if_any, _) := [{"path": e.c, "item": e.c, "cause": "value", "value": [], "msg": ""}] if {
 	e.v == []
 	not _walk_empty_ok(e.v, if_any)
 }
 
-_walk_expand_fail(e, true, _) := [{"path": e.c, "item": e.c, "cause": _walk_state(e.v), "value": _walk_shown(e.v), "msg": "a list"}] if not is_array(e.v)
+_walk_expand_fail(e, true, _, _) := [{"path": e.c, "item": e.c, "cause": _walk_state(e.v), "value": null, "msg": "a list"}] if {
+	not is_array(e.v)
+	_walk_marked(e.v)
+}
+
+_walk_expand_fail(e, true, _, _) := [{"path": e.c, "item": e.c, "cause": _walk_state(e.v), "value": e.v, "msg": "a list"}] if {
+	not is_array(e.v)
+	not _walk_marked(e.v)
+}
 
 _walk_empty_ok(v, _) if count(v) > 0
 
 _walk_empty_ok(_, true)
 
-_walk_step(e, keys, i) := e if i >= count(keys)
+_walk_step(e, keys, i, _) := e if i >= count(keys)
 
-_walk_step(e, keys, i) := {"c": array.concat(e.c, [keys[i]]), "v": _walk_read(e.v, keys[i]), "i": e.i, "iv": e.iv, "r": array.concat(e.r, [keys[i]])} if i < count(keys)
+_walk_step(e, keys, i, start) := {"c": array.concat(e.c, [keys[i]]), "v": _walk_read(e.v, keys[i], start), "i": e.i, "iv": e.iv, "r": array.concat(e.r, [keys[i]])} if i < count(keys)
 
-_walk_read(v, k) := object.get(v, k, _absent) if {
+_walk_read(v, k, _) := object.get(v, k, _absent) if {
 	is_object(v)
 	is_string(k)
 	v != _absent
@@ -292,7 +300,14 @@ _walk_marked(v) if v == _absent
 
 _walk_marked(v) if v == _unusable_mark
 
-_walk_judge(check, w, e) := {"kept": kept, "passed": passed, "failure": failure} if {
+_walk_judge(check, w, e) := _walk_judgement(check, w, e) if not is_number(e.iv)
+
+_walk_judge(check, w, e) := j if {
+	is_number(e.iv)
+	j := _walk_judgement(check, w, e) with data.ergo_item as json.marshal(e.iv)
+}
+
+_walk_judgement(check, w, e) := {"kept": kept, "passed": passed, "failure": failure} if {
 	undecided := [[c, cause] | some c in check.whose; cause := _focus_cause(c, e); not cause in {"satisfied", "value"}]
 	kept := count([c | some c in check.whose; _focus_cause(c, e) == "value"]) == 0
 	leaf := _walk_target(check.check, e.r)

@@ -54,7 +54,7 @@ _s_text_names(text) := {concat("", ["unknown name ", m[1]]) |
 
 else := set()
 
-_s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_base_problems(parsed) := (((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -108,6 +108,10 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"out_of_range" in object.keys(node)
+}) | {concat("", [_too_long_problem, ": ", node.too_long]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	"too_long" in object.keys(node)
 }) | {concat("", ["invalid pattern ", _json_text(v)]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
