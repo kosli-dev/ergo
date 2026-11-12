@@ -14305,6 +14305,1058 @@
     ]
   },
   {
+    "description": "a for line that starts with some fails when the only items that pass have an alias the sentence can't read, even when nothing comes after them to check",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pull_request": {
+          "from": "pull_requests",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "checks": {
+            "if_any_after": {
+              "for": "some approvers as approver, every commits, if any, as commit",
+              "assert": "approver.state is \"APPROVED\""
+            },
+            "whose_after": {
+              "for": "some approvers as approver, every commits whose author does not equal approver.u, if any, as commit",
+              "assert": "approver.state is \"APPROVED\""
+            },
+            "own_list_after": {
+              "for": "some approvers as approver, every approver.subs, if any, as sub",
+              "assert": "approver.state is \"APPROVED\""
+            },
+            "author_after": {
+              "for": "some approvers as approver, every commits, if any, as commit",
+              "assert": "commit.author is approver.u"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails when the only approver has no state, even though nothing comes after it to check",
+        "rules": [
+          "for.pass",
+          "for.roots",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada",
+                  "u": "ada",
+                  "subs": []
+                }
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "author_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "if_any_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "own_list_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approver.subs[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails when the only approver's state is null, even though nothing comes after it to check",
+        "rules": [
+          "for.pass",
+          "for.roots",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada",
+                  "u": "ada",
+                  "subs": [],
+                  "state": null
+                }
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "author_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": null,
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "if_any_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": null,
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "own_list_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approver.subs[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": null,
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": null,
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails when the only approver's state is a number, even though nothing comes after it to check",
+        "rules": [
+          "for.pass",
+          "for.roots",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada",
+                  "u": "ada",
+                  "subs": [],
+                  "state": 3
+                }
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "author_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": 3,
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "if_any_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": 3,
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "own_list_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approver.subs[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": 3,
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": 3,
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails when the only approver has no state and the whose of the item after it leaves nothing",
+        "rules": [
+          "for.pass",
+          "for.roots",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada",
+                  "u": "ada",
+                  "subs": []
+                }
+              ],
+              "commits": [
+                {
+                  "author": "ada"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "author_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada"
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "if_any_after",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "subs": [],
+                  "u": "ada",
+                  "username": "ada"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "own_list_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approver.subs[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails when the only approver has no u for the sentence to read, even though there are no commits",
+        "rules": [
+          "for.pass",
+          "for.roots",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada",
+                  "subs": [],
+                  "state": "APPROVED"
+                }
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "author_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "subs": [],
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: approver.u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "if_any_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "subs": [],
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "own_list_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approver.subs[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "subs": [],
+                    "username": "ada"
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "subs": [],
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: approver.u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when another approver approved, even though nothing comes after either of them to check",
+        "rules": [
+          "for.pass",
+          "for.roots",
+          "walk.some",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada",
+                  "u": "ada",
+                  "subs": []
+                },
+                {
+                  "username": "grace",
+                  "u": "grace",
+                  "subs": [],
+                  "state": "APPROVED"
+                }
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "author_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "subs": [],
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "if_any_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "subs": [],
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "own_list_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approver.subs[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "subs": [],
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose_after",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "subs": [],
+                    "u": "ada",
+                    "username": "ada"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "subs": [],
+                    "u": "grace",
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "every over the subs of the first item that whose kept",
     "policy": {
       "ergo_spec": "{{spec}}",

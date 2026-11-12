@@ -81,6 +81,8 @@ impl For {
     }
 }
 
+type SecondRoots = (Cause, Vec<String>, Vec<String>, Vec<String>);
+
 pub struct Run {
     pub verdict: Verdict,
     pub failed_items: Vec<Value>,
@@ -1609,11 +1611,11 @@ impl For {
         }
         let second: Vec<String> = self
             .second_roots(ctx)
-            .map(|(_, texts, _)| texts)
+            .map(|(_, texts, _, _)| texts)
             .unwrap_or_default();
         let (items, hoisted) = if failed {
             let mut skip = once.clone();
-            if let Some((_, _, raw)) = self.second_roots(ctx) {
+            if let Some((_, _, raw, _)) = self.second_roots(ctx) {
                 skip.extend(raw);
             }
             let (items, _, hoisted) = self.run_items(ctx, skip);
@@ -1688,7 +1690,7 @@ impl For {
                     .any(|check| check.flawed(&outer));
             return self.read_roots_first(run, ctx, outer_flaw, sentence_flaw, flawed);
         }
-        if let Some((cause, texts, _)) = self.second_roots(ctx) {
+        if let Some((cause, texts, _, _)) = self.second_roots(ctx) {
             let (cause, texts) = match &outer_flaw {
                 None => (cause, texts),
                 Some((outer_cause, outer_text)) => (
@@ -1776,8 +1778,8 @@ impl For {
                 mode = Named::Ahead(texts);
             }
         }
-        if !self.some_passed(run)
-            && let Some((second, second_texts, _)) = self.second_roots(ctx)
+        if let Some((second, second_texts, _, unread)) = self.second_roots(ctx)
+            && !self.some_passed(run, ctx, &unread)
         {
             let row = run.verdict.cause;
             mode = match mode {
@@ -1840,11 +1842,23 @@ impl For {
             || super::message::root_flaw_in_for(&whose, outer, &[], &[]).is_some()
     }
 
-    fn some_passed(&self, run: &Run) -> bool {
-        matches!(self.items[0].how, How::Some { .. }) && run.verdict.cause == Cause::Satisfied
+    fn some_passed(&self, run: &Run, ctx: &Ctx, unread: &[String]) -> bool {
+        if !matches!(self.items[0].how, How::Some { .. }) || run.verdict.cause != Cause::Satisfied {
+            return false;
+        }
+        let mut collect = Collect {
+            lists: Vec::new(),
+            seen: vec![false; self.items.len()],
+            skip: Vec::new(),
+            free: Vec::new(),
+        };
+        self.level(0, ctx, &mut collect)
+            .children
+            .iter()
+            .any(|child| child.failed.is_none() && !unread.contains(&child.entry.name))
     }
 
-    fn second_roots(&self, ctx: &Ctx) -> Option<(Cause, Vec<String>, Vec<String>)> {
+    fn second_roots(&self, ctx: &Ctx) -> Option<SecondRoots> {
         let [first, second] = self.items.as_slice() else {
             return None;
         };
@@ -1857,6 +1871,7 @@ impl For {
         let mut causes = Vec::new();
         let mut texts = Vec::new();
         let mut raw = Vec::new();
+        let mut unread = Vec::new();
         for live in self.candidates(0, ctx).live {
             let mut bound = ctx.clone();
             bound.aliases.insert(first.alias.clone(), live.at.clone());
@@ -1879,6 +1894,7 @@ impl For {
                     causes.push(cause);
                     texts.extend(extra.iter().map(|t| format!("{}: {t}", live.name)));
                     raw.extend(extra.iter().map(|t| (*t).to_string()));
+                    unread.push(live.name.clone());
                 }
             }
             for form in &forms {
@@ -1898,10 +1914,11 @@ impl For {
                     causes.push(cause);
                     texts.extend(extra.iter().map(|t| format!("{}: {t}", live.name)));
                     raw.extend(extra.iter().map(|t| (*t).clone()));
+                    unread.push(live.name.clone());
                 }
             }
         }
-        Cause::worst(causes).map(|cause| (cause, texts, raw))
+        Cause::worst(causes).map(|cause| (cause, texts, raw, unread))
     }
 
     fn run_items(&self, ctx: &Ctx, skip: Vec<String>) -> (Run, Vec<String>, Vec<String>) {
