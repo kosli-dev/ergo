@@ -139,14 +139,15 @@ _usable_sides(check, l, r, _) if {
 	_items_fit(l, [r])
 }
 
-_within_usable(check, l, r, _) if {
+_within_usable(check, l, r, subj) if {
+	_ = subj
 	_numbers(l, r)
 	is_number(check.within)
 	_within_spread([json.marshal(l), json.marshal(r), json.marshal(check.within)]) <= 4096
 }
 
-_within_gap(lt, rt, wt) if {
-	texts := [lt, rt, wt]
+_within_gap(l_text, r_text, w_text) if {
+	texts := [l_text, r_text, w_text]
 	_within_spread(texts) <= 4096
 	_within_texts(texts)
 }
@@ -378,12 +379,16 @@ _tally_mark(_, e) := set() if not _walk_marked(e.v)
 
 _tally_mark(false, e) := set() if _walk_marked(e.v)
 
-_tally_distinct(side, kept, _, _) := kept if object.get(side, "distinct", false) != true
+_tally_distinct(side, kept, subj, part) := kept if {
+	object.get(side, "distinct", false) != true
+	_ = subj
+	_ = part
+}
 
 else := [x[2] | some j, x in sorted; _first_of_kind(sorted, j)] if {
 	others := [[0, v, v] | some v in kept; not is_number(v)]
-	numbers := [[1, _decimal_parts(json.marshal(v)), v] | some v in kept; is_number(v)]
-	sorted := sort(array.concat(others, numbers))
+	nums := [[1, _decimal_parts(json.marshal(v)), v] | some v in kept; is_number(v)]
+	sorted := sort(array.concat(others, nums))
 }
 
 _first_of_kind(_, 0)

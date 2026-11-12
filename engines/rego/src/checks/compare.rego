@@ -9,10 +9,12 @@ _cmp("eq", l, r, _, _) if {
 	not is_number(l)
 }
 
-_cmp("eq", l, r, _, _) if {
+_cmp("eq", l, r, check, subj) if {
 	l == r
 	is_number(l)
 	_text_order(json.marshal(l), json.marshal(r)) == 0
+	_ = check
+	_ = subj
 }
 
 _cmp("ne", l, r, _, _) if l != r
@@ -65,12 +67,12 @@ _cmp("lte", l, r, _, _) if {
 	_text_order(json.marshal(l), json.marshal(r)) <= 0
 }
 
-_text_order(t, t) := 0
+_text_order(a_text, b_text) := 0 if a_text == b_text
 
-_text_order(lt, rt) := _signed_order(a.negative, b.negative, _magnitude_order(a, b)) if {
-	lt != rt
-	a := _decimal_parts(lt)
-	b := _decimal_parts(rt)
+_text_order(a_text, b_text) := _signed_order(a.negative, b.negative, _magnitude_order(a, b)) if {
+	a_text != b_text
+	a := _decimal_parts(a_text)
+	b := _decimal_parts(b_text)
 }
 
 _signed_order(false, false, m) := m
@@ -100,7 +102,7 @@ _ordered(x, y) := -1 if x < y
 
 _ordered(x, y) := 1 if x > y
 
-_ordered(x, x) := 0
+_ordered(x, y) := 0 if x == y
 
 _member(list, x, _) if {
 	not is_number(x)

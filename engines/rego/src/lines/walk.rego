@@ -214,7 +214,10 @@ _walks_here(entries, keys, i) if {
 
 _walk_expand(e, false, _, _) := [e]
 
-_walk_expand(e, true, i, _) := [{"c": array.concat(_walk_unaliased(e.c, i), [j]), "v": x, "i": array.concat(_walk_unaliased(e.c, i), [j]), "iv": x, "r": []} | some j, x in e.v] if is_array(e.v)
+_walk_expand(e, true, i, start) := [{"c": array.concat(_walk_unaliased(e.c, i), [j]), "v": x, "i": array.concat(_walk_unaliased(e.c, i), [j]), "iv": x, "r": []} | some j, x in e.v] if {
+	is_array(e.v)
+	_ = start
+}
 
 _walk_expand(e, true, _, _) := [] if not is_array(e.v)
 
@@ -238,7 +241,8 @@ _walk_inside_part(c, i) if {
 
 _walk_expand_fail(_, false, _, _) := []
 
-_walk_expand_fail(e, true, if_any, _) := [] if {
+_walk_expand_fail(e, true, if_any, start) := [] if {
+	_ = start
 	is_array(e.v)
 	_walk_empty_ok(e.v, if_any)
 }
@@ -266,7 +270,8 @@ _walk_step(e, keys, i, _) := e if i >= count(keys)
 
 _walk_step(e, keys, i, start) := {"c": array.concat(e.c, [keys[i]]), "v": _walk_read(e.v, keys[i], start), "i": e.i, "iv": e.iv, "r": array.concat(e.r, [keys[i]])} if i < count(keys)
 
-_walk_read(v, k, _) := object.get(v, k, _absent) if {
+_walk_read(v, k, start) := object.get(v, k, _absent) if {
+	_ = start
 	is_object(v)
 	is_string(k)
 	v != _absent
@@ -298,7 +303,11 @@ _walk_shown(v) := v if not _walk_marked(v)
 
 _walk_value(v, _, _) := null if _walk_marked(v)
 
-_walk_value(v, _, _) := v if not _walk_marked(v)
+_walk_value(v, e, w) := v if {
+	not _walk_marked(v)
+	_ = e
+	_ = w
+}
 
 _walk_marked(v) if v == _absent
 

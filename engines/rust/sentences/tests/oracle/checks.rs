@@ -105,6 +105,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("some .cov.xs is 9", "some cov.xs is 9", &[], &[]),
     ("w is at least 2", "w is at least 2", &[], &[]),
     ("w is \"xy\"", "w is \"xy\"", &[], &[]),
+    ("x is 900719925474099", "x is 900719925474099", &[], &[]),
     ("z is at least 2", "z is at least 2", &[], &[]),
     ("z is at least 9", "z is at least 9", &[], &[]),
     ("z.y is 0", "z.y is 0", &[], &[]),

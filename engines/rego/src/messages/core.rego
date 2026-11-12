@@ -19,9 +19,11 @@ _m_print(v) := concat("", ["[", concat(", ", [_m_item(x) | some x in v]), "]"]) 
 	count(v) <= 3
 }
 
-_m_print_at(v, _, _) := _m_print(v) if {
+_m_print_at(v, at, row) := _m_print(v) if {
 	not is_number(v)
 	not is_array(v)
+	_ = at
+	_ = row
 }
 
 _m_print_at(v, _, _) := _m_number_text(v, json.marshal(v)) if is_number(v)
