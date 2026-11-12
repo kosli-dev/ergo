@@ -82,6 +82,14 @@ impl Decimal {
         }
     }
 
+    pub(crate) fn too_long(&self) -> bool {
+        !self.out_of_range() && self.digits.len() > 15
+    }
+
+    pub(crate) fn unusable(&self) -> bool {
+        self.out_of_range() || self.too_long()
+    }
+
     pub(crate) fn out_of_range(&self) -> bool {
         if self.is_zero() {
             return false;
@@ -104,6 +112,14 @@ fn padded_compare(a: &str, b: &str) -> Ordering {
 
 pub(crate) fn out_of_range(text: &str) -> bool {
     Decimal::read(text).is_some_and(|d| d.out_of_range())
+}
+
+pub(crate) fn too_long(text: &str) -> bool {
+    Decimal::read(text).is_some_and(|d| d.too_long())
+}
+
+pub(crate) fn unusable_number(text: &str) -> bool {
+    Decimal::read(text).is_some_and(|d| d.unusable())
 }
 
 pub(crate) fn above_list_position(digits: &str) -> bool {

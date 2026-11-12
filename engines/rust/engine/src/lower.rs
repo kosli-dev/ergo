@@ -573,6 +573,11 @@ fn number(text: &str) -> Result<Value, Vec<String>> {
     } else if float.abs() < f64::MIN_POSITIVE {
         return Err(out_of_range());
     }
+    if decimal.parts().1.len() > 15 {
+        return Err(vec![format!(
+            "number with more than 15 significant digits: {text}"
+        )]);
+    }
     serde_json::from_str::<Value>(text).map_err(|_| out_of_range())
 }
 
@@ -1346,12 +1351,32 @@ mod tests {
             "0",
             "0.0",
             "-0",
-            "2.2250738585072014e-308",
-            "1.7976931348623157e308",
+            "2.22507385850721e-308",
+            "1.79769313486231e308",
             "0e500",
+            "1.50000000000000000000",
         ] {
             assert!(
                 scope.value(&s::Value::Number(text.into())).is_ok(),
+                "{text}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_number_with_more_than_15_significant_digits_is_written_wrong() {
+        let scope = Scope::new();
+        for text in [
+            "1234567890.1209567890",
+            "12345678901234567890",
+            "2.2250738585072014e-308",
+            "1.7976931348623157e308",
+        ] {
+            assert_eq!(
+                scope.value(&s::Value::Number(text.into())).unwrap_err(),
+                [format!(
+                    "number with more than 15 significant digits: {text}"
+                )],
                 "{text}"
             );
         }

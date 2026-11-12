@@ -5,6 +5,82 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of distinct xs is 2",
+        "count of distinct xs is 2",
+        &[],
+        &[],
+    ),
+    ("every xs is at most r", "every xs is at most r", &[], &[]),
+    ("l equals $params.low", "l equals $params.low", &[], &[]),
+    ("l equals 5040424028.5118", "l is 5040424028.5118", &[], &[]),
+    ("l equals r", "l equals r", &[], &[]),
+    ("l equals r within 1", "l equals r within 1", &[], &[]),
+    (
+        "l is at least $params.high",
+        "l is at least $params.high",
+        &[],
+        &[],
+    ),
+    (
+        "l is at least 5040424028.5118",
+        "l is at least 5040424028.5118",
+        &[],
+        &[],
+    ),
+    (
+        "l is at most $params.low",
+        "l is at most $params.low",
+        &[],
+        &[],
+    ),
+    (
+        "l is at most 1.50000000000000000000",
+        "l is at most 1.5",
+        &[],
+        &[],
+    ),
+    (
+        "l is at most 123456789012345",
+        "l is at most 123456789012345",
+        &[],
+        &[],
+    ),
+    (
+        "l is at most 1e20",
+        "l is at most 100000000000000000000",
+        &[],
+        &[],
+    ),
+    ("l is at most r", "l is at most r", &[], &[]),
+    ("l is in $params.lst", "l is in $params.lst", &[], &[]),
+    (
+        "l is less than $params.high",
+        "l is less than $params.high",
+        &[],
+        &[],
+    ),
+    ("l is more than r", "l is more than r", &[], &[]),
+    (
+        "l is not $params.low",
+        "l does not equal $params.low",
+        &[],
+        &[],
+    ),
+    (
+        "l is not in $params.lst",
+        "l is not in $params.lst",
+        &[],
+        &[],
+    ),
+    (
+        "l is not r within 1",
+        "l does not equal r within 1",
+        &[],
+        &[],
+    ),
+    ("l is one of ls", "l is in ls", &[], &[]),
+    ("some xs is more than r", "some xs is more than r", &[], &[]),
     ("valid is true", "valid is true", &[], &[]),
     ("i.qty is 1", "i.qty is 1", &[], &[]),
     ("w is not empty", "w is not empty", &[], &[]),
@@ -389,7 +465,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("x is 0.10e1", "x is 1", &[], &[]),
     ("x is 1e-7", "x is 0.0000001", &[], &[]),
     ("x is 1e21", "x is 1000000000000000000000", &[], &[]),
-    ("x is 9007199254740993", "x is 9007199254740993", &[], &[]),
     (
         "x is one of 1e1, -0.0, 2.50",
         "x is one of 10, 0, 2.5",
@@ -1310,12 +1385,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
-        "days elapsed from a1 to b1 is between 12345678901234567890 and 12345678901234567891",
-        "days elapsed from a1 to b1 is between 12345678901234567890 and 12345678901234567891",
-        &[],
-        &[],
-    ),
-    (
         "days elapsed from first_seen_ts to now_ts is 3.5",
         "days elapsed from first_seen_ts to now_ts is 3.5",
         &[],
@@ -1681,12 +1750,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
-        "every items whose k is 1 is between 12345678901234567890 and 12345678901234567891",
-        "every items whose k is 1 is between 12345678901234567890 and 12345678901234567891",
-        &[],
-        &[],
-    ),
-    (
         "every items whose k is 1 is null",
         "every items whose k is 1 is null",
         &[],
@@ -1785,12 +1848,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every items, if any, is after \"2020-01-01T23:59:59.5Z\"",
         "every items, if any, is after \"2020-01-01T23:59:59.5Z\"",
-        &[],
-        &[],
-    ),
-    (
-        "every items, if any, is at least 1.7976931348623157e308",
-        "every items, if any, is at least 179769313486231570000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
         &[],
         &[],
     ),
@@ -2234,12 +2291,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
-        "every items.x.y is at least 1.7976931348623157e308",
-        "every items.x.y is at least 179769313486231570000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-        &[],
-        &[],
-    ),
-    (
         "every items.x.y is before \"2020-01-01\"",
         "every items.x.y is before \"2020-01-01\"",
         &[],
@@ -2625,12 +2676,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("it is an object", "it is an object", &[], &[]),
     ("it is at least 2", "it is at least 2", &[], &[]),
-    (
-        "it is at least 2.2250738585072014e-308",
-        "it is at least 0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000022250738585072014",
-        &[],
-        &[],
-    ),
     ("it is before y", "it is before y", &[], &[]),
     ("it is not empty", "it is not empty", &[], &[]),
     ("it is null", "it is null", &[], &[]),
@@ -3140,12 +3185,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "some items is at least 1e308",
         "some items is at least 100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-        &[],
-        &[],
-    ),
-    (
-        "some items is at least 2.2250738585072014e-308",
-        "some items is at least 0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000022250738585072014",
         &[],
         &[],
     ),
@@ -3984,12 +4023,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("y plus 1 equals x", "y plus 1 equals x", &[], &[]),
     ("y plus 1 equals x1", "y plus 1 equals x1", &[], &[]),
     ("y plus 1 is at least 1", "y plus 1 is at least 1", &[], &[]),
-    (
-        "y plus 1 is at least 1.7976931348623157e308",
-        "y plus 1 is at least 179769313486231570000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-        &[],
-        &[],
-    ),
     (
         "y plus 1 is at least 1e308",
         "y plus 1 is at least 100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
@@ -9115,6 +9148,62 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    (
+        "count of items whose k is 1 is between 12345678901234567891 and 12345678901234567890",
+        &[
+            "number with more than 15 significant digits: 12345678901234567890",
+            "number with more than 15 significant digits: 12345678901234567891",
+        ],
+    ),
+    (
+        "days elapsed from a1 to b1 is between 12345678901234567890 and 12345678901234567891",
+        &[
+            "number with more than 15 significant digits: 12345678901234567890",
+            "number with more than 15 significant digits: 12345678901234567891",
+        ],
+    ),
+    (
+        "every it is between 12345678901234567891 and 12345678901234567890",
+        &[
+            "number with more than 15 significant digits: 12345678901234567890",
+            "number with more than 15 significant digits: 12345678901234567891",
+        ],
+    ),
+    (
+        "every items whose k is 1 is between 0.5 and 0.49999999999999999999",
+        &["number with more than 15 significant digits: 0.49999999999999999999"],
+    ),
+    (
+        "every items whose k is 1 is between 12345678901234567890 and 12345678901234567891",
+        &[
+            "number with more than 15 significant digits: 12345678901234567890",
+            "number with more than 15 significant digits: 12345678901234567891",
+        ],
+    ),
+    (
+        "every items, if any, is at least 1.7976931348623157e308",
+        &["number with more than 15 significant digits: 1.7976931348623157e308"],
+    ),
+    (
+        "every items.x.y is at least 1.7976931348623157e308",
+        &["number with more than 15 significant digits: 1.7976931348623157e308"],
+    ),
+    (
+        "it is at least 2.2250738585072014e-308",
+        &["number with more than 15 significant digits: 2.2250738585072014e-308"],
+    ),
+    (
+        "l equals 1234567890.1209567890",
+        &["number with more than 15 significant digits: 1234567890.1209567890"],
+    ),
+    (
+        "some items is at least 2.2250738585072014e-308",
+        &["number with more than 15 significant digits: 2.2250738585072014e-308"],
+    ),
+    (
+        "x is 9007199254740993",
+        &["number with more than 15 significant digits: 9007199254740993"],
+    ),
     ("x is x and y is $foo", &["unknown name $foo"]),
     ("$foo.x exists", &["unknown name $foo"]),
     (
@@ -9233,10 +9322,6 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["number out of range: 1e-999"],
     ),
     (
-        "count of items whose k is 1 is between 12345678901234567891 and 12345678901234567890",
-        &["min above max"],
-    ),
-    (
         "count of items whose k is 1 is between 1e2 and 99",
         &["min above max"],
     ),
@@ -9330,10 +9415,6 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     ),
     ("every it is between -1 and -2", &["min above max"]),
     (
-        "every it is between 12345678901234567891 and 12345678901234567890",
-        &["min above max"],
-    ),
-    (
         "every it is between 1e400 and 2",
         &["number out of range: 1e400"],
     ),
@@ -9410,10 +9491,6 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     (
         "every items whose k is 1 is at least 1e999",
         &["number out of range: 1e999"],
-    ),
-    (
-        "every items whose k is 1 is between 0.5 and 0.49999999999999999999",
-        &["min above max"],
     ),
     (
         "every items whose k is 1 is between 1e999 and 1e999",
@@ -10114,6 +10191,10 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
             "\"within\" only compares numbers",
             "number out of range: 1e999",
         ],
+    ),
+    (
+        "y plus 1 is at least 1.7976931348623157e308",
+        &["number with more than 15 significant digits: 1.7976931348623157e308"],
     ),
     (
         "y plus 1 is between 1 and 1e-400",

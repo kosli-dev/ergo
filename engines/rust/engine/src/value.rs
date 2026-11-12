@@ -313,6 +313,11 @@ pub fn fits_a_float(number: &serde_json::Number) -> bool {
     Decimal::parse(&number.to_string()).is_some_and(|decimal| decimal.fits_a_float())
 }
 
+pub fn too_long(number: &serde_json::Number) -> bool {
+    Decimal::parse(&number.to_string())
+        .is_some_and(|decimal| decimal.fits_a_float() && decimal.parts().1.len() > 15)
+}
+
 pub fn out_of_range(value: &Value) -> bool {
     match value {
         Value::Number(number) => !fits_a_float(number),

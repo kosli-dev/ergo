@@ -996,5 +996,29 @@
         ]
       }
     ]
+  },
+  {
+    "description": "distinct numbers with more than 15 significant digits",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "count of distinct xs is 2"}}}},
+    "cases": [
+      {
+        "description": "count numbers as copies only when they're equal in every digit",
+        "rules": ["value.number", "tally.distinct"],
+        "input": {"things": [{"id": "a", "xs": [1234567890.1209567890, 1234567890.1209567890, 1234567890.120956789]}, {"id": "b", "xs": [1234567890.1209567890, 1234567890.1209567990, 1234567890.1209567890]}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of distinct xs", "value": 1}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [1234567890.120956789, 1234567890.120956789, 1234567890.120956789]}], "message": "count of distinct xs is 1", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "count of distinct xs", "value": 2}, {"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "xs[]", "value": [1234567890.120956789, 1234567890.120956789, 1234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "count numbers as copies only when they're equal in every digit, in the other order",
+        "rules": ["value.number", "tally.distinct"],
+        "input": {"things": [{"id": "b", "xs": [1234567890.1209567890, 1234567890.1209567990, 1234567890.1209567890]}, {"id": "a", "xs": [1234567890.1209567890, 1234567890.1209567890, 1234567890.120956789]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of distinct xs", "value": 2}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [1234567890.120956789, 1234567890.120956789, 1234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "count of distinct xs", "value": 1}, {"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "xs[]", "value": [1234567890.120956789, 1234567890.120956789, 1234567890.120956789]}], "message": "count of distinct xs is 1", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

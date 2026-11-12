@@ -2,10 +2,15 @@
 
 This file is about `ergo.rego` only. The Rust engine's changes are in [engines/rust/CHANGELOG.md](engines/rust/CHANGELOG.md), and the spec's in [spec/CHANGELOG.md](spec/CHANGELOG.md). Each release names the version of the spec it follows.
 
-## 0.6.1
+## 0.7.0
+
+### Changed
+
+- A number in the policy with more than 15 significant digits is written wrong, as spec 0.7 says ([sentence.value.scalar](spec/syntax.md#values)). `l equals 1234567890.1209567890` fails `$well_formed` with `number with more than 15 significant digits: 1234567890.1209567890`, and the requirement gets no other row, where it passed with `l` holding `1234567890.1209567990`. A number in `from`, `meta` or `min_subjects` is written wrong the same way. Digits are counted on the value, so `1.50` has 2 and `1e20` has 1. The limits of the range, `2.2250738585072014e-308` and `1.7976931348623157e308`, have 17, so a policy can't write them any more. Changes the report of every policy that writes such a number.
 
 ### Fixed
 
+- Numbers in the input and the params are compared on every digit, as spec 0.7 says ([value.number](spec/semantics.md#values)), where OPA could count two decimals as equal when they differed only after the 15th significant digit. With `{"rows": [{"id": "b", "l": 1234567890.1209567990}]}` and `limit` `1234567890.1209567890` in the params, `l is at most $params.limit` fails as `value`, where it passed. The same goes for `equals`, `is not`, the order phrases, `is between`, `is … within`, `is one of`, `is in`, `contains`, the items of `every` and `some`, the copies `distinct` drops and a time written as a number. A row no longer takes the answer of another row whose numbers OPA counted as equal, so the report doesn't depend on the order of the input, and a message quotes the row's own numbers with every digit, where `r is less than l` could say `l is 1234567890.120956789` for an `l` of `1234567890.1209567990`. Changes the report of checks on such numbers.
 - A root of the wrong type on the left of a compare, like `z` in `z is at least 1` under `every xs, if any, as m` with `z` holding `"s"`, fails the check as `unusable` with `z is "s", which isn't a number` on an empty list too, as spec 0.7 says ([for.roots](spec/semantics.md#for)), where it passed. The same goes for `is at most`, `is more than`, `is less than`, `is not`, `does not equal`, `is … within`, a text compare like `starts with`, a time compare when the value isn't a time at all, and a root on the left in a `whose`, like `count of xs whose $params.q is at least v is 0` ([tally.whose](spec/semantics.md#counts-and-sums)). With items, the root is named once with no item in front, like a root on the right: `z is at least m.v` says `z is "s", which isn't a number` where it said it for each item, and `z is at least $params.q` with no `q`, or a `null` one, says `z is "s", which isn't a number; $params.q is missing` (or `is null`) where it said only `$params.q is missing` (or `is null`). With params that aren't an object, like `3`, `z is at least 1` on an empty list was already `unusable`, and its message changes from `for every xs, if any, as m: z is at least 1 is false` to `z is "s", which isn't a number`.
 
 ## 0.6.0

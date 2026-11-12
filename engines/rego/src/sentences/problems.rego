@@ -54,7 +54,7 @@ _s_text_names(text) := {concat("", ["unknown name ", m[1]]) |
 
 else := set()
 
-_s_base_problems(parsed) := (((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -104,14 +104,10 @@ _s_base_problems(parsed) := (((((((((((((((((({concat("", [node.bare_word, " is 
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bad_index" in object.keys(node)
-}) | {concat("", ["number out of range: ", node.out_of_range]) |
+}) | {concat("", [_s_number_problem(object.get(node, "too_long", false)), node.out_of_range]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"out_of_range" in object.keys(node)
-}) | {concat("", [_too_long_problem, ": ", node.too_long]) |
-	some node in _s_nodes(parsed)
-	is_object(node)
-	"too_long" in object.keys(node)
 }) | {concat("", ["invalid pattern ", _json_text(v)]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -398,3 +394,7 @@ _s_parsed_anyway(text, pat) := {"assertions": assertions} if {
 	count(items) == count(pieces)
 	count(pieces) in {1, 2}
 } else := _s_from_plain(text, pat)
+
+_s_number_problem(false) := "number out of range: "
+
+_s_number_problem(true) := concat("", [_too_long_problem, ": "])

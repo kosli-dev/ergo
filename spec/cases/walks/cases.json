@@ -3419,5 +3419,33 @@
         ]
       }
     ]
+  },
+  {
+    "description": "items with more than 15 significant digits",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"every": "every xs is at most r", "some": "some xs is more than r"}}}},
+    "cases": [
+      {
+        "description": "compare each item on every digit",
+        "rules": ["value.number", "walk.every", "walk.some", "walk.failed_items"],
+        "input": {"things": [{"id": "a", "xs": [1234567890.1209567990, 1234567890.1209567890], "r": 1234567890.1209567890}, {"id": "b", "xs": [1234567890.1209567890, 1234567890.1209567990], "r": 1234567890.1209567890}]},
+        "results": [
+          {"cause": "value", "check": "every", "failed_items": [{"cause": "value", "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": 1234567890.120956799}], "inputs": [{"locations": ["/things/0/r"], "name": "r", "value": 1234567890.120956789}, {"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "xs[]", "value": [1234567890.120956799, 1234567890.120956799]}], "message": "item 1 of xs is 1234567890.120956799, and r is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "some", "failed_items": [], "inputs": [{"locations": ["/things/0/r"], "name": "r", "value": 1234567890.120956789}, {"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "xs[]", "value": [1234567890.120956799, 1234567890.120956799]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "every", "failed_items": [{"cause": "value", "item": "item 2 of xs", "locations": ["/things/1/xs/1"], "path": "item 2 of xs", "value": 1234567890.120956799}], "inputs": [{"locations": ["/things/1/r"], "name": "r", "value": 1234567890.120956789}, {"locations": ["/things/1/xs/0", "/things/1/xs/1"], "name": "xs[]", "value": [1234567890.120956789, 1234567890.120956789]}], "message": "item 2 of xs is 1234567890.120956799, and r is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "some", "failed_items": [], "inputs": [{"locations": ["/things/1/r"], "name": "r", "value": 1234567890.120956789}, {"locations": ["/things/1/xs/0", "/things/1/xs/1"], "name": "xs[]", "value": [1234567890.120956789, 1234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "compare each item on every digit, in the other order",
+        "rules": ["value.number", "walk.every", "walk.some", "walk.failed_items"],
+        "input": {"things": [{"id": "b", "xs": [1234567890.1209567890, 1234567890.1209567990], "r": 1234567890.1209567890}, {"id": "a", "xs": [1234567890.1209567990, 1234567890.1209567890], "r": 1234567890.1209567890}]},
+        "results": [
+          {"cause": "value", "check": "every", "failed_items": [{"cause": "value", "item": "item 2 of xs", "locations": ["/things/0/xs/1"], "path": "item 2 of xs", "value": 1234567890.120956799}], "inputs": [{"locations": ["/things/0/r"], "name": "r", "value": 1234567890.120956789}, {"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "xs[]", "value": [1234567890.120956789, 1234567890.120956789]}], "message": "item 2 of xs is 1234567890.120956799, and r is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "some", "failed_items": [], "inputs": [{"locations": ["/things/0/r"], "name": "r", "value": 1234567890.120956789}, {"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "xs[]", "value": [1234567890.120956789, 1234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "every", "failed_items": [{"cause": "value", "item": "item 1 of xs", "locations": ["/things/1/xs/0"], "path": "item 1 of xs", "value": 1234567890.120956799}], "inputs": [{"locations": ["/things/1/r"], "name": "r", "value": 1234567890.120956789}, {"locations": ["/things/1/xs/0", "/things/1/xs/1"], "name": "xs[]", "value": [1234567890.120956799, 1234567890.120956799]}], "message": "item 1 of xs is 1234567890.120956799, and r is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "some", "failed_items": [], "inputs": [{"locations": ["/things/1/r"], "name": "r", "value": 1234567890.120956789}, {"locations": ["/things/1/xs/0", "/things/1/xs/1"], "name": "xs[]", "value": [1234567890.120956799, 1234567890.120956799]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

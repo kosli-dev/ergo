@@ -279,5 +279,134 @@
         ]
       }
     ]
+  },
+  {
+    "description": "numbers with more than 15 significant digits",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"eq": "l equals $params.low", "ne": "l is not $params.low", "lte": "l is at most $params.low", "lt": "l is less than $params.high", "gte": "l is at least $params.high", "gt": "l is more than r", "same": "l equals r"}}}},
+    "params": {"low": 1234567890.1209567890, "high": 1234567890.1209567990},
+    "cases": [
+      {
+        "description": "compare every digit, so 1234567890.1209567990 is more than 1234567890.1209567890",
+        "rules": ["value.number", "compare.pass", "compare.fail", "sentence.phrase.order", "message.value"],
+        "input": {"things": [{"id": "a", "l": 1234567890.1209567890, "r": 1234567890.1209567890}, {"id": "b", "l": 1234567890.1209567990, "r": 1234567890.1209567890}]},
+        "results": [
+          {"cause": "satisfied", "check": "eq", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "gt", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/0/r"], "name": "r", "value": 1234567890.120956789}], "message": "l is 1234567890.120956789, and r is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "gte", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/high"], "name": "$params.high", "value": 1234567890.120956799}], "message": "l is 1234567890.120956789, and $params.high is 1234567890.120956799", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "lt", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/high"], "name": "$params.high", "value": 1234567890.120956799}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "lte", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "ne", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "message": "l is 1234567890.120956789, and $params.low is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "same", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/0/r"], "name": "r", "value": 1234567890.120956789}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "eq", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "message": "l is 1234567890.120956799, and $params.low is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "gt", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/1/r"], "name": "r", "value": 1234567890.120956789}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "gte", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/high"], "name": "$params.high", "value": 1234567890.120956799}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "lt", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/high"], "name": "$params.high", "value": 1234567890.120956799}], "message": "l is 1234567890.120956799, and $params.high is 1234567890.120956799", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "lte", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "message": "l is 1234567890.120956799, and $params.low is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "ne", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "same", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/1/r"], "name": "r", "value": 1234567890.120956789}], "message": "l is 1234567890.120956799, and r is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "compare every digit, so 1234567890.1209567990 is more than 1234567890.1209567890, in the other order",
+        "rules": ["value.number", "compare.pass", "compare.fail", "sentence.phrase.order", "message.value"],
+        "input": {"things": [{"id": "b", "l": 1234567890.1209567990, "r": 1234567890.1209567890}, {"id": "a", "l": 1234567890.1209567890, "r": 1234567890.1209567890}]},
+        "results": [
+          {"cause": "value", "check": "eq", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "message": "l is 1234567890.120956799, and $params.low is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "gt", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/0/r"], "name": "r", "value": 1234567890.120956789}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "gte", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/high"], "name": "$params.high", "value": 1234567890.120956799}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "lt", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/high"], "name": "$params.high", "value": 1234567890.120956799}], "message": "l is 1234567890.120956799, and $params.high is 1234567890.120956799", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "lte", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "message": "l is 1234567890.120956799, and $params.low is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "ne", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "same", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/0/r"], "name": "r", "value": 1234567890.120956789}], "message": "l is 1234567890.120956799, and r is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "eq", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "gt", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/1/r"], "name": "r", "value": 1234567890.120956789}], "message": "l is 1234567890.120956789, and r is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "gte", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/high"], "name": "$params.high", "value": 1234567890.120956799}], "message": "l is 1234567890.120956789, and $params.high is 1234567890.120956799", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "lt", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/high"], "name": "$params.high", "value": 1234567890.120956799}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "lte", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "ne", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/low"], "name": "$params.low", "value": 1234567890.120956789}], "message": "l is 1234567890.120956789, and $params.low is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "same", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/1/r"], "name": "r", "value": 1234567890.120956789}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "within on numbers with more than 15 significant digits",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"w": "l equals r within 1", "nw": "l is not r within 1"}}}},
+    "cases": [
+      {
+        "description": "works out the gap on every digit, row by row",
+        "rules": ["value.number", "compare.within", "sentence.phrase.within"],
+        "input": {"things": [{"id": "a", "l": 1234567890.1209567890, "r": 1234567889.1209567890}, {"id": "b", "l": 1234567890.1209567990, "r": 1234567889.1209567890}]},
+        "results": [
+          {"cause": "value", "check": "nw", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/0/r"], "name": "r", "value": 1234567889.120956789}], "message": "l is 1234567890.120956789, and r is 1234567889.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "w", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/0/r"], "name": "r", "value": 1234567889.120956789}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "nw", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/1/r"], "name": "r", "value": 1234567889.120956789}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "w", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/1/r"], "name": "r", "value": 1234567889.120956789}], "message": "l is 1234567890.120956799, and r is 1234567889.120956789", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "works out the gap on every digit, row by row, in the other order",
+        "rules": ["value.number", "compare.within", "sentence.phrase.within"],
+        "input": {"things": [{"id": "b", "l": 1234567890.1209567990, "r": 1234567889.1209567890}, {"id": "a", "l": 1234567890.1209567890, "r": 1234567889.1209567890}]},
+        "results": [
+          {"cause": "satisfied", "check": "nw", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/0/r"], "name": "r", "value": 1234567889.120956789}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "w", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/0/r"], "name": "r", "value": 1234567889.120956789}], "message": "l is 1234567890.120956799, and r is 1234567889.120956789", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "nw", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/1/r"], "name": "r", "value": 1234567889.120956789}], "message": "l is 1234567890.120956789, and r is 1234567889.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "w", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/1/r"], "name": "r", "value": 1234567889.120956789}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a failed row quotes its own long numbers",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "l is at most r"}}}},
+    "cases": [
+      {
+        "description": "each message shows the row's numbers with every digit",
+        "rules": ["value.number", "message.value", "message.print"],
+        "input": {"things": [{"id": "a", "l": 1234567890.1209567990, "r": 1234567890.1209567890}, {"id": "b", "l": 1234567890.1209567890, "r": 1234567890.1209567790}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/0/r"], "name": "r", "value": 1234567890.120956789}], "message": "l is 1234567890.120956799, and r is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/1/r"], "name": "r", "value": 1234567890.120956779}], "message": "l is 1234567890.120956789, and r is 1234567890.120956779", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "each message shows the row's numbers with every digit, in the other order",
+        "rules": ["value.number", "message.value", "message.print"],
+        "input": {"things": [{"id": "b", "l": 1234567890.1209567890, "r": 1234567890.1209567790}, {"id": "a", "l": 1234567890.1209567990, "r": 1234567890.1209567890}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/0/r"], "name": "r", "value": 1234567890.120956779}], "message": "l is 1234567890.120956789, and r is 1234567890.120956779", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/1/r"], "name": "r", "value": 1234567890.120956789}], "message": "l is 1234567890.120956799, and r is 1234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a number in the policy and a longer one in the input",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"gte": "l is at least 5040424028.5118", "eq": "l equals 5040424028.5118"}}}},
+    "cases": [
+      {
+        "description": "compares every digit of the input",
+        "rules": ["value.number", "compare.pass", "compare.fail"],
+        "input": {"things": [{"id": "a", "l": 5040424028.51180}, {"id": "b", "l": 5040424028.5117999990}]},
+        "results": [
+          {"cause": "satisfied", "check": "eq", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 5040424028.5118}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "gte", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 5040424028.5118}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "eq", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 5040424028.511799999}], "message": "l is 5040424028.511799999", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "gte", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 5040424028.511799999}], "message": "l is 5040424028.511799999", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "compares every digit of the input, in the other order",
+        "rules": ["value.number", "compare.pass", "compare.fail"],
+        "input": {"things": [{"id": "b", "l": 5040424028.5117999990}, {"id": "a", "l": 5040424028.51180}]},
+        "results": [
+          {"cause": "value", "check": "eq", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 5040424028.511799999}], "message": "l is 5040424028.511799999", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "gte", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 5040424028.511799999}], "message": "l is 5040424028.511799999", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "eq", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 5040424028.5118}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "gte", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 5040424028.5118}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

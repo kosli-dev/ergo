@@ -1447,5 +1447,38 @@
         ]
       }
     ]
+  },
+  {
+    "description": "lists of numbers with more than 15 significant digits",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "l is in $params.lst", "not_in": "l is not in $params.lst", "field": "l is one of ls"}}}},
+    "params": {"lst": [1234567890.1209567890]},
+    "cases": [
+      {
+        "description": "find an item only when every digit matches",
+        "rules": ["value.number", "in.pass", "in.fail", "not_in.pass", "not_in.fail"],
+        "input": {"things": [{"id": "a", "l": 1234567890.1209567890, "ls": [1234567890.1209567890]}, {"id": "b", "l": 1234567890.1209567990, "ls": [1234567890.1209567890]}]},
+        "results": [
+          {"cause": "satisfied", "check": "field", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/0/ls"], "name": "ls", "value": [1234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "in", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/lst"], "name": "$params.lst", "value": [1234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "not_in", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/lst"], "name": "$params.lst", "value": [1234567890.120956789]}], "message": "l is 1234567890.120956789, and $params.lst is [1234567890.120956789]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "field", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/1/ls"], "name": "ls", "value": [1234567890.120956789]}], "message": "l is 1234567890.120956799, and ls is [1234567890.120956789]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "in", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/lst"], "name": "$params.lst", "value": [1234567890.120956789]}], "message": "l is 1234567890.120956799, and $params.lst is [1234567890.120956789]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "not_in", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/lst"], "name": "$params.lst", "value": [1234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "find an item only when every digit matches, in the other order",
+        "rules": ["value.number", "in.pass", "in.fail", "not_in.pass", "not_in.fail"],
+        "input": {"things": [{"id": "b", "l": 1234567890.1209567990, "ls": [1234567890.1209567890]}, {"id": "a", "l": 1234567890.1209567890, "ls": [1234567890.1209567890]}]},
+        "results": [
+          {"cause": "value", "check": "field", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["/things/0/ls"], "name": "ls", "value": [1234567890.120956789]}], "message": "l is 1234567890.120956799, and ls is [1234567890.120956789]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "in", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/lst"], "name": "$params.lst", "value": [1234567890.120956789]}], "message": "l is 1234567890.120956799, and $params.lst is [1234567890.120956789]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "not_in", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 1234567890.120956799}, {"locations": ["$params:/lst"], "name": "$params.lst", "value": [1234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "field", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["/things/1/ls"], "name": "ls", "value": [1234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "in", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/lst"], "name": "$params.lst", "value": [1234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "not_in", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1234567890.120956789}, {"locations": ["$params:/lst"], "name": "$params.lst", "value": [1234567890.120956789]}], "message": "l is 1234567890.120956789, and $params.lst is [1234567890.120956789]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

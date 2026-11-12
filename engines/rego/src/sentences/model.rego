@@ -558,11 +558,6 @@ _s_takes_value(_, v) if {
 	"out_of_range" in object.keys(v)
 }
 
-_s_takes_value(_, v) if {
-	is_object(v)
-	"too_long" in object.keys(v)
-}
-
 _s_time_value(v) if is_number(v)
 
 _s_time_value(v) if _rfc3339_shaped(v)

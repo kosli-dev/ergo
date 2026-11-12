@@ -147,7 +147,7 @@ Params are the third argument to `ergo.report`. Ergo doesn't look for them anywh
 
 ## Numbers
 
-`ergo.rego` compares numbers with OPA, and OPA can treat two decimals as the same when they only differ after the 15th significant digit. Whole numbers are always compared exactly. With this policy and this input:
+`ergo.rego` compares numbers in the input and the params on every digit, however many they have. OPA on its own treats some decimals as the same when they only differ after the 15th significant digit, like `1234567890.1209567890` and `1234567890.1209567990`, so Ergo checks the digits itself whenever OPA says two numbers are equal. With this policy and these params:
 
 ```yaml
 ergo_spec: v0.7-dev
@@ -159,15 +159,23 @@ requirements:
   r:
     subject: row
     checks:
-      most: l is at most 1234567890.1209567890
-      within: l equals r within 1234567889.6209567890
+      most: l is at most $params.limit
+      within: l equals r within 1
 ```
 
 ```json
-{"rows": [{"id": "a", "l": 1234567890.1209567890, "r": 0.5}, {"id": "b", "l": 1234567890.1209567990, "r": 0.5}]}
+{"limit": 1234567890.1209567890}
 ```
 
-`most` passes on `b`, even though its `l` is bigger than the limit. OPA also remembers the result of a comparison and reuses it for any number it treats as the same, so the answer can depend on the other rows: `within` fails on `b` when `b` is the only row, but passes on `b` when `a` is also in the input. The Rust engine, which the `ergo` CLI runs, compares every digit and fails both checks on `b`. So keep the decimals you compare to at most 15 significant digits, or use the Rust engine, for example with the `ergo` CLI. [#426](https://github.com/kosli-dev/ergo/issues/426) is about fixing `ergo.rego`.
+and this input:
+
+```json
+{"rows": [{"id": "a", "l": 1234567890.1209567890, "r": 1234567889.1209567890}, {"id": "b", "l": 1234567890.1209567990, "r": 1234567889.1209567890}]}
+```
+
+both checks pass on `a` and fail on `b`, whatever order the rows come in, with the messages `l is 1234567890.120956799, and $params.limit is 1234567890.120956789` and `l is 1234567890.120956799, and r is 1234567889.120956789`. A number written in the policy has at most 15 significant digits, so `l is at most 1234567890.1209567890` is written wrong.
+
+Give the input and the params to OPA as JSON when they hold such numbers. OPA keeps every digit of a number in a JSON file, but it reads a decimal in a YAML file as a 64-bit float, so `1234567890.1209567890` in YAML reaches Ergo as `1234567890.120957`. Whole numbers keep every digit either way.
 
 ## Compiling to Wasm
 
@@ -193,7 +201,7 @@ const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": pars
 Treat a compiled policy like a compiler's object file. Make it in the build that uses it, don't commit it, and make it again whenever the policy or your copy of `ergo.rego` changes. Its shape is Ergo's own and changes between versions. A compiled policy holds the `engine` that compiled it, the same name and version a report gives. When it's missing or isn't the one running, `ergo.report` reads the policy the compiled one came from and fails every requirement's `$well_formed` row with an input like:
 
 ```json
-{"name": "ergo/compiled engine", "value": ["compiled by another engine, expected ergo-rego 0.6.1-dev"], "locations": []}
+{"name": "ergo/compiled engine", "value": ["compiled by another engine, expected ergo-rego 0.7.0-dev"], "locations": []}
 ```
 
 or `["missing"]` when the compiled policy has no `engine`. That only tells released versions apart: every copy of `ergo.rego` between two releases has the same `-dev` version, so a compiled policy from an older copy of the same version still runs and can give a wrong report. Ergo doesn't check that nobody edited it either, so don't edit it. One with a field missing or of the wrong type fails like a policy Ergo can't read, and compiling a compiled policy gives it back unchanged, even one from another engine.

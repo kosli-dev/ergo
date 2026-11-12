@@ -631,8 +631,9 @@ test_a_number_out_of_range_is_written_wrong_without_opa_comparing_it if {
 	_read(`x is one of 1, 2e400`) == {"problems": ["number out of range: 2e400"]}
 	_read(`x is 1 within 1e999`) == {"problems": ["number out of range: 1e999"]}
 	_read(`count of y plus 1e-9999999 is 3`) == {"problems": ["number out of range: 1e-9999999"]}
-	_read(`x is 1.7976931348623157e308`).assertions[0].phrase.value == 1.7976931348623157e308
-	_read(`x is 2.2250738585072014e-308`).assertions[0].phrase.value == 2.2250738585072014e-308
+	_read(`x is 1.79769313486231e308`).assertions[0].phrase.value == 1.79769313486231e308
+	_read(`x is 2.22507385850721e-308`).assertions[0].phrase.value == 2.22507385850721e-308
+	_read(`x is 1.7976931348623157e308`) == {"problems": ["number with more than 15 significant digits: 1.7976931348623157e308"]}
 	_read(`x is 0.0e-9999999`).assertions[0].phrase.value == 0
 }
 

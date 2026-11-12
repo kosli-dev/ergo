@@ -12,7 +12,7 @@ _json_problems(v) := {"holds a key that isn't a string" |
 	is_set(x)
 }
 
-_meta_problems(m) := (_json_problems(m) | {"number out of range" | _out_of_range(m)}) | {_too_long_problem | _too_long(m)}
+_meta_problems(m) := _json_problems(m) | _number_flaws(m)
 
 _meta_shaped(v) if {
 	is_object(v)
@@ -185,15 +185,16 @@ _min_subjects_out_of_range(req, "min_subjects") if {
 
 _min_subjects_out_of_range(req, "min_subjects") if {
 	is_number(req.min_subjects)
-	_too_long(req.min_subjects)
+	_number_flaw(req.min_subjects, json.marshal(req.min_subjects)) == _too_long_problem
 }
 
 _range_problems(req) := {["min_subjects", "number out of range"] |
 	is_number(_min_subjects_of(req))
 	_out_of_range(_min_subjects_of(req))
 } | {["min_subjects", _too_long_problem] |
-	is_number(_min_subjects_of(req))
-	_too_long(_min_subjects_of(req))
+	m := _req_field(req, "min_subjects", null)
+	is_number(m)
+	_number_flaw(m, json.marshal(m)) == _too_long_problem
 }
 
 _unknown_problems(req) := {[f, "unknown field"] | some f in _unknown_req_fields(req)}
@@ -256,7 +257,7 @@ _edge_chars := {"\u0009", "\u000a", "\u000b", "\u000c", "\u000d", "\u0020", "\u0
 
 _require_problems(req) := {["require", "neither every nor some"] | is_object(req); not _require_of(req) in {"every", "some"}}
 
-_path_problems(req, f) := {[f, "number out of range"] | is_array(_req_field(req, f, null)); _out_of_range(req[f])} | {[f, _too_long_problem] | is_array(_req_field(req, f, null)); _too_long(req[f])}
+_path_problems(req, f) := {[f, p] | is_array(_req_field(req, f, null)); some p in _number_flaws(req[f])}
 
 _field_problem_inputs(req) := [{"name": _field_key_name(k), "value": sort({p[1] | some p in problems; _field_sort_key(p[0]) == k}), "locations": []} | some k in sort({_field_sort_key(p[0]) | some p in problems; p[0] != "require"})] if {
 	problems := _req_problems(req)
@@ -559,7 +560,7 @@ _sentence_cmp(node, here) if {
 	_s_read(node, here)
 }
 
-_out_of_range_problem(node) := {"number out of range" | _out_of_range(_own_fields(node))} | {_too_long_problem | _too_long(_own_fields(node))}
+_out_of_range_problem(node) := _number_flaws(_own_fields(node))
 
 _refs_problem(node) := {"invalid ref" |
 	some r in _check_refs(_own_fields(node))

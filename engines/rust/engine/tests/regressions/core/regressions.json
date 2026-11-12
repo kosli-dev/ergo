@@ -39047,7 +39047,7 @@
             "a": "x is 1.50",
             "b": "y is -0.0",
             "c": "z is at least 1e2",
-            "d": "big is 12345678901234567890",
+            "d": "big is 123456789012345",
             "e": "x is between 1.0 and 2.50",
             "f": "l includes 2.50",
             "g": "count of l is 2.0",
@@ -39111,7 +39111,7 @@
             },
             "d": {
               "description": "",
-              "expression": "big is 12345678901234567890",
+              "expression": "big is 123456789012345",
               "meta": {}
             },
             "e": {

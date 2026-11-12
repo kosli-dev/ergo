@@ -158,3 +158,33 @@ test_text_order_reads_every_digit if {
 	ergo._text_order("-1", "1") == -1
 	ergo._text_order("1", "-1") == 1
 }
+
+_well_formed_message(checks) := [r.message | some r in ergo.report({"things": [{"id": "a", "l": 1}]}, _sentence_policy(checks), {}).results; r.check == "$well_formed"; r.cause != "satisfied"]
+
+test_a_policy_number_with_more_than_15_significant_digits_is_written_wrong if {
+	_well_formed_message({"c": "l equals 1234567890.1209567890"}) == ["checks.c: number with more than 15 significant digits: 1234567890.1209567890"]
+	_well_formed_message({"c": "l is at most 1234567890123456"}) == ["checks.c: number with more than 15 significant digits: 1234567890123456"]
+	_well_formed_message({"c": "l is at most 12345678901234567890"}) == ["checks.c: number with more than 15 significant digits: 12345678901234567890"]
+	_well_formed_message({"c": "l equals 1 within 0.1234567890123456"}) == ["checks.c: number with more than 15 significant digits: 0.1234567890123456"]
+	_well_formed_message({"c": "l is one of 1, 1234567890.1209567890"}) == ["checks.c: number with more than 15 significant digits: 1234567890.1209567890"]
+	_well_formed_message({"c": "l is between 1234567890.1209567890 and 2e10"}) == ["checks.c: number with more than 15 significant digits: 1234567890.1209567890"]
+}
+
+test_significant_digits_are_counted_on_the_value if {
+	_well_formed_message({"c": "l is at most 123456789012345"}) == []
+	_well_formed_message({"c": "l is at most 1.50000000000000000000"}) == []
+	_well_formed_message({"c": "l is at most 1e20"}) == []
+	_well_formed_message({"c": "l is at most 0.000000000000000000001"}) == []
+	_well_formed_message({"c": "l is at most 1234567890123456000000"}) == ["checks.c: number with more than 15 significant digits: 1234567890123456000000"]
+}
+
+test_a_number_out_of_range_is_named_before_its_digits if {
+	_well_formed_message({"c": "l is at least 1.2345678901234567e400"}) == ["checks.c: number out of range: 1.2345678901234567e400"]
+}
+
+test_a_long_number_outside_a_check_is_written_wrong if {
+	policy := object.union(_sentence_policy({"c": "l exists"}), {"requirements": {"s": {"subject": "thing", "min_subjects": 1.0000000000000000001, "meta": {"n": 1234567890.1209567890}, "checks": {"c": "l exists"}}}})
+	[r.message | some r in ergo.report({"things": [{"id": "a", "l": 1}]}, policy, {}).results; r.check == "$well_formed"] == ["meta: number with more than 15 significant digits; min_subjects: number with more than 15 significant digits"]
+	from := object.union(_sentence_policy({"c": "l exists"}), {"subjects": {"thing": {"from": "things whose l is 1234567890.1209567890", "identified_by": "id"}}})
+	[r.message | some r in ergo.report({"things": [{"id": "a", "l": 1}]}, from, {}).results; r.check == "$well_formed"] == ["subjects.thing.from: number with more than 15 significant digits: 1234567890.1209567890"]
+}

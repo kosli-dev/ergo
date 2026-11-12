@@ -17,6 +17,7 @@ NON_SYNTAX = [
         r"^unknown alias ",
         r"^min above max$",
         r"^number out of range: ",
+        r"^number with more than 15 significant digits: ",
         r" can't be a list position$",
         r"^invalid pattern ",
         r'^"is not null" is written "exists"$',

@@ -1,4 +1,4 @@
-use crate::value::{Decimal, fits_a_float};
+use crate::value::{Decimal, fits_a_float, too_long};
 use serde_json::{Map, Value};
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -537,6 +537,14 @@ fn read_min_subjects(map: &Map<String, Value>, problems: &mut Problems) -> (Valu
         None => (Value::from(1), 1),
         Some(Value::Number(number)) if !fits_a_float(number) => {
             add_problem(problems, "min_subjects".to_string(), "number out of range");
+            (Value::Number(number.clone()), 1)
+        }
+        Some(Value::Number(number)) if too_long(number) => {
+            add_problem(
+                problems,
+                "min_subjects".to_string(),
+                "number with more than 15 significant digits",
+            );
             (Value::Number(number.clone()), 1)
         }
         Some(Value::Number(number)) => {
@@ -1187,7 +1195,6 @@ mod tests {
             json!(1.5),
             json!(1000001),
             serde_json::from_str::<Value>("1e308").unwrap(),
-            serde_json::from_str::<Value>("9007199254740993").unwrap(),
             serde_json::from_str::<Value>("1000000.5").unwrap(),
             json!("1"),
             json!(null),
@@ -1203,6 +1210,28 @@ mod tests {
                 "{bad}"
             );
             assert_eq!(r.min_subjects, bad);
+        }
+    }
+
+    #[test]
+    fn a_min_subjects_with_more_than_15_significant_digits_is_written_wrong() {
+        for text in [
+            "9007199254740993",
+            "1.0000000000000000001",
+            "5.000000000000000000001",
+        ] {
+            let mut v = valid();
+            v["min_subjects"] = serde_json::from_str(text).unwrap();
+            let r = read(one(v)).requirements["s"].clone();
+            assert_eq!(
+                r.problems
+                    .get("min_subjects")
+                    .map(|p| p.iter().cloned().collect::<Vec<_>>()),
+                Some(vec![
+                    "number with more than 15 significant digits".to_string()
+                ]),
+                "{text}"
+            );
         }
     }
 

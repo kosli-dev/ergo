@@ -8,11 +8,13 @@ _out_of_range(x) if {
 	not _fits_a_float(n)
 }
 
-_too_long(x) if {
-	walk(x, [_, n])
-	is_number(n)
+_number_flaws(x) := {p | walk(x, [_, n]); is_number(n); p := _number_flaw(n, json.marshal(n))}
+
+_number_flaw(n, _) := "number out of range" if not _fits_a_float(n)
+
+_number_flaw(n, t) := _too_long_problem if {
 	_fits_a_float(n)
-	count(_decimal_parts(json.marshal(n)).digits) > 15
+	count(_decimal_parts(t).digits) > 15
 }
 
 _too_long_problem := "number with more than 15 significant digits"
