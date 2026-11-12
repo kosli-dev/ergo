@@ -7997,6 +7997,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("sum of $params.q is 1", "sum of $params.q is 1", &[], &[]),
+    (
+        "commit.author is approver.u",
+        "commit.author equals approver.u",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -11080,8 +11086,44 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "some approvers as approver, first of commits as commit",
+        "some approvers as approver, first of commits as commit",
+        &[],
+        &[],
+    ),
+    (
         "some approvers as approver, last of commits sorted by timestamp as last_commit",
         "some approvers as approver, last of commits sorted by timestamp as last_commit",
+        &[],
+        &[],
+    ),
+    (
+        "some approvers as approver, some commits as commit",
+        "some approvers as approver, some commits as commit",
+        &[],
+        &[],
+    ),
+    (
+        "every commits as commit, some approvers as approver",
+        "every commits as commit, some approvers as approver",
+        &[],
+        &[],
+    ),
+    (
+        "some approvers as approver, every commits, if any, as commit",
+        "some approvers as approver, every commits, if any, as commit",
+        &[],
+        &[],
+    ),
+    (
+        "some approvers as approver, every commits whose author does not equal approver.u, if any, as commit",
+        "some approvers as approver, every commits whose author does not equal approver.u, if any, as commit",
+        &[],
+        &[],
+    ),
+    (
+        "some approvers as approver, every approver.subs, if any, as sub",
+        "some approvers as approver, every approver.subs, if any, as sub",
         &[],
         &[],
     ),
