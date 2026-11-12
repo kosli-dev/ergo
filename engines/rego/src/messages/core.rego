@@ -9,16 +9,6 @@ _m_print(v) := _m_item(v) if {
 	not is_array(v)
 }
 
-_m_print(v) := concat("", ["[", concat(", ", [_m_item(x) | some x in array.slice(v, 0, 3)]), ", and ", _literal_text(count(v) - 3), " more]"]) if {
-	is_array(v)
-	count(v) > 3
-}
-
-_m_print(v) := concat("", ["[", concat(", ", [_m_item(x) | some x in v]), "]"]) if {
-	is_array(v)
-	count(v) <= 3
-}
-
 _m_print_at(v, at, row) := _m_print(v) if {
 	not is_number(v)
 	not is_array(v)
