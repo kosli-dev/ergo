@@ -643,13 +643,26 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 } else := {"passed": false, "cause": w.unread, "lines": [], "unchecked": u} if {
 	"unread" in object.keys(w)
 	u := [object.union(f, _m_unread_names(check.items[1].path, subj, f)) | some f in _for_unwalked(check, w)] with input as {"ergo/names": names}
-} else := {"passed": cause == "satisfied", "cause": cause, "lines": lines, "unchecked": [f | some f in fails; f.lines == []]} if {
+} else := res if {
 	item := check.items[1]
 	judged := _for_copies_merged(item, names, w, [_for_judge_inner(check, subj, names, item, e, w) | some e in w.items])
 	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
 	cause := _for_verdict(item, w, judged, fails)
-	lines := _for_merge_lines(check, cause, fails)
+	res := _for_inner_result(check, subj, names, judged, fails, cause)
 }
+
+_for_inner_result(check, subj, names, judged, fails, cause) := _for_lines(_for_without(check, check.items[1].as), subj, names) if {
+	cause == "satisfied"
+	check.items[1].if_any == true
+	every j in judged {
+		j.kept == false
+	}
+} else := {"passed": cause == "satisfied", "cause": cause, "lines": _for_merge_lines(check, cause, fails), "unchecked": [f | some f in fails; f.lines == []]}
+
+_for_without(check, name) := object.union(check, {
+	"checks": [c | some c in check.checks; not _reads_name(c, name)],
+	"assertions": [check.assertions[i] | some i, c in check.checks; not _reads_name(c, name)],
+})
 
 _for_lines(check, subj, names) := {"passed": count(lines) == 0, "cause": _all_of_cause(lines), "lines": lines} if {
 	lines := [object.union({"assertion": check.assertions[i], "cause": cause, "inputs": _for_line_inputs(check, c, read), "msg": [_m_aliased(x) | some x in m]}, _m_own_msg(check, c, m, count(read) == 1)) |

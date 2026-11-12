@@ -739,6 +739,20 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "commit.author does not equal approver.u",
+        "commit.author does not equal approver.u",
+        &[],
+        &[],
+    ),
+    (
+        "count of approver.subs is 1",
+        "count of approver.subs is 1",
+        &[],
+        &[],
+    ),
+    ("sub is 1", "sub is 1", &[], &[]),
+    ("title is \"fix\"", "title is \"fix\"", &[], &[]),
+    (
         "approver.t is more than commit.t",
         "approver.t is more than commit.t",
         &[],
@@ -11124,6 +11138,24 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "some approvers as approver, every approver.subs, if any, as sub",
         "some approvers as approver, every approver.subs, if any, as sub",
+        &[],
+        &[],
+    ),
+    (
+        "every approvers as approver, every approver.subs, if any, as sub",
+        "every approvers as approver, every approver.subs, if any, as sub",
+        &[],
+        &[],
+    ),
+    (
+        "every approvers as approver, every commits whose author does not equal approver.u, if any, as commit",
+        "every approvers as approver, every commits whose author does not equal approver.u, if any, as commit",
+        &[],
+        &[],
+    ),
+    (
+        "every approvers as approver, every commits, if any, as commit",
+        "every approvers as approver, every commits, if any, as commit",
         &[],
         &[],
     ),

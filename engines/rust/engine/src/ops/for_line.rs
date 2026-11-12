@@ -347,6 +347,7 @@ fn merged_live(live: Vec<Live<'_>>) -> Vec<Live<'_>> {
     out
 }
 
+#[derive(Clone)]
 struct Dead {
     raw: Option<Value>,
     msg: Option<String>,
@@ -1201,9 +1202,26 @@ impl For {
                     Vec::new(),
                 )
             } else if last {
-                self.try_sentences(&bound, collect)
+                self.try_sentences(&bound, collect, false)
             } else {
-                let nested = self.level(depth + 1, &bound, collect);
+                let mut nested = self.level(depth + 1, &bound, collect);
+                if nested.cause == Cause::Satisfied
+                    && nested.children.is_empty()
+                    && matches!(self.items[depth + 1].how, How::Every { if_any: true })
+                    && let (Some(failed), sfails) = self.try_sentences(&bound, collect, true)
+                {
+                    nested = Level {
+                        cause: failed.cause,
+                        dead: Vec::new(),
+                        children: vec![Child {
+                            order: Vec::new(),
+                            entry: entry.clone(),
+                            failed: Some(failed),
+                            sfails,
+                            copies: Vec::new(),
+                        }],
+                    };
+                }
                 if nested.cause == Cause::Satisfied {
                     (None, Vec::new())
                 } else {
@@ -1327,10 +1345,18 @@ impl For {
             .unwrap_or_default()
     }
 
-    fn try_sentences(&self, ctx: &Ctx, collect: &mut Collect) -> (Option<Outcome>, Vec<Sfail>) {
+    fn try_sentences(
+        &self,
+        ctx: &Ctx,
+        collect: &mut Collect,
+        skip_last: bool,
+    ) -> (Option<Outcome>, Vec<Sfail>) {
         let alias = self.last_alias();
         let mut sfails = Vec::new();
         for (idx, sentence) in self.sentences.iter().enumerate() {
+            if skip_last && sentence.reads_last {
+                continue;
+            }
             let ran = run_full(&sentence.check, ctx);
             let verdict = ran.verdict.clone();
             if !verdict.passed() {
@@ -3343,6 +3369,61 @@ mod tests {
         let listed = row("every xs as x", json!("x is 1"), subject);
         assert_eq!(items(&listed), ["xs"]);
         assert_eq!(listed["inputs"][0]["name"], "xs[]");
+    }
+
+    #[test]
+    fn an_empty_list_a_for_line_tolerates_still_runs_the_sentences_that_dont_read_it() {
+        let subject = json!({
+            "approvers": [{"u": "ada", "subs": []}, {"u": "g", "state": "REJECTED"}],
+            "commits": []
+        });
+        for line in [
+            "some approvers as ap, every commits, if any, as c",
+            "every approvers as ap, every commits, if any, as c",
+        ] {
+            let failed = row(line, json!("ap.state is \"APPROVED\""), subject.clone());
+            assert_eq!(failed["cause"], "absent");
+            assert_eq!(
+                items(&failed),
+                ["item 1 of approvers", "item 2 of approvers"]
+            );
+            assert_eq!(
+                failed["message"],
+                "item 1 of approvers: ap.state is missing; item 2 of approvers: ap.state is \"REJECTED\""
+            );
+        }
+    }
+
+    #[test]
+    fn a_sentence_that_reads_the_alias_of_an_empty_list_a_for_line_tolerates_has_nothing_to_check()
+    {
+        let line = "some approvers as ap, every commits, if any, as c";
+        let approved = json!({"approvers": [{"u": "ada", "state": "APPROVED"}], "commits": []});
+        assert_eq!(
+            cause(
+                line,
+                json!(["ap.state is \"APPROVED\"", "c.author does not equal ap.u"]),
+                approved
+            ),
+            "satisfied"
+        );
+        let rejected = json!({"approvers": [{"u": "ada", "state": "REJECTED"}], "commits": []});
+        assert_eq!(
+            cause(
+                line,
+                json!("c.author does not equal ap.u"),
+                rejected.clone()
+            ),
+            "satisfied"
+        );
+        assert_eq!(
+            cause(
+                line,
+                json!(["ap.state is \"APPROVED\"", "c.author does not equal ap.u"]),
+                rejected
+            ),
+            "value"
+        );
     }
 
     #[test]
