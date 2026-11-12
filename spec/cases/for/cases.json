@@ -28683,12 +28683,12 @@
         ]
       },
       {
-        "description": "fails on an empty list when the field is a number where a list or a key is read, and passes where it is compared with 1, since a number that isn't 1 can still be read",
-        "rules": ["for.roots", "for.flaws"],
+        "description": "fails on an empty list when the field is a number where a list or a key is read, and where it is compared with 1, because a sentence that doesn't read the alias still runs",
+        "rules": ["for.flaws", "for.if_any", "for.roots"],
         "input": {"prs": [{"id": "p0", "z": 3, "xs": []}]},
         "results": [
           {"cause": "unusable", "check": "count_z", "failed_items": [], "inputs": [{"locations": [], "name": "count of z", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": [], "name": "z", "value": []}], "message": "z is 3, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
-          {"cause": "satisfied", "check": "is_z", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "value", "check": "is_z", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "message": "z is 3", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "key_z", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "message": "z is 3, which isn't text", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "sum_z", "failed_items": [], "inputs": [{"locations": [], "name": "sum of z", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": [], "name": "z", "value": []}], "message": "z is 3, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
         ]
@@ -28861,7 +28861,7 @@
       },
       {
         "description": "fails on an empty list when the field is text, and names it once",
-        "rules": ["for.roots", "for.flaws"],
+        "rules": ["for.flaws", "for.if_any", "for.roots"],
         "input": {"prs": [{"id": "p0", "z": "s", "xs": []}]},
         "results": [
           {"cause": "unusable", "check": "does_not", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
@@ -28874,7 +28874,7 @@
           {"cause": "unusable", "check": "most", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "not_true", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't true or false", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "not_within", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
-          {"cause": "satisfied", "check": "number", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "value", "check": "number", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\"", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "plain", "inputs": [{"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "plain_not", "inputs": [{"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "within", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
@@ -28882,7 +28882,7 @@
       },
       {
         "description": "fails on an empty list when the field is an object, and names it once",
-        "rules": ["for.roots", "for.flaws"],
+        "rules": ["for.flaws", "for.if_any", "for.roots"],
         "input": {"prs": [{"id": "p0", "z": {"a": 1}, "xs": []}]},
         "results": [
           {"cause": "unusable", "check": "does_not", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
@@ -28895,31 +28895,31 @@
           {"cause": "unusable", "check": "most", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "not_true", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't true or false", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "not_within", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
-          {"cause": "satisfied", "check": "number", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "value", "check": "number", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "plain", "inputs": [{"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "plain_not", "inputs": [{"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "within", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": {"a": 1}}], "message": "z is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
         ]
       },
       {
-        "description": "passes on an empty list when the field is a number that doesn't match, because it can be read, and fails only where the phrase reads true or false",
-        "rules": ["for.roots", "for.flaws"],
+        "description": "fails on an empty list when the field is a number that doesn't match, because a sentence that doesn't read the alias still runs",
+        "rules": ["for.flaws", "for.if_any", "for.roots"],
         "input": {"prs": [{"id": "p0", "z": 3, "xs": []}]},
         "results": [
           {"cause": "satisfied", "check": "does_not", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
-          {"cause": "satisfied", "check": "is", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "value", "check": "is", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "message": "z is 3", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "satisfied", "check": "is_not", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "satisfied", "check": "item", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "satisfied", "check": "least", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
-          {"cause": "satisfied", "check": "less", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "value", "check": "less", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "message": "z is 3", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "satisfied", "check": "more", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
-          {"cause": "satisfied", "check": "most", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "value", "check": "most", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "message": "z is 3", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "not_true", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "message": "z is 3, which isn't true or false", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "satisfied", "check": "not_within", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "satisfied", "check": "number", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "satisfied", "check": "plain", "inputs": [{"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "satisfied", "check": "plain_not", "inputs": [{"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
-          {"cause": "satisfied", "check": "within", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+          {"cause": "value", "check": "within", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": 3}], "message": "z is 3", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
         ]
       },
       {
@@ -29583,12 +29583,12 @@
     "cases": [
       {
         "description": "fails on an empty list and names both roots, the worse cause first",
-        "rules": ["for.roots", "for.flaws"],
+        "rules": ["for.flaws", "for.if_any", "for.roots"],
         "input": {"prs": [{"id": "p0", "z": "s", "xs": []}]},
         "results": [
           {"cause": "unusable", "check": "field", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}, {"locations": ["/prs/0"], "name": "zb", "value": null}], "message": "z is \"s\", which isn't a number; zb is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "params", "failed_items": [], "inputs": [{"locations": ["$params:"], "name": "$params.q", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number; $params.q is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
-          {"cause": "satisfied", "check": "text", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "passed": true, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "value", "check": "text", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\"", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "time", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a time", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
         ]
       },
@@ -42645,6 +42645,4930 @@
             "requirement": "s",
             "subject": {
               "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line runs the sentences that don't read the alias of an empty first list it tolerates, for each item of the second list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pull_request": {
+          "from": "pull_requests",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "checks": {
+            "some_second": {
+              "for": "every commits, if any, as commit, some approvers as approver",
+              "assert": "approver.state is \"APPROVED\""
+            },
+            "every_second": {
+              "for": "every commits, if any, as commit, every approvers as approver",
+              "assert": "approver.state is \"APPROVED\""
+            },
+            "two_lines": {
+              "for": "every commits, if any, as commit, some approvers as approver",
+              "assert": [
+                "commit.author is approver.u",
+                "approver.state is \"APPROVED\""
+              ]
+            },
+            "both_aliases": {
+              "for": "every commits, if any, as commit, some approvers as approver",
+              "assert": "commit.author is approver.u"
+            },
+            "no_alias": {
+              "for": "every commits, if any, as commit, every approvers as approver",
+              "assert": "title is \"fix\""
+            },
+            "whose_leaves_none": {
+              "for": "every commits whose kind is \"code\", if any, as commit, every approvers as approver",
+              "assert": "approver.state is \"APPROVED\""
+            },
+            "through_first": {
+              "for": "every commits, if any, as commit, every commit.files as file",
+              "assert": [
+                "file.path starts with \"src/\"",
+                "title is \"fix\""
+              ]
+            },
+            "whose_reads_first": {
+              "for": "every commits, if any, as commit, every approvers whose u is commit.author as approver",
+              "assert": [
+                "approver.state is \"APPROVED\"",
+                "title is \"fix\""
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails each approver that didn't approve when there are no commits, runs the sentence that reads neither alias once, and skips the sentences that read commit, also through the second line",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "title": "wip",
+              "approvers": [
+                {
+                  "u": "ada",
+                  "state": "REJECTED"
+                },
+                {
+                  "u": "grace"
+                }
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "both_aliases",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "every_second",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0/state"
+                        ],
+                        "name": "approver.state",
+                        "value": "REJECTED"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "state": "REJECTED",
+                  "u": "ada"
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "u": "grace"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: state is \"REJECTED\"; item 2 of approvers: state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "no_alias",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "title is \"fix\"",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/title"
+                        ],
+                        "name": "title",
+                        "value": "wip"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "state": "REJECTED",
+                  "u": "ada"
+                }
+              },
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "title is \"fix\"",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/title"
+                        ],
+                        "name": "title",
+                        "value": "wip"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "u": "grace"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "wip"
+              }
+            ],
+            "message": "title is \"wip\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some_second",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0/state"
+                        ],
+                        "name": "approver.state",
+                        "value": "REJECTED"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "state": "REJECTED",
+                  "u": "ada"
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "u": "grace"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: state is \"REJECTED\"; item 2 of approvers: state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "through_first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commit.files",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "wip"
+              }
+            ],
+            "message": "title is \"wip\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "two_lines",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0/state"
+                        ],
+                        "name": "approver.state",
+                        "value": "REJECTED"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "state": "REJECTED",
+                  "u": "ada"
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "u": "grace"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: state is \"REJECTED\"; item 2 of approvers: state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose_leaves_none",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0/state"
+                        ],
+                        "name": "approver.state",
+                        "value": "REJECTED"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "state": "REJECTED",
+                  "u": "ada"
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "u": "grace"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of approvers: state is \"REJECTED\"; item 2 of approvers: state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "whose_reads_first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "wip"
+              }
+            ],
+            "message": "title is \"wip\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when every approver approved and there are no commits",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr2",
+              "title": "fix",
+              "approvers": [
+                {
+                  "u": "ada",
+                  "state": "APPROVED"
+                }
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "both_aliases",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "every_second",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "no_alias",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "some_second",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "through_first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commit.files",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "two_lines",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose_leaves_none",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose_reads_first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails each approver that didn't approve when the whose of the first line leaves no commit",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr3",
+              "title": "fix",
+              "approvers": [
+                {
+                  "u": "ada",
+                  "state": "REJECTED"
+                },
+                {
+                  "u": "grace"
+                }
+              ],
+              "commits": [
+                {
+                  "kind": "docs",
+                  "author": "ada"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "both_aliases",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "kind": "docs"
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "every_second",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/0/state"
+                            ],
+                            "name": "approver.state",
+                            "value": "REJECTED"
+                          }
+                        ],
+                        "item": "item 1 of approvers"
+                      },
+                      {
+                        "cause": "absent",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/1"
+                            ],
+                            "name": "approver.state",
+                            "value": null
+                          }
+                        ],
+                        "item": "item 2 of approvers"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of commits",
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "path": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "kind": "docs"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "kind": "docs"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of commits: item 1 of approvers: state is \"REJECTED\"; item 1 of commits: item 2 of approvers: state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "no_alias",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "kind": "docs"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some_second",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/0/state"
+                            ],
+                            "name": "approver.state",
+                            "value": "REJECTED"
+                          }
+                        ],
+                        "item": "item 1 of approvers"
+                      },
+                      {
+                        "cause": "absent",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/1"
+                            ],
+                            "name": "approver.state",
+                            "value": null
+                          }
+                        ],
+                        "item": "item 2 of approvers"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of commits",
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "path": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "kind": "docs"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "kind": "docs"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of commits: item 1 of approvers: state is \"REJECTED\"; item 1 of commits: item 2 of approvers: state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "through_first",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "commit.files",
+                    "locations": [
+                      "/pull_requests/0/commits/0"
+                    ],
+                    "path": "commit.files",
+                    "value": null
+                  }
+                ],
+                "item": "item 1 of commits",
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "path": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "kind": "docs"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commit.files",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "kind": "docs"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "item 1 of commits: commit.files is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "two_lines",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "commit.author equals approver.u",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/commits/0/author"
+                            ],
+                            "name": "commit.author",
+                            "value": "ada"
+                          },
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/1/u"
+                            ],
+                            "name": "approver.u",
+                            "value": "grace"
+                          }
+                        ],
+                        "item": "item 2 of approvers"
+                      }
+                    ]
+                  },
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/0/state"
+                            ],
+                            "name": "approver.state",
+                            "value": "REJECTED"
+                          }
+                        ],
+                        "item": "item 1 of approvers"
+                      },
+                      {
+                        "cause": "absent",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/1"
+                            ],
+                            "name": "approver.state",
+                            "value": null
+                          }
+                        ],
+                        "item": "item 2 of approvers"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of commits",
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "path": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "kind": "docs"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "kind": "docs"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of commits: item 1 of approvers: state is \"REJECTED\"; item 1 of commits: item 2 of approvers: commit.author is \"ada\", and approver.u is \"grace\", and approver.state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose_leaves_none",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/0/state"
+                        ],
+                        "name": "approver.state",
+                        "value": "REJECTED"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "state": "REJECTED",
+                  "u": "ada"
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/approvers/1"
+                        ],
+                        "name": "approver.state",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "u": "grace"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "kind": "docs"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: state is \"REJECTED\"; item 2 of approvers: state is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "whose_reads_first",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/0/state"
+                            ],
+                            "name": "approver.state",
+                            "value": "REJECTED"
+                          }
+                        ],
+                        "item": "item 1 of approvers"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of commits",
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "path": "item 1 of commits",
+                "value": {
+                  "author": "ada",
+                  "kind": "docs"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "REJECTED",
+                    "u": "ada"
+                  },
+                  {
+                    "u": "grace"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ada",
+                    "kind": "docs"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "item 1 of commits: item 1 of approvers: state is \"REJECTED\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when commits is missing, as without if any",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "for.walk",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr4",
+              "title": "fix",
+              "approvers": [
+                {
+                  "u": "ada",
+                  "state": "APPROVED"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "both_aliases",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "every_second",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "no_alias",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some_second",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "through_first",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commit.files",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "two_lines",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose_leaves_none",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose_reads_first",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when commits is null",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "for.walk",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr5",
+              "title": "fix",
+              "approvers": [
+                {
+                  "u": "ada",
+                  "state": "APPROVED"
+                }
+              ],
+              "commits": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "both_aliases",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "every_second",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "no_alias",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "some_second",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "through_first",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commit.files",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "two_lines",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "whose_leaves_none",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "whose_reads_first",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when commits isn't a list",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "for.walk",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr6",
+              "title": "fix",
+              "approvers": [
+                {
+                  "u": "ada",
+                  "state": "APPROVED"
+                }
+              ],
+              "commits": "s"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "both_aliases",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "every_second",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "no_alias",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some_second",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "through_first",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commit.files",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "two_lines",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "whose_leaves_none",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "whose_reads_first",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "u": "ada"
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails when there are no commits and no approvers, because the second line doesn't tolerate an empty list, and passes where the second line or every sentence reads commit",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr7",
+              "title": "fix",
+              "approvers": [],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "both_aliases",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "every_second",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0/approvers"
+                ],
+                "path": "approvers",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "approvers is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "no_alias",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0/approvers"
+                ],
+                "path": "approvers",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "approvers is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "some_second",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0/approvers"
+                ],
+                "path": "approvers",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "approvers is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "through_first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commit.files",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "two_lines",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0/approvers"
+                ],
+                "path": "approvers",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "approvers is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "whose_leaves_none",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0/approvers"
+                ],
+                "path": "approvers",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "approvers is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose_reads_first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers[]",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when there are no commits and approvers is missing, and passes where the second line or every sentence reads commit",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "for.walk",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr8",
+              "title": "fix",
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "both_aliases",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr8",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "every_second",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "approvers",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "approvers is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr8",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "no_alias",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "approvers",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "approvers is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr8",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some_second",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "approvers",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "approvers is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr8",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "through_first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commit.files",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr8",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "two_lines",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "approvers",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "approvers is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr8",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose_leaves_none",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "approvers",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "approvers",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "message": "approvers is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr8",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose_reads_first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "approvers",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr8",
+              "type": "pull_request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with one item runs the sentences that don't read its alias on an empty list it tolerates",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pull_request": {
+          "from": "pull_requests",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "checks": {
+            "field": {
+              "for": "every commits, if any, as commit",
+              "assert": "title is \"fix\""
+            },
+            "both": {
+              "for": "every commits, if any, as commit",
+              "assert": [
+                "commit.signed is true",
+                "title is \"fix\""
+              ]
+            },
+            "alias_only": {
+              "for": "every commits, if any, as commit",
+              "assert": "commit.signed is true"
+            },
+            "whose": {
+              "for": "every commits whose kind is \"code\", if any, as commit",
+              "assert": [
+                "commit.signed is true",
+                "title is \"fix\""
+              ]
+            },
+            "exists": {
+              "for": "every commits, if any, as commit",
+              "assert": "reviewer exists"
+            },
+            "count": {
+              "for": "every commits, if any, as commit",
+              "assert": "count of labels is at least 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails each sentence that doesn't read commit when there are no commits, names what it read once with no item, and skips the sentences that read commit",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.roots",
+          "for.try",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "title": "wip",
+              "labels": [],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "alias_only",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "both",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "wip"
+              }
+            ],
+            "message": "title is \"wip\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "count of labels",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "labels[]",
+                "value": []
+              }
+            ],
+            "message": "count of labels is 0",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "name": "reviewer",
+                "value": null
+              }
+            ],
+            "message": "reviewer is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "field",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "wip"
+              }
+            ],
+            "message": "title is \"wip\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "wip"
+              }
+            ],
+            "message": "title is \"wip\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when the sentences that don't read commit pass and there are no commits",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr2",
+              "title": "fix",
+              "reviewer": "ada",
+              "labels": [
+                "x"
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "alias_only",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "both",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/labels/0"
+                ],
+                "name": "count of labels",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/labels/0"
+                ],
+                "name": "labels[]",
+                "value": [
+                  "x"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/reviewer"
+                ],
+                "name": "reviewer",
+                "value": "ada"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "field",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr2",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails the sentences that don't read commit when the whose leaves no commit",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr3",
+              "title": "wip",
+              "reviewer": "ada",
+              "labels": [
+                "x"
+              ],
+              "commits": [
+                {
+                  "kind": "docs"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "alias_only",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "commit.signed is true",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/commits/0"
+                        ],
+                        "name": "commit.signed",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of commits",
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "path": "item 1 of commits",
+                "value": {
+                  "kind": "docs"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "docs"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of commits: signed is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "both",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "commit.signed is true",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/commits/0"
+                        ],
+                        "name": "commit.signed",
+                        "value": null
+                      }
+                    ]
+                  },
+                  {
+                    "assertion": "title is \"fix\"",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/title"
+                        ],
+                        "name": "title",
+                        "value": "wip"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of commits",
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "path": "item 1 of commits",
+                "value": {
+                  "kind": "docs"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "docs"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "wip"
+              }
+            ],
+            "message": "title is \"wip\"; item 1 of commits: commit.signed is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "docs"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/labels/0"
+                ],
+                "name": "count of labels",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/labels/0"
+                ],
+                "name": "labels[]",
+                "value": [
+                  "x"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "docs"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/reviewer"
+                ],
+                "name": "reviewer",
+                "value": "ada"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "field",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "title is \"fix\"",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/title"
+                        ],
+                        "name": "title",
+                        "value": "wip"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of commits",
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "path": "item 1 of commits",
+                "value": {
+                  "kind": "docs"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "docs"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "wip"
+              }
+            ],
+            "message": "title is \"wip\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "docs"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "wip"
+              }
+            ],
+            "message": "title is \"wip\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr3",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when a field a sentence reads is null and there are no commits",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.roots",
+          "for.try",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr4",
+              "title": null,
+              "reviewer": null,
+              "labels": null,
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "alias_only",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "both",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": null
+              }
+            ],
+            "message": "title is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [],
+                "name": "count of labels",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "labels",
+                "value": []
+              }
+            ],
+            "message": "labels is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/reviewer"
+                ],
+                "name": "reviewer",
+                "value": null
+              }
+            ],
+            "message": "reviewer is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "field",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": null
+              }
+            ],
+            "message": "title is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": null
+              }
+            ],
+            "message": "title is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr4",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when commits is missing, as without if any",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "for.walk",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr5",
+              "title": "fix",
+              "reviewer": "ada",
+              "labels": [
+                "x"
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "alias_only",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "both",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "count",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/labels/0"
+                ],
+                "name": "count of labels",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/labels/0"
+                ],
+                "name": "labels[]",
+                "value": [
+                  "x"
+                ]
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "exists",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/reviewer"
+                ],
+                "name": "reviewer",
+                "value": "ada"
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "field",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr5",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when commits is null",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "for.walk",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr6",
+              "title": "fix",
+              "reviewer": "ada",
+              "labels": [
+                "x"
+              ],
+              "commits": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "alias_only",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "both",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "count",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/labels/0"
+                ],
+                "name": "count of labels",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/labels/0"
+                ],
+                "name": "labels[]",
+                "value": [
+                  "x"
+                ]
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "exists",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/reviewer"
+                ],
+                "name": "reviewer",
+                "value": "ada"
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "field",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "whose",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr6",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when commits isn't a list",
+        "rules": [
+          "for.if_any",
+          "for.pass",
+          "for.try",
+          "for.walk",
+          "sentence.every.if_any"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr7",
+              "title": "fix",
+              "reviewer": "ada",
+              "labels": [
+                "x"
+              ],
+              "commits": "s"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "alias_only",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "both",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "count",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/labels/0"
+                ],
+                "name": "count of labels",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/labels/0"
+                ],
+                "name": "labels[]",
+                "value": [
+                  "x"
+                ]
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "exists",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/reviewer"
+                ],
+                "name": "reviewer",
+                "value": "ada"
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "field",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "whose",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "commits",
+                "locations": [
+                  "/pull_requests/0/commits"
+                ],
+                "path": "commits",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "commits",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/pull_requests/0/title"
+                ],
+                "name": "title",
+                "value": "fix"
+              }
+            ],
+            "message": "commits is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr7",
               "type": "pull_request"
             }
           }

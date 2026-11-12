@@ -1610,7 +1610,7 @@ impl For {
     }
 
     pub fn run(&self, ctx: &Ctx) -> Run {
-        let (mut run, free, _) = self.run_items(ctx, Vec::new());
+        let (mut run, free, _, alone) = self.run_items(ctx, Vec::new());
         let said = run.message.clone();
         let (roots, ahead) = match self.rooted(&mut run, ctx) {
             Named::Plain => (Vec::new(), false),
@@ -1618,7 +1618,7 @@ impl For {
             Named::Ahead(texts) => (texts, true),
         };
         let failed = !run.failed_items.is_empty();
-        let free: Vec<String> = if failed {
+        let free: Vec<String> = if failed || alone {
             free.iter()
                 .map(|text| unskipped(text, &roots))
                 .filter(|text| !text.is_empty())
@@ -1644,9 +1644,9 @@ impl For {
             if let Some((_, _, raw, _)) = self.second_roots(ctx) {
                 skip.extend(raw);
             }
-            let (items, _, hoisted) = self.run_items(ctx, skip);
+            let (items, _, hoisted, _) = self.run_items(ctx, skip);
             (items.message, hoisted)
-        } else if ahead {
+        } else if ahead && !alone {
             (said, Vec::new())
         } else {
             (None, Vec::new())
@@ -1947,7 +1947,106 @@ impl For {
         Cause::worst(causes).map(|cause| (cause, texts, raw, unread))
     }
 
-    fn run_items(&self, ctx: &Ctx, skip: Vec<String>) -> (Run, Vec<String>, Vec<String>) {
+    fn none_kept(&self, ctx: &Ctx) -> bool {
+        if !matches!(
+            self.items[0].how,
+            How::Every { if_any: true } | How::Some { if_any: true }
+        ) {
+            return false;
+        }
+        let cands = self.candidates(0, ctx);
+        cands.unreadable.is_none() && cands.dead.is_empty() && cands.live.is_empty()
+    }
+
+    fn after_first(&self) -> Option<For> {
+        let [first, second] = self.items.as_slice() else {
+            return None;
+        };
+        if reads_path(&second.path, &first.alias)
+            || second
+                .whose
+                .iter()
+                .any(|check| reads_alias(check, &first.alias))
+        {
+            return None;
+        }
+        let sentences: Vec<Sentence> = self
+            .sentences
+            .iter()
+            .filter(|sentence| !reads_alias(&sentence.check, &first.alias))
+            .cloned()
+            .collect();
+        (!sentences.is_empty()).then(|| For {
+            items: vec![second.clone()],
+            sentences,
+        })
+    }
+
+    fn flawed(&self, ctx: &Ctx) -> bool {
+        let outer = outer_ctx(ctx);
+        self.items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .chain(self.sentences.iter().map(|s| &s.check))
+            .any(|check| check.flawed(&outer))
+            && !self.reads_a_flawed_root(&outer)
+    }
+
+    fn unaliased_failures(&self, ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
+        let mut causes = Vec::new();
+        let mut texts: Vec<String> = Vec::new();
+        for sentence in &self.sentences {
+            if self
+                .items
+                .iter()
+                .any(|item| reads_alias(&sentence.check, &item.alias))
+            {
+                continue;
+            }
+            let ran = run_full(&sentence.check, ctx);
+            let verdict = ran.verdict.clone();
+            if verdict.passed() {
+                continue;
+            }
+            causes.push(verdict.cause);
+            let walks = matches!(sentence.check, Check::Walk(_));
+            let lines = match (ran.message, ran.parts) {
+                (_, Some(parts)) if walks && !parts.is_empty() => parts,
+                (Some(said), _) if walks => vec![said],
+                _ => vec![super::message::message(&sentence.check, ctx, &verdict)],
+            };
+            for line in lines {
+                for text in line.split("; ") {
+                    if !texts.iter().any(|t| t == text) {
+                        texts.push(text.to_string());
+                    }
+                }
+            }
+        }
+        Cause::worst(causes).map(|cause| (cause, texts))
+    }
+
+    fn run_items(&self, ctx: &Ctx, skip: Vec<String>) -> (Run, Vec<String>, Vec<String>, bool) {
+        let (run, free, hoisted) = self.run_items_of(ctx, skip.clone());
+        if run.verdict.cause != Cause::NotAnObject && !self.flawed(ctx) && self.none_kept(ctx) {
+            if let Some(rest) = self.after_first() {
+                let (mut reduced, free, hoisted, alone) = rest.run_items(ctx, skip);
+                reduced.verdict.inputs = run.verdict.inputs;
+                return (reduced, free, hoisted, alone);
+            }
+            if run.verdict.cause == Cause::Satisfied
+                && let Some((cause, texts)) = self.unaliased_failures(ctx)
+            {
+                let mut run = run;
+                run.verdict.cause = cause;
+                run.message = Some(super::message::joined(texts.clone()));
+                return (run, texts, hoisted, true);
+            }
+        }
+        (run, free, hoisted, false)
+    }
+
+    fn run_items_of(&self, ctx: &Ctx, skip: Vec<String>) -> (Run, Vec<String>, Vec<String>) {
         let first = &self.items[0];
         let whole_subject = !ctx.subject.value.is_object()
             && (!ctx.subject.value.is_array() || matches!(first.how, How::Pick { .. }))
@@ -3423,6 +3522,96 @@ mod tests {
                 rejected
             ),
             "value"
+        );
+    }
+
+    #[test]
+    fn an_empty_first_list_a_for_line_tolerates_still_runs_the_sentences_that_dont_read_it() {
+        let approvers = json!([{"u": "ada"}, {"u": "g", "state": "REJECTED"}]);
+        for line in [
+            "every commits, if any, as c, some approvers as ap",
+            "every commits, if any, as c, every approvers as ap",
+        ] {
+            let failed = row(
+                line,
+                json!(["c.author is ap.u", "ap.state is \"APPROVED\""]),
+                json!({"approvers": approvers, "commits": []}),
+            );
+            assert_eq!(failed["cause"], "absent");
+            assert_eq!(
+                items(&failed),
+                ["item 1 of approvers", "item 2 of approvers"]
+            );
+            assert_eq!(
+                failed["message"],
+                "item 1 of approvers: state is missing; item 2 of approvers: state is \"REJECTED\""
+            );
+            assert_eq!(names(&failed), ["approvers[]", "commits[]"]);
+        }
+        let filtered = row(
+            "every commits whose n is 1, if any, as c, some approvers as ap",
+            json!("ap.state is \"APPROVED\""),
+            json!({"approvers": approvers, "commits": [{"n": 2}]}),
+        );
+        assert_eq!(filtered["cause"], "absent");
+        assert_eq!(
+            cause(
+                "every commits, if any, as c, some approvers as ap",
+                json!("c.author is ap.u"),
+                json!({"approvers": [{"u": "ada"}], "commits": []})
+            ),
+            "satisfied"
+        );
+        assert_eq!(
+            cause(
+                "every commits, if any, as c, some approvers as ap",
+                json!("c.author is ap.u"),
+                json!({"commits": []})
+            ),
+            "satisfied"
+        );
+    }
+
+    #[test]
+    fn an_empty_list_a_one_item_for_line_tolerates_still_runs_the_sentences_that_dont_read_it() {
+        for line in [
+            "every xs, if any, as m",
+            "every xs whose k is 1, if any, as m",
+        ] {
+            let failed = row(
+                line,
+                json!(["m.v is 1", "z is 1"]),
+                json!({"xs": [], "z": 3}),
+            );
+            assert_eq!(failed["cause"], "value");
+            assert_eq!(failed["message"], "z is 3");
+            assert_eq!(failed["failed_items"], json!([]));
+            assert_eq!(
+                cause(
+                    line,
+                    json!(["m.v is 1", "z is 1"]),
+                    json!({"xs": [], "z": 1})
+                ),
+                "satisfied"
+            );
+        }
+        assert_eq!(
+            row(
+                "every commits, if any, as c, every c.files as f",
+                json!(["f.n is 1", "z is 1"]),
+                json!({"commits": [], "z": 3})
+            )["message"],
+            "z is 3"
+        );
+        let mixed = row(
+            "every xs, if any, as m",
+            json!(["w exists", "y is at least 1", "z is 1"]),
+            json!({"xs": [], "z": 3, "y": "s"}),
+        );
+        assert_eq!(mixed["cause"], "unusable");
+        assert_eq!(
+            mixed["message"],
+            "y is \"s\", which isn't a number; w is missing; z is 3"
         );
     }
 

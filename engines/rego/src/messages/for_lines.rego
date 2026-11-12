@@ -118,7 +118,7 @@ _for_message(check, subj, r) := _m_not_object(check, subj) if {
 	r.failed == []
 }
 
-_for_message(check, subj, r) := _m_joined(_m_for_empty(check, subj, r.cause)) if {
+_for_message(check, subj, r) := _m_joined(_m_for_empty(object.union(check, {"items": object.get(r, "said_items", check.items)}), subj, r.cause)) if {
 	r.cause != "not_an_object"
 	r.failed == []
 }

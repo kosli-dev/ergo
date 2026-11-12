@@ -753,6 +753,19 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("sub is 1", "sub is 1", &[], &[]),
     ("title is \"fix\"", "title is \"fix\"", &[], &[]),
     (
+        "count of labels is at least 1",
+        "count of labels is at least 1",
+        &[],
+        &[],
+    ),
+    (
+        "file.path starts with \"src/\"",
+        "file.path starts with \"src/\"",
+        &[],
+        &[],
+    ),
+    ("reviewer exists", "reviewer exists", &[], &[]),
+    (
         "approver.t is more than commit.t",
         "approver.t is more than commit.t",
         &[],
@@ -11144,6 +11157,48 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every approvers as approver, every approver.subs, if any, as sub",
         "every approvers as approver, every approver.subs, if any, as sub",
+        &[],
+        &[],
+    ),
+    (
+        "every commits whose kind is \"code\", if any, as commit",
+        "every commits whose kind is \"code\", if any, as commit",
+        &[],
+        &[],
+    ),
+    (
+        "every commits whose kind is \"code\", if any, as commit, every approvers as approver",
+        "every commits whose kind is \"code\", if any, as commit, every approvers as approver",
+        &[],
+        &[],
+    ),
+    (
+        "every commits, if any, as commit",
+        "every commits, if any, as commit",
+        &[],
+        &[],
+    ),
+    (
+        "every commits, if any, as commit, every approvers as approver",
+        "every commits, if any, as commit, every approvers as approver",
+        &[],
+        &[],
+    ),
+    (
+        "every commits, if any, as commit, every approvers whose u is commit.author as approver",
+        "every commits, if any, as commit, every approvers whose u equals commit.author as approver",
+        &[],
+        &[],
+    ),
+    (
+        "every commits, if any, as commit, every commit.files as file",
+        "every commits, if any, as commit, every commit.files as file",
+        &[],
+        &[],
+    ),
+    (
+        "every commits, if any, as commit, some approvers as approver",
+        "every commits, if any, as commit, some approvers as approver",
         &[],
         &[],
     ),
