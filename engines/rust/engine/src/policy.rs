@@ -186,7 +186,7 @@ fn meta_number_flaws(map: &Map<String, Value>) -> BTreeSet<&'static str> {
 
 fn reported_meta(map: &Map<String, Value>) -> Value {
     match map.get("meta") {
-        Some(meta @ Value::Object(_)) => meta.clone(),
+        Some(meta @ Value::Object(_)) if meta_number_flaws(map).is_empty() => meta.clone(),
         _ => empty_meta(),
     }
 }
@@ -1511,15 +1511,29 @@ mod tests {
             check_problems(json!({"assert": "x", "meta": meta.clone()})),
             both
         );
+        assert_eq!(
+            read_check(&json!({"assert": "x", "meta": meta.clone()})).meta,
+            json!({})
+        );
         let mut v = valid();
         v["meta"] = meta.clone();
-        assert_eq!(requirement_problems(one(v), "s"), [problem("meta", &both)]);
+        assert_eq!(
+            requirement_problems(one(v.clone()), "s"),
+            [problem("meta", &both)]
+        );
+        assert_eq!(
+            read(one(v)).requirements["s"].meta,
+            json!({}),
+            "a requirement meta written wrong is reported as {{}}"
+        );
         let mut policy = one(valid());
         policy["meta"] = meta;
+        let read_policy = read(policy);
         assert_eq!(
-            read(policy).problems["policy meta"],
+            read_policy.problems["policy meta"],
             BTreeSet::from(both.map(String::from))
         );
+        assert_eq!(read_policy.meta, json!({}));
     }
 
     #[test]

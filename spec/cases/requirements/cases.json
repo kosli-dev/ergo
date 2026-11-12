@@ -4462,5 +4462,30 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a policy, a requirement and a check whose meta holds a number out of range or with more than 15 significant digits",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "meta": {"n": 1234567890.1209567890, "k": 1},
+      "subjects": {"row": {"from": "rows", "identified_by": "id"}},
+      "requirements": {
+        "s": {
+          "subject": "row",
+          "meta": {"n": 1e400, "k": 1},
+          "checks": {"c": {"assert": "l exists", "meta": {"n": 1234567890.1209567890}}}
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong and the report shows {} in place of each meta",
+        "rules": ["report.policy", "report.requirements"],
+        "input": {"rows": [{"id": "a", "l": 1}]},
+        "report": {"meta": {}},
+        "requirements": {"s": {"meta": {}}},
+        "results": [{"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "meta", "value": ["number out of range"]}, {"locations": [], "name": "checks.c", "value": ["number with more than 15 significant digits"]}, {"locations": [], "name": "policy meta", "value": ["number with more than 15 significant digits"]}], "message": "meta: number out of range; checks.c: number with more than 15 significant digits; policy meta: number with more than 15 significant digits", "passed": false, "requirement": "s", "subject": {"id": null, "type": "row"}}]
+      }
+    ]
   }
 ]
