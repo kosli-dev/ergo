@@ -8404,6 +8404,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "some ys whose n is at least art.cov.z exists",
+        "some ys whose n is at least art.cov.z exists",
+        &[],
+        &[],
+    ),
+    (
         "count of rows whose n is count of $input.lst.k is 0",
         "count of rows whose n equals count of $input.lst.k is 0",
         &[],
