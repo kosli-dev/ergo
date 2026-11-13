@@ -398,6 +398,39 @@
     ]
   },
   {
+    "description": "a name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "cs", "identified_by": "id", "has": {"pos": "os"}}}, "requirements": {"r": {"subject": "c", "checks": {"field": "every rows.v is in os.name", "part": "every rows.v is in pos.name", "count": "count of rows whose v matches pos.p is 1"}}}},
+    "cases": [
+      {
+        "description": "a text value among numbers, and a number among patterns",
+        "rules": ["compare.list", "walk.right", "walk.right.fail", "message.items"],
+        "input": {"cs": [{"id": "c1", "os": [{"name": 3, "p": "^a"}, {"name": 4, "p": "^b"}], "rows": [{"v": "abc"}, {"v": 5}]}]},
+        "results": [
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "count of rows whose v matches pos.p", "value": null}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"v": "abc"}, {"v": 5}]}, {"locations": ["/cs/0/os/0/p", "/cs/0/os/1/p"], "name": "pos[].p", "part": {"id": null, "name": "pos"}, "value": ["^a", "^b"]}], "message": "item 2 of rows: v is 5, which isn't text", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "unusable", "check": "field", "failed_items": [{"cause": "unusable", "item": "item 1 of rows", "locations": ["/cs/0/rows/0/v"], "path": "rows[0].v", "value": "abc"}, {"cause": "value", "item": "item 2 of rows", "locations": ["/cs/0/rows/1/v"], "path": "rows[1].v", "value": 5}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "os[].name", "value": [3, 4]}, {"locations": ["/cs/0/rows/0/v", "/cs/0/rows/1/v"], "name": "rows[].v", "value": ["abc", 5]}], "message": "item 1 of rows: v is \"abc\", which isn't a number; item 2 of rows: v is 5, and os[].name is [3, 4]", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "unusable", "check": "part", "failed_items": [{"cause": "unusable", "item": "item 1 of rows", "locations": ["/cs/0/rows/0/v"], "path": "rows[0].v", "value": "abc"}, {"cause": "value", "item": "item 2 of rows", "locations": ["/cs/0/rows/1/v"], "path": "rows[1].v", "value": 5}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": [3, 4]}, {"locations": ["/cs/0/rows/0/v", "/cs/0/rows/1/v"], "name": "rows[].v", "value": ["abc", 5]}], "message": "item 1 of rows: v is \"abc\", which isn't a number; item 2 of rows: v is 5, and pos[].name is [3, 4]", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "cs", "identified_by": "id", "has": {"pos": "os"}}, "kid": {"from": "every c.kids", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"parent": "every rows.v is in c.os.name", "part": "every rows.v is in c.pos.name", "count": "count of rows whose v matches c.os.p is 1", "part_count": "count of rows whose v matches c.pos.p is 1"}}}},
+    "cases": [
+      {
+        "description": "a text value among numbers, and a number among patterns",
+        "rules": ["compare.list", "walk.right", "walk.right.fail", "message.items"],
+        "input": {"cs": [{"id": "c1", "os": [{"name": 3, "p": "^a"}, {"name": 4, "p": "^b"}], "kids": [{"id": "k1", "rows": [{"v": "abc"}, {"v": 5}]}]}]},
+        "results": [
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": ["/cs/0/kids/0/rows/0", "/cs/0/kids/0/rows/1"], "name": "count of rows whose v matches c.os.p", "value": null}, {"locations": ["/cs/0/kids/0/rows/0", "/cs/0/kids/0/rows/1"], "name": "rows[]", "value": [{"v": "abc"}, {"v": 5}]}, {"locations": ["/cs/0/os/0/p", "/cs/0/os/1/p"], "name": "c.os[].p", "value": ["^a", "^b"]}], "message": "item 2 of rows: v is 5, which isn't text", "passed": false, "requirement": "r", "subject": {"id": "k1", "in": {"c": "c1"}, "type": "kid"}},
+          {"cause": "unusable", "check": "parent", "failed_items": [{"cause": "unusable", "item": "item 1 of rows", "locations": ["/cs/0/kids/0/rows/0/v"], "path": "rows[0].v", "value": "abc"}, {"cause": "value", "item": "item 2 of rows", "locations": ["/cs/0/kids/0/rows/1/v"], "path": "rows[1].v", "value": 5}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "c.os[].name", "value": [3, 4]}, {"locations": ["/cs/0/kids/0/rows/0/v", "/cs/0/kids/0/rows/1/v"], "name": "rows[].v", "value": ["abc", 5]}], "message": "item 1 of rows: v is \"abc\", which isn't a number; item 2 of rows: v is 5, and c.os[].name is [3, 4]", "passed": false, "requirement": "r", "subject": {"id": "k1", "in": {"c": "c1"}, "type": "kid"}},
+          {"cause": "unusable", "check": "part", "failed_items": [{"cause": "unusable", "item": "item 1 of rows", "locations": ["/cs/0/kids/0/rows/0/v"], "path": "rows[0].v", "value": "abc"}, {"cause": "value", "item": "item 2 of rows", "locations": ["/cs/0/kids/0/rows/1/v"], "path": "rows[1].v", "value": 5}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "c.pos[].name", "part": {"id": null, "name": "c.pos"}, "value": [3, 4]}, {"locations": ["/cs/0/kids/0/rows/0/v", "/cs/0/kids/0/rows/1/v"], "name": "rows[].v", "value": ["abc", 5]}], "message": "item 1 of rows: v is \"abc\", which isn't a number; item 2 of rows: v is 5, and c.pos[].name is [3, 4]", "passed": false, "requirement": "r", "subject": {"id": "k1", "in": {"c": "c1"}, "type": "kid"}},
+          {"cause": "unusable", "check": "part_count", "inputs": [{"locations": ["/cs/0/kids/0/rows/0", "/cs/0/kids/0/rows/1"], "name": "count of rows whose v matches c.pos.p", "value": null}, {"locations": ["/cs/0/kids/0/rows/0", "/cs/0/kids/0/rows/1"], "name": "rows[]", "value": [{"v": "abc"}, {"v": 5}]}, {"locations": ["/cs/0/os/0/p", "/cs/0/os/1/p"], "name": "c.pos[].p", "part": {"id": null, "name": "c.pos"}, "value": ["^a", "^b"]}], "message": "item 2 of rows: v is 5, which isn't text", "passed": false, "requirement": "r", "subject": {"id": "k1", "in": {"c": "c1"}, "type": "kid"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "two names read from outside the item in a whose, each with items that can't be used, are each named once, in the order the sentence reads them",
     "policy": {
       "ergo_spec": "{{spec}}",
@@ -687,6 +720,22 @@
           {"cause": "satisfied", "check": "params", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $params.lst.name", "value": 1}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "passed": true, "requirement": "r", "subject": {"id": {"os": "s", "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
           {"cause": "unusable", "check": "part", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of pl.name", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/objs/0/os"], "name": "pl.name", "part": {"id": null, "name": "pl"}, "value": null}], "message": "pl is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"os": "s", "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}},
           {"cause": "unusable", "check": "sum", "failed_items": [{"cause": "unusable", "item": "item 1 of rows", "locations": ["/lst"], "path": "$input.lst.k", "value": null}], "inputs": [{"locations": ["/lst"], "name": "$input.lst.k", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "$input.lst is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"os": "s", "rows": [{"n": 2, "v": "bob"}]}, "type": "u"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a name read both item by item and as one value in one check is listed for each read",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "cs", "identified_by": "id", "has": {"pos": "os"}}}, "requirements": {"r": {"subject": "c", "checks": {"count": "count of rows whose v is in pos.name and whose w is pos.name is 0", "every": "every rows whose v is in pos.name and whose w is pos.name exists", "for": {"for": "every rows whose v is in pos.name and whose w is pos.name as r", "assert": "r.v is \"a\""}}}}},
+    "cases": [
+      {
+        "description": "the walked read holds each name, and the plain read null where it stopped",
+        "rules": ["walk.right.inputs", "walk.inputs", "tally.inputs", "for.inputs"],
+        "input": {"cs": [{"id": "c1", "os": [{"name": "a"}], "rows": [{"v": "a", "w": "a"}]}]},
+        "results": [
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": ["/cs/0/rows/0"], "name": "count of rows whose v is in pos.name and whose w equals pos.name", "value": null}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "a", "w": "a"}]}, {"locations": ["/cs/0/os"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}, {"locations": ["/cs/0/os/0/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["a"]}], "message": "pos is [{\"name\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "unusable", "check": "every", "failed_items": [{"cause": "unusable", "item": "item 1 of rows", "locations": ["/cs/0/os"], "path": "pos.name", "value": null}], "inputs": [{"locations": ["/cs/0/os"], "name": "pos.name", "part": {"id": null, "name": "pos"}, "value": null}, {"locations": ["/cs/0/os/0/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["a"]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "a", "w": "a"}]}], "message": "pos is [{\"name\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
+          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "a", "w": "a"}}], "inputs": [{"locations": ["/cs/0/os/0/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["a"]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "a", "w": "a"}]}], "message": "pos is [{\"name\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
         ]
       }
     ]

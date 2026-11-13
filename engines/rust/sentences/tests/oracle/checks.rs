@@ -8518,6 +8518,56 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("r.k is 1", "r.k is 1", &[], &[]),
     ("w.n is 1", "w.n is 1", &[], &[]),
     ("r.w is 1", "r.w is 1", &[], &[]),
+    (
+        "count of rows whose v is in pos.name and whose w is pos.name is 0",
+        "count of rows whose v is in pos.name and whose w equals pos.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v matches c.os.p is 1",
+        "count of rows whose v matches c.os.p is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v matches c.pos.p is 1",
+        "count of rows whose v matches c.pos.p is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v matches pos.p is 1",
+        "count of rows whose v matches pos.p is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in pos.name and whose w is pos.name exists",
+        "every rows whose v is in pos.name and whose w equals pos.name exists",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.v is in c.os.name",
+        "every rows.v is in c.os.name",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.v is in c.pos.name",
+        "every rows.v is in c.pos.name",
+        &[],
+        &[],
+    ),
+    (
+        "every ws.n whose v is in pos.name is 2",
+        "every ws.n whose v is in pos.name is 2",
+        &[],
+        &[],
+    ),
+    ("r.v is \"a\"", "r.v is \"a\"", &[], &[]),
+    ("w.n is 2", "w.n is 2", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -12743,6 +12793,66 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("some rows as r", "some rows as r", &[], &[]),
+    (
+        "every ms as m, every m.ws whose v is in $input.os.name as w",
+        "every ms as m, every m.ws whose v is in $input.os.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every ms as m, every m.ws whose v is in $params.os.name as w",
+        "every ms as m, every m.ws whose v is in $params.os.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every ms as m, every m.ws whose v is in c.os.name as w",
+        "every ms as m, every m.ws whose v is in c.os.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every ms as m, every m.ws whose v is in c.pos.name as w",
+        "every ms as m, every m.ws whose v is in c.pos.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in pos.name and whose w is pos.name as r",
+        "every rows whose v is in pos.name and whose w equals pos.name as r",
+        &[],
+        &[],
+    ),
+    (
+        "every ws whose v is in $input.os.name as w",
+        "every ws whose v is in $input.os.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every ws whose v is in $params.os.name as w",
+        "every ws whose v is in $params.os.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every ws whose v is in c.os.name as w",
+        "every ws whose v is in c.os.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every ws whose v is in c.pos.name as w",
+        "every ws whose v is in c.pos.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every ws whose v is in pos.name as w",
+        "every ws whose v is in pos.name as w",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

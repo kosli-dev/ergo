@@ -60,7 +60,13 @@ _for_root_why(c, cause, subj) := [t] if {
 	ts != []
 } else := []
 
-_for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": [ts[0]], "root_why": true, "free": true}) if {
+_for_why(first, item, e, names, wh, failure) := object.union(failure, _for_own_why_of(first, e, own)) if {
+	failure != null
+	wh.undecided != []
+	_for_root_fails(item, e, names)
+	own := _for_own_texts(item, e, names)
+	own != []
+} else := object.union(failure, {"why": [ts[0]], "root_why": true, "free": true}) if {
 	failure != null
 	wh.undecided != []
 	ts := [t |
@@ -116,6 +122,51 @@ _for_own_why(true, item, e, names) if {
 	roots := _m_keyed_roots(object.get(names, "ergo/subject", null), c, cause) with input as {"ergo/names": names}
 	_m_own_said(_message(c, fe.iv, cause), roots) with input as {"ergo/names": names}
 }
+
+_for_own_why_of(true, e, own) := {"why": [_m_why_text(_m_item_name(e.i, set()), own[0])]}
+
+_for_own_why_of(false, _, own) := {"own": own}
+
+_for_root_fails(item, e, names) if {
+	some c in item.whose
+	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
+	not cause in {"satisfied", "value"}
+	subj := object.get(names, "ergo/subject", null)
+	count(array.concat(_for_root_why(c, _m_undecided(cause), subj), _m_keyed_off(subj, c, cause))) > 0 with input as {"ergo/names": names}
+}
+
+_for_root_fails(item, e, names) if {
+	some c in item.whose
+	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
+	not cause in {"satisfied", "value"}
+	not _root_read_flaw(object.get(names, "ergo/subject", null), c) in {"", "not_an_object"} with input as {"ergo/names": names}
+}
+
+_for_own_texts(item, e, names) := [t |
+	some c in item.whose
+	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
+	not cause in {"satisfied", "value"}
+	fe := _focus_of(e, c)
+	some x in _walk_sides_paths(c)
+	is_array(x[0])
+	not _walk_outside(x[0])
+	own := _read_state(fe.iv, x[0])
+	own in {"absent", "null", "unusable", "not_an_object"}
+	subj := object.get(names, "ergo/subject", null)
+	roots := {piece | some r in array.concat(array.concat(_for_root_why(c, _m_undecided(own), subj), _m_keyed_off(subj, c, own)), _m_cond_root_texts(subj, c)); some piece in split(r, "; ")} with input as {"ergo/names": names}
+	said := _message(c, fe.iv, own) with input as {"ergo/names": names}
+	parts := [y | some z in split(said, "; "); some y in split(z, ", and "); not y in roots; not regex.match(`^and [0-9]+ more$`, y)]
+	parts != []
+	t := _m_aliased(concat(", and ", parts))
+]
+
+_m_inner_text(check, f) := [_m_why_text(_m_for_item_name(check, f.path), f.own[0])] if count(object.get(f, "own", [])) > 0
+
+else := _m_root_why(f)
+
+_m_inner_free(f) := false if count(object.get(f, "own", [])) > 0
+
+else := object.get(f, "free", false)
 
 _m_own_said(said, roots) if {
 	some x in split(said, "; ")
@@ -562,19 +613,28 @@ _m_root_problem(leaf, shown, subj, cause) := _rwalk_text(subj, shown) if {
 }
 
 else := concat("", [_input_name(shown), " is missing"]) if {
+	not _m_walks_root(leaf, shown, subj)
 	cause == "absent"
 	_any_read_state(subj, shown) == cause
 	i := min({j | some j in numbers.range(1, count(shown)); _any_read_state(subj, array.slice(shown, 0, j)) == cause})
 	i < count(shown)
 	not _has_field_step(array.slice(shown, 0, i))
 } else := _message({"op": "present", "path": shown}, subj, cause) if {
+	not _m_walks_root(leaf, shown, subj)
 	cause in {"absent", "null", "unusable"}
 	_any_read_state(subj, shown) == cause
 } else := _m_isnt(_input_name(shown), v, kind) if {
+	not _m_walks_root(leaf, shown, subj)
 	cause == "unusable"
 	_any_read_state(subj, shown) == "value"
 	v := _value_at(subj, shown)
 	kind := _m_leaf_needs(leaf, v)
+}
+
+_m_walks_root(leaf, shown, subj) if {
+	_list_phrase(leaf)
+	not _one_right(leaf)
+	_rwalking(subj, shown)
 }
 
 _m_leaf_needs(leaf, v) := k if {

@@ -46,9 +46,9 @@ else := _conds_named_inputs(subj, array.concat([check.check], check.whose))
 _conds_named_inputs(subj, conds) := _conds_named_inputs_but(subj, conds, set())
 
 _conds_named_inputs_but(subj, conds, skip) := array.concat(array.concat(_named_inputs(subj, paths), _field_named_inputs(subj, paths)), [x[1] | some x in reads]) if {
-	reads := {x | some x in _listed_reads(subj, conds); not x[0] in skip}
-	listed := {x[0] | some x in reads}
-	paths := [p | some c in conds; some p in _condition_paths(c); not p in listed; not p in skip]
+	per := [_listed_reads(subj, [c]) | some c in conds]
+	reads := {x | some xs in per; some x in xs; not x[0] in skip}
+	paths := [p | some i, c in conds; listed := {x[0] | some x in per[i]}; some p in _condition_paths(c); not p in listed; not p in skip]
 }
 
 _listed_reads(subj, conds) := {[c.right, {"name": w.name, "value": w.value, "locations": w.locations}] |

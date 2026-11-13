@@ -426,7 +426,8 @@ _m_cond_message(c, item, cause) := concat(", and ", cs) if {
 	cs != []
 } else := concat(", and ", cs) if {
 	cause == "unusable"
-	cs := _once(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, c), _m_blocked(item, c)), _m_faults(item, c)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
+	wc := _m_walked(c, item)
+	cs := _once(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, wc), _m_blocked(item, wc)), _m_faults(item, wc)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
 	cs != []
 } else := _m_fallback(c)
 

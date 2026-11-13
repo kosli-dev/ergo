@@ -872,7 +872,7 @@ _for_failed(check, cause, fails) := [object.union(object.union({"path": _failed_
 
 _for_unchecked(_, []) := {}
 
-_for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_root_why(f), "free": object.get(f, "free", false)} |
+_for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_inner_text(check, f), "free": _m_inner_free(f)} |
 	some p in sort({f.path | some f in inner})
 	some f in inner
 	f.path == p
