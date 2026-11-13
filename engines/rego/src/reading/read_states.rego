@@ -276,23 +276,9 @@ _cause_precedence := ["not_an_object", "ambiguous", "unusable", "absent", "null"
 
 _worst_read(subj, check) := _read_cause(subj, check, refs, {_used_ref_state(check, r) | some r in refs}) if refs := _check_refs(check)
 
-_read_cause(subj, check, _, states) := _worst_of(states | _other_side_states(check, subj)) if {
+_read_cause(_, _, _, states) := _worst_of(states) if {
 	some state in states
 	state != "value"
-}
-
-_other_side_states(check, subj) := {s |
-	check.op == "compare"
-	not _list_cmp(check)
-	some p in _read_paths(check)
-	not _has_ref_step(p)
-	s := _read_state(subj, p)
-	s != "value"
-}
-
-_has_ref_step(p) if {
-	some step in p
-	_is_ref(step)
 }
 
 _read_cause(_, _, refs, states) := "value" if {
@@ -412,13 +398,21 @@ _used_ref_state(check, r) := "not_an_object" if {
 } else := _ref_state(r)
 
 _key_of_input_path(check, r) if {
-	some p in _read_paths(check)
+	walk(check, [q, p])
+	is_array(p)
 	count(p) > 1
 	p[0] == "$$input"
-	is_string(p[1])
+	not _index_step(p[1])
 	{"ref": r} in p
+	not _under_literal(check, q)
+	not _tallied_at(q)
 	object.get(check, "ergo/for", false) == false
 	_no_for_alias
+}
+
+_tallied_at(q) if {
+	some seg in q
+	seg in {"count_of", "sum_of"}
 }
 
 _no_for_alias if {

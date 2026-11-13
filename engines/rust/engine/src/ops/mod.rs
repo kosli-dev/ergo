@@ -344,7 +344,7 @@ pub struct Ran {
 pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
     match check {
         Check::Walk(check) => {
-            let run = walk::run(check, ctx);
+            let run = crate::path::item_by_item(|| walk::run(check, ctx));
             Ran {
                 verdict: run.verdict,
                 failed_items: Some(run.failed_items),
@@ -353,7 +353,7 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
             }
         }
         Check::For(check) => {
-            let run = check.run(ctx);
+            let run = crate::path::item_by_item(|| check.run(ctx));
             Ran {
                 verdict: run.verdict,
                 failed_items: Some(run.failed_items),
@@ -378,8 +378,8 @@ pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
         Check::Equals(check) => equals::run(check, ctx),
         Check::Range(check) => range::run(check, ctx),
         Check::Tally(check) => tally::run(check, ctx),
-        Check::Walk(check) => walk::run(check, ctx).verdict,
-        Check::For(check) => check.run(ctx).verdict,
+        Check::Walk(check) => crate::path::item_by_item(|| walk::run(check, ctx)).verdict,
+        Check::For(check) => crate::path::item_by_item(|| check.run(ctx)).verdict,
         Check::AnyOf(check) => any_of::run(check, ctx),
         Check::In(check) => lists::run_in(check, ctx),
         Check::Contains(check) => lists::run_contains(check, ctx),

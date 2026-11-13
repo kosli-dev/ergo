@@ -1184,6 +1184,12 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
         .collect()
 }
 
+fn keyed_by_a_list_input(path: &Path, ctx: &Ctx) -> bool {
+    path::step_refs(path)
+        .iter()
+        .any(|reference| super::lists::input_one_path(reference, ctx))
+}
+
 pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String> {
     let mut out = Vec::new();
     {
@@ -1212,6 +1218,11 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                 }
                 Some(Cause::Null) if cause == Cause::Null => {
                     out.push(format!("{} is null", walked.name));
+                }
+                Some(Cause::NotAnObject)
+                    if cause == Cause::NotAnObject && keyed_by_a_list_input(&counted.path, ctx) =>
+                {
+                    out.push(super::message::isnt("$input", ctx.input, "an object"));
                 }
                 Some(Cause::Unusable) if cause == Cause::Unusable => {
                     let blocked = if walk::through_a_list(&counted.path, &outer) {

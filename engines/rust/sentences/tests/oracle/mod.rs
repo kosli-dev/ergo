@@ -5,6 +5,14 @@ pub mod checks;
 pub const FROM_OK: &[(&str, &str)] = &[
     ("commits", "commits"),
     (
+        "$input whose k is $input.m named by $params.k",
+        "$input whose k equals $input.m named by $params.k",
+    ),
+    (
+        "$input whose k is m named by $input.k",
+        "$input whose k equals m named by $input.k",
+    ),
+    (
         "commits whose merged is true",
         "commits whose merged is true",
     ),

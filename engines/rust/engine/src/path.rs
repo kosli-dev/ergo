@@ -221,6 +221,12 @@ pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
         }
         Step::Ref(reference) => {
             let read = read(reference, ctx);
+            if reference.start == Start::Input
+                && read.outcome == Outcome::NotAnObject
+                && in_item_by_item()
+            {
+                return Err(Outcome::Unusable);
+            }
             if read.outcome != Outcome::Found {
                 return Err(read.outcome);
             }
@@ -300,6 +306,7 @@ pub fn part_tag(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
 pub fn read<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
     let mut walked = walk(path, ctx);
     if !walked.step_unreadable
+        && !(reads_a_list_input(path, ctx) && walked.outcome == Outcome::NotAnObject)
         && matches!(
             walked.outcome,
             Outcome::Absent | Outcome::Null | Outcome::Unusable | Outcome::NotAnObject
@@ -319,6 +326,29 @@ pub fn read<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
     walked
 }
 
+thread_local! {
+    static ITEM_BY_ITEM: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Runs `run`, the check of a `for` line or a one-line `every` or `some`,
+/// and returns what it returns. While it runs, a key read from an input that
+/// is a list, like `$input.k`, ends `Unusable`, and a path from such an input
+/// whose key can't be read ends with the key's outcome.
+pub fn item_by_item<T>(run: impl FnOnce() -> T) -> T {
+    let before = ITEM_BY_ITEM.with(|flag| flag.replace(true));
+    let out = run();
+    ITEM_BY_ITEM.with(|flag| flag.set(before));
+    out
+}
+
+fn in_item_by_item() -> bool {
+    ITEM_BY_ITEM.with(std::cell::Cell::get)
+}
+
+fn reads_a_list_input(path: &Path, ctx: &Ctx) -> bool {
+    path.start == Start::Input && ctx.input.is_array() && !in_item_by_item()
+}
+
 fn walk<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
     let (mut value, mut location, from_subject) = match start_of(&path.start, ctx) {
         Ok(found) => found,
@@ -326,6 +356,9 @@ fn walk<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
     };
     let steps = leading_steps(&path.start).iter().chain(path.steps.iter());
     for (at, step) in steps.enumerate() {
+        if at == 0 && reads_a_list_input(path, ctx) && matches!(step, Step::Ref(_)) {
+            return ended(Outcome::NotAnObject, location);
+        }
         let resolved = match resolve(step, ctx) {
             Ok(resolved) => resolved,
             Err(outcome) => {
@@ -465,6 +498,31 @@ mod tests {
             assert_eq!(o, Outcome::Found, "{text}");
             assert_eq!(value, Some(v(text)));
             assert_eq!(l, loc("/s"));
+        }
+    }
+
+    #[test]
+    fn a_path_from_a_list_input_is_not_an_object_whatever_its_key_holds_but_item_by_item() {
+        let params_key = Step::Ref(Box::new(at(Start::Params, vec![key("k")])));
+        let input_key = Step::Ref(Box::new(at(Start::Input, vec![key("k")])));
+        for params in ["{}", r#"{"k": null}"#, r#"{"k": 3}"#, r#"{"k": "a"}"#] {
+            let w = World::new(r#"{"m": {"a": 1}}"#)
+                .with_input(r#"[{"m": {"a": 1}}]"#)
+                .with_params(params);
+            let from_input = at(Start::Input, vec![key("m"), params_key.clone()]);
+            let whole = at(Start::Input, vec![params_key.clone()]);
+            let keyed = subject_path(vec![key("m"), input_key.clone()]);
+            for path in [&from_input, &whole, &keyed] {
+                assert_eq!(w.run(path).0, Outcome::NotAnObject, "{params} {path:?}");
+            }
+            let walked = item_by_item(|| (w.run(&from_input).0, w.run(&keyed).0));
+            let key_outcome = match params {
+                "{}" => Outcome::Absent,
+                r#"{"k": null}"# => Outcome::Null,
+                r#"{"k": 3}"# => Outcome::Unusable,
+                _ => Outcome::NotAnObject,
+            };
+            assert_eq!(walked, (key_outcome, Outcome::Unusable), "{params}");
         }
     }
 

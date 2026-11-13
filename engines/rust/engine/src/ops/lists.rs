@@ -970,7 +970,7 @@ pub fn one_rights(check: &super::Check) -> Vec<&Path> {
     out
 }
 
-fn input_one_path(path: &Path, ctx: &Ctx) -> bool {
+pub(super) fn input_one_path(path: &Path, ctx: &Ctx) -> bool {
     path.start == Start::Input
         && ctx.input.is_array()
         && matches!(
@@ -981,7 +981,8 @@ fn input_one_path(path: &Path, ctx: &Ctx) -> bool {
 
 pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
     let mut paths: Vec<&Path> = match check {
-        super::Check::Compare(c) => [&c.left, &c.right]
+        super::Check::Compare(super::compare::Compare { left, right, .. })
+        | super::Check::CompareTime(super::time::CompareTime { left, right, .. }) => [left, right]
             .into_iter()
             .flat_map(|side| match side {
                 super::compare::Side::Join(pieces) => pieces.iter().collect(),
