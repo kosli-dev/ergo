@@ -368,12 +368,31 @@ _m_off_item(subj, c, "unusable") := _once(array.concat(
 	],
 ))
 
-_m_walked_root_text(c, cause) := _rwalk_text(null, p) if {
-	_list_cmp(c)
+_m_walked_root_text(c, cause) := ts[0] if {
+	ts := [t |
+		some p in _m_walked_roots(c)
+		t := _m_walked_root_fault(c, _as_subject_part(p), object.get(input, ["ergo/names", "ergo/subject"], null), cause)
+	]
+	count(ts) > 0
+}
+
+_m_walked_roots(c) := [p |
+	_list_phrase(c)
 	not _one_right(c)
-	p := _rpath(c.right)
+	some p in _m_root_paths(c)
+	_walk_outside(p)
 	_walking_root(c, p)
-	_rwalk(null, p).state == cause
+]
+
+_m_walked_root_fault(c, shown, x, cause) := _rwalk_text(x, shown) if {
+	w := _rwalk(x, shown)
+	w.failed
+	w.state == cause
+} else := _m_isnt(w.name, w.value, k) if {
+	cause == "unusable"
+	w := _rwalk(x, shown)
+	not w.failed
+	k := _m_leaf_needs(c, w.value)
 }
 
 _m_off_right(subj, c) := [_m_isnt(_root_label(p), _root_value(subj, p), k) |

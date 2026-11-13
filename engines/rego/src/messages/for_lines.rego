@@ -7,7 +7,7 @@ _for_is_free(item, names) if _for_free(item, names)
 else := false
 
 _for_free(item, names) if {
-	aliases := {concat("", ["$", a]) | some a, _ in names; not startswith(a, "ergo/")}
+	aliases := {concat("", ["$", a]) | some a, _ in names; not startswith(a, "ergo/"); not a in object.keys(_for_names)}
 	not _for_reads_alias(item, aliases)
 }
 
@@ -34,7 +34,45 @@ _for_why(_, _, _, _, wh, failure) := failure if {
 	wh.undecided == []
 }
 
-_for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": [_m_tally_item("count_of", e, set())[0][1]]}) if {
+_for_counts_a_root(c) if {
+	walk(c, [_, y])
+	is_object(y)
+	some f in ["count_of", "sum_of"]
+	p := object.get(y, f, null)
+	is_array(p)
+	_m_off_path(p)
+}
+
+_for_own_read_fails(c, e) if {
+	fe := _focus_of(e, c)
+	some x in _walk_sides_paths(c)
+	is_array(x[0])
+	not _walk_outside(x[0])
+	_read_state(fe.iv, x[0]) in {"absent", "null", "unusable", "not_an_object"}
+}
+
+_for_root_why(c, cause, subj) := [t] if {
+	t := _m_walked_root_text(c, cause)
+} else := ts if {
+	_for_counts_a_root(c)
+	_root_read_flaw(subj, c) == cause
+	ts := _m_cond_root_texts(subj, c)
+	ts != []
+} else := []
+
+_for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": [ts[0]], "root_why": true, "free": true}) if {
+	failure != null
+	wh.undecided != []
+	ts := [t |
+		some c in item.whose
+		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
+		not cause in {"satisfied", "value"}
+		not _for_own_read_fails(c, e)
+		said := _for_root_why(c, _m_undecided(cause), object.get(names, "ergo/subject", null)) with input as {"ergo/names": names}
+		some t in said
+	]
+	count(ts) > 0
+} else := object.union(failure, {"why": [_m_tally_item("count_of", e, set())[0][1]]}) if {
 	failure != null
 	wh.undecided != []
 	some c in item.whose
@@ -165,10 +203,30 @@ _m_list_found(subj, path) := [_m_is(_input_name(p), _value_at(subj, p))] if {
 	p := array.slice(path, 0, i)
 } else := []
 
-_for_message(check, _, r) := _m_for_joined(array.concat(
-	[{"i": i, "t": p, "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) == true; some j, p in _m_for_part(check, r.failed, i, f)],
-	[{"i": i, "t": p, "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) != true; some j, p in _m_for_part(check, r.failed, i, f)],
-)) if r.failed != []
+_for_message(check, _, r) := _m_for_joined(_for_ents(check, r)) if r.failed != []
+
+_for_message_parts(check, subj, r) := _once([e.t | some e in _for_ents(check, r)]) if r.failed != []
+
+else := split(_for_message(check, subj, r), "; ")
+
+_for_ents(check, r) := array.concat(
+	[{"i": i, "t": _m_for_unled(said, p), "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) == true; some j, p in _m_for_part(check, r.failed, i, f)],
+	[{"i": i, "t": _m_for_unled(said, p), "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) != true; some j, p in _m_for_part(check, r.failed, i, f)],
+) if said := _m_for_said(check)
+
+_m_for_said(check) := {t |
+	walk(check, [_, c])
+	is_object(c)
+	_list_phrase(c)
+	some cause in ["absent", "null", "unusable"]
+	t := _m_walked_root_text(c, cause)
+}
+
+_m_for_unled(said, p) := t if {
+	startswith(p, "item ")
+	some t in said
+	endswith(p, concat("", [": ", t]))
+} else := p
 
 _m_for_joined(ents) := concat("; ", _once([e.t | some e in ents])) if count(_once([e.t | some e in ents; e.x == false])) <= 3
 
@@ -241,12 +299,23 @@ _m_for_groups(f) := _m_groups(_once([q | some ps in lines; some p in ps; q := _m
 _m_unskipped(p, skip) := p if skip == []
 
 else := concat("; ", [y |
-	some x in split(p, "; ")
-	not x in skip
-	not _m_after_lead(_m_lead_of(x), x) in skip
+	xs := split(p, "; ")
+	some x in xs
+	not _m_skipped(x, skip)
+	not _m_more_of_skipped(x, xs, skip)
 	y := concat(", and ", [z | some z in split(x, ", and "); not z in skip])
 	y != ""
 ])
+
+_m_skipped(x, skip) if x in skip
+
+_m_skipped(x, skip) if _m_after_lead(_m_lead_of(x), x) in skip
+
+_m_more_of_skipped(x, xs, skip) if {
+	regex.match(`^and [0-9]+ more$`, x)
+	some y in xs
+	_m_skipped(y, skip)
+}
 
 default _m_extra_part(_, _) := false
 
@@ -410,7 +479,10 @@ _m_listed(names) := concat("", ["item ", concat(" and item ", [m[1] | some m in 
 	count({m[2] | some m in ms}) == 1
 } else := concat(" and ", names)
 
-_m_walk_leaf(e, leaf, cause, roots) := concat(", and ", off) if {
+_m_walk_leaf(e, leaf, cause, roots) := t if {
+	leaf != null
+	t := _m_walked_root_text(leaf, cause)
+} else := concat(", and ", off) if {
 	leaf != null
 	off := _m_keyed_off(object.get(input, ["ergo/names", "ergo/subject"], null), leaf, cause)
 	off != []
@@ -437,6 +509,10 @@ _m_root_alone(leaf, cause) := [m |
 _m_root_problem(leaf, shown, subj, cause) := _rwalk_text(subj, shown) if {
 	_list_phrase(leaf)
 	_rfailed(subj, shown)
+} else := _m_walked_root_fault(leaf, shown, subj, cause) if {
+	_list_phrase(leaf)
+	not _one_right(leaf)
+	_rwalking(subj, shown)
 }
 
 else := concat("", [_input_name(shown), " is missing"]) if {

@@ -1417,7 +1417,25 @@ pub fn root_fault(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
     let mut paths = check.paths();
     paths.extend(super::walk::listed_refs(check));
     paths.into_iter().find_map(|path| {
-        if !reads_from_a_root(path) || path::read(path, ctx).outcome.cause() != Some(cause) {
+        if !reads_from_a_root(path) {
+            return None;
+        }
+        if lists::right_paths(check).contains(&path) && lists::walked_in(check, path, ctx).is_some()
+        {
+            return lists::walked_root_fault(check, path, ctx)
+                .filter(|(found, _)| *found == cause)
+                .map(|(_, text)| text);
+        }
+        if let Check::Tally(tally) = check
+            && tally.counted_paths().contains(&path)
+            && (lists::starts_at_a_list(path, ctx) || lists::walked(path, ctx).is_some())
+        {
+            return super::tally::counted_faults(tally, path, ctx)
+                .into_iter()
+                .find(|(found, _)| *found == cause)
+                .map(|(_, text)| text);
+        }
+        if path::read(path, ctx).outcome.cause() != Some(cause) {
             return None;
         }
         Some(root_text(path, ctx, cause))

@@ -588,21 +588,31 @@ impl For {
                 .and_then(|(check, verdict)| {
                     let text = (!lost)
                         .then(|| {
-                            super::message::root_fault(check, &outer, verdict.cause).or_else(|| {
-                                (verdict.cause == Cause::Unusable)
-                                    .then(|| {
-                                        check.paths().into_iter().find_map(|path| {
-                                            super::message::reads_from_a_root(path)
-                                                .then(|| {
-                                                    super::message::root_kind_fault(
-                                                        check, path, &outer,
-                                                    )
-                                                })
-                                                .flatten()
+                            super::message::root_flaw(&[check], &outer)
+                                .filter(|(cause, _)| {
+                                    depth > 0
+                                        && *cause == verdict.cause
+                                        && !own_read_fails(check, &focus)
+                                })
+                                .and_then(|(_, text)| text.split("; ").next().map(str::to_string))
+                                .or_else(|| {
+                                    super::message::root_fault(check, &outer, verdict.cause)
+                                })
+                                .or_else(|| {
+                                    (verdict.cause == Cause::Unusable)
+                                        .then(|| {
+                                            check.paths().into_iter().find_map(|path| {
+                                                super::message::reads_from_a_root(path)
+                                                    .then(|| {
+                                                        super::message::root_kind_fault(
+                                                            check, path, &outer,
+                                                        )
+                                                    })
+                                                    .flatten()
+                                            })
                                         })
-                                    })
-                                    .flatten()
-                            })
+                                        .flatten()
+                                })
                         })
                         .flatten()?;
                     Some(if depth > 0 && !reads_alias(check, first_alias) {
@@ -626,12 +636,22 @@ impl For {
                 })
             };
             let why = undecided_whose()
-                .find(|(check, verdict)| !lost && own(check, verdict))
-                .map(|(check, verdict)| {
-                    super::message::prefixed(
-                        &walked.item_name_dotted(walk::focus_segs(w, check)),
-                        &super::message::message(check, &focus, verdict),
-                    )
+                .find_map(|(check, verdict)| {
+                    super::message::root_flaw(&[check], &outer)
+                        .filter(|(cause, _)| {
+                            !lost && *cause == verdict.cause && !own_read_fails(check, &focus)
+                        })
+                        .map(|(_, text)| text)
+                })
+                .or_else(|| {
+                    undecided_whose()
+                        .find(|(check, verdict)| !lost && own(check, verdict))
+                        .map(|(check, verdict)| {
+                            super::message::prefixed(
+                                &walked.item_name_dotted(walk::focus_segs(w, check)),
+                                &super::message::message(check, &focus, verdict),
+                            )
+                        })
                 })
                 .or_else(|| {
                     undecided_whose().next().map(|(check, verdict)| {
@@ -2104,6 +2124,36 @@ impl For {
         (run, free, hoisted, false)
     }
 
+    fn walked_root_texts(&self, ctx: &Ctx) -> Vec<String> {
+        let outer = outer_ctx(ctx);
+        let mut checks: Vec<&Check> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .collect();
+        for sentence in &self.sentences {
+            checks.push(&sentence.check);
+            checks.extend(nested_whose(&sentence.check, false));
+            if let Check::Walk(walk) = &sentence.check {
+                checks.push(&walk.check);
+            }
+        }
+        let mut texts: Vec<String> = Vec::new();
+        for check in checks {
+            for path in super::lists::right_paths(check) {
+                if !super::message::reads_from_a_root(path) {
+                    continue;
+                }
+                if let Some((_, text)) = super::lists::walked_root_fault(check, path, &outer)
+                    && !texts.contains(&text)
+                {
+                    texts.push(text);
+                }
+            }
+        }
+        texts
+    }
+
     fn run_items_of(&self, ctx: &Ctx, skip: Vec<String>) -> (Run, Vec<String>, Vec<String>) {
         let first = &self.items[0];
         let whole_subject = !ctx.subject.value.is_object()
@@ -2199,12 +2249,23 @@ impl For {
             .map(|text| unskipped(text, &collect.skip))
             .filter(|text| !text.is_empty())
             .collect();
+        let roots = self.walked_root_texts(ctx);
         let said: Vec<Said> = said
             .into_iter()
-            .map(|(order, text, extra)| (order, unskipped(&text, &collect.skip), extra))
+            .map(|(order, text, extra)| {
+                (
+                    order,
+                    unled(&roots, &unskipped(&text, &collect.skip)),
+                    extra,
+                )
+            })
             .filter(|(_, text, _)| !text.is_empty())
             .collect();
-        let message = if flawed
+        let message = if flawed && !roots.is_empty() {
+            let mut roots = roots.clone();
+            roots.sort();
+            Some(super::message::joined(roots))
+        } else if flawed
             || said.is_empty()
                 && failed.is_empty()
                 && !matches!(cause, Cause::Satisfied | Cause::NotAnObject)
@@ -2774,16 +2835,19 @@ fn unskipped(text: &str, skip: &[String]) -> String {
         return text.to_string();
     }
     let skipped = |part: &str| skip.iter().any(|s| s == part);
+    let dropped = |part: &str| {
+        let lead = lead_of(part);
+        let after = if lead.is_empty() {
+            part
+        } else {
+            part.strip_prefix(&format!("{lead}: ")).unwrap_or(part)
+        };
+        skipped(part) || skipped(after)
+    };
+    let more = regex::Regex::new(r"^and [0-9]+ more$").expect("a valid pattern");
+    let any_dropped = text.split("; ").any(dropped);
     text.split("; ")
-        .filter(|part| {
-            let lead = lead_of(part);
-            let after = if lead.is_empty() {
-                *part
-            } else {
-                part.strip_prefix(&format!("{lead}: ")).unwrap_or(part)
-            };
-            !skipped(part) && !skipped(after)
-        })
+        .filter(|part| !dropped(part) && !(any_dropped && more.is_match(part)))
         .map(|part| {
             part.split(", and ")
                 .filter(|piece| !skipped(piece))
@@ -2793,6 +2857,29 @@ fn unskipped(text: &str, skip: &[String]) -> String {
         .filter(|part| !part.is_empty())
         .collect::<Vec<_>>()
         .join("; ")
+}
+
+fn own_read_fails(check: &Check, focus: &Ctx) -> bool {
+    let counts_a_root = matches!(check, Check::Tally(tally) if tally
+        .counted_paths()
+        .iter()
+        .any(|path| super::message::reads_from_a_root(path)));
+    !counts_a_root
+        || check.paths().into_iter().any(|path| {
+            matches!(path.start, Start::Subject | Start::Own)
+                && path::read(path, focus).outcome.cause().is_some()
+        })
+}
+
+fn unled(roots: &[String], text: &str) -> String {
+    if text.starts_with("item ")
+        && let Some(root) = roots
+            .iter()
+            .find(|root| text.ends_with(&format!(": {root}")))
+    {
+        return root.clone();
+    }
+    text.to_string()
 }
 
 fn unmarked(text: &str) -> String {

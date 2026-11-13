@@ -8441,6 +8441,62 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("r.n is 1", "r.n is 1", &[], &[]),
     ("w.x is \"bob\"", "w.x is \"bob\"", &[], &[]),
+    (
+        "count of m.ws whose n is count of pl.k is at least 0",
+        "count of m.ws whose n equals count of pl.k is at least 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of m.ws whose v is in $input.os.name is 2",
+        "count of m.ws whose v is in $input.os.name is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of m.ws whose v is in pos.name is 2",
+        "count of m.ws whose v is in pos.name is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v is in pos.name is 2",
+        "count of rows whose v is in pos.name is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v matches pl.z is 0",
+        "count of xs whose v matches pl.z is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys whose n matches art.cov.z is 0",
+        "count of ys whose n matches art.cov.z is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in $input.os.name exists",
+        "every rows whose v is in $input.os.name exists",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in pos.name exists",
+        "every rows whose v is in pos.name exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.v matches pl.z",
+        "every xs.v matches pl.z",
+        &[],
+        &[],
+    ),
+    ("r.n is at least 0", "r.n is at least 0", &[], &[]),
+    ("w.n is at least 0", "w.n is at least 0", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -12590,6 +12646,48 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every rows whose v is in c.pos.name as r",
         "every rows whose v is in c.pos.name as r",
+        &[],
+        &[],
+    ),
+    (
+        "every ms as m, every m.ws whose n is count of pl.k, if any, as w",
+        "every ms as m, every m.ws whose n equals count of pl.k, if any, as w",
+        &[],
+        &[],
+    ),
+    (
+        "every ms as m, every m.ws whose n is count of pl.z, if any, as w",
+        "every ms as m, every m.ws whose n equals count of pl.z, if any, as w",
+        &[],
+        &[],
+    ),
+    (
+        "every ms as m, every m.ws whose v is in pos.name as w",
+        "every ms as m, every m.ws whose v is in pos.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose n is count of pl.z as r",
+        "every rows whose n equals count of pl.z as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose n is count of pl.z, if any, as r",
+        "every rows whose n equals count of pl.z, if any, as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose n is sum of $input.os.k, if any, as r",
+        "every rows whose n equals sum of $input.os.k, if any, as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose n is sum of pos.k, if any, as r",
+        "every rows whose n equals sum of pos.k, if any, as r",
         &[],
         &[],
     ),

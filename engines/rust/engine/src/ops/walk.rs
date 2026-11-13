@@ -1012,8 +1012,10 @@ fn root_alone(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
                 .contains(&path)
                 .then(|| super::lists::walked_in(check, path, ctx))
                 .flatten();
-            if let Some(listed) = listed {
-                return (listed.cause == Some(cause)).then_some(listed.text);
+            if listed.is_some() {
+                return super::lists::walked_root_fault(check, path, ctx)
+                    .filter(|(found, _)| *found == cause)
+                    .map(|(_, text)| text);
             }
             let read = path::read(path, ctx);
             let state = read.outcome.cause();
