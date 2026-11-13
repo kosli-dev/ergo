@@ -8568,6 +8568,111 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("r.v is \"a\"", "r.v is \"a\"", &[], &[]),
     ("w.n is 2", "w.n is 2", &[], &[]),
+    (
+        "count of d.ks.name is 1",
+        "count of d.ks.name is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose $params.who is in pos.name is 3",
+        "count of rows whose $params.who is in pos.name is 3",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose n is count of pos.name is 1",
+        "count of rows whose n equals count of pos.name is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v is in $input.os.name is 0",
+        "count of rows whose v is in $input.os.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v is in pos.name is 0",
+        "count of rows whose v is in pos.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v matches pos.name is 0",
+        "count of rows whose v matches pos.name is 0",
+        &[],
+        &[],
+    ),
+    ("count of zz.a is r.n", "count of zz.a equals r.n", &[], &[]),
+    (
+        "every d.ks.name is \"a\"",
+        "every d.ks.name is \"a\"",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in pos.name, if any, exists",
+        "every rows whose v is in pos.name, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose v is in d.ks.name is at least 0",
+        "every rows.n whose v is in d.ks.name is at least 0",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.v, if any, is in pos.name",
+        "every rows.v, if any, is in pos.name",
+        &[],
+        &[],
+    ),
+    ("m is \"a\"", "m is \"a\"", &[], &[]),
+    ("m.ws is not empty", "m.ws is not empty", &[], &[]),
+    ("r.n is 2", "r.n is 2", &[], &[]),
+    (
+        "r.v is in $input.os.name",
+        "r.v is in $input.os.name",
+        &[],
+        &[],
+    ),
+    (
+        "some d.ks.name is \"a\"",
+        "some d.ks.name is \"a\"",
+        &[],
+        &[],
+    ),
+    (
+        "some rows.v is in pos.name",
+        "some rows.v is in pos.name",
+        &[],
+        &[],
+    ),
+    (
+        "sum of rows.n whose $params.w is in pos.name is 1",
+        "sum of rows.n whose $params.w is in pos.name is 1",
+        &[
+            "whose pos.name: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose pos.name: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+    ),
+    (
+        "sum of rows.n whose $params.who is in pos.name is 2",
+        "sum of rows.n whose $params.who is in pos.name is 2",
+        &[
+            "whose pos.name: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose pos.name: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+    ),
+    ("v is in d.ks.name", "v is in d.ks.name", &[], &[]),
+    ("v is in pd.ks.name", "v is in pd.ks.name", &[], &[]),
+    ("w.v is in os.name", "w.v is in os.name", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -12850,6 +12955,60 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every ws whose v is in pos.name as w",
         "every ws whose v is in pos.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every deps as d, every d.ks.name as m",
+        "every deps as d, every d.ks.name as m",
+        &[],
+        &[],
+    ),
+    (
+        "every deps as d, some rows whose v is in d.name as r",
+        "every deps as d, some rows whose v is in d.name as r",
+        &[],
+        &[],
+    ),
+    (
+        "every ms as m, every m.ws as w",
+        "every ms as m, every m.ws as w",
+        &[],
+        &[],
+    ),
+    (
+        "every ms whose n is count of pos.name as m",
+        "every ms whose n equals count of pos.name as m",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in $input.os.name as r",
+        "every rows whose v is in $input.os.name as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in $params.os.name as r",
+        "every rows whose v is in $params.os.name as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in $params.zz and whose v is in pos.name as r",
+        "every rows whose v is in $params.zz and whose v is in pos.name as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in pos.name and whose v is in $params.zz as r",
+        "every rows whose v is in pos.name and whose v is in $params.zz as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in pos.name, if any, as r",
+        "every rows whose v is in pos.name, if any, as r",
         &[],
         &[],
     ),

@@ -589,7 +589,7 @@ impl For {
                     if lost {
                         return None;
                     }
-                    let said = own_beside_root(check, &outer, &focus, verdict.cause)?;
+                    let said = own_beside_root(check, &outer, &focus, verdict.cause, depth > 0)?;
                     let name = walked.item_name_dotted(walk::focus_segs(w, check));
                     let name = if depth > 0 { self.strip(&name) } else { name };
                     Some(super::message::prefixed(&name, &said))
@@ -1740,10 +1740,12 @@ impl For {
             Named::Ahead(texts) => (texts, true),
         };
         let failed = !run.failed_items.is_empty();
+        let pieces = super::message::root_pieces(&roots);
         let free: Vec<String> = if failed || alone {
-            free.iter()
-                .map(|text| unskipped(text, &roots))
+            super::message::without_roots(&free.join("; "), &pieces)
+                .split("; ")
                 .filter(|text| !text.is_empty())
+                .map(str::to_string)
                 .collect()
         } else {
             Vec::new()
@@ -1785,10 +1787,13 @@ impl For {
             }
         }
         let once = ordered;
-        let mut parts = super::message::capped_units(once.clone());
+        let mut parts = super::message::capped_units(super::message::whole_units(
+            once.clone(),
+            &self.walked_root_texts(ctx),
+        ));
         if let Some(items) = items {
             parts.extend(
-                items
+                super::message::without_roots(&items, &pieces)
                     .split("; ")
                     .filter(|part| {
                         !part.is_empty()
@@ -2299,10 +2304,22 @@ impl For {
             .filter(|text| !text.is_empty())
             .collect();
         let roots = self.walked_root_texts(ctx);
+        let pieces = super::message::root_pieces(
+            &collect
+                .skip
+                .iter()
+                .chain(roots.iter())
+                .cloned()
+                .collect::<Vec<_>>(),
+        );
         let said: Vec<Said> = said
             .into_iter()
             .flat_map(|(order, text, extra)| {
-                unled(&roots, &unskipped(&text, &collect.skip))
+                let mut texts = unled(&roots, &text);
+                if let Some(own) = texts.pop() {
+                    texts.push(super::message::without_roots(&own, &pieces));
+                }
+                texts
                     .into_iter()
                     .map(move |text| (order.clone(), text, extra))
             })
@@ -2906,10 +2923,16 @@ fn unskipped(text: &str, skip: &[String]) -> String {
         .join("; ")
 }
 
-fn own_beside_root(check: &Check, outer: &Ctx, focus: &Ctx, cause: Cause) -> Option<String> {
+fn own_beside_root(
+    check: &Check,
+    outer: &Ctx,
+    focus: &Ctx,
+    cause: Cause,
+    rootless: bool,
+) -> Option<String> {
     let flaw = super::message::root_flaw(&[check], outer);
     let fault = super::message::root_fault(check, outer, cause);
-    if flaw.is_none() && fault.is_none() {
+    if !rootless && flaw.is_none() && fault.is_none() {
         return None;
     }
     let own = check.paths().into_iter().find_map(|path| {
@@ -3398,6 +3421,13 @@ fn root_rank(path: &Path) -> (u8, String) {
     }
 }
 
+fn bound_alias(root: &Path, ctx: &Ctx) -> bool {
+    match &root.start {
+        Start::Alias(name) => ctx.aliases.contains_key(name),
+        _ => true,
+    }
+}
+
 fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
     let mut texts: Vec<String> = Vec::new();
     let mut causes: Vec<Cause> = Vec::new();
@@ -3436,6 +3466,16 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
                 if path::is_root(&root.start)
                     || (!ctx.subject.value.is_array() && super::lists::walked(root, ctx).is_some())
                 {
+                    if let Check::Tally(tally) = check
+                        && bound_alias(root, ctx)
+                        && nested_whose(check, false).is_empty()
+                        && root
+                            .steps
+                            .iter()
+                            .all(|step| matches!(step, Step::Key(_) | Step::Index(_)))
+                    {
+                        found.extend(super::tally::counted_faults(tally, root, ctx));
+                    }
                     continue;
                 }
             }
@@ -3444,6 +3484,14 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
             if super::lists::right_paths(check).contains(&root)
                 && super::lists::walked_in(check, root, ctx).is_some()
             {
+                if bound_alias(root, ctx)
+                    && let Some(fault) = super::lists::walked_root_fault(check, root, ctx)
+                    && fault.0 != Cause::Value
+                    && !fault.1.starts_with('.')
+                    && !fault.1.contains(" of .")
+                {
+                    found.push(fault);
+                }
                 continue;
             }
             if !(part && read.outcome.cause().is_some())

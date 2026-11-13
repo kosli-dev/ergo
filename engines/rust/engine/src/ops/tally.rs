@@ -630,14 +630,11 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
 }
 
 fn walked_list(walked: &walk::Walked, path: &Path, outer: &Ctx) -> Input {
+    let (value, locations) = walked.listed();
     Input {
         name: walked.name.clone(),
-        value: Value::Array(walked.items.iter().map(walk::WalkItem::shown).collect()),
-        locations: walked
-            .items
-            .iter()
-            .map(|item| item.end_location.render())
-            .collect(),
+        value: Value::Array(value),
+        locations,
         part: path::part_tag(path, outer).map(|(name, id)| Part { name, id }),
         state: crate::path::Outcome::Found,
         null_at: None,
@@ -1309,9 +1306,25 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
             .iter()
             .map(|f| (f.cause, f.msg.clone()))
             .collect();
-        let root_texts: Vec<String> = any_root
+        let mut root_texts: Vec<String> = any_root
             .map(|(_, text)| text.split("; ").map(str::to_string).collect())
             .unwrap_or_default();
+        if !walked.failures.is_empty() {
+            let walked_roots: Vec<String> = whose
+                .iter()
+                .flat_map(|check| {
+                    super::lists::right_paths(check)
+                        .into_iter()
+                        .filter(|path| super::message::reads_from_a_root(path))
+                        .filter_map(|path| super::lists::walked_root_fault(check, path, &outer))
+                        .map(|(_, text)| text)
+                        .collect::<Vec<_>>()
+                })
+                .collect();
+            let pieces = super::message::root_pieces(&walked_roots);
+            root_texts
+                .retain(|text| !pieces.contains(text) && super::message::cap_note(text).is_none());
+        }
         for text in &root_texts {
             always.insert(found.len());
             found.push((cause, text.clone()));
@@ -1362,6 +1375,11 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                             fault
                         } else if let Some(text) = walked_root {
                             text
+                        } else if off.is_empty()
+                            && verdict.cause == Cause::Unusable
+                            && !walk::reads_focus(check)
+                        {
+                            super::message::message(check, &focus, &verdict)
                         } else if off.is_empty() {
                             super::message::prefixed(
                                 &walked.item_name(walk::focus_segs(item, check)),

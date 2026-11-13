@@ -285,6 +285,9 @@ _m_undecided_text(subj, c, e, cause, roots) := _m_isnt(_m_item_name(e.i, roots),
 	cause == "not_an_object"
 	off := _m_input_one_refs(c)
 	off != []
+} else := _m_cond_message(c, e.iv, cause) if {
+	cause == "unusable"
+	not _reads_focus(c)
 } else := _m_leaf_in(e.i, _m_cond_message(c, e.iv, cause), roots)
 
 _m_off_path(p) if {

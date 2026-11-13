@@ -172,11 +172,14 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	ms != []
 ]
 
-_for_row_message(check, subj, r) := _m_joined(array.concat(_m_tally_grouped(check, once), [t | some t in _for_item_parts(check, subj, r, once); t != ""; not t in once])) if {
+_for_row_message(check, subj, r) := _m_joined(array.concat(said, [t | some t in split(_m_without_roots(concat("; ", [p | some p in _for_item_parts(check, subj, r, once); p != ""]), pieces), "; "); t != ""; not t in once])) if {
 	rs := object.get(r, "root_msgs", object.get(r, "other_roots", []))
 	second := {m | some x in _for_second_roots(check, subj); some m in x.ms}
-	once := _once(array.concat(array.concat(array.concat([m | some m in rs; not m in second], [t | some p in _for_free_texts(check, r); t := _m_unskipped(p, rs); t != ""]), _for_hoisted_texts(check, r)), [m | some m in rs; m in second]))
+	first := [m | some m in rs; not m in second]
+	pieces := _m_root_pieces(rs)
+	once := _once(array.concat(array.concat(array.concat(first, [t | some m in _for_free_texts(check, r); some t in split(_m_without_roots(m, pieces), "; "); t != ""]), _for_hoisted_texts(check, r)), [m | some m in rs; m in second]))
 	once != []
+	said := _m_tally_grouped(check, once)
 } else := _for_message(check, subj, r)
 
 _for_hoisted_texts(check, r) := [p |
@@ -204,13 +207,11 @@ _for_free_texts(check, r) := array.concat(
 		some f in r.failed
 		some l in object.get(f, "failed_assertions", [])
 		_for_free_line(check, l)
-		some m in _m_line_msg(l, f)
-		some p in split(m, "; ")
+		some p in _m_line_msg(l, f)
 	],
 	[p |
 		some l in object.get(r, "free_lines", [])
-		some m in l.msg
-		some p in split(m, "; ")
+		some p in l.msg
 	],
 )
 
@@ -342,7 +343,7 @@ _for_shared(check, fails, pre, names) := array.concat([trimmed[i] | some i, f in
 
 _for_free_undecided(check, _, _) := [] if _for_whose_reads(check.items[1].whose, check.items[0].as)
 
-_for_free_undecided(check, pre, names) := [{"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_value(e.v, e, pre), "lines": [], "at": _walk_at(pre, e)} |
+_for_free_undecided(check, pre, names) := [_for_why(true, check.items[1], e, names, wh, {"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_value(e.v, e, pre), "lines": [], "at": _walk_at(pre, e)}) |
 	some e in pre.items
 	wh := _for_whose(check.items[1], e, names)
 	wh.undecided != []
@@ -829,6 +830,17 @@ _m_for_item_name(check, p) := _input_name(array.slice(p, 1, count(p))) if {
 _m_for_item_name(check, p) := _for_item_name(check, p) if {
 	p[0] in {concat("", ["$", item.as]) | some item in check.items}
 	not _m_unaliased(p)
+	not _m_alias_item(p)
+}
+
+_m_for_item_name(check, p) := concat("", ["item ", _literal_text(p[1] + 1), " of ", substring(p[0], 1, -1), ": ", _plain_steps_name(array.slice(p, 2, count(p)))]) if {
+	p[0] in {concat("", ["$", item.as]) | some item in check.items}
+	_m_alias_item(p)
+}
+
+_m_alias_item(p) if {
+	count(p) > 2
+	is_number(p[1])
 }
 
 _m_for_item_name(check, p) := _m_item_name(p, _for_dotted(check)) if not p[0] in {concat("", ["$", item.as]) | some item in check.items}

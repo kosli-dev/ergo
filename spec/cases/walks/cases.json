@@ -135,7 +135,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.null"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": null}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "message": "item 2 of pull_requests: commits is null", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "null", "value": null, "locations": ["/releases/0/pull_requests/1/commits"]}]}
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "item": "pull_requests[1].commits", "locations": ["/releases/0/pull_requests/1/commits"], "path": "pull_requests[1].commits", "value": null}], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/1/commits"], "name": "pull_requests[].commits[].signed", "value": [true, null]}], "message": "item 2 of pull_requests: commits is null", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       },
       {
@@ -315,7 +315,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.null"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": null}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "message": "item 2 of pull_requests: commits is null", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "null", "value": null, "locations": ["/releases/0/pull_requests/1/commits"]}]}
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "item": "pull_requests[1].commits", "locations": ["/releases/0/pull_requests/1/commits"], "path": "pull_requests[1].commits", "value": null}], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/1/commits"], "name": "pull_requests[].commits[].signed", "value": [true, null]}], "message": "item 2 of pull_requests: commits is null", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       },
       {

@@ -19,10 +19,20 @@ _plain_root_states(subj, c) := {st |
 	st in {"absent", "null", "unusable", "not_an_object"}
 }
 
-_root_states(subj, c) := _plain_root_states(subj, c) | {st |
+_root_states(subj, c) := _named_root_states(subj, c) | _walked_root_states(c)
+
+_named_root_states(subj, c) := _plain_root_states(subj, c) | {st |
 	some y in _walked_tallies(c)
 	some st in _walked_tally_states(subj, y)
 	st in {"absent", "null", "unusable", "not_an_object"}
+}
+
+_walked_root_states(c) := {st |
+	walk(c, [_, x])
+	is_object(x)
+	some p in _m_walked_roots(x)
+	some st in ["absent", "null", "unusable", "not_an_object"]
+	_m_walked_root_fault(x, _as_subject_part(p), object.get(input, ["ergo/names", "ergo/subject"], null), st)
 }
 
 _walked_tally_walk(subj, y) := _walk(_walk_start({"path": p}, subj), _walk_keys({"path": p}, subj), true) if p := y[_basic_form(y)]
@@ -66,7 +76,7 @@ _m_cond_root_texts(subj, c) := _once([m |
 else := _m_root_texts_all(subj, c)
 
 _m_root_texts_all(subj, c) := _once([m |
-	states := _root_states(subj, c)
+	states := _named_root_states(subj, c)
 	ys := _walked_tallies(c)
 	some st in _cause_precedence
 	st in states
@@ -418,7 +428,7 @@ _walk_root_msgs(check, subj) := _once(array.concat(
 		],
 		[m |
 			some c in _for_sentence_conds(check)
-			some m in _m_cond_root_texts(subj, c)
+			some m in array.concat(_m_cond_root_texts(subj, c), _m_cond_walked_texts(c))
 		],
 	),
 ))
@@ -445,6 +455,11 @@ _leaf_root_flaw(check, subj) := fl if {
 	_leaf_may_root(check.check)
 	some p in _root_reads(check.check)
 	_root_kind(subj, check.check, p)
+} else := _worst_of(states) if {
+	check.op in {"every", "some"}
+	is_object(object.get(check, "check", null))
+	states := _walked_root_states(check.check)
+	count(states) > 0
 } else := ""
 
 _leaf_may_root(c) if not _leaf_without_roots(c)

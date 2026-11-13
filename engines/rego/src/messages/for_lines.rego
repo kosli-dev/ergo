@@ -66,7 +66,7 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, _for_own_w
 	_for_root_fails(item, e, names)
 	own := _for_own_texts(item, e, names)
 	own != []
-} else := object.union(failure, {"why": [ts[0]], "root_why": true, "free": true}) if {
+} else := object.union(failure, {"why": [_m_aliased(ts[0])], "root_why": true, "free": _for_is_free(item, names)}) if {
 	failure != null
 	wh.undecided != []
 	ts := [t |
@@ -74,10 +74,19 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, _for_own_w
 		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
 		not cause in {"satisfied", "value"}
 		not _for_own_read_fails(c, e)
+		not _for_first_ref_of_kinds(first, c)
 		said := _for_root_why(c, _m_undecided(cause), object.get(names, "ergo/subject", null)) with input as {"ergo/names": names}
 		some t in said
 	]
 	count(ts) > 0
+	not _for_any_ref_of_kinds(first, item)
+} else := object.union(failure, {"own": own}) if {
+	first == false
+	failure != null
+	wh.undecided != []
+	not _for_focus_lost(item, e)
+	own := _for_own_texts(item, e, names)
+	own != []
 } else := object.union(failure, {"why": [_m_tally_item("count_of", e, set())[0][1]]}) if {
 	failure != null
 	wh.undecided != []
@@ -140,6 +149,14 @@ _for_root_fails(item, e, names) if {
 	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
 	not cause in {"satisfied", "value"}
 	not _root_read_flaw(object.get(names, "ergo/subject", null), c) in {"", "not_an_object"} with input as {"ergo/names": names}
+}
+
+_for_root_fails(item, e, names) if {
+	some c in item.whose
+	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
+	not cause in {"satisfied", "value"}
+	_for_counts_a_root(c)
+	_root_read_flaw(object.get(names, "ergo/subject", null), c) == "not_an_object" with input as {"ergo/names": names}
 }
 
 _for_own_texts(item, e, names) := [t |
@@ -856,3 +873,71 @@ _m_applies(evals, req, false) := {"message": concat("; ", ms)} if {
 	ms := _once([evals[n].message | some n in _applies_to_names(req); not evals[n].passed])
 	ms != []
 } else := {"message": concat("", [_text(object.get(req, "subject", null)), " doesn't match"])}
+
+_m_root_pieces(rs) := {p |
+	some m in rs
+	some p in split(m, "; ")
+	not regex.match(`^and [0-9]+ more$`, p)
+}
+
+_m_without_roots(text, pieces) := text if count(pieces) == 0
+
+else := concat("; ", [y |
+	xs := split(text, "; ")
+	some i, x in xs
+	not _m_note_of_root(xs, i, pieces)
+	y := _m_own_part(x, pieces)
+	y != ""
+])
+
+_m_note_of_root(xs, i, pieces) if {
+	i > 0
+	regex.match(`^and [0-9]+ more$`, xs[i])
+	_m_own_part(xs[i - 1], pieces) == ""
+}
+
+_m_own_part(x, pieces) := _m_own_joined([_m_own_piece(z, pieces) | some z in split(x, ", and ")])
+
+_m_own_piece(z, pieces) := {"gone": true} if z in pieces
+
+else := {"lead": substring(z, 0, (count(z) - n) - 2)} if {
+	startswith(z, "item ")
+	ns := [count(t) | some t in pieces; endswith(z, concat("", [": ", t]))]
+	count(ns) > 0
+	n := max(ns)
+}
+
+else := {"text": z}
+
+_m_own_joined(zs) := "" if {
+	every z in zs {
+		not "text" in object.keys(z)
+	}
+}
+
+else := concat("", [zs[0].lead, ": ", concat(", and ", [z.text | some z in zs; "text" in object.keys(z)])]) if "lead" in object.keys(zs[0])
+
+else := concat(", and ", [z.text | some z in zs; "text" in object.keys(z)])
+
+_for_focus_lost(item, e) if {
+	some c in item.whose
+	_focus_lost(e, c)
+}
+
+_for_focus_lost(item, e) if {
+	some c in item.whose
+	not is_object(_focus_of(e, c).iv)
+}
+
+_for_any_ref_of_kinds(first, item) if {
+	some c in item.whose
+	_for_first_ref_of_kinds(first, c)
+}
+
+_for_first_ref_of_kinds(true, c) if _for_ref_of_kinds(c)
+
+_for_ref_of_kinds(c) if {
+	some p in _m_walked_roots(c)
+	_builtin(p)
+	not _ref_walk(p).failed
+}

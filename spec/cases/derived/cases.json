@@ -1437,37 +1437,7 @@
           ]
         },
         "results": [
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "message": "item 2 of pull_requests: commits is null",
-            "passed": false,
-            "cause": "null",
-            "inputs": [
-              {
-                "name": "count of pull_requests.commits",
-                "value": null,
-                "locations": [
-                  "/releases/0/pull_requests/0/commits/0"
-                ]
-              },
-              {
-                "name": "pull_requests[].commits[]",
-                "value": [
-                  {
-                    "sha": "a"
-                  }
-                ],
-                "locations": [
-                  "/releases/0/pull_requests/0/commits/0"
-                ]
-              }
-            ]
-          }
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0", "/releases/0/pull_requests/1/commits"], "name": "count of pull_requests.commits", "value": null}, {"locations": ["/releases/0/pull_requests/0/commits/0", "/releases/0/pull_requests/1/commits"], "name": "pull_requests[].commits[]", "value": [{"sha": "a"}, null]}], "message": "item 2 of pull_requests: commits is null", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       },
       {

@@ -975,6 +975,78 @@ pub fn capped_units(parts: Vec<String>) -> Vec<String> {
     units.into_iter().map(|(text, _)| text).collect()
 }
 
+pub fn whole_units(parts: Vec<String>, units: &[String]) -> Vec<String> {
+    let mut parts = parts;
+    for unit in units {
+        let pieces: Vec<&str> = unit.split("; ").collect();
+        if pieces.len() < 2
+            || pieces.iter().any(|piece| cap_note(piece).is_some())
+            || !pieces.iter().all(|piece| parts.iter().any(|p| p == piece))
+        {
+            continue;
+        }
+        let at = parts.iter().position(|p| p == pieces[0]).unwrap_or(0);
+        parts[at] = unit.clone();
+        parts.retain(|p| !pieces.contains(&p.as_str()));
+    }
+    parts
+}
+
+pub fn root_pieces(roots: &[String]) -> Vec<String> {
+    let mut pieces: Vec<String> = Vec::new();
+    for piece in roots.iter().flat_map(|root| root.split("; ")) {
+        if cap_note(piece).is_none() && !pieces.iter().any(|p| p == piece) {
+            pieces.push(piece.to_string());
+        }
+    }
+    pieces
+}
+
+fn own_part(part: &str, pieces: &[String]) -> String {
+    let mut lead: Option<String> = None;
+    let mut texts: Vec<&str> = Vec::new();
+    for (at, piece) in part.split(", and ").enumerate() {
+        if pieces.iter().any(|p| p == piece) {
+            continue;
+        }
+        let under = pieces
+            .iter()
+            .filter(|p| piece.starts_with("item ") && piece.ends_with(&format!(": {p}")))
+            .map(|p| p.len())
+            .max();
+        match under {
+            Some(len) if at == 0 => lead = Some(piece[..piece.len() - len - 2].to_string()),
+            Some(_) => {}
+            None => texts.push(piece),
+        }
+    }
+    if texts.is_empty() {
+        return String::new();
+    }
+    match lead {
+        Some(lead) => format!("{lead}: {}", texts.join(", and ")),
+        None => texts.join(", and "),
+    }
+}
+
+pub fn without_roots(text: &str, pieces: &[String]) -> String {
+    if pieces.is_empty() {
+        return text.to_string();
+    }
+    let parts: Vec<&str> = text.split("; ").collect();
+    let mut out: Vec<String> = Vec::new();
+    for (at, part) in parts.iter().enumerate() {
+        if at > 0 && cap_note(part).is_some() && own_part(parts[at - 1], pieces).is_empty() {
+            continue;
+        }
+        let own = own_part(part, pieces);
+        if !own.is_empty() {
+            out.push(own);
+        }
+    }
+    out.join("; ")
+}
+
 pub fn cap_note(part: &str) -> Option<usize> {
     part.strip_prefix("and ")
         .and_then(|rest| rest.strip_suffix(" more"))
@@ -1685,6 +1757,12 @@ fn root_texts_with(
                 if lists::right_paths(check).contains(&&root)
                     && lists::walked_in(check, &root, ctx).is_some()
                 {
+                    if !is_key
+                        && let Some((cause, text)) = lists::walked_root_fault(check, &root, ctx)
+                        && cause != Cause::Value
+                    {
+                        found.push((at, cause, text, false));
+                    }
                     continue;
                 }
                 let counted = match check {
@@ -1868,4 +1946,82 @@ fn off_item_rights(check: &Check, ctx: &Ctx) -> Vec<String> {
         }
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{root_pieces, whole_units, without_roots};
+
+    fn pieces(texts: &[&str]) -> Vec<String> {
+        texts.iter().map(|text| text.to_string()).collect()
+    }
+
+    #[test]
+    fn a_root_said_under_an_item_is_left_out_of_what_the_item_says() {
+        let roots = pieces(&["item 2 of pos: name is missing", "$params.zz is missing"]);
+        assert_eq!(
+            without_roots("item 1 of rows: item 2 of pos: name is missing", &roots),
+            ""
+        );
+        assert_eq!(
+            without_roots(
+                "item 2 of rows: v is missing, and item 2 of pos: name is missing",
+                &roots
+            ),
+            "item 2 of rows: v is missing"
+        );
+        assert_eq!(
+            without_roots(
+                "item 2 of rows: item 2 of pos: name is missing, and v is 5, which isn't text",
+                &roots
+            ),
+            "item 2 of rows: v is 5, which isn't text"
+        );
+        assert_eq!(
+            without_roots(
+                "$params.zz is missing; item 2 of rows: v is missing",
+                &roots
+            ),
+            "item 2 of rows: v is missing"
+        );
+    }
+
+    #[test]
+    fn the_and_n_more_of_a_root_goes_with_it_and_an_items_own_stays() {
+        let roots = root_pieces(&pieces(&[
+            "item 2 of pos: name is missing; item 3 of pos: name is missing; and 2 more",
+        ]));
+        assert_eq!(
+            roots,
+            pieces(&[
+                "item 2 of pos: name is missing",
+                "item 3 of pos: name is missing"
+            ])
+        );
+        assert_eq!(
+            without_roots(
+                "item 2 of pos: name is missing; item 3 of pos: name is missing; and 2 more; item 2 of rows: v is missing; and 1 more",
+                &roots
+            ),
+            "item 2 of rows: v is missing; and 1 more"
+        );
+        assert_eq!(
+            without_roots("item 1 of rows: v is missing; and 2 more", &[]),
+            "item 1 of rows: v is missing; and 2 more"
+        );
+    }
+
+    #[test]
+    fn the_items_of_a_walked_root_stay_together_as_one_unit() {
+        let unit = "item 1 of t: c.name is missing; item 2 of t: c.name is missing".to_string();
+        let parts = pieces(&[
+            "item 1 of t: c.name is missing",
+            "item 2 of t: c.name is missing",
+            "$params.zz is missing",
+        ]);
+        assert_eq!(
+            whole_units(parts, std::slice::from_ref(&unit)),
+            vec![unit, "$params.zz is missing".to_string()]
+        );
+    }
 }
