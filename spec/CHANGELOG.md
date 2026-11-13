@@ -20,6 +20,8 @@ Each version says whether reports changed, so that anyone who only stores report
 
 - A `count of` or `sum of` inside a `whose` reads its path as it does on its own, whatever it starts at ([tally.whose](semantics.md#counts-and-sums)). `count of rows whose n is count of $input.lst.name is 1` with `$input.lst` holding `[{"name": "bob"}, {"name": "x"}]` passes, where it failed as `unusable` with `$input.lst is [...], which isn't an object`, and its row lists `$input.lst[].name` holding `["bob", "x"]`. The same goes for `$params`, a part and a parent, and for a `count of` in a `for` line's sentence whose path has a list in the middle, like `count of pl.z is 2` with `pl` holding `[{"z": 1}, {"z": 2}]`, which [for.roots](semantics.md#for) already said is walked and both engines failed as `unusable`. Reports change for policies with such a count. Spec cases pin it.
 
+- The message of a `followed by` row after `contains` or `does not contain` that fails as `unusable` names the left side only when it isn't a list of text ([compare.join](semantics.md#compare)). `tags contains $input.o.a.b followed by ""` with `tags` holding `["a"]` and `$input.o.a` holding `1` says `$input.o.a is 1, which isn't an object`, where engines added `tags is ["a"], which isn't a number`. With every piece read, `p contains "a" followed by v` with `p` holding `5` says `p is 5, which isn't a list`, where it said `"a" followed by v is "ax", which isn't a number`, and `l` holding `[1, 2]` says `l is [1, 2], which isn't a list of text`. A piece read from `$input` on an input that is a list names the input, as a path on its own does: `$input is [...], which isn't an object`. Only messages change. Spec cases pin it.
+
 ## 0.6
 
 ### Changed
