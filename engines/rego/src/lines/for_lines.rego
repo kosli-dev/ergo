@@ -154,7 +154,7 @@ _for_worse_root(check, subj, rr) := object.union(rr, {"cause": _worst_of({rr.cau
 	flaw != ""
 } else := rr
 
-_for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_aliased(m) | some m in _m_cond_root_texts(subj, c) with input as {"ergo/names": names}]} |
+_for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_aliased(m) | some m in said]} |
 	count(check.items) == 2
 	item := check.items[0]
 	w := _for_walk(item, subj, _for_names)
@@ -168,7 +168,8 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	some c in conds
 	fl := _root_read_flaw(subj, c) with input as {"ergo/names": names}
 	not fl in {"", "not_an_object"}
-	ms := [_m_under(_m_for_item_name(check, e.i), _m_aliased(m)) | some m in _m_cond_root_texts(subj, c) with input as {"ergo/names": names}; not m in outer]
+	said := array.concat(_m_cond_root_texts(subj, c), _m_cond_walked_texts(c)) with input as {"ergo/names": names}
+	ms := [_m_under(_m_for_item_name(check, e.i), _m_aliased(m)) | some m in said; not m in outer]
 	ms != []
 ]
 

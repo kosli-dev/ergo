@@ -278,11 +278,9 @@ _for_message_parts(check, subj, r) := _once([e.t | some e in _for_ents(check, r)
 else := split(_for_message(check, subj, r), "; ")
 
 _for_ents(check, r) := array.concat(
-	[{"i": i, "t": t, "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) == true; some j, p in _m_for_part(check, r.failed, i, f); some t in _m_for_unled(said, p)],
-	[{"i": i, "t": t, "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) != true; some j, p in _m_for_part(check, r.failed, i, f); some t in _m_for_unled(said, p)],
-) if said := _m_for_said(check) | _m_for_tally_said(check)
-
-_m_for_tally_said(check) := {_m_joined(xs) | some xs in _m_for_tally_lists(check)}
+	[{"i": i, "t": p, "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) == true; some j, p in _m_for_part(check, r.failed, i, f)],
+	[{"i": i, "t": p, "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) != true; some j, p in _m_for_part(check, r.failed, i, f)],
+)
 
 _m_for_tally_lists(check) := {xs |
 	subj := object.get(input, ["ergo/names", "ergo/subject"], null)
@@ -320,27 +318,6 @@ _m_for_said(check) := {t |
 	some cause in ["absent", "null", "unusable"]
 	t := _m_walked_root_text(c, cause)
 }
-
-_m_for_unled(said, p) := [t] if {
-	startswith(p, "item ")
-	some t in said
-	endswith(p, concat("", [": ", t]))
-} else := [t, substring(p, 0, count(p) - count(tail))] if {
-	startswith(p, "item ")
-	some t in said
-	tail := concat("", [", and ", t])
-	endswith(p, tail)
-} else := [t, concat("", [substring(p, 0, i + 2), substring(p, (i + count(t)) + 8, -1)])] if {
-	startswith(p, "item ")
-	some t in said
-	i := indexof(p, concat("", [": ", t, ", and "]))
-	i > 0
-} else := [t, concat("", [substring(p, 0, i), substring(p, (i + count(t)) + 6, -1)])] if {
-	startswith(p, "item ")
-	some t in said
-	i := indexof(p, concat("", [", and ", t, ", and "]))
-	i > 0
-} else := [p]
 
 _m_for_joined(ents) := concat("; ", _once([e.t | some e in ents])) if count(_once([e.t | some e in ents; e.x == false])) <= 3
 
@@ -877,7 +854,15 @@ _m_applies(evals, req, false) := {"message": concat("; ", ms)} if {
 _m_root_pieces(rs) := {p |
 	some m in rs
 	some p in split(m, "; ")
-	not regex.match(`^and [0-9]+ more$`, p)
+	not _m_cap_note(p)
+}
+
+_m_cap_note(p) if {
+	startswith(p, "and ")
+	endswith(p, " more")
+	n := substring(p, 4, count(p) - 9)
+	n != ""
+	trim_left(n, "0123456789") == ""
 }
 
 _m_without_roots(text, pieces) := text if count(pieces) == 0
@@ -892,7 +877,7 @@ else := concat("; ", [y |
 
 _m_note_of_root(xs, i, pieces) if {
 	i > 0
-	regex.match(`^and [0-9]+ more$`, xs[i])
+	_m_cap_note(xs[i])
 	_m_own_part(xs[i - 1], pieces) == ""
 }
 

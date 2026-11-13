@@ -31,8 +31,17 @@ _walked_root_states(c) := {st |
 	walk(c, [_, x])
 	is_object(x)
 	some p in _m_walked_roots(x)
-	some st in ["absent", "null", "unusable", "not_an_object"]
-	_m_walked_root_fault(x, _as_subject_part(p), object.get(input, ["ergo/names", "ergo/subject"], null), st)
+	st := _walked_root_state(x, _rwalk_run(object.get(input, ["ergo/names", "ergo/subject"], null), _as_subject_part(p)))
+	st in {"absent", "null", "unusable", "not_an_object"}
+}
+
+_walked_root_state(x, w) := _walked_state_of(x, w, _rwalk_states(w))
+
+_walked_state_of(_, _, states) := _worst_of(states) if count(states) > 0
+
+_walked_state_of(x, w, states) := "unusable" if {
+	count(states) == 0
+	_m_leaf_needs(x, _walk_listed_values(w))
 }
 
 _walked_tally_walk(subj, y) := _walk(_walk_start({"path": p}, subj), _walk_keys({"path": p}, subj), true) if p := y[_basic_form(y)]

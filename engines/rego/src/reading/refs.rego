@@ -138,8 +138,10 @@ _rwalk_item_states(e) := {"unusable"} if {
 
 _rwalk(x, path) := {"state": _worst_or_value(states), "failed": count(states) > 0, "name": _walk_name(path, w.walked), "value": _walk_listed_values(w), "locations": _walk_listed_locations(w)} if {
 	w := _rwalk_run(x, path)
-	states := ({f.cause | some f in w.fails} | {f.cause | some f in _walk_stop(w)}) | {s | some e in w.items; some s in _rwalk_item_states(e)}
+	states := _rwalk_states(w)
 }
+
+_rwalk_states(w) := ({f.cause | some f in w.fails} | {f.cause | some f in _walk_stop(w)}) | {s | some e in w.items; some s in _rwalk_item_states(e)}
 
 _rwalk_text(x, path) := _m_joined(_m_fail_parts("unusable", fails, _dotted_roots([path]))) if {
 	w := _rwalk_run(x, path)

@@ -8630,6 +8630,19 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("m is \"a\"", "m is \"a\"", &[], &[]),
+    ("r.v is in d.name", "r.v is in d.name", &[], &[]),
+    (
+        "count of rows whose v is in d.name is 0",
+        "count of rows whose v is in d.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.v, if any, is in d.name",
+        "every rows.v, if any, is in d.name",
+        &[],
+        &[],
+    ),
     ("m.ws is not empty", "m.ws is not empty", &[], &[]),
     ("r.n is 2", "r.n is 2", &[], &[]),
     (
@@ -12967,6 +12980,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every deps as d, some rows whose v is in d.name as r",
         "every deps as d, some rows whose v is in d.name as r",
+        &[],
+        &[],
+    ),
+    (
+        "every deps as d, every rows whose v is in d.name, if any, as r",
+        "every deps as d, every rows whose v is in d.name, if any, as r",
+        &[],
+        &[],
+    ),
+    (
+        "every deps as d, every rows, if any, as r",
+        "every deps as d, every rows, if any, as r",
         &[],
         &[],
     ),
