@@ -299,7 +299,7 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	kept := [e.v | some i, e in w.items; judged[i].kept]
 	read := [e.v | some i, e in w.items; judged[i].read]
 	states := (((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | {fl | some fl in flaws; fl != ""}) | {fl | some c in side.whose; fl := _root_read_flaw(subj, c); fl != ""}
-	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": _walk_listed_values(w), "locations": _walk_listed_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states))
+	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states))
 }
 
 _tally_judge(side, e, flaws, w, true) := j if {

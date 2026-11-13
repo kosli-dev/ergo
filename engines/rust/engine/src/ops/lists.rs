@@ -295,11 +295,14 @@ fn walked_from(path: &Path, ctx: &Ctx, from_start: bool) -> Option<Walked> {
     faults.sort_by(|a, b| a.1.cmp(&b.1));
     let cause = Cause::worst(faults.iter().map(|f| f.0));
     let text = super::message::joined(faults.into_iter().map(|f| f.2).collect());
-    let (value, locations) = walked.listed();
     Some(Walked {
         name: walked.name.clone(),
-        value,
-        locations,
+        value: walked.items.iter().map(walk::WalkItem::shown).collect(),
+        locations: walked
+            .items
+            .iter()
+            .map(|item| item.end_location.render())
+            .collect(),
         cause,
         text,
         part: path::part_tag(path, ctx).map(|(name, id)| super::Part { name, id }),

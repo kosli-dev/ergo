@@ -63,22 +63,3 @@ test_a_ref_that_is_not_a_list_names_the_kind_of_list_the_phrase_needs if {
 	ergo._m_leaf_needs({"op": "includes", "values": {"ref": ["$$params", "q"]}}, []) == "a list with at least one value"
 	ergo._m_leaf_needs({"op": "matches", "patterns": {"ref": ["$$params", "q"]}}, "s") == "a list"
 }
-
-test_a_root_said_under_an_item_is_left_out_of_what_the_item_says if {
-	pieces := {"item 2 of pos: name is missing", "$params.zz is missing"}
-	ergo._m_without_roots("item 1 of rows: item 2 of pos: name is missing", pieces) == ""
-	ergo._m_without_roots("item 2 of rows: v is missing, and item 2 of pos: name is missing", pieces) == "item 2 of rows: v is missing"
-	ergo._m_without_roots("item 2 of rows: item 2 of pos: name is missing, and v is 5, which isn't text", pieces) == "item 2 of rows: v is 5, which isn't text"
-	ergo._m_without_roots("$params.zz is missing; item 2 of rows: v is missing", pieces) == "item 2 of rows: v is missing"
-}
-
-test_the_and_n_more_of_a_root_goes_with_it_and_an_items_own_stays if {
-	pieces := {"item 2 of pos: name is missing", "item 3 of pos: name is missing", "item 4 of pos: name is missing"}
-	said := "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more; item 2 of rows: v is missing; and 1 more"
-	ergo._m_without_roots(said, pieces) == "item 2 of rows: v is missing; and 1 more"
-}
-
-test_a_message_with_no_roots_is_left_as_it_is if {
-	ergo._m_without_roots("item 1 of rows: v is missing; and 2 more", set()) == "item 1 of rows: v is missing; and 2 more"
-	ergo._m_root_pieces(["a; b; and 2 more", "c"]) == {"a", "b", "c"}
-}

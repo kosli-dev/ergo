@@ -2080,6 +2080,30 @@ fn check_rows<'a>(
         .collect()
 }
 
+fn walked_roots_run(check: &Check, ctx: &Ctx) -> ops::Ran {
+    let ran = ops::run_full(check, ctx);
+    if !ran.verdict.passed() {
+        return ran;
+    }
+    ops::reading_walked_roots(|| {
+        let mut again = ops::run_full(check, ctx);
+        if again.verdict.passed() {
+            return ran;
+        }
+        if again.message.is_none() {
+            again.message = Some(match check {
+                Check::Tally(tally) => ops::tally::with_walked_roots(
+                    tally,
+                    ctx,
+                    ops::message::message(check, ctx, &again.verdict),
+                ),
+                _ => ops::message::message(check, ctx, &again.verdict),
+            });
+        }
+        again
+    })
+}
+
 fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc: &[Anc]) -> Row {
     let mut failed_items = None;
     let mut said: Vec<Option<String>> = Vec::new();
@@ -2094,7 +2118,7 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
     let verdicts: Vec<Verdict> = checks
         .iter()
         .map(|check| {
-            let ran = ops::run_full(check, ctx);
+            let ran = walked_roots_run(check, ctx);
             failed_items = ran.failed_items.map(Value::Array);
             let mut verdict = ran.verdict;
             let mut own = ran.message;

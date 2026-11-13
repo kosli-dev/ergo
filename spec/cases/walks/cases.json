@@ -135,7 +135,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.null"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": null}]}]},
         "results": [
-          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "item": "pull_requests[1].commits", "locations": ["/releases/0/pull_requests/1/commits"], "path": "pull_requests[1].commits", "value": null}], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/1/commits"], "name": "pull_requests[].commits[].signed", "value": [true, null]}], "message": "item 2 of pull_requests: commits is null", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "message": "item 2 of pull_requests: commits is null", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "null", "value": null, "locations": ["/releases/0/pull_requests/1/commits"]}]}
         ]
       },
       {
@@ -315,7 +315,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.null"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": null}]}]},
         "results": [
-          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "item": "pull_requests[1].commits", "locations": ["/releases/0/pull_requests/1/commits"], "path": "pull_requests[1].commits", "value": null}], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/1/commits"], "name": "pull_requests[].commits[].signed", "value": [true, null]}], "message": "item 2 of pull_requests: commits is null", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "message": "item 2 of pull_requests: commits is null", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "null", "value": null, "locations": ["/releases/0/pull_requests/1/commits"]}]}
         ]
       },
       {
@@ -3453,5 +3453,2142 @@
   ]},
   {"description": "objects in a list that differ past 15 significant digits, in the other order", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"every": "every xs.v is at most $params.r", "some": "some xs.v is more than $params.r", "count": "count of xs whose v is more than $params.r equals 1", "distinct_v": "count of distinct xs.v equals 2", "distinct_xs": "count of distinct xs equals 2"}}}}, "params": {"r": 2234567890.1209567890}, "cases": [
       {"description": "compares each item on every digit, in the other order", "rules": ["value.number", "walk.every", "walk.some", "tally.whose", "tally.distinct"], "input": {"things": [{"id": "a", "xs": [{"v": 2234567890.1209567990}, {"v": 2234567890.1209567890}]}]}, "results": [{"cause": "satisfied", "check": "count", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "count of xs whose v is more than $params.r", "value": 1}, {"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "xs[]", "value": [{"v": 2234567890.120956799}, {"v": 2234567890.120956789}]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}}, {"cause": "satisfied", "check": "distinct_v", "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v"], "name": "count of distinct xs.v", "value": 2}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v"], "name": "xs[].v", "value": [2234567890.120956799, 2234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}}, {"cause": "satisfied", "check": "distinct_xs", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "count of distinct xs", "value": 2}, {"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "xs[]", "value": [{"v": 2234567890.120956799}, {"v": 2234567890.120956789}]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}}, {"cause": "value", "check": "every", "failed_items": [{"cause": "value", "item": "item 1 of xs", "locations": ["/things/0/xs/0/v"], "path": "xs[0].v", "value": 2234567890.120956799}], "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v"], "name": "xs[].v", "value": [2234567890.120956799, 2234567890.120956789]}], "message": "item 1 of xs: v is 2234567890.120956799, and $params.r is 2234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}, {"cause": "satisfied", "check": "some", "failed_items": [], "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v"], "name": "xs[].v", "value": [2234567890.120956799, 2234567890.120956789]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}}]}
-  ]}
+  ]},
+  {
+    "description": "a part that a phrase walks as a list fails a check on an empty list when an item of it can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "count": "count of rows whose v is in pos.name is 0",
+            "that": "count of rows.v that is in pos.name is 0",
+            "every": "every rows.v, if any, is in pos.name",
+            "matches": "every rows.v, if any, matches pos.name"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows, when an item of it has no name",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows whose v is in pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of pos: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "every",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of pos: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "matches",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of pos: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "that",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows.v that is in pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of pos: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when an item of it is null",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows whose v is in pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of pos is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of pos is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "matches",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of pos is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "that",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows.v that is in pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of pos is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when it holds names of more than one kind",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": 3
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows whose v is in pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  3
+                ]
+              }
+            ],
+            "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "matches",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "pos[].name is [\"bob\", 3], which isn't a list of patterns",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "that",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows.v that is in pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  3
+                ]
+              }
+            ],
+            "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes, with an empty rows, when it reads fine",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": "ann"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows whose v is in pos.name",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "every",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "matches",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "that",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows.v that is in pos.name",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's list that a phrase walks fails a check on an empty list when an item of it can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "one_of": "every rows.v, if any, is one of c.os.name",
+            "exists": "every rows whose v is in c.os.name, if any, exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows, when an item of it has no name",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {}
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "c.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of c.os: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "one_of",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "c.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of c.os: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when an item of it is null",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                null
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "c.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of c.os is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "one_of",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "c.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of c.os is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when it holds names of more than one kind",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": 3
+                }
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.os[].name",
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "c.os[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "one_of",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.os[].name",
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "c.os[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes, with an empty rows, when it reads fine",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": "ann"
+                }
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.os[].name",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "one_of",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.os[].name",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's part that a phrase walks fails a check on an empty list when an item of it can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "count": "count of rows whose v is in c.pos.name is 0",
+            "sum": "sum of rows.n that is in c.pos.name is 0"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows, when an item of it has no name",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {}
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows whose v is in c.pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of c.pos: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "sum",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of rows.n that is in c.pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[].n",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of c.pos: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when an item of it is null",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                null
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows whose v is in c.pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of c.pos is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "sum",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of rows.n that is in c.pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[].n",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              }
+            ],
+            "message": "item 2 of c.pos is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when it holds names of more than one kind",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": 3
+                }
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows whose v is in c.pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
+                "value": [
+                  "bob",
+                  3
+                ]
+              }
+            ],
+            "message": "c.pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "sum",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of rows.n that is in c.pos.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[].n",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
+                "value": [
+                  "bob",
+                  3
+                ]
+              }
+            ],
+            "message": "c.pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes, with an empty rows, when it reads fine",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": "ann"
+                }
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows whose v is in c.pos.name",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "sum",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of rows.n that is in c.pos.name",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "rows[].n",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an $input list that a phrase walks fails a check on an empty list when an item of it can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "not_in": "every rows.v, if any, is not in $input.os.name",
+            "exists": "every rows whose v is in $input.os.name, if any, exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows, when an item of it has no name",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ],
+          "os": [
+            {
+              "name": "bob"
+            },
+            {}
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/os/0/name",
+                  "/os/1"
+                ],
+                "name": "$input.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $input.os: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "not_in",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/os/0/name",
+                  "/os/1"
+                ],
+                "name": "$input.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $input.os: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when an item of it is null",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ],
+          "os": [
+            {
+              "name": "bob"
+            },
+            null
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/os/0/name",
+                  "/os/1"
+                ],
+                "name": "$input.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $input.os is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "not_in",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/os/0/name",
+                  "/os/1"
+                ],
+                "name": "$input.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $input.os is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when it holds names of more than one kind",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ],
+          "os": [
+            {
+              "name": "bob"
+            },
+            {
+              "name": 3
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/os/0/name",
+                  "/os/1/name"
+                ],
+                "name": "$input.os[].name",
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "$input.os[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "not_in",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/os/0/name",
+                  "/os/1/name"
+                ],
+                "name": "$input.os[].name",
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "$input.os[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes, with an empty rows, when it reads fine",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ],
+          "os": [
+            {
+              "name": "bob"
+            },
+            {
+              "name": "ann"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/os/0/name",
+                  "/os/1/name"
+                ],
+                "name": "$input.os[].name",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "not_in",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/os/0/name",
+                  "/os/1/name"
+                ],
+                "name": "$input.os[].name",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a $params list that a phrase walks fails a check on an empty list when an item of it can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "every": "every rows.v, if any, is in $params.os.name",
+            "exists": "every rows whose v is in $params.os.name, if any, exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows, when an item of it has no name",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "every",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.os: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.os: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ],
+    "params": {
+      "os": [
+        {
+          "name": "bob"
+        },
+        {}
+      ]
+    }
+  }
 ]

@@ -19,7 +19,11 @@ _plain_root_states(subj, c) := {st |
 	st in {"absent", "null", "unusable", "not_an_object"}
 }
 
-_root_states(subj, c) := _named_root_states(subj, c) | _walked_root_states(c)
+_root_states(subj, c) := _named_root_states(subj, c) | _walked_root_states(c) if _walk_roots_on
+
+else := _named_root_states(subj, c)
+
+_walk_roots_on if data.ergo_walk_roots == true
 
 _named_root_states(subj, c) := _plain_root_states(subj, c) | {st |
 	some y in _walked_tallies(c)
@@ -31,9 +35,19 @@ _walked_root_states(c) := {st |
 	walk(c, [_, x])
 	is_object(x)
 	some p in _m_walked_roots(x)
-	st := _walked_root_state(x, _rwalk_run(object.get(input, ["ergo/names", "ergo/subject"], null), _as_subject_part(p)))
+	st := _walked_root_state(x, _rwalk_run(object.get(input, ["ergo/names", "ergo/subject"], null), _dotted_root_part(p)))
 	st in {"absent", "null", "unusable", "not_an_object"}
 }
+
+_dotted_root_part(p) := rest if {
+	p[0] == _root_marker
+	rest := array.slice(p, 1, count(p))
+	_literal_walk_path(rest)
+} else := _as_subject_part(p)
+
+_walked_root_shown(p) := _dotted_root_part(p) if _walk_roots_on
+
+else := _as_subject_part(p)
 
 _walked_root_state(x, w) := _walked_state_of(x, w, _rwalk_states(w))
 
@@ -41,7 +55,7 @@ _walked_state_of(_, _, states) := _worst_of(states) if count(states) > 0
 
 _walked_state_of(x, w, states) := "unusable" if {
 	count(states) == 0
-	_m_leaf_needs(x, _walk_listed_values(w))
+	_m_leaf_needs(x, [_walk_value(e.v, e, w) | some e in w.items])
 }
 
 _walked_tally_walk(subj, y) := _walk(_walk_start({"path": p}, subj), _walk_keys({"path": p}, subj), true) if p := y[_basic_form(y)]
@@ -437,7 +451,7 @@ _walk_root_msgs(check, subj) := _once(array.concat(
 		],
 		[m |
 			some c in _for_sentence_conds(check)
-			some m in array.concat(_m_cond_root_texts(subj, c), _m_cond_walked_texts(c))
+			some m in array.concat(_m_cond_root_texts(subj, c), _m_walked_root_texts(c))
 		],
 	),
 ))
@@ -449,6 +463,10 @@ _m_cond_walked_texts(c) := [t |
 	some cause in ["absent", "null", "unusable"]
 	t := _m_walked_root_text(x, cause)
 ]
+
+_m_walked_root_texts(c) := _m_cond_walked_texts(c) if _walk_roots_on
+
+else := []
 
 _leaf_root_flaw(check, subj) := fl if {
 	check.op in {"every", "some"}
@@ -465,6 +483,7 @@ _leaf_root_flaw(check, subj) := fl if {
 	some p in _root_reads(check.check)
 	_root_kind(subj, check.check, p)
 } else := _worst_of(states) if {
+	_walk_roots_on
 	check.op in {"every", "some"}
 	is_object(object.get(check, "check", null))
 	states := _walked_root_states(check.check)

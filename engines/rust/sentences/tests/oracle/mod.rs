@@ -2166,7 +2166,6 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("gs", "gs"),
     ("every c.kids", "every c.kids"),
     ("every cs", "every cs"),
-    ("d", "d"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -3292,7 +3291,6 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("c.os", "c.os"),
     ("c.names", "c.names"),
     ("os", "os"),
-    ("d", "d"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[

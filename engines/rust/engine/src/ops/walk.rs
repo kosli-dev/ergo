@@ -166,46 +166,11 @@ pub struct Walked<'a> {
     pub steps: usize,
     pub name: String,
     pub unreadable: Option<Outcome>,
-    nulls: Vec<(Vec<u64>, Location)>,
     start: Start,
     keeps_dot: bool,
 }
 
-fn indexes_of(segs: &[Seg]) -> Vec<u64> {
-    segs.iter()
-        .filter_map(|seg| match seg {
-            Seg::Index(at) => Some(*at),
-            Seg::Key(_) => None,
-        })
-        .collect()
-}
-
 impl Walked<'_> {
-    pub fn listed(&self) -> (Vec<Value>, Vec<String>) {
-        let mut rows: Vec<(Vec<u64>, u8, Value, String)> = self
-            .items
-            .iter()
-            .map(|item| {
-                (
-                    indexes_of(&item.item_segs),
-                    0,
-                    item.shown(),
-                    item.end_location.render(),
-                )
-            })
-            .collect();
-        if self.nulls.is_empty() {
-            return rows.into_iter().map(|row| (row.2, row.3)).unzip();
-        }
-        rows.extend(
-            self.nulls
-                .iter()
-                .map(|(indexes, location)| (indexes.clone(), 1, Value::Null, location.render())),
-        );
-        rows.sort_by(|a, b| (&a.0, a.1).cmp(&(&b.0, b.1)));
-        rows.into_iter().map(|row| (row.2, row.3)).unzip()
-    }
-
     pub fn walked_last(&self) -> bool {
         self.walked.contains(&self.steps)
     }
@@ -452,7 +417,6 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
                     steps: segs.len(),
                     name: name::name(path),
                     unreadable: Some(outcome),
-                    nulls: Vec::new(),
                     start: path.start.clone(),
                     keeps_dot: false,
                 };
@@ -483,7 +447,6 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
     )];
     let mut walked = BTreeSet::new();
     let mut raws: Vec<Raw> = Vec::new();
-    let mut nulls: Vec<(Vec<u64>, Location)> = Vec::new();
     for level in 0..=total {
         let seg = segs.get(level);
         let walks_here = entries.iter().any(|entry| {
@@ -517,18 +480,12 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
                             });
                         }
                     }
-                    None => {
-                        let indexes = indexes_of(&entry.segs);
-                        if entry.val.cause() == Cause::Null && !indexes.is_empty() {
-                            nulls.push((indexes, entry.location.clone()));
-                        }
-                        raws.push(failed(
-                            &entry,
-                            entry.val.cause(),
-                            entry.val.shown(),
-                            "a list",
-                        ));
-                    }
+                    None => raws.push(failed(
+                        &entry,
+                        entry.val.cause(),
+                        entry.val.shown(),
+                        "a list",
+                    )),
                 }
             }
             entries = next;
@@ -628,7 +585,6 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
         steps: total,
         name: shown_name,
         unreadable: None,
-        nulls,
         start: path.start.clone(),
         keeps_dot: path.start == Start::Own,
     };
@@ -1364,11 +1320,14 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         sorted.iter().map(|f| f.to_json()).collect()
     };
     let tag = path::part_tag(&walk.path, &outer).map(|(name, id)| super::Part { name, id });
-    let (listed_values, listed_locations) = walked.listed();
     let mut inputs = vec![Input {
         name: walked.name.clone(),
-        value: Value::Array(listed_values),
-        locations: listed_locations,
+        value: Value::Array(walked.items.iter().map(WalkItem::shown).collect()),
+        locations: walked
+            .items
+            .iter()
+            .map(|item| item.end_location.render())
+            .collect(),
         part: tag,
         state: crate::path::Outcome::Found,
         null_at: None,

@@ -589,7 +589,7 @@ impl For {
                     if lost {
                         return None;
                     }
-                    let said = own_beside_root(check, &outer, &focus, verdict.cause, depth > 0)?;
+                    let said = own_beside_root(check, &outer, &focus, verdict.cause)?;
                     let name = walked.item_name_dotted(walk::focus_segs(w, check));
                     let name = if depth > 0 { self.strip(&name) } else { name };
                     Some(super::message::prefixed(&name, &said))
@@ -1740,12 +1740,10 @@ impl For {
             Named::Ahead(texts) => (texts, true),
         };
         let failed = !run.failed_items.is_empty();
-        let pieces = super::message::root_pieces(&roots);
         let free: Vec<String> = if failed || alone {
-            super::message::without_roots(&free.join("; "), &pieces)
-                .split("; ")
+            free.iter()
+                .map(|text| unskipped(text, &roots))
                 .filter(|text| !text.is_empty())
-                .map(str::to_string)
                 .collect()
         } else {
             Vec::new()
@@ -1787,13 +1785,10 @@ impl For {
             }
         }
         let once = ordered;
-        let mut parts = super::message::capped_units(super::message::whole_units(
-            once.clone(),
-            &self.walked_root_texts(ctx),
-        ));
+        let mut parts = super::message::capped_units(once.clone());
         if let Some(items) = items {
             parts.extend(
-                super::message::without_roots(&items, &pieces)
+                items
                     .split("; ")
                     .filter(|part| {
                         !part.is_empty()
@@ -2029,11 +2024,20 @@ impl For {
         let mut texts = Vec::new();
         let mut raw = Vec::new();
         let mut unread = Vec::new();
+        let walked = super::walked_roots_on();
+        let nested: Vec<&Check> = if walked {
+            self.sentences
+                .iter()
+                .flat_map(|s| nested_whose(&s.check, false))
+                .collect()
+        } else {
+            Vec::new()
+        };
         for live in self.candidates(0, ctx).live {
             let mut bound = ctx.clone();
             bound.aliases.insert(first.alias.clone(), live.at.clone());
             let bound = outer_ctx(&bound);
-            for cond in &second.whose {
+            for cond in second.whose.iter().chain(nested.iter().copied()) {
                 let Some((cause, text)) = super::message::root_flaw(&[cond], &bound) else {
                     continue;
                 };
@@ -2049,7 +2053,11 @@ impl For {
                     .collect();
                 if !extra.is_empty() {
                     causes.push(cause);
-                    texts.extend(extra.iter().map(|t| format!("{}: {t}", live.name)));
+                    if walked {
+                        texts.push(format!("{}: {}", live.name, extra.join("; ")));
+                    } else {
+                        texts.extend(extra.iter().map(|t| format!("{}: {t}", live.name)));
+                    }
                     raw.extend(extra.iter().map(|t| (*t).to_string()));
                     unread.push(live.name.clone());
                 }
@@ -2304,22 +2312,10 @@ impl For {
             .filter(|text| !text.is_empty())
             .collect();
         let roots = self.walked_root_texts(ctx);
-        let pieces = super::message::root_pieces(
-            &collect
-                .skip
-                .iter()
-                .chain(roots.iter())
-                .cloned()
-                .collect::<Vec<_>>(),
-        );
         let said: Vec<Said> = said
             .into_iter()
             .flat_map(|(order, text, extra)| {
-                let mut texts = unled(&roots, &text);
-                if let Some(own) = texts.pop() {
-                    texts.push(super::message::without_roots(&own, &pieces));
-                }
-                texts
+                unled(&roots, &unskipped(&text, &collect.skip))
                     .into_iter()
                     .map(move |text| (order.clone(), text, extra))
             })
@@ -2923,16 +2919,10 @@ fn unskipped(text: &str, skip: &[String]) -> String {
         .join("; ")
 }
 
-fn own_beside_root(
-    check: &Check,
-    outer: &Ctx,
-    focus: &Ctx,
-    cause: Cause,
-    rootless: bool,
-) -> Option<String> {
+fn own_beside_root(check: &Check, outer: &Ctx, focus: &Ctx, cause: Cause) -> Option<String> {
     let flaw = super::message::root_flaw(&[check], outer);
     let fault = super::message::root_fault(check, outer, cause);
-    if !rootless && flaw.is_none() && fault.is_none() {
+    if flaw.is_none() && fault.is_none() {
         return None;
     }
     let own = check.paths().into_iter().find_map(|path| {
@@ -3466,7 +3456,8 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
                 if path::is_root(&root.start)
                     || (!ctx.subject.value.is_array() && super::lists::walked(root, ctx).is_some())
                 {
-                    if let Check::Tally(tally) = check
+                    if super::walked_roots_on()
+                        && let Check::Tally(tally) = check
                         && bound_alias(root, ctx)
                         && nested_whose(check, false).is_empty()
                         && root
@@ -3484,11 +3475,10 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
             if super::lists::right_paths(check).contains(&root)
                 && super::lists::walked_in(check, root, ctx).is_some()
             {
-                if bound_alias(root, ctx)
+                if super::walked_roots_on()
+                    && bound_alias(root, ctx)
                     && let Some(fault) = super::lists::walked_root_fault(check, root, ctx)
                     && fault.0 != Cause::Value
-                    && !fault.1.starts_with('.')
-                    && !fault.1.contains(" of .")
                 {
                     found.push(fault);
                 }

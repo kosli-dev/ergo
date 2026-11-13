@@ -136,7 +136,7 @@ _rwalk_item_states(e) := {"unusable"} if {
 	is_object(e.iv)
 }
 
-_rwalk(x, path) := {"state": _worst_or_value(states), "failed": count(states) > 0, "name": _walk_name(path, w.walked), "value": _walk_listed_values(w), "locations": _walk_listed_locations(w)} if {
+_rwalk(x, path) := {"state": _worst_or_value(states), "failed": count(states) > 0, "name": _walk_name(path, w.walked), "value": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)} if {
 	w := _rwalk_run(x, path)
 	states := _rwalk_states(w)
 }

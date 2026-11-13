@@ -530,33 +530,7 @@ _walk_failed(cause, fails, path) := [{"path": _failed_name(f.path, _dotted_roots
 	f.path == p
 ] if cause != "satisfied"
 
-_walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": _walk_listed_values(w), "locations": _walk_listed_locations(w)}]
-
-_walk_listed_values(w) := [_walk_value(e.v, e, w) | some e in w.items] if not _walk_null_list(w)
-
-else := [r[3].v | some r in _walk_listed(w)]
-
-_walk_listed_locations(w) := _walk_locations(w) if not _walk_null_list(w)
-
-else := [r[3].at | some r in _walk_listed(w)]
-
-_walk_listed(w) := sort(array.concat(
-	[[[n | some n in e.c; is_number(n)], 0, k, {"v": _walk_value(e.v, e, w), "at": _walk_at(w, e)}] | some k, e in w.items],
-	[[[n | some n in f.path; is_number(n)], 1, k, {"v": null, "at": f.at}] | some k, f in w.fails; _walk_null_fail(f)],
-))
-
-_walk_null_list(w) if {
-	some f in w.fails
-	_walk_null_fail(f)
-}
-
-_walk_null_fail(f) if {
-	f.cause == "null"
-	f.value == null
-	f.msg == "a list"
-	some n in f.path
-	is_number(n)
-}
+_walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}]
 
 _walk_name(path, walked) := _walk_shown_name(_walk_unaliased(path, _walk_crossed(path, walked)), walked)
 

@@ -3956,7 +3956,78 @@
           ]
         },
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 1 of pr.approvers", "locations": ["/releases/0/pull_requests/0/approvers/0"], "path": "item 1 of pr.approvers", "value": {"username": "lee"}}], "item": "item 1 of pull_requests", "locations": ["/releases/0/pull_requests/0"], "path": "item 1 of pull_requests", "value": {"approvers": [{"username": "lee"}], "author": "kim"}}], "inputs": [{"locations": ["/releases/0/pull_requests/0/approvers/0"], "name": "pr.approvers[]", "value": [{"username": "lee"}]}, {"locations": ["/releases/0/pull_requests/0"], "name": "pull_requests[]", "value": [{"approvers": [{"username": "lee"}], "author": "kim"}]}], "message": "item 1 of pull_requests: item 1 of approvers: state is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of pr.approvers",
+                    "path": "item 1 of pr.approvers",
+                    "value": {
+                      "username": "lee"
+                    },
+                    "locations": [
+                      "/releases/0/pull_requests/0/approvers/0"
+                    ]
+                  }
+                ],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": {
+                  "approvers": [
+                    {
+                      "username": "lee"
+                    }
+                  ],
+                  "author": "kim"
+                },
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pr.approvers[]",
+                "value": [
+                  {
+                    "username": "lee"
+                  }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/approvers/0"
+                ]
+              },
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "approvers": [
+                      {
+                        "username": "lee"
+                      }
+                    ],
+                    "author": "kim"
+                  }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
+              }
+            ],
+            "message": "item 1 of pull_requests: item 1 of approvers is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
         ]
       },
       {
@@ -8549,7 +8620,64 @@
           ]
         },
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 2 of commits", "locations": ["/pull_requests/0/commits/1"], "path": "item 2 of commits", "value": {"t": 2}}], "inputs": [{"locations": ["/pull_requests/0/approvers/0", "/pull_requests/0/approvers/1"], "name": "approvers[]", "value": [{"t": 5}, {"t": 6}]}, {"locations": ["/pull_requests/0/commits/0", "/pull_requests/0/commits/1"], "name": "commits[]", "value": [{"kind": "code", "t": 1}, {"t": 2}]}], "message": "item 2 of commits: kind is missing", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pull request"}}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 2 of commits",
+                "path": "item 2 of commits",
+                "value": {
+                  "t": 2
+                },
+                "locations": [
+                  "/pull_requests/0/commits/1"
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "t": 5
+                  },
+                  {
+                    "t": 6
+                  }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ]
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "code",
+                    "t": 1
+                  },
+                  {
+                    "t": 2
+                  }
+                ],
+                "locations": [
+                  "/pull_requests/0/commits/0",
+                  "/pull_requests/0/commits/1"
+                ]
+              }
+            ],
+            "message": "item 2 of commits is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p1",
+              "type": "pull request"
+            }
+          }
         ]
       }
     ]
@@ -8611,7 +8739,106 @@
           ]
         },
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 2 of commits", "locations": ["/pull_requests/0/commits/1"], "path": "item 2 of commits", "value": {"t": 2}}], "item": "item 1 of approvers", "locations": ["/pull_requests/0/approvers/0"], "path": "item 1 of approvers", "value": {"t": 5, "u": "bob"}}, {"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 2 of commits", "locations": ["/pull_requests/0/commits/1"], "path": "item 2 of commits", "value": {"t": 2}}], "item": "item 2 of approvers", "locations": ["/pull_requests/0/approvers/1"], "path": "item 2 of approvers", "value": {"t": 6, "u": "cat"}}], "inputs": [{"locations": ["/pull_requests/0/approvers/0", "/pull_requests/0/approvers/1"], "name": "approvers[]", "value": [{"t": 5, "u": "bob"}, {"t": 6, "u": "cat"}]}, {"locations": ["/pull_requests/0/commits/0", "/pull_requests/0/commits/1"], "name": "commits[]", "value": [{"author": "ann", "t": 1}, {"t": 2}]}], "message": "item 1 of approvers: item 2 of commits: author is missing; item 2 of approvers: item 2 of commits: author is missing", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pull request"}}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of commits",
+                    "path": "item 2 of commits",
+                    "value": {
+                      "t": 2
+                    },
+                    "locations": [
+                      "/pull_requests/0/commits/1"
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "path": "item 1 of approvers",
+                "value": {
+                  "t": 5,
+                  "u": "bob"
+                },
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ]
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of commits",
+                    "path": "item 2 of commits",
+                    "value": {
+                      "t": 2
+                    },
+                    "locations": [
+                      "/pull_requests/0/commits/1"
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "path": "item 2 of approvers",
+                "value": {
+                  "t": 6,
+                  "u": "cat"
+                },
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "t": 5,
+                    "u": "bob"
+                  },
+                  {
+                    "t": 6,
+                    "u": "cat"
+                  }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
+                ]
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ann",
+                    "t": 1
+                  },
+                  {
+                    "t": 2
+                  }
+                ],
+                "locations": [
+                  "/pull_requests/0/commits/0",
+                  "/pull_requests/0/commits/1"
+                ]
+              }
+            ],
+            "message": "item 1 of approvers: item 2 of commits is missing; item 2 of approvers: item 2 of commits is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p1",
+              "type": "pull request"
+            }
+          }
         ]
       }
     ]
@@ -9472,7 +9699,7 @@
         "rules": ["location.failed_items"],
         "input": {"pull_requests": [{"id": "p1", "approvers": [{"u": "bob", "t": 5}], "commits": [{"t": 1, "author": "ann"}, {"t": 2}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 2 of commits", "locations": ["/pull_requests/0/commits/1"], "path": "item 2 of commits", "value": {"t": 2}}], "item": "item 1 of approvers", "locations": ["/pull_requests/0/approvers/0"], "path": "item 1 of approvers", "value": {"t": 5, "u": "bob"}}], "inputs": [{"locations": ["/pull_requests/0/approvers/0"], "name": "approvers[]", "value": [{"t": 5, "u": "bob"}]}, {"locations": ["/pull_requests/0/commits/0", "/pull_requests/0/commits/1"], "name": "commits[]", "value": [{"author": "ann", "t": 1}, {"t": 2}]}], "message": "item 1 of approvers: item 2 of commits: author is missing", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pull request"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 2 of commits", "locations": ["/pull_requests/0/commits/1"], "path": "item 2 of commits", "value": {"t": 2}}], "item": "item 1 of approvers", "locations": ["/pull_requests/0/approvers/0"], "path": "item 1 of approvers", "value": {"t": 5, "u": "bob"}}], "inputs": [{"locations": ["/pull_requests/0/approvers/0"], "name": "approvers[]", "value": [{"t": 5, "u": "bob"}]}, {"locations": ["/pull_requests/0/commits/0", "/pull_requests/0/commits/1"], "name": "commits[]", "value": [{"author": "ann", "t": 1}, {"t": 2}]}], "message": "item 1 of approvers: item 2 of commits is missing", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pull request"}}
         ]
       }
     ]
@@ -17412,7 +17639,75 @@
           }
         },
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 3 of artifact.ap.w", "locations": ["/trail/artifacts/0/ps/w/2"], "path": "item 3 of artifact.ap.w", "value": {}}], "item": "item 1 of keys", "locations": ["/trail/artifacts/0/prs/0/keys/0"], "path": "item 1 of keys", "value": "k1"}], "inputs": [{"locations": ["/trail/artifacts/0/ps/w/0", "/trail/artifacts/0/ps/w/1", "/trail/artifacts/0/ps/w/2"], "name": "artifact.ap.w[]", "part": {"id": null, "name": "artifact.ap"}, "value": [{"t": "k1"}, {"t": "k1"}, {}]}, {"locations": ["/trail/artifacts/0/prs/0/keys/0"], "name": "keys[]", "value": ["k1"]}], "message": "item 1 of keys: item 3 of artifact.ap.w: t is missing", "passed": false, "requirement": "s", "subject": {"id": "p1", "in": {"artifact": "a1"}, "type": "pr"}}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 3 of artifact.ap.w",
+                    "locations": [
+                      "/trail/artifacts/0/ps/w/2"
+                    ],
+                    "path": "item 3 of artifact.ap.w",
+                    "value": {}
+                  }
+                ],
+                "item": "item 1 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "path": "item 1 of keys",
+                "value": "k1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/ps/w/0",
+                  "/trail/artifacts/0/ps/w/1",
+                  "/trail/artifacts/0/ps/w/2"
+                ],
+                "name": "artifact.ap.w[]",
+                "part": {
+                  "id": null,
+                  "name": "artifact.ap"
+                },
+                "value": [
+                  {
+                    "t": "k1"
+                  },
+                  {
+                    "t": "k1"
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              }
+            ],
+            "message": "item 1 of keys: item 3 of artifact.ap.w is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
         ],
         "expressions": {
           "s": {
@@ -38877,9 +39172,9 @@
         "rules": ["message.items", "tally.whose", "for.roots", "walk.start"],
         "input": {"teams": [[{"c": {"z": ["a"]}, "rows": [{"n": 2}], "ms": [{"ws": [{"n": 2}]}]}, {"rows": [{"n": 1}], "ms": [{"ws": [{"n": 1}]}], "c": {"z": null}}]]},
         "results": [
-          {"cause": "null", "check": "own", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of t[0].rows", "locations": ["/teams/0/0/rows/0"], "path": "item 1 of t[0].rows", "value": {"n": 2}}, {"cause": "null", "failed_assertions": [], "item": "item 1 of t[1].rows", "locations": ["/teams/0/1/rows/0"], "path": "item 1 of t[1].rows", "value": {"n": 1}}], "inputs": [{"locations": ["/teams/0/0/c/z/0", "/teams/0/1/c/z"], "name": "t[].c.z[]", "value": ["a", null]}, {"locations": ["/teams/0/0/rows/0", "/teams/0/1/rows/0"], "name": "t[].rows[]", "value": [{"n": 2}, {"n": 1}]}], "message": "item 2 of t: c.z is null", "passed": false, "requirement": "r", "subject": {"id": [{"c": {"z": ["a"]}, "ms": [{"ws": [{"n": 2}]}], "rows": [{"n": 2}]}, {"c": {"z": null}, "ms": [{"ws": [{"n": 1}]}], "rows": [{"n": 1}]}], "type": "t"}},
-          {"cause": "null", "check": "own_if_any", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of t[0].rows", "locations": ["/teams/0/0/rows/0"], "path": "item 1 of t[0].rows", "value": {"n": 2}}, {"cause": "null", "failed_assertions": [], "item": "item 1 of t[1].rows", "locations": ["/teams/0/1/rows/0"], "path": "item 1 of t[1].rows", "value": {"n": 1}}], "inputs": [{"locations": ["/teams/0/0/c/z/0", "/teams/0/1/c/z"], "name": "t[].c.z[]", "value": ["a", null]}, {"locations": ["/teams/0/0/rows/0", "/teams/0/1/rows/0"], "name": "t[].rows[]", "value": [{"n": 2}, {"n": 1}]}], "message": "item 2 of t: c.z is null", "passed": false, "requirement": "r", "subject": {"id": [{"c": {"z": ["a"]}, "ms": [{"ws": [{"n": 2}]}], "rows": [{"n": 2}]}, {"c": {"z": null}, "ms": [{"ws": [{"n": 1}]}], "rows": [{"n": 1}]}], "type": "t"}},
-          {"cause": "null", "check": "second", "failed_items": [{"cause": "null", "failed_assertions": [], "failed_items": [{"cause": "null", "item": "item 1 of m.ws", "locations": ["/teams/0/0/ms/0/ws/0"], "path": "item 1 of m.ws", "value": {"n": 2}}], "item": "item 1 of t[0].ms", "locations": ["/teams/0/0/ms/0"], "path": "item 1 of t[0].ms", "value": {"ws": [{"n": 2}]}}, {"cause": "null", "failed_assertions": [], "failed_items": [{"cause": "null", "item": "item 1 of m.ws", "locations": ["/teams/0/1/ms/0/ws/0"], "path": "item 1 of m.ws", "value": {"n": 1}}], "item": "item 1 of t[1].ms", "locations": ["/teams/0/1/ms/0"], "path": "item 1 of t[1].ms", "value": {"ws": [{"n": 1}]}}], "inputs": [{"locations": ["/teams/0/0/ms/0/ws/0", "/teams/0/1/ms/0/ws/0"], "name": "m.ws[]", "value": [{"n": 2}, {"n": 1}]}, {"locations": ["/teams/0/0/c/z/0", "/teams/0/1/c/z"], "name": "t[].c.z[]", "value": ["a", null]}, {"locations": ["/teams/0/0/ms/0", "/teams/0/1/ms/0"], "name": "t[].ms[]", "value": [{"ws": [{"n": 2}]}, {"ws": [{"n": 1}]}]}], "message": "item 2 of t: c.z is null", "passed": false, "requirement": "r", "subject": {"id": [{"c": {"z": ["a"]}, "ms": [{"ws": [{"n": 2}]}], "rows": [{"n": 2}]}, {"c": {"z": null}, "ms": [{"ws": [{"n": 1}]}], "rows": [{"n": 1}]}], "type": "t"}}
+          {"cause": "null", "check": "own", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of t[0].rows", "locations": ["/teams/0/0/rows/0"], "path": "item 1 of t[0].rows", "value": {"n": 2}}, {"cause": "null", "failed_assertions": [], "item": "item 1 of t[1].rows", "locations": ["/teams/0/1/rows/0"], "path": "item 1 of t[1].rows", "value": {"n": 1}}], "inputs": [{"locations": ["/teams/0/0/c/z/0"], "name": "t[].c.z[]", "value": ["a"]}, {"locations": ["/teams/0/0/rows/0", "/teams/0/1/rows/0"], "name": "t[].rows[]", "value": [{"n": 2}, {"n": 1}]}], "message": "item 2 of t: c.z is null", "passed": false, "requirement": "r", "subject": {"id": [{"c": {"z": ["a"]}, "ms": [{"ws": [{"n": 2}]}], "rows": [{"n": 2}]}, {"c": {"z": null}, "ms": [{"ws": [{"n": 1}]}], "rows": [{"n": 1}]}], "type": "t"}},
+          {"cause": "null", "check": "own_if_any", "failed_items": [{"cause": "null", "failed_assertions": [], "item": "item 1 of t[0].rows", "locations": ["/teams/0/0/rows/0"], "path": "item 1 of t[0].rows", "value": {"n": 2}}, {"cause": "null", "failed_assertions": [], "item": "item 1 of t[1].rows", "locations": ["/teams/0/1/rows/0"], "path": "item 1 of t[1].rows", "value": {"n": 1}}], "inputs": [{"locations": ["/teams/0/0/c/z/0"], "name": "t[].c.z[]", "value": ["a"]}, {"locations": ["/teams/0/0/rows/0", "/teams/0/1/rows/0"], "name": "t[].rows[]", "value": [{"n": 2}, {"n": 1}]}], "message": "item 2 of t: c.z is null", "passed": false, "requirement": "r", "subject": {"id": [{"c": {"z": ["a"]}, "ms": [{"ws": [{"n": 2}]}], "rows": [{"n": 2}]}, {"c": {"z": null}, "ms": [{"ws": [{"n": 1}]}], "rows": [{"n": 1}]}], "type": "t"}},
+          {"cause": "null", "check": "second", "failed_items": [{"cause": "null", "failed_assertions": [], "failed_items": [{"cause": "null", "item": "item 1 of m.ws", "locations": ["/teams/0/0/ms/0/ws/0"], "path": "item 1 of m.ws", "value": {"n": 2}}], "item": "item 1 of t[0].ms", "locations": ["/teams/0/0/ms/0"], "path": "item 1 of t[0].ms", "value": {"ws": [{"n": 2}]}}, {"cause": "null", "failed_assertions": [], "failed_items": [{"cause": "null", "item": "item 1 of m.ws", "locations": ["/teams/0/1/ms/0/ws/0"], "path": "item 1 of m.ws", "value": {"n": 1}}], "item": "item 1 of t[1].ms", "locations": ["/teams/0/1/ms/0"], "path": "item 1 of t[1].ms", "value": {"ws": [{"n": 1}]}}], "inputs": [{"locations": ["/teams/0/0/ms/0/ws/0", "/teams/0/1/ms/0/ws/0"], "name": "m.ws[]", "value": [{"n": 2}, {"n": 1}]}, {"locations": ["/teams/0/0/c/z/0"], "name": "t[].c.z[]", "value": ["a"]}, {"locations": ["/teams/0/0/ms/0", "/teams/0/1/ms/0"], "name": "t[].ms[]", "value": [{"ws": [{"n": 2}]}, {"ws": [{"n": 1}]}]}], "message": "item 2 of t: c.z is null", "passed": false, "requirement": "r", "subject": {"id": [{"c": {"z": ["a"]}, "ms": [{"ws": [{"n": 2}]}], "rows": [{"n": 2}]}, {"c": {"z": null}, "ms": [{"ws": [{"n": 1}]}], "rows": [{"n": 1}]}], "type": "t"}}
         ]
       },
       {
@@ -39281,7 +39576,68 @@
           ]
         },
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 1 of $params.l", "locations": ["$params:/l/0"], "path": "item 1 of $params.l", "value": {"w": 1}}], "item": "item 1 of items", "locations": ["/rows/0/items/0"], "path": "item 1 of items", "value": {"t": 1}}], "inputs": [{"locations": ["$params:/l/0"], "name": "$params.l[]", "value": [{"w": 1}]}, {"locations": ["/rows/0/items/0"], "name": "items[]", "value": [{"t": 1}]}], "message": "item 1 of items: item 1 of $params.l: v is missing", "passed": false, "requirement": "r", "subject": {"id": "n", "type": "s"}}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of $params.l",
+                    "locations": [
+                      "$params:/l/0"
+                    ],
+                    "path": "item 1 of $params.l",
+                    "value": {
+                      "w": 1
+                    }
+                  }
+                ],
+                "item": "item 1 of items",
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "t": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l/0"
+                ],
+                "name": "$params.l[]",
+                "value": [
+                  {
+                    "w": 1
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "t": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of items: item 1 of $params.l is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "n",
+              "type": "s"
+            }
+          }
         ]
       }
     ]
@@ -39416,7 +39772,68 @@
           ]
         },
         "results": [
-          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [], "failed_items": [{"cause": "null", "item": "item 1 of $params.l", "locations": ["$params:/l/0"], "path": "item 1 of $params.l", "value": {"v": null}}], "item": "item 1 of items", "locations": ["/rows/0/items/0"], "path": "item 1 of items", "value": {"t": 1}}], "inputs": [{"locations": ["$params:/l/0"], "name": "$params.l[]", "value": [{"v": null}]}, {"locations": ["/rows/0/items/0"], "name": "items[]", "value": [{"t": 1}]}], "message": "item 1 of items: item 1 of $params.l: v is null", "passed": false, "requirement": "r", "subject": {"id": "n", "type": "s"}}
+          {
+            "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "null",
+                    "item": "item 1 of $params.l",
+                    "locations": [
+                      "$params:/l/0"
+                    ],
+                    "path": "item 1 of $params.l",
+                    "value": {
+                      "v": null
+                    }
+                  }
+                ],
+                "item": "item 1 of items",
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "t": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l/0"
+                ],
+                "name": "$params.l[]",
+                "value": [
+                  {
+                    "v": null
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/rows/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "t": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of items: item 1 of $params.l is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "n",
+              "type": "s"
+            }
+          }
         ]
       }
     ]
@@ -50885,175 +51302,19 @@
     ]
   },
   {
-    "description": "a part that walks a list with more than three items that can't be read is said once on a for line, with its own and N more",
-    "policy": {
-      "ergo_spec": "{{spec}}",
-      "subjects": {
-        "c": {
-          "from": "every cs",
-          "identified_by": "id",
-          "has": {
-            "pos": "os"
-          }
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "c",
-          "checks": {
-            "count_free": {
-              "for": "every ms as m",
-              "assert": "count of rows whose v is in pos.name is 1"
-            },
-            "sum_free": {
-              "for": "every ms as m",
-              "assert": "sum of rows.n whose $params.w is in pos.name is 1"
-            },
-            "nested_count": {
-              "for": "every rows as r",
-              "assert": "count of rows whose n is count of pos.name is 1"
-            },
-            "every_free": {
-              "for": "every ms as m",
-              "assert": "every rows.v is in pos.name"
-            },
-            "some_free": {
-              "for": "every ms as m",
-              "assert": "some rows.v is in pos.name"
-            },
-            "two_roots": {
-              "for": "every rows whose v is in pos.name and whose v is in $params.zz as r",
-              "assert": "r.n is 2"
-            },
-            "two_roots_rev": {
-              "for": "every rows whose v is in $params.zz and whose v is in pos.name as r",
-              "assert": "r.n is 2"
-            }
-          }
-        }
-      }
-    },
-    "params": {"w": "bob"},
-    "cases": [
-      {
-        "description": "five items of the part have no name",
-        "rules": ["message.items", "for.roots"],
-        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}, {}, {}, {}, {}, {}], "rows": [{"v": "bob", "n": 2}], "ms": [{}, {}]}]},
-        "results": [
-          {"cause": "absent", "check": "count_free", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of rows whose v is in pos.name is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0"], "name": "count of rows whose v is in pos.name", "value": null}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {}}, {"cause": "absent", "failed_assertions": [{"assertion": "count of rows whose v is in pos.name is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0"], "name": "count of rows whose v is in pos.name", "value": null}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 2 of ms", "locations": ["/cs/0/ms/1"], "path": "item 2 of ms", "value": {}}], "inputs": [{"locations": ["/cs/0/rows/0"], "name": "count of rows whose v is in pos.name", "value": null}, {"locations": ["/cs/0/ms/0", "/cs/0/ms/1"], "name": "ms[]", "value": [{}, {}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "every_free", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "every rows.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v"], "name": "rows[].v", "value": ["bob"]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {}}, {"cause": "absent", "failed_assertions": [{"assertion": "every rows.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v"], "name": "rows[].v", "value": ["bob"]}]}], "item": "item 2 of ms", "locations": ["/cs/0/ms/1"], "path": "item 2 of ms", "value": {}}], "inputs": [{"locations": ["/cs/0/ms/0", "/cs/0/ms/1"], "name": "ms[]", "value": [{}, {}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v"], "name": "rows[].v", "value": ["bob"]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "nested_count", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of rows whose n equals count of pos.name is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0"], "name": "count of rows whose n equals count of pos.name", "value": null}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"n": 2, "v": "bob"}}], "inputs": [{"locations": ["/cs/0/rows/0"], "name": "count of rows whose n equals count of pos.name", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "some_free", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "some rows.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v"], "name": "rows[].v", "value": ["bob"]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {}}, {"cause": "absent", "failed_assertions": [{"assertion": "some rows.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v"], "name": "rows[].v", "value": ["bob"]}]}], "item": "item 2 of ms", "locations": ["/cs/0/ms/1"], "path": "item 2 of ms", "value": {}}], "inputs": [{"locations": ["/cs/0/ms/0", "/cs/0/ms/1"], "name": "ms[]", "value": [{}, {}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v"], "name": "rows[].v", "value": ["bob"]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "sum_free", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "sum of rows.n whose $params.w is in pos.name is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/n"], "name": "sum of rows.n whose $params.w is in pos.name", "value": null}, {"locations": ["/cs/0/rows/0/n"], "name": "rows[].n", "value": [2]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {}}, {"cause": "absent", "failed_assertions": [{"assertion": "sum of rows.n whose $params.w is in pos.name is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/n"], "name": "sum of rows.n whose $params.w is in pos.name", "value": null}, {"locations": ["/cs/0/rows/0/n"], "name": "rows[].n", "value": [2]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 2 of ms", "locations": ["/cs/0/ms/1"], "path": "item 2 of ms", "value": {}}], "inputs": [{"locations": ["/cs/0/ms/0", "/cs/0/ms/1"], "name": "ms[]", "value": [{}, {}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/n"], "name": "rows[].n", "value": [2]}, {"locations": ["/cs/0/rows/0/n"], "name": "sum of rows.n whose $params.w is in pos.name", "value": null}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "two_roots", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"n": 2, "v": "bob"}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more; $params.zz is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "two_roots_rev", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"n": 2, "v": "bob"}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}]}], "message": "$params.zz is missing; item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
-        ]
-      },
-      {
-        "description": "five items of the part have no name, and an item of the list has no v",
-        "rules": ["message.items", "for.roots"],
-        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}, {}, {}, {}, {}, {}], "rows": [{"v": "bob", "n": 2}, {"n": 2}], "ms": [{}, {}]}]},
-        "results": [
-          {"cause": "absent", "check": "count_free", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of rows whose v is in pos.name is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "count of rows whose v is in pos.name", "value": null}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {}}, {"cause": "absent", "failed_assertions": [{"assertion": "count of rows whose v is in pos.name is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "count of rows whose v is in pos.name", "value": null}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 2 of ms", "locations": ["/cs/0/ms/1"], "path": "item 2 of ms", "value": {}}], "inputs": [{"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "count of rows whose v is in pos.name", "value": null}, {"locations": ["/cs/0/ms/0", "/cs/0/ms/1"], "name": "ms[]", "value": [{}, {}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "every_free", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "every rows.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v", "/cs/0/rows/1"], "name": "rows[].v", "value": ["bob", null]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {}}, {"cause": "absent", "failed_assertions": [{"assertion": "every rows.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v", "/cs/0/rows/1"], "name": "rows[].v", "value": ["bob", null]}]}], "item": "item 2 of ms", "locations": ["/cs/0/ms/1"], "path": "item 2 of ms", "value": {}}], "inputs": [{"locations": ["/cs/0/ms/0", "/cs/0/ms/1"], "name": "ms[]", "value": [{}, {}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v", "/cs/0/rows/1"], "name": "rows[].v", "value": ["bob", null]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "nested_count", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of rows whose n equals count of pos.name is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "count of rows whose n equals count of pos.name", "value": null}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"n": 2, "v": "bob"}}, {"cause": "absent", "failed_assertions": [{"assertion": "count of rows whose n equals count of pos.name is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "count of rows whose n equals count of pos.name", "value": null}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {"n": 2}}], "inputs": [{"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "count of rows whose n equals count of pos.name", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "some_free", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "some rows.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v", "/cs/0/rows/1"], "name": "rows[].v", "value": ["bob", null]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {}}, {"cause": "absent", "failed_assertions": [{"assertion": "some rows.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v", "/cs/0/rows/1"], "name": "rows[].v", "value": ["bob", null]}]}], "item": "item 2 of ms", "locations": ["/cs/0/ms/1"], "path": "item 2 of ms", "value": {}}], "inputs": [{"locations": ["/cs/0/ms/0", "/cs/0/ms/1"], "name": "ms[]", "value": [{}, {}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/v", "/cs/0/rows/1"], "name": "rows[].v", "value": ["bob", null]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "sum_free", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "sum of rows.n whose $params.w is in pos.name is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/n", "/cs/0/rows/1/n"], "name": "sum of rows.n whose $params.w is in pos.name", "value": null}, {"locations": ["/cs/0/rows/0/n", "/cs/0/rows/1/n"], "name": "rows[].n", "value": [2, 2]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {}}, {"cause": "absent", "failed_assertions": [{"assertion": "sum of rows.n whose $params.w is in pos.name is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/n", "/cs/0/rows/1/n"], "name": "sum of rows.n whose $params.w is in pos.name", "value": null}, {"locations": ["/cs/0/rows/0/n", "/cs/0/rows/1/n"], "name": "rows[].n", "value": [2, 2]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 2 of ms", "locations": ["/cs/0/ms/1"], "path": "item 2 of ms", "value": {}}], "inputs": [{"locations": ["/cs/0/ms/0", "/cs/0/ms/1"], "name": "ms[]", "value": [{}, {}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0/n", "/cs/0/rows/1/n"], "name": "rows[].n", "value": [2, 2]}, {"locations": ["/cs/0/rows/0/n", "/cs/0/rows/1/n"], "name": "sum of rows.n whose $params.w is in pos.name", "value": null}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "two_roots", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"n": 2, "v": "bob"}}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {"n": 2}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more; $params.zz is missing; item 2 of rows: v is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "two_roots_rev", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"n": 2, "v": "bob"}}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {"n": 2}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}], "message": "$params.zz is missing; item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more; item 2 of rows: v is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
-        ]
-      }
-    ]
-  },
-  {
-    "description": "an item's own problem comes after a count of a root with an item that isn't an object, in a for line's own whose",
-    "policy": {
-      "ergo_spec": "{{spec}}",
-      "subjects": {
-        "c": {
-          "from": "every cs",
-          "identified_by": "id",
-          "has": {
-            "pos": "os"
-          }
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "c",
-          "checks": {
-            "whose_count": {
-              "for": "every ms whose n is count of pos.name as m",
-              "assert": "m.ws is not empty"
-            }
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "an item of the part is null and the items have no n",
-        "rules": ["message.items", "for.roots"],
-        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}, null], "ms": [{"ws": [1]}, {"ws": [1]}]}]},
-        "results": [
-          {"cause": "not_an_object", "check": "whose_count", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ws": [1]}}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of ms", "locations": ["/cs/0/ms/1"], "path": "item 2 of ms", "value": {"ws": [1]}}], "inputs": [{"locations": ["/cs/0/ms/0", "/cs/0/ms/1"], "name": "ms[]", "value": [{"ws": [1]}, {"ws": [1]}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}], "message": "item 2 of pos is null, which isn't an object; item 1 of ms: n is missing; item 2 of ms: n is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
-        ]
-      }
-    ]
-  },
-  {
-    "description": "an alias of an earlier line that holds a list, read in a second item's whose or as its list, names its item under the first item",
-    "policy": {
-      "ergo_spec": "{{spec}}",
-      "subjects": {
-        "c": {
-          "from": "every cs",
-          "identified_by": "id",
-          "has": {
-            "pos": "os"
-          }
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "c",
-          "checks": {
-            "whose_alias": {
-              "for": "every deps as d, some rows whose v is in d.name as r",
-              "assert": "r.v is \"a\""
-            },
-            "sentence_alias": {
-              "for": "every deps as d",
-              "assert": "every rows.n whose v is in d.ks.name is at least 0"
-            },
-            "list_alias": {
-              "for": "every deps as d, every d.ks.name as m",
-              "assert": "m is \"a\""
-            }
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "the second item of the alias has no name and no ks",
-        "rules": ["message.items", "for.roots", "walk.right.fail"],
-        "input": {"cs": [{"id": "c1", "rows": [{"v": "a", "n": 1}], "deps": [[{"name": "a", "ks": [{"name": "a"}]}, {}]]}]},
-        "results": [
-          {"cause": "absent", "check": "list_alias", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "d[1].ks", "locations": ["/cs/0/deps/0/1"], "path": "d[1].ks", "value": null}], "item": "item 1 of deps", "locations": ["/cs/0/deps/0"], "path": "item 1 of deps", "value": [{"ks": [{"name": "a"}], "name": "a"}, {}]}], "inputs": [{"locations": ["/cs/0/deps/0/0/ks/0/name"], "name": "d[].ks[].name", "value": ["a"]}, {"locations": ["/cs/0/deps/0"], "name": "deps[]", "value": [[{"ks": [{"name": "a"}], "name": "a"}, {}]]}], "message": "item 1 of deps: item 2 of d: ks is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "sentence_alias", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "every rows.n whose v is in d.ks.name is at least 0", "cause": "absent", "inputs": [{"locations": ["/cs/0/deps/0/0/ks/0/name"], "name": "d[].ks[].name", "value": ["a"]}, {"locations": ["/cs/0/rows/0/n"], "name": "rows[].n", "value": [1]}]}], "item": "item 1 of deps", "locations": ["/cs/0/deps/0"], "path": "item 1 of deps", "value": [{"ks": [{"name": "a"}], "name": "a"}, {}]}], "inputs": [{"locations": ["/cs/0/deps/0"], "name": "deps[]", "value": [[{"ks": [{"name": "a"}], "name": "a"}, {}]]}, {"locations": ["/cs/0/rows/0/n"], "name": "rows[].n", "value": [1]}], "message": "item 1 of deps: item 2 of d: ks is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "whose_alias", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"n": 1, "v": "a"}}], "item": "item 1 of deps", "locations": ["/cs/0/deps/0"], "path": "item 1 of deps", "value": [{"ks": [{"name": "a"}], "name": "a"}, {}]}], "inputs": [{"locations": ["/cs/0/deps/0"], "name": "deps[]", "value": [[{"ks": [{"name": "a"}], "name": "a"}, {}]]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"n": 1, "v": "a"}]}], "message": "item 1 of deps: item 2 of d: name is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
-        ]
-      }
-    ]
-  },
-  {
-    "description": "an alias of an earlier line that walks a list with an item that can't be read is a root, and fails a second item on an empty list too",
+    "description": "a part that a for line walks as a list fails it on an empty list when an item of it can't be read",
     "policy": {
       "ergo_spec": "{{spec}}",
       "subjects": {
         "c": {
           "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
           "identified_by": "id"
         }
       },
@@ -51061,21 +51322,13 @@
         "r": {
           "subject": "c",
           "checks": {
-            "whose_if_any": {
-              "for": "every deps as d, every rows whose v is in d.name, if any, as r",
+            "whose": {
+              "for": "every rows whose v is in pos.name, if any, as r",
               "assert": "r.n is 1"
             },
-            "sentence_if_any": {
-              "for": "every deps as d, every rows, if any, as r",
-              "assert": "r.v is in d.name"
-            },
-            "count": {
-              "for": "every deps as d",
-              "assert": "count of rows whose v is in d.name is 0"
-            },
-            "every_if_any": {
-              "for": "every deps as d",
-              "assert": "every rows.v, if any, is in d.name"
+            "sentence": {
+              "for": "every rows, if any, as r",
+              "assert": "r.v is in pos.name"
             }
           }
         }
@@ -51083,932 +51336,451 @@
     },
     "cases": [
       {
-        "description": "an item of the alias has no name, and the second list is empty",
+        "description": "fails, with an empty rows, when an item of it has no name",
         "rules": [
+          "tally.walk",
           "for.roots",
-          "walk.flaws",
-          "message.items"
+          "walk.right.fail"
         ],
         "input": {
           "cs": [
             {
               "id": "c1",
-              "deps": [
-                [
-                  {
-                    "name": "bob"
-                  },
-                  {}
-                ]
+              "rows": [],
+              "ms": [
+                {}
               ],
-              "rows": []
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "absent",
-            "check": "count",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "count of rows whose v is in d.name is 0",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "count of rows whose v is in d.name",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "rows[]",
-                        "value": []
-                      },
-                      {
-                        "locations": [
-                          "/cs/0/deps/0/0/name",
-                          "/cs/0/deps/0/1"
-                        ],
-                        "name": "d[].name",
-                        "value": [
-                          "bob",
-                          null
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
-                  {
-                    "name": "bob"
-                  },
-                  {}
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {}
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: item 2 of d: name is missing",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "every_if_any",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "every rows.v, if any, is in d.name",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/deps/0/0/name",
-                          "/cs/0/deps/0/1"
-                        ],
-                        "name": "d[].name",
-                        "value": [
-                          "bob",
-                          null
-                        ]
-                      },
-                      {
-                        "locations": [],
-                        "name": "rows[].v",
-                        "value": []
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
-                  {
-                    "name": "bob"
-                  },
-                  {}
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {}
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[].v",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: item 2 of d: name is missing",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "sentence_if_any",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {}
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: item 2 of d: name is missing",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "whose_if_any",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {}
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: item 2 of d: name is missing",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          }
-        ]
-      },
-      {
-        "description": "an item of the alias is null, and the second list is empty",
-        "rules": [
-          "for.roots",
-          "walk.flaws",
-          "message.items"
-        ],
-        "input": {
-          "cs": [
-            {
-              "id": "c1",
-              "deps": [
-                [
-                  {
-                    "name": "bob"
-                  },
-                  null
-                ]
-              ],
-              "rows": []
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "unusable",
-            "check": "count",
-            "failed_items": [
-              {
-                "cause": "unusable",
-                "failed_assertions": [
-                  {
-                    "assertion": "count of rows whose v is in d.name is 0",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "count of rows whose v is in d.name",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "rows[]",
-                        "value": []
-                      },
-                      {
-                        "locations": [
-                          "/cs/0/deps/0/0/name",
-                          "/cs/0/deps/0/1"
-                        ],
-                        "name": "d[].name",
-                        "value": [
-                          "bob",
-                          null
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
-                  {
-                    "name": "bob"
-                  },
-                  null
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    null
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: item 2 of d is null, which isn't an object",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "unusable",
-            "check": "every_if_any",
-            "failed_items": [
-              {
-                "cause": "unusable",
-                "failed_assertions": [
-                  {
-                    "assertion": "every rows.v, if any, is in d.name",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/deps/0/0/name",
-                          "/cs/0/deps/0/1"
-                        ],
-                        "name": "d[].name",
-                        "value": [
-                          "bob",
-                          null
-                        ]
-                      },
-                      {
-                        "locations": [],
-                        "name": "rows[].v",
-                        "value": []
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
-                  {
-                    "name": "bob"
-                  },
-                  null
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    null
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[].v",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: item 2 of d is null, which isn't an object",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "unusable",
-            "check": "sentence_if_any",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    null
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: item 2 of d is null, which isn't an object",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "unusable",
-            "check": "whose_if_any",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    null
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: item 2 of d is null, which isn't an object",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          }
-        ]
-      },
-      {
-        "description": "the alias holds names of more than one kind, and the second list is empty",
-        "rules": [
-          "for.roots",
-          "walk.flaws",
-          "message.items"
-        ],
-        "input": {
-          "cs": [
-            {
-              "id": "c1",
-              "deps": [
-                [
-                  {
-                    "name": "bob"
-                  },
-                  {
-                    "name": 3
-                  }
-                ]
-              ],
-              "rows": []
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "unusable",
-            "check": "count",
-            "failed_items": [
-              {
-                "cause": "unusable",
-                "failed_assertions": [
-                  {
-                    "assertion": "count of rows whose v is in d.name is 0",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "count of rows whose v is in d.name",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "rows[]",
-                        "value": []
-                      },
-                      {
-                        "locations": [
-                          "/cs/0/deps/0/0/name",
-                          "/cs/0/deps/0/1/name"
-                        ],
-                        "name": "d[].name",
-                        "value": [
-                          "bob",
-                          3
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
-                  {
-                    "name": "bob"
-                  },
-                  {
-                    "name": 3
-                  }
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {
-                      "name": 3
-                    }
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: d[].name is [\"bob\", 3], which isn't a list of one kind of value",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "unusable",
-            "check": "every_if_any",
-            "failed_items": [
-              {
-                "cause": "unusable",
-                "failed_assertions": [
-                  {
-                    "assertion": "every rows.v, if any, is in d.name",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/deps/0/0/name",
-                          "/cs/0/deps/0/1/name"
-                        ],
-                        "name": "d[].name",
-                        "value": [
-                          "bob",
-                          3
-                        ]
-                      },
-                      {
-                        "locations": [],
-                        "name": "rows[].v",
-                        "value": []
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
-                  {
-                    "name": "bob"
-                  },
-                  {
-                    "name": 3
-                  }
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {
-                      "name": 3
-                    }
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[].v",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: d[].name is [\"bob\", 3], which isn't a list of one kind of value",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "unusable",
-            "check": "sentence_if_any",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {
-                      "name": 3
-                    }
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: d[].name is [\"bob\", 3], which isn't a list of one kind of value",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "unusable",
-            "check": "whose_if_any",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {
-                      "name": 3
-                    }
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "message": "item 1 of deps: d[].name is [\"bob\", 3], which isn't a list of one kind of value",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          }
-        ]
-      },
-      {
-        "description": "the alias reads fine, and the second list is empty",
-        "rules": [
-          "for.roots",
-          "walk.flaws",
-          "message.items"
-        ],
-        "input": {
-          "cs": [
-            {
-              "id": "c1",
-              "deps": [
-                [
-                  {
-                    "name": "bob"
-                  },
-                  {
-                    "name": "ann"
-                  }
-                ]
-              ],
-              "rows": []
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "satisfied",
-            "check": "count",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {
-                      "name": "ann"
-                    }
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "every_if_any",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {
-                      "name": "ann"
-                    }
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[].v",
-                "value": []
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "sentence_if_any",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {
-                      "name": "ann"
-                    }
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "whose_if_any",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {
-                      "name": "ann"
-                    }
-                  ]
-                ]
-              },
-              {
-                "locations": [],
-                "name": "rows[]",
-                "value": []
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          }
-        ]
-      },
-      {
-        "description": "an item of the alias has no name, and an item of the second list has no v",
-        "rules": [
-          "for.roots",
-          "walk.flaws",
-          "message.items"
-        ],
-        "input": {
-          "cs": [
-            {
-              "id": "c1",
-              "deps": [
-                [
-                  {
-                    "name": "bob"
-                  },
-                  {}
-                ]
-              ],
-              "rows": [
+              "os": [
                 {
-                  "v": "bob",
-                  "n": 1
+                  "name": "bob"
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "sentence",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of pos: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of pos: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when an item of it is null",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "sentence",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of pos is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of pos is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when it holds names of more than one kind",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
                 },
                 {
-                  "n": 1
+                  "name": 3
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "sentence",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes, with an empty rows, when it reads fine",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": "ann"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "sentence",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "second": {
+              "for": "every ms as m, every rows, if any, as r",
+              "assert": "r.v is in c.pos.name"
+            },
+            "count": {
+              "for": "every rows, if any, as r",
+              "assert": "count of rows whose v is in c.os.name is 0"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows, when an item of it has no name",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {}
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
                 }
               ]
             }
@@ -52018,387 +51790,447 @@
           {
             "cause": "absent",
             "check": "count",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "count of rows whose v is in d.name is 0",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/rows/0",
-                          "/cs/0/rows/1"
-                        ],
-                        "name": "count of rows whose v is in d.name",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/cs/0/rows/0",
-                          "/cs/0/rows/1"
-                        ],
-                        "name": "rows[]",
-                        "value": [
-                          {
-                            "n": 1,
-                            "v": "bob"
-                          },
-                          {
-                            "n": 1
-                          }
-                        ]
-                      },
-                      {
-                        "locations": [
-                          "/cs/0/deps/0/0/name",
-                          "/cs/0/deps/0/1"
-                        ],
-                        "name": "d[].name",
-                        "value": [
-                          "bob",
-                          null
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
-                  {
-                    "name": "bob"
-                  },
-                  {}
-                ]
-              }
-            ],
+            "failed_items": [],
             "inputs": [
               {
                 "locations": [
-                  "/cs/0/deps/0"
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
                 ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {}
-                  ]
-                ]
-              },
-              {
-                "locations": [
-                  "/cs/0/rows/0",
-                  "/cs/0/rows/1"
-                ],
-                "name": "rows[]",
-                "value": [
-                  {
-                    "n": 1,
-                    "v": "bob"
-                  },
-                  {
-                    "n": 1
-                  }
-                ]
-              }
-            ],
-            "message": "item 1 of deps: item 2 of d: name is missing",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "c1",
-              "type": "c"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "every_if_any",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "every rows.v, if any, is in d.name",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/deps/0/0/name",
-                          "/cs/0/deps/0/1"
-                        ],
-                        "name": "d[].name",
-                        "value": [
-                          "bob",
-                          null
-                        ]
-                      },
-                      {
-                        "locations": [
-                          "/cs/0/rows/0/v",
-                          "/cs/0/rows/1"
-                        ],
-                        "name": "rows[].v",
-                        "value": [
-                          "bob",
-                          null
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
-                  {
-                    "name": "bob"
-                  },
-                  {}
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "name": "deps[]",
-                "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {}
-                  ]
-                ]
-              },
-              {
-                "locations": [
-                  "/cs/0/rows/0/v",
-                  "/cs/0/rows/1"
-                ],
-                "name": "rows[].v",
+                "name": "c.os[].name",
                 "value": [
                   "bob",
                   null
                 ]
+              },
+              {
+                "locations": [],
+                "name": "count of rows whose v is in c.os.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
               }
             ],
-            "message": "item 1 of deps: item 2 of d: name is missing",
+            "message": "item 2 of c.os: name is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
-              "id": "c1",
-              "type": "c"
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
             }
           },
           {
             "cause": "absent",
-            "check": "sentence_if_any",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "r.v is in d.name",
-                    "cause": "absent",
-                    "items": [
-                      {
-                        "cause": "absent",
-                        "inputs": [
-                          {
-                            "locations": [
-                              "/cs/0/rows/0/v"
-                            ],
-                            "name": "r.v",
-                            "value": "bob"
-                          },
-                          {
-                            "locations": [
-                              "/cs/0/deps/0/0/name",
-                              "/cs/0/deps/0/1"
-                            ],
-                            "name": "d[].name",
-                            "value": [
-                              "bob",
-                              null
-                            ]
-                          }
-                        ],
-                        "item": "item 1 of rows"
-                      },
-                      {
-                        "cause": "absent",
-                        "inputs": [
-                          {
-                            "locations": [
-                              "/cs/0/rows/1"
-                            ],
-                            "name": "r.v",
-                            "value": null
-                          },
-                          {
-                            "locations": [
-                              "/cs/0/deps/0/0/name",
-                              "/cs/0/deps/0/1"
-                            ],
-                            "name": "d[].name",
-                            "value": [
-                              "bob",
-                              null
-                            ]
-                          }
-                        ],
-                        "item": "item 2 of rows"
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
-                  {
-                    "name": "bob"
-                  },
-                  {}
-                ]
-              }
-            ],
+            "check": "second",
+            "failed_items": [],
             "inputs": [
               {
                 "locations": [
-                  "/cs/0/deps/0"
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
                 ],
-                "name": "deps[]",
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
                 "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {}
-                  ]
+                  "bob",
+                  null
                 ]
               },
               {
                 "locations": [
-                  "/cs/0/rows/0",
-                  "/cs/0/rows/1"
+                  "/cs/0/kids/0/ms/0"
                 ],
-                "name": "rows[]",
+                "name": "ms[]",
                 "value": [
-                  {
-                    "n": 1,
-                    "v": "bob"
-                  },
-                  {
-                    "n": 1
-                  }
+                  {}
                 ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
               }
             ],
-            "message": "item 1 of deps: item 2 of d: name is missing; item 1 of deps: item 2 of rows: r.v is missing",
+            "message": "item 2 of c.pos: name is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when an item of it is null",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
               "id": "c1",
-              "type": "c"
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                null
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "c.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "count of rows whose v is in c.os.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of c.os is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
             }
           },
           {
-            "cause": "absent",
-            "check": "whose_if_any",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "failed_assertions": [],
-                "failed_items": [
-                  {
-                    "cause": "absent",
-                    "item": "item 1 of rows",
-                    "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "path": "item 1 of rows",
-                    "value": {
-                      "n": 1,
-                      "v": "bob"
-                    }
-                  },
-                  {
-                    "cause": "absent",
-                    "item": "item 2 of rows",
-                    "locations": [
-                      "/cs/0/rows/1"
-                    ],
-                    "path": "item 2 of rows",
-                    "value": {
-                      "n": 1
-                    }
-                  }
-                ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/cs/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
-                  {
-                    "name": "bob"
-                  },
-                  {}
-                ]
-              }
-            ],
+            "cause": "unusable",
+            "check": "second",
+            "failed_items": [],
             "inputs": [
               {
                 "locations": [
-                  "/cs/0/deps/0"
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
                 ],
-                "name": "deps[]",
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
                 "value": [
-                  [
-                    {
-                      "name": "bob"
-                    },
-                    {}
-                  ]
+                  "bob",
+                  null
                 ]
               },
               {
                 "locations": [
-                  "/cs/0/rows/0",
-                  "/cs/0/rows/1"
+                  "/cs/0/kids/0/ms/0"
                 ],
-                "name": "rows[]",
+                "name": "ms[]",
                 "value": [
-                  {
-                    "n": 1,
-                    "v": "bob"
-                  },
-                  {
-                    "n": 1
-                  }
+                  {}
                 ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
               }
             ],
-            "message": "item 1 of deps: item 2 of d: name is missing; item 1 of deps: item 2 of rows: v is missing",
+            "message": "item 2 of c.pos is null, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when it holds names of more than one kind",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
               "id": "c1",
-              "type": "c"
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": 3
+                }
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.os[].name",
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "count of rows whose v is in c.os.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "c.os[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "second",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/kids/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "c.pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes, with an empty rows, when it reads fine",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": "ann"
+                }
+              ],
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [],
+                  "ms": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.os[].name",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "count of rows whose v is in c.os.name",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "second",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "c.pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "c.pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/kids/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "c": "c1"
+              },
+              "type": "k"
             }
           }
         ]
@@ -52406,98 +52238,19 @@
     ]
   },
   {
-    "description": "a second item's whose that can't read its own field names the field, as a first item's does",
+    "description": "an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read",
     "policy": {
       "ergo_spec": "{{spec}}",
       "subjects": {
         "c": {
-          "from": "every cs",
+          "from": "cs",
           "identified_by": "id",
           "has": {
             "pos": "os"
           }
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "c",
-          "checks": {
-            "no_root": {
-              "for": "every ms as m, every m.ws whose v is in pos.name as w",
-              "assert": "w.n is 2"
-            },
-            "subject_field": {
-              "for": "every ms as m, every m.ws as w",
-              "assert": "w.v is in os.name"
-            }
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "the part reads fine and an item has no v",
-        "rules": ["message.items", "for.roots"],
-        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}], "ms": [{"ws": [{"v": "bob", "n": 2}, {"n": 2}]}]}]},
-        "results": [
-          {"cause": "absent", "check": "no_root", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 2 of m.ws", "locations": ["/cs/0/ms/0/ws/1"], "path": "item 2 of m.ws", "value": {"n": 2}}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ws": [{"n": 2, "v": "bob"}, {"n": 2}]}}], "inputs": [{"locations": ["/cs/0/ms/0/ws/0", "/cs/0/ms/0/ws/1"], "name": "m.ws[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}, {"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ws": [{"n": 2, "v": "bob"}, {"n": 2}]}]}, {"locations": ["/cs/0/os/0/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob"]}], "message": "item 1 of ms: item 2 of ws: v is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "subject_field", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "w.v is in os.name", "cause": "absent", "items": [{"cause": "absent", "inputs": [{"locations": ["/cs/0/ms/0/ws/1"], "name": "w.v", "value": null}, {"locations": ["/cs/0/os/0/name"], "name": "os[].name", "value": ["bob"]}], "item": "item 2 of m.ws"}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ws": [{"n": 2, "v": "bob"}, {"n": 2}]}}], "inputs": [{"locations": ["/cs/0/ms/0/ws/0", "/cs/0/ms/0/ws/1"], "name": "m.ws[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}, {"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ws": [{"n": 2, "v": "bob"}, {"n": 2}]}]}, {"locations": ["/cs/0/os/0/name"], "name": "os[].name", "value": ["bob"]}], "message": "item 1 of ms: item 2 of ws: w.v is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
-        ]
-      },
-      {
-        "description": "an item of the subject's list has no name and an item has no v",
-        "rules": ["message.items", "for.roots"],
-        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}, {}], "ms": [{"ws": [{"v": "bob", "n": 2}, {"n": 2}]}]}]},
-        "results": [
-          {"cause": "absent", "check": "no_root", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 1 of m.ws", "locations": ["/cs/0/ms/0/ws/0"], "path": "item 1 of m.ws", "value": {"n": 2, "v": "bob"}}, {"cause": "absent", "item": "item 2 of m.ws", "locations": ["/cs/0/ms/0/ws/1"], "path": "item 2 of m.ws", "value": {"n": 2}}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ws": [{"n": 2, "v": "bob"}, {"n": 2}]}}], "inputs": [{"locations": ["/cs/0/ms/0/ws/0", "/cs/0/ms/0/ws/1"], "name": "m.ws[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}, {"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ws": [{"n": 2, "v": "bob"}, {"n": 2}]}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}], "message": "item 2 of pos: name is missing; item 1 of ms: item 2 of ws: v is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "subject_field", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "w.v is in os.name", "cause": "absent", "items": [{"cause": "absent", "inputs": [{"locations": ["/cs/0/ms/0/ws/0/v"], "name": "w.v", "value": "bob"}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "os[].name", "value": ["bob", null]}], "item": "item 1 of m.ws"}, {"cause": "absent", "inputs": [{"locations": ["/cs/0/ms/0/ws/1"], "name": "w.v", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "os[].name", "value": ["bob", null]}], "item": "item 2 of m.ws"}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ws": [{"n": 2, "v": "bob"}, {"n": 2}]}}], "inputs": [{"locations": ["/cs/0/ms/0/ws/0", "/cs/0/ms/0/ws/1"], "name": "m.ws[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}, {"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ws": [{"n": 2, "v": "bob"}, {"n": 2}]}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "os[].name", "value": ["bob", null]}], "message": "item 2 of os: name is missing; item 1 of ms: item 2 of ws: w.v is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a list of the subject that a sentence counts, with items that aren't objects, is said once on a for line",
-    "policy": {
-      "ergo_spec": "{{spec}}",
-      "subjects": {
-        "c": {
-          "from": "every cs",
-          "identified_by": "id",
-          "has": {
-            "pos": "os"
-          }
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "c",
-          "checks": {
-            "count_root": {
-              "for": "every rows as r",
-              "assert": "count of zz.a is r.n"
-            }
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "the items of the list are a number and null",
-        "rules": ["message.items", "for.roots"],
-        "input": {"cs": [{"id": "c1", "zz": [1, null], "rows": [{"n": 2}, {"n": 2}]}]},
-        "results": [
-          {"cause": "not_an_object", "check": "count_root", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "count of zz.a equals r.n", "cause": "not_an_object", "inputs": [{"locations": ["/cs/0/zz/0", "/cs/0/zz/1"], "name": "count of zz.a", "value": null}, {"locations": ["/cs/0/zz/0", "/cs/0/zz/1"], "name": "zz[].a", "value": [null, null]}, {"locations": ["/cs/0/rows/0/n"], "name": "r.n", "value": 2}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"n": 2}}, {"cause": "not_an_object", "failed_assertions": [{"assertion": "count of zz.a equals r.n", "cause": "not_an_object", "inputs": [{"locations": ["/cs/0/zz/0", "/cs/0/zz/1"], "name": "count of zz.a", "value": null}, {"locations": ["/cs/0/zz/0", "/cs/0/zz/1"], "name": "zz[].a", "value": [null, null]}, {"locations": ["/cs/0/rows/1/n"], "name": "r.n", "value": 2}]}], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {"n": 2}}], "inputs": [{"locations": ["/cs/0/zz/0", "/cs/0/zz/1"], "name": "count of zz.a", "value": null}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2}, {"n": 2}]}, {"locations": ["/cs/0/zz/0", "/cs/0/zz/1"], "name": "zz[].a", "value": [null, null]}], "message": "item 1 of zz is 1, which isn't an object; item 2 of zz is null, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a $params or $input name that walks a list of more than one kind of value fails the items of a for line, and each item still says its own problem",
-    "policy": {
-      "ergo_spec": "{{spec}}",
-      "subjects": {
-        "c": {
-          "from": "every cs",
+        },
+        "k": {
+          "from": "every c.kids",
           "identified_by": "id"
         }
       },
@@ -52505,68 +52258,517 @@
         "r": {
           "subject": "c",
           "checks": {
-            "params_whose": {
-              "for": "every rows whose v is in $params.os.name as r",
-              "assert": "r.n is 2"
+            "whose": {
+              "for": "every deps as d, every rows whose v is in d.name, if any, as r",
+              "assert": "r.n is 1"
             },
-            "input_whose": {
-              "for": "every rows whose v is in $input.os.name as r",
-              "assert": "r.n is 2"
-            },
-            "input_sentence": {
-              "for": "every rows as r",
-              "assert": "r.v is in $input.os.name"
+            "count": {
+              "for": "every deps as d, every rows, if any, as r",
+              "assert": "count of r.tags that is in d.name is 0"
             }
           }
         }
       }
     },
-    "params": {"os": [{"name": "bob"}, {"name": 3}]},
     "cases": [
       {
-        "description": "an item has no v",
-        "rules": ["message.items", "for.roots"],
-        "input": {"os": [{"name": "bob"}, {"name": 3}], "cs": [{"id": "c1", "rows": [{"v": "bob", "n": 2}, {"n": 2}]}]},
+        "description": "fails, with an empty rows, when an item of it has no name",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "deps": [
+                [
+                  {
+                    "name": "bob"
+                  },
+                  {}
+                ]
+              ]
+            }
+          ]
+        },
         "results": [
-          {"cause": "unusable", "check": "input_sentence", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.v is in $input.os.name", "cause": "unusable", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/os/0/name", "/os/1/name"], "name": "$input.os[].name", "value": ["bob", 3]}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"n": 2, "v": "bob"}}, {"cause": "unusable", "failed_assertions": [{"assertion": "r.v is in $input.os.name", "cause": "unusable", "inputs": [{"locations": ["/cs/0/rows/1"], "name": "r.v", "value": null}, {"locations": ["/os/0/name", "/os/1/name"], "name": "$input.os[].name", "value": ["bob", 3]}]}], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {"n": 2}}], "inputs": [{"locations": ["/os/0/name", "/os/1/name"], "name": "$input.os[].name", "value": ["bob", 3]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}], "message": "$input.os[].name is [\"bob\", 3], which isn't a list of one kind of value; item 1 of rows: r.v is \"bob\", which isn't a number or text", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "unusable", "check": "input_whose", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"n": 2, "v": "bob"}}, {"cause": "unusable", "failed_assertions": [], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {"n": 2}}], "inputs": [{"locations": ["/os/0/name", "/os/1/name"], "name": "$input.os[].name", "value": ["bob", 3]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}], "message": "$input.os[].name is [\"bob\", 3], which isn't a list of one kind of value; item 1 of rows: v is \"bob\", which isn't a number or text; item 2 of rows: v is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "unusable", "check": "params_whose", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"n": 2, "v": "bob"}}, {"cause": "unusable", "failed_assertions": [], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {"n": 2}}], "inputs": [{"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"n": 2, "v": "bob"}, {"n": 2}]}], "message": "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value; item 1 of rows: v is \"bob\", which isn't a number or text; item 2 of rows: v is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
+          {
+            "cause": "absent",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/deps/0"
+                ],
+                "name": "deps[]",
+                "value": [
+                  [
+                    {
+                      "name": "bob"
+                    },
+                    {}
+                  ]
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of deps: item 2 of d: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/deps/0"
+                ],
+                "name": "deps[]",
+                "value": [
+                  [
+                    {
+                      "name": "bob"
+                    },
+                    {}
+                  ]
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of deps: item 2 of d: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when an item of it is null",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "deps": [
+                [
+                  {
+                    "name": "bob"
+                  },
+                  null
+                ]
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/deps/0"
+                ],
+                "name": "deps[]",
+                "value": [
+                  [
+                    {
+                      "name": "bob"
+                    },
+                    null
+                  ]
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of deps: item 2 of d is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/deps/0"
+                ],
+                "name": "deps[]",
+                "value": [
+                  [
+                    {
+                      "name": "bob"
+                    },
+                    null
+                  ]
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of deps: item 2 of d is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails, with an empty rows, when it holds names of more than one kind",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "deps": [
+                [
+                  {
+                    "name": "bob"
+                  },
+                  {
+                    "name": 3
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/deps/0"
+                ],
+                "name": "deps[]",
+                "value": [
+                  [
+                    {
+                      "name": "bob"
+                    },
+                    {
+                      "name": 3
+                    }
+                  ]
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of deps: d[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/deps/0"
+                ],
+                "name": "deps[]",
+                "value": [
+                  [
+                    {
+                      "name": "bob"
+                    },
+                    {
+                      "name": 3
+                    }
+                  ]
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of deps: d[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes, with an empty rows, when it reads fine",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "deps": [
+                [
+                  {
+                    "name": "bob"
+                  },
+                  {
+                    "name": "ann"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/deps/0"
+                ],
+                "name": "deps[]",
+                "value": [
+                  [
+                    {
+                      "name": "bob"
+                    },
+                    {
+                      "name": "ann"
+                    }
+                  ]
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/deps/0"
+                ],
+                "name": "deps[]",
+                "value": [
+                  [
+                    {
+                      "name": "bob"
+                    },
+                    {
+                      "name": "ann"
+                    }
+                  ]
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes, with an empty rows, when the earlier line's item is null",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "deps": [
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "count",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/deps/0"
+                ],
+                "name": "deps[]",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "whose",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/deps/0"
+                ],
+                "name": "deps[]",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
         ]
       }
     ]
   },
   {
-    "description": "a name read from outside the item that walks a list with an item that can't be read fails a for line on an empty list too",
+    "description": "a field of the subject written with a dot that a for line walks fails it on an empty list when an item of it can't be read",
     "policy": {
       "ergo_spec": "{{spec}}",
       "subjects": {
         "c": {
-          "from": "every cs",
+          "from": "cs",
           "identified_by": "id",
           "has": {
             "pos": "os"
           }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
         }
       },
       "requirements": {
         "r": {
           "subject": "c",
           "checks": {
-            "whose_if_any": {
-              "for": "every rows whose v is in pos.name, if any, as r",
-              "assert": "r.n is 2"
+            "sentence": {
+              "for": "every rows, if any, as p",
+              "assert": "p.v is in .p.name"
             },
-            "whose": {
-              "for": "every rows whose v is in pos.name as r",
-              "assert": "r.n is 2"
-            },
-            "sentence_if_any": {
-              "for": "every rows, if any, as r",
-              "assert": "r.v is in pos.name"
-            },
-            "sentence_field": {
-              "for": "every rows, if any, as r",
-              "assert": "r.v is in os.name"
+            "contains": {
+              "for": "every rows, if any, as p",
+              "assert": "p.tags contains all of .p.name"
             }
           }
         }
@@ -52574,49 +52776,501 @@
     },
     "cases": [
       {
-        "description": "an item of the part has no name",
-        "rules": ["for.roots", "walk.flaws"],
-        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}, {}], "rows": []}]},
+        "description": "fails, with an empty rows, when an item of it has no name",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "p": [
+                {
+                  "name": "bob"
+                },
+                {}
+              ]
+            }
+          ]
+        },
         "results": [
-          {"cause": "absent", "check": "sentence_field", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "os[].name", "value": ["bob", null]}, {"locations": [], "name": "rows[]", "value": []}], "message": "item 2 of os: name is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "sentence_if_any", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}, {"locations": [], "name": "rows[]", "value": []}], "message": "item 2 of pos: name is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "whose", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "rows", "locations": ["/cs/0/rows"], "path": "rows", "value": []}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}, {"locations": [], "name": "rows[]", "value": []}], "message": "item 2 of pos: name is missing; rows is []", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "absent", "check": "whose_if_any", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}, {"locations": [], "name": "rows[]", "value": []}], "message": "item 2 of pos: name is missing", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
+          {
+            "cause": "absent",
+            "check": "contains",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/p/0/name",
+                  "/cs/0/p/1"
+                ],
+                "name": ".p[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of .p: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "sentence",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/p/0/name",
+                  "/cs/0/p/1"
+                ],
+                "name": ".p[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of .p: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
         ]
       },
       {
-        "description": "an item of the part is null",
-        "rules": ["for.roots", "walk.flaws"],
-        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}, null], "rows": []}]},
+        "description": "fails, with an empty rows, when an item of it is null",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "p": [
+                {
+                  "name": "bob"
+                },
+                null
+              ]
+            }
+          ]
+        },
         "results": [
-          {"cause": "unusable", "check": "sentence_field", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "os[].name", "value": ["bob", null]}, {"locations": [], "name": "rows[]", "value": []}], "message": "item 2 of os is null, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "unusable", "check": "sentence_if_any", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}, {"locations": [], "name": "rows[]", "value": []}], "message": "item 2 of pos is null, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "unusable", "check": "whose", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "rows", "locations": ["/cs/0/rows"], "path": "rows", "value": []}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}, {"locations": [], "name": "rows[]", "value": []}], "message": "item 2 of pos is null, which isn't an object; rows is []", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "unusable", "check": "whose_if_any", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}, {"locations": [], "name": "rows[]", "value": []}], "message": "item 2 of pos is null, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
+          {
+            "cause": "unusable",
+            "check": "contains",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/p/0/name",
+                  "/cs/0/p/1"
+                ],
+                "name": ".p[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of .p is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "sentence",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/p/0/name",
+                  "/cs/0/p/1"
+                ],
+                "name": ".p[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of .p is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
         ]
       },
       {
-        "description": "the names are of more than one kind",
-        "rules": ["for.roots", "walk.flaws"],
-        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}, {"name": 3}], "rows": []}]},
+        "description": "fails, with an empty rows, when it holds names of more than one kind",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "p": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": 3
+                }
+              ]
+            }
+          ]
+        },
         "results": [
-          {"cause": "unusable", "check": "sentence_field", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "os[].name", "value": ["bob", 3]}, {"locations": [], "name": "rows[]", "value": []}], "message": "os[].name is [\"bob\", 3], which isn't a list of one kind of value", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "unusable", "check": "sentence_if_any", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", 3]}, {"locations": [], "name": "rows[]", "value": []}], "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "unusable", "check": "whose", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "rows", "locations": ["/cs/0/rows"], "path": "rows", "value": []}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", 3]}, {"locations": [], "name": "rows[]", "value": []}], "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value; rows is []", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "unusable", "check": "whose_if_any", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", 3]}, {"locations": [], "name": "rows[]", "value": []}], "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
+          {
+            "cause": "unusable",
+            "check": "contains",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/p/0/name",
+                  "/cs/0/p/1/name"
+                ],
+                "name": ".p[].name",
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": ".p[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "sentence",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/p/0/name",
+                  "/cs/0/p/1/name"
+                ],
+                "name": ".p[].name",
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": ".p[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
         ]
       },
       {
-        "description": "the part reads fine",
-        "rules": ["for.roots", "walk.flaws"],
-        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}], "rows": []}]},
+        "description": "passes, with an empty rows, when it reads fine",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ],
+              "p": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": "ann"
+                }
+              ]
+            }
+          ]
+        },
         "results": [
-          {"cause": "satisfied", "check": "sentence_field", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name"], "name": "os[].name", "value": ["bob"]}, {"locations": [], "name": "rows[]", "value": []}], "passed": true, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "satisfied", "check": "sentence_if_any", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob"]}, {"locations": [], "name": "rows[]", "value": []}], "passed": true, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "value", "check": "whose", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "rows", "locations": ["/cs/0/rows"], "path": "rows", "value": []}], "inputs": [{"locations": ["/cs/0/os/0/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob"]}, {"locations": [], "name": "rows[]", "value": []}], "message": "rows is []", "passed": false, "requirement": "r", "subject": {"id": "c1", "type": "c"}},
-          {"cause": "satisfied", "check": "whose_if_any", "failed_items": [], "inputs": [{"locations": ["/cs/0/os/0/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob"]}, {"locations": [], "name": "rows[]", "value": []}], "passed": true, "requirement": "r", "subject": {"id": "c1", "type": "c"}}
+          {
+            "cause": "satisfied",
+            "check": "contains",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/p/0/name",
+                  "/cs/0/p/1/name"
+                ],
+                "name": ".p[].name",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "sentence",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/p/0/name",
+                  "/cs/0/p/1/name"
+                ],
+                "name": ".p[].name",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
         ]
       }
     ]
+  },
+  {
+    "description": "a $params list that a for line walks fails it on an empty list when an item of it can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "contains": {
+              "for": "every rows, if any, as r",
+              "assert": "r.tags contains all of $params.os.name"
+            },
+            "every": {
+              "for": "every ms as m",
+              "assert": "every rows.v, if any, is in $params.os.name"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows, when an item of it has no name",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "contains",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/os/0/name",
+                  "$params:/os/1"
+                ],
+                "name": "$params.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.os: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "every",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "every rows.v, if any, is in $params.os.name",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "rows[].v",
+                        "value": []
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ms",
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "path": "item 1 of ms",
+                "value": {}
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.os: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ],
+    "params": {
+      "os": [
+        {
+          "name": "bob"
+        },
+        {}
+      ]
+    }
   }
 ]
