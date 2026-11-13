@@ -135,6 +135,7 @@ mod tests {
         let input = json!({"s": subject});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["s"],
                 location: Location::input_root().key("s"),

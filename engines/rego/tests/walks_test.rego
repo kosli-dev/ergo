@@ -1802,9 +1802,58 @@ test_a_right_side_walks_a_list_input_whatever_another_check_reads_as_a_key if {
 	}}}}
 	doc := [{"id": "x", "k": "x", "m": {"x": 1}}]
 	rep := ergo.report(doc, policy, {})
-	[[r.check, r.passed, r.cause] | some r in rep.results; r.check in {"c", "d"}] == [["c", true, "satisfied"], ["d", false, "unusable"]]
+	[[r.check, r.passed, r.cause] | some r in rep.results; r.check in {"c", "d"}] == [["c", true, "satisfied"], ["d", false, "not_an_object"]]
 	rep.requirements.r.checks.c["$refs"] == [{"name": "$input[].k", "value": ["x"], "locations": ["/0/k"]}]
 	rep.requirements.r.checks.d["$refs"] == [{"name": "$input.k", "value": null, "locations": [""]}]
+}
+
+test_a_check_decides_a_named_by_key_on_a_list_input_by_its_own_form_not_by_the_checks_beside_it if {
+	doc := [{"id": "t", "k": "a", "m": {"a": "a"}, "rs": [{"v": "a"}]}]
+	message := concat("", ["$input is ", ergo._text(doc), ", which isn't an object"])
+	every params in [{}, {"k": null}, {"k": 3}] {
+		every beside in [{"for": "every rs as r", "assert": "r.v is \"a\""}, "every rs.v is m named by $input.k", "some rs.v is m named by $input.k", "count of rs whose v is m named by $input.k is 1", "some rs whose v is m named by $input.k exists"] {
+			policy := {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"x": "k is $input.m named by $params.k", "z": beside}}}}
+			[[r.cause, r.message] | some r in ergo.report(doc, policy, params).results; r.check == "x"] == [["not_an_object", message]]
+		}
+	}
+}
+
+test_a_count_of_a_child_subject_and_a_from_line_read_a_named_by_key_on_a_list_input_as_they_did_before if {
+	doc := [{"id": "t", "k": "a", "m": {"a": "a"}, "rs": [{"v": "a"}], "xs": [{"m": {"a": "a"}}], "cs": [{"id": "c1", "k": "a"}]}]
+	listed := "$input is [an object with 6 keys], which isn't an object"
+	policy := {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "$input", "identified_by": "id"}, "c": {"from": "every t.cs", "identified_by": "id"}, "u": {"from": "$input whose k is $input.m named by $params.k", "identified_by": "id"}}, "requirements": {
+		"r": {"subject": "t", "checks": {
+			"plain": "k is $input.m named by $params.k",
+			"count_whose": "count of rs whose v is $input.m named by $params.k is 1",
+			"count_input": "count of xs.m named by $input.k is 1",
+			"any_of_count": {"any_of": {"a": "k is $input.m named by $params.k", "b": "count of xs.m named by $input.k is 1"}},
+		}},
+		"s": {"subject": "c", "checks": {"child": "k is $input.m named by $params.k"}},
+		"q": {"subject": "u", "checks": {"c": "id exists"}},
+	}}
+	every said in [
+		[{}, "absent", "$params.k is missing", "$params.k is missing"],
+		[{"k": null}, "null", "$params.k is null", "$params.k is null"],
+		[{"k": 3}, "unusable", "$params.k is 3, which isn't text", listed],
+	] {
+		rows := {r.check: [r.cause, r.message] | some r in ergo.report(doc, policy, said[0]).results; r.check != "$min_subjects"; r.check != "$unique_ids"; r.check != "$unique_ancestor_ids"}
+		rows == {
+			"plain": ["not_an_object", listed],
+			"count_whose": [said[1], said[3]],
+			"count_input": ["unusable", "count of xs.m named by $input.k is 1 is false"],
+			"any_of_count": ["unusable", concat("", ["a: ", said[2], "; b: the check is false"])],
+			"child": [said[1], said[2]],
+			"$applies": [said[1], said[2]],
+		}
+	}
+}
+
+test_a_for_sentence_reads_a_named_by_key_on_a_list_input_as_it_did_before if {
+	doc := [{"id": "t", "k": "a", "m": {"a": "a"}, "rs": [{"v": "a"}]}]
+	policy := {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"z": {"for": "every rs as r", "assert": "k is \"a\" followed by $input.m named by $params.k"}}}}}
+	every params in [[{}, "absent", "$params.k is missing"], [{"k": null}, "null", "$params.k is null"], [{"k": 3}, "unusable", "$params.k is 3, which isn't text"]] {
+		[[r.cause, r.message] | some r in ergo.report(doc, policy, params[0]).results; r.check == "z"] == [[params[1], params[2]]]
+	}
 }
 
 test_a_position_after_a_walked_ref_names_the_value_that_isnt_a_list if {

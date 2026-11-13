@@ -230,6 +230,7 @@ enum Read<'a> {
 fn context<'a>(env: &Env<'a>, subject: Located<'a>, anc: &[Anc<'a>]) -> Ctx<'a> {
     Ctx {
         label: None,
+        item_by_item: true,
         subject,
         input: env.input,
         params: env.params,
@@ -2057,6 +2058,7 @@ fn check_rows<'a>(
 ) -> Vec<Row> {
     let mut ctx = context(env, at, anc);
     ctx.label = Some(env.subject.to_string());
+    ctx.item_by_item = !anc.is_empty();
     env.checks
         .iter()
         .filter(|(name, _)| !name.starts_with('$'))
@@ -2105,6 +2107,13 @@ fn walked_roots_run(check: &Check, ctx: &Ctx) -> ops::Ran {
 }
 
 fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc: &[Anc]) -> Row {
+    let by_item;
+    let ctx = if !ctx.item_by_item && plan.items.iter().any(|item| item.check.reads_by_item()) {
+        by_item = ctx.item_by_item();
+        &by_item
+    } else {
+        ctx
+    };
     let mut failed_items = None;
     let mut said: Vec<Option<String>> = Vec::new();
     let checks: Vec<Check> = plan

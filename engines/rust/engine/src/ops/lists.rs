@@ -970,7 +970,7 @@ pub fn one_rights(check: &super::Check) -> Vec<&Path> {
     out
 }
 
-fn input_one_path(path: &Path, ctx: &Ctx) -> bool {
+pub(super) fn input_one_path(path: &Path, ctx: &Ctx) -> bool {
     path.start == Start::Input
         && ctx.input.is_array()
         && matches!(
@@ -981,7 +981,9 @@ fn input_one_path(path: &Path, ctx: &Ctx) -> bool {
 
 pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
     let mut paths: Vec<&Path> = match check {
-        super::Check::Compare(c) => [&c.left, &c.right]
+        super::Check::CompareTime(_) if ctx.item_by_item => check.left_path().into_iter().collect(),
+        super::Check::Compare(super::compare::Compare { left, right, .. })
+        | super::Check::CompareTime(super::time::CompareTime { left, right, .. }) => [left, right]
             .into_iter()
             .flat_map(|side| match side {
                 super::compare::Side::Join(pieces) => pieces.iter().collect(),
@@ -1008,7 +1010,17 @@ pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
             .into_iter()
             .filter(|path| walked_in(check, path, ctx).is_none()),
     );
-    if paths.iter().any(|path| input_one_path(path, ctx)) {
+    let keyed_by_input = |path: &&Path| {
+        !ctx.item_by_item
+            && path
+                .steps
+                .iter()
+                .any(|step| matches!(step, Step::Ref(reference) if input_one_path(reference, ctx)))
+    };
+    if paths
+        .iter()
+        .any(|path| input_one_path(path, ctx) || keyed_by_input(path))
+    {
         vec![super::message::isnt("$input", ctx.input, "an object")]
     } else {
         Vec::new()
@@ -1222,6 +1234,7 @@ mod tests {
         let input = json!({"things": [subject]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -1895,6 +1908,7 @@ mod tests {
         let input = json!({"things": [{"x": "a"}]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2054,6 +2068,7 @@ mod tests {
         let input = json!({"things": [with_deps(json!([{"name": "click"}, {}]))]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2081,6 +2096,7 @@ mod tests {
         let input = json!({"things": [{"x": "a", "w": w}]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
