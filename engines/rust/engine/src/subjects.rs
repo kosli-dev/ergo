@@ -2130,9 +2130,12 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             .zip(&verdicts)
             .zip(&said)
             .filter(|((_, v), _)| !v.passed())
-            .map(|((check, v), own)| match own {
-                Some(text) => text.clone(),
-                None => ops::message::message(check, ctx, v),
+            .map(|((check, v), own)| match (own, check) {
+                (Some(text), _) => text.clone(),
+                (None, Check::Tally(tally)) => {
+                    ops::tally::with_walked_roots(tally, ctx, ops::message::message(check, ctx, v))
+                }
+                (None, _) => ops::message::message(check, ctx, v),
             })
             .collect();
         let mut once: Vec<String> = Vec::new();

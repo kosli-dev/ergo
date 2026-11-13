@@ -2122,3 +2122,23 @@ test_missing_or_empty_params_leave_items_that_arent_objects_as_not_an_object if 
 		rows.some[0] == "not_an_object"
 	}
 }
+
+_said_once_report(check, os) := ergo.report(
+	{"os": os, "cs": [{"id": "c1", "os": os, "rows": [{"v": "bob", "n": 2}, {"v": "ann", "n": 2}], "ms": [{"ws": [{"v": "bob", "n": 2}, {"v": "ann", "n": 2}]}]}]},
+	{"ergo_spec": ergo._spec, "subjects": {"c": {"from": "cs", "identified_by": "id", "has": {"pos": "os"}}}, "requirements": {"r": {"subject": "c", "checks": {"c": check}}}},
+	{},
+)
+
+test_an_every_whose_says_a_walked_parts_problem_once_with_no_item if {
+	rep := _said_once_report("every rows whose v is in pos.name exists", [{"name": "bob"}, {}])
+	_parts_row(rep, "c").cause == "absent"
+	_parts_row(rep, "c").message == "item 2 of pos: name is missing"
+	mixed := _said_once_report("every rows whose v is in pos.name exists", [{"name": "bob"}, {"name": 3}])
+	_parts_row(mixed, "c").message == "pos[].name is [\"bob\", 3], which isn't a list of one kind of value"
+}
+
+test_a_for_line_count_says_a_walked_input_lists_kind_problem_once if {
+	rep := _said_once_report({"for": "every ms as m", "assert": "count of m.ws whose v is in $input.os.name is 2"}, [{"name": "bob"}, {"name": 3}])
+	_parts_row(rep, "c").cause == "unusable"
+	_parts_row(rep, "c").message == "$input.os[].name is [\"bob\", 3], which isn't a list of one kind of value"
+}

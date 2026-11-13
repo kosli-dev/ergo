@@ -57,7 +57,7 @@ _m_list_read_plain(check, subj) if {
 _m_list_read_plain(check, subj) if {
 	some side in _m_tally_parts(check)
 	some c in side.whose
-	_root_read_flaw(subj, c) == "not_an_object"
+	_plain_root_flaw(subj, c) == "not_an_object"
 }
 
 _m_input_one_refs(check) := [_m_isnt("$input", data.ergo_document, "an object") |

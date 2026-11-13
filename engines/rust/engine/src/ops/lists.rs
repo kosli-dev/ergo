@@ -1031,6 +1031,21 @@ pub fn walked_in(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked>
     walked_from(path, ctx, right_paths(check).contains(&path))
 }
 
+pub(super) fn walked_root_fault(
+    check: &super::Check,
+    path: &Path,
+    ctx: &Ctx,
+) -> Option<(Cause, String)> {
+    let walk = walked_in(check, path, ctx)?;
+    if let Some(cause) = walk.cause {
+        return Some((cause, walk.text));
+    }
+    ref_faults(check, ctx)
+        .into_iter()
+        .next()
+        .map(|text| (Cause::Unusable, text))
+}
+
 pub(super) fn field_walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {
     rights_of(check).into_iter().find_map(|right| match right {
         Right::Field(path) => {
