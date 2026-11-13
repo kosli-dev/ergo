@@ -1330,6 +1330,14 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
         let mut refs: Vec<Path> = counted.whose.iter().flat_map(Check::refs).collect();
         refs.sort_by_key(name::name);
         refs.dedup();
+        if cause == Cause::NotAnObject
+            && !ctx.item_by_item
+            && refs
+                .iter()
+                .any(|reference| super::lists::input_one_path(reference, ctx))
+        {
+            return Some(super::message::isnt("$input", ctx.input, "an object"));
+        }
         for reference in &refs {
             let read = path::read(reference, &outer);
             let said = match read.outcome {
@@ -1487,6 +1495,7 @@ mod tests {
         let input = json!({"things": [subject]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2065,6 +2074,7 @@ mod tests {
         }
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2633,6 +2643,7 @@ mod tests {
         let input = json!({"things": [{"items": items}]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2810,6 +2821,7 @@ mod tests {
         let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2873,6 +2885,7 @@ mod tests {
         let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),

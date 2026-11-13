@@ -1231,6 +1231,7 @@ mod tests {
         let input = json!({"things": [subject]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -1904,6 +1905,7 @@ mod tests {
         let input = json!({"things": [{"x": "a"}]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2063,6 +2065,7 @@ mod tests {
         let input = json!({"things": [with_deps(json!([{"name": "click"}, {}]))]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2090,6 +2093,7 @@ mod tests {
         let input = json!({"things": [{"x": "a", "w": w}]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),

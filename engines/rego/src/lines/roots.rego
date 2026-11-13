@@ -87,6 +87,7 @@ _root_reads(c) := {x |
 	not _unbound_alias(x)
 	not _walking_root(c, x)
 	not _unbound_name_step(x)
+	not _key_of_list_input_path(c, x)
 }
 
 _unbound_name_step(p) if {

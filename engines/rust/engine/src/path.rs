@@ -121,11 +121,25 @@ pub struct Ctx<'a> {
     pub params: Option<&'a Value>,
     pub aliases: BTreeMap<String, Located<'a>>,
     pub label: Option<String>,
+    /// True while the check of a `for` line or of a one-line `every` or
+    /// `some` runs. Then a key read from an input that is a list, like
+    /// `$input.k`, ends `Unusable`, and a path from such an input whose key
+    /// can't be read ends with the key's outcome.
+    pub item_by_item: bool,
 }
 
-impl Ctx<'_> {
+impl<'a> Ctx<'a> {
     pub fn subject_label(&self) -> &str {
         self.label.as_deref().unwrap_or("the subject")
+    }
+
+    /// Returns a copy of this context with `item_by_item` set.
+    #[must_use]
+    pub fn item_by_item(&self) -> Ctx<'a> {
+        Ctx {
+            item_by_item: true,
+            ..self.clone()
+        }
     }
 }
 
@@ -223,7 +237,7 @@ pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
             let read = read(reference, ctx);
             if reference.start == Start::Input
                 && read.outcome == Outcome::NotAnObject
-                && in_item_by_item()
+                && ctx.item_by_item
             {
                 return Err(Outcome::Unusable);
             }
@@ -326,27 +340,8 @@ pub fn read<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
     walked
 }
 
-thread_local! {
-    static ITEM_BY_ITEM: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
-}
-
-/// Runs `run`, the check of a `for` line or a one-line `every` or `some`,
-/// and returns what it returns. While it runs, a key read from an input that
-/// is a list, like `$input.k`, ends `Unusable`, and a path from such an input
-/// whose key can't be read ends with the key's outcome.
-pub fn item_by_item<T>(run: impl FnOnce() -> T) -> T {
-    let before = ITEM_BY_ITEM.with(|flag| flag.replace(true));
-    let out = run();
-    ITEM_BY_ITEM.with(|flag| flag.set(before));
-    out
-}
-
-fn in_item_by_item() -> bool {
-    ITEM_BY_ITEM.with(std::cell::Cell::get)
-}
-
 fn reads_a_list_input(path: &Path, ctx: &Ctx) -> bool {
-    path.start == Start::Input && ctx.input.is_array() && !in_item_by_item()
+    path.start == Start::Input && ctx.input.is_array() && !ctx.item_by_item
 }
 
 fn walk<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
@@ -455,8 +450,21 @@ mod tests {
         }
 
         fn run(&self, path: &Path) -> (Outcome, Option<Value>, Option<String>) {
+            self.run_with(path, false)
+        }
+
+        fn run_item_by_item(&self, path: &Path) -> (Outcome, Option<Value>, Option<String>) {
+            self.run_with(path, true)
+        }
+
+        fn run_with(
+            &self,
+            path: &Path,
+            item_by_item: bool,
+        ) -> (Outcome, Option<Value>, Option<String>) {
             let ctx = Ctx {
                 label: None,
+                item_by_item,
                 subject: Located {
                     value: &self.subject,
                     location: Location::input_root().key("s"),
@@ -515,7 +523,10 @@ mod tests {
             for path in [&from_input, &whole, &keyed] {
                 assert_eq!(w.run(path).0, Outcome::NotAnObject, "{params} {path:?}");
             }
-            let walked = item_by_item(|| (w.run(&from_input).0, w.run(&keyed).0));
+            let walked = (
+                w.run_item_by_item(&from_input).0,
+                w.run_item_by_item(&keyed).0,
+            );
             let key_outcome = match params {
                 "{}" => Outcome::Absent,
                 r#"{"k": null}"# => Outcome::Null,
@@ -558,6 +569,7 @@ mod tests {
         );
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -593,6 +605,7 @@ mod tests {
             );
             let ctx = Ctx {
                 label: None,
+                item_by_item: false,
                 subject: Located {
                     value: &w.subject,
                     location: Location::input_root(),
@@ -614,6 +627,7 @@ mod tests {
         let w = World::new("{}");
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1124,6 +1138,7 @@ mod tests {
         );
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1148,6 +1163,7 @@ mod tests {
         let w = World::new(r#"{"d": {"id": "c1", "x": 1}}"#);
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1166,6 +1182,7 @@ mod tests {
         let w = World::new(r#"{"d": {"id": null}}"#);
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1193,6 +1210,7 @@ mod tests {
         let w = World::new("{}");
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),

@@ -1807,6 +1807,25 @@ test_a_right_side_walks_a_list_input_whatever_another_check_reads_as_a_key if {
 	rep.requirements.r.checks.d["$refs"] == [{"name": "$input.k", "value": null, "locations": [""]}]
 }
 
+test_a_check_decides_a_named_by_key_on_a_list_input_by_its_own_form_not_by_the_checks_beside_it if {
+	doc := [{"id": "t", "k": "a", "m": {"a": "a"}, "rs": [{"v": "a"}]}]
+	message := concat("", ["$input is ", ergo._text(doc), ", which isn't an object"])
+	every params in [{}, {"k": null}, {"k": 3}] {
+		every beside in [{"for": "every rs as r", "assert": "r.v is \"a\""}, "every rs.v is m named by $input.k", "some rs.v is m named by $input.k"] {
+			policy := {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"x": "k is $input.m named by $params.k", "z": beside}}}}
+			[[r.cause, r.message] | some r in ergo.report(doc, policy, params).results; r.check == "x"] == [["not_an_object", message]]
+		}
+	}
+}
+
+test_a_for_sentence_reads_a_named_by_key_on_a_list_input_as_it_did_before if {
+	doc := [{"id": "t", "k": "a", "m": {"a": "a"}, "rs": [{"v": "a"}]}]
+	policy := {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"z": {"for": "every rs as r", "assert": "k is \"a\" followed by $input.m named by $params.k"}}}}}
+	every params in [[{}, "absent", "$params.k is missing"], [{"k": null}, "null", "$params.k is null"], [{"k": 3}, "unusable", "$params.k is 3, which isn't text"]] {
+		[[r.cause, r.message] | some r in ergo.report(doc, policy, params[0]).results; r.check == "z"] == [[params[1], params[2]]]
+	}
+}
+
 test_a_position_after_a_walked_ref_names_the_value_that_isnt_a_list if {
 	every check, doc in {
 		"id is in $input.l[0]": [{"id": "a", "l": ["a"]}, {"id": "b", "l": "ab"}],

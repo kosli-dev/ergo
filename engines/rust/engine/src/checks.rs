@@ -414,6 +414,7 @@ pub fn refs_read(paths: &[Path], input: &Value, params: Option<&Value>) -> Vec<V
 fn refs_walked(paths: &[(Path, bool)], input: &Value, params: Option<&Value>) -> Vec<Value> {
     let ctx = Ctx {
         label: None,
+        item_by_item: false,
         subject: Located {
             value: input,
             location: Location::input_root(),

@@ -384,8 +384,7 @@ _step_refs(check) := {x.ref |
 }
 
 _used_ref_state(check, r) := "not_an_object" if {
-	is_array(data.ergo_document)
-	_key_of_input_path(check, r)
+	_key_of_list_input_path(check, r)
 } else := "unusable" if {
 	_wrong_step(check, r)
 } else := "not_an_object" if {
@@ -394,8 +393,13 @@ _used_ref_state(check, r) := "not_an_object" if {
 } else := "not_an_object" if {
 	_input_key_ref(r)
 	r in _step_refs(check)
-	_no_for_alias
+	not _item_by_item
 } else := _ref_state(r)
+
+_key_of_list_input_path(check, r) if {
+	is_array(data.ergo_document)
+	_key_of_input_path(check, r)
+}
 
 _key_of_input_path(check, r) if {
 	walk(check, [q, p])
@@ -406,8 +410,7 @@ _key_of_input_path(check, r) if {
 	{"ref": r} in p
 	not _under_literal(check, q)
 	not _tallied_at(q)
-	object.get(check, "ergo/for", false) == false
-	_no_for_alias
+	not _item_by_item
 }
 
 _tallied_at(q) if {
@@ -415,11 +418,9 @@ _tallied_at(q) if {
 	seg in {"count_of", "sum_of"}
 }
 
-_no_for_alias if {
-	every a, _ in object.get(input, "ergo/names", {}) {
-		startswith(a, "ergo/")
-	}
-}
+default _item_by_item := false
+
+_item_by_item if data.ergo_item_by_item == true
 
 _input_one_root(c, p) if _one_input_ref(c, p)
 

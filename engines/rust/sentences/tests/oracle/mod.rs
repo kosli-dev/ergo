@@ -13,6 +13,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "$input whose k equals m named by $input.k",
     ),
     (
+        "every t.cs whose k is $input.m named by $params.k",
+        "every t.cs whose k equals $input.m named by $params.k",
+    ),
+    ("every t.cs", "every t.cs"),
+    (
         "commits whose merged is true",
         "commits whose merged is true",
     ),

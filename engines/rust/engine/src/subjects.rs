@@ -230,6 +230,7 @@ enum Read<'a> {
 fn context<'a>(env: &Env<'a>, subject: Located<'a>, anc: &[Anc<'a>]) -> Ctx<'a> {
     Ctx {
         label: None,
+        item_by_item: false,
         subject,
         input: env.input,
         params: env.params,

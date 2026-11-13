@@ -58,6 +58,7 @@ mod tests {
         let input = json!({"things": [serde_json::from_str::<Value>(subject).unwrap()]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),

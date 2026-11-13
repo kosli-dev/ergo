@@ -199,8 +199,13 @@ _with_ref_answer(check) := _ref_answered_compare(check) if {
 	check.op == "compare"
 } else := object.union(check, {"checks": [_ref_answered_compare(c) | some c in check.checks]}) if {
 	is_object(check)
-	check.op in {"all_of", "sentence_any_of", "for"}
+	check.op in {"all_of", "sentence_any_of"}
 	is_array(check.checks)
+} else := object.union(check, {"checks": checks}) if {
+	is_object(check)
+	check.op == "for"
+	is_array(check.checks)
+	checks := [_ref_answered_compare(c) | some c in check.checks] with data.ergo_item_by_item as true
 } else := check
 
 _ref_answered_compare(c) := object.union(c, {"$ref_cause": _ref_cause(c), "$once": true}) if {
