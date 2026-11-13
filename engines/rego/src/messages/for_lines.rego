@@ -210,9 +210,40 @@ _for_message_parts(check, subj, r) := _once([e.t | some e in _for_ents(check, r)
 else := split(_for_message(check, subj, r), "; ")
 
 _for_ents(check, r) := array.concat(
-	[{"i": i, "t": _m_for_unled(said, p), "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) == true; some j, p in _m_for_part(check, r.failed, i, f)],
-	[{"i": i, "t": _m_for_unled(said, p), "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) != true; some j, p in _m_for_part(check, r.failed, i, f)],
-) if said := _m_for_said(check)
+	[{"i": i, "t": t, "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) == true; some j, p in _m_for_part(check, r.failed, i, f); some t in _m_for_unled(said, p)],
+	[{"i": i, "t": t, "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) != true; some j, p in _m_for_part(check, r.failed, i, f); some t in _m_for_unled(said, p)],
+) if said := _m_for_said(check) | _m_for_tally_said(check)
+
+_m_for_tally_said(check) := {_m_joined(xs) | some xs in _m_for_tally_lists(check)}
+
+_m_for_tally_lists(check) := {xs |
+	subj := object.get(input, ["ergo/names", "ergo/subject"], null)
+	walk(check, [_, c])
+	is_object(c)
+	ys := _walked_tallies(c)
+	some cause in ["absent", "null", "unusable"]
+	xs := _m_walked_tally_texts(subj, ys, cause)
+	xs != []
+}
+
+_m_tally_grouped(check, once) := [t |
+	lists := [xs | some xs in _m_for_tally_lists(check); count(xs) > 3; every x in xs { x in once }]
+	some m in once
+	not _m_later_piece(lists, m)
+	t := _m_tally_unit(lists, m)
+]
+
+_m_later_piece(lists, m) if {
+	some xs in lists
+	some j, x in xs
+	j > 0
+	x == m
+}
+
+_m_tally_unit(lists, m) := _m_joined(xs) if {
+	some xs in lists
+	xs[0] == m
+} else := m
 
 _m_for_said(check) := {t |
 	walk(check, [_, c])
@@ -222,11 +253,26 @@ _m_for_said(check) := {t |
 	t := _m_walked_root_text(c, cause)
 }
 
-_m_for_unled(said, p) := t if {
+_m_for_unled(said, p) := [t] if {
 	startswith(p, "item ")
 	some t in said
 	endswith(p, concat("", [": ", t]))
-} else := p
+} else := [t, substring(p, 0, count(p) - count(tail))] if {
+	startswith(p, "item ")
+	some t in said
+	tail := concat("", [", and ", t])
+	endswith(p, tail)
+} else := [t, concat("", [substring(p, 0, i + 2), substring(p, (i + count(t)) + 8, -1)])] if {
+	startswith(p, "item ")
+	some t in said
+	i := indexof(p, concat("", [": ", t, ", and "]))
+	i > 0
+} else := [t, concat("", [substring(p, 0, i), substring(p, (i + count(t)) + 6, -1)])] if {
+	startswith(p, "item ")
+	some t in said
+	i := indexof(p, concat("", [", and ", t, ", and "]))
+	i > 0
+} else := [p]
 
 _m_for_joined(ents) := concat("; ", _once([e.t | some e in ents])) if count(_once([e.t | some e in ents; e.x == false])) <= 3
 

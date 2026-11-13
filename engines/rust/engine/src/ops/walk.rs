@@ -1356,6 +1356,17 @@ fn first_list(path: &Path, ctx: &Ctx) -> String {
 }
 
 pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
+    let mut row = run_rows(walk, ctx);
+    let in_a_for_line = ctx.aliases.keys().any(|name| name != OUTER);
+    if !in_a_for_line && row.verdict.cause != Cause::Satisfied {
+        let outer_ctx = outer(ctx);
+        let whose: Vec<&Check> = walk.whose.iter().collect();
+        row.message = message::walked_roots_ahead(row.message.take(), &whose, &outer_ctx, &[]);
+    }
+    row
+}
+
+fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
     let flawed = walk.flawed(ctx);
     if !flawed && subject_is_not_an_object(walk, ctx) {
         return Run {

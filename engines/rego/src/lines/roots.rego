@@ -290,10 +290,9 @@ _walk_root_flaw(check, subj) := _worst_of(states) if {
 	count(states) > 0
 } else := ""
 
-_walk_root_conds(check) := array.concat(
-	array.concat(array.concat(object.get(check, "whose", []), [c | check.op == "for"; some item in check.items; some c in object.get(item, "whose", [])]), _for_nested_conds(check)),
-	_for_sentence_conds(check),
-)
+_walk_root_conds(check) := array.concat(_walk_whose_conds(check), _for_sentence_conds(check))
+
+_walk_whose_conds(check) := array.concat(array.concat(object.get(check, "whose", []), [c | check.op == "for"; some item in check.items; some c in object.get(item, "whose", [])]), _for_nested_conds(check))
 
 _for_nested_conds(check) := [c |
 	check.op == "for"
@@ -411,12 +410,26 @@ _walk_count_conds(check) := [c |
 ]
 
 _walk_root_msgs(check, subj) := _once(array.concat(
-	sort([m | some c in _walk_count_conds(check); some m in _m_root_texts_all(subj, c); _m_ref_first(m)]),
-	[m |
-		some c in _walk_root_conds(check)
-		some m in _m_cond_root_texts(subj, c)
-	],
+	sort([m | some c in _walk_count_conds(check); some m in array.concat(_m_root_texts_all(subj, c), _m_cond_walked_texts(c)); _m_ref_first(m)]),
+	array.concat(
+		[m |
+			some c in _walk_whose_conds(check)
+			some m in array.concat(_m_cond_root_texts(subj, c), _m_cond_walked_texts(c))
+		],
+		[m |
+			some c in _for_sentence_conds(check)
+			some m in _m_cond_root_texts(subj, c)
+		],
+	),
 ))
+
+_m_cond_walked_texts(c) := [t |
+	walk(c, [_, x])
+	is_object(x)
+	_list_phrase(x)
+	some cause in ["absent", "null", "unusable"]
+	t := _m_walked_root_text(x, cause)
+]
 
 _leaf_root_flaw(check, subj) := fl if {
 	check.op in {"every", "some"}

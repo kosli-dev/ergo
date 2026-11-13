@@ -8497,6 +8497,27 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("r.n is at least 0", "r.n is at least 0", &[], &[]),
     ("w.n is at least 0", "w.n is at least 0", &[], &[]),
+    (
+        "count of m.ws whose n is count of pos.name is 2",
+        "count of m.ws whose n equals count of pos.name is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v is in $params.os.name and whose v is in pos.name is 1",
+        "count of rows whose v is in $params.os.name and whose v is in pos.name is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v is in pos.name and whose v is in $params.os.name is 1",
+        "count of rows whose v is in pos.name and whose v is in $params.os.name is 1",
+        &[],
+        &[],
+    ),
+    ("r.k is 1", "r.k is 1", &[], &[]),
+    ("w.n is 1", "w.n is 1", &[], &[]),
+    ("r.w is 1", "r.w is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -12691,6 +12712,37 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every ms as m, every m.ws whose n is count of pos.name as w",
+        "every ms as m, every m.ws whose n equals count of pos.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose k is sum of pos.k, if any, as r",
+        "every rows whose k equals sum of pos.k, if any, as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose n is count of pos.name as r",
+        "every rows whose n equals count of pos.name as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in $params.os.name and whose v is in pos.name as r",
+        "every rows whose v is in $params.os.name and whose v is in pos.name as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows, if any, as r",
+        "every rows, if any, as r",
+        &[],
+        &[],
+    ),
+    ("some rows as r", "some rows as r", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

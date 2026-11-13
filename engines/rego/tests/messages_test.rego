@@ -968,7 +968,30 @@ test_a_part_that_is_a_list_of_objects_is_walked_on_the_right_of_a_list_phrase_bu
 	rows := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": [{"z": 1}], "xs": [{"v": 1}]}]}, {})
 	rows["in"] == ["satisfied", null]
 	rows.contains == ["unusable", "pl is [{\"z\": 1}], which isn't an object"]
-	rows.matches == ["unusable", "item 1 of xs: m.v is 1, which isn't text, and pl[].z is [1], which isn't a list of patterns"]
+	rows.matches == ["unusable", "pl[].z is [1], which isn't a list of patterns; item 1 of xs: m.v is 1, which isn't text"]
+}
+
+_two_roots_policy := _item_policy({"has": {"pos": "os"}}, {
+	"every": "every rows whose v is in pos.name and whose v is in $params.os.name exists",
+	"every_rev": "every rows whose v is in $params.os.name and whose v is in pos.name exists",
+	"for_count": {"for": "every ms as m", "assert": "count of m.ws whose v is in pos.name and whose v is in $params.os.name is 1"},
+})
+
+_two_roots_rows(pos, os) := _item_rows(_two_roots_policy, {"prs": [{"id": "p0", "os": pos, "rows": [{"v": "bob"}], "ms": [{"ws": [{"v": "bob"}]}]}]}, {"os": os})
+
+test_two_roots_in_one_whose_are_each_named_in_the_order_the_sentence_reads_them if {
+	pos := "pos[].name is [\"bob\", 3], which isn't a list of one kind of value"
+	params := "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value"
+	missing := "item 2 of pos: name is missing"
+	mixed := [{"name": "bob"}, {"name": 3}]
+	both := _two_roots_rows(mixed, mixed)
+	both.every == ["unusable", concat("; ", [pos, params])]
+	both.every_rev == ["unusable", concat("; ", [params, pos])]
+	both.for_count == ["unusable", concat("; ", [pos, params])]
+	one := _two_roots_rows([{"name": "bob"}, {}], mixed)
+	one.every == ["unusable", concat("; ", [missing, params])]
+	one.every_rev == ["unusable", concat("; ", [params, missing])]
+	one.for_count == ["unusable", concat("; ", [missing, params])]
 }
 
 test_a_part_that_is_text_or_null_on_the_right_of_a_list_phrase_says_so if {

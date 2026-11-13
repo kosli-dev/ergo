@@ -36148,6 +36148,209 @@
     ]
   },
   {
+    "description": "a name read from outside the item and walked on a for line is said once, before what each item says on its own",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "every cs",
+          "has": {
+            "pos": "os"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "every": {
+              "for": "every rows as r",
+              "assert": "r.v is in pos.name"
+            },
+            "whose": {
+              "for": "every rows whose v is in pos.name as r",
+              "assert": "r.v is \"bob\""
+            },
+            "if_any": {
+              "for": "every rows, if any, as r",
+              "assert": "r.v is in pos.name"
+            },
+            "some": {
+              "for": "some rows as r",
+              "assert": "r.v is in pos.name"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "an item without the name it reads is named after the root, without the root",
+        "rules": [
+          "for.roots",
+          "message.items"
+        ],
+        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}, {}], "rows": [{"v": "bob"}, {}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob"}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/1"], "name": "r.v", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}]}], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"v": "bob"}, {}]}], "message": "item 2 of pos: name is missing; item 2 of rows: r.v is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "os": [{"name": "bob"}, {}], "rows": [{"v": "bob"}, {}]}, "type": "c"}},
+          {"cause": "absent", "check": "if_any", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob"}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/1"], "name": "r.v", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}]}], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"v": "bob"}, {}]}], "message": "item 2 of pos: name is missing; item 2 of rows: r.v is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "os": [{"name": "bob"}, {}], "rows": [{"v": "bob"}, {}]}, "type": "c"}},
+          {"cause": "absent", "check": "some", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob"}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/1"], "name": "r.v", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}]}], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"v": "bob"}, {}]}], "message": "item 2 of pos: name is missing; item 2 of rows: r.v is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "os": [{"name": "bob"}, {}], "rows": [{"v": "bob"}, {}]}, "type": "c"}},
+          {"cause": "absent", "check": "whose", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob"}}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"v": "bob"}, {}]}], "message": "item 2 of pos: name is missing; item 2 of rows: v is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "os": [{"name": "bob"}, {}], "rows": [{"v": "bob"}, {}]}, "type": "c"}}
+        ]
+      },
+      {
+        "description": "with more than three items without the name, the name's own list says how many more once",
+        "rules": [
+          "for.roots",
+          "message.items"
+        ],
+        "input": {"cs": [{"id": "c1", "os": [{"name": "bob", "k": 1}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"v": "bob"}, {}, {}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob"}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/1"], "name": "r.v", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/2"], "name": "r.v", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 3 of rows", "locations": ["/cs/0/rows/2"], "path": "item 3 of rows", "value": {}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1", "/cs/0/rows/2"], "name": "rows[]", "value": [{"v": "bob"}, {}, {}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more; item 2 of rows: r.v is missing; item 3 of rows: r.v is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"v": "bob"}, {}, {}]}, "type": "c"}},
+          {"cause": "absent", "check": "if_any", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob"}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/1"], "name": "r.v", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/2"], "name": "r.v", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 3 of rows", "locations": ["/cs/0/rows/2"], "path": "item 3 of rows", "value": {}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1", "/cs/0/rows/2"], "name": "rows[]", "value": [{"v": "bob"}, {}, {}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more; item 2 of rows: r.v is missing; item 3 of rows: r.v is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"v": "bob"}, {}, {}]}, "type": "c"}},
+          {"cause": "absent", "check": "some", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob"}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/1"], "name": "r.v", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/2"], "name": "r.v", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 3 of rows", "locations": ["/cs/0/rows/2"], "path": "item 3 of rows", "value": {}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1", "/cs/0/rows/2"], "name": "rows[]", "value": [{"v": "bob"}, {}, {}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more; item 2 of rows: r.v is missing; item 3 of rows: r.v is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"v": "bob"}, {}, {}]}, "type": "c"}},
+          {"cause": "absent", "check": "whose", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob"}}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {}}, {"cause": "absent", "failed_assertions": [], "item": "item 3 of rows", "locations": ["/cs/0/rows/2"], "path": "item 3 of rows", "value": {}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1", "/cs/0/rows/2"], "name": "rows[]", "value": [{"v": "bob"}, {}, {}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more; item 2 of rows: v is missing; item 3 of rows: v is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"v": "bob"}, {}, {}]}, "type": "c"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a name read from outside the item and walked in one of two sentences on a for line is said once, wherever the item's own problems are",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "every cs",
+          "has": {
+            "pos": "os"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "two": {
+              "for": "every rows as r",
+              "assert": [
+                "r.v is in pos.name",
+                "r.w is 1"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "the name is said before the item's problems in both sentences",
+        "rules": [
+          "for.roots",
+          "message.items"
+        ],
+        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}, {}], "rows": [{"v": "bob", "w": 1}, {}]}]},
+        "results": [
+          {"cause": "absent", "check": "two", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob", "w": 1}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/1"], "name": "r.v", "value": null}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}]}, {"assertion": "r.w is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/1"], "name": "r.w", "value": null}]}], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1"], "name": "rows[]", "value": [{"v": "bob", "w": 1}, {}]}], "message": "item 2 of pos: name is missing; item 2 of rows: r.v is missing, and r.w is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "os": [{"name": "bob"}, {}], "rows": [{"v": "bob", "w": 1}, {}]}, "type": "c"}}
+        ]
+      },
+      {
+        "description": "the name is said before the item's problem in the other sentence",
+        "rules": [
+          "for.roots",
+          "message.items"
+        ],
+        "input": {"cs": [{"id": "c1", "os": [{"name": "bob"}, {"name": 3}], "rows": [{"v": "bob"}]}]},
+        "results": [
+          {"cause": "unusable", "check": "two", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.v is in pos.name", "cause": "unusable", "inputs": [{"locations": ["/cs/0/rows/0/v"], "name": "r.v", "value": "bob"}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", 3]}]}, {"assertion": "r.w is 1", "cause": "absent", "inputs": [{"locations": ["/cs/0/rows/0"], "name": "r.w", "value": null}]}], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"v": "bob"}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1/name"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", 3]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"v": "bob"}]}], "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value; item 1 of rows: r.w is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "os": [{"name": "bob"}, {"name": 3}], "rows": [{"v": "bob"}]}, "type": "c"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count or sum of a name read from outside the item on a for line says how many more of its items can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "every cs",
+          "has": {
+            "pos": "os"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "count": {
+              "for": "every rows whose n is count of pos.name as r",
+              "assert": "r.n is 1"
+            },
+            "two_lines": {
+              "for": "every ms as m, every m.ws whose n is count of pos.name as w",
+              "assert": "w.n is 1"
+            },
+            "sum": {
+              "for": "every rows whose k is sum of pos.k, if any, as r",
+              "assert": "r.k is 1"
+            },
+            "sentence": {
+              "for": "every ms as m",
+              "assert": "count of m.ws whose n is count of pos.name is 2"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "5 items without the name",
+        "rules": [
+          "for.roots",
+          "message.items",
+          "tally.walk"
+        ],
+        "input": {"cs": [{"id": "c1", "os": [{"name": "bob", "k": 1}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"n": 1, "k": 1}], "ms": [{"ws": [{"n": 1}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "count", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"k": 1, "n": 1}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"k": 1, "n": 1}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"k": 1, "n": 1}]}, "type": "c"}},
+          {"cause": "absent", "check": "sentence", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of m.ws whose n equals count of pos.name is 2", "cause": "absent", "inputs": [{"locations": ["/cs/0/ms/0/ws/0"], "name": "count of m.ws whose n equals count of pos.name", "value": null}, {"locations": ["/cs/0/ms/0/ws/0"], "name": "m.ws[]", "value": [{"n": 1}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ws": [{"n": 1}]}}], "inputs": [{"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ws": [{"n": 1}]}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"k": 1, "n": 1}]}, "type": "c"}},
+          {"cause": "absent", "check": "sum", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"k": 1, "n": 1}}], "inputs": [{"locations": ["/cs/0/os/0/k", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].k", "part": {"id": null, "name": "pos"}, "value": [1, null, null, null, null, null]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"k": 1, "n": 1}]}], "message": "item 2 of pos: k is missing; item 3 of pos: k is missing; item 4 of pos: k is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"k": 1, "n": 1}]}, "type": "c"}},
+          {"cause": "absent", "check": "two_lines", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 1 of m.ws", "locations": ["/cs/0/ms/0/ws/0"], "path": "item 1 of m.ws", "value": {"n": 1}}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ws": [{"n": 1}]}}], "inputs": [{"locations": ["/cs/0/ms/0/ws/0"], "name": "m.ws[]", "value": [{"n": 1}]}, {"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ws": [{"n": 1}]}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"k": 1, "n": 1}]}, "type": "c"}}
+        ]
+      },
+      {
+        "description": "7 items without the name",
+        "rules": [
+          "for.roots",
+          "message.items",
+          "tally.walk"
+        ],
+        "input": {"cs": [{"id": "c1", "os": [{"name": "bob", "k": 1}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}, {"v": 5}, {"v": 6}], "rows": [{"n": 1, "k": 1}], "ms": [{"ws": [{"n": 1}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "count", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"k": 1, "n": 1}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5", "/cs/0/os/6", "/cs/0/os/7"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null, null, null]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"k": 1, "n": 1}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 4 more", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}, {"v": 5}, {"v": 6}], "rows": [{"k": 1, "n": 1}]}, "type": "c"}},
+          {"cause": "absent", "check": "sentence", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of m.ws whose n equals count of pos.name is 2", "cause": "absent", "inputs": [{"locations": ["/cs/0/ms/0/ws/0"], "name": "count of m.ws whose n equals count of pos.name", "value": null}, {"locations": ["/cs/0/ms/0/ws/0"], "name": "m.ws[]", "value": [{"n": 1}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5", "/cs/0/os/6", "/cs/0/os/7"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null, null, null]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ws": [{"n": 1}]}}], "inputs": [{"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ws": [{"n": 1}]}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5", "/cs/0/os/6", "/cs/0/os/7"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null, null, null]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 4 more", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}, {"v": 5}, {"v": 6}], "rows": [{"k": 1, "n": 1}]}, "type": "c"}},
+          {"cause": "absent", "check": "sum", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"k": 1, "n": 1}}], "inputs": [{"locations": ["/cs/0/os/0/k", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5", "/cs/0/os/6", "/cs/0/os/7"], "name": "pos[].k", "part": {"id": null, "name": "pos"}, "value": [1, null, null, null, null, null, null, null]}, {"locations": ["/cs/0/rows/0"], "name": "rows[]", "value": [{"k": 1, "n": 1}]}], "message": "item 2 of pos: k is missing; item 3 of pos: k is missing; item 4 of pos: k is missing; and 4 more", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}, {"v": 5}, {"v": 6}], "rows": [{"k": 1, "n": 1}]}, "type": "c"}},
+          {"cause": "absent", "check": "two_lines", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 1 of m.ws", "locations": ["/cs/0/ms/0/ws/0"], "path": "item 1 of m.ws", "value": {"n": 1}}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ws": [{"n": 1}]}}], "inputs": [{"locations": ["/cs/0/ms/0/ws/0"], "name": "m.ws[]", "value": [{"n": 1}]}, {"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ws": [{"n": 1}]}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5", "/cs/0/os/6", "/cs/0/os/7"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null, null, null]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 4 more", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}, {"v": 5}, {"v": 6}], "rows": [{"k": 1, "n": 1}]}, "type": "c"}}
+        ]
+      },
+      {
+        "description": "5 items without the name, and items of the line without their own",
+        "rules": [
+          "for.roots",
+          "message.items",
+          "tally.walk"
+        ],
+        "input": {"cs": [{"id": "c1", "os": [{"name": "bob", "k": 1}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"n": 1, "k": 1}, {}, {}], "ms": [{"ws": [{"n": 1}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "count", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"k": 1, "n": 1}}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {}}, {"cause": "absent", "failed_assertions": [], "item": "item 3 of rows", "locations": ["/cs/0/rows/2"], "path": "item 3 of rows", "value": {}}], "inputs": [{"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1", "/cs/0/rows/2"], "name": "rows[]", "value": [{"k": 1, "n": 1}, {}, {}]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more; item 2 of rows: n is missing; item 3 of rows: n is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"k": 1, "n": 1}, {}, {}]}, "type": "c"}},
+          {"cause": "absent", "check": "sentence", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of m.ws whose n equals count of pos.name is 2", "cause": "absent", "inputs": [{"locations": ["/cs/0/ms/0/ws/0"], "name": "count of m.ws whose n equals count of pos.name", "value": null}, {"locations": ["/cs/0/ms/0/ws/0"], "name": "m.ws[]", "value": [{"n": 1}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}]}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ws": [{"n": 1}]}}], "inputs": [{"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ws": [{"n": 1}]}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"k": 1, "n": 1}, {}, {}]}, "type": "c"}},
+          {"cause": "absent", "check": "sum", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of rows", "locations": ["/cs/0/rows/0"], "path": "item 1 of rows", "value": {"k": 1, "n": 1}}, {"cause": "absent", "failed_assertions": [], "item": "item 2 of rows", "locations": ["/cs/0/rows/1"], "path": "item 2 of rows", "value": {}}, {"cause": "absent", "failed_assertions": [], "item": "item 3 of rows", "locations": ["/cs/0/rows/2"], "path": "item 3 of rows", "value": {}}], "inputs": [{"locations": ["/cs/0/os/0/k", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].k", "part": {"id": null, "name": "pos"}, "value": [1, null, null, null, null, null]}, {"locations": ["/cs/0/rows/0", "/cs/0/rows/1", "/cs/0/rows/2"], "name": "rows[]", "value": [{"k": 1, "n": 1}, {}, {}]}], "message": "item 2 of pos: k is missing; item 3 of pos: k is missing; item 4 of pos: k is missing; and 2 more; item 2 of rows: k is missing; item 3 of rows: k is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"k": 1, "n": 1}, {}, {}]}, "type": "c"}},
+          {"cause": "absent", "check": "two_lines", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 1 of m.ws", "locations": ["/cs/0/ms/0/ws/0"], "path": "item 1 of m.ws", "value": {"n": 1}}], "item": "item 1 of ms", "locations": ["/cs/0/ms/0"], "path": "item 1 of ms", "value": {"ws": [{"n": 1}]}}], "inputs": [{"locations": ["/cs/0/ms/0/ws/0"], "name": "m.ws[]", "value": [{"n": 1}]}, {"locations": ["/cs/0/ms/0"], "name": "ms[]", "value": [{"ws": [{"n": 1}]}]}, {"locations": ["/cs/0/os/0/name", "/cs/0/os/1", "/cs/0/os/2", "/cs/0/os/3", "/cs/0/os/4", "/cs/0/os/5"], "name": "pos[].name", "part": {"id": null, "name": "pos"}, "value": ["bob", null, null, null, null, null]}], "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more", "passed": false, "requirement": "r", "subject": {"id": {"id": "c1", "ms": [{"ws": [{"n": 1}]}], "os": [{"k": 1, "name": "bob"}, {"v": 0}, {"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}], "rows": [{"k": 1, "n": 1}, {}, {}]}, "type": "c"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a part that holds a list is walked in the whose of a for line and in a whose under it",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "pr", "checks": {"every_if_any": {"for": "every xs whose v is in pl.z, if any, as m", "assert": "m.v is 1"}, "every": {"for": "every xs whose v is in pl.z as m", "assert": "m.v is 1"}, "some": {"for": "some xs whose v is in pl.z as m", "assert": "m.v is 1"}, "some_exists": {"for": "every xs as m", "assert": "some xs whose v is in pl.z exists"}}}}},
     "cases": [

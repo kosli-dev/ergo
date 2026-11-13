@@ -1688,6 +1688,34 @@ impl For {
     }
 
     pub fn run(&self, ctx: &Ctx) -> Run {
+        let mut run = self.run_lines(ctx);
+        if run.verdict.cause != Cause::Satisfied {
+            let whose: Vec<&Check> = self
+                .items
+                .iter()
+                .flat_map(|item| item.whose.iter())
+                .chain(
+                    self.sentences
+                        .iter()
+                        .flat_map(|s| nested_whose(&s.check, false)),
+                )
+                .collect();
+            let counted: Vec<&Check> = self
+                .sentences
+                .iter()
+                .flat_map(|s| nested_whose(&s.check, true))
+                .collect();
+            run.message = super::message::walked_roots_ahead(
+                run.message.take(),
+                &whose,
+                &outer_ctx(ctx),
+                &counted,
+            );
+        }
+        run
+    }
+
+    fn run_lines(&self, ctx: &Ctx) -> Run {
         let (mut run, free, _, alone) = self.run_items(ctx, Vec::new());
         let said = run.message.clone();
         let (roots, ahead) = match self.rooted(&mut run, ctx) {
@@ -1741,12 +1769,16 @@ impl For {
             }
         }
         let once = ordered;
-        let mut parts = once.clone();
+        let mut parts = super::message::capped_units(once.clone());
         if let Some(items) = items {
             parts.extend(
                 items
                     .split("; ")
-                    .filter(|part| !part.is_empty() && !once.iter().any(|o| o == part))
+                    .filter(|part| {
+                        !part.is_empty()
+                            && (super::message::cap_note(part).is_some()
+                                || !once.iter().any(|o| o == part))
+                    })
                     .map(str::to_string),
             );
         }
@@ -2144,7 +2176,8 @@ impl For {
                 if !super::message::reads_from_a_root(path) {
                     continue;
                 }
-                if let Some((_, text)) = super::lists::walked_root_fault(check, path, &outer)
+                if let Some((cause, text)) = super::lists::walked_root_fault(check, path, &outer)
+                    && cause != Cause::Value
                     && !texts.contains(&text)
                 {
                     texts.push(text);
@@ -2252,12 +2285,10 @@ impl For {
         let roots = self.walked_root_texts(ctx);
         let said: Vec<Said> = said
             .into_iter()
-            .map(|(order, text, extra)| {
-                (
-                    order,
-                    unled(&roots, &unskipped(&text, &collect.skip)),
-                    extra,
-                )
+            .flat_map(|(order, text, extra)| {
+                unled(&roots, &unskipped(&text, &collect.skip))
+                    .into_iter()
+                    .map(move |text| (order.clone(), text, extra))
             })
             .filter(|(_, text, _)| !text.is_empty())
             .collect();
@@ -2871,15 +2902,38 @@ fn own_read_fails(check: &Check, focus: &Ctx) -> bool {
         })
 }
 
-fn unled(roots: &[String], text: &str) -> String {
-    if text.starts_with("item ")
-        && let Some(root) = roots
-            .iter()
-            .find(|root| text.ends_with(&format!(": {root}")))
-    {
-        return root.clone();
+fn unled(roots: &[String], text: &str) -> Vec<String> {
+    if !text.starts_with("item ") {
+        return vec![text.to_string()];
     }
-    text.to_string()
+    if let Some(root) = roots
+        .iter()
+        .find(|root| text.ends_with(&format!(": {root}")))
+    {
+        return vec![root.clone()];
+    }
+    if let Some(root) = roots
+        .iter()
+        .find(|root| text.ends_with(&format!(", and {root}")))
+    {
+        let own = &text[..text.len() - root.len() - ", and ".len()];
+        return vec![root.clone(), own.to_string()];
+    }
+    if let Some((root, at)) = roots
+        .iter()
+        .find_map(|root| text.find(&format!(": {root}, and ")).map(|at| (root, at)))
+    {
+        let own = format!("{}{}", &text[..at + 2], &text[at + root.len() + 8..]);
+        return vec![root.clone(), own];
+    }
+    if let Some((root, at)) = roots.iter().find_map(|root| {
+        text.find(&format!(", and {root}, and "))
+            .map(|at| (root, at))
+    }) {
+        let own = format!("{}{}", &text[..at], &text[at + root.len() + 6..]);
+        return vec![root.clone(), own];
+    }
+    vec![text.to_string()]
 }
 
 fn unmarked(text: &str) -> String {
@@ -4922,6 +4976,61 @@ mod tests {
         }
     }
 
+    fn two_roots_rows(pos: Value, os: Value) -> Vec<(String, Value)> {
+        let policy = json!({
+            "ergo_spec": SPEC,
+            "subjects": {"pr": {"from": "prs", "identified_by": "id", "has": {"pos": "os"}}},
+            "requirements": {"r": {"subject": "pr", "checks": {
+                "every": "every rows whose v is in pos.name and whose v is in $params.os.name exists",
+                "every_rev": "every rows whose v is in $params.os.name and whose v is in pos.name exists",
+                "for_count": {"for": "every ms as m", "assert": "count of m.ws whose v is in pos.name and whose v is in $params.os.name is 1"}
+            }}}
+        });
+        let input = json!({"prs": [{"id": "p0", "os": pos, "rows": [{"v": "bob"}], "ms": [{"ws": [{"v": "bob"}]}]}]});
+        let report = crate::report(&input, &policy, &json!({"os": os}));
+        ["every", "every_rev", "for_count"]
+            .iter()
+            .map(|check| {
+                let row = report["results"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|row| row["check"] == *check)
+                    .unwrap();
+                (
+                    row["cause"].as_str().unwrap().to_string(),
+                    row["message"].clone(),
+                )
+            })
+            .collect()
+    }
+
+    #[test]
+    fn two_roots_in_one_whose_are_each_named_in_the_order_the_sentence_reads_them() {
+        let kinds = "which isn't a list of one kind of value";
+        let pos = format!("pos[].name is [\"bob\", 3], {kinds}");
+        let params = format!("$params.os[].name is [\"bob\", 3], {kinds}");
+        let missing = "item 2 of pos: name is missing";
+        let mixed = json!([{"name": "bob"}, {"name": 3}]);
+        let unusable = |text: String| ("unusable".to_string(), json!(text));
+        assert_eq!(
+            two_roots_rows(mixed.clone(), mixed.clone()),
+            vec![
+                unusable(format!("{pos}; {params}")),
+                unusable(format!("{params}; {pos}")),
+                unusable(format!("{pos}; {params}")),
+            ]
+        );
+        assert_eq!(
+            two_roots_rows(json!([{"name": "bob"}, {}]), mixed),
+            vec![
+                unusable(format!("{missing}; {params}")),
+                unusable(format!("{params}; {missing}")),
+                unusable(format!("{missing}; {params}")),
+            ]
+        );
+    }
+
     #[test]
     fn a_part_that_is_a_list_of_objects_is_walked_on_the_right_of_a_list_phrase_but_not_before_contains()
      {
@@ -4936,7 +5045,7 @@ mod tests {
                 "m.v matches pl.z",
                 "unusable",
                 json!(
-                    "item 1 of xs: m.v is 1, which isn't text, and pl[].z is [1], which isn't a list of patterns"
+                    "pl[].z is [1], which isn't a list of patterns; item 1 of xs: m.v is 1, which isn't text"
                 ),
             ),
         ] {

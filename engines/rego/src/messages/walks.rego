@@ -235,8 +235,8 @@ _m_tally(subj, side) := array.concat(
 	array.concat(
 		[[x.cause, _m_fail(x, roots)] | some x in array.concat(w.fails, _walk_stop(w))],
 		array.concat(
-			[["root", m] | some m in sort([m | some c in side.whose; some m in _m_root_texts_all(subj, c); _m_ref_first(m)])],
-			[["root", m] | some c in side.whose; some m in _m_root_texts_all(subj, c)],
+			[["root", m] | some m in sort([m | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); _m_ref_first(m)])],
+			[["root", m] | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w))],
 		),
 	),
 	_m_tally_items(subj, side),
@@ -245,6 +245,10 @@ _m_tally(subj, side) := array.concat(
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	roots := _dotted_roots([side[f]])
 }
+
+_m_tally_walked(c, w) := _m_cond_walked_texts(c) if array.concat(w.fails, _walk_stop(w)) == []
+
+else := []
 
 _m_tally_items(subj, side) := [x | some e in w.items; some x in array.concat(_m_whose_undecided(subj, side, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
 	f := _basic_form(side)
