@@ -154,7 +154,7 @@ _for_worse_root(check, subj, rr) := object.union(rr, {"cause": _worst_of({rr.cau
 	flaw != ""
 } else := rr
 
-_for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_aliased(m) | some m in _m_cond_root_texts(subj, c) with input as {"ergo/names": names}]} |
+_for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_aliased(m) | some m in said]} |
 	count(check.items) == 2
 	item := check.items[0]
 	w := _for_walk(item, subj, _for_names)
@@ -168,16 +168,21 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	some c in conds
 	fl := _root_read_flaw(subj, c) with input as {"ergo/names": names}
 	not fl in {"", "not_an_object"}
-	ms := [_m_under(_m_for_item_name(check, e.i), _m_aliased(m)) | some m in _m_cond_root_texts(subj, c) with input as {"ergo/names": names}; not m in outer]
+	said := array.concat(_m_cond_root_texts(subj, c), _m_walked_root_texts(c)) with input as {"ergo/names": names}
+	ms := [_m_under(_m_for_item_name(check, e.i), _m_aliased(m)) | some m in said; not m in outer]
 	ms != []
 ]
 
 _for_row_message(check, subj, r) := _m_joined(array.concat(_m_tally_grouped(check, once), [t | some t in _for_item_parts(check, subj, r, once); t != ""; not t in once])) if {
 	rs := object.get(r, "root_msgs", object.get(r, "other_roots", []))
 	second := {m | some x in _for_second_roots(check, subj); some m in x.ms}
-	once := _once(array.concat(array.concat(array.concat([m | some m in rs; not m in second], [t | some p in _for_free_texts(check, r); t := _m_unskipped(p, rs); t != ""]), _for_hoisted_texts(check, r)), [m | some m in rs; m in second]))
+	once := _once(array.concat(array.concat(array.concat([m | some m in rs; not m in second], [t | some p in _for_free_texts(check, r); t := _m_unskipped(p, _m_root_skip(rs)); t != ""]), _for_hoisted_texts(check, r)), [m | some m in rs; m in second]))
 	once != []
 } else := _for_message(check, subj, r)
+
+_m_root_skip(rs) := [x | some m in rs; some x in split(m, "; ")] if _walk_roots_on
+
+else := rs
 
 _for_hoisted_texts(check, r) := [p |
 	rs := object.get(r, "root_msgs", object.get(r, "other_roots", []))

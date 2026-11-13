@@ -2024,11 +2024,20 @@ impl For {
         let mut texts = Vec::new();
         let mut raw = Vec::new();
         let mut unread = Vec::new();
+        let walked = super::walked_roots_on();
+        let nested: Vec<&Check> = if walked {
+            self.sentences
+                .iter()
+                .flat_map(|s| nested_whose(&s.check, false))
+                .collect()
+        } else {
+            Vec::new()
+        };
         for live in self.candidates(0, ctx).live {
             let mut bound = ctx.clone();
             bound.aliases.insert(first.alias.clone(), live.at.clone());
             let bound = outer_ctx(&bound);
-            for cond in &second.whose {
+            for cond in second.whose.iter().chain(nested.iter().copied()) {
                 let Some((cause, text)) = super::message::root_flaw(&[cond], &bound) else {
                     continue;
                 };
@@ -2044,7 +2053,11 @@ impl For {
                     .collect();
                 if !extra.is_empty() {
                     causes.push(cause);
-                    texts.extend(extra.iter().map(|t| format!("{}: {t}", live.name)));
+                    if walked {
+                        texts.push(format!("{}: {}", live.name, extra.join("; ")));
+                    } else {
+                        texts.extend(extra.iter().map(|t| format!("{}: {t}", live.name)));
+                    }
                     raw.extend(extra.iter().map(|t| (*t).to_string()));
                     unread.push(live.name.clone());
                 }
@@ -3398,6 +3411,13 @@ fn root_rank(path: &Path) -> (u8, String) {
     }
 }
 
+fn bound_alias(root: &Path, ctx: &Ctx) -> bool {
+    match &root.start {
+        Start::Alias(name) => ctx.aliases.contains_key(name),
+        _ => true,
+    }
+}
+
 fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
     let mut texts: Vec<String> = Vec::new();
     let mut causes: Vec<Cause> = Vec::new();
@@ -3436,6 +3456,17 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
                 if path::is_root(&root.start)
                     || (!ctx.subject.value.is_array() && super::lists::walked(root, ctx).is_some())
                 {
+                    if super::walked_roots_on()
+                        && let Check::Tally(tally) = check
+                        && bound_alias(root, ctx)
+                        && nested_whose(check, false).is_empty()
+                        && root
+                            .steps
+                            .iter()
+                            .all(|step| matches!(step, Step::Key(_) | Step::Index(_)))
+                    {
+                        found.extend(super::tally::counted_faults(tally, root, ctx));
+                    }
                     continue;
                 }
             }
@@ -3444,6 +3475,13 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
             if super::lists::right_paths(check).contains(&root)
                 && super::lists::walked_in(check, root, ctx).is_some()
             {
+                if super::walked_roots_on()
+                    && bound_alias(root, ctx)
+                    && let Some(fault) = super::lists::walked_root_fault(check, root, ctx)
+                    && fault.0 != Cause::Value
+                {
+                    found.push(fault);
+                }
                 continue;
             }
             if !(part && read.outcome.cause().is_some())

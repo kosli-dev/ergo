@@ -1685,6 +1685,13 @@ fn root_texts_with(
                 if lists::right_paths(check).contains(&&root)
                     && lists::walked_in(check, &root, ctx).is_some()
                 {
+                    if super::walked_roots_on()
+                        && !is_key
+                        && let Some((cause, text)) = lists::walked_root_fault(check, &root, ctx)
+                        && cause != Cause::Value
+                    {
+                        found.push((at, cause, text, false));
+                    }
                     continue;
                 }
                 let counted = match check {

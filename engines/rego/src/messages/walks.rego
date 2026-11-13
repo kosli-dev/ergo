@@ -375,7 +375,7 @@ _m_off_item(subj, c, "unusable") := _once(array.concat(
 _m_walked_root_text(c, cause) := ts[0] if {
 	ts := [t |
 		some p in _m_walked_roots(c)
-		t := _m_walked_root_fault(c, _as_subject_part(p), object.get(input, ["ergo/names", "ergo/subject"], null), cause)
+		t := _m_walked_root_fault(c, _walked_root_shown(p), object.get(input, ["ergo/names", "ergo/subject"], null), cause)
 	]
 	count(ts) > 0
 }

@@ -546,3 +546,17 @@ test_a_part_that_is_an_object_with_a_list_still_works_in_a_count_of_whose_under_
 	rows.xs == ["satisfied", null]
 	rows.at_least == ["satisfied", null]
 }
+
+test_host_data_cannot_turn_on_reading_walked_roots if {
+	policy := {
+		"ergo_spec": ergo._spec,
+		"subjects": {"c": {"from": "cs", "identified_by": "id"}},
+		"requirements": {"r": {"subject": "c", "checks": {"c": {"for": "every rows, if any, as r", "assert": "r.tags contains all of $params.os.name"}}}},
+	}
+	doc := {"cs": [{"id": "c1", "rows": [{"tags": ["bob"]}]}]}
+	params := {"os": [{"name": "bob"}, {}]}
+	plain := ergo.report(doc, policy, params)
+	[[r.cause, r.message] | some r in plain.results; r.check == "c"] == [["absent", "item 1 of rows: item 2 of $params.os: name is missing"]]
+	hosted := ergo.report(doc, policy, params) with data.ergo_walk_roots as true
+	hosted == plain
+}

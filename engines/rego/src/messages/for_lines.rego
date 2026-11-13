@@ -653,6 +653,11 @@ _list_phrase(leaf) if _list_cmp(leaf)
 
 _list_phrase(leaf) if leaf.op in {"in", "not_in", "includes_some", "not_includes_all", "matches_any", "not_matches_any"}
 
+_list_phrase(leaf) if {
+	_walk_roots_on
+	leaf.op in {"includes", "excludes"}
+}
+
 _m_right_needs(leaf, v) := "a number" if {
 	leaf.op == "compare"
 	leaf.cmp in {"gt", "gte", "lt", "lte"}

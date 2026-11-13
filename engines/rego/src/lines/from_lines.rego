@@ -895,15 +895,49 @@ _filter_assertion_cause(true, _, _, _) := "satisfied"
 
 _filter_assertion_cause(false, check, subj, flaw) := _assertion_cause(check, subj, flaw)
 
-_outcome(req, written, flaw, subj) := _tagged_outcome(_messaged(_check_outcome(_walk_labelled(check, req, subj), subj, flaw), check, req, subj), check, req, subj) if {
+_outcome(req, written, flaw, subj) := _tagged_outcome(_rooted_outcome(_walk_labelled(check, req, subj), subj, flaw, check, req), check, req, subj) if {
 	not _scoped(req)
 	check := _list_read(written, req, subj)
 } else := o if {
 	_scoped(req)
 	check := _list_read(written, req, subj)
 	s := _scope_of(req, subj)
-	raw := _messaged(_check_outcome(_walk_labelled(check, req, subj), subj, flaw), check, req, subj) with input as s
+	raw := _rooted_outcome(_walk_labelled(check, req, subj), subj, flaw, check, req) with input as s
 	o := _tagged_failures(object.union(raw, {"inputs": _tagged(raw.inputs, check, req, subj)}), check, req, subj) with input as s
+}
+
+_rooted_outcome(c, subj, flaw, check, req) := _walk_rooted_outcome(_check_outcome(c, subj, flaw), c, subj, flaw, check, req)
+
+_walk_rooted_outcome(raw, c, subj, flaw, check, req) := o if {
+	raw.passed == true
+	_may_hide_a_root(raw, c)
+	o := _messaged(_check_outcome(c, subj, flaw), check, req, subj) with _walk_roots_on as true
+	o.passed == false
+} else := _messaged(raw, check, req, subj)
+
+_may_hide_a_root(raw, _) if {
+	some i in raw.inputs
+	i.value == []
+}
+
+_may_hide_a_root(_, c) if {
+	c.op == "for"
+	some item in c.items
+	item.if_any == true
+}
+
+_may_hide_a_root(_, c) if {
+	c.op == "for"
+	walk(c.checks, [_, x])
+	is_object(x)
+	_walks_in_a_sentence(x)
+}
+
+_walks_in_a_sentence(x) if x.op in {"every", "some"}
+
+_walks_in_a_sentence(x) if {
+	some f in ["count_of", "sum_of"]
+	f in object.keys(x)
 }
 
 _list_read(check, req, subj) := _ls_check(check, req.subject) if {

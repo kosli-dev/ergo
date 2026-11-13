@@ -355,6 +355,21 @@ pub struct Ran {
     pub parts: Option<Vec<String>>,
 }
 
+thread_local! {
+    static WALKED_ROOTS: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+pub fn walked_roots_on() -> bool {
+    WALKED_ROOTS.with(std::cell::Cell::get)
+}
+
+pub fn reading_walked_roots<T>(work: impl FnOnce() -> T) -> T {
+    let was = WALKED_ROOTS.with(|on| on.replace(true));
+    let out = work();
+    WALKED_ROOTS.with(|on| on.set(was));
+    out
+}
+
 pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
     if check.reads_by_item() && !ctx.item_by_item {
         return run_full(check, &ctx.item_by_item());
