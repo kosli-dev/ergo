@@ -378,41 +378,69 @@ test_the_derived_cases_pass_compiled_part_5_of_6 if _differences_compiled("deriv
 
 test_the_derived_cases_pass_compiled_part_6_of_6 if _differences_compiled("derived", _part("derived", 5, 6)) == set()
 
-test_the_for_cases_pass_part_1_of_6 if _part_passes("for", 0, 6)
+test_the_for_cases_pass_part_1_of_12 if _case_part_passes("for", 0, 12)
 
-test_the_for_cases_pass_part_2_of_6 if _part_passes("for", 1, 6)
+test_the_for_cases_pass_part_2_of_12 if _case_part_passes("for", 1, 12)
 
-test_the_for_cases_pass_part_3_of_6 if _part_passes("for", 2, 6)
+test_the_for_cases_pass_part_3_of_12 if _case_part_passes("for", 2, 12)
 
-test_the_for_cases_pass_part_4_of_6 if _part_passes("for", 3, 6)
+test_the_for_cases_pass_part_4_of_12 if _case_part_passes("for", 3, 12)
 
-test_the_for_cases_pass_part_5_of_6 if _part_passes("for", 4, 6)
+test_the_for_cases_pass_part_5_of_12 if _case_part_passes("for", 4, 12)
 
-test_the_for_cases_pass_part_6_of_6 if _part_passes("for", 5, 6)
+test_the_for_cases_pass_part_6_of_12 if _case_part_passes("for", 5, 12)
 
-test_the_for_cases_pass_compiled_part_1_of_12 if _differences_compiled("for", _case_part("for", 0, 12)) == set()
+test_the_for_cases_pass_part_7_of_12 if _case_part_passes("for", 6, 12)
 
-test_the_for_cases_pass_compiled_part_2_of_12 if _differences_compiled("for", _case_part("for", 1, 12)) == set()
+test_the_for_cases_pass_part_8_of_12 if _case_part_passes("for", 7, 12)
 
-test_the_for_cases_pass_compiled_part_3_of_12 if _differences_compiled("for", _case_part("for", 2, 12)) == set()
+test_the_for_cases_pass_part_9_of_12 if _case_part_passes("for", 8, 12)
 
-test_the_for_cases_pass_compiled_part_4_of_12 if _differences_compiled("for", _case_part("for", 3, 12)) == set()
+test_the_for_cases_pass_part_10_of_12 if _case_part_passes("for", 9, 12)
 
-test_the_for_cases_pass_compiled_part_5_of_12 if _differences_compiled("for", _case_part("for", 4, 12)) == set()
+test_the_for_cases_pass_part_11_of_12 if _case_part_passes("for", 10, 12)
 
-test_the_for_cases_pass_compiled_part_6_of_12 if _differences_compiled("for", _case_part("for", 5, 12)) == set()
+test_the_for_cases_pass_part_12_of_12 if _case_part_passes("for", 11, 12)
 
-test_the_for_cases_pass_compiled_part_7_of_12 if _differences_compiled("for", _case_part("for", 6, 12)) == set()
+test_the_for_cases_pass_compiled_part_1_of_20 if _differences_compiled("for", _case_part("for", 0, 20)) == set()
 
-test_the_for_cases_pass_compiled_part_8_of_12 if _differences_compiled("for", _case_part("for", 7, 12)) == set()
+test_the_for_cases_pass_compiled_part_2_of_20 if _differences_compiled("for", _case_part("for", 1, 20)) == set()
 
-test_the_for_cases_pass_compiled_part_9_of_12 if _differences_compiled("for", _case_part("for", 8, 12)) == set()
+test_the_for_cases_pass_compiled_part_3_of_20 if _differences_compiled("for", _case_part("for", 2, 20)) == set()
 
-test_the_for_cases_pass_compiled_part_10_of_12 if _differences_compiled("for", _case_part("for", 9, 12)) == set()
+test_the_for_cases_pass_compiled_part_4_of_20 if _differences_compiled("for", _case_part("for", 3, 20)) == set()
 
-test_the_for_cases_pass_compiled_part_11_of_12 if _differences_compiled("for", _case_part("for", 10, 12)) == set()
+test_the_for_cases_pass_compiled_part_5_of_20 if _differences_compiled("for", _case_part("for", 4, 20)) == set()
 
-test_the_for_cases_pass_compiled_part_12_of_12 if _differences_compiled("for", _case_part("for", 11, 12)) == set()
+test_the_for_cases_pass_compiled_part_6_of_20 if _differences_compiled("for", _case_part("for", 5, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_7_of_20 if _differences_compiled("for", _case_part("for", 6, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_8_of_20 if _differences_compiled("for", _case_part("for", 7, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_9_of_20 if _differences_compiled("for", _case_part("for", 8, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_10_of_20 if _differences_compiled("for", _case_part("for", 9, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_11_of_20 if _differences_compiled("for", _case_part("for", 10, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_12_of_20 if _differences_compiled("for", _case_part("for", 11, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_13_of_20 if _differences_compiled("for", _case_part("for", 12, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_14_of_20 if _differences_compiled("for", _case_part("for", 13, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_15_of_20 if _differences_compiled("for", _case_part("for", 14, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_16_of_20 if _differences_compiled("for", _case_part("for", 15, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_17_of_20 if _differences_compiled("for", _case_part("for", 16, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_18_of_20 if _differences_compiled("for", _case_part("for", 17, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_19_of_20 if _differences_compiled("for", _case_part("for", 18, 20)) == set()
+
+test_the_for_cases_pass_compiled_part_20_of_20 if _differences_compiled("for", _case_part("for", 19, 20)) == set()
 
 test_the_walks_cases_pass if {
 	_topic_failures("walks") == _known_in("walks")
