@@ -873,7 +873,15 @@ _for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check,
 	f.path == p
 ]} if inner != []
 
-_for_inputs(check, subj, names, item, w) := _merged_inputs([{"name": t[0], "value": t[1], "locations": t[2]} | some t in (_for_input_pairs(check, subj, names, item, w) | _for_listed_pairs(check, subj))])
+_for_inputs(check, subj, names, item, w) := _merged_inputs([{"name": t[0], "value": t[1], "locations": t[2]} | some t in ((_for_input_pairs(check, subj, names, item, w) | _for_listed_pairs(check, subj)) | _for_whose_pairs(check, subj))])
+
+_for_whose_pairs(check, subj) := {[x[1].name, x[1].value, x[1].locations] |
+	some item in check.items
+	some x in _listed_reads(subj, object.get(item, "whose", []))
+} | {[i.name, i.value, i.locations] |
+	some item in check.items
+	some i in _input_ref_inputs(object.get(item, "whose", []))
+}
 
 _for_listed_pairs(check, subj) := {[r.name, r.value, r.locations] |
 	some c in check.checks

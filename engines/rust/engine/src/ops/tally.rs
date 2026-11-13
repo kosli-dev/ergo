@@ -1167,6 +1167,25 @@ pub fn derived_operands(derived: &Derived) -> (Vec<&Path>, Vec<&Path>, Vec<(&Pat
     (plain, counted, elapsed)
 }
 
+pub(super) fn counted_faults(tally: &Tally, path: &Path, ctx: &Ctx) -> Vec<(Cause, String)> {
+    let mut faults = Vec::new();
+    for side in tally_sides(tally) {
+        let Side::Derived(derived) = side else {
+            continue;
+        };
+        for term in &derived.terms {
+            if let Term::Counted(counted) = term
+                && counted.path == *path
+                && let Err(cause) = work_counted(counted, ctx).result
+                && let Some(text) = counted_text(counted, ctx, cause)
+            {
+                faults.push((cause, text));
+            }
+        }
+    }
+    faults
+}
+
 pub fn tally_sides(check: &Tally) -> Vec<&Side> {
     std::iter::once(&check.left)
         .chain(check.right.as_ref())

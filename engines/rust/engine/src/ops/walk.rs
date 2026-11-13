@@ -690,6 +690,17 @@ pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
     inputs
 }
 
+pub(super) fn listed_outside_inputs(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
+    let mut inputs = Vec::new();
+    for check in checks {
+        for path in check.paths().into_iter().filter(|p| reads_outside(p)) {
+            inputs.extend(listed_input(check, path, ctx));
+        }
+        inputs.extend(super::lists::ref_inputs(check, ctx, false));
+    }
+    inputs
+}
+
 pub(super) fn listed_input(check: &Check, path: &Path, ctx: &Ctx) -> Option<Input> {
     if matches!(path.start, Start::Params) {
         return None;

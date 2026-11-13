@@ -8403,6 +8403,44 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of rows whose n is count of $input.lst.k is 0",
+        "count of rows whose n equals count of $input.lst.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose n is count of $params.lst.k is 0",
+        "count of rows whose n equals count of $params.lst.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose n is count of c.os.k is 0",
+        "count of rows whose n equals count of c.os.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose n is count of c.pos.k is 0",
+        "count of rows whose n equals count of c.pos.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose n is count of pl.k is 0",
+        "count of rows whose n equals count of pl.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose n is count of pl.z is 0",
+        "count of rows whose n equals count of pl.z is 0",
+        &[],
+        &[],
+    ),
+    ("r.n is 1", "r.n is 1", &[], &[]),
+    ("w.x is \"bob\"", "w.x is \"bob\"", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -12516,6 +12554,42 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every ys whose n is at least art.cov.z, if any, as y",
         "every ys whose n is at least art.cov.z, if any, as y",
+        &[],
+        &[],
+    ),
+    (
+        "every rows as r, every r.ws whose x is in pos.name as w",
+        "every rows as r, every r.ws whose x is in pos.name as w",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose n is count of pl.k, if any, as r",
+        "every rows whose n equals count of pl.k, if any, as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose n is sum of pl.k, if any, as r",
+        "every rows whose n equals sum of pl.k, if any, as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in $input.lst.name as r",
+        "every rows whose v is in $input.lst.name as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in c.os.name as r",
+        "every rows whose v is in c.os.name as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose v is in c.pos.name as r",
+        "every rows whose v is in c.pos.name as r",
         &[],
         &[],
     ),

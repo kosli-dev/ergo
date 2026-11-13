@@ -2164,6 +2164,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("os", "os"),
     ("every g.arts", "every g.arts"),
     ("gs", "gs"),
+    ("every c.kids", "every c.kids"),
+    ("every cs", "every cs"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

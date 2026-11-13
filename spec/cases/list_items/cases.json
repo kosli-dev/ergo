@@ -311,6 +311,160 @@
     ]
   },
   {
+    "description": "a count of inside a whose reads its list before any item, so a list it can't read fails the check on an empty list too",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"u": {"from": "every objs", "has": {"pl": "os"}}}, "requirements": {"r": {"subject": "u", "checks": {"input": "count of rows whose n is count of $input.lst.k is 0", "part": "count of rows whose n is count of pl.k is 0"}}}},
+    "cases": [
+      {
+        "description": "an item without the name fails as absent, said once as the count alone says it",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"objs": [{"rows": [], "os": [{"k": 1}, {}]}], "lst": [{"k": 1}, {}]},
+        "results": [
+          {"cause": "absent", "check": "input", "inputs": [{"locations": [], "name": "count of rows whose n equals count of $input.lst.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/lst/0/k", "/lst/1"], "name": "$input.lst[].k", "value": [1, null]}], "message": "item 2 of $input.lst: k is missing", "passed": false, "requirement": "r", "subject": {"id": {"os": [{"k": 1}, {}], "rows": []}, "type": "u"}},
+          {"cause": "absent", "check": "part", "inputs": [{"locations": [], "name": "count of rows whose n equals count of pl.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/objs/0/os/0/k", "/objs/0/os/1"], "name": "pl[].k", "part": {"id": null, "name": "pl"}, "value": [1, null]}], "message": "item 2 of pl: k is missing", "passed": false, "requirement": "r", "subject": {"id": {"os": [{"k": 1}, {}], "rows": []}, "type": "u"}}
+        ]
+      },
+      {
+        "description": "a null item fails as not_an_object",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"objs": [{"rows": [], "os": [{"k": 1}, null]}], "lst": [{"k": 1}, null]},
+        "results": [
+          {"cause": "not_an_object", "check": "input", "inputs": [{"locations": [], "name": "count of rows whose n equals count of $input.lst.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/lst/0/k", "/lst/1"], "name": "$input.lst[].k", "value": [1, null]}], "message": "item 2 of $input.lst is null, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"os": [{"k": 1}, null], "rows": []}, "type": "u"}},
+          {"cause": "not_an_object", "check": "part", "inputs": [{"locations": [], "name": "count of rows whose n equals count of pl.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/objs/0/os/0/k", "/objs/0/os/1"], "name": "pl[].k", "part": {"id": null, "name": "pl"}, "value": [1, null]}], "message": "item 2 of pl is null, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"os": [{"k": 1}, null], "rows": []}, "type": "u"}}
+        ]
+      },
+      {
+        "description": "items that aren't objects fail as not_an_object",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"objs": [{"rows": [], "os": [1, 2]}], "lst": [1, 2]},
+        "results": [
+          {"cause": "not_an_object", "check": "input", "inputs": [{"locations": [], "name": "count of rows whose n equals count of $input.lst.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/lst/0", "/lst/1"], "name": "$input.lst[].k", "value": [null, null]}], "message": "item 1 of $input.lst is 1, which isn't an object; item 2 of $input.lst is 2, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"os": [1, 2], "rows": []}, "type": "u"}},
+          {"cause": "not_an_object", "check": "part", "inputs": [{"locations": [], "name": "count of rows whose n equals count of pl.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/objs/0/os/0", "/objs/0/os/1"], "name": "pl[].k", "part": {"id": null, "name": "pl"}, "value": [null, null]}], "message": "item 1 of pl is 1, which isn't an object; item 2 of pl is 2, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"os": [1, 2], "rows": []}, "type": "u"}}
+        ]
+      },
+      {
+        "description": "a null name is counted, so the check passes",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"objs": [{"rows": [], "os": [{"k": 1}, {"k": null}]}], "lst": [{"k": 1}, {"k": null}]},
+        "results": [
+          {"cause": "satisfied", "check": "input", "inputs": [{"locations": [], "name": "count of rows whose n equals count of $input.lst.k", "value": 0}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/lst/0/k", "/lst/1/k"], "name": "$input.lst[].k", "value": [1, null]}], "passed": true, "requirement": "r", "subject": {"id": {"os": [{"k": 1}, {"k": null}], "rows": []}, "type": "u"}},
+          {"cause": "satisfied", "check": "part", "inputs": [{"locations": [], "name": "count of rows whose n equals count of pl.k", "value": 0}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/objs/0/os/0/k", "/objs/0/os/1/k"], "name": "pl[].k", "part": {"id": null, "name": "pl"}, "value": [1, null]}], "passed": true, "requirement": "r", "subject": {"id": {"os": [{"k": 1}, {"k": null}], "rows": []}, "type": "u"}}
+        ]
+      },
+      {
+        "description": "a list that is text fails as unusable",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"objs": [{"rows": [], "os": "s"}], "lst": "s"},
+        "results": [
+          {"cause": "unusable", "check": "input", "inputs": [{"locations": [], "name": "count of rows whose n equals count of $input.lst.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/lst"], "name": "$input.lst.k", "value": null}], "message": "$input.lst is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"os": "s", "rows": []}, "type": "u"}},
+          {"cause": "unusable", "check": "part", "inputs": [{"locations": [], "name": "count of rows whose n equals count of pl.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/objs/0/os"], "name": "pl.k", "part": {"id": null, "name": "pl"}, "value": null}], "message": "pl is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"os": "s", "rows": []}, "type": "u"}}
+        ]
+      },
+      {
+        "description": "with items, an item without the name is said once, with no item of rows in front",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"objs": [{"rows": [{"n": 2}], "os": [{"k": 1}, {}]}], "lst": [{"k": 1}, {}]},
+        "results": [
+          {"cause": "absent", "check": "input", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $input.lst.k", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2}]}, {"locations": ["/lst/0/k", "/lst/1"], "name": "$input.lst[].k", "value": [1, null]}], "message": "item 2 of $input.lst: k is missing", "passed": false, "requirement": "r", "subject": {"id": {"os": [{"k": 1}, {}], "rows": [{"n": 2}]}, "type": "u"}},
+          {"cause": "absent", "check": "part", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of pl.k", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2}]}, {"locations": ["/objs/0/os/0/k", "/objs/0/os/1"], "name": "pl[].k", "part": {"id": null, "name": "pl"}, "value": [1, null]}], "message": "item 2 of pl: k is missing", "passed": false, "requirement": "r", "subject": {"id": {"os": [{"k": 1}, {}], "rows": [{"n": 2}]}, "type": "u"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of $params inside a whose reads its list before any item, with an item without the name",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"u": {"from": "every objs"}}, "requirements": {"r": {"subject": "u", "checks": {"params": "count of rows whose n is count of $params.lst.k is 0"}}}},
+    "params": {"lst": [{"k": 1}, {}]},
+    "cases": [
+      {
+        "description": "fails as absent on an empty list",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"objs": [{"rows": []}]},
+        "results": [
+          {"cause": "absent", "check": "params", "inputs": [{"locations": [], "name": "count of rows whose n equals count of $params.lst.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}], "message": "item 2 of $params.lst: k is missing", "passed": false, "requirement": "r", "subject": {"id": {"rows": []}, "type": "u"}}
+        ]
+      },
+      {
+        "description": "fails as absent with items, said once",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"objs": [{"rows": [{"n": 2}]}]},
+        "results": [
+          {"cause": "absent", "check": "params", "inputs": [{"locations": ["/objs/0/rows/0"], "name": "count of rows whose n equals count of $params.lst.k", "value": null}, {"locations": ["/objs/0/rows/0"], "name": "rows[]", "value": [{"n": 2}]}], "message": "item 2 of $params.lst: k is missing", "passed": false, "requirement": "r", "subject": {"id": {"rows": [{"n": 2}]}, "type": "u"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a parent's list inside a whose reads it before any item",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "every cs", "identified_by": "id", "has": {"pos": "os"}}, "k": {"from": "every c.kids", "identified_by": "id"}}, "requirements": {"r": {"subject": "k", "checks": {"parent": "count of rows whose n is count of c.os.k is 0", "parent_part": "count of rows whose n is count of c.pos.k is 0"}}}},
+    "cases": [
+      {
+        "description": "an item without the name fails as absent on an empty list",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"cs": [{"id": "c1", "os": [{"k": 1}, {}], "kids": [{"id": "k1", "rows": []}]}]},
+        "results": [
+          {"cause": "absent", "check": "parent", "inputs": [{"locations": [], "name": "count of rows whose n equals count of c.os.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/cs/0/os/0/k", "/cs/0/os/1"], "name": "c.os[].k", "value": [1, null]}], "message": "item 2 of c.os: k is missing", "passed": false, "requirement": "r", "subject": {"id": "k1", "in": {"c": "c1"}, "type": "k"}},
+          {"cause": "absent", "check": "parent_part", "inputs": [{"locations": [], "name": "count of rows whose n equals count of c.pos.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/cs/0/os/0/k", "/cs/0/os/1"], "name": "c.pos[].k", "part": {"id": null, "name": "c.pos"}, "value": [1, null]}], "message": "item 2 of c.pos: k is missing", "passed": false, "requirement": "r", "subject": {"id": "k1", "in": {"c": "c1"}, "type": "k"}}
+        ]
+      },
+      {
+        "description": "a null item fails as not_an_object on an empty list",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"cs": [{"id": "c1", "os": [{"k": 1}, null], "kids": [{"id": "k1", "rows": []}]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "parent", "inputs": [{"locations": [], "name": "count of rows whose n equals count of c.os.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/cs/0/os/0/k", "/cs/0/os/1"], "name": "c.os[].k", "value": [1, null]}], "message": "item 2 of c.os is null, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "k1", "in": {"c": "c1"}, "type": "k"}},
+          {"cause": "not_an_object", "check": "parent_part", "inputs": [{"locations": [], "name": "count of rows whose n equals count of c.pos.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/cs/0/os/0/k", "/cs/0/os/1"], "name": "c.pos[].k", "part": {"id": null, "name": "c.pos"}, "value": [1, null]}], "message": "item 2 of c.pos is null, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "k1", "in": {"c": "c1"}, "type": "k"}}
+        ]
+      },
+      {
+        "description": "a list that is text fails as unusable on an empty list",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"cs": [{"id": "c1", "os": "s", "kids": [{"id": "k1", "rows": []}]}]},
+        "results": [
+          {"cause": "unusable", "check": "parent", "inputs": [{"locations": [], "name": "count of rows whose n equals count of c.os.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/cs/0/os"], "name": "c.os.k", "value": null}], "message": "c.os is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "k1", "in": {"c": "c1"}, "type": "k"}},
+          {"cause": "unusable", "check": "parent_part", "inputs": [{"locations": [], "name": "count of rows whose n equals count of c.pos.k", "value": null}, {"locations": [], "name": "rows[]", "value": []}, {"locations": ["/cs/0/os"], "name": "c.pos.k", "part": {"id": null, "name": "c.pos"}, "value": null}], "message": "c.pos is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "k1", "in": {"c": "c1"}, "type": "k"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a part inside a whose on a subject that is a list reads the part before any item",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every teams", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"nested": "count of rows whose n is count of pl.z is 0"}}}},
+    "cases": [
+      {
+        "description": "a subject item without the part fails as absent, said once with no item of rows in front",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"teams": [[{"c": {"z": ["a"]}, "rows": [{"n": 2}]}, {"rows": [{"n": 1}]}]]},
+        "results": [
+          {"cause": "absent", "check": "nested", "inputs": [{"locations": ["/teams/0/0/rows/0", "/teams/0/1/rows/0"], "name": "count of rows whose n equals count of pl.z", "value": null}, {"locations": ["/teams/0/0/rows/0", "/teams/0/1/rows/0"], "name": "t[].rows[]", "value": [{"n": 2}, {"n": 1}]}, {"locations": ["/teams/0/0/c/z/0"], "name": "t[].c.z[]", "value": ["a"]}], "message": "item 2 of t: c.z is missing", "passed": false, "requirement": "r", "subject": {"id": [{"c": {"z": ["a"]}, "rows": [{"n": 2}]}, {"rows": [{"n": 1}]}], "type": "t"}}
+        ]
+      },
+      {
+        "description": "fails the same on empty lists of rows",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"teams": [[{"c": {"z": ["a"]}, "rows": []}, {"rows": []}]]},
+        "results": [
+          {"cause": "absent", "check": "nested", "inputs": [{"locations": [], "name": "count of rows whose n equals count of pl.z", "value": null}, {"locations": [], "name": "t[].rows[]", "value": []}, {"locations": ["/teams/0/0/c/z/0"], "name": "t[].c.z[]", "value": ["a"]}], "message": "item 2 of t: c.z is missing", "passed": false, "requirement": "r", "subject": {"id": [{"c": {"z": ["a"]}, "rows": []}, {"rows": []}], "type": "t"}}
+        ]
+      },
+      {
+        "description": "a null item in the part fails as not_an_object and names it, not the subject",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"teams": [[{"c": [{"z": 1}, null], "rows": []}, {"c": [{"z": 1}], "rows": []}]]},
+        "results": [
+          {"cause": "not_an_object", "check": "nested", "inputs": [{"locations": [], "name": "count of rows whose n equals count of pl.z", "value": null}, {"locations": [], "name": "t[].rows[]", "value": []}, {"locations": ["/teams/0/0/c/0/z", "/teams/0/0/c/1", "/teams/0/1/c/0/z"], "name": "t[].c[].z", "value": [1, null, 1]}], "message": "item 1 of t: item 2 of c is null, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [{"c": [{"z": 1}, null], "rows": []}, {"c": [{"z": 1}], "rows": []}], "type": "t"}}
+        ]
+      },
+      {
+        "description": "passes when the part can be read",
+        "rules": ["tally.whose", "tally.walk"],
+        "input": {"teams": [[{"c": {"z": ["a"]}, "rows": []}, {"c": {"z": ["b"]}, "rows": []}]]},
+        "results": [
+          {"cause": "satisfied", "check": "nested", "inputs": [{"locations": [], "name": "count of rows whose n equals count of pl.z", "value": 0}, {"locations": [], "name": "t[].rows[]", "value": []}, {"locations": ["/teams/0/0/c/z/0", "/teams/0/1/c/z/0"], "name": "t[].c.z[]", "value": ["a", "b"]}], "passed": true, "requirement": "r", "subject": {"id": [{"c": {"z": ["a"]}, "rows": []}, {"c": {"z": ["b"]}, "rows": []}], "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a count of $params inside a whose, with a list that is missing",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"u": {"from": "every objs"}}, "requirements": {"r": {"subject": "u", "checks": {"params": "count of rows whose n is count of $params.lst.name is 1"}}}},
     "params": {},

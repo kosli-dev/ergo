@@ -779,7 +779,8 @@ fn list_read_plainly(check: &Check, ctx: &Ctx) -> bool {
         TallySide::Plain(_) => false,
         TallySide::Derived(d) => d.terms.iter().any(|term| match term {
             tally::Term::Counted(counted) => counted.whose.iter().any(|w| {
-                root_flaw(&[w], &outer).is_some_and(|(cause, _)| cause == Cause::NotAnObject)
+                root_flaw_with(&[w], &outer, &[], &[], false)
+                    .is_some_and(|(cause, _)| cause == Cause::NotAnObject)
             }),
             _ => false,
         }),
@@ -1487,6 +1488,16 @@ pub fn root_flaw_ordered(
     refs_first: &[&Check],
     keys_left: &[&Check],
 ) -> Option<(Cause, String)> {
+    root_flaw_with(checks, ctx, refs_first, keys_left, true)
+}
+
+fn root_flaw_with(
+    checks: &[&Check],
+    ctx: &Ctx,
+    refs_first: &[&Check],
+    keys_left: &[&Check],
+    walked_counts: bool,
+) -> Option<(Cause, String)> {
     let mut found: Vec<(usize, Cause, String, bool)> = Vec::new();
     let mut refs: Vec<String> = Vec::new();
     for (at, check) in checks.iter().enumerate() {
@@ -1535,6 +1546,11 @@ pub fn root_flaw_ordered(
                     && !is_key
                     && (lists::starts_at_a_list(&root, ctx) || lists::walked(&root, ctx).is_some())
                 {
+                    if walked_counts && let Check::Tally(tally) = check {
+                        for (cause, text) in super::tally::counted_faults(tally, path, ctx) {
+                            found.push((at, cause, text, false));
+                        }
+                    }
                     continue;
                 }
                 if counted && let Some(found) = first_null_step(&root, ctx) {

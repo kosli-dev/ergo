@@ -200,7 +200,7 @@ _m_tallies(subj, check, cause) := [c |
 ]
 
 _m_tally_dropped(subj, side, cause, x) if {
-	roots := {m | some c in object.get(side, "whose", []); _root_read_flaw(subj, c) == cause; some m in _m_root_texts(subj, c, cause)}
+	roots := {m | some c in object.get(side, "whose", []); _root_read_flaw(subj, c) == cause; some m in array.concat(_m_root_texts(subj, c, cause), _m_walked_tally_texts(subj, _walked_tallies(c), cause))}
 	roots != set()
 	not x[1] in roots
 	x in _m_tally_items(subj, side)

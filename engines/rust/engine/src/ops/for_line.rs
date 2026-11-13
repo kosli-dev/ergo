@@ -1658,6 +1658,12 @@ impl For {
                 inputs.extend(super::lists::ref_inputs(inner, ctx, false));
             }
         }
+        let whose: Vec<&Check> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .collect();
+        inputs.extend(walk::listed_outside_inputs(&whose, &outer_ctx(ctx)));
         inputs
     }
 
