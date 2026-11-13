@@ -1167,6 +1167,55 @@ pub fn derived_operands(derived: &Derived) -> (Vec<&Path>, Vec<&Path>, Vec<(&Pat
     (plain, counted, elapsed)
 }
 
+pub(super) fn counted_faults(tally: &Tally, path: &Path, ctx: &Ctx) -> Vec<(Cause, String)> {
+    let mut faults = Vec::new();
+    for side in tally_sides(tally) {
+        let Side::Derived(derived) = side else {
+            continue;
+        };
+        for term in &derived.terms {
+            if let Term::Counted(counted) = term
+                && counted.path == *path
+                && let Err(cause) = work_counted(counted, ctx).result
+                && let Some(text) = counted_text(counted, ctx, cause)
+            {
+                faults.push((cause, text));
+            }
+        }
+    }
+    faults
+}
+
+pub fn with_walked_roots(check: &Tally, ctx: &Ctx, message: String) -> String {
+    let outer = outer_ctx(ctx);
+    let whose: Vec<&Check> = tally_sides(check)
+        .into_iter()
+        .filter_map(|side| match side {
+            Side::Derived(derived) => Some(derived),
+            _ => None,
+        })
+        .flat_map(|derived| derived.terms.iter())
+        .filter_map(|term| match term {
+            Term::Counted(counted) => {
+                let walked = walk::walk(
+                    &counted.path,
+                    &outer,
+                    Options {
+                        if_any: false,
+                        empty_adds_nothing: true,
+                    },
+                );
+                (walked.unreadable.is_none() && walked.failures.is_empty())
+                    .then(|| counted.whose.iter())
+            }
+            _ => None,
+        })
+        .flatten()
+        .collect();
+    super::message::walked_roots_ahead(Some(message.clone()), &whose, &outer, &whose)
+        .unwrap_or(message)
+}
+
 pub fn tally_sides(check: &Tally) -> Vec<&Side> {
     std::iter::once(&check.left)
         .chain(check.right.as_ref())

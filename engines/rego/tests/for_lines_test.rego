@@ -530,16 +530,15 @@ test_params_that_arent_an_object_name_themselves_in_a_for_line_that_reads_them_w
 	rows.whose == ["unusable", "$params is 3, which isn't an object"]
 }
 
-test_a_part_that_holds_a_list_fails_a_count_of_whose_under_a_for_line_as_unusable_and_names_the_part if {
-	every part, shown in {"[]": [], "[{\"z\": 1}]": [{"z": 1}]} {
-		every xs in [[{"v": 1, "ys": [{"v": 1}]}], []] {
-			rows := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": shown, "xs": xs}]}, {})
-			every check in ["xs", "ys", "at_least"] {
-				rows[check][0] == "unusable"
-				startswith(rows[check][1], concat("", ["pl is ", part, ", which isn't an object"]))
-			}
-		}
-	}
+test_a_part_that_holds_a_list_is_walked_by_a_count_of_whose_under_a_for_line if {
+	xs := [{"v": 1, "ys": [{"v": 1}]}]
+	empty := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": [], "xs": xs}]}, {})
+	empty.xs[0] == "satisfied"
+	empty.ys[0] == "satisfied"
+	objects := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": [{"z": 1}], "xs": xs}]}, {})
+	objects.xs == ["value", "count of xs whose v is in pl.z is 1"]
+	objects.ys == ["value", "item 1 of xs: count of m.ys whose v is in pl.z is 1"]
+	objects.at_least[0] == "satisfied"
 }
 
 test_a_part_that_is_an_object_with_a_list_still_works_in_a_count_of_whose_under_a_for_line if {

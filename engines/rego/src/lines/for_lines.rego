@@ -76,7 +76,12 @@ _params_shape_only_unreadable(check) if {
 }
 
 _flawed_root_msgs(check, subj, said) := _with_roots(split(said, "; "), roots) if {
-	roots := _walk_root_msgs(check, subj)
+	walked := _m_for_said(check)
+	roots := _once(array.concat(_walk_root_msgs(check, subj), sort(walked)))
+	some m in roots
+	not m in walked
+} else := roots if {
+	roots := _once(array.concat(_walk_root_msgs(check, subj), sort(_m_for_said(check))))
 	roots != []
 } else := []
 
@@ -167,7 +172,7 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	ms != []
 ]
 
-_for_row_message(check, subj, r) := _m_joined(array.concat(once, [t | some t in split(_for_item_text(check, subj, r, once), "; "); t != ""; not t in once])) if {
+_for_row_message(check, subj, r) := _m_joined(array.concat(_m_tally_grouped(check, once), [t | some t in _for_item_parts(check, subj, r, once); t != ""; not t in once])) if {
 	rs := object.get(r, "root_msgs", object.get(r, "other_roots", []))
 	second := {m | some x in _for_second_roots(check, subj); some m in x.ms}
 	once := _once(array.concat(array.concat(array.concat([m | some m in rs; not m in second], [t | some p in _for_free_texts(check, r); t := _m_unskipped(p, rs); t != ""]), _for_hoisted_texts(check, r)), [m | some m in rs; m in second]))
@@ -182,15 +187,15 @@ _for_hoisted_texts(check, r) := [p |
 	some p in _m_for_part(check, r.failed, i, f)
 ]
 
-_for_item_text(check, subj, r, once) := "" if {
+_for_item_parts(check, subj, r, once) := [] if {
 	"root_msgs" in object.keys(r)
 	r.failed == []
-} else := "" if {
+} else := [] if {
 	"free_lines" in object.keys(r)
 	r.failed == []
-} else := _for_message(check, subj, r) if {
+} else := _for_message_parts(check, subj, r) if {
 	r.failed == []
-} else := _for_message(check, subj, object.union(r, {"failed": [object.union(f, {"skip": skip}) | some f in r.failed]})) if {
+} else := _for_message_parts(check, subj, object.union(r, {"failed": [object.union(f, {"skip": skip}) | some f in r.failed]})) if {
 	skip := array.concat(once, [m | some x in _for_second_roots(check, subj); some m in x.raw])
 }
 
@@ -867,13 +872,21 @@ _for_failed(check, cause, fails) := [object.union(object.union({"path": _failed_
 
 _for_unchecked(_, []) := {}
 
-_for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_root_why(f), "free": object.get(f, "free", false)} |
+_for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_inner_text(check, f), "free": _m_inner_free(f)} |
 	some p in sort({f.path | some f in inner})
 	some f in inner
 	f.path == p
 ]} if inner != []
 
-_for_inputs(check, subj, names, item, w) := _merged_inputs([{"name": t[0], "value": t[1], "locations": t[2]} | some t in (_for_input_pairs(check, subj, names, item, w) | _for_listed_pairs(check, subj))])
+_for_inputs(check, subj, names, item, w) := _merged_inputs([{"name": t[0], "value": t[1], "locations": t[2]} | some t in ((_for_input_pairs(check, subj, names, item, w) | _for_listed_pairs(check, subj)) | _for_whose_pairs(check, subj))])
+
+_for_whose_pairs(check, subj) := {[x[1].name, x[1].value, x[1].locations] |
+	some item in check.items
+	some x in _listed_reads(subj, object.get(item, "whose", []))
+} | {[i.name, i.value, i.locations] |
+	some item in check.items
+	some i in _input_ref_inputs(object.get(item, "whose", []))
+}
 
 _for_listed_pairs(check, subj) := {[r.name, r.value, r.locations] |
 	some c in check.checks
@@ -902,6 +915,12 @@ _for_listed(subj, c, p) if {
 	_rwalks(subj, p)
 }
 
+_for_listed(subj, c, p) if {
+	_for_listed_right(c, p)
+	_part_start(p)
+	_rwalks(subj, p)
+}
+
 _for_listed_right(c, p) if {
 	_list_cmp(c)
 	not _one_right(c)
@@ -926,7 +945,7 @@ _for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input
 	some c in check.checks
 	some side in _derived_sides(c)
 	not _tally_named(check, side)
-	some i in _for_side_inputs(subj, side)
+	some i in _side_inputs(subj, side)
 }) | {[i.name, i.value, i.locations] |
 	some c in check.checks
 	some side in _derived_sides(c)
@@ -958,11 +977,6 @@ _for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input
 	some c in check.checks
 	c.op in _right_ref_ops
 	some i in _ref_inputs(object.remove(c, ["path"]))
-}
-
-_for_side_inputs(subj, side) := array.concat([i | some i in _side_inputs(subj, side); not i in held], [_path_input(subj, x[0]) | some x in xs]) if {
-	xs := [x | some t in _tally_parts(side); some x in _listed_reads(subj, t.whose)]
-	held := {x[1] | some x in xs}
 }
 
 _for_alias_path(check, p) if p[0] in {concat("", ["$", item.as]) | some item in check.items}
@@ -1080,7 +1094,7 @@ _tally_kept_inputs(check, subj, part) := array.concat(
 	),
 	_merged_inputs(array.concat(
 		array.concat(
-			_for_conds_named_inputs(subj, part.whose, {p | some c in part.whose; some p in _condition_paths(c); _for_alias_path(check, p)}),
+			_conds_named_inputs_but(subj, part.whose, {p | some c in part.whose; some p in _condition_paths(c); _for_alias_path(check, p)}),
 			_named_inputs(subj, [shown | some c in part.whose; some p in _condition_paths(c); shown := _before_alias_name(check, subj, p)]),
 		),
 		_input_ref_inputs(part.whose),

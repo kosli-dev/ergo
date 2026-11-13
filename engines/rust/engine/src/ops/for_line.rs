@@ -139,7 +139,7 @@ fn listed_walk(path: &Path, listed: &[*const Path], ctx: &Ctx, hidden: &[&str]) 
     }
     let walks = match &path.start {
         Start::Subject | Start::Own => true,
-        start @ Start::Part(_) => path::is_root(start) || ctx.subject.value.is_array(),
+        Start::Part(_) => true,
         Start::Alias(name) => !hidden.contains(&name.as_str()),
         _ => false,
     };
@@ -580,6 +580,20 @@ impl For {
                     .filter(|c| !matches!(c, Cause::Satisfied | Cause::Value)),
             );
             let first_alias = self.items[0].alias.as_str();
+            let own_text = item
+                .whose
+                .iter()
+                .zip(&verdicts)
+                .filter(|(_, verdict)| !matches!(verdict.cause, Cause::Satisfied | Cause::Value))
+                .find_map(|(check, verdict)| {
+                    if lost {
+                        return None;
+                    }
+                    let said = own_beside_root(check, &outer, &focus, verdict.cause)?;
+                    let name = walked.item_name_dotted(walk::focus_segs(w, check));
+                    let name = if depth > 0 { self.strip(&name) } else { name };
+                    Some(super::message::prefixed(&name, &said))
+                });
             let fault = item
                 .whose
                 .iter()
@@ -588,21 +602,31 @@ impl For {
                 .and_then(|(check, verdict)| {
                     let text = (!lost)
                         .then(|| {
-                            super::message::root_fault(check, &outer, verdict.cause).or_else(|| {
-                                (verdict.cause == Cause::Unusable)
-                                    .then(|| {
-                                        check.paths().into_iter().find_map(|path| {
-                                            super::message::reads_from_a_root(path)
-                                                .then(|| {
-                                                    super::message::root_kind_fault(
-                                                        check, path, &outer,
-                                                    )
-                                                })
-                                                .flatten()
+                            super::message::root_flaw(&[check], &outer)
+                                .filter(|(cause, _)| {
+                                    depth > 0
+                                        && *cause == verdict.cause
+                                        && !own_read_fails(check, &focus)
+                                })
+                                .and_then(|(_, text)| text.split("; ").next().map(str::to_string))
+                                .or_else(|| {
+                                    super::message::root_fault(check, &outer, verdict.cause)
+                                })
+                                .or_else(|| {
+                                    (verdict.cause == Cause::Unusable)
+                                        .then(|| {
+                                            check.paths().into_iter().find_map(|path| {
+                                                super::message::reads_from_a_root(path)
+                                                    .then(|| {
+                                                        super::message::root_kind_fault(
+                                                            check, path, &outer,
+                                                        )
+                                                    })
+                                                    .flatten()
+                                            })
                                         })
-                                    })
-                                    .flatten()
-                            })
+                                        .flatten()
+                                })
                         })
                         .flatten()?;
                     Some(if depth > 0 && !reads_alias(check, first_alias) {
@@ -626,12 +650,22 @@ impl For {
                 })
             };
             let why = undecided_whose()
-                .find(|(check, verdict)| !lost && own(check, verdict))
-                .map(|(check, verdict)| {
-                    super::message::prefixed(
-                        &walked.item_name_dotted(walk::focus_segs(w, check)),
-                        &super::message::message(check, &focus, verdict),
-                    )
+                .find_map(|(check, verdict)| {
+                    super::message::root_flaw(&[check], &outer)
+                        .filter(|(cause, _)| {
+                            !lost && *cause == verdict.cause && !own_read_fails(check, &focus)
+                        })
+                        .map(|(_, text)| text)
+                })
+                .or_else(|| {
+                    undecided_whose()
+                        .find(|(check, verdict)| !lost && own(check, verdict))
+                        .map(|(check, verdict)| {
+                            super::message::prefixed(
+                                &walked.item_name_dotted(walk::focus_segs(w, check)),
+                                &super::message::message(check, &focus, verdict),
+                            )
+                        })
                 })
                 .or_else(|| {
                     undecided_whose().next().map(|(check, verdict)| {
@@ -656,6 +690,8 @@ impl For {
                         }
                     })
                 });
+            let fault = own_text.clone().or(fault);
+            let why = own_text.or(why);
             let dead_item = |cause: Cause| Dead {
                 raw: (w.end.is_none() && !w.item.value.is_object()).then(|| w.item.value.clone()),
                 bare: None,
@@ -1591,9 +1627,19 @@ impl For {
                 Check::Walk(walk) => std::iter::once(&*walk.check)
                     .chain(walk.whose.iter())
                     .collect::<Vec<_>>(),
-                other => vec![other],
+                other => nested_checks(other),
             })
             .filter_map(super::lists::walked_right)
+            .map(std::ptr::from_ref)
+            .collect();
+        let counted: Vec<*const Path> = self
+            .sentences
+            .iter()
+            .flat_map(|sentence| nested_checks(&sentence.check).into_iter().skip(1))
+            .flat_map(|check| match check {
+                Check::Tally(tally) => tally.counted_paths(),
+                _ => Vec::new(),
+            })
             .map(std::ptr::from_ref)
             .collect();
         for path in paths {
@@ -1612,7 +1658,18 @@ impl For {
                     inputs.extend(super::field_inputs(path, ctx));
                 }
                 _ if in_whose.contains(&std::ptr::from_ref(path)) => {
-                    inputs.extend(walk::path_inputs(path, &outer_ctx(ctx), &hidden, true));
+                    let outer = outer_ctx(ctx);
+                    if counted.contains(&std::ptr::from_ref(path))
+                        && !hides(path)
+                        && super::lists::walked(path, &outer).is_some()
+                    {
+                        inputs.push(super::tally::counted_list(path, &outer));
+                        continue;
+                    }
+                    match listed_walk(path, &listed, &outer, &hidden) {
+                        Some(input) => inputs.push(input),
+                        None => inputs.extend(walk::path_inputs(path, &outer, &hidden, true)),
+                    }
                 }
                 _ => {
                     let on_items = in_walk.contains(&std::ptr::from_ref(path));
@@ -1637,10 +1694,44 @@ impl For {
                 inputs.extend(super::lists::ref_inputs(inner, ctx, false));
             }
         }
+        let whose: Vec<&Check> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .collect();
+        inputs.extend(walk::listed_outside_inputs(&whose, &outer_ctx(ctx)));
         inputs
     }
 
     pub fn run(&self, ctx: &Ctx) -> Run {
+        let mut run = self.run_lines(ctx);
+        if run.verdict.cause != Cause::Satisfied {
+            let whose: Vec<&Check> = self
+                .items
+                .iter()
+                .flat_map(|item| item.whose.iter())
+                .chain(
+                    self.sentences
+                        .iter()
+                        .flat_map(|s| nested_whose(&s.check, false)),
+                )
+                .collect();
+            let counted: Vec<&Check> = self
+                .sentences
+                .iter()
+                .flat_map(|s| nested_whose(&s.check, true))
+                .collect();
+            run.message = super::message::walked_roots_ahead(
+                run.message.take(),
+                &whose,
+                &outer_ctx(ctx),
+                &counted,
+            );
+        }
+        run
+    }
+
+    fn run_lines(&self, ctx: &Ctx) -> Run {
         let (mut run, free, _, alone) = self.run_items(ctx, Vec::new());
         let said = run.message.clone();
         let (roots, ahead) = match self.rooted(&mut run, ctx) {
@@ -1694,12 +1785,16 @@ impl For {
             }
         }
         let once = ordered;
-        let mut parts = once.clone();
+        let mut parts = super::message::capped_units(once.clone());
         if let Some(items) = items {
             parts.extend(
                 items
                     .split("; ")
-                    .filter(|part| !part.is_empty() && !once.iter().any(|o| o == part))
+                    .filter(|part| {
+                        !part.is_empty()
+                            && (super::message::cap_note(part).is_some()
+                                || !once.iter().any(|o| o == part))
+                    })
                     .map(str::to_string),
             );
         }
@@ -1729,7 +1824,7 @@ impl For {
             .flat_map(|s| nested_whose(&s.check, false))
             .collect();
         let outer = outer_ctx(ctx);
-        let outer_flaw = super::message::root_flaw_in_for(&whose, &outer, &counted, &nested);
+        let outer_flaw = super::message::root_flaw_ordered(&whose, &outer, &counted, &nested);
         let forms: Vec<(Check, bool)> = self
             .sentences
             .iter()
@@ -1895,8 +1990,8 @@ impl For {
             .flat_map(|item| item.whose.iter())
             .collect();
         sentence_root_flaw(&forms, outer).is_some()
-            || super::message::root_flaw_in_for(&nested, outer, &[], &[]).is_some()
-            || super::message::root_flaw_in_for(&whose, outer, &[], &[]).is_some()
+            || super::message::root_flaw_ordered(&nested, outer, &[], &[]).is_some()
+            || super::message::root_flaw_ordered(&whose, outer, &[], &[]).is_some()
     }
 
     fn some_passed(&self, run: &Run, ctx: &Ctx, unread: &[String]) -> bool {
@@ -2077,6 +2172,37 @@ impl For {
         (run, free, hoisted, false)
     }
 
+    fn walked_root_texts(&self, ctx: &Ctx) -> Vec<String> {
+        let outer = outer_ctx(ctx);
+        let mut checks: Vec<&Check> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .collect();
+        for sentence in &self.sentences {
+            checks.push(&sentence.check);
+            checks.extend(nested_whose(&sentence.check, false));
+            if let Check::Walk(walk) = &sentence.check {
+                checks.push(&walk.check);
+            }
+        }
+        let mut texts: Vec<String> = Vec::new();
+        for check in checks {
+            for path in super::lists::right_paths(check) {
+                if !super::message::reads_from_a_root(path) {
+                    continue;
+                }
+                if let Some((cause, text)) = super::lists::walked_root_fault(check, path, &outer)
+                    && cause != Cause::Value
+                    && !texts.contains(&text)
+                {
+                    texts.push(text);
+                }
+            }
+        }
+        texts
+    }
+
     fn run_items_of(&self, ctx: &Ctx, skip: Vec<String>) -> (Run, Vec<String>, Vec<String>) {
         let first = &self.items[0];
         let whole_subject = !ctx.subject.value.is_object()
@@ -2172,12 +2298,21 @@ impl For {
             .map(|text| unskipped(text, &collect.skip))
             .filter(|text| !text.is_empty())
             .collect();
+        let roots = self.walked_root_texts(ctx);
         let said: Vec<Said> = said
             .into_iter()
-            .map(|(order, text, extra)| (order, unskipped(&text, &collect.skip), extra))
+            .flat_map(|(order, text, extra)| {
+                unled(&roots, &unskipped(&text, &collect.skip))
+                    .into_iter()
+                    .map(move |text| (order.clone(), text, extra))
+            })
             .filter(|(_, text, _)| !text.is_empty())
             .collect();
-        let message = if flawed
+        let message = if flawed && !roots.is_empty() {
+            let mut roots = roots.clone();
+            roots.sort();
+            Some(super::message::joined(roots))
+        } else if flawed
             || said.is_empty()
                 && failed.is_empty()
                 && !matches!(cause, Cause::Satisfied | Cause::NotAnObject)
@@ -2747,16 +2882,19 @@ fn unskipped(text: &str, skip: &[String]) -> String {
         return text.to_string();
     }
     let skipped = |part: &str| skip.iter().any(|s| s == part);
+    let dropped = |part: &str| {
+        let lead = lead_of(part);
+        let after = if lead.is_empty() {
+            part
+        } else {
+            part.strip_prefix(&format!("{lead}: ")).unwrap_or(part)
+        };
+        skipped(part) || skipped(after)
+    };
+    let more = regex::Regex::new(r"^and [0-9]+ more$").expect("a valid pattern");
+    let any_dropped = text.split("; ").any(dropped);
     text.split("; ")
-        .filter(|part| {
-            let lead = lead_of(part);
-            let after = if lead.is_empty() {
-                *part
-            } else {
-                part.strip_prefix(&format!("{lead}: ")).unwrap_or(part)
-            };
-            !skipped(part) && !skipped(after)
-        })
+        .filter(|part| !dropped(part) && !(any_dropped && more.is_match(part)))
         .map(|part| {
             part.split(", and ")
                 .filter(|piece| !skipped(piece))
@@ -2766,6 +2904,84 @@ fn unskipped(text: &str, skip: &[String]) -> String {
         .filter(|part| !part.is_empty())
         .collect::<Vec<_>>()
         .join("; ")
+}
+
+fn own_beside_root(check: &Check, outer: &Ctx, focus: &Ctx, cause: Cause) -> Option<String> {
+    let flaw = super::message::root_flaw(&[check], outer);
+    let fault = super::message::root_fault(check, outer, cause);
+    if flaw.is_none() && fault.is_none() {
+        return None;
+    }
+    let own = check.paths().into_iter().find_map(|path| {
+        if !matches!(path.start, Start::Subject | Start::Own) {
+            return None;
+        }
+        path::read(path, focus).outcome.cause()
+    })?;
+    let mut roots: Vec<String> = flaw
+        .map(|(_, text)| text)
+        .into_iter()
+        .chain(fault)
+        .collect();
+    roots.extend(super::message::root_fault(check, outer, own));
+    let roots: Vec<&str> = roots.iter().flat_map(|text| text.split("; ")).collect();
+    let verdict = Verdict {
+        cause: own,
+        inputs: Vec::new(),
+    };
+    let said = super::message::message(check, focus, &verdict);
+    let parts: Vec<&str> = said
+        .split("; ")
+        .flat_map(|part| part.split(", and "))
+        .filter(|part| !roots.contains(part) && super::message::cap_note(part).is_none())
+        .collect();
+    (!parts.is_empty()).then(|| parts.join(", and "))
+}
+
+fn own_read_fails(check: &Check, focus: &Ctx) -> bool {
+    let counts_a_root = matches!(check, Check::Tally(tally) if tally
+        .counted_paths()
+        .iter()
+        .any(|path| super::message::reads_from_a_root(path)));
+    !counts_a_root
+        || check.paths().into_iter().any(|path| {
+            matches!(path.start, Start::Subject | Start::Own)
+                && path::read(path, focus).outcome.cause().is_some()
+        })
+}
+
+fn unled(roots: &[String], text: &str) -> Vec<String> {
+    if !text.starts_with("item ") {
+        return vec![text.to_string()];
+    }
+    if let Some(root) = roots
+        .iter()
+        .find(|root| text.ends_with(&format!(": {root}")))
+    {
+        return vec![root.clone()];
+    }
+    if let Some(root) = roots
+        .iter()
+        .find(|root| text.ends_with(&format!(", and {root}")))
+    {
+        let own = &text[..text.len() - root.len() - ", and ".len()];
+        return vec![root.clone(), own.to_string()];
+    }
+    if let Some((root, at)) = roots
+        .iter()
+        .find_map(|root| text.find(&format!(": {root}, and ")).map(|at| (root, at)))
+    {
+        let own = format!("{}{}", &text[..at + 2], &text[at + root.len() + 8..]);
+        return vec![root.clone(), own];
+    }
+    if let Some((root, at)) = roots.iter().find_map(|root| {
+        text.find(&format!(", and {root}, and "))
+            .map(|at| (root, at))
+    }) {
+        let own = format!("{}{}", &text[..at], &text[at + root.len() + 6..]);
+        return vec![root.clone(), own];
+    }
+    vec![text.to_string()]
 }
 
 fn unmarked(text: &str) -> String {
@@ -3217,14 +3433,15 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
                     found.push(fault);
                     continue;
                 }
-                if path::is_root(&root.start) {
+                if path::is_root(&root.start)
+                    || (!ctx.subject.value.is_array() && super::lists::walked(root, ctx).is_some())
+                {
                     continue;
                 }
             }
             let read = path::read(root, ctx);
             let part = matches!(&root.start, Start::Part(part) if !part.steps.is_empty());
             if super::lists::right_paths(check).contains(&root)
-                && !part
                 && super::lists::walked_in(check, root, ctx).is_some()
             {
                 continue;
@@ -4772,55 +4989,123 @@ mod tests {
     }
 
     #[test]
-    fn a_part_that_is_not_an_object_on_the_right_of_a_list_phrase_fails_as_unusable_and_names_the_part()
-     {
-        for assertion in [
-            "m.v is in pl.z",
-            "m.v matches pl.z",
-            "pl.z contains m.v",
-            "m.v is at least pl.z",
+    fn an_empty_part_is_walked_on_the_right_of_a_list_phrase_and_named_as_not_an_object_elsewhere()
+    {
+        for (assertion, cause, message) in [
+            (
+                "m.v is in pl.z",
+                "value",
+                "item 1 of xs: m.v is 1, and pl is []",
+            ),
+            (
+                "m.v matches pl.z",
+                "value",
+                "item 1 of xs: m.v is 1, and pl is []",
+            ),
+            (
+                "pl.z contains m.v",
+                "unusable",
+                "pl is [], which isn't an object",
+            ),
+            (
+                "m.v is at least pl.z",
+                "unusable",
+                "pl is [], which isn't an object",
+            ),
         ] {
-            let (cause, message) = pr_row(
+            let found = pr_row(
                 json!({"pl": "c"}),
                 "every xs as m",
                 json!(assertion),
                 json!({"c": [], "xs": [{"v": 1}]}),
                 json!({}),
             );
-            assert_eq!(cause, "unusable", "{assertion}");
-            assert_eq!(message, "pl is [], which isn't an object", "{assertion}");
+            assert_eq!(found, (cause.to_string(), json!(message)), "{assertion}");
         }
     }
 
+    fn two_roots_rows(pos: Value, os: Value) -> Vec<(String, Value)> {
+        let policy = json!({
+            "ergo_spec": SPEC,
+            "subjects": {"pr": {"from": "prs", "identified_by": "id", "has": {"pos": "os"}}},
+            "requirements": {"r": {"subject": "pr", "checks": {
+                "every": "every rows whose v is in pos.name and whose v is in $params.os.name exists",
+                "every_rev": "every rows whose v is in $params.os.name and whose v is in pos.name exists",
+                "for_count": {"for": "every ms as m", "assert": "count of m.ws whose v is in pos.name and whose v is in $params.os.name is 1"}
+            }}}
+        });
+        let input = json!({"prs": [{"id": "p0", "os": pos, "rows": [{"v": "bob"}], "ms": [{"ws": [{"v": "bob"}]}]}]});
+        let report = crate::report(&input, &policy, &json!({"os": os}));
+        ["every", "every_rev", "for_count"]
+            .iter()
+            .map(|check| {
+                let row = report["results"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|row| row["check"] == *check)
+                    .unwrap();
+                (
+                    row["cause"].as_str().unwrap().to_string(),
+                    row["message"].clone(),
+                )
+            })
+            .collect()
+    }
+
     #[test]
-    fn a_part_that_is_a_list_of_objects_is_not_walked_on_the_right_of_a_list_phrase() {
-        let fields = json!({"c": [{"z": 1}], "xs": [{"v": 1}]});
-        for assertion in ["m.v is in pl.z", "pl.z contains m.v"] {
-            let (cause, message) = pr_row(
+    fn two_roots_in_one_whose_are_each_named_in_the_order_the_sentence_reads_them() {
+        let kinds = "which isn't a list of one kind of value";
+        let pos = format!("pos[].name is [\"bob\", 3], {kinds}");
+        let params = format!("$params.os[].name is [\"bob\", 3], {kinds}");
+        let missing = "item 2 of pos: name is missing";
+        let mixed = json!([{"name": "bob"}, {"name": 3}]);
+        let unusable = |text: String| ("unusable".to_string(), json!(text));
+        assert_eq!(
+            two_roots_rows(mixed.clone(), mixed.clone()),
+            vec![
+                unusable(format!("{pos}; {params}")),
+                unusable(format!("{params}; {pos}")),
+                unusable(format!("{pos}; {params}")),
+            ]
+        );
+        assert_eq!(
+            two_roots_rows(json!([{"name": "bob"}, {}]), mixed),
+            vec![
+                unusable(format!("{missing}; {params}")),
+                unusable(format!("{params}; {missing}")),
+                unusable(format!("{missing}; {params}")),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_part_that_is_a_list_of_objects_is_walked_on_the_right_of_a_list_phrase_but_not_before_contains()
+     {
+        for (assertion, cause, message) in [
+            ("m.v is in pl.z", "satisfied", Value::Null),
+            (
+                "pl.z contains m.v",
+                "unusable",
+                json!("pl is [{\"z\": 1}], which isn't an object"),
+            ),
+            (
+                "m.v matches pl.z",
+                "unusable",
+                json!(
+                    "pl[].z is [1], which isn't a list of patterns; item 1 of xs: m.v is 1, which isn't text"
+                ),
+            ),
+        ] {
+            let found = pr_row(
                 json!({"pl": "c"}),
                 "every xs as m",
                 json!(assertion),
-                fields.clone(),
+                json!({"c": [{"z": 1}], "xs": [{"v": 1}]}),
                 json!({}),
             );
-            assert_eq!(cause, "unusable", "{assertion}");
-            assert_eq!(
-                message, "pl is [{\"z\": 1}], which isn't an object",
-                "{assertion}"
-            );
+            assert_eq!(found, (cause.to_string(), message), "{assertion}");
         }
-        let (cause, message) = pr_row(
-            json!({"pl": "c"}),
-            "every xs as m",
-            json!("m.v matches pl.z"),
-            fields,
-            json!({}),
-        );
-        assert_eq!(cause, "unusable");
-        assert_eq!(
-            message,
-            "pl is [{\"z\": 1}], which isn't an object; item 1 of xs: m.v is 1, which isn't text, and pl[].z is [1], which isn't a list of patterns"
-        );
     }
 
     #[test]
@@ -5027,31 +5312,43 @@ mod tests {
     }
 
     #[test]
-    fn a_part_that_holds_a_list_fails_a_count_of_whose_under_a_for_line_as_unusable() {
-        for (part, shown) in [(json!([]), "[]"), (json!([{"z": 1}]), "[{\"z\": 1}]")] {
-            for xs in [json!([{"v": 1, "ys": [{"v": 1}]}]), json!([])] {
-                for assertion in [
-                    "count of xs whose v is in pl.z is 0",
-                    "count of m.ys whose v is in pl.z is 0",
-                    "count of xs whose v is in pl.z is at least 0",
-                ] {
-                    let (cause, message) = pr_row(
-                        json!({"pl": "c"}),
-                        "every xs as m",
-                        json!(assertion),
-                        json!({"c": part, "xs": xs}),
-                        json!({}),
-                    );
-                    assert_eq!(cause, "unusable");
-                    assert!(
-                        message
-                            .as_str()
-                            .unwrap()
-                            .starts_with(&format!("pl is {shown}, which isn't an object")),
-                        "{message}"
-                    );
-                }
-            }
+    fn a_part_that_holds_a_list_is_walked_by_a_count_of_whose_under_a_for_line() {
+        let xs = json!([{"v": 1, "ys": [{"v": 1}]}]);
+        for (part, assertion, cause) in [
+            (
+                json!([]),
+                "count of xs whose v is in pl.z is 0",
+                "satisfied",
+            ),
+            (
+                json!([]),
+                "count of m.ys whose v is in pl.z is 0",
+                "satisfied",
+            ),
+            (
+                json!([{"z": 1}]),
+                "count of xs whose v is in pl.z is 0",
+                "value",
+            ),
+            (
+                json!([{"z": 1}]),
+                "count of m.ys whose v is in pl.z is 0",
+                "value",
+            ),
+            (
+                json!([{"z": 1}]),
+                "count of xs whose v is in pl.z is at least 0",
+                "satisfied",
+            ),
+        ] {
+            let (found, _) = pr_row(
+                json!({"pl": "c"}),
+                "every xs as m",
+                json!(assertion),
+                json!({"c": part, "xs": xs}),
+                json!({}),
+            );
+            assert_eq!(found, cause, "{assertion}");
         }
     }
 

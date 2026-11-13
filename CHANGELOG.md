@@ -27,6 +27,14 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 - A name after `that` on a `for` line that the item lacks is named after the item and a colon, as after `whose` ([message.items](spec/semantics.md#messages)): `every xs that is at least c as x` says `item 1 of xs: c is missing`, where it said `item 1 of xs c is missing`. The Rust engine already did this.
 - An alias that `first of`, `last of` or a position leaves without a value, because its list is empty, is named without a `$` on a later line ([message.alias](spec/semantics.md#messages)): `last of approvers sorted by t as approver, some approver.subs as commit` says `approver.subs is missing`, where it said `$approver.subs is missing`. The same goes for a position, like `ap[0]` in `first of approvers as ap, every ap[0] as c` with the input `{"prs": [{"id": "p", "approvers": []}]}`: it says `item 1 of ap is missing`, where it said `item 1 of $ap is missing`. The Rust engine already did this.
 
+- A list on the right of `is in`, `matches` and the other list phrases, read from a part, a parent, a parent's part, `$input` or `$params`, is walked on a `for` line, in a sentence, in the line's own `whose` and in the `whose` of a `count of`, as spec 0.7 says ([for.roots](spec/semantics.md#for)), where it failed as `unusable`. A `count of` or `sum of` inside a `whose` reads its path as it does on its own ([tally.whose](spec/semantics.md#counts-and-sums)) and is read once before any item, so a problem it has fails the row on an empty list too. A `for` line's `inputs` list the walked name, like `pos[].name`.
+
+- A name read from outside the item that walks a list is named once, with no item in front, in an `every`, a `whose` and a `for` line, as spec 0.7 says ([message.items](spec/semantics.md#messages)), where it was read as `pos is [...], which isn't an object` or repeated under each item. A `for` line says an item's own problem after a root that can't be read, even when it fails no worse than the root, and `and N more` counts each problem once.
+
+- A list that a phrase after `is in`, `is not in` or `matches` walks and that reads fine isn't named as `os is [...], which isn't an object` when the item can't be compared: `every rows.v is in os.name` with `os` holding `[{"name": 3}]` says `item 1 of rows: v is "bob", which isn't a number`, as the Rust engine does.
+
+- A check that reads one name both item by item and as one value lists both reads in its `inputs`, as spec 0.7 says ([walk.inputs](spec/semantics.md#every-and-some)): `pos[].name` holding `["a"]` and `pos.name` holding `null`, as the Rust engine does.
+
 ## 0.6.0
 
 ### Changed

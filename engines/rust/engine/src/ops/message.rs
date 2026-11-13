@@ -779,7 +779,8 @@ fn list_read_plainly(check: &Check, ctx: &Ctx) -> bool {
         TallySide::Plain(_) => false,
         TallySide::Derived(d) => d.terms.iter().any(|term| match term {
             tally::Term::Counted(counted) => counted.whose.iter().any(|w| {
-                root_flaw(&[w], &outer).is_some_and(|(cause, _)| cause == Cause::NotAnObject)
+                root_flaw_with(&[w], &outer, &[], &[], false)
+                    .is_some_and(|(cause, _)| cause == Cause::NotAnObject)
             }),
             _ => false,
         }),
@@ -931,19 +932,54 @@ pub fn with_roots(said: Vec<String>, roots: &str) -> Vec<String> {
 
 pub fn joined(parts: Vec<String>) -> String {
     let mut once: Vec<String> = Vec::new();
+    let mut hidden = 0;
+    let mut fresh: Vec<bool> = Vec::new();
     for part in parts {
-        if !once.contains(&part) {
+        if let Some(more) = cap_note(&part) {
+            if fresh.iter().rev().take(3).any(|new| *new) {
+                hidden += more;
+            }
+            fresh.push(false);
+        } else if once.contains(&part) {
+            fresh.push(false);
+        } else {
             once.push(part);
+            fresh.push(true);
         }
     }
-    if once.len() <= 3 {
+    if once.len() + hidden <= 3 {
         once.join("; ")
     } else {
-        let more = once.len() - 3;
+        let more = once.len() + hidden - 3;
         let mut shown: Vec<String> = once.into_iter().take(3).collect();
         shown.push(format!("and {more} more"));
         shown.join("; ")
     }
+}
+
+pub fn capped_units(parts: Vec<String>) -> Vec<String> {
+    let mut units: Vec<(String, bool)> = Vec::new();
+    for part in parts {
+        let at = units.len().saturating_sub(3);
+        if cap_note(&part).is_some()
+            && units.len() >= 3
+            && units[at..].iter().all(|(_, whole)| !whole)
+        {
+            let mut list: Vec<String> = units.drain(at..).map(|(text, _)| text).collect();
+            list.push(part);
+            units.push((list.join("; "), true));
+        } else {
+            units.push((part, false));
+        }
+    }
+    units.into_iter().map(|(text, _)| text).collect()
+}
+
+pub fn cap_note(part: &str) -> Option<usize> {
+    part.strip_prefix("and ")
+        .and_then(|rest| rest.strip_suffix(" more"))
+        .filter(|n| !n.is_empty() && n.bytes().all(|b| b.is_ascii_digit()))
+        .and_then(|n| n.parse().ok())
 }
 
 fn join_text(side: &Side) -> String {
@@ -1416,7 +1452,25 @@ pub fn root_fault(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
     let mut paths = check.paths();
     paths.extend(super::walk::listed_refs(check));
     paths.into_iter().find_map(|path| {
-        if !reads_from_a_root(path) || path::read(path, ctx).outcome.cause() != Some(cause) {
+        if !reads_from_a_root(path) {
+            return None;
+        }
+        if lists::right_paths(check).contains(&path) && lists::walked_in(check, path, ctx).is_some()
+        {
+            return lists::walked_root_fault(check, path, ctx)
+                .filter(|(found, _)| *found == cause)
+                .map(|(_, text)| text);
+        }
+        if let Check::Tally(tally) = check
+            && tally.counted_paths().contains(&path)
+            && (lists::starts_at_a_list(path, ctx) || lists::walked(path, ctx).is_some())
+        {
+            return super::tally::counted_faults(tally, path, ctx)
+                .into_iter()
+                .find(|(found, _)| *found == cause)
+                .map(|(_, text)| text);
+        }
+        if path::read(path, ctx).outcome.cause() != Some(cause) {
             return None;
         }
         Some(root_text(path, ctx, cause))
@@ -1487,15 +1541,6 @@ pub fn root_flaw_ordered(
     refs_first: &[&Check],
     keys_left: &[&Check],
 ) -> Option<(Cause, String)> {
-    root_flaw_with(checks, ctx, refs_first, keys_left, false)
-}
-
-pub fn root_flaw_in_for(
-    checks: &[&Check],
-    ctx: &Ctx,
-    refs_first: &[&Check],
-    keys_left: &[&Check],
-) -> Option<(Cause, String)> {
     root_flaw_with(checks, ctx, refs_first, keys_left, true)
 }
 
@@ -1504,8 +1549,104 @@ fn root_flaw_with(
     ctx: &Ctx,
     refs_first: &[&Check],
     keys_left: &[&Check],
-    parts_fail: bool,
+    walked_counts: bool,
 ) -> Option<(Cause, String)> {
+    root_texts_with(checks, ctx, refs_first, keys_left, walked_counts)
+        .map(|(cause, texts)| (cause, texts.join("; ")))
+}
+
+pub fn walked_roots_ahead(
+    message: Option<String>,
+    checks: &[&Check],
+    ctx: &Ctx,
+    refs_first: &[&Check],
+) -> Option<String> {
+    let walked = checks.iter().any(|check| {
+        lists::right_paths(check).into_iter().any(|path| {
+            reads_from_a_root(path)
+                && lists::walked_root_fault(check, path, ctx)
+                    .is_some_and(|(cause, _)| cause != Cause::Value)
+        })
+    });
+    let message = message?;
+    if !walked {
+        return Some(message);
+    }
+    let roots = ordered_roots(checks, ctx, refs_first);
+    Some(joined(roots_ahead(&message, &roots)))
+}
+
+pub fn ordered_roots(checks: &[&Check], ctx: &Ctx, refs_first: &[&Check]) -> Vec<String> {
+    let mut first: Vec<String> = Vec::new();
+    let mut rest: Vec<String> = Vec::new();
+    for check in checks {
+        let counted = refs_first.iter().any(|c| std::ptr::eq(*c, *check));
+        let mut texts: Vec<String> = root_texts_with(&[check], ctx, &[], &[], true)
+            .map(|(_, texts)| texts)
+            .unwrap_or_default();
+        for path in lists::right_paths(check) {
+            if reads_from_a_root(path)
+                && let Some((cause, text)) = lists::walked_root_fault(check, path, ctx)
+                && cause != Cause::Value
+            {
+                texts.push(text);
+            }
+        }
+        for text in texts {
+            if counted && ref_first(&text) {
+                first.push(text);
+            } else {
+                rest.push(text);
+            }
+        }
+    }
+    first.sort();
+    let mut out: Vec<String> = Vec::new();
+    for text in first.into_iter().chain(rest) {
+        if !out.contains(&text) {
+            out.push(text);
+        }
+    }
+    out
+}
+
+fn ref_first(text: &str) -> bool {
+    text.starts_with('$') && (text.ends_with(" is missing") || text.ends_with(" is null"))
+}
+
+pub fn roots_ahead(message: &str, roots: &[String]) -> Vec<String> {
+    let mut rest = format!("; {message}; ");
+    for root in roots {
+        let said = regex::Regex::new(&format!(
+            r"; (?:item [0-9]+ of [^;:]+: )*{}; ",
+            regex::escape(root)
+        ))
+        .expect("a valid pattern");
+        while said.is_match(&rest) {
+            rest = said.replace(&rest, "; ").into_owned();
+        }
+    }
+    let mut out: Vec<String> = roots.to_vec();
+    for part in capped_units(
+        rest.split("; ")
+            .filter(|part| !part.is_empty())
+            .map(str::to_string)
+            .collect(),
+    ) {
+        if !out.contains(&part) {
+            out.push(part);
+        }
+    }
+    out
+}
+
+fn root_texts_with(
+    checks: &[&Check],
+    ctx: &Ctx,
+    refs_first: &[&Check],
+    keys_left: &[&Check],
+    walked_counts: bool,
+) -> Option<(Cause, Vec<String>)> {
     let mut found: Vec<(usize, Cause, String, bool)> = Vec::new();
     let mut refs: Vec<String> = Vec::new();
     for (at, check) in checks.iter().enumerate() {
@@ -1541,9 +1682,7 @@ fn root_flaw_with(
                 }) {
                     continue;
                 }
-                let part = matches!(&root.start, Start::Part(part) if !part.steps.is_empty());
                 if lists::right_paths(check).contains(&&root)
-                    && !(part && parts_fail)
                     && lists::walked_in(check, &root, ctx).is_some()
                 {
                     continue;
@@ -1552,11 +1691,19 @@ fn root_flaw_with(
                     Check::Tally(tally) => tally.counted_paths().contains(&path),
                     _ => false,
                 };
-                if counted && !is_key && lists::starts_at_a_list(&root, ctx) {
+                if counted
+                    && !is_key
+                    && (lists::starts_at_a_list(&root, ctx) || lists::walked(&root, ctx).is_some())
+                {
+                    if walked_counts && let Check::Tally(tally) = check {
+                        for (cause, text) in super::tally::counted_faults(tally, path, ctx) {
+                            found.push((at, cause, text, false));
+                        }
+                    }
                     continue;
                 }
-                if counted && let Some(found) = first_null_step(&root, ctx) {
-                    return Some(found);
+                if counted && let Some((cause, text)) = first_null_step(&root, ctx) {
+                    return Some((cause, vec![text]));
                 }
                 if !is_key
                     && lists::one_rights(check).contains(&&root)
@@ -1620,7 +1767,7 @@ fn root_flaw_with(
             texts.push(text);
         }
     }
-    Some((worst, texts.join("; ")))
+    Some((worst, texts))
 }
 
 pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {

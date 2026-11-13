@@ -690,11 +690,25 @@ pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
     inputs
 }
 
+pub(super) fn listed_outside_inputs(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
+    let mut inputs = Vec::new();
+    for check in checks {
+        for path in check.paths().into_iter().filter(|p| reads_outside(p)) {
+            inputs.extend(listed_input(check, path, ctx));
+        }
+        inputs.extend(super::lists::ref_inputs(check, ctx, false));
+    }
+    inputs
+}
+
 pub(super) fn listed_input(check: &Check, path: &Path, ctx: &Ctx) -> Option<Input> {
-    if matches!(path.start, Start::Input | Start::Params) {
+    if matches!(path.start, Start::Params) {
         return None;
     }
     if super::lists::walked_right(check).is_some_and(|right| std::ptr::eq(right, path)) {
+        if matches!(path.start, Start::Input) {
+            return None;
+        }
         return super::lists::walked(path, ctx).map(|walked| walked.input());
     }
     match check {
@@ -998,8 +1012,10 @@ fn root_alone(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
                 .contains(&path)
                 .then(|| super::lists::walked_in(check, path, ctx))
                 .flatten();
-            if let Some(listed) = listed {
-                return (listed.cause == Some(cause)).then_some(listed.text);
+            if listed.is_some() {
+                return super::lists::walked_root_fault(check, path, ctx)
+                    .filter(|(found, _)| *found == cause)
+                    .map(|(_, text)| text);
             }
             let read = path::read(path, ctx);
             let state = read.outcome.cause();
@@ -1340,6 +1356,17 @@ fn first_list(path: &Path, ctx: &Ctx) -> String {
 }
 
 pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
+    let mut row = run_rows(walk, ctx);
+    let in_a_for_line = ctx.aliases.keys().any(|name| name != OUTER);
+    if !in_a_for_line && row.verdict.cause != Cause::Satisfied {
+        let outer_ctx = outer(ctx);
+        let whose: Vec<&Check> = walk.whose.iter().collect();
+        row.message = message::walked_roots_ahead(row.message.take(), &whose, &outer_ctx, &[]);
+    }
+    row
+}
+
+fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
     let flawed = walk.flawed(ctx);
     if !flawed && subject_is_not_an_object(walk, ctx) {
         return Run {

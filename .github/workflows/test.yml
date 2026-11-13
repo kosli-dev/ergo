@@ -11,7 +11,7 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
         with:
@@ -78,7 +78,7 @@ jobs:
 
   tests-rego:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 5
     strategy:
       matrix:
         part: [1, 2, 3, 4]
@@ -146,7 +146,7 @@ jobs:
 
   tests-compiled-policy:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2

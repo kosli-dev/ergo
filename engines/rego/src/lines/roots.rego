@@ -7,27 +7,70 @@ _root_read_flaw(subj, c) := _worst_of(states) if {
 	count(states) > 0
 } else := ""
 
-_root_states(subj, c) := {st |
+_plain_root_flaw(subj, c) := _worst_of(states) if {
+	states := _plain_root_states(subj, c)
+	count(states) > 0
+} else := ""
+
+_plain_root_states(subj, c) := {st |
 	lists := {y[_basic_form(y)] | walk(c, [_, y]); _basic_form(y) in {"count_of", "sum_of"}}
 	some p in _root_reads(c)
 	st := _root_state(subj, c, p, lists)
 	st in {"absent", "null", "unusable", "not_an_object"}
 }
 
+_root_states(subj, c) := _plain_root_states(subj, c) | {st |
+	some y in _walked_tallies(c)
+	some st in _walked_tally_states(subj, y)
+	st in {"absent", "null", "unusable", "not_an_object"}
+}
+
+_walked_tally_walk(subj, y) := _walk(_walk_start({"path": p}, subj), _walk_keys({"path": p}, subj), true) if p := y[_basic_form(y)]
+
+_walked_tally_states(subj, y) := (({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {st | some e in w.items; some st in _tally_mark(true, e)}) | _tally_number_states(f, _tally_distinct(y, [e.v | some e in w.items], subj, "read")) if {
+	f := _basic_form(y)
+	w := _walked_tally_walk(subj, y)
+}
+
+_walked_tallies(c) := {y |
+	some side in _derived_sides(c)
+	some y in _tally_parts(side)
+	p := y[_basic_form(y)]
+	is_array(p)
+	_m_off_path(p)
+	not _m_key_ref_failed(p)
+	not _unbound_alias(p)
+	not _unbound_name_step(p)
+	_root_walk_node(y, p)
+}
+
+_m_walked_tally_texts(subj, ys, st) := [x[1] |
+	some y in sort(ys)
+	_worst_of(_walked_tally_states(subj, y) & {"absent", "null", "unusable", "not_an_object"}) == st
+	f := _basic_form(y)
+	w := _walked_tally_walk(subj, y)
+	roots := _dotted_roots([y[f]])
+	some x in array.concat([[z.cause, _m_fail(z, roots)] | some z in array.concat(w.fails, _walk_stop(w))], [z | some e in w.items; some z in _m_tally_item(f, e, roots)])
+	x[0] == st
+]
+
 _m_cond_root_texts(subj, c) := _once([m |
+	ys := _walked_tallies(c)
 	some st in _cause_precedence
-	some p in sort(_root_reads(c))
-	_root_state(subj, c, p, set()) == st
-	m := _m_for_root_text(subj, c, p, st)
+	some m in array.concat(
+		[m | some p in sort(_root_reads(c)); _root_state(subj, c, p, set()) == st; m := _m_for_root_text(subj, c, p, st)],
+		_m_walked_tally_texts(subj, ys, st),
+	)
 ]) if object.get(c, "ergo/for", false) == true
 
 else := _m_root_texts_all(subj, c)
 
 _m_root_texts_all(subj, c) := _once([m |
 	states := _root_states(subj, c)
+	ys := _walked_tallies(c)
 	some st in _cause_precedence
 	st in states
-	some m in _m_root_texts(subj, c, st)
+	some m in array.concat(_m_root_texts(subj, c, st), _m_walked_tally_texts(subj, ys, st))
 ])
 
 _m_for_root_text(subj, c, p, st) := f.msg if {
@@ -58,13 +101,6 @@ _walking_root(_, p) if {
 }
 
 _walking_root(c, p) if {
-	_list_cmp(c)
-	not _one_right(c)
-	_rpath(c.right) == p
-	_rwalks(null, p)
-}
-
-_walking_root(c, p) if {
 	object.get(c, "ergo/for", false) == true
 	_list_cmp(c)
 	not _one_right(c)
@@ -74,21 +110,37 @@ _walking_root(c, p) if {
 }
 
 _walking_root(c, p) if {
-	object.get(c, "ergo/for", false) == true
-	_list_cmp(c)
-	not _one_right(c)
-	_rpath(c.right) == p
-	subj := object.get(input, ["ergo/names", "ergo/subject"], null)
-	_list_start(p, subj)
-	_part_of(p).old == false
-	_rwalks(subj, p)
+	walk(c, [_, y])
+	is_object(y)
+	_root_walk_node(y, p)
 }
 
-_walking_root(c, p) if {
-	walk(c, [_, y])
-	_basic_form(y) in {"count_of", "sum_of"}
-	y[_basic_form(y)] == p
+_root_walk_node(y, p) if {
+	_rpath(object.get(y, "right", null)) == p
+	_list_cmp(y)
+	not _one_right(y)
+	_root_walks(p)
+}
+
+_root_walk_node(y, p) if {
+	some f in ["count_of", "sum_of"]
+	object.get(y, f, null) == p
 	_walks_list_start(p)
+}
+
+_root_walk_node(y, p) if {
+	some f in ["count_of", "sum_of"]
+	object.get(y, f, null) == p
+	_root_walks(p)
+	not is_array(object.get(input, ["ergo/names", "ergo/subject"], null))
+}
+
+_root_walks(p) if _rwalks(null, p)
+
+_root_walks(p) if {
+	_part_start(p)
+	_part_of(p).old == false
+	_rwalks(object.get(input, ["ergo/names", "ergo/subject"], null), p)
 }
 
 _walks_list_start(p) if {
@@ -238,10 +290,9 @@ _walk_root_flaw(check, subj) := _worst_of(states) if {
 	count(states) > 0
 } else := ""
 
-_walk_root_conds(check) := array.concat(
-	array.concat(array.concat(object.get(check, "whose", []), [c | check.op == "for"; some item in check.items; some c in object.get(item, "whose", [])]), _for_nested_conds(check)),
-	_for_sentence_conds(check),
-)
+_walk_root_conds(check) := array.concat(_walk_whose_conds(check), _for_sentence_conds(check))
+
+_walk_whose_conds(check) := array.concat(array.concat(object.get(check, "whose", []), [c | check.op == "for"; some item in check.items; some c in object.get(item, "whose", [])]), _for_nested_conds(check))
 
 _for_nested_conds(check) := [c |
 	check.op == "for"
@@ -359,12 +410,26 @@ _walk_count_conds(check) := [c |
 ]
 
 _walk_root_msgs(check, subj) := _once(array.concat(
-	sort([m | some c in _walk_count_conds(check); some m in _m_root_texts_all(subj, c); _m_ref_first(m)]),
-	[m |
-		some c in _walk_root_conds(check)
-		some m in _m_cond_root_texts(subj, c)
-	],
+	sort([m | some c in _walk_count_conds(check); some m in array.concat(_m_root_texts_all(subj, c), _m_cond_walked_texts(c)); _m_ref_first(m)]),
+	array.concat(
+		[m |
+			some c in _walk_whose_conds(check)
+			some m in array.concat(_m_cond_root_texts(subj, c), _m_cond_walked_texts(c))
+		],
+		[m |
+			some c in _for_sentence_conds(check)
+			some m in _m_cond_root_texts(subj, c)
+		],
+	),
 ))
+
+_m_cond_walked_texts(c) := [t |
+	walk(c, [_, x])
+	is_object(x)
+	_list_phrase(x)
+	some cause in ["absent", "null", "unusable"]
+	t := _m_walked_root_text(x, cause)
+]
 
 _leaf_root_flaw(check, subj) := fl if {
 	check.op in {"every", "some"}

@@ -200,7 +200,7 @@ _m_tallies(subj, check, cause) := [c |
 ]
 
 _m_tally_dropped(subj, side, cause, x) if {
-	roots := {m | some c in object.get(side, "whose", []); _root_read_flaw(subj, c) == cause; some m in _m_root_texts(subj, c, cause)}
+	roots := {m | some c in object.get(side, "whose", []); _root_read_flaw(subj, c) == cause; some m in array.concat(_m_root_texts(subj, c, cause), _m_walked_tally_texts(subj, _walked_tallies(c), cause))}
 	roots != set()
 	not x[1] in roots
 	x in _m_tally_items(subj, side)
@@ -235,8 +235,8 @@ _m_tally(subj, side) := array.concat(
 	array.concat(
 		[[x.cause, _m_fail(x, roots)] | some x in array.concat(w.fails, _walk_stop(w))],
 		array.concat(
-			[["root", m] | some m in sort([m | some c in side.whose; some m in _m_root_texts_all(subj, c); _m_ref_first(m)])],
-			[["root", m] | some c in side.whose; some m in _m_root_texts_all(subj, c)],
+			[["root", m] | some m in sort([m | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); _m_ref_first(m)])],
+			[["root", m] | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w))],
 		),
 	),
 	_m_tally_items(subj, side),
@@ -245,6 +245,10 @@ _m_tally(subj, side) := array.concat(
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	roots := _dotted_roots([side[f]])
 }
+
+_m_tally_walked(c, w) := _m_cond_walked_texts(c) if array.concat(w.fails, _walk_stop(w)) == []
+
+else := []
 
 _m_tally_items(subj, side) := [x | some e in w.items; some x in array.concat(_m_whose_undecided(subj, side, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
 	f := _basic_form(side)
@@ -368,12 +372,31 @@ _m_off_item(subj, c, "unusable") := _once(array.concat(
 	],
 ))
 
-_m_walked_root_text(c, cause) := _rwalk_text(null, p) if {
-	_list_cmp(c)
+_m_walked_root_text(c, cause) := ts[0] if {
+	ts := [t |
+		some p in _m_walked_roots(c)
+		t := _m_walked_root_fault(c, _as_subject_part(p), object.get(input, ["ergo/names", "ergo/subject"], null), cause)
+	]
+	count(ts) > 0
+}
+
+_m_walked_roots(c) := [p |
+	_list_phrase(c)
 	not _one_right(c)
-	p := _rpath(c.right)
+	some p in _m_root_paths(c)
+	_walk_outside(p)
 	_walking_root(c, p)
-	_rwalk(null, p).state == cause
+]
+
+_m_walked_root_fault(c, shown, x, cause) := _rwalk_text(x, shown) if {
+	w := _rwalk(x, shown)
+	w.failed
+	w.state == cause
+} else := _m_isnt(w.name, w.value, k) if {
+	cause == "unusable"
+	w := _rwalk(x, shown)
+	not w.failed
+	k := _m_leaf_needs(c, w.value)
 }
 
 _m_off_right(subj, c) := [_m_isnt(_root_label(p), _root_value(subj, p), k) |
@@ -403,7 +426,8 @@ _m_cond_message(c, item, cause) := concat(", and ", cs) if {
 	cs != []
 } else := concat(", and ", cs) if {
 	cause == "unusable"
-	cs := _once(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, c), _m_blocked(item, c)), _m_faults(item, c)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
+	wc := _m_walked(c, item)
+	cs := _once(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, wc), _m_blocked(item, wc)), _m_faults(item, wc)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
 	cs != []
 } else := _m_fallback(c)
 
