@@ -22,6 +22,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A `followed by` piece read from `$input` on an input that is a list says `$input is [...], which isn't an object` after `is`, `starts with` and the other phrases too, as in `ergo.rego` 0.7.0 and spec 0.7 ([compare.join](../../spec/semantics.md#compare)), where only `contains` did. After `contains` and `does not contain`, an `unusable` row names the left side only when it isn't a list of text, and names a piece that can't be read before it, as `ergo.rego` does: `tags contains $input.o.a.b followed by ""` with `tags` holding `["a"]` and `$input.o.a` holding `1` says `$input.o.a is 1, which isn't an object`, where it said `tags is ["a"], which isn't a number, and $input.o.a is 1, which isn't an object`, and `p contains "a" followed by v` with `p` holding `5` says `p is 5, which isn't a list`, where it said `"a" followed by v is "ax", which isn't a number`. Changes the message of such rows.
 
+- `m named by $input.k` on an input that is a list fails as `not_an_object` with `$input is [...], which isn't an object`, as in `ergo.rego` 0.7.0 and spec 0.7 ([path.not_an_object](../../spec/semantics.md#reading-a-path)), where it failed as `unusable` with `k equals m named by $input.k is false`. The same goes for `contains`, `is in`, `is one of` and `followed by`. A `from` line still fails `$min_subjects` as `unusable`. Changes the report of such checks.
+
 ## 0.4.0
 
 ### New

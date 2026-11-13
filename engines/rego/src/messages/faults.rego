@@ -71,6 +71,14 @@ _reads_input_one(check) if {
 }
 
 _reads_input_one(check) if {
+	is_array(data.ergo_document)
+	some r in _check_refs(check)
+	count(r) > 1
+	r[0] == "$$input"
+	is_string(r[1])
+}
+
+_reads_input_one(check) if {
 	_one_right(check)
 	is_array(check.right)
 	check.right[0] == "$$input"

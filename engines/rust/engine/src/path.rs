@@ -221,9 +221,6 @@ pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
         }
         Step::Ref(reference) => {
             let read = read(reference, ctx);
-            if reference.start == Start::Input && read.outcome == Outcome::NotAnObject {
-                return Err(Outcome::Unusable);
-            }
             if read.outcome != Outcome::Found {
                 return Err(read.outcome);
             }

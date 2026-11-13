@@ -1008,7 +1008,15 @@ pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
             .into_iter()
             .filter(|path| walked_in(check, path, ctx).is_none()),
     );
-    if paths.iter().any(|path| input_one_path(path, ctx)) {
+    let keyed_by_input = |path: &&Path| {
+        path.steps
+            .iter()
+            .any(|step| matches!(step, Step::Ref(reference) if input_one_path(reference, ctx)))
+    };
+    if paths
+        .iter()
+        .any(|path| input_one_path(path, ctx) || keyed_by_input(path))
+    {
         vec![super::message::isnt("$input", ctx.input, "an object")]
     } else {
         Vec::new()

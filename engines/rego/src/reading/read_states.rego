@@ -276,9 +276,23 @@ _cause_precedence := ["not_an_object", "ambiguous", "unusable", "absent", "null"
 
 _worst_read(subj, check) := _read_cause(subj, check, refs, {_used_ref_state(check, r) | some r in refs}) if refs := _check_refs(check)
 
-_read_cause(_, _, _, states) := _worst_of(states) if {
+_read_cause(subj, check, _, states) := _worst_of(states | _other_side_states(check, subj)) if {
 	some state in states
 	state != "value"
+}
+
+_other_side_states(check, subj) := {s |
+	check.op == "compare"
+	not _list_cmp(check)
+	some p in _read_paths(check)
+	not _has_ref_step(p)
+	s := _read_state(subj, p)
+	s != "value"
+}
+
+_has_ref_step(p) if {
+	some step in p
+	_is_ref(step)
 }
 
 _read_cause(_, _, refs, states) := "value" if {
@@ -383,12 +397,35 @@ _step_refs(check) := {x.ref |
 	is_number(p[count(p) - 1])
 }
 
-_used_ref_state(check, r) := "unusable" if {
+_used_ref_state(check, r) := "not_an_object" if {
+	is_array(data.ergo_document)
+	_key_of_input_path(check, r)
+} else := "unusable" if {
 	_wrong_step(check, r)
 } else := "not_an_object" if {
 	_one_input_ref(check, r)
 	is_array(data.ergo_document)
+} else := "not_an_object" if {
+	_input_key_ref(r)
+	r in _step_refs(check)
+	_no_for_alias
 } else := _ref_state(r)
+
+_key_of_input_path(check, r) if {
+	some p in _read_paths(check)
+	count(p) > 1
+	p[0] == "$$input"
+	is_string(p[1])
+	{"ref": r} in p
+	object.get(check, "ergo/for", false) == false
+	_no_for_alias
+}
+
+_no_for_alias if {
+	every a, _ in object.get(input, "ergo/names", {}) {
+		startswith(a, "ergo/")
+	}
+}
 
 _input_one_root(c, p) if _one_input_ref(c, p)
 
@@ -424,6 +461,13 @@ _under_literal(check, p) if {
 default _ref_state(_) := "absent"
 
 _ref_state(r) := _ref_state_read(r) if not _params_null(r)
+
+_input_key_ref(r) if {
+	r[0] == "$$input"
+	is_array(data.ergo_document)
+	count(r) > 1
+	is_string(r[1])
+}
 
 _params_null(r) if {
 	r[0] in _params_starts

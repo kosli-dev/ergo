@@ -291,6 +291,56 @@
     ]
   },
   {
+    "description": "a named by key that can't be read, on an input that is a list",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"contains_params": "tags contains $input.m named by $params.k", "contains_input": "tags contains $input.m named by $input.k", "is": "k is m named by $input.k", "contains": "tags contains m named by $input.k", "in": "tags is in m named by $input.k", "followed": "k is \"a\" followed by m named by $input.k"}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as not_an_object and names the input once, whatever the key holds, a $params.k that is missing included",
+        "rules": ["path.not_an_object", "path.ref_step", "contains.value"],
+        "input": [{"id": "t", "k": "a", "m": {"a": "a"}, "tags": ["a"]}],
+        "results": [
+          {"cause": "not_an_object", "check": "contains", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}, {"locations": ["/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"m\": {\"a\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "not_an_object", "check": "contains_input", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}, {"locations": [""], "name": "$input.m named by $input.k", "value": null}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"m\": {\"a\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "not_an_object", "check": "contains_params", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}, {"locations": [""], "name": "$input.m named by $params.k", "value": null}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"m\": {\"a\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "not_an_object", "check": "followed", "inputs": [{"locations": ["/0/k"], "name": "k", "value": "a"}, {"locations": ["/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"m\": {\"a\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "not_an_object", "check": "in", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}, {"locations": ["/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"m\": {\"a\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "not_an_object", "check": "is", "inputs": [{"locations": ["/0/k"], "name": "k", "value": "a"}, {"locations": ["/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"m\": {\"a\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a $params key that is null after a path from $input, on an input that is a list",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"contains_params": "tags contains $input.m named by $params.k"}}}},
+    "params": {"k": null},
+    "cases": [
+      {
+        "description": "fails as not_an_object and names the input, whatever the key holds",
+        "rules": ["path.not_an_object", "path.ref_step", "contains.value"],
+        "input": [{"id": "t", "k": "a", "m": {"a": "a"}, "tags": ["a"]}],
+        "results": [
+          {"cause": "not_an_object", "check": "contains_params", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}, {"locations": [""], "name": "$input.m named by $params.k", "value": null}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"m\": {\"a\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a $params key that is a number after a path from $input, on an input that is a list",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"contains_params": "tags contains $input.m named by $params.k"}}}},
+    "params": {"k": 3},
+    "cases": [
+      {
+        "description": "fails as not_an_object and names the input, whatever the key holds",
+        "rules": ["path.not_an_object", "path.ref_step", "contains.value"],
+        "input": [{"id": "t", "k": "a", "m": {"a": "a"}, "tags": ["a"]}],
+        "results": [
+          {"cause": "not_an_object", "check": "contains_params", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}, {"locations": [""], "name": "$input.m named by $params.k", "value": null}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"m\": {\"a\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a check that reads a field of a subject that is a list outside what it reads item by item fails as a whole",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every things"}}, "requirements": {"r": {"subject": "t", "checks": {"every": "every name is other", "dot": "every name is .other", "some": "some name is other", "for": {"for": "every owner as o", "assert": "o is boss"}, "named": {"for": "every owner as o", "assert": "o is $params.m named by stage"}}}}},
     "params": {"m": {"build": "ana"}},

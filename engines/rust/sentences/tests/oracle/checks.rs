@@ -7882,6 +7882,42 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "tags contains $input.m named by $params.k",
+        "tags contains $input.m named by $params.k",
+        &[],
+        &[],
+    ),
+    (
+        "tags contains $input.m named by $input.k",
+        "tags contains $input.m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "k is m named by $input.k",
+        "k equals m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "tags contains m named by $input.k",
+        "tags contains m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "tags is in m named by $input.k",
+        "tags is in m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "k is \"a\" followed by m named by $input.k",
+        "k is \"a\" followed by m named by $input.k",
+        &[],
+        &[],
+    ),
     ("o is pl.name", "o equals pl.name", &[], &[]),
     (
         "count of xs whose s starts with pr.z is 0",

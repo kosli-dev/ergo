@@ -1169,7 +1169,10 @@ fn unread_ref_cause(env: &Env, source: &Source, anc: &[Anc]) -> Option<Cause> {
         let step = Step::Ref(Box::new(reference.clone()));
         path::resolve(&step, &ctx)
             .err()
-            .map(|outcome| outcome.cause().unwrap_or(Cause::Unusable))
+            .map(|outcome| match outcome {
+                Outcome::NotAnObject if reference.start == Start::Input => Cause::Unusable,
+                other => other.cause().unwrap_or(Cause::Unusable),
+            })
     });
     if first_bad_ref.is_some() {
         return first_bad_ref;

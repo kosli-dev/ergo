@@ -9,7 +9,7 @@ test_a_named_by_key_read_from_a_list_input_is_not_walked if {
 		rows := [[r.passed, r.cause, r.message] | some r in ergo.report(doc, policy, {}).results; r.check == "c"]
 		count(rows) > 0
 		every row in rows {
-			row == [false, "unusable", concat("", ["$input is ", ergo._text(doc), ", which isn't an object"])]
+			row == [false, "not_an_object", concat("", ["$input is ", ergo._text(doc), ", which isn't an object"])]
 		}
 	}
 }
