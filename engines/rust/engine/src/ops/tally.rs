@@ -1233,6 +1233,23 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
         .collect()
 }
 
+impl Tally {
+    /// Returns true when it reads a `count of` or a `sum of`, like
+    /// `count of rs whose v is "a" is 1`.
+    #[must_use]
+    pub fn counts(&self) -> bool {
+        std::iter::once(&self.left)
+            .chain(self.right.as_ref())
+            .any(|side| match side {
+                Side::Derived(derived) => derived
+                    .terms
+                    .iter()
+                    .any(|term| matches!(term, Term::Counted(_))),
+                Side::Plain(_) => false,
+            })
+    }
+}
+
 pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String> {
     let mut out = Vec::new();
     {
@@ -1457,6 +1474,29 @@ mod tests {
     }
 
     #[test]
+    fn a_count_of_or_a_sum_of_reads_its_lists_by_item_and_a_plain_check_doesnt() {
+        for sentence in [
+            "count of rs whose v is \"a\" is 1",
+            "count of rs.v that is \"a\" is 1",
+            "count of xs.m named by $input.k is 1",
+            "sum of rs.n is 1",
+            "every rs.v is \"a\"",
+            "some rs whose v is \"a\" exists",
+        ] {
+            assert!(lowered(sentence).reads_by_item(), "{sentence}");
+        }
+        for sentence in [
+            "k is $input.m named by $params.k",
+            "k is m named by $input.k",
+            "tags contains $input.m named by $params.k",
+            "ts is after $input.ts",
+            "x plus y is 3",
+        ] {
+            assert!(!lowered(sentence).reads_by_item(), "{sentence}");
+        }
+    }
+
+    #[test]
     fn a_tally_lists_the_refs_inside_ref_steps_but_not_a_side_that_is_a_ref() {
         let names: Vec<String> = lowered("x plus y named by $params.k is $params.limit")
             .refs()
@@ -1476,6 +1516,7 @@ mod tests {
         let input = json!({"things": [subject]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2054,6 +2095,7 @@ mod tests {
         }
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2622,6 +2664,7 @@ mod tests {
         let input = json!({"things": [{"items": items}]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2799,6 +2842,7 @@ mod tests {
         let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2862,6 +2906,7 @@ mod tests {
         let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),

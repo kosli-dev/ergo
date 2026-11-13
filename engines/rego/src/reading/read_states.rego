@@ -383,12 +383,39 @@ _step_refs(check) := {x.ref |
 	is_number(p[count(p) - 1])
 }
 
-_used_ref_state(check, r) := "unusable" if {
+_used_ref_state(check, r) := "not_an_object" if {
+	_key_of_list_input_path(check, r)
+} else := "unusable" if {
 	_wrong_step(check, r)
 } else := "not_an_object" if {
 	_one_input_ref(check, r)
 	is_array(data.ergo_document)
+} else := "not_an_object" if {
+	_input_key_ref(r)
+	r in _step_refs(check)
+	_plain_check(check)
 } else := _ref_state(r)
+
+_key_of_list_input_path(check, r) if {
+	is_array(data.ergo_document)
+	_key_of_input_path(check, r)
+}
+
+_key_of_input_path(check, r) if {
+	walk(check, [q, p])
+	is_array(p)
+	count(p) > 1
+	p[0] == "$$input"
+	not _index_step(p[1])
+	{"ref": r} in p
+	not _under_literal(check, q)
+	_plain_check(check)
+}
+
+_plain_check(check) if {
+	is_object(check)
+	check["$plain"] == true
+}
 
 _input_one_root(c, p) if _one_input_ref(c, p)
 
@@ -424,6 +451,13 @@ _under_literal(check, p) if {
 default _ref_state(_) := "absent"
 
 _ref_state(r) := _ref_state_read(r) if not _params_null(r)
+
+_input_key_ref(r) if {
+	r[0] == "$$input"
+	is_array(data.ergo_document)
+	count(r) > 1
+	is_string(r[1])
+}
 
 _params_null(r) if {
 	r[0] in _params_starts

@@ -148,7 +148,36 @@ _fixed(req) := {
 		some n, check in _checks_of(req)
 		here := _s_written_here(req, "checks", n)
 	},
-	"prepared": {n: _with_ref_answer(check) | some n, check in _checks_of(req)},
+	"prepared": {n: _with_ref_answer(_as_plain(req, check)) | some n, check in _checks_of(req)},
+}
+
+_as_plain(req, check) := object.union(check, {"$plain": true, "checks": [object.union(c, {"$plain": true}) | some c in check.checks]}) if {
+	_plain_shaped(req, check)
+	is_array(check.checks)
+} else := object.union(check, {"$plain": true}) if {
+	_plain_shaped(req, check)
+} else := check
+
+_plain_shaped(req, check) if {
+	is_array(data.ergo_document)
+	is_object(check)
+	not _chained(req)
+	not _reads_by_item(check)
+	every c in object.get(check, "checks", []) {
+		is_object(c)
+		not _reads_by_item(c)
+	}
+}
+
+_reads_by_item(c) if _walks(c)
+
+_reads_by_item(c) if c.op == "for"
+
+_reads_by_item(c) if {
+	walk(c, [_, x])
+	is_object(x)
+	some k in ["whose", "count_of", "sum_of"]
+	k in object.keys(x)
 }
 
 _evaluation_with(doc, written, name, fixed) := {

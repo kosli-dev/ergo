@@ -203,6 +203,7 @@ mod tests {
         let input = json!({"things": [subject]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -395,6 +396,7 @@ mod tests {
         let input = json!({"things": [{"a": "2024-01-01"}]});
         let ctx = Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),

@@ -284,6 +284,20 @@ impl Check {
         }
     }
 
+    /// Returns true when the check reads its lists item by item: a `for`
+    /// line, a one-line `every` or `some`, a `count of` or `sum of`, or an
+    /// `any_of` with one of those among its options. It runs with
+    /// [`Ctx::item_by_item`] set.
+    #[must_use]
+    pub fn reads_by_item(&self) -> bool {
+        match self {
+            Check::Walk(_) | Check::For(_) => true,
+            Check::Tally(check) => check.counts(),
+            Check::AnyOf(check) => check.options.iter().flatten().any(Check::reads_by_item),
+            _ => false,
+        }
+    }
+
     pub fn refs(&self) -> Vec<Path> {
         match self {
             Check::Present(check) => check.refs(),
@@ -342,6 +356,9 @@ pub struct Ran {
 }
 
 pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
+    if check.reads_by_item() && !ctx.item_by_item {
+        return run_full(check, &ctx.item_by_item());
+    }
     match check {
         Check::Walk(check) => {
             let run = walk::run(check, ctx);
@@ -371,6 +388,9 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
 }
 
 pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
+    if check.reads_by_item() && !ctx.item_by_item {
+        return run(check, &ctx.item_by_item());
+    }
     match check {
         Check::Present(check) => present::run(check, ctx),
         Check::Compare(check) => compare::run(check, ctx),
@@ -407,6 +427,7 @@ mod tests {
     fn ctx<'a>(subject: &'a Value, input: &'a Value) -> Ctx<'a> {
         Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: subject,
                 location: Location::input_root().key("s"),

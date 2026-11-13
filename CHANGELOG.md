@@ -35,6 +35,8 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 - A check that reads one name both item by item and as one value lists both reads in its `inputs`, as spec 0.7 says ([walk.inputs](spec/semantics.md#every-and-some)): `pos[].name` holding `["a"]` and `pos.name` holding `null`, as the Rust engine does.
 
+- A check that doesn't go through a list item by item, like `k is $input.m named by $params.k`, `k is m named by $input.k` or `tags contains $input.m named by $params.k`, fails as `not_an_object` with `$input is [...], which isn't an object` when the input is a list and the `named by` key can't be read, as spec 0.7 says ([path.not_an_object](spec/semantics.md#reading-a-path)). With no `k` in the params, `k is $input.m named by $params.k` and `k is $input named by $params.k` failed as `absent` with `$params.k is missing`, and as `null` or `unusable` with a `null` or a number, and `k is m named by $input.k` failed as `unusable`. Each check decides this on its own, whatever the other checks of the requirement are. The cause is `not_an_object` in every plain check, and the message is the list message for the forms the cases pin: a few, like `n plus m named by $input.k is 2`, give the same cause with a different message in the two engines ([OPEN.md](spec/OPEN.md#where-ergorego-and-the-rust-engine-differ)). A one-line `every` or `some`, a `for` line, a `count of` or `sum of`, a child subject's checks and the `whose` of a `from` line don't change. Changes the report of such checks.
+
 ## 0.6.0
 
 ### Changed

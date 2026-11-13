@@ -1492,6 +1492,7 @@ mod tests {
     fn ctx<'a>(subject: &'a Value, input: &'a Value, params: Option<&'a Value>) -> Ctx<'a> {
         Ctx {
             label: None,
+            item_by_item: false,
             subject: Located {
                 value: subject,
                 location: Location::input_root().key("s"),
