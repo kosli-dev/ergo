@@ -23,7 +23,7 @@ _root_states(subj, c) := _named_root_states(subj, c) | _walked_root_states(c) if
 
 else := _named_root_states(subj, c)
 
-_walk_roots_on if data.ergo_walk_roots == true
+_walk_roots_on := false
 
 _named_root_states(subj, c) := _plain_root_states(subj, c) | {st |
 	some y in _walked_tallies(c)

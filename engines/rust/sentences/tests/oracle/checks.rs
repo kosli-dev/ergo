@@ -8670,6 +8670,24 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
             "that c.pos.name: sum of adds up numbers, which have no fields, so c.pos.name can't be read from one: to read the subject's c.pos.name, write \u{1}.c.pos.name",
         ],
     ),
+    (
+        "count of rows whose v is in $params.os.name is 0",
+        "count of rows whose v is in $params.os.name is 0",
+        &[],
+        &[],
+    ),
+    (
+        "r.v is in $params.os.name",
+        "r.v is in $params.os.name",
+        &[],
+        &[],
+    ),
+    (
+        "sum of rows.n that is in $input.os.name is 0",
+        "sum of rows.n that is in $input.os.name is 0",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -12982,6 +13000,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every rows, if any, as p",
         "every rows, if any, as p",
+        &[],
+        &[],
+    ),
+    (
+        "every ms as m, every rows whose k is 1, if any, as r",
+        "every ms as m, every rows whose k is 1, if any, as r",
+        &[],
+        &[],
+    ),
+    (
+        "every rows whose k is 1, if any, as r",
+        "every rows whose k is 1, if any, as r",
         &[],
         &[],
     ),

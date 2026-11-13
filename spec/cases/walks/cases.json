@@ -5590,5 +5590,400 @@
         {}
       ]
     }
+  },
+  {
+    "description": "a $params list that a phrase walks fails a check on an empty list when an item of it is null",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "every": "every rows.v, if any, is in $params.os.name",
+            "exists": "every rows whose v is in $params.os.name, if any, exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows",
+        "rules": [
+          "tally.walk",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.os is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.os is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ],
+    "params": {
+      "os": [
+        {
+          "name": "bob"
+        },
+        null
+      ]
+    }
+  },
+  {
+    "description": "a $params list that a phrase walks fails a check on an empty list when it holds names of more than one kind",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "every": "every rows.v, if any, is in $params.os.name"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows",
+        "rules": [
+          "tally.walk",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ],
+    "params": {
+      "os": [
+        {
+          "name": "bob"
+        },
+        {
+          "name": 3
+        }
+      ]
+    }
+  },
+  {
+    "description": "a $params list that a phrase walks passes a check on an empty list when it reads fine",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "every": "every rows.v, if any, is in $params.os.name",
+            "exists": "every rows whose v is in $params.os.name, if any, exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes, with an empty rows",
+        "rules": [
+          "tally.walk",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "every",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "exists",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ],
+    "params": {
+      "os": [
+        {
+          "name": "bob"
+        },
+        {
+          "name": "ann"
+        }
+      ]
+    }
+  },
+  {
+    "description": "a count of or a sum of that walks a $params or $input list of names of more than one kind fails on an empty list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "count_params": "count of rows whose v is in $params.os.name is 0",
+            "sum_input": "sum of rows.n that is in $input.os.name is 0"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows",
+        "rules": [
+          "tally.walk",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ],
+          "os": [
+            {
+              "name": "bob"
+            },
+            {
+              "name": 3
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count_params",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of rows whose v is in $params.os.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "sum_input",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of rows.n that is in $input.os.name",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "rows[].n",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/os/0/name",
+                  "/os/1/name"
+                ],
+                "name": "$input.os[].name",
+                "value": [
+                  "bob",
+                  3
+                ]
+              }
+            ],
+            "message": "$input.os[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ],
+    "params": {
+      "os": [
+        {
+          "name": "bob"
+        },
+        {
+          "name": 3
+        }
+      ]
+    }
   }
 ]

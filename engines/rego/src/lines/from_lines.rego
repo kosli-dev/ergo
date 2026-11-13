@@ -910,17 +910,23 @@ _rooted_outcome(c, subj, flaw, check, req) := _walk_rooted_outcome(_check_outcom
 
 _walk_rooted_outcome(raw, c, subj, flaw, check, req) := o if {
 	raw.passed == true
-	_has_empty_list(raw, c)
-	o := _messaged(_check_outcome(c, subj, flaw), check, req, subj) with data.ergo_walk_roots as true
+	_may_hide_a_root(raw, c)
+	o := _messaged(_check_outcome(c, subj, flaw), check, req, subj) with _walk_roots_on as true
 	o.passed == false
 } else := _messaged(raw, check, req, subj)
 
-_has_empty_list(raw, _) if {
+_may_hide_a_root(raw, _) if {
 	some i in raw.inputs
 	i.value == []
 }
 
-_has_empty_list(_, c) if {
+_may_hide_a_root(_, c) if {
+	c.op == "for"
+	some item in c.items
+	item.if_any == true
+}
+
+_may_hide_a_root(_, c) if {
 	c.op == "for"
 	walk(c.checks, [_, x])
 	is_object(x)

@@ -53272,5 +53272,831 @@
         {}
       ]
     }
+  },
+  {
+    "description": "a $params list that a for line walks fails it on an empty list when an item of it is null",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "contains": {
+              "for": "every rows, if any, as r",
+              "assert": "r.tags contains all of $params.os.name"
+            },
+            "every": {
+              "for": "every ms as m",
+              "assert": "every rows.v, if any, is in $params.os.name"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "contains",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/os/0/name",
+                  "$params:/os/1"
+                ],
+                "name": "$params.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.os is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "every rows.v, if any, is in $params.os.name",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "rows[].v",
+                        "value": []
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ms",
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "path": "item 1 of ms",
+                "value": {}
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "message": "item 2 of $params.os is null, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ],
+    "params": {
+      "os": [
+        {
+          "name": "bob"
+        },
+        null
+      ]
+    }
+  },
+  {
+    "description": "a $params list that a for line walks fails it on an empty list when it holds names of more than one kind",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "in": {
+              "for": "every rows, if any, as r",
+              "assert": "r.v is in $params.os.name"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, with an empty rows",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "in",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/os/0/name",
+                  "$params:/os/1/name"
+                ],
+                "name": "$params.os[].name",
+                "value": [
+                  "bob",
+                  3
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "message": "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ],
+    "params": {
+      "os": [
+        {
+          "name": "bob"
+        },
+        {
+          "name": 3
+        }
+      ]
+    }
+  },
+  {
+    "description": "a $params list that a for line walks passes it on an empty list when it reads fine",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "contains": {
+              "for": "every rows, if any, as r",
+              "assert": "r.tags contains all of $params.os.name"
+            },
+            "every": {
+              "for": "every ms as m",
+              "assert": "every rows.v, if any, is in $params.os.name"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes, with an empty rows",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [],
+              "ms": [
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "contains",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/os/0/name",
+                  "$params:/os/1/name"
+                ],
+                "name": "$params.os[].name",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "every",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "rows[].v",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ],
+    "params": {
+      "os": [
+        {
+          "name": "bob"
+        },
+        {
+          "name": "ann"
+        }
+      ]
+    }
+  },
+  {
+    "description": "a part that a for line reads fails it when the line's whose leaves nothing and an item of the part can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "first": {
+              "for": "every rows whose k is 1, if any, as r",
+              "assert": "r.v is in pos.name"
+            },
+            "second": {
+              "for": "every ms as m, every rows whose k is 1, if any, as r",
+              "assert": "r.v is in pos.name"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, when the whose leaves nothing, when an item of it has no name",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "for.if_any",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [
+                {
+                  "k": 2,
+                  "v": "zz",
+                  "n": 1
+                }
+              ],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/rows/0"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "k": 2,
+                    "n": 1,
+                    "v": "zz"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of pos: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "second",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/rows/0"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "k": 2,
+                    "n": 1,
+                    "v": "zz"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of pos: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes, when the whose leaves nothing, when it reads fine",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "for.if_any",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [
+                {
+                  "k": 2,
+                  "v": "zz",
+                  "n": 1
+                }
+              ],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": "ann"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/rows/0"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "k": 2,
+                    "n": 1,
+                    "v": "zz"
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "second",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/cs/0/ms/0"
+                ],
+                "name": "ms[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/rows/0"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "k": 2,
+                    "n": 1,
+                    "v": "zz"
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a $params list that a for line reads fails it when the line's whose leaves nothing and an item of the list can't be read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "c": {
+          "from": "cs",
+          "identified_by": "id",
+          "has": {
+            "pos": "os"
+          }
+        },
+        "k": {
+          "from": "every c.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "first": {
+              "for": "every rows whose k is 1, if any, as r",
+              "assert": "r.v is in $params.os.name"
+            },
+            "two": {
+              "for": "every rows whose k is 1, if any, as r",
+              "assert": [
+                "r.v is in pos.name",
+                "r.v is in $params.os.name"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, when the whose leaves nothing",
+        "rules": [
+          "tally.walk",
+          "for.roots",
+          "for.if_any",
+          "walk.right.fail"
+        ],
+        "input": {
+          "cs": [
+            {
+              "id": "c1",
+              "rows": [
+                {
+                  "k": 2,
+                  "v": "zz",
+                  "n": 1
+                }
+              ],
+              "ms": [
+                {}
+              ],
+              "os": [
+                {
+                  "name": "bob"
+                },
+                {
+                  "name": "ann"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/os/0/name",
+                  "$params:/os/1"
+                ],
+                "name": "$params.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/rows/0"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "k": 2,
+                    "n": 1,
+                    "v": "zz"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of $params.os: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "two",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/os/0/name",
+                  "$params:/os/1"
+                ],
+                "name": "$params.os[].name",
+                "value": [
+                  "bob",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/os/0/name",
+                  "/cs/0/os/1/name"
+                ],
+                "name": "pos[].name",
+                "part": {
+                  "id": null,
+                  "name": "pos"
+                },
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [
+                  "/cs/0/rows/0"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "k": 2,
+                    "n": 1,
+                    "v": "zz"
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of $params.os: name is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c1",
+              "type": "c"
+            }
+          }
+        ]
+      }
+    ],
+    "params": {
+      "os": [
+        {
+          "name": "bob"
+        },
+        {}
+      ]
+    }
   }
 ]
