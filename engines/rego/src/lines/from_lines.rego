@@ -910,14 +910,29 @@ _rooted_outcome(c, subj, flaw, check, req) := _walk_rooted_outcome(_check_outcom
 
 _walk_rooted_outcome(raw, c, subj, flaw, check, req) := o if {
 	raw.passed == true
-	_may_walk_roots(c)
+	_has_empty_list(raw, c)
 	o := _messaged(_check_outcome(c, subj, flaw), check, req, subj) with data.ergo_walk_roots as true
 	o.passed == false
 } else := _messaged(raw, check, req, subj)
 
-_may_walk_roots(c) if _walked_root_states(c) != set()
+_has_empty_list(raw, _) if {
+	some i in raw.inputs
+	i.value == []
+}
 
-_may_walk_roots(c) if c.op == "for"
+_has_empty_list(_, c) if {
+	c.op == "for"
+	walk(c.checks, [_, x])
+	is_object(x)
+	_walks_in_a_sentence(x)
+}
+
+_walks_in_a_sentence(x) if x.op in {"every", "some"}
+
+_walks_in_a_sentence(x) if {
+	some f in ["count_of", "sum_of"]
+	f in object.keys(x)
+}
 
 _list_read(check, req, subj) := _ls_check(check, req.subject) if {
 	is_array(subj)
