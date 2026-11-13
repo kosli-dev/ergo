@@ -121,10 +121,12 @@ pub struct Ctx<'a> {
     pub params: Option<&'a Value>,
     pub aliases: BTreeMap<String, Located<'a>>,
     pub label: Option<String>,
-    /// True while the check of a `for` line or of a one-line `every` or
-    /// `some` runs. Then a key read from an input that is a list, like
-    /// `$input.k`, ends `Unusable`, and a path from such an input whose key
-    /// can't be read ends with the key's outcome.
+    /// False only while a plain check of a subject that isn't a child subject
+    /// runs: not a `for` line, a one-line `every` or `some`, a `count of` or
+    /// a `sum of`, nor a `from` line. When it's true, a key read from an
+    /// input that is a list, like `$input.k`, ends `Unusable`, and a path
+    /// from such an input whose key can't be read ends with the key's
+    /// outcome. When it's false, both end `NotAnObject`.
     pub item_by_item: bool,
 }
 

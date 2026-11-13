@@ -6,9 +6,7 @@ _for_names := object.get(input, "ergo/names", {})
 
 _bound(names, name, v, at) := object.union(names, {name: v, "$at": object.union(object.get(names, "$at", {}), {"names": object.union(object.get(object.get(names, "$at", {}), "names", {}), {name: at})})})
 
-_for_row(check, subj) := r if {
-	r := _for_row_of(check, subj, _for_row_raw(check, subj)) with data.ergo_item_by_item as true
-}
+_for_row(check, subj) := _for_row_of(check, subj, _for_row_raw(check, subj))
 
 _for_row_of(check, subj, r) := r if {
 	r.cause == "satisfied"

@@ -393,7 +393,7 @@ _used_ref_state(check, r) := "not_an_object" if {
 } else := "not_an_object" if {
 	_input_key_ref(r)
 	r in _step_refs(check)
-	not _item_by_item
+	_plain_check(check)
 } else := _ref_state(r)
 
 _key_of_list_input_path(check, r) if {
@@ -409,18 +409,13 @@ _key_of_input_path(check, r) if {
 	not _index_step(p[1])
 	{"ref": r} in p
 	not _under_literal(check, q)
-	not _tallied_at(q)
-	not _item_by_item
+	_plain_check(check)
 }
 
-_tallied_at(q) if {
-	some seg in q
-	seg in {"count_of", "sum_of"}
+_plain_check(check) if {
+	is_object(check)
+	check["$plain"] == true
 }
-
-default _item_by_item := false
-
-_item_by_item if data.ergo_item_by_item == true
 
 _input_one_root(c, p) if _one_input_ref(c, p)
 

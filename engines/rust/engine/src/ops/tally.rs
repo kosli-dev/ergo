@@ -1233,10 +1233,21 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
         .collect()
 }
 
-fn keyed_by_a_list_input(path: &Path, ctx: &Ctx) -> bool {
-    path::step_refs(path)
-        .iter()
-        .any(|reference| super::lists::input_one_path(reference, ctx))
+impl Tally {
+    /// Returns true when it reads a `count of` or a `sum of`, like
+    /// `count of rs whose v is "a" is 1`.
+    #[must_use]
+    pub fn counts(&self) -> bool {
+        std::iter::once(&self.left)
+            .chain(self.right.as_ref())
+            .any(|side| match side {
+                Side::Derived(derived) => derived
+                    .terms
+                    .iter()
+                    .any(|term| matches!(term, Term::Counted(_))),
+                Side::Plain(_) => false,
+            })
+    }
 }
 
 pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String> {
@@ -1267,11 +1278,6 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                 }
                 Some(Cause::Null) if cause == Cause::Null => {
                     out.push(format!("{} is null", walked.name));
-                }
-                Some(Cause::NotAnObject)
-                    if cause == Cause::NotAnObject && keyed_by_a_list_input(&counted.path, ctx) =>
-                {
-                    out.push(super::message::isnt("$input", ctx.input, "an object"));
                 }
                 Some(Cause::Unusable) if cause == Cause::Unusable => {
                     let blocked = if walk::through_a_list(&counted.path, &outer) {
@@ -1330,14 +1336,6 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
         let mut refs: Vec<Path> = counted.whose.iter().flat_map(Check::refs).collect();
         refs.sort_by_key(name::name);
         refs.dedup();
-        if cause == Cause::NotAnObject
-            && !ctx.item_by_item
-            && refs
-                .iter()
-                .any(|reference| super::lists::input_one_path(reference, ctx))
-        {
-            return Some(super::message::isnt("$input", ctx.input, "an object"));
-        }
         for reference in &refs {
             let read = path::read(reference, &outer);
             let said = match read.outcome {
@@ -1473,6 +1471,29 @@ mod tests {
     fn lowered(sentence: &str) -> Check {
         let tree = s::parse_check(sentence).unwrap();
         crate::lower::lower_assertion(&tree.assertions[0], &Scope::new()).unwrap()
+    }
+
+    #[test]
+    fn a_count_of_or_a_sum_of_reads_its_lists_by_item_and_a_plain_check_doesnt() {
+        for sentence in [
+            "count of rs whose v is \"a\" is 1",
+            "count of rs.v that is \"a\" is 1",
+            "count of xs.m named by $input.k is 1",
+            "sum of rs.n is 1",
+            "every rs.v is \"a\"",
+            "some rs whose v is \"a\" exists",
+        ] {
+            assert!(lowered(sentence).reads_by_item(), "{sentence}");
+        }
+        for sentence in [
+            "k is $input.m named by $params.k",
+            "k is m named by $input.k",
+            "tags contains $input.m named by $params.k",
+            "ts is after $input.ts",
+            "x plus y is 3",
+        ] {
+            assert!(!lowered(sentence).reads_by_item(), "{sentence}");
+        }
     }
 
     #[test]

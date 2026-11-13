@@ -83,6 +83,7 @@ OPA 1.20.2 crashes when it compares a number whose exponent is beyond ±1e6 with
 The spec doesn't settle these yet, because the two engines give different reports. Both still fail and pass the same checks.
 
 - **A check with a field it doesn't take.** [sentence.print.written_wrong](syntax.md#printing-the-sentence) doesn't say how a check prints when its sentences read but it has an unknown field, a `for` that isn't a string, or `for` or `assert` next to `any_of`. `ergo.rego` prints it as written and Rust prints it from its parse, so `{"assert": " x  is  1", "zzz": 1}` gives `x  is  1` with one and `x is 1` with the other.
+- **A `named by` key on an input that is a list, where a check goes through a list item by item.** [path.not_an_object](semantics.md#reading-a-path) settles it only for a check that doesn't. In a `count of` or `sum of` with `whose` or `that`, a `whose … exists`, a child subject's checks and the `whose` of a `from` line, the engines can give different messages, and sometimes different causes. On the input `[{"id": "t", "k": "a", "m": {"a": "a"}, "rs": [{"v": "a"}]}]`, `count of rs whose v is m named by $input.k is 1` fails as `not_an_object` in both, with `$input is [...], which isn't an object` in `ergo.rego` and `count of rs whose v equals m named by $input.k is 1 is false` in Rust, and on a child subject with no `k` in the params, `tags contains $input.m named by $params.k` fails as `absent` in `ergo.rego` and `not_an_object` in Rust.
 
 ## Where both engines differ from a rule
 

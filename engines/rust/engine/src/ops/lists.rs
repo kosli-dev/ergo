@@ -981,6 +981,7 @@ pub(super) fn input_one_path(path: &Path, ctx: &Ctx) -> bool {
 
 pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
     let mut paths: Vec<&Path> = match check {
+        super::Check::CompareTime(_) if ctx.item_by_item => check.left_path().into_iter().collect(),
         super::Check::Compare(super::compare::Compare { left, right, .. })
         | super::Check::CompareTime(super::time::CompareTime { left, right, .. }) => [left, right]
             .into_iter()
@@ -1010,9 +1011,11 @@ pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
             .filter(|path| walked_in(check, path, ctx).is_none()),
     );
     let keyed_by_input = |path: &&Path| {
-        path.steps
-            .iter()
-            .any(|step| matches!(step, Step::Ref(reference) if input_one_path(reference, ctx)))
+        !ctx.item_by_item
+            && path
+                .steps
+                .iter()
+                .any(|step| matches!(step, Step::Ref(reference) if input_one_path(reference, ctx)))
     };
     if paths
         .iter()

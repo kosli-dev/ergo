@@ -230,7 +230,7 @@ enum Read<'a> {
 fn context<'a>(env: &Env<'a>, subject: Located<'a>, anc: &[Anc<'a>]) -> Ctx<'a> {
     Ctx {
         label: None,
-        item_by_item: false,
+        item_by_item: true,
         subject,
         input: env.input,
         params: env.params,
@@ -1170,10 +1170,7 @@ fn unread_ref_cause(env: &Env, source: &Source, anc: &[Anc]) -> Option<Cause> {
         let step = Step::Ref(Box::new(reference.clone()));
         path::resolve(&step, &ctx)
             .err()
-            .map(|outcome| match outcome {
-                Outcome::NotAnObject if reference.start == Start::Input => Cause::Unusable,
-                other => other.cause().unwrap_or(Cause::Unusable),
-            })
+            .map(|outcome| outcome.cause().unwrap_or(Cause::Unusable))
     });
     if first_bad_ref.is_some() {
         return first_bad_ref;
@@ -2061,6 +2058,7 @@ fn check_rows<'a>(
 ) -> Vec<Row> {
     let mut ctx = context(env, at, anc);
     ctx.label = Some(env.subject.to_string());
+    ctx.item_by_item = !anc.is_empty();
     env.checks
         .iter()
         .filter(|(name, _)| !name.starts_with('$'))
@@ -2085,6 +2083,13 @@ fn check_rows<'a>(
 }
 
 fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc: &[Anc]) -> Row {
+    let by_item;
+    let ctx = if !ctx.item_by_item && plan.items.iter().any(|item| item.check.reads_by_item()) {
+        by_item = ctx.item_by_item();
+        &by_item
+    } else {
+        ctx
+    };
     let mut failed_items = None;
     let mut said: Vec<Option<String>> = Vec::new();
     let checks: Vec<Check> = plan

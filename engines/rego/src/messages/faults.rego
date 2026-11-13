@@ -72,7 +72,7 @@ _reads_input_one(check) if {
 
 _reads_input_one(check) if {
 	is_array(data.ergo_document)
-	not _item_by_item
+	_plain_check(check)
 	some r in _check_refs(check)
 	count(r) > 1
 	r[0] == "$$input"

@@ -284,6 +284,20 @@ impl Check {
         }
     }
 
+    /// Returns true when the check reads its lists item by item: a `for`
+    /// line, a one-line `every` or `some`, a `count of` or `sum of`, or an
+    /// `any_of` with one of those among its options. It runs with
+    /// [`Ctx::item_by_item`] set.
+    #[must_use]
+    pub fn reads_by_item(&self) -> bool {
+        match self {
+            Check::Walk(_) | Check::For(_) => true,
+            Check::Tally(check) => check.counts(),
+            Check::AnyOf(check) => check.options.iter().flatten().any(Check::reads_by_item),
+            _ => false,
+        }
+    }
+
     pub fn refs(&self) -> Vec<Path> {
         match self {
             Check::Present(check) => check.refs(),
@@ -342,9 +356,12 @@ pub struct Ran {
 }
 
 pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
+    if check.reads_by_item() && !ctx.item_by_item {
+        return run_full(check, &ctx.item_by_item());
+    }
     match check {
         Check::Walk(check) => {
-            let run = walk::run(check, &ctx.item_by_item());
+            let run = walk::run(check, ctx);
             Ran {
                 verdict: run.verdict,
                 failed_items: Some(run.failed_items),
@@ -353,7 +370,7 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
             }
         }
         Check::For(check) => {
-            let run = check.run(&ctx.item_by_item());
+            let run = check.run(ctx);
             Ran {
                 verdict: run.verdict,
                 failed_items: Some(run.failed_items),
@@ -371,6 +388,9 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
 }
 
 pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
+    if check.reads_by_item() && !ctx.item_by_item {
+        return run(check, &ctx.item_by_item());
+    }
     match check {
         Check::Present(check) => present::run(check, ctx),
         Check::Compare(check) => compare::run(check, ctx),
@@ -378,8 +398,8 @@ pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
         Check::Equals(check) => equals::run(check, ctx),
         Check::Range(check) => range::run(check, ctx),
         Check::Tally(check) => tally::run(check, ctx),
-        Check::Walk(check) => walk::run(check, &ctx.item_by_item()).verdict,
-        Check::For(check) => check.run(&ctx.item_by_item()).verdict,
+        Check::Walk(check) => walk::run(check, ctx).verdict,
+        Check::For(check) => check.run(ctx).verdict,
         Check::AnyOf(check) => any_of::run(check, ctx),
         Check::In(check) => lists::run_in(check, ctx),
         Check::Contains(check) => lists::run_contains(check, ctx),

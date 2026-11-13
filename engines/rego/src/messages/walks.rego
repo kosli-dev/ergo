@@ -273,13 +273,7 @@ _m_focus_text(_, c, e, _, roots) := _m_tally_item("count_of", e, roots)[0][1] if
 
 _m_focus_text(subj, c, e, cause, roots) := _m_undecided_text(subj, c, _focus_of(e, c), cause, roots) if not _focus_lost(e, c)
 
-_m_undecided_text(subj, c, e, cause, roots) := concat(", and ", off) if {
-	cause == "not_an_object"
-	some r in _check_refs(c)
-	_key_of_list_input_path(c, r)
-	off := _m_input_one_refs(c)
-	off != []
-} else := _m_isnt(_m_item_name(e.i, roots), e.iv, "an object") if {
+_m_undecided_text(subj, c, e, cause, roots) := _m_isnt(_m_item_name(e.i, roots), e.iv, "an object") if {
 	cause == "not_an_object"
 	not is_object(e.iv)
 } else := t if {

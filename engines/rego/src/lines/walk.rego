@@ -2,11 +2,7 @@ package ergo
 
 import rego.v1
 
-_walk_row(check, subj) := r if {
-	r := _walk_row_of(check, subj) with data.ergo_item_by_item as true
-}
-
-_walk_row_of(check, subj) := object.union(r, {"root_msgs": ms | ms := _flawed_root_msgs(check, subj, _walk_message(check, subj, r, r)); ms != []}) if {
+_walk_row(check, subj) := object.union(r, {"root_msgs": ms | ms := _flawed_root_msgs(check, subj, _walk_message(check, subj, r, r)); ms != []}) if {
 	_walk_flawed(check)
 	r := object.union(_walk_read_row(check, subj), {"cause": "unusable", "failed": []})
 } else := {"cause": "not_an_object", "inputs": [], "failed": []} if {
