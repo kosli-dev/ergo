@@ -61,6 +61,15 @@ pub struct Matches {
 }
 
 impl Right {
+    /// Adds every path this right side reads, in the order it writes them.
+    pub fn paths<'a>(&'a self, out: &mut Vec<&'a Path>) {
+        match self {
+            Right::Ref(path) | Right::Field(path) => out.push(path),
+            Right::Join(pieces) => pieces.iter().for_each(|piece| piece.paths(out)),
+            Right::Written(_) => {}
+        }
+    }
+
     pub(super) fn ref_paths(&self) -> Vec<&Path> {
         match self {
             Right::Ref(path) => vec![path],
@@ -809,20 +818,13 @@ pub fn right_inputs(check: &super::Check, ctx: &Ctx) -> Vec<Input> {
 }
 
 pub fn right_paths(check: &super::Check) -> Vec<&Path> {
-    fn of<'a>(right: &'a Right, out: &mut Vec<&'a Path>) {
-        match right {
-            Right::Ref(path) | Right::Field(path) => out.push(path),
-            Right::Join(pieces) => pieces.iter().for_each(|piece| of(piece, out)),
-            Right::Written(_) => {}
-        }
-    }
     let mut out = Vec::new();
     match check {
-        super::Check::In(c) => of(&c.values, &mut out),
+        super::Check::In(c) => c.values.paths(&mut out),
         super::Check::Contains(c) => match &c.wanted {
-            Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => of(right, &mut out),
+            Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => right.paths(&mut out),
         },
-        super::Check::Matches(c) => of(&c.patterns, &mut out),
+        super::Check::Matches(c) => c.patterns.paths(&mut out),
         _ => {}
     }
     out
@@ -952,20 +954,13 @@ pub fn haystacks(check: &super::Check) -> Vec<&Path> {
 }
 
 pub fn one_rights(check: &super::Check) -> Vec<&Path> {
-    fn of<'a>(right: &'a Right, out: &mut Vec<&'a Path>) {
-        match right {
-            Right::Ref(path) | Right::Field(path) => out.push(path),
-            Right::Join(pieces) => pieces.iter().for_each(|piece| of(piece, out)),
-            Right::Written(_) => {}
-        }
-    }
     let mut out = Vec::new();
     if let super::Check::Contains(Contains {
         wanted: Wanted::One(right),
         ..
     }) = check
     {
-        of(right, &mut out);
+        right.paths(&mut out);
     }
     out
 }

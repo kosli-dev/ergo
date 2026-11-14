@@ -141,6 +141,18 @@ fn merged_rows(rows: Vec<Row>) -> Row {
     row
 }
 
+fn merge_runs(first: Vec<Row>, rest: &[&Vec<Row>]) -> Vec<Row> {
+    first
+        .into_iter()
+        .enumerate()
+        .map(|(i, row)| {
+            let mut all = vec![row];
+            all.extend(rest.iter().filter_map(|run| run.get(i).cloned()));
+            merged_rows(all)
+        })
+        .collect()
+}
+
 fn merged_evaluations(runs: Vec<Vec<Evaluation>>) -> Vec<Evaluation> {
     let mut runs = runs.into_iter();
     let Some(first) = runs.next() else {
@@ -153,14 +165,8 @@ fn merged_evaluations(runs: Vec<Vec<Evaluation>>) -> Vec<Evaluation> {
         .map(|(at, evaluation)| {
             let others: Vec<&Evaluation> = rest.iter().filter_map(|run| run.get(at)).collect();
             let merge = |pick: &dyn Fn(&Evaluation) -> &Vec<Row>, mine: Vec<Row>| -> Vec<Row> {
-                mine.into_iter()
-                    .enumerate()
-                    .map(|(i, row)| {
-                        let mut all = vec![row];
-                        all.extend(others.iter().filter_map(|e| pick(e).get(i).cloned()));
-                        merged_rows(all)
-                    })
-                    .collect()
+                let rest: Vec<&Vec<Row>> = others.iter().map(|e| pick(e)).collect();
+                merge_runs(mine, &rest)
             };
             Evaluation {
                 total: evaluation.total,
@@ -177,17 +183,11 @@ fn merged_evaluations(runs: Vec<Vec<Evaluation>>) -> Vec<Evaluation> {
                     .into_iter()
                     .enumerate()
                     .map(|(g, group)| {
-                        group
-                            .into_iter()
-                            .enumerate()
-                            .map(|(i, row)| {
-                                let mut all = vec![row];
-                                all.extend(others.iter().filter_map(|e| {
-                                    e.subject_rows.get(g).and_then(|rows| rows.get(i)).cloned()
-                                }));
-                                merged_rows(all)
-                            })
-                            .collect()
+                        let rest: Vec<&Vec<Row>> = others
+                            .iter()
+                            .filter_map(|e| e.subject_rows.get(g))
+                            .collect();
+                        merge_runs(group, &rest)
                     })
                     .collect(),
             }
@@ -598,19 +598,11 @@ fn named_steps(steps: &[Step]) -> usize {
 }
 
 fn keyed_message(env: &Env, source: &Source, anc: &[Anc]) -> Option<String> {
-    match source {
-        Source::Root {
-            path,
-            each_of: Some(_),
-            ..
-        }
-        | Source::Child {
-            path,
-            each_of: Some(_),
-            ..
-        } => keyed_met(env, path, source, anc),
-        _ => None,
+    if !source.is_keyed() {
+        return None;
     }
+    let (Source::Root { path, .. } | Source::Child { path, .. }) = source;
+    keyed_met(env, path, source, anc)
 }
 
 fn plain_met(env: &Env, source: &Source, anc: &[Anc]) -> Option<(usize, String)> {
@@ -1658,9 +1650,7 @@ fn inputs_in_order(inputs: Vec<Input>) -> Vec<Value> {
     let mut kept: Vec<Value> = Vec::new();
     for input in inputs {
         let entry = input.to_json();
-        if !kept.contains(&entry) {
-            kept.push(entry);
-        }
+        ops::push_new(&mut kept, entry);
     }
     kept
 }
@@ -1690,7 +1680,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
             failed_items = ran.failed_items.map(Value::Array);
             let mut own = ran.message;
             if unreadable {
-                let keeps_own = !matches!(verdict.cause, Cause::Satisfied | Cause::Value)
+                let keeps_own = verdict.cause.is_failure()
                     && matches!(&filter.check, Check::Walk(w) if walk::walks_nothing(w, ctx))
                     && ops::message::params_that_arent_an_object(&filter.check, ctx).is_none();
                 verdict.cause = Cause::Unusable;
@@ -1745,9 +1735,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     );
     let mut once: Vec<String> = Vec::new();
     for text in said {
-        if !once.contains(&text) {
-            once.push(text);
-        }
+        ops::push_new(&mut once, text);
     }
     let message = if matched {
         None
@@ -2028,15 +2016,8 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
             let mut runs = runs.into_iter();
             let first = runs.next().unwrap_or_default();
             let rest: Vec<Vec<Row>> = runs.collect();
-            first
-                .into_iter()
-                .enumerate()
-                .map(|(i, row)| {
-                    let mut all = vec![row];
-                    all.extend(rest.iter().filter_map(|run| run.get(i).cloned()));
-                    merged_rows(all)
-                })
-                .collect::<Vec<Row>>()
+            let rest: Vec<&Vec<Row>> = rest.iter().collect();
+            merge_runs(first, &rest)
         })
         .filter(|rows| !rows.is_empty())
         .collect();
@@ -2182,9 +2163,7 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             .collect();
         let mut once: Vec<String> = Vec::new();
         for text in messages {
-            if !once.contains(&text) {
-                once.push(text);
-            }
+            ops::push_new(&mut once, text);
         }
         row.message = Some(once.join("; "));
     }

@@ -22,6 +22,11 @@ impl Cause {
         }
     }
 
+    /// Whether this cause is a failure: anything but `Satisfied` and `Value`.
+    pub fn is_failure(self) -> bool {
+        !matches!(self, Cause::Satisfied | Cause::Value)
+    }
+
     pub fn worst<I: IntoIterator<Item = Cause>>(causes: I) -> Option<Cause> {
         causes.into_iter().filter(|c| *c != Cause::Satisfied).min()
     }

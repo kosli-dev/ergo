@@ -61,3 +61,18 @@ fn worst_of_nothing_or_only_satisfied_is_none() {
     assert_eq!(Cause::worst([]), None);
     assert_eq!(Cause::worst([Cause::Satisfied, Cause::Satisfied]), None);
 }
+
+#[test]
+fn only_satisfied_and_value_are_not_failures() {
+    assert!(!Cause::Satisfied.is_failure());
+    assert!(!Cause::Value.is_failure());
+    for cause in [
+        Cause::NotAnObject,
+        Cause::Ambiguous,
+        Cause::Unusable,
+        Cause::Absent,
+        Cause::Null,
+    ] {
+        assert!(cause.is_failure());
+    }
+}

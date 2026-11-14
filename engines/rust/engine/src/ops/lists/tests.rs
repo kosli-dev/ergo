@@ -986,3 +986,21 @@ fn a_key_after_a_position_fails_as_unusable_when_another_item_holds_no_object_th
     );
     assert_eq!(walk.cause, None);
 }
+
+#[test]
+fn right_paths_lists_every_ref_and_field_inside_a_join_and_skips_written_values() {
+    let a = key_path(Start::Subject, &["a"]);
+    let b = key_path(Start::Input, &["b"]);
+    let right = Right::Join(vec![
+        Right::Ref(a.clone()),
+        Right::Written(json!("x")),
+        Right::Join(vec![Right::Field(b.clone())]),
+    ]);
+    let mut out = Vec::new();
+    right.paths(&mut out);
+    assert_eq!(out, [&a, &b]);
+    let written = Right::Written(json!(1));
+    let mut none = Vec::new();
+    written.paths(&mut none);
+    assert!(none.is_empty());
+}
