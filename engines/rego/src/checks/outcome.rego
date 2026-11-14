@@ -100,9 +100,11 @@ _eval_cause(true, _, _) := "satisfied"
 
 _eval_cause(false, "", states) := _worst_or_value(states)
 
-_eval_cause(false, ref_cause, _) := ref_cause if ref_cause != ""
+_eval_cause(false, ref_cause, states) := _worst_of(states | {ref_cause}) if ref_cause in {"absent", "null"}
 
-_basic_eval(subj, side) := {"v": v, "found": [x | x := _simple_found(subj, side)], "states": {_read_state(subj, side)}, "inputs": _basic_inputs(subj, side)} if {
+_eval_cause(false, ref_cause, _) := ref_cause if not ref_cause in {"", "absent", "null"}
+
+_basic_eval(subj, side) := {"v": v, "found": [x | x := _simple_found(subj, side)], "states": {_side_state(subj, side)}, "inputs": _basic_inputs(subj, side)} if {
 	_basic_form(side) == "path"
 	v := [x | x := _value_at(subj, side)]
 }

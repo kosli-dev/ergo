@@ -1695,9 +1695,15 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                 own = None;
             }
             if !verdict.passed() {
-                said.push(
-                    own.unwrap_or_else(|| ops::message::message(&filter.check, ctx, &verdict)),
-                );
+                said.push(own.unwrap_or_else(|| {
+                    if matches!(verdict.cause, Cause::Absent | Cause::Null) {
+                        let mut unlabelled = ctx.clone();
+                        unlabelled.label = None;
+                        ops::message::message(&filter.check, &unlabelled, &verdict)
+                    } else {
+                        ops::message::message(&filter.check, ctx, &verdict)
+                    }
+                }));
             }
             (filter, verdict)
         })

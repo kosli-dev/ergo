@@ -2181,6 +2181,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("gs", "gs"),
     ("every c.kids", "every c.kids"),
     ("every cs", "every cs"),
+    ("things whose c.z is d.z", "things whose c.z equals d.z"),
+    (
+        "things whose k is m named by $input.k",
+        "things whose k equals m named by $input.k",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
