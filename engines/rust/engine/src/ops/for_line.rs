@@ -1,7 +1,7 @@
 use super::tally::{Side, Tally, Term};
 use super::time::{self, Time};
 use super::walk::{self, Failure, Options, Seg, WalkItem};
-use super::{Check, Input, Part, Verdict, run_full};
+use super::{Check, Input, Part, Verdict, push_new, run_full};
 use crate::cause::Cause;
 use crate::lower::{self, Scope};
 use crate::path::{self, Ctx, Located, Location, OUTER, Path, Start, Step};
@@ -573,18 +573,13 @@ impl For {
             let verdicts: Vec<Verdict> = read.into_iter().map(|(verdict, _)| verdict).collect();
             let causes: Vec<Cause> = verdicts.iter().map(|v| v.cause).collect();
             let name = walked.name_of(&w.item_segs, w.unaliased);
-            let undecided = Cause::worst(
-                causes
-                    .iter()
-                    .copied()
-                    .filter(|c| !matches!(c, Cause::Satisfied | Cause::Value)),
-            );
+            let undecided = Cause::worst(causes.iter().copied().filter(|c| c.is_failure()));
             let first_alias = self.items[0].alias.as_str();
             let own_text = item
                 .whose
                 .iter()
                 .zip(&verdicts)
-                .filter(|(_, verdict)| !matches!(verdict.cause, Cause::Satisfied | Cause::Value))
+                .filter(|(_, verdict)| verdict.cause.is_failure())
                 .find_map(|(check, verdict)| {
                     if lost {
                         return None;
@@ -598,7 +593,7 @@ impl For {
                 .whose
                 .iter()
                 .zip(&verdicts)
-                .find(|(_, verdict)| !matches!(verdict.cause, Cause::Satisfied | Cause::Value))
+                .find(|(_, verdict)| verdict.cause.is_failure())
                 .and_then(|(check, verdict)| {
                     let text = (!lost)
                         .then(|| {
@@ -649,9 +644,10 @@ impl For {
                     .any(|part| !roots.split("; ").any(|root| root == part))
             };
             let undecided_whose = || {
-                item.whose.iter().zip(&verdicts).filter(|(_, verdict)| {
-                    !matches!(verdict.cause, Cause::Satisfied | Cause::Value)
-                })
+                item.whose
+                    .iter()
+                    .zip(&verdicts)
+                    .filter(|(_, verdict)| verdict.cause.is_failure())
             };
             let why = undecided_whose()
                 .find_map(|(check, verdict)| {
@@ -1426,9 +1422,7 @@ impl For {
                     Some(parts) if walks && !parts.is_empty() => {
                         let mut once: Vec<String> = Vec::new();
                         for part in parts {
-                            if !once.contains(&part) {
-                                once.push(part);
-                            }
+                            push_new(&mut once, part);
                         }
                         once
                     }
@@ -1757,9 +1751,7 @@ impl For {
         };
         let mut once: Vec<String> = Vec::new();
         for text in roots.into_iter().chain(free) {
-            if !once.contains(&text) {
-                once.push(text);
-            }
+            push_new(&mut once, text);
         }
         if once.is_empty() {
             return run;
@@ -1876,7 +1868,7 @@ impl For {
             .flat_map(|item| item.whose.iter())
             .collect();
         let outer_flaw = super::message::root_flaw_ordered(&whose, &outer, &counted, &nested);
-        let outer_flaw = if matches!(run.verdict.cause, Cause::Satisfied | Cause::Value) {
+        let outer_flaw = if !run.verdict.cause.is_failure() {
             super::message::worse_key_cause(outer_flaw, &item_whose, &outer)
         } else {
             outer_flaw
@@ -1910,7 +1902,7 @@ impl For {
                         .collect(),
                 ),
             };
-            if matches!(run.verdict.cause, Cause::Satisfied | Cause::Value) {
+            if !run.verdict.cause.is_failure() {
                 run.verdict.cause = cause;
                 run.failed_items = Vec::new();
                 return Named::Roots(texts);
@@ -1937,7 +1929,7 @@ impl For {
         let row = run.verdict.cause;
         if row == cause {
             Named::Roots(texts)
-        } else if matches!(row, Cause::Satisfied | Cause::Value) {
+        } else if !row.is_failure() {
             run.verdict.cause = cause;
             run.failed_items = Vec::new();
             Named::Roots(texts)
@@ -1964,9 +1956,7 @@ impl For {
         if let Some((cause, sentence_texts)) = sentence_flaw {
             causes.push(cause);
             for text in sentence_texts {
-                if !texts.contains(&text) {
-                    texts.push(text);
-                }
+                push_new(&mut texts, text);
             }
         }
         let mut mode = Named::Plain;
@@ -1977,7 +1967,7 @@ impl For {
                 mode = Named::Ahead(texts);
             } else if row == cause {
                 mode = Named::Roots(texts);
-            } else if matches!(row, Cause::Satisfied | Cause::Value) {
+            } else if !row.is_failure() {
                 run.verdict.cause = cause;
                 run.failed_items = Vec::new();
                 mode = Named::Roots(texts);
@@ -3132,9 +3122,7 @@ fn group_by_lead(texts: &[String]) -> Vec<Vec<String>> {
     }
     let mut order: Vec<&String> = Vec::new();
     for lead in &leads {
-        if !order.contains(&lead) {
-            order.push(lead);
-        }
+        push_new(&mut order, lead);
     }
     order
         .into_iter()
@@ -3576,9 +3564,7 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
         found.sort_by_key(|(cause, _)| *cause);
         for (cause, text) in found {
             causes.push(cause);
-            if !texts.contains(&text) {
-                texts.push(text);
-            }
+            push_new(&mut texts, text);
         }
     }
     Cause::worst(causes).map(|cause| (cause, texts))

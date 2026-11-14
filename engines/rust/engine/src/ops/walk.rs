@@ -1088,9 +1088,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     }
                 })
                 .collect();
-            let undecided = verdicts
-                .iter()
-                .find(|(_, v, _)| !matches!(v.cause, Cause::Satisfied | Cause::Value));
+            let undecided = verdicts.iter().find(|(_, v, _)| v.cause.is_failure());
             let kept = !verdicts.iter().any(|(_, v, _)| v.cause == Cause::Value);
             let leaf_check = walk.check.with_left(item.rest_path());
             let leaf = run_check(&leaf_check, &at);
@@ -1417,7 +1415,7 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
     }
     let outer_ctx = outer(ctx);
     let whose: Vec<&Check> = walk.whose.iter().collect();
-    let unread = matches!(row.verdict.cause, Cause::Satisfied | Cause::Value);
+    let unread = !row.verdict.cause.is_failure();
     let check_cause = unread
         .then(|| message::root_flaw(&[&*walk.check], &outer_ctx))
         .flatten();
@@ -1435,9 +1433,7 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
         flaw
     };
     if let Some((cause, text)) = flaw {
-        if row.verdict.cause != cause
-            && !matches!(row.verdict.cause, Cause::Satisfied | Cause::Value)
-        {
+        if row.verdict.cause != cause && row.verdict.cause.is_failure() {
             if ctx.label.is_some() && !in_a_for_line(ctx) && !row.parts.is_empty() {
                 let parts = message::with_roots(std::mem::take(&mut row.parts), &text);
                 row.message = Some(message::joined(parts.clone()));
@@ -1471,7 +1467,7 @@ pub(super) fn read_up_front(
 ) -> (Cause, Vec<Value>, Option<String>) {
     if row == flaw {
         (row, failed_items, Some(text.to_string()))
-    } else if matches!(row, Cause::Satisfied | Cause::Value) {
+    } else if !row.is_failure() {
         (flaw, Vec::new(), Some(text.to_string()))
     } else {
         let message =

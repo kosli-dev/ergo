@@ -59,6 +59,22 @@ pub enum Source {
     },
 }
 
+impl Source {
+    /// Whether the source reads its entries by key, with an `each of` path.
+    pub fn is_keyed(&self) -> bool {
+        matches!(
+            self,
+            Source::Root {
+                each_of: Some(_),
+                ..
+            } | Source::Child {
+                each_of: Some(_),
+                ..
+            }
+        )
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Lowered {
     pub source: Source,

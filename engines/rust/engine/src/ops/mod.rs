@@ -17,6 +17,13 @@ use crate::name;
 use crate::path::{self, Ctx, Outcome, Path, Step};
 use serde_json::{Map, Value, json};
 
+/// Adds `item` to the end of `list` unless an equal one is already there.
+pub fn push_new<T: PartialEq>(list: &mut Vec<T>, item: T) {
+    if !list.contains(&item) {
+        list.push(item);
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Part {
     pub name: String,

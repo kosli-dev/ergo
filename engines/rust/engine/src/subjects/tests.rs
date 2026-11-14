@@ -1782,3 +1782,25 @@ fn a_from_line_that_reads_null_params_says_the_param_is_missing() {
         min_subjects("absent", "$params.env is missing")
     );
 }
+
+#[test]
+fn merge_runs_keeps_the_rows_of_the_first_run_whatever_the_length_of_the_others() {
+    let row = |id: i64| crate::report::Row {
+        requirement: "r".to_string(),
+        subject_type: json!("thing"),
+        subject_id: json!(id),
+        subject_in: None,
+        check: "c".to_string(),
+        cause: crate::cause::Cause::Satisfied,
+        inputs: Vec::new(),
+        message: None,
+        failed_items: None,
+        failed_assertions: None,
+    };
+    let short = vec![row(3)];
+    let long = vec![row(4), row(5), row(6)];
+    let merged = super::merge_runs(vec![row(1), row(2)], &[&short, &long]);
+    let ids: Vec<Value> = merged.iter().map(|r| r.subject_id.clone()).collect();
+    assert_eq!(ids, [json!(1), json!(2)]);
+    assert!(super::merge_runs(Vec::new(), &[&long]).is_empty());
+}

@@ -115,3 +115,12 @@ fn an_input_read_without_a_part_has_no_tag() {
     let verdict = run(&present(path, false), &ctx(&subject, &input));
     assert!(verdict.inputs[0].to_json().get("part").is_none());
 }
+
+#[test]
+fn push_new_adds_an_item_once_and_keeps_the_order() {
+    let mut list = vec!["b".to_string()];
+    push_new(&mut list, "a".to_string());
+    push_new(&mut list, "b".to_string());
+    push_new(&mut list, "a".to_string());
+    assert_eq!(list, ["b", "a"]);
+}

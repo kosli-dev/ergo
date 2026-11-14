@@ -737,3 +737,15 @@ fn a_from_with_an_unknown_name_and_a_syntax_error_lists_no_other_subject() {
     assert_eq!(r.listed("kid"), ["kid"]);
     assert_eq!(texts(&r, "kid", "subjects.kid.from"), ["doesn't parse"]);
 }
+
+#[test]
+fn only_a_source_with_each_of_is_keyed() {
+    let (_, r) = reading(json!({
+        "art": {"from": "arts"},
+        "kid": {"from": "art named by each of $params.k"},
+        "plain": {"from": "art"},
+    }));
+    assert!(!r.lowered("art").unwrap().source.is_keyed());
+    assert!(r.lowered("kid").unwrap().source.is_keyed());
+    assert!(!r.lowered("plain").unwrap().source.is_keyed());
+}

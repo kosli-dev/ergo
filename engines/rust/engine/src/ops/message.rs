@@ -1,6 +1,6 @@
 use super::compare::{Cmp, Side, read_side};
 use super::tally::{self, Side as TallySide};
-use super::{Check, Input, Verdict, lists, read_path, run_full};
+use super::{Check, Input, Verdict, lists, push_new, read_path, run_full};
 use crate::cause::Cause;
 use crate::name;
 use crate::path::{self, Ctx, Outcome, Path, Resolved, Start, Step};
@@ -220,9 +220,7 @@ fn side_paths(check: &Check) -> Vec<&Path> {
 pub fn once_of(all: Vec<String>) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for text in all {
-        if !out.contains(&text) {
-            out.push(text);
-        }
+        push_new(&mut out, text);
     }
     out
 }
@@ -266,9 +264,7 @@ pub fn key_states_of(path: &Path, ctx: &Ctx, want: Outcome) -> Vec<String> {
             && input.state == want
         {
             let clause = format!("{} is {}", input.stopped_at(), state_word(want));
-            if !out.contains(&clause) {
-                out.push(clause);
-            }
+            push_new(&mut out, clause);
         }
     }
     out
@@ -294,9 +290,7 @@ pub fn key_faults_of(path: &Path, ctx: &Ctx) -> Vec<String> {
             && !input.value.is_string()
         {
             let clause = isnt(&input.name, &input.value, "text");
-            if !out.contains(&clause) {
-                out.push(clause);
-            }
+            push_new(&mut out, clause);
         }
     }
     out
@@ -629,9 +623,7 @@ fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
         let name = any.names.get(at).cloned().unwrap_or_default();
         let mut once: Vec<String> = Vec::new();
         for line in lines {
-            if !once.contains(&line) {
-                once.push(line);
-            }
+            push_new(&mut once, line);
         }
         parts.push(format!("{name}: {}", once.join(", and ")));
     }
@@ -756,9 +748,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                 if others && clause.ends_with(digits) {
                     continue;
                 }
-                if !once.contains(&clause) {
-                    once.push(clause);
-                }
+                push_new(&mut once, clause);
             }
             once
         }
@@ -790,9 +780,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
     };
     let mut once: Vec<String> = Vec::new();
     for clause in clauses {
-        if !once.contains(&clause) {
-            once.push(clause);
-        }
+        push_new(&mut once, clause);
     }
     if once.is_empty() && verdict.cause == Cause::Unusable {
         once.extend(params_that_arent_an_object(check, ctx));
@@ -1273,9 +1261,7 @@ pub fn ref_fault_list(checks: &[&Check], ctx: &Ctx) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for check in checks {
         for fault in lists::ref_faults(check, ctx) {
-            if !out.contains(&fault) {
-                out.push(fault);
-            }
+            push_new(&mut out, fault);
         }
     }
     out
@@ -1619,9 +1605,7 @@ fn key_problems(checks: &[&Check], ctx: &Ctx) -> Vec<(Cause, String)> {
             .collect();
         own.sort_by_key(name::name);
         for key in own {
-            if !keys.contains(&key) {
-                keys.push(key);
-            }
+            push_new(&mut keys, key);
         }
     }
     keys.iter()
@@ -1700,9 +1684,7 @@ pub fn ordered_roots(checks: &[&Check], ctx: &Ctx, refs_first: &[&Check]) -> Vec
     first.sort();
     let mut out: Vec<String> = Vec::new();
     for text in first.into_iter().chain(rest) {
-        if !out.contains(&text) {
-            out.push(text);
-        }
+        push_new(&mut out, text);
     }
     out
 }
@@ -1730,9 +1712,7 @@ pub fn roots_ahead(message: &str, roots: &[String]) -> Vec<String> {
             .map(str::to_string)
             .collect(),
     ) {
-        if !out.contains(&part) {
-            out.push(part);
-        }
+        push_new(&mut out, part);
     }
     out
 }
@@ -1867,9 +1847,7 @@ fn root_texts_with(
         .chain(refs.clone())
         .chain(kept.iter().map(|(text, _)| text.clone()))
     {
-        if !texts.contains(&text) {
-            texts.push(text);
-        }
+        push_new(&mut texts, text);
     }
     Some((worst, texts))
 }
@@ -1901,9 +1879,7 @@ pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {
             };
             if path::read(&prefix, ctx).outcome == want {
                 let clause = format!("{} is {}", name::name(&prefix), state_word(want));
-                if !out.contains(&clause) {
-                    out.push(clause);
-                }
+                push_new(&mut out, clause);
                 break;
             }
         }
@@ -1940,9 +1916,7 @@ fn off_item_lists(check: &Check, ctx: &Ctx) -> Vec<String> {
             && !value.is_null()
         {
             let clause = isnt(&name::name(path), value, "a list");
-            if !out.contains(&clause) {
-                out.push(clause);
-            }
+            push_new(&mut out, clause);
         }
     }
     out
@@ -1966,9 +1940,7 @@ fn off_item_rights(check: &Check, ctx: &Ctx) -> Vec<String> {
             && !value.is_array()
         {
             let clause = isnt(&name::name(path), value, "a list");
-            if !out.contains(&clause) {
-                out.push(clause);
-            }
+            push_new(&mut out, clause);
         }
     }
     out

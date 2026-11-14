@@ -1,7 +1,7 @@
 use super::compare::{self, Cmp, Compare};
 use super::time::{self, NANOS_PER_SECOND, SECONDS_PER_DAY, Time};
 use super::walk::{self, Options};
-use super::{Check, Input, Part, SidePath, Verdict, read_path, verdict};
+use super::{Check, Input, Part, SidePath, Verdict, push_new, read_path, verdict};
 use crate::cause::Cause;
 use crate::lower::{Scope, UNSUPPORTED_SUFFIX};
 use crate::name;
@@ -354,9 +354,7 @@ fn decide(test: &Test, left: &Value, right: Option<Value>, ctx: &Ctx) -> Cause {
 fn merged(entries: Vec<Input>) -> Vec<Input> {
     let mut out: Vec<Input> = Vec::new();
     for entry in entries {
-        if !out.contains(&entry) {
-            out.push(entry);
-        }
+        push_new(&mut out, entry);
     }
     out
 }
@@ -430,9 +428,7 @@ fn work_derived(derived: &Derived, ctx: &Ctx) -> Worked<Number> {
     let mut sum = number_entry(&derived.text, &result, located.clone());
     let mut tags: Vec<&super::Part> = Vec::new();
     for tag in below.iter().filter_map(|entry| entry.part.as_ref()) {
-        if !tags.contains(&tag) {
-            tags.push(tag);
-        }
+        push_new(&mut tags, tag);
     }
     if let [only] = tags.as_slice() {
         sum.part = Some((*only).clone());
@@ -598,10 +594,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             .iter()
             .map(|check| walk::focus_verdict(check, item, &at, &focus).0.cause)
             .collect();
-        let undecided = verdicts
-            .iter()
-            .filter(|cause| !matches!(cause, Cause::Satisfied | Cause::Value))
-            .copied();
+        let undecided = verdicts.iter().filter(|cause| cause.is_failure()).copied();
         let before = causes.len();
         causes.extend(undecided);
         if causes.len() > before || verdicts.contains(&Cause::Value) {
@@ -1376,7 +1369,7 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
             let mut undecided = false;
             for check in &counted.whose {
                 let (verdict, lost) = walk::focus_verdict(check, item, &at, &focus);
-                if !matches!(verdict.cause, Cause::Satisfied | Cause::Value) {
+                if verdict.cause.is_failure() {
                     undecided = true;
                     let said = if lost {
                         super::message::prefixed(
