@@ -141,6 +141,18 @@ When Ergo can't read something or isn't sure, the check fails. It never passes b
 
 The report must stay byte-identical for the same policy and input, whatever order the policy was written in. Sort anything that ends up in the report.
 
+## Code rules
+
+- Names that JavaScript sees, like Wasm exports and npm APIs, are camelCase (`#[wasm_bindgen(js_name = parseCheck)]`). JSON keys the spec defines, like `failed_items`, stay as they are.
+- A `$` name in a report must be something a policy can read. Ergo's own labels in reports are plain words.
+- A line that coverage lists isn't dead code. Check every caller and try a real policy before deleting it. If it can be reached, add a test.
+- In Rego, `not f(x.y)` is undefined when `x.y` is missing. Put the test in a small rule and negate that.
+
+## Spec rules
+
+- Ergo must be easy to reimplement outside Rego. Prefer rules that a TypeScript or Python version can follow to the same report over OPA behaviour.
+- Ergo reports every failure. Name every failed root and every problem, not only the first one.
+
 ## Docs
 
 When behaviour changes, update its rule in `spec/` and add or change cases for it, so `spec_test.rego` fails when one no longer matches. When a policy or a report changes shape, update `spec/policy/schema.json` or `spec/report/schema.json` too. Update `REFERENCE.md` in the same change. When it affects the first policy or its report, update `README.md` too, when it changes how `ergo.rego` runs, `OPA.md`, and when it changes the `ergo` command, `CLI.md`.
@@ -156,7 +168,13 @@ Write in plain English that anyone can follow:
 - Say things simply. No jargon, no buzzwords, no filler, and no pet words like "load-bearing".
 - Explain what the reader needs at that point, and no more. Leave the theory out.
 - Don't sound robotic either. Vary sentence length, and join related ideas with "and", "but", "so" and "because" rather than stacking short sentences.
-- Show real examples.
+- Show real examples. Show the input next to every policy or report example.
+- No idioms or figures of speech, and no names of your own for things. Not everyone reading is a native English speaker.
+- Write "Ergo" in prose. Code names like `ergo.rego` and `ergo.report` stay lowercase.
+- Say "Rego engine" and "Rust engine", never "Rust port".
+- Pad markdown tables so the columns line up in the source.
+- Keep it brief: what the reader needs to act, a short list, one example.
+- Words in the check sentences are plain English, like `it`. Don't add `$` names or code-looking words. A field that clashes with one is written with a leading dot, like `.empty`.
 
 When talking to people:
 
@@ -171,7 +189,7 @@ The first line says what the change does, in the imperative and in lowercase, li
 
 An area prefix is optional. Add one when a single area clearly fits, and leave it out when the change spans several. People have used `rego:`, `rust:`, `docs:`, `site:`, `ci:`, `examples:`, `spec:` and `playground:`, and commits from before the Rust engine say `core:` for `rego:`, and commits from before the playground say `markdown:` for `playground:`. Nothing in CI checks the prefix.
 
-A `rego:` change that alters behaviour adds the cases Rust now fails to `engines/rust/known-failures.txt`. The change that ports it to the Rust engine deletes those lines.
+One pull request carries a fix for both engines, Rego and Rust, with the spec cases, `REFERENCE.md` and the changelogs. Don't open a separate Rust pull request for it. A case Rust can't pass yet goes in `engines/rust/known-failures.txt`, and the pull request that makes it pass deletes the line. Two or three small related fixes can share one pull request.
 
 When a change to `ergo.rego` or to the Rust engine alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
 
