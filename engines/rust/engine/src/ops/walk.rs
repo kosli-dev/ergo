@@ -1351,14 +1351,17 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     }
 }
 
+fn in_a_for_line(ctx: &Ctx) -> bool {
+    (ctx.label.is_none() || ctx.in_option) && ctx.aliases.keys().any(|name| name != OUTER)
+}
+
 fn first_list(path: &Path, ctx: &Ctx) -> String {
     message::first_list_text(path, ctx).unwrap_or_else(|| "the check is false".to_string())
 }
 
 pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
     let mut row = run_rows(walk, ctx);
-    let in_a_for_line = ctx.aliases.keys().any(|name| name != OUTER);
-    if !in_a_for_line && row.verdict.cause != Cause::Satisfied {
+    if !in_a_for_line(ctx) && row.verdict.cause != Cause::Satisfied {
         let outer_ctx = outer(ctx);
         let whose: Vec<&Check> = walk.whose.iter().collect();
         row.message = message::walked_roots_ahead(row.message.take(), &whose, &outer_ctx, &[]);
@@ -1411,8 +1414,7 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
         if row.verdict.cause != cause
             && !matches!(row.verdict.cause, Cause::Satisfied | Cause::Value)
         {
-            let in_a_for_line = ctx.aliases.keys().any(|name| name != OUTER);
-            if ctx.label.is_some() && !in_a_for_line && !row.parts.is_empty() {
+            if ctx.label.is_some() && !in_a_for_line(ctx) && !row.parts.is_empty() {
                 let parts = message::with_roots(std::mem::take(&mut row.parts), &text);
                 row.message = Some(message::joined(parts.clone()));
                 row.parts = parts;
@@ -1493,6 +1495,7 @@ mod tests {
         Ctx {
             label: None,
             item_by_item: false,
+            in_option: false,
             subject: Located {
                 value: subject,
                 location: Location::input_root().key("s"),

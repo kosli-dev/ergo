@@ -2034,6 +2034,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every art.items whose v equals art.k",
     ),
     ("every art.kids", "every art.kids"),
+    ("every art.ms", "every art.ms"),
     ("every art.prs", "every art.prs"),
     ("every art.things", "every art.things"),
     (
@@ -2181,6 +2182,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("every teams", "every teams"),
     ("every rel.kids", "every rel.kids"),
     ("every art.xs", "every art.xs"),
+    ("every mid.xs", "every mid.xs"),
     ("cs", "cs"),
     ("os", "os"),
     ("every g.arts", "every g.arts"),
@@ -3280,6 +3282,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("meta", "meta"),
     ("meta.id", "meta.id"),
     ("meta.w", "meta.w"),
+    ("mid", "mid"),
     ("name", "name"),
     ("ps", "ps"),
     ("p", "p"),

@@ -37,6 +37,8 @@ Each version says whether reports changed, so that anyone who only stores report
 
 - A `for` line's row lists each piece of a `followed by` that doesn't start at an alias, and a `$params` list an `every` or `some` walks, as the sentence's own row would ([for.inputs](semantics.md#for)). With `for: every ts as i`, `i.tags contains i.v followed by $params.x.y` lists `$params.x.y`, and `every $params.q is 1` lists `$params.q[]`. A piece of a `followed by` from `$params` or `$input` is in the check's `$refs` too, after `contains` and after `is` alike ([compare.join](semantics.md#compare)). Reports change where an engine left these out of the row or out of `$refs`.
 
+- An `every` or a `some` whose list is missing, `null` or of the wrong type names a part, a parent's part or a grandparent's part that its `whose` or `that` reads and that can't be read before the list ([walk.flaws](semantics.md#every-and-some)). With the parent's part `art.cov` `null` and no `ys`, `every ys whose n is at least art.cov.z, if any, exists` says `art.cov is null; ys is missing`. `ergo.rego` already did this, and the Rust engine said only `ys is missing` for a parent's part. A part of the subject was already named first in both. In an option of an `any_of` a part is named only when it is in the same state as the list: both `null`, both missing, or the part of the wrong type and the list present but not a list. Otherwise the list is named.
+
 ## 0.6
 
 ### Changed

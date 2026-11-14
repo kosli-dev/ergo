@@ -35,6 +35,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A piece of a `followed by` from `$params` or `$input` after `is` or another comparison, like `$params.x.y` in `w is v followed by $params.x.y`, is in the check's `$refs`, as in `ergo.rego` and spec 0.7 ([compare.join](../../spec/semantics.md#compare)). After `contains` it already was.
 
+- An `every` or a `some` whose list is missing, `null` or of the wrong type names a parent's part or a grandparent's part that its `whose` or `that` reads and that can't be read before the list, as a part of the subject already was and as in `ergo.rego` 0.7.0 and spec 0.7 ([walk.flaws](../../spec/semantics.md#every-and-some)). With the parent's part `art.cov` `null` and no `ys`, `every ys whose n is at least art.cov.z, if any, exists` says `art.cov is null; ys is missing`, where it said `ys is missing`. A child subject's check was treated as if it were a `for` line because it holds its parents' names. In an `any_of` option a part is still named only when it is in the same state as the list, as in `ergo.rego`, and otherwise the list is named. Changes the report of such checks.
+
 ## 0.4.0
 
 ### New

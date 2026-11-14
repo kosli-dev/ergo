@@ -2601,6 +2601,192 @@
     ]
   },
   {
+    "description": "a parent's part read in a whose on a plain check, next to a list that can't be read",
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"every": "every ys whose n is at least art.cov.z, if any, exists", "some": "some ys whose n is at least art.cov.z exists"}, "subject": "ch"}}, "subjects": {"art": {"from": "arts", "has": {"cov": "c"}, "identified_by": "id"}, "ch": {"from": "every art.xs"}}},
+    "cases": [
+      {
+        "description": "names a part that is null before a list that is missing",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": null, "id": "a1", "xs": [{}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov is null; ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "absent", "check": "some", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov is null; ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a part that is missing before a list that is null",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"id": "a1", "xs": [{"ys": null}]}]},
+        "results": [
+          {"cause": "null", "check": "every", "failed_items": [{"cause": "null", "item": "ys", "locations": ["/arts/0/xs/0/ys"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is missing; ys is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": null}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "null", "check": "some", "failed_items": [{"cause": "null", "item": "ys", "locations": ["/arts/0/xs/0/ys"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is missing; ys is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": null}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a part of the wrong type before a list that is text",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": {"z": "s"}, "id": "a1", "xs": [{"ys": "s"}]}]},
+        "results": [
+          {"cause": "unusable", "check": "every", "failed_items": [{"cause": "unusable", "item": "ys", "locations": ["/arts/0/xs/0/ys"], "path": "ys", "value": "s"}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": "s"}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "unusable", "check": "some", "failed_items": [{"cause": "unusable", "item": "ys", "locations": ["/arts/0/xs/0/ys"], "path": "ys", "value": "s"}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": "s"}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a part that is a list before a list that is missing",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": [{"z": 1}], "id": "a1", "xs": [{}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov is [{\"z\": 1}], which isn't an object; ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "absent", "check": "some", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov is [{\"z\": 1}], which isn't an object; ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "says only the list when the part reads",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": {"z": 1}, "id": "a1", "xs": [{}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": 1}, {"locations": [], "name": "ys", "value": []}], "message": "ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "absent", "check": "some", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": 1}, {"locations": [], "name": "ys", "value": []}], "message": "ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's part read in a whose inside an any_of option, next to a list that can't be read",
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"every": {"any_of": {"a": "every ys whose n is at least art.cov.z, if any, exists", "b": "x is 1"}}, "some": {"any_of": {"a": "some ys whose n is at least art.cov.z exists", "b": "x is 1"}}}, "subject": "ch"}}, "subjects": {"art": {"from": "arts", "has": {"cov": "c"}, "identified_by": "id"}, "ch": {"from": "every art.xs"}}},
+    "cases": [
+      {
+        "description": "names no part when the list is missing and the part is null",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause", "any_of.cause"],
+        "input": {"arts": [{"c": null, "id": "a1", "xs": [{}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": ["/arts/0/xs/0"], "name": "x", "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "a: ys is missing; b: x is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "absent", "check": "some", "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": ["/arts/0/xs/0"], "name": "x", "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "a: ys is missing; b: x is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names no part when the list is null and the part is missing",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause", "any_of.cause"],
+        "input": {"arts": [{"id": "a1", "xs": [{"ys": null}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "inputs": [{"locations": ["/arts/0"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": ["/arts/0/xs/0"], "name": "x", "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "a: ys is null; b: x is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": null}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "absent", "check": "some", "inputs": [{"locations": ["/arts/0"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": ["/arts/0/xs/0"], "name": "x", "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "a: ys is null; b: x is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": null}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names the part that has the wrong type when the list is text",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause", "any_of.cause"],
+        "input": {"arts": [{"c": {"z": "s"}, "id": "a1", "xs": [{"ys": "s"}]}]},
+        "results": [
+          {"cause": "unusable", "check": "every", "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}, {"locations": ["/arts/0/xs/0"], "name": "x", "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "a: art.cov.z is \"s\", which isn't a number; b: x is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": "s"}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "unusable", "check": "some", "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}, {"locations": ["/arts/0/xs/0"], "name": "x", "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "a: art.cov.z is \"s\", which isn't a number; b: x is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": "s"}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's part read in a that on a plain check, next to a list that can't be read",
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"every": "every ys that is at least art.cov.z, if any, exists", "some": "some ys that is at least art.cov.z exists"}, "subject": "ch"}}, "subjects": {"art": {"from": "arts", "has": {"cov": "c"}, "identified_by": "id"}, "ch": {"from": "every art.xs"}}},
+    "cases": [
+      {
+        "description": "names a part that is null before a list that is missing",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": null, "id": "a1", "xs": [{}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov is null; ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "absent", "check": "some", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov is null; ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a part that is missing before a list that is null",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"id": "a1", "xs": [{"ys": null}]}]},
+        "results": [
+          {"cause": "null", "check": "every", "failed_items": [{"cause": "null", "item": "ys", "locations": ["/arts/0/xs/0/ys"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is missing; ys is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": null}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "null", "check": "some", "failed_items": [{"cause": "null", "item": "ys", "locations": ["/arts/0/xs/0/ys"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is missing; ys is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": null}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a part of the wrong type before a list that is text",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": {"z": "s"}, "id": "a1", "xs": [{"ys": "s"}]}]},
+        "results": [
+          {"cause": "unusable", "check": "every", "failed_items": [{"cause": "unusable", "item": "ys", "locations": ["/arts/0/xs/0/ys"], "path": "ys", "value": "s"}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": "s"}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "unusable", "check": "some", "failed_items": [{"cause": "unusable", "item": "ys", "locations": ["/arts/0/xs/0/ys"], "path": "ys", "value": "s"}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": "s"}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a part that is null on an empty list",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": null, "id": "a1", "xs": [{"ys": []}]}]},
+        "results": [
+          {"cause": "null", "check": "every", "failed_items": [], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys[]", "value": []}], "message": "art.cov is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "null", "check": "some", "failed_items": [], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys[]", "value": []}], "message": "art.cov is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "says only the list when the part reads",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": {"z": 1}, "id": "a1", "xs": [{}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": 1}, {"locations": [], "name": "ys", "value": []}], "message": "ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}},
+          {"cause": "absent", "check": "some", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": 1}, {"locations": [], "name": "ys", "value": []}], "message": "ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1"}, "type": "ch"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a grandparent's part read in a whose on a plain check, next to a list that can't be read",
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"every": "every ys whose n is at least art.cov.z, if any, exists", "some": "some ys whose n is at least art.cov.z exists"}, "subject": "ch"}}, "subjects": {"art": {"from": "arts", "has": {"cov": "c"}, "identified_by": "id"}, "mid": {"from": "every art.ms", "identified_by": "mid"}, "ch": {"from": "every mid.xs"}}},
+    "cases": [
+      {
+        "description": "names a part that is null before a list that is missing",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": null, "id": "a1", "ms": [{"mid": "m1", "xs": [{}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/ms/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov is null; ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1", "mid": "m1"}, "type": "ch"}},
+          {"cause": "absent", "check": "some", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/ms/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov is null; ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1", "mid": "m1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a part that is missing before a list that is null",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"id": "a1", "ms": [{"mid": "m1", "xs": [{"ys": null}]}]}]},
+        "results": [
+          {"cause": "null", "check": "every", "failed_items": [{"cause": "null", "item": "ys", "locations": ["/arts/0/ms/0/xs/0/ys"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is missing; ys is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": null}, "in": {"art": "a1", "mid": "m1"}, "type": "ch"}},
+          {"cause": "null", "check": "some", "failed_items": [{"cause": "null", "item": "ys", "locations": ["/arts/0/ms/0/xs/0/ys"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is missing; ys is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": null}, "in": {"art": "a1", "mid": "m1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a part of the wrong type before a list that is text",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": {"z": "s"}, "id": "a1", "ms": [{"mid": "m1", "xs": [{"ys": "s"}]}]}]},
+        "results": [
+          {"cause": "unusable", "check": "every", "failed_items": [{"cause": "unusable", "item": "ys", "locations": ["/arts/0/ms/0/xs/0/ys"], "path": "ys", "value": "s"}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": "s"}, "in": {"art": "a1", "mid": "m1"}, "type": "ch"}},
+          {"cause": "unusable", "check": "some", "failed_items": [{"cause": "unusable", "item": "ys", "locations": ["/arts/0/ms/0/xs/0/ys"], "path": "ys", "value": "s"}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": "s"}, {"locations": [], "name": "ys", "value": []}], "message": "art.cov.z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"ys": "s"}, "in": {"art": "a1", "mid": "m1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "names a part that is null on an empty list",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": null, "id": "a1", "ms": [{"mid": "m1", "xs": [{"ys": []}]}]}]},
+        "results": [
+          {"cause": "null", "check": "every", "failed_items": [], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys[]", "value": []}], "message": "art.cov is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1", "mid": "m1"}, "type": "ch"}},
+          {"cause": "null", "check": "some", "failed_items": [], "inputs": [{"locations": ["/arts/0/c"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": null}, {"locations": [], "name": "ys[]", "value": []}], "message": "art.cov is null", "passed": false, "requirement": "r", "subject": {"id": {"ys": []}, "in": {"art": "a1", "mid": "m1"}, "type": "ch"}}
+        ]
+      },
+      {
+        "description": "says only the list when the part reads",
+        "rules": ["walk.flaws", "for.roots", "sentence.resolve.clause"],
+        "input": {"arts": [{"c": {"z": 1}, "id": "a1", "ms": [{"mid": "m1", "xs": [{}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/ms/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": 1}, {"locations": [], "name": "ys", "value": []}], "message": "ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1", "mid": "m1"}, "type": "ch"}},
+          {"cause": "absent", "check": "some", "failed_items": [{"cause": "absent", "item": "ys", "locations": ["/arts/0/ms/0/xs/0"], "path": "ys", "value": null}], "inputs": [{"locations": ["/arts/0/c/z"], "name": "art.cov.z", "part": {"id": null, "name": "art.cov"}, "value": 1}, {"locations": [], "name": "ys", "value": []}], "message": "ys is missing", "passed": false, "requirement": "r", "subject": {"id": {}, "in": {"art": "a1", "mid": "m1"}, "type": "ch"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a parent's part read in a that on a for line",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"art": {"from": "arts", "identified_by": "id", "has": {"cov": "c"}}, "ch": {"from": "every art.xs"}}, "requirements": {"r": {"subject": "ch", "checks": {"that": {"for": "every ys that is at least art.cov.z as x", "assert": "x is 1"}, "count": "count of ys that is at least art.cov.z is 2"}}}},
     "cases": [
