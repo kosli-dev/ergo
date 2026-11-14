@@ -44,6 +44,8 @@ regal lint --disable-all --enable-category bugs --disable redundant-existence-ch
 .github/rego-folders_test.sh
 python3 .github/rego-layers.py
 .github/rego-layers_test.sh
+.github/no-inline-tests.sh
+.github/no-inline-tests_test.sh
 .github/spec-placeholder.sh
 .github/spec-placeholder_test.sh
 python3 spec/check_rules.py
@@ -110,6 +112,8 @@ CI also fails when a line of Rego isn't reached by any test. It runs the tests o
 ## Tests
 
 Every change needs tests: new behaviour, bug fixes and changes to existing behaviour alike. A bug fix starts with a test that fails because of the bug. A change without tests isn't finished.
+
+Rust tests never live inline in a source file. Tests that need private items go in `<file>/tests.rs`, and tests of the public API in the crate's `tests/` folder. CI fails on an inline test module.
 
 ## No comments
 
