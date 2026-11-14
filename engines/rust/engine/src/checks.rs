@@ -415,6 +415,7 @@ fn refs_walked(paths: &[(Path, bool)], input: &Value, params: Option<&Value>) ->
     let ctx = Ctx {
         label: None,
         item_by_item: true,
+        in_option: false,
         subject: Located {
             value: input,
             location: Location::input_root(),

@@ -38,11 +38,15 @@ fn answers_presence(check: &Check, verdict: &Verdict) -> bool {
 pub fn run(check: &AnyOf, ctx: &Ctx) -> Verdict {
     let mut inputs: Vec<Input> = Vec::new();
     let mut options: Vec<Cause> = Vec::new();
+    let in_option = Ctx {
+        in_option: true,
+        ..ctx.clone()
+    };
     for option in &check.options {
         let mut causes = Vec::new();
         let mut field_missing = false;
         for line in option {
-            let ran = run_full(line, ctx).verdict;
+            let ran = run_full(line, &in_option).verdict;
             field_missing |= answers_presence(line, &ran);
             causes.push(ran.cause);
             inputs.extend(ran.inputs);
@@ -136,6 +140,7 @@ mod tests {
         let ctx = Ctx {
             label: None,
             item_by_item: false,
+            in_option: false,
             subject: Located {
                 value: &input["s"],
                 location: Location::input_root().key("s"),

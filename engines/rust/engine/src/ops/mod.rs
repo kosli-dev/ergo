@@ -443,6 +443,7 @@ mod tests {
         Ctx {
             label: None,
             item_by_item: false,
+            in_option: false,
             subject: Located {
                 value: subject,
                 location: Location::input_root().key("s"),
