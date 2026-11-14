@@ -1359,6 +1359,18 @@ fn first_list(path: &Path, ctx: &Ctx) -> String {
     message::first_list_text(path, ctx).unwrap_or_else(|| "the check is false".to_string())
 }
 
+pub fn walks_nothing(walk: &Walk, ctx: &Ctx) -> bool {
+    let walked = self::walk(
+        &walk.path,
+        &outer(ctx),
+        Options {
+            if_any: walk.if_any,
+            empty_adds_nothing: false,
+        },
+    );
+    walked.unreadable.is_none() && walked.failures.is_empty() && walked.items.is_empty()
+}
+
 pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
     let mut row = run_rows(walk, ctx);
     if !in_a_for_line(ctx) && row.verdict.cause != Cause::Satisfied {
@@ -1406,17 +1418,22 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
     let outer_ctx = outer(ctx);
     let whose: Vec<&Check> = walk.whose.iter().collect();
     let unread = matches!(row.verdict.cause, Cause::Satisfied | Cause::Value);
+    let check_flaw = unread
+        .then(|| message::root_flaw(&[&*walk.check], &outer_ctx))
+        .flatten();
+    let keyed =
+        check_flaw.is_some() && check_flaw == message::key_cause(&[&*walk.check], &outer_ctx);
     let flaw = message::root_flaw(&whose, &outer_ctx)
-        .or_else(|| {
-            unread
-                .then(|| message::root_flaw(&[&*walk.check], &outer_ctx))
-                .flatten()
-        })
-        .or_else(|| {
-            unread
-                .then(|| message::key_cause_unread_first(&whose, &outer_ctx))
-                .flatten()
-        });
+        .or_else(|| (unread && !keyed).then_some(check_flaw).flatten());
+    let flaw = if unread {
+        let mut keys = whose.clone();
+        if keyed {
+            keys.push(&*walk.check);
+        }
+        message::worse_key_cause(flaw, &keys, &outer_ctx)
+    } else {
+        flaw
+    };
     if let Some((cause, text)) = flaw {
         if row.verdict.cause != cause
             && !matches!(row.verdict.cause, Cause::Satisfied | Cause::Value)

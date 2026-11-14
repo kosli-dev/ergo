@@ -1597,24 +1597,33 @@ pub fn key_cause(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
     worst_texts(key_problems(checks, ctx))
 }
 
-pub fn key_cause_unread_first(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
-    let found = key_problems(checks, ctx);
-    let unread: Vec<(Cause, String)> = found
-        .iter()
-        .filter(|(cause, _)| *cause != Cause::Unusable)
-        .cloned()
-        .collect();
-    worst_texts(if unread.is_empty() { found } else { unread })
+pub fn worse_key_cause(
+    flaw: Option<(Cause, String)>,
+    checks: &[&Check],
+    ctx: &Ctx,
+) -> Option<(Cause, String)> {
+    match (flaw, key_cause(checks, ctx)) {
+        (Some(flaw), Some(key)) if key.0 >= flaw.0 => Some(flaw),
+        (flaw, None) => flaw,
+        (_, key) => key,
+    }
 }
 
 fn key_problems(checks: &[&Check], ctx: &Ctx) -> Vec<(Cause, String)> {
-    let mut keys: Vec<Path> = checks
-        .iter()
-        .flat_map(|check| check.paths())
-        .flat_map(path::step_refs)
-        .collect();
-    keys.sort_by_key(name::name);
-    keys.dedup();
+    let mut keys: Vec<Path> = Vec::new();
+    for check in checks {
+        let mut own: Vec<Path> = check
+            .paths()
+            .into_iter()
+            .flat_map(path::step_refs)
+            .collect();
+        own.sort_by_key(name::name);
+        for key in own {
+            if !keys.contains(&key) {
+                keys.push(key);
+            }
+        }
+    }
     keys.iter()
         .filter_map(|key| {
             let read = path::read(key, ctx);

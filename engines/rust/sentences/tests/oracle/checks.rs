@@ -9548,8 +9548,20 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of es whose zz is m named by $input.k and whose v is m named by $input.j is 0",
+        "count of es whose zz equals m named by $input.k and whose v equals m named by $input.j is 0",
+        &[],
+        &[],
+    ),
+    (
         "every es whose zz is m named by $input.k and whose v is m named by $input.j, if any, exists",
         "every es whose zz equals m named by $input.k and whose v equals m named by $input.j, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose zz is m named by $input.k, if any, is m named by $input.j",
+        "every es whose zz equals m named by $input.k, if any, equals m named by $input.j",
         &[],
         &[],
     ),

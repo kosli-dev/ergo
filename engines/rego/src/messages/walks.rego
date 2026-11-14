@@ -75,6 +75,11 @@ _walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
 
 _m_empty_walk_roots(check, subj, r) := ms if {
 	_m_params_only_flaw(check, r)
+	ms := _walk_key_texts(check, r)
+	ms != []
+	_key_beats_roots(check, subj)
+} else := ms if {
+	_m_params_only_flaw(check, r)
 	ms := _walk_root_msgs(check, subj)
 	ms != []
 } else := ms if {

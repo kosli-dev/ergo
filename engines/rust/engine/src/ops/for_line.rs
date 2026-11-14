@@ -1871,12 +1871,12 @@ impl For {
             .iter()
             .flat_map(|item| item.whose.iter())
             .collect();
-        let outer_flaw = super::message::root_flaw_ordered(&whose, &outer, &counted, &nested)
-            .or_else(|| {
-                matches!(run.verdict.cause, Cause::Satisfied | Cause::Value)
-                    .then(|| super::message::key_cause_unread_first(&item_whose, &outer))
-                    .flatten()
-            });
+        let outer_flaw = super::message::root_flaw_ordered(&whose, &outer, &counted, &nested);
+        let outer_flaw = if matches!(run.verdict.cause, Cause::Satisfied | Cause::Value) {
+            super::message::worse_key_cause(outer_flaw, &item_whose, &outer)
+        } else {
+            outer_flaw
+        };
         let forms: Vec<(Check, bool)> = self
             .sentences
             .iter()
