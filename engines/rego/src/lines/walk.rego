@@ -29,7 +29,7 @@ _walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.c
 	not _walk_keys(check, subj)
 }
 
-_walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": failed, "fails": fails} if {
+_walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": failed, "fails": fails, "empty": w.items == []} if {
 	keys := _walk_keys(check, subj)
 	w := _walk(_walk_start(check, subj), keys, check.if_any == true)
 	judged := _walk_judged(check, w)

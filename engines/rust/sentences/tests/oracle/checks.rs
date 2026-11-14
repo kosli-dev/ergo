@@ -13888,6 +13888,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every es whose zz is m named by $input.k, if any, as e",
+        "every es whose zz equals m named by $input.k, if any, as e",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

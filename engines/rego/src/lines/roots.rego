@@ -284,10 +284,16 @@ _key_root_texts(c) := [_m_isnt(_ref_name(p), v, "text") |
 	not is_string(v)
 ]
 
-_walk_key_texts(check) := _once([m |
-	some c in array.concat(_walk_whose_conds(check), [x | x := object.get(check, "check", null); is_object(x)])
+_walk_key_texts(check, r) := _once([m |
+	some c in _key_conds(check, r)
 	some m in _key_root_texts(c)
 ])
+
+_key_conds(check, r) := array.concat(object.get(check, "whose", []), [x | x := object.get(check, "check", null); is_object(x)]) if {
+	r.empty == true
+} else := [c | some item in object.get(check, "items", []); some c in object.get(item, "whose", [])] if {
+	not "empty" in object.keys(r)
+} else := []
 
 _side_root(c, p) if c.right == p
 
@@ -534,7 +540,7 @@ _rooted_row(check, subj, r) := object.union(r, object.union({"cause": flaw, "fai
 	flaw != ""
 } else := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": ms}) if {
 	r.cause in {"satisfied", "value"}
-	ms := _walk_key_texts(check)
+	ms := _walk_key_texts(check, r)
 	ms != []
 } else := object.union(r, {"other_roots": ms}) if {
 	not r.cause in {"satisfied", "value"}
