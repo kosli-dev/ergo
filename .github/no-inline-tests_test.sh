@@ -69,6 +69,36 @@ echo "no-inline-tests.sh fails on a wasm_bindgen_test function"
 printf '    #[wasm_bindgen_test]\n    fn t() {}\n' > src/inline_wasm.rs
 check_fails "a wasm_bindgen_test function" src/inline_wasm.rs "src/inline_wasm.rs:1"
 
+echo "no-inline-tests.sh passes on attributes that only end in the letters test"
+printf '#[attest]\n#[contest(x)]\n#[latest]\n#[my::latest]\n#[derive(Debug, PartialEq)]\n#[should_panic]\nfn a() {}\n' > src/lookalikes.rs
+git add .
+sh "$script"
+git rm --quiet --cached src/lookalikes.rs
+/bin/rm -f src/lookalikes.rs
+
+echo "no-inline-tests.sh fails on a test attribute with arguments, spaces or a comment after it"
+printf '#[tokio::test(flavor = "x")]\nasync fn t() {}\n' > src/inline_args.rs
+check_fails "a tokio test with arguments" src/inline_args.rs "src/inline_args.rs:1"
+printf '#[test]   \nfn t() {}\n' > src/inline_spaces.rs
+check_fails "a test attribute with trailing spaces" src/inline_spaces.rs "src/inline_spaces.rs:1"
+printf '#[test] // c\nfn t() {}\n' > src/inline_comment.rs
+check_fails "a test attribute with a comment" src/inline_comment.rs "src/inline_comment.rs:1"
+
+echo "no-inline-tests.sh fails on a cfg_attr that adds a test attribute"
+printf '#[cfg_attr(test, test)]\nfn t() {}\n' > src/inline_cfg_attr.rs
+check_fails "a cfg_attr test" src/inline_cfg_attr.rs "src/inline_cfg_attr.rs:1"
+
+echo "no-inline-tests.sh fails on a test module after a doc comment"
+printf '#[cfg(test)]\n/// doc\n//! inner\n// plain\nmod x {\n}\n' > src/inline_doc.rs
+check_fails "a test module after doc comments" src/inline_doc.rs "src/inline_doc.rs:5"
+
+echo "no-inline-tests.sh passes on a module after a function that followed a cfg(test) and a doc comment"
+printf '#[cfg(test)]\n/// doc\nfn helper() {}\n\nmod helpers {\n}\n' > src/doc_then_fn.rs
+git add .
+sh "$script"
+git rm --quiet --cached src/doc_then_fn.rs
+/bin/rm -f src/doc_then_fn.rs
+
 echo "no-inline-tests.sh passes on the word test in a comment and in a cfg attribute"
 printf '/// #[test]\n// #[test]\n#[cfg(test)]\nfn only() {}\n' > src/comments.rs
 sh "$script"

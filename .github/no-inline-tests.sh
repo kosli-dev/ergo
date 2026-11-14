@@ -19,9 +19,10 @@ found=$(printf '%s\n' "$files" | while read -r file; do
       armed = 0
       next
     }
-    /^[[:space:]]*#\[cfg\(test\)\][[:space:]]*$/ { armed = 1; next }
+    /^[[:space:]]*#\[cfg\(test\)\][[:space:]]*(\/\/.*)?$/ { armed = 1; next }
+    /^[[:space:]]*\/\// { next }
     /^[[:space:]]*#\[/ || /^[[:space:]]*$/ {
-      if (!exempt && $0 ~ /^[[:space:]]*#\[[A-Za-z_0-9:]*test(\(.*\))?\]/) print file ":" NR
+      if (!exempt && ($0 ~ /^[[:space:]]*#\[([A-Za-z_0-9]+::)*(test|[A-Za-z_0-9]*_test)(\(.*\))?\]/ || $0 ~ /^[[:space:]]*#\[cfg_attr\(test,[[:space:]]*([A-Za-z_0-9]+::)*(test|[A-Za-z_0-9]*_test)[,)(]/)) print file ":" NR
       next
     }
     { armed = 0 }
