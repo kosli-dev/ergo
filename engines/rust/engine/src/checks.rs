@@ -94,7 +94,7 @@ fn lowered_plan(
     scope: &Scope,
     aliases: &[&str],
     problems: &mut BTreeSet<String>,
-) -> Option<Plan> {
+) -> Plan {
     let mut items = Vec::new();
     for (tree, place) in trees.iter().zip(places) {
         for assertion in &tree.assertions {
@@ -110,7 +110,7 @@ fn lowered_plan(
         }
     }
     let all_of = items.len() > 1;
-    Some(Plan { items, all_of })
+    Plan { items, all_of }
 }
 
 fn read_one(
@@ -176,7 +176,7 @@ fn read_form(
             }
             CheckRead {
                 expression: printed(&lines.trees, &print_aliases),
-                plan,
+                plan: Some(plan),
                 problems,
             }
         }
@@ -233,7 +233,7 @@ fn read_form(
                     }
                     CheckRead {
                         expression: printed(&parsed.trees, &print_aliases),
-                        plan,
+                        plan: Some(plan),
                         problems,
                     }
                 }
@@ -299,16 +299,15 @@ fn read_form(
                             &mut problems,
                         );
                         ok &= found.ok;
-                        if let Some(plan) = lowered_plan(
+                        let plan = lowered_plan(
                             &found.trees,
                             &found.places,
                             scope,
                             &aliases,
                             &mut problems,
-                        ) {
-                            lowered_names.push(option.to_string());
-                            lowered_options.push(plan.items.into_iter().map(|i| i.check).collect());
-                        }
+                        );
+                        lowered_names.push(option.to_string());
+                        lowered_options.push(plan.items.into_iter().map(|i| i.check).collect());
                         parts.push(format!(
                             "{option}({})",
                             printed(&found.trees, &print_aliases)
