@@ -47,6 +47,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A `for` line whose `sum of` or `count of` reads a `named by` key from `$params` that isn't text, on an input that is an object, adds what is wrong with an item that isn't an object after the key's message, like `$params.k is 3, which isn't text; item 1 of xs: x is 1, which isn't an object`, as `ergo.rego` does. It left the item out.
 
+- A `whose` on an empty list reads its `named by` key before any item, as in `ergo.rego` and spec 0.7 ([tally.whose](../../spec/semantics.md#counts-and-sums), [walk.flaws](../../spec/semantics.md#every-and-some)), where it could pass. With `es` `[]`, `count of es whose zz is m named by $input.k is 0` passed when the key held `3`, and now fails as `unusable` with `$input.k is 3, which isn't text`, the message it now gives for `true`, `[]` and `{}` too, where it said `count of es whose zz equals m named by $input.k needs more than 15 digits`. `every es whose zz is m named by $input.k, if any, exists` passed whatever the key held, and now fails as `absent` with `$input.k is missing`, as `null` with `$input.k is null`, and as `unusable` for a key that isn't text. `some` and the `whose` of a `for` item, like `every es whose zz is m named by $input.k as e`, failed as `value` with `es is []`, and now fail with the key's cause, the `for` line with `$input.k is missing; es is []`. On an input that is a list, `every es whose zz is m named by $input.k, if any, exists` now fails as `not_an_object` with `$input is [...], which isn't an object`, where it passed. On a list with items, nothing changes. Changes the report of such checks.
+
 ## 0.4.0
 
 ### New

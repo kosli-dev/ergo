@@ -270,6 +270,25 @@ _keys_by(c, p) if {
 	step == {"ref": p}
 }
 
+_key_root_texts(c) := [_m_isnt(_ref_name(p), v, "text") |
+	some p in sort({step.ref |
+		walk(c, [_, x])
+		is_array(x)
+		some step in x
+		_is_ref(step)
+		_builtin(step.ref)
+	})
+	not _ref_walks(p)
+	_ref_state(p) == "value"
+	v := _ref_read(p)
+	not is_string(v)
+]
+
+_walk_key_texts(check) := _once([m |
+	some c in array.concat(_walk_whose_conds(check), [x | x := object.get(check, "check", null); is_object(x)])
+	some m in _key_root_texts(c)
+])
+
 _side_root(c, p) if c.right == p
 
 _side_root(c, p) if c.right == {"ref": p}
@@ -513,6 +532,10 @@ _rooted_row(check, subj, r) := object.union(r, object.union({"cause": flaw, "fai
 	r.cause in {"satisfied", "value"}
 	flaw := _leaf_root_flaw(check, subj)
 	flaw != ""
+} else := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": ms}) if {
+	r.cause in {"satisfied", "value"}
+	ms := _walk_key_texts(check)
+	ms != []
 } else := object.union(r, {"other_roots": ms}) if {
 	not r.cause in {"satisfied", "value"}
 	ms := _walk_root_msgs(check, subj)

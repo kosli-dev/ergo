@@ -5985,5 +5985,77 @@
         }
       ]
     }
+  },
+  {
+    "description": "an every, a some or a for item that reads a named by key from $input reads the key before any item, on an empty list too",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"every": "every es whose zz is m named by $input.k, if any, exists", "some": "some es whose v is m named by $input.k exists", "right": "every es.v, if any, is m named by $input.k", "for": {"for": "every es whose zz is m named by $input.k as e", "assert": "e.v is 2"}}}}},
+    "cases": [
+      {
+        "description": "the key is missing",
+        "rules": ["walk.flaws", "path.ref_step", "tally.whose", "for.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is missing; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is null",
+        "rules": ["walk.flaws", "path.ref_step", "tally.whose", "for.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}, "k": null},
+        "results": [
+          {"cause": "null", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "null", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is null; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "null", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "null", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is a number",
+        "rules": ["walk.flaws", "path.ref_step", "tally.whose", "for.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}, "k": 3},
+        "results": [
+          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is 3, which isn't text; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is true",
+        "rules": ["walk.flaws", "path.ref_step", "tally.whose", "for.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}, "k": true},
+        "results": [
+          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is true, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is true, which isn't text; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is true, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is true, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is a list",
+        "rules": ["walk.flaws", "path.ref_step", "tally.whose", "for.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}, "k": []},
+        "results": [
+          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is [], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is [], which isn't text; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is [], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is [], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is an object",
+        "rules": ["walk.flaws", "path.ref_step", "tally.whose", "for.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}, "k": {}},
+        "results": [
+          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is {}, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is {}, which isn't text; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is {}, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is {}, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

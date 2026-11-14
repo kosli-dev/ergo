@@ -1593,6 +1593,40 @@ fn root_flaw_with(
         .map(|(cause, texts)| (cause, texts.join("; ")))
 }
 
+pub fn key_cause(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
+    let mut keys: Vec<Path> = checks
+        .iter()
+        .flat_map(|check| check.paths())
+        .flat_map(path::step_refs)
+        .collect();
+    keys.sort_by_key(name::name);
+    keys.dedup();
+    let found: Vec<(Cause, String)> = keys
+        .iter()
+        .filter_map(|key| {
+            let read = path::read(key, ctx);
+            match (read.outcome.cause(), read.value) {
+                (Some(Cause::NotAnObject), _) => {
+                    Some((Cause::NotAnObject, isnt("$input", ctx.input, "an object")))
+                }
+                (Some(cause), _) => Some((cause, root_text(key, ctx, cause))),
+                (None, Some(value)) if !value.is_string() => {
+                    Some((Cause::Unusable, isnt(&name::name(key), value, "text")))
+                }
+                (None, _) => None,
+            }
+        })
+        .collect();
+    let worst = Cause::worst(found.iter().map(|(cause, _)| *cause))?;
+    let mut texts: Vec<String> = Vec::new();
+    for (cause, text) in found {
+        if cause == worst && !texts.contains(&text) {
+            texts.push(text);
+        }
+    }
+    Some((worst, joined(texts)))
+}
+
 pub fn walked_roots_ahead(
     message: Option<String>,
     checks: &[&Check],

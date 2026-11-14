@@ -1405,11 +1405,18 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
     }
     let outer_ctx = outer(ctx);
     let whose: Vec<&Check> = walk.whose.iter().collect();
-    let flaw = message::root_flaw(&whose, &outer_ctx).or_else(|| {
-        matches!(row.verdict.cause, Cause::Satisfied | Cause::Value)
-            .then(|| message::root_flaw(&[&*walk.check], &outer_ctx))
-            .flatten()
-    });
+    let unread = matches!(row.verdict.cause, Cause::Satisfied | Cause::Value);
+    let flaw = message::root_flaw(&whose, &outer_ctx)
+        .or_else(|| {
+            unread
+                .then(|| message::root_flaw(&[&*walk.check], &outer_ctx))
+                .flatten()
+        })
+        .or_else(|| {
+            unread
+                .then(|| message::key_cause(&whose, &outer_ctx))
+                .flatten()
+        });
     if let Some((cause, text)) = flaw {
         if row.verdict.cause != cause
             && !matches!(row.verdict.cause, Cause::Satisfied | Cause::Value)

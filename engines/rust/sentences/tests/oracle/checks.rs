@@ -9391,6 +9391,49 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of es whose v is at least m named by $input.k is 0",
+        "count of es whose v is at least m named by $input.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of es whose v is in m named by $input.k is 0",
+        "count of es whose v is in m named by $input.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of es whose zz is m named by $params.k is 0",
+        "count of es whose zz equals m named by $params.k is 0",
+        &[],
+        &[],
+    ),
+    ("e.v is 2", "e.v is 2", &[], &[]),
+    (
+        "every es whose zz is m named by $input.k, if any, exists",
+        "every es whose zz equals m named by $input.k, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose zz is m named by $params.k, if any, exists",
+        "every es whose zz equals m named by $params.k, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es.v, if any, is m named by $input.k",
+        "every es.v, if any, equals m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose v is m named by $input.k exists",
+        "some es whose v equals m named by $input.k exists",
+        &[],
+        &[],
+    ),
+    (
         "count of ns whose zz is m named by $input.k is 1",
         "count of ns whose zz equals m named by $input.k is 1",
         &[],
@@ -13836,6 +13879,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every $params.objs.x as o",
         "every $params.objs.x as o",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose zz is m named by $input.k as e",
+        "every es whose zz equals m named by $input.k as e",
         &[],
         &[],
     ),
