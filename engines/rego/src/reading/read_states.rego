@@ -383,10 +383,34 @@ _listed_refs(check) := _check_refs(check) | {piece |
 	_whole_ref(piece)
 } if _applies_wrap(check)
 
-else := _check_refs(check) | {x |
+else := _read_refs(_read_part(check))
+
+_read_part(check) := object.remove(check, ["meta", "description"]) if is_object(check)
+
+else := check
+
+_read_refs(check) := _check_refs(check) | {_listed_ref(check, p, x) |
 	walk(check, [p, x])
 	_whole_ref(x)
 	not _under_literal(check, p)
+}
+
+_listed_ref(check, p, x) := _s_walked(x) if _walked_at(check, p)
+
+else := x
+
+_walked_at(_, p) if p[count(p) - 1] in {"count_of", "sum_of"}
+
+_walked_at(check, p) if {
+	p[count(p) - 1] == "path"
+	_walk_holder(object.get(check, array.slice(p, 0, count(p) - 1), null))
+}
+
+_walk_holder(x) if x.op in {"every", "some"}
+
+_walk_holder(x) if {
+	is_object(x)
+	"q" in object.keys(x)
 }
 
 _applies_wrap(check) if {

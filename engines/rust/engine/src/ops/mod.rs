@@ -318,22 +318,38 @@ impl Check {
         }
     }
 
-    pub fn listed_refs(&self) -> Vec<Path> {
-        let mut refs = self.refs();
+    pub fn listed_refs(&self) -> Vec<(Path, bool)> {
+        if let Check::AnyOf(check) = self {
+            return check
+                .options
+                .iter()
+                .flatten()
+                .flat_map(Check::listed_refs)
+                .collect();
+        }
+        let walking = self.walking_refs();
+        let mut refs: Vec<(Path, bool)> = self
+            .refs()
+            .into_iter()
+            .map(|reference| {
+                let walks = walking.contains(&reference);
+                (reference, walks)
+            })
+            .collect();
         refs.extend(self.read_refs());
         refs
     }
 
-    fn read_refs(&self) -> Vec<Path> {
-        let own = |paths: Vec<&Path>| -> Vec<Path> {
+    fn read_refs(&self) -> Vec<(Path, bool)> {
+        let own = |paths: Vec<&Path>, walks: bool| -> Vec<(Path, bool)> {
             paths
                 .into_iter()
                 .filter(|path| path::is_ref(path))
-                .cloned()
+                .map(|path| (path.clone(), walks))
                 .collect()
         };
         match self {
-            Check::Walk(check) => own(vec![&check.path])
+            Check::Walk(check) => own(vec![&check.path], true)
                 .into_iter()
                 .chain(
                     check
@@ -347,7 +363,7 @@ impl Check {
                 .items
                 .iter()
                 .flat_map(|item| {
-                    own(vec![&item.path])
+                    own(vec![&item.path], true)
                         .into_iter()
                         .chain(item.whose.iter().flat_map(Check::read_refs))
                 })
@@ -364,11 +380,20 @@ impl Check {
                 .flatten()
                 .flat_map(Check::read_refs)
                 .collect(),
-            Check::Tally(check) => own(check.paths())
-                .into_iter()
-                .chain(check.counted_whose().flat_map(Check::read_refs))
-                .collect(),
-            _ => own(self.paths()),
+            Check::Tally(check) => {
+                let counted = check.counted_paths();
+                check
+                    .paths()
+                    .into_iter()
+                    .filter(|path| path::is_ref(path))
+                    .map(|path| {
+                        let walks = counted.iter().any(|c| std::ptr::eq(*c, path));
+                        (path.clone(), walks)
+                    })
+                    .chain(check.counted_whose().flat_map(Check::read_refs))
+                    .collect()
+            }
+            _ => own(self.paths(), false),
         }
     }
 

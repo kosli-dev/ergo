@@ -384,25 +384,21 @@ pub fn read_checks(reading: &Reading, requirement: &Requirement) -> BTreeMap<Str
 }
 
 pub fn refs_of(plan: &Plan, input: &Value, params: Option<&Value>) -> Vec<Value> {
-    let checks: Vec<&Check> = plan.items.iter().map(|item| &item.check).collect();
-    refs_listed(&checks, input, params, Check::listed_refs)
+    let paths: Vec<(Path, bool)> = plan
+        .items
+        .iter()
+        .flat_map(|item| item.check.listed_refs())
+        .collect();
+    refs_walked(&paths, input, params)
 }
 
 pub fn refs_of_checks(checks: &[&Check], input: &Value, params: Option<&Value>) -> Vec<Value> {
-    refs_listed(checks, input, params, Check::refs)
-}
-
-fn refs_listed(
-    checks: &[&Check],
-    input: &Value,
-    params: Option<&Value>,
-    listed: fn(&Check) -> Vec<Path>,
-) -> Vec<Value> {
     let paths: Vec<(Path, bool)> = checks
         .iter()
         .flat_map(|check| {
             let walking = check.walking_refs();
-            listed(check)
+            check
+                .refs()
                 .into_iter()
                 .map(|reference| {
                     let walks = walking.contains(&reference);

@@ -4016,5 +4016,562 @@
         }
       }
     ]
+  },
+  {
+    "description": "$refs list a path that walks a list once, as is in lists it, whatever walks it",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "a": "every $params.objs.x is \"y\"",
+            "b": "some $input.objs.x is \"y\"",
+            "c": "count of $params.objs.n is 2",
+            "d": "sum of $params.objs.n is 3",
+            "e": {"for": "every $params.objs.x as o", "assert": "o is v"},
+            "f": "v is in $params.objs.x",
+            "g": {"any_of": {"a": "v is in $params.objs.x", "b": "every $params.objs.x is \"y\""}},
+            "h": {"any_of": {"a": "v is $params.objs.x", "b": "v is in $params.objs.x"}}
+          }
+        }
+      }
+    },
+    "params": {"objs": [{"x": "y", "n": 1}, {"x": "z", "n": 2}]},
+    "cases": [
+      {
+        "description": "lists the values each walk read, where it read them, and no entry for the path as written",
+        "rules": ["value.refs", "walk.right.inputs", "location.refs"],
+        "input": {"things": [{"id": "t1", "v": "y"}], "objs": [{"x": "y"}, {"x": "y"}]},
+        "results": [
+          {
+            "cause": "value",
+            "check": "a",
+            "failed_items": [{"cause": "value", "item": "item 2 of $params.objs", "locations": ["$params:/objs/1/x"], "path": "$params.objs[1].x", "value": "z"}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "message": "item 2 of $params.objs: x is \"z\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "b",
+            "failed_items": [],
+            "inputs": [{"locations": ["/objs/0/x", "/objs/1/x"], "name": "$input.objs[].x", "value": ["y", "y"]}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "count of $params.objs.n", "value": 2},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "d",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "sum of $params.objs.n", "value": 3},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "value",
+            "check": "e",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [{"assertion": "o equals v", "cause": "value", "inputs": [{"locations": ["$params:/objs/1/x"], "name": "o", "value": "z"}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}]}],
+                "item": "item 2 of $params.objs",
+                "locations": ["$params:/objs/1/x"],
+                "path": "item 2 of $params.objs",
+                "value": "z"
+              }
+            ],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "item 2 of $params.objs: o is \"z\", and v is \"y\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "f",
+            "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "g",
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "h",
+            "inputs": [
+              {"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null},
+              {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]},
+              {"locations": ["/things/0/v"], "name": "v", "value": "y"}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ],
+        "refs": {
+          "s": {
+            "a": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "b": [{"locations": ["/objs/0/x", "/objs/1/x"], "name": "$input.objs[].x", "value": ["y", "y"]}],
+            "c": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
+            "d": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
+            "e": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "f": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "g": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "h": [{"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null}, {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}]
+          }
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "a",
+            "description": "",
+            "expression": "every $params.objs.x is \"y\"",
+            "failed_items": [{"cause": "value", "item": "item 2 of $params.objs", "locations": ["$params:/objs/1/x"], "path": "$params.objs[1].x", "value": "z"}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "message": "item 2 of $params.objs: x is \"z\"",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "value",
+            "check": "e",
+            "description": "",
+            "expression": "for every $params.objs.x as o: o equals v",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [{"assertion": "o equals v", "cause": "value", "inputs": [{"locations": ["$params:/objs/1/x"], "name": "o", "value": "z"}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}]}],
+                "item": "item 2 of $params.objs",
+                "locations": ["$params:/objs/1/x"],
+                "path": "item 2 of $params.objs",
+                "value": "z"
+              }
+            ],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "item 2 of $params.objs: o is \"z\", and v is \"y\"",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ]
+      },
+      {
+        "description": "lists what the walk read when an item of the input has no x",
+        "rules": ["value.refs", "walk.right.inputs"],
+        "input": {"things": [{"id": "t1", "v": "y"}], "objs": [{"x": "y"}, {}]},
+        "results": [
+          {
+            "cause": "value",
+            "check": "a",
+            "failed_items": [{"cause": "value", "item": "item 2 of $params.objs", "locations": ["$params:/objs/1/x"], "path": "$params.objs[1].x", "value": "z"}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "message": "item 2 of $params.objs: x is \"z\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "b",
+            "failed_items": [],
+            "inputs": [{"locations": ["/objs/0/x", "/objs/1"], "name": "$input.objs[].x", "value": ["y", null]}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "count of $params.objs.n", "value": 2},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "d",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "sum of $params.objs.n", "value": 3},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "value",
+            "check": "e",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [{"assertion": "o equals v", "cause": "value", "inputs": [{"locations": ["$params:/objs/1/x"], "name": "o", "value": "z"}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}]}],
+                "item": "item 2 of $params.objs",
+                "locations": ["$params:/objs/1/x"],
+                "path": "item 2 of $params.objs",
+                "value": "z"
+              }
+            ],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "item 2 of $params.objs: o is \"z\", and v is \"y\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "f",
+            "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "g",
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "h",
+            "inputs": [
+              {"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null},
+              {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]},
+              {"locations": ["/things/0/v"], "name": "v", "value": "y"}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ],
+        "refs": {
+          "s": {
+            "a": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "b": [{"locations": ["/objs/0/x", "/objs/1"], "name": "$input.objs[].x", "value": ["y", null]}],
+            "c": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
+            "d": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
+            "e": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "f": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "g": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "h": [{"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null}, {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "$refs list a path whose walk fails on an item that isn't an object with what the walk read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "a": "every $params.objs.x is \"y\"",
+            "b": "some $input.objs.x is \"y\"",
+            "c": "count of $params.objs.n is 2",
+            "d": "sum of $params.objs.n is 3",
+            "e": {"for": "every $params.objs.x as o", "assert": "o is v"},
+            "f": "v is in $params.objs.x",
+            "g": {"any_of": {"a": "v is in $params.objs.x", "b": "every $params.objs.x is \"y\""}},
+            "h": {"any_of": {"a": "v is $params.objs.x", "b": "v is in $params.objs.x"}}
+          }
+        }
+      }
+    },
+    "params": {"objs": [{"x": "y", "n": 1}, 3]},
+    "cases": [
+      {
+        "description": "lists the value read and the item the walk stopped at",
+        "rules": ["value.refs", "walk.right.inputs"],
+        "input": {"things": [{"id": "t1", "v": "y"}], "objs": [3]},
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "a",
+            "failed_items": [{"cause": "not_an_object", "item": "item 2 of $params.objs", "locations": ["$params:/objs/1"], "path": "$params.objs[1].x", "value": null}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "b",
+            "failed_items": [{"cause": "not_an_object", "item": "item 1 of $input.objs", "locations": ["/objs/0"], "path": "$input.objs[0].x", "value": null}],
+            "inputs": [{"locations": ["/objs/0"], "name": "$input.objs[].x", "value": [null]}],
+            "message": "item 1 of $input.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "count of $params.objs.n", "value": null},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}
+            ],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "d",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "sum of $params.objs.n", "value": null},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}
+            ],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "e",
+            "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of $params.objs", "locations": ["$params:/objs/1"], "path": "item 2 of $params.objs", "value": null}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "unusable",
+            "check": "f",
+            "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "g",
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "a: item 2 of $params.objs is 3, which isn't an object; b: item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "unusable",
+            "check": "h",
+            "inputs": [
+              {"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null},
+              {"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]},
+              {"locations": ["/things/0/v"], "name": "v", "value": "y"}
+            ],
+            "message": "a: $params.objs is [{\"n\": 1, \"x\": \"y\"}, 3], which isn't an object; b: item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ],
+        "refs": {
+          "s": {
+            "a": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "b": [{"locations": ["/objs/0"], "name": "$input.objs[].x", "value": [null]}],
+            "c": [{"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}],
+            "d": [{"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}],
+            "e": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "f": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "g": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "h": [{"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null}, {"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}]
+          }
+        },
+        "violations": [
+          {
+            "cause": "not_an_object",
+            "check": "a",
+            "description": "",
+            "expression": "every $params.objs.x is \"y\"",
+            "failed_items": [{"cause": "not_an_object", "item": "item 2 of $params.objs", "locations": ["$params:/objs/1"], "path": "$params.objs[1].x", "value": null}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "b",
+            "description": "",
+            "expression": "some $input.objs.x is \"y\"",
+            "failed_items": [{"cause": "not_an_object", "item": "item 1 of $input.objs", "locations": ["/objs/0"], "path": "$input.objs[0].x", "value": null}],
+            "inputs": [{"locations": ["/objs/0"], "name": "$input.objs[].x", "value": [null]}],
+            "message": "item 1 of $input.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "description": "",
+            "expression": "count of $params.objs.n is 2",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "count of $params.objs.n", "value": null},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}
+            ],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "d",
+            "description": "",
+            "expression": "sum of $params.objs.n is 3",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "sum of $params.objs.n", "value": null},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}
+            ],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "e",
+            "description": "",
+            "expression": "for every $params.objs.x as o: o equals v",
+            "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of $params.objs", "locations": ["$params:/objs/1"], "path": "item 2 of $params.objs", "value": null}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "unusable",
+            "check": "f",
+            "description": "",
+            "expression": "v is in $params.objs.x",
+            "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "g",
+            "description": "",
+            "expression": "one of: a(v is in $params.objs.x) | b(every $params.objs.x is \"y\")",
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "a: item 2 of $params.objs is 3, which isn't an object; b: item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "unusable",
+            "check": "h",
+            "description": "",
+            "expression": "one of: a(v equals $params.objs.x) | b(v is in $params.objs.x)",
+            "inputs": [
+              {"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null},
+              {"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]},
+              {"locations": ["/things/0/v"], "name": "v", "value": "y"}
+            ],
+            "message": "a: $params.objs is [{\"n\": 1, \"x\": \"y\"}, 3], which isn't an object; b: item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "$refs list nothing from a check's meta or description",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {"a": {"assert": "v exists", "meta": {"ref": ["$$params", "a"]}, "description": "reads v"}, "b": {"assert": "v is $params.a", "meta": {"from": ["$$params", "b"], "also": ["$$input", "z"]}}}
+        }
+      }
+    },
+    "params": {"a": "y", "b": 1},
+    "cases": [
+      {
+        "description": "lists only what the assertion reads",
+        "rules": ["value.refs"],
+        "input": {"things": [{"id": "t1", "v": "y"}], "z": 1},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {
+            "cause": "satisfied",
+            "check": "b",
+            "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["$params:/a"], "name": "$params.a", "value": "y"}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ],
+        "refs": {"s": {"a": [], "b": [{"locations": ["$params:/a"], "name": "$params.a", "value": "y"}]}},
+        "violations": []
+      }
+    ]
+  },
+  {
+    "description": "$refs list nothing from a meta that is written wrong",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+      "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": "v exists", "meta": ["$$input", "z"]}}}}
+    },
+    "cases": [
+      {
+        "description": "lists nothing, though the meta looks like a path from $input",
+        "rules": ["value.refs"],
+        "input": {"things": [{"id": "t1", "v": "y"}]},
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["invalid meta"]}],
+            "message": "checks.c: invalid meta",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": null, "type": "thing"}
+          }
+        ],
+        "refs": {"s": {"c": []}}
+      }
+    ]
   }
 ]
