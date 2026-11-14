@@ -239,7 +239,13 @@ _s_cond_paths(c) := array.concat(
 	_s_cond_right_paths(object.get(c, "phrase", {})),
 )
 
-_s_cond_right_paths(ph) := array.concat(array.concat([t | some t in object.get(ph, "terms", []); is_object(t); "steps" in object.keys(t)], [t[k] | some t in object.get(ph, "terms", []); is_object(t); some k in ["count", "sum", "elapsed_from", "elapsed_to"]; is_object(object.get(t, k, null))]), [ph.path | is_object(object.get(ph, "path", null))])
+_s_cond_right_paths(ph) := array.concat(array.concat(_s_cond_step_terms(ph), _s_cond_count_terms(ph)), _s_cond_own_path(ph))
+
+_s_cond_step_terms(ph) := [t | some t in object.get(ph, "terms", []); is_object(t); "steps" in object.keys(t)]
+
+_s_cond_count_terms(ph) := [t[k] | some t in object.get(ph, "terms", []); is_object(t); some k in ["count", "sum", "elapsed_from", "elapsed_to"]; is_object(object.get(t, k, null))]
+
+_s_cond_own_path(ph) := [ph.path | is_object(object.get(ph, "path", null))]
 
 _s_focus_read(p) if {
 	not "start" in object.keys(p)

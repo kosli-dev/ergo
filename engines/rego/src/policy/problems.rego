@@ -253,7 +253,41 @@ _edge_char(c) if {
 
 _written_name_problems(name) := ({_dollar_name_problem | _dollar_name(name)} | {_edge_name_problem | _edge_name(name)}) | {_empty_name_problem | _empty_name(name)}
 
-_edge_chars := {"\u0009", "\u000a", "\u000b", "\u000c", "\u000d", "\u0020", "\u0085", "\u00a0", "\u1680", "\u2000", "\u2001", "\u2002", "\u2003", "\u2004", "\u2005", "\u2006", "\u2007", "\u2008", "\u2009", "\u200a", "\u2028", "\u2029", "\u202f", "\u205f", "\u3000", "\u00ad", "\u0600", "\u0601", "\u0602", "\u0603", "\u0604", "\u0605", "\u061c", "\u06dd", "\u070f", "\u0890", "\u0891", "\u08e2", "\u180e", "\u200b", "\u200c", "\u200d", "\u200e", "\u200f", "\u202a", "\u202b", "\u202c", "\u202d", "\u202e", "\u2060", "\u2061", "\u2062", "\u2063", "\u2064", "\u2066", "\u2067", "\u2068", "\u2069", "\u206a", "\u206b", "\u206c", "\u206d", "\u206e", "\u206f", "\ufeff", "\ufff9", "\ufffa", "\ufffb", "\ud804\udcbd", "\ud804\udccd", "\ud80d\udc30", "\ud80d\udc31", "\ud80d\udc32", "\ud80d\udc33", "\ud80d\udc34", "\ud80d\udc35", "\ud80d\udc36", "\ud80d\udc37", "\ud80d\udc38", "\ud80d\udc39", "\ud80d\udc3a", "\ud80d\udc3b", "\ud80d\udc3c", "\ud80d\udc3d", "\ud80d\udc3e", "\ud80d\udc3f", "\ud82f\udca0", "\ud82f\udca1", "\ud82f\udca2", "\ud82f\udca3", "\ud834\udd73", "\ud834\udd74", "\ud834\udd75", "\ud834\udd76", "\ud834\udd77", "\ud834\udd78", "\ud834\udd79", "\ud834\udd7a", "\udb40\udc01", "\udb40\udc20", "\udb40\udc21", "\udb40\udc22", "\udb40\udc23", "\udb40\udc24", "\udb40\udc25", "\udb40\udc26", "\udb40\udc27", "\udb40\udc28", "\udb40\udc29", "\udb40\udc2a", "\udb40\udc2b", "\udb40\udc2c", "\udb40\udc2d", "\udb40\udc2e", "\udb40\udc2f", "\udb40\udc30", "\udb40\udc31", "\udb40\udc32", "\udb40\udc33", "\udb40\udc34", "\udb40\udc35", "\udb40\udc36", "\udb40\udc37", "\udb40\udc38", "\udb40\udc39", "\udb40\udc3a", "\udb40\udc3b", "\udb40\udc3c", "\udb40\udc3d", "\udb40\udc3e", "\udb40\udc3f", "\udb40\udc40", "\udb40\udc41", "\udb40\udc42", "\udb40\udc43", "\udb40\udc44", "\udb40\udc45", "\udb40\udc46", "\udb40\udc47", "\udb40\udc48", "\udb40\udc49", "\udb40\udc4a", "\udb40\udc4b", "\udb40\udc4c", "\udb40\udc4d", "\udb40\udc4e", "\udb40\udc4f", "\udb40\udc50", "\udb40\udc51", "\udb40\udc52", "\udb40\udc53", "\udb40\udc54", "\udb40\udc55", "\udb40\udc56", "\udb40\udc57", "\udb40\udc58", "\udb40\udc59", "\udb40\udc5a", "\udb40\udc5b", "\udb40\udc5c", "\udb40\udc5d", "\udb40\udc5e", "\udb40\udc5f", "\udb40\udc60", "\udb40\udc61", "\udb40\udc62", "\udb40\udc63", "\udb40\udc64", "\udb40\udc65", "\udb40\udc66", "\udb40\udc67", "\udb40\udc68", "\udb40\udc69", "\udb40\udc6a", "\udb40\udc6b", "\udb40\udc6c", "\udb40\udc6d", "\udb40\udc6e", "\udb40\udc6f", "\udb40\udc70", "\udb40\udc71", "\udb40\udc72", "\udb40\udc73", "\udb40\udc74", "\udb40\udc75", "\udb40\udc76", "\udb40\udc77", "\udb40\udc78", "\udb40\udc79", "\udb40\udc7a", "\udb40\udc7b", "\udb40\udc7c", "\udb40\udc7d", "\udb40\udc7e", "\udb40\udc7f"}
+_edge_chars := ((_edge_space_chars | _edge_format_chars) | _edge_astral_format_chars) | _edge_tag_chars
+
+_edge_space_chars := {
+	"\u0009", "\u000a", "\u000b", "\u000c", "\u000d", "\u0020", "\u0085", "\u00a0", "\u1680", "\u2000",
+	"\u2001", "\u2002", "\u2003", "\u2004", "\u2005", "\u2006", "\u2007", "\u2008", "\u2009", "\u200a",
+	"\u2028", "\u2029", "\u202f", "\u205f", "\u3000",
+}
+
+_edge_format_chars := {
+	"\u00ad", "\u0600", "\u0601", "\u0602", "\u0603", "\u0604", "\u0605", "\u061c", "\u06dd", "\u070f",
+	"\u0890", "\u0891", "\u08e2", "\u180e", "\u200b", "\u200c", "\u200d", "\u200e", "\u200f", "\u202a",
+	"\u202b", "\u202c", "\u202d", "\u202e", "\u2060", "\u2061", "\u2062", "\u2063", "\u2064", "\u2066",
+	"\u2067", "\u2068", "\u2069", "\u206a", "\u206b", "\u206c", "\u206d", "\u206e", "\u206f", "\ufeff",
+	"\ufff9", "\ufffa", "\ufffb",
+}
+
+_edge_astral_format_chars := {
+	"\ud804\udcbd", "\ud804\udccd", "\ud80d\udc30", "\ud80d\udc31", "\ud80d\udc32", "\ud80d\udc33", "\ud80d\udc34", "\ud80d\udc35", "\ud80d\udc36",
+	"\ud80d\udc37", "\ud80d\udc38", "\ud80d\udc39", "\ud80d\udc3a", "\ud80d\udc3b", "\ud80d\udc3c", "\ud80d\udc3d", "\ud80d\udc3e", "\ud80d\udc3f", "\ud82f\udca0",
+	"\ud82f\udca1", "\ud82f\udca2", "\ud82f\udca3", "\ud834\udd73", "\ud834\udd74", "\ud834\udd75", "\ud834\udd76", "\ud834\udd77", "\ud834\udd78", "\ud834\udd79",
+	"\ud834\udd7a",
+}
+
+_edge_tag_chars := {
+	"\udb40\udc01", "\udb40\udc20", "\udb40\udc21", "\udb40\udc22", "\udb40\udc23", "\udb40\udc24", "\udb40\udc25", "\udb40\udc26", "\udb40\udc27", "\udb40\udc28",
+	"\udb40\udc29", "\udb40\udc2a", "\udb40\udc2b", "\udb40\udc2c", "\udb40\udc2d", "\udb40\udc2e", "\udb40\udc2f", "\udb40\udc30", "\udb40\udc31", "\udb40\udc32",
+	"\udb40\udc33", "\udb40\udc34", "\udb40\udc35", "\udb40\udc36", "\udb40\udc37", "\udb40\udc38", "\udb40\udc39", "\udb40\udc3a", "\udb40\udc3b", "\udb40\udc3c",
+	"\udb40\udc3d", "\udb40\udc3e", "\udb40\udc3f", "\udb40\udc40", "\udb40\udc41", "\udb40\udc42", "\udb40\udc43", "\udb40\udc44", "\udb40\udc45", "\udb40\udc46",
+	"\udb40\udc47", "\udb40\udc48", "\udb40\udc49", "\udb40\udc4a", "\udb40\udc4b", "\udb40\udc4c", "\udb40\udc4d", "\udb40\udc4e", "\udb40\udc4f", "\udb40\udc50",
+	"\udb40\udc51", "\udb40\udc52", "\udb40\udc53", "\udb40\udc54", "\udb40\udc55", "\udb40\udc56", "\udb40\udc57", "\udb40\udc58", "\udb40\udc59", "\udb40\udc5a",
+	"\udb40\udc5b", "\udb40\udc5c", "\udb40\udc5d", "\udb40\udc5e", "\udb40\udc5f", "\udb40\udc60", "\udb40\udc61", "\udb40\udc62", "\udb40\udc63", "\udb40\udc64",
+	"\udb40\udc65", "\udb40\udc66", "\udb40\udc67", "\udb40\udc68", "\udb40\udc69", "\udb40\udc6a", "\udb40\udc6b", "\udb40\udc6c", "\udb40\udc6d", "\udb40\udc6e",
+	"\udb40\udc6f", "\udb40\udc70", "\udb40\udc71", "\udb40\udc72", "\udb40\udc73", "\udb40\udc74", "\udb40\udc75", "\udb40\udc76", "\udb40\udc77", "\udb40\udc78",
+	"\udb40\udc79", "\udb40\udc7a", "\udb40\udc7b", "\udb40\udc7c", "\udb40\udc7d", "\udb40\udc7e", "\udb40\udc7f",
+}
 
 _require_problems(req) := {["require", "neither every nor some"] | is_object(req); not _require_of(req) in {"every", "some"}}
 
@@ -378,7 +412,11 @@ _assertion_children(node, names) := array.concat([[node.check, ["check"], "asser
 	is_array(node.whose)
 }
 
-_assertion_children(node, names) := array.concat([[c, ["checks", i], "assertion", (names | _for_item_names(node.items, count(node.items)))] | some i, c in node.checks], [[c, ["items", i, "whose", j], "assertion", (names | _for_item_names(node.items, i))] | some i, item in node.items; some j, c in item.whose]) if {
+_assertion_check_children(node, names) := [[c, ["checks", i], "assertion", (names | _for_item_names(node.items, count(node.items)))] | some i, c in node.checks]
+
+_assertion_whose_children(node, names) := [[c, ["items", i, "whose", j], "assertion", (names | _for_item_names(node.items, i))] | some i, item in node.items; some j, c in item.whose]
+
+_assertion_children(node, names) := array.concat(_assertion_check_children(node, names), _assertion_whose_children(node, names)) if {
 	node.op == "for"
 	is_array(node.checks)
 	is_array(node.items)
@@ -397,7 +435,11 @@ _node_problems(node, kinds, names, here) := (_field_problems(node, here) | _name
 
 _node_problems(node, _, _, here) := {p | some p in node["$sentence"]} | _wording_problem(node) if _s_unread(node, here)
 
-_field_problems(node, here) := union({_side_problem(node, here), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node, here), _compare_max_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node, here), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
+_field_problems(node, here) := _field_shape_problems(node, here) | _field_value_problems(node, here)
+
+_field_shape_problems(node, here) := union({_side_problem(node, here), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node, here), _compare_max_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node)})
+
+_field_value_problems(node, here) := union({_values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node, here), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
 
 _json_problem(node) := _json_problems(object.remove(_own_fields(node), ["meta"]))
 

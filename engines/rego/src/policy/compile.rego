@@ -40,7 +40,17 @@ _read_ahead(policy) := object.union(rd, {"ahead": ahead}) if {
 		"policy_problems": _policy_problem_inputs(policy),
 		"listed": _reported_subjects(_section(policy, "subjects"), rd.reqs),
 		"requirements": {name: {"well_formed": _well_formed_row_of(req, name), "defs": _requirement_check_defs(req)} | some name, req in rd.reqs},
-	} with data.ergo_policy_problems as _policy_problem_inputs(policy) with data.ergo_document as {} with data.ergo_params as {} with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_reading as true with data.ergo_unreadable as [] with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
+	}
+		with data.ergo_policy_problems as _policy_problem_inputs(policy)
+		with data.ergo_document as {}
+		with data.ergo_params as {}
+		with data.ergo_subjects as rd.subjects
+		with data.ergo_resolved as rd.resolved
+		with data.ergo_reading as true
+		with data.ergo_unreadable as []
+		with data.ergo_sentences as rd.sentences
+		with data.ergo_subject_sentences as rd.subject_sentences
+		with input as {"ergo/names": {}}
 }
 
 _to_compiled(rd) := {

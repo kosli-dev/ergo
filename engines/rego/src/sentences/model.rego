@@ -8,12 +8,14 @@ _p_requirements(reqs, chains, parts) := {name: _p_requirement(req, chains, parts
 
 _p_requirements(reqs, _, _) := reqs if not is_object(reqs)
 
-_p_requirement(req, chains, parts) := object.union(object.remove(req, ["checks"]), {"checks": {name: _subject_marked(req, _rooted(_p_applied_to(check, _s_parent_named(check, _p_written(check, _p_check_aliases(check, aliases, req), _s_parents_of(req, chains), pc), _s_parents_of(req, chains)), pc))) | some name, check in req.checks}}) if {
+_p_requirement(req, chains, parts) := object.union(object.remove(req, ["checks"]), {"checks": {name: _p_marked_check(req, check, chains, aliases, pc) | some name, check in req.checks}}) if {
 	is_object(req)
 	is_object(object.get(req, "checks", null))
 	aliases := _p_aliases(req, parts)
 	pc := _p_context(req, chains, parts)
 } else := req
+
+_p_marked_check(req, check, chains, aliases, pc) := _subject_marked(req, _rooted(_p_applied_to(check, _s_parent_named(check, _p_written(check, _p_check_aliases(check, aliases, req), _s_parents_of(req, chains), pc), _s_parents_of(req, chains)), pc)))
 
 _root_marker := _p_marker("", -1, null, true)
 
@@ -113,15 +115,21 @@ _s_named_model_leaf(m, names) := _s_named(m, names) if not m.op in {"every", "so
 
 _s_written_check(check) := _p_written(check, set(), set(), _p_context({}, {}, _p_no_parts))
 
+_p_plain_check_problems(check, aliases, pc) := ((_s_form_problems(check) | _p_named_by_problems(_s_lines(check.assert), "", aliases, object.get(pc, "subject", null))) | _p_part_walk_problems(_s_lines(check.assert), "", pc)) | _p_subject_follow_problems(check, _s_lines(check.assert), "", pc)
+
+_p_for_check_problems(check, aliases, pc) := (_p_for_form_problems(check, aliases, pc) | _p_part_walk_problems(_s_lines(check.assert), check.for, pc)) | _p_subject_follow_problems(check, _s_lines(check.assert), check.for, pc)
+
+_p_for_form_problems(check, aliases, pc) := (_s_form_problems(check) | _p_for_clash(check, pc)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases, object.get(pc, "subject", null))
+
 _p_written(check, aliases, parents, pc) := _s_check_mixed([check], {}, ((_p_named_by_problems([check], "", aliases, object.get(pc, "subject", null)) | _p_part_walk_problems([check], "", pc)) | _p_subject_follow_problems(check, [check], "", pc)), aliases | parents) if is_string(check)
 
-_p_written(check, aliases, parents, pc) := _s_check_mixed(_s_lines(check.assert), object.filter(check, {"description", "meta"}), (((_s_form_problems(check) | _p_named_by_problems(_s_lines(check.assert), "", aliases, object.get(pc, "subject", null))) | _p_part_walk_problems(_s_lines(check.assert), "", pc)) | _p_subject_follow_problems(check, _s_lines(check.assert), "", pc)), aliases | parents) if {
+_p_written(check, aliases, parents, pc) := _s_check_mixed(_s_lines(check.assert), object.filter(check, {"description", "meta"}), _p_plain_check_problems(check, aliases, pc), aliases | parents) if {
 	_s_assert_form(check)
 	"assert" in object.keys(check)
 	not "for" in object.keys(check)
 }
 
-_p_written(check, aliases, parents, pc) := _s_check_for_mixed(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), ((((_s_form_problems(check) | _p_for_clash(check, pc)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases, object.get(pc, "subject", null))) | _p_part_walk_problems(_s_lines(check.assert), check.for, pc)) | _p_subject_follow_problems(check, _s_lines(check.assert), check.for, pc)), aliases | parents) if {
+_p_written(check, aliases, parents, pc) := _s_check_for_mixed(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), _p_for_check_problems(check, aliases, pc), aliases | parents) if {
 	_s_assert_form(check)
 	"assert" in object.keys(check)
 	"for" in object.keys(check)
@@ -675,9 +683,13 @@ _s_plain_model(a) := {"op": "range", "path": _s_model_path(a.path), "min": a.phr
 
 _s_plain_model(a) := {"op": "outside_range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is not between"
 
+_s_text_compare_ops := {"starts with": ["compare", "starts_with"], "ends with": ["compare", "ends_with"], "does not start with": ["compare", "not_starts_with"], "does not end with": ["compare", "not_ends_with"]}
+
+_s_alphabetical_compare_ops := {"is alphabetically before": ["compare", "alphabetically_before"], "is alphabetically after": ["compare", "alphabetically_after"], "is alphabetically on or before": ["compare", "alphabetically_lte"], "is alphabetically on or after": ["compare", "alphabetically_gte"]}
+
 _s_compare_ops := object.union(
 	object.union({op: ["compare", cmp] | some op, cmp in _s_order_cmps}, {op: ["compare_time", cmp] | some op, cmp in _s_time_cmps}),
-	{"starts with": ["compare", "starts_with"], "ends with": ["compare", "ends_with"], "does not start with": ["compare", "not_starts_with"], "does not end with": ["compare", "not_ends_with"], "is alphabetically before": ["compare", "alphabetically_before"], "is alphabetically after": ["compare", "alphabetically_after"], "is alphabetically on or before": ["compare", "alphabetically_lte"], "is alphabetically on or after": ["compare", "alphabetically_gte"]},
+	object.union(_s_text_compare_ops, _s_alphabetical_compare_ops),
 )
 
 _s_contains_ops := {
@@ -849,7 +861,13 @@ _s_for_line_unsupported(lines, ftext) := {concat("", ["for: ", u]) | some u in _
 	"items" in object.keys(fl)
 }
 
-_s_for_unsupported(fl, assertions) := ({u | some item in fl.items; some u in _s_item_unsupported(item)} | {u | some a in assertions; some u in _s_assertion_unsupported(a)}) | {u | some i, item in fl.items; some u in _s_names_not_given(item, {later.as | some later in array.slice(fl.items, i, count(fl.items))})}
+_s_for_unsupported(fl, assertions) := (_s_for_items_unsupported(fl) | _s_for_assertions_unsupported(assertions)) | _s_for_later_names_unsupported(fl)
+
+_s_for_items_unsupported(fl) := {u | some item in fl.items; some u in _s_item_unsupported(item)}
+
+_s_for_assertions_unsupported(assertions) := {u | some a in assertions; some u in _s_assertion_unsupported(a)}
+
+_s_for_later_names_unsupported(fl) := {u | some i, item in fl.items; some u in _s_names_not_given(item, {later.as | some later in array.slice(fl.items, i, count(fl.items))})}
 
 _s_names_not_given(x, later) := {concat("", ["unknown alias ", ref.steps[0]]) |
 	some node in _s_nodes(x)

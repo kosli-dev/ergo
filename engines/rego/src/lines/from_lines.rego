@@ -1185,12 +1185,14 @@ _tagged_input(i, matches) := object.union(i, {"part": tag}) if {
 
 _tagged_input(i, matches) := i if count(matches) != 1
 
-_check_parts(check, req) := [{"patterns": [_mention_pattern(_steps_name([_p_marker(m.alias, m.n, m.of, false)])), _mention_pattern(_steps_name([ms])), _mention_pattern(_steps_name(array.concat([_p_marker(m.alias, -1, m.of, m.old)], steps)))], "name": _tag_name(m), "ms": ms, "steps": steps, "read": read} |
+_check_parts(check, req) := [{"patterns": _check_patterns(m, ms, steps), "name": _tag_name(m), "ms": ms, "steps": steps, "read": read} |
 	some ms in {x[0] | walk(check, [_, x]); is_array(x); _part_start(x)}
 	m := json.unmarshal(substring(ms, 1, -1))
 	read := data.ergo_subject_sentences.parts[_marker_owner(req, m)][m.alias]
 	steps := read.from.path
 ]
+
+_check_patterns(m, ms, steps) := [_mention_pattern(_steps_name([_p_marker(m.alias, m.n, m.of, false)])), _mention_pattern(_steps_name([ms])), _mention_pattern(_steps_name(array.concat([_p_marker(m.alias, -1, m.of, m.old)], steps)))]
 
 _marker_owner(req, m) := req.subject if m.of == null
 

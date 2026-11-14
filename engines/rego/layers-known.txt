@@ -33,8 +33,8 @@ _entry_ref_of -> _scoped
 _entry_ref_of -> _subject_type_of
 _field_named_inputs -> _own_key_fields
 _field_path_name -> _names
-_field_problems -> _side_problem
-_field_problems -> _within_problem
+_field_shape_problems -> _side_problem
+_field_shape_problems -> _within_problem
 _filter_eval -> _m_filter
 _filter_eval -> _m_filter_walk
 _filter_eval -> _row_inputs
@@ -54,7 +54,7 @@ _fl_parent_unread -> _chained
 _fl_type_name -> _m_from_item_name
 _fl_type_name -> _m_from_root
 _flawed_root_msgs -> _m_for_said
-_for_failed -> _m_rest_named
+_for_failed_base -> _m_rest_named
 _for_failure -> _for_rest
 _for_free_texts -> _m_line_msg
 _for_free_undecided -> _for_rest
@@ -85,9 +85,9 @@ _for_row_raw -> _for_message
 _for_row_text -> _m_fallback
 _for_second_roots -> _m_aliased
 _for_second_roots -> _m_under
-_for_unchecked -> _m_inner_free
-_for_unchecked -> _m_inner_text
-_for_unchecked -> _m_rest_named
+_for_unchecked_item -> _m_inner_free
+_for_unchecked_item -> _m_inner_text
+_for_unchecked_item -> _m_rest_named
 _for_unsortable -> _m_isnt
 _for_unsortable -> _m_leaf
 _from_cause -> _m_from_params_unread
@@ -216,7 +216,7 @@ _s_any_of -> _option_text
 _s_any_of_written -> _one_of
 _s_check_for_mixed -> _s_check_for
 _s_derived_too_long -> _walk_steps
-_s_every_unsupported -> _walk_steps
+_s_every_too_long -> _walk_steps
 _s_has_mixed -> _values_problem
 _s_has_mixed -> _walk_nodes
 _s_line_mixed -> _values_problem

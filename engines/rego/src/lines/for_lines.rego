@@ -878,20 +878,37 @@ _failed_name(path, roots) := _with_dot(_input_name(path), true) if _dotted_root(
 
 _for_failed(_, "satisfied", _) := []
 
-_for_failed(check, cause, fails) := [object.union(object.union({"path": _failed_name(f.path, _for_dotted(check)), "item": _failed_name(f.item, _for_dotted(check)), "cause": f.cause, "value": f.value, "failed_assertions": f.lines, "locations": _fail_locations(f), "said": _m_for_item_name(check, f.item), "bare": _m_rest_named(_m_for_item_name(check, f.item), f)}, _for_unchecked(check, object.get(f, "inner", []))), object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)})) |
+_for_failed(check, cause, fails) := [_for_failed_row(check, f) |
 	some p in sort({f.path | some f in fails; not object.get(f, "nothing_picked", false)})
 	some f in fails
 	f.path == p
 	not object.get(f, "nothing_picked", false)
 ] if cause != "satisfied"
 
+_for_failed_row(check, f) := object.union(object.union(_for_failed_base(check, f), _for_unchecked(check, object.get(f, "inner", []))), _for_failed_flags(f))
+
+_for_failed_base(check, f) := {
+	"path": _failed_name(f.path, _for_dotted(check)),
+	"item": _failed_name(f.item, _for_dotted(check)),
+	"cause": f.cause,
+	"value": f.value,
+	"failed_assertions": f.lines,
+	"locations": _fail_locations(f),
+	"said": _m_for_item_name(check, f.item),
+	"bare": _m_rest_named(_m_for_item_name(check, f.item), f),
+}
+
+_for_failed_flags(f) := object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)})
+
 _for_unchecked(_, []) := {}
 
-_for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_inner_text(check, f), "free": _m_inner_free(f)} |
+_for_unchecked(check, inner) := {"failed_items": [_for_unchecked_item(check, f) |
 	some p in sort({f.path | some f in inner})
 	some f in inner
 	f.path == p
 ]} if inner != []
+
+_for_unchecked_item(check, f) := {"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_inner_text(check, f), "free": _m_inner_free(f)}
 
 _for_inputs(check, subj, names, item, w) := _merged_inputs([{"name": t[0], "value": t[1], "locations": t[2]} | some t in ((_for_input_pairs(check, subj, names, item, w) | _for_listed_pairs(check, subj)) | _for_whose_pairs(check, subj))])
 
