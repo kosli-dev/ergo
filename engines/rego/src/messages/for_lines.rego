@@ -83,10 +83,10 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, _for_own_w
 	wh.undecided != []
 	some c in item.whose
 	_focus_lost(e, c)
-} else := object.union(failure, {"why": [ms[0]], "root_why": true, "free": _for_is_free(item, names)}) if {
+} else := object.union(failure, {"why": [ms[0][0]], "root_why": true, "free": ms[0][1]}) if {
 	failure != null
 	wh.undecided != []
-	ms := [m |
+	ms := [[m, _for_is_free({"whose": [c]}, names)] |
 		some c in item.whose
 		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
 		not cause in {"satisfied", "value"}

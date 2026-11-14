@@ -56641,5 +56641,1839 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a whose on the second for item that reads a root and the first item's alias says the root once and the alias for each item",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "art": {
+          "from": "arts",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "art",
+          "checks": {
+            "c": {
+              "for": "every ws as w, every ys whose n is at least art.z and whose n is at most w.z as x",
+              "assert": "x.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as absent with the root once and the alias for the item without it",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "n": 1,
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/arts/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1,
+                      "ok": true
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/arts/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 5,
+                      "ok": false
+                    }
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/arts/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": {
+                  "z": 9
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/arts/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1,
+                      "ok": true
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/arts/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 5,
+                      "ok": false
+                    }
+                  }
+                ],
+                "item": "item 2 of ws",
+                "locations": [
+                  "/arts/0/ws/1"
+                ],
+                "path": "item 2 of ws",
+                "value": {}
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1,
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "art.z is missing; item 2 of ws: w.z is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable with the root of the wrong type once and the alias for the item without it",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "n": 1,
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ],
+              "z": "s"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "unusable",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/arts/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1,
+                      "ok": true
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/arts/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 5,
+                      "ok": false
+                    }
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/arts/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": {
+                  "z": 9
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "unusable",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/arts/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1,
+                      "ok": true
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/arts/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 5,
+                      "ok": false
+                    }
+                  }
+                ],
+                "item": "item 2 of ws",
+                "locations": [
+                  "/arts/0/ws/1"
+                ],
+                "path": "item 2 of ws",
+                "value": {}
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1,
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "art.z is \"s\", which isn't a number; item 2 of ws: w.z is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose on the second for item that reads $params text after is in says the root once, with no item of its list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "art": {
+          "from": "arts",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "art",
+          "checks": {
+            "c": {
+              "for": "every ws as w, every ys whose n is in $params.z as x",
+              "assert": "x.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "z": "s"
+    },
+    "cases": [
+      {
+        "description": "fails as unusable with the root once",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "n": 1,
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "n": 1,
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1,
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$params.z is \"s\", which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable with the root once and then the item that can't be read on its own",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$params.z is \"s\", which isn't a list; item 1 of ys: n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose on the second for item that reads a $params object after is in says the root once, with no item of its list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "art": {
+          "from": "arts",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "art",
+          "checks": {
+            "c": {
+              "for": "every ws as w, every ys whose n is in $params.z as x",
+              "assert": "x.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "z": {
+        "a": 1
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable with the root once",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "n": 1,
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "n": 1,
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1,
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$params.z is {\"a\": 1}, which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable with the root once and then the item that can't be read on its own",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$params.z is {\"a\": 1}, which isn't a list; item 1 of ys: n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose on the second for item with every that reads $input after is in says the root once, with no item of its list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "art": {
+          "from": "arts",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "art",
+          "checks": {
+            "c": {
+              "for": "every ws as w, every ys whose n is in $input.z as x",
+              "assert": "x.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable with the root once when it is text",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "n": 1,
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ],
+          "z": "s"
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "n": 1,
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": "s"
+              },
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1,
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$input.z is \"s\", which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable with the root once when it is an object, and then the item that can't be read on its own",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ],
+          "z": {
+            "a": 1
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": {
+                  "a": 1
+                }
+              },
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$input.z is {\"a\": 1}, which isn't a list; item 1 of ys: n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose on the second for item with some that reads $input after is in says the root once, with no item of its list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "art": {
+          "from": "arts",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "art",
+          "checks": {
+            "c": {
+              "for": "every ws as w, some ys whose n is in $input.z as x",
+              "assert": "x.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable with the root once when it is text",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "n": 1,
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ],
+          "z": "s"
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "n": 1,
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": "s"
+              },
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1,
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$input.z is \"s\", which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable with the root once when it is an object, and then the item that can't be read on its own",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ],
+          "z": {
+            "a": 1
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": {
+                  "a": 1
+                }
+              },
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$input.z is {\"a\": 1}, which isn't a list; item 1 of ys: n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose on the second for item with first of that reads $input after is in says the root once, with no item of its list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "art": {
+          "from": "arts",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "art",
+          "checks": {
+            "c": {
+              "for": "every ws as w, first of ys whose n is in $input.z sorted by n as x",
+              "assert": "x.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable with the root once when it is text",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma",
+          "for.pick",
+          "sentence.for.pick"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "n": 1,
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ],
+          "z": "s"
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "n": 1,
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": "s"
+              },
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1,
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$input.z is \"s\", which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable with the root once when it is an object, and then the item that can't be read on its own",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma",
+          "for.pick",
+          "sentence.for.pick"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ],
+          "z": {
+            "a": 1
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": {
+                  "a": 1
+                }
+              },
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$input.z is {\"a\": 1}, which isn't a list; item 1 of ys: n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose on the second for item with last of that reads $input after is in says the root once, with no item of its list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "art": {
+          "from": "arts",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "art",
+          "checks": {
+            "c": {
+              "for": "every ws as w, last of ys whose n is in $input.z sorted by n as x",
+              "assert": "x.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable with the root once when it is text",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma",
+          "for.pick",
+          "sentence.for.pick"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "n": 1,
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ],
+          "z": "s"
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "n": 1,
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": "s"
+              },
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1,
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$input.z is \"s\", which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable with the root once when it is an object, and then the item that can't be read on its own",
+        "rules": [
+          "message.items",
+          "for.roots",
+          "for.shared_failures",
+          "sentence.for.line",
+          "sentence.for.comma",
+          "for.pick",
+          "sentence.for.pick"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "z": 9
+                },
+                {}
+              ],
+              "ys": [
+                {
+                  "ok": true
+                },
+                {
+                  "n": 5,
+                  "ok": false
+                }
+              ]
+            }
+          ],
+          "z": {
+            "a": 1
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/arts/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "ok": true
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/arts/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 5,
+                  "ok": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": {
+                  "a": 1
+                }
+              },
+              {
+                "locations": [
+                  "/arts/0/ws/0",
+                  "/arts/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": 9
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/ys/0",
+                  "/arts/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "ok": true
+                  },
+                  {
+                    "n": 5,
+                    "ok": false
+                  }
+                ]
+              }
+            ],
+            "message": "$input.z is {\"a\": 1}, which isn't a list; item 1 of ys: n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

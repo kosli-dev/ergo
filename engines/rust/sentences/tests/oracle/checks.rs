@@ -4980,6 +4980,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of xs whose tags contains art.m named by key is 1",
+        "count of xs whose tags contains art.m named by key is 1",
+        &[],
+        &[],
+    ),
+    (
         "s is \"a\" followed by t named by $input.k",
         "s is \"a\" followed by t named by $input.k",
         &[],
@@ -13090,6 +13096,42 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every ws as w, every ys whose n is at least art.z as x",
         "every ws as w, every ys whose n is at least art.z as x",
+        &[],
+        &[],
+    ),
+    (
+        "every ws as w, every ys whose n is at least art.z and whose n is at most w.z as x",
+        "every ws as w, every ys whose n is at least art.z and whose n is at most w.z as x",
+        &[],
+        &[],
+    ),
+    (
+        "every ws as w, every ys whose n is in $params.z as x",
+        "every ws as w, every ys whose n is in $params.z as x",
+        &[],
+        &[],
+    ),
+    (
+        "every ws as w, every ys whose n is in $input.z as x",
+        "every ws as w, every ys whose n is in $input.z as x",
+        &[],
+        &[],
+    ),
+    (
+        "every ws as w, some ys whose n is in $input.z as x",
+        "every ws as w, some ys whose n is in $input.z as x",
+        &[],
+        &[],
+    ),
+    (
+        "every ws as w, first of ys whose n is in $input.z sorted by n as x",
+        "every ws as w, first of ys whose n is in $input.z sorted by n as x",
+        &[],
+        &[],
+    ),
+    (
+        "every ws as w, last of ys whose n is in $input.z sorted by n as x",
+        "every ws as w, last of ys whose n is in $input.z sorted by n as x",
         &[],
         &[],
     ),

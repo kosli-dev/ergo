@@ -15993,5 +15993,221 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count whose whose reads a field of the subject with a named by key from the item, a null root next to the key",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "art": {
+          "from": "arts",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "art",
+          "checks": {
+            "c": "count of xs whose tags contains art.m named by key is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the null field of the subject and then the missing key inside the item",
+        "rules": [
+          "message.items",
+          "tally.whose",
+          "sentence.derived.count",
+          "sentence.phrase.contains"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "tags": [
+                    "x"
+                  ]
+                },
+                {
+                  "key": "a",
+                  "tags": [
+                    "x"
+                  ]
+                }
+              ],
+              "m": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/arts/0/xs/0",
+                  "/arts/0/xs/1"
+                ],
+                "name": "count of xs whose tags contains art.m named by key",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/arts/0/xs/0",
+                  "/arts/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "tags": [
+                      "x"
+                    ]
+                  },
+                  {
+                    "key": "a",
+                    "tags": [
+                      "x"
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/m"
+                ],
+                "name": "art.m",
+                "value": null
+              }
+            ],
+            "message": "item 1 of xs: art.m is null; key is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "art"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count whose whose reads a field of the parent with a named by key from the item, a null root next to the key",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "art": {
+          "from": "arts",
+          "identified_by": "id"
+        },
+        "w": {
+          "from": "every art.ws",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "w",
+          "checks": {
+            "c": "count of xs whose tags contains art.m named by key is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the null field of the parent and then the missing key inside the item",
+        "rules": [
+          "message.items",
+          "tally.whose",
+          "sentence.derived.count",
+          "sentence.phrase.contains"
+        ],
+        "input": {
+          "arts": [
+            {
+              "id": "a",
+              "m": null,
+              "ws": [
+                {
+                  "id": "b",
+                  "xs": [
+                    {
+                      "tags": [
+                        "x"
+                      ]
+                    },
+                    {
+                      "key": "a",
+                      "tags": [
+                        "x"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/arts/0/ws/0/xs/0",
+                  "/arts/0/ws/0/xs/1"
+                ],
+                "name": "count of xs whose tags contains art.m named by key",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/arts/0/ws/0/xs/0",
+                  "/arts/0/ws/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "tags": [
+                      "x"
+                    ]
+                  },
+                  {
+                    "key": "a",
+                    "tags": [
+                      "x"
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/arts/0/m"
+                ],
+                "name": "art.m",
+                "value": null
+              }
+            ],
+            "message": "item 1 of xs: art.m is null; key is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "b",
+              "in": {
+                "art": "a"
+              },
+              "type": "w"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
