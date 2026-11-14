@@ -1825,7 +1825,7 @@ test_a_check_decides_a_named_by_key_on_a_list_input_by_its_own_form_not_by_the_c
 	}
 }
 
-test_a_count_of_a_child_subject_and_a_from_line_read_a_named_by_key_on_a_list_input_as_they_did_before if {
+test_a_count_of_a_child_subject_and_a_from_line_read_a_named_by_key_on_a_list_input_and_a_count_says_the_input_is_not_an_object if {
 	doc := [{"id": "t", "k": "a", "m": {"a": "a"}, "rs": [{"v": "a"}], "xs": [{"m": {"a": "a"}}], "cs": [{"id": "c1", "k": "a"}]}]
 	listed := "$input is [an object with 6 keys], which isn't an object"
 	policy := {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "$input", "identified_by": "id"}, "c": {"from": "every t.cs", "identified_by": "id"}, "u": {"from": "$input whose k is $input.m named by $params.k", "identified_by": "id"}}, "requirements": {
@@ -1847,8 +1847,8 @@ test_a_count_of_a_child_subject_and_a_from_line_read_a_named_by_key_on_a_list_in
 		rows == {
 			"plain": ["not_an_object", listed],
 			"count_whose": [said[1], said[3]],
-			"count_input": ["unusable", "count of xs.m named by $input.k is 1 is false"],
-			"any_of_count": ["unusable", concat("", ["a: ", said[2], "; b: the check is false"])],
+			"count_input": ["unusable", listed],
+			"any_of_count": ["unusable", concat("", ["a: ", said[2], "; b: ", listed])],
 			"child": [said[1], said[2]],
 			"$applies": [said[1], said[2]],
 		}

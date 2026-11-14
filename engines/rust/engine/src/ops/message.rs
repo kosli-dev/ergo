@@ -358,6 +358,22 @@ fn blocked(check: &Check, ctx: &Ctx, late: bool) -> Vec<String> {
     )
 }
 
+fn refs_blocked(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
+    let mut refs = check.refs();
+    refs.sort_by_key(name::name);
+    once_of(
+        refs.iter()
+            .flat_map(|r| {
+                if lists::input_one_path(r, ctx) {
+                    vec![isnt("$input", ctx.input, "an object")]
+                } else {
+                    blocked_of(r, ctx)
+                }
+            })
+            .collect(),
+    )
+}
+
 fn key_unreadable_off_alias(path: &Path, ctx: &Ctx) -> bool {
     !matches!(path.start, Start::Alias(_))
         || path.steps.iter().any(|step| {
@@ -389,6 +405,18 @@ pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
     {
         return Vec::new();
     }
+    blocked_along(path, ctx)
+}
+
+pub fn blocked_before_key(path: &Path, ctx: &Ctx) -> Vec<String> {
+    let read = path::read(path, ctx);
+    if read.outcome != Outcome::Unusable || !read.step_unreadable {
+        return Vec::new();
+    }
+    blocked_along(path, ctx)
+}
+
+fn blocked_along(path: &Path, ctx: &Ctx) -> Vec<String> {
     let Ok((mut value, _, _)) = path::start_of(&path.start, ctx) else {
         return Vec::new();
     };
@@ -716,6 +744,11 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                     .map(|(_, text)| text),
             );
             let digits = " needs more than 15 digits";
+            if let Check::Tally(tally_check) = check
+                && all.iter().all(|c| c.ends_with(digits))
+            {
+                all.extend(refs_blocked(tally_check, ctx));
+            }
             let others = all.iter().any(|c| !c.ends_with(digits))
                 || params_that_arent_an_object(check, ctx).is_some();
             let mut once = Vec::new();

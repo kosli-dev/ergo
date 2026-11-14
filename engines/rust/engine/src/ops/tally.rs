@@ -1288,7 +1288,12 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                     let blocked = if walk::through_a_list(&counted.path, &outer) {
                         Vec::new()
                     } else {
-                        super::message::blocked_of(&counted.path, &outer)
+                        let found = super::message::blocked_of(&counted.path, &outer);
+                        if found.is_empty() {
+                            super::message::blocked_before_key(&counted.path, &outer)
+                        } else {
+                            found
+                        }
                     };
                     if !blocked.is_empty() {
                         out.push(super::message::joined(blocked));
