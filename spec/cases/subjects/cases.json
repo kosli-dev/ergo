@@ -29150,5 +29150,181 @@
   ]},
   {"description": "subject ids that differ only past 15 significant digits, in the other order", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "l is at most r"}}}}, "cases": [
       {"description": "keeps each subject apart, in the other order", "rules": ["value.number", "subjects.id", "unique_ids"], "input": {"things": [{"id": 2234567890.1209567990, "l": 2234567890.1209567990, "r": 2234567890.1209567890}, {"id": 2234567890.1209567890, "l": 2234567890.1209567890, "r": 2234567890.1209567890}]}, "results": [{"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated thing ids", "value": []}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}}, {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": 2234567890.120956799}, {"locations": ["/things/0/r"], "name": "r", "value": 2234567890.120956789}], "message": "l is 2234567890.120956799, and r is 2234567890.120956789", "passed": false, "requirement": "s", "subject": {"id": 2234567890.120956799, "type": "thing"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 2234567890.120956789}, {"locations": ["/things/1/r"], "name": "r", "value": 2234567890.120956789}], "passed": true, "requirement": "s", "subject": {"id": 2234567890.120956789, "type": "thing"}}]}
-  ]}
+  ]},
+  {
+    "description": "a from line whose condition reads params that are a list, through a position and a key",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things whose x is in $params[0].v",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is 1"
+          }
+        }
+      }
+    },
+    "params": [
+      [
+        1
+      ]
+    ],
+    "cases": [
+      {
+        "description": "the $applies ref points at the item of the params where the read stopped",
+        "rules": [
+          "value.refs",
+          "location.refs",
+          "location.read"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/0"
+                ],
+                "name": "$params[0].v",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "message": "item 1 of $params is [1], which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/0"
+                ],
+                "name": "$params[0].v",
+                "value": null
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a from line named by each of params that are a list, read through a position and a key",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "z named by each of $params[0].v"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is 1"
+          }
+        }
+      }
+    },
+    "params": [
+      [
+        1
+      ]
+    ],
+    "cases": [
+      {
+        "description": "the ref of $min_subjects and $unique_ids points at the item of the params where the read stopped",
+        "rules": [
+          "value.refs",
+          "location.refs",
+          "location.read",
+          "subjects.keyed.list"
+        ],
+        "input": {
+          "z": {
+            "a": {
+              "x": 1
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "item 1 of $params is [1], which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "$min_subjects": [
+              {
+                "locations": [
+                  "$params:/0"
+                ],
+                "name": "$params[0].v",
+                "value": null
+              }
+            ],
+            "$unique_ids": [
+              {
+                "locations": [
+                  "$params:/0"
+                ],
+                "name": "$params[0].v",
+                "value": null
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
 ]

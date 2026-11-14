@@ -382,7 +382,7 @@ fn ancestor_def(
             refs.extend(crate::checks::refs_read(
                 &reading.source_refs(level),
                 input,
-                params.as_object().map(|_| params),
+                Some(params),
             ));
             reading.infos[level].from_text.clone().unwrap_or_default()
         } else {
@@ -457,11 +457,9 @@ pub fn check_defs(
         )
     };
     let from_refs = match policy.subject_of(requirement) {
-        Some((name, _)) if from_readable(reading, name, extra) => crate::checks::refs_read(
-            &reading.source_refs(name),
-            input,
-            params.as_object().map(|_| params),
-        ),
+        Some((name, _)) if from_readable(reading, name, extra) => {
+            crate::checks::refs_read(&reading.source_refs(name), input, Some(params))
+        }
         _ => Vec::new(),
     };
     let mut min_def = CheckDef::added(min_description, min_expression);
@@ -491,11 +489,7 @@ pub fn check_defs(
             {
                 let checks: Vec<&crate::ops::Check> =
                     lowered.filters.iter().map(|f| &f.check).collect();
-                applies_def.refs = crate::checks::refs_of_checks(
-                    &checks,
-                    input,
-                    params.as_object().map(|_| params),
-                );
+                applies_def.refs = crate::checks::refs_of_checks(&checks, input, Some(params));
             }
             defs.insert("$applies".to_string(), applies_def);
         }

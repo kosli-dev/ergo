@@ -935,13 +935,13 @@ _for_listed_right(c, p) if {
 _for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_input_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
-	some p in _leaf_paths(c)
+	some p in _for_read_paths(c)
 	not _for_listed(subj, c, p)
 	shown := _before_names(p)
 }) | {[_input_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
-	some p in _leaf_paths(c)
+	some p in _for_read_paths(c)
 	_starts_at_name(p)
 	not p[0] in {concat("", ["$", item.as]) | some item in check.items}
 	not _for_listed(subj, c, p)
@@ -983,6 +983,13 @@ _for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input
 	c.op in _right_ref_ops
 	some i in _ref_inputs(object.remove(c, ["path"]))
 }
+
+_for_read_paths(c) := array.concat(_leaf_paths(c), [piece |
+	some f in ["left", "right"]
+	_side_form(object.get(c, f, null)) == "join"
+	some piece in c[f].join
+	is_array(piece)
+])
 
 _for_alias_path(check, p) if p[0] in {concat("", ["$", item.as]) | some item in check.items}
 

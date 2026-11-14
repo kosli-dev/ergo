@@ -126,6 +126,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "m named by each of $params.a.k",
     ),
     (
+        "z named by each of $params[0].v",
+        "z named by each of $params[0].v",
+    ),
+    (
         "$input.m named by each of $input.a.k",
         "$input.m named by each of $input.a.k",
     ),
@@ -1422,6 +1426,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("x whose aa is equal to y", "x whose aa equals y"),
     ("x whose aa is false", "x whose aa is false"),
     ("x whose aa is in $params.l", "x whose aa is in $params.l"),
+    (
+        "things whose x is in $params[0].v",
+        "things whose x is in $params[0].v",
+    ),
     ("x whose aa is in 1", "x whose aa is one of 1"),
     ("x whose aa is in l", "x whose aa is in l"),
     ("x whose aa is in true", "x whose aa is one of true"),

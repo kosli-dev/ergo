@@ -54098,5 +54098,372 @@
         {}
       ]
     }
+  },
+  {
+    "description": "an every on a for line that walks a $params list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ts as t",
+              "assert": "every $params.q is 1"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "q": [
+        1,
+        2
+      ]
+    },
+    "cases": [
+      {
+        "description": "the row lists the $params list it walked, as the every does on its own",
+        "rules": [
+          "for.inputs",
+          "walk.inputs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ts": [
+                {
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "every $params.q is 1",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/q/0",
+                          "$params:/q/1"
+                        ],
+                        "name": "$params.q[]",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ts",
+                "locations": [
+                  "/things/0/ts/0"
+                ],
+                "path": "item 1 of ts",
+                "value": {
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/q/0",
+                  "$params:/q/1"
+                ],
+                "name": "$params.q[]",
+                "value": [
+                  1,
+                  2
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ts/0"
+                ],
+                "name": "ts[]",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 2 of $params.q is 2",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a for line assertion whose followed by reads a piece from $params, $input and the subject",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ts as i",
+              "assert": "i.tags contains i.v followed by $params.x.y"
+            },
+            "d": {
+              "for": "every ts as i",
+              "assert": "i.tags contains $input.y followed by i.v followed by w"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "x": {
+        "y": "b"
+      }
+    },
+    "cases": [
+      {
+        "description": "the row lists each piece that doesn't start at the alias, and the check has no $refs",
+        "rules": [
+          "for.inputs",
+          "compare.join",
+          "value.refs"
+        ],
+        "input": {
+          "y": "c",
+          "things": [
+            {
+              "id": "t",
+              "w": "d",
+              "ts": [
+                {
+                  "v": "a",
+                  "tags": [
+                    "z"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "i.tags contains i.v followed by $params.x.y",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ts/0/tags"
+                        ],
+                        "name": "i.tags",
+                        "value": [
+                          "z"
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/things/0/ts/0/v"
+                        ],
+                        "name": "i.v",
+                        "value": "a"
+                      },
+                      {
+                        "locations": [
+                          "$params:/x/y"
+                        ],
+                        "name": "$params.x.y",
+                        "value": "b"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ts",
+                "locations": [
+                  "/things/0/ts/0"
+                ],
+                "path": "item 1 of ts",
+                "value": {
+                  "tags": [
+                    "z"
+                  ],
+                  "v": "a"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": "b"
+              },
+              {
+                "locations": [
+                  "/things/0/ts/0"
+                ],
+                "name": "ts[]",
+                "value": [
+                  {
+                    "tags": [
+                      "z"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ts: i.tags is [\"z\"], and i.v followed by $params.x.y is \"ab\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "d",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "i.tags contains $input.y followed by i.v followed by w",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ts/0/tags"
+                        ],
+                        "name": "i.tags",
+                        "value": [
+                          "z"
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/y"
+                        ],
+                        "name": "$input.y",
+                        "value": "c"
+                      },
+                      {
+                        "locations": [
+                          "/things/0/ts/0/v"
+                        ],
+                        "name": "i.v",
+                        "value": "a"
+                      },
+                      {
+                        "locations": [
+                          "/things/0/w"
+                        ],
+                        "name": "w",
+                        "value": "d"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ts",
+                "locations": [
+                  "/things/0/ts/0"
+                ],
+                "path": "item 1 of ts",
+                "value": {
+                  "tags": [
+                    "z"
+                  ],
+                  "v": "a"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/y"
+                ],
+                "name": "$input.y",
+                "value": "c"
+              },
+              {
+                "locations": [
+                  "/things/0/ts/0"
+                ],
+                "name": "ts[]",
+                "value": [
+                  {
+                    "tags": [
+                      "z"
+                    ],
+                    "v": "a"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/w"
+                ],
+                "name": "w",
+                "value": "d"
+              }
+            ],
+            "message": "item 1 of ts: i.tags is [\"z\"], and $input.y followed by i.v followed by w is \"cad\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "c": [],
+            "d": []
+          }
+        }
+      }
+    ]
   }
 ]

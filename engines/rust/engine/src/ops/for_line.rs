@@ -1645,6 +1645,7 @@ impl For {
         for path in paths {
             let own = walked.iter().find(|(p, _)| std::ptr::eq(*p, path));
             if matches!(path.start, Start::Params)
+                && own.is_none()
                 && in_walk.contains(&std::ptr::from_ref(path))
                 && !walk::has_root_field(path)
             {
@@ -2769,6 +2770,7 @@ fn reads_other(check: &Check, alias: &str) -> bool {
     }
     top.iter().any(|path| !at_alias(path))
         || check.refs().iter().any(|path| !at_alias(path))
+        || matches!(check, Check::Contains(contains) if contains.joined_refs().into_iter().any(|path| !at_alias(path)))
         || nested_checks(check).into_iter().any(|inner| {
             worked_out(inner)
                 || inner

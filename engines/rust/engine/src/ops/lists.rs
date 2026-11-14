@@ -27,7 +27,13 @@ impl Right {
                 .collect(),
             Right::Ref(path) => step_refs(path),
             Right::Field(path) => step_refs(path),
-            Right::Join(pieces) => pieces.iter().flat_map(Right::refs).collect(),
+            Right::Join(pieces) => pieces
+                .iter()
+                .flat_map(|piece| match piece {
+                    Right::Ref(path) | Right::Field(path) => step_refs(path),
+                    Right::Written(_) | Right::Join(_) => Vec::new(),
+                })
+                .collect(),
         }
     }
 }
@@ -94,6 +100,13 @@ impl In {
 }
 
 impl Contains {
+    pub fn joined_refs(&self) -> Vec<&Path> {
+        match &self.wanted {
+            Wanted::One(right @ Right::Join(_)) => right.ref_paths(),
+            _ => Vec::new(),
+        }
+    }
+
     pub fn paths(&self) -> Vec<&Path> {
         let right = match &self.wanted {
             Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => right,
@@ -1738,6 +1751,24 @@ mod tests {
                 .is_empty()
         );
         assert!(written(json!(["a"])).refs().is_empty());
+    }
+
+    #[test]
+    fn a_piece_of_a_join_is_a_path_and_lists_only_its_ref_steps_in_refs() {
+        let k = key_path(Start::Params, &["k"]);
+        let y = key_path(Start::Params, &["x", "y"]);
+        let named = Path {
+            start: Start::Subject,
+            steps: vec![Step::Key("m".into()), Step::Ref(Box::new(k.clone()))],
+        };
+        let join = Right::Join(vec![
+            Right::Field(key_path(Start::Subject, &["v"])),
+            Right::Ref(y.clone()),
+            Right::Field(named),
+            written(json!("-")),
+        ]);
+        assert_eq!(join.refs(), vec![k]);
+        assert_eq!(join.ref_paths(), vec![&y]);
     }
 
     fn lowered(sentence: &str) -> Option<Result<Check, Vec<String>>> {

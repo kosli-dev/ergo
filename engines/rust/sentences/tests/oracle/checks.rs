@@ -4588,6 +4588,24 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "tags contains v followed by $params.x.y",
+        "tags contains v followed by $params.x.y",
+        &[],
+        &[],
+    ),
+    (
+        "i.tags contains i.v followed by $params.x.y",
+        "i.tags contains i.v followed by $params.x.y",
+        &[],
+        &[],
+    ),
+    (
+        "i.tags contains $input.y followed by i.v followed by w",
+        "i.tags contains $input.y followed by i.v followed by w",
+        &[],
+        &[],
+    ),
+    (
         "v is $params.p followed by t",
         "v is $params.p followed by t",
         &[],
@@ -5891,6 +5909,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every $params.a is 1", "every $params.a is 1", &[], &[]),
+    ("every $params.q is 1", "every $params.q is 1", &[], &[]),
     ("zz is in $params.a", "zz is in $params.a", &[], &[]),
     ("zz is in $params[0].a", "zz is in $params[0].a", &[], &[]),
     (
@@ -11407,6 +11426,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every ts as t", "every ts as t", &[], &[]),
+    ("every ts as i", "every ts as i", &[], &[]),
     (
         "every ts as t, every t.fs as f",
         "every ts as t, every t.fs as f",

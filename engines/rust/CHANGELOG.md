@@ -29,6 +29,12 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A check that doesn't go through a list item by item fails as `not_an_object` with `$input is [...], which isn't an object` when the input is a list and its `named by` key can't be read, as in `ergo.rego` 0.7.0 and spec 0.7 ([path.not_an_object](../../spec/semantics.md#reading-a-path)). With no `k` in the params, `k is $input.m named by $params.k` and `k is $input named by $params.k` failed as `absent` with `$params.k is missing`, and as `null` or `unusable` with a `null` or a number, where only `contains` did this, and `k is m named by $input.k` failed as `unusable` with `k equals m named by $input.k is false`. `ts is after m named by $input.k` and `m named by $input.k exists` said `... is false`. On a list input, `ts is after $input.ts` and `ts is after $input.m named by $params.k` with a text key, which were `not_an_object` with `ts is after $input.ts is false`, now say `$input is [...], which isn't an object`, and so does the option `b: k is m named by $input.k` of an `any_of` with a text key, where it said `b: the check is false`. A one-line `every` or `some`, a `for` line, a `count of` or `sum of`, a child subject's checks and the `whose` of a `from` line don't change. Changes the report of such checks.
 
+- The `$refs` of `$applies`, `$min_subjects`, `$unique_ids` and `$unique_ancestor_ids` point at the item of the params where the read stopped when the params are a list, as in `ergo.rego` and spec 0.7 ([location.read](../../spec/semantics.md#where-a-value-was-read)). With params `[[1]]`, `from: things whose x is in $params[0].v` gives `$applies` the ref `$params[0].v` at `$params:/0`, where it said `$params:`. A check already did this.
+
+- A `for` line's row lists an `every` or `some` that walks a `$params` list, like `$params.q[]` for `every $params.q is 1`, as in `ergo.rego` and spec 0.7 ([for.inputs](../../spec/semantics.md#for)), where it left it out.
+
+- A piece of a `followed by` from `$params` or `$input`, like `$params.x.y` in `tags contains v followed by $params.x.y`, isn't in the check's `$refs`, as in `ergo.rego` and spec 0.7 ([compare.join](../../spec/semantics.md#compare)), because it's a path, as one after `is` is. A `named by` key from `$params` inside a piece still is.
+
 ## 0.4.0
 
 ### New

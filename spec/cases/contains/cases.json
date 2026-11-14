@@ -499,5 +499,92 @@
         ]
       }
     ]
+  },
+  {
+    "description": "contains with a followed by that reads a piece from $params",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "tags contains v followed by $params.x.y"
+          }
+        }
+      }
+    },
+    "params": {
+      "x": {
+        "y": "b"
+      }
+    },
+    "cases": [
+      {
+        "description": "the row lists the piece, and the check has no $refs, as a path on a side of a comparison has none",
+        "rules": [
+          "compare.join",
+          "value.refs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "v": "a",
+              "tags": [
+                "ab"
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/tags"
+                ],
+                "name": "tags",
+                "value": [
+                  "ab"
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": "b"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
+      }
+    ]
   }
 ]
