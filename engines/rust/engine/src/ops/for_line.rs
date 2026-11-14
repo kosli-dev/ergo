@@ -1866,7 +1866,17 @@ impl For {
             .flat_map(|s| nested_whose(&s.check, false))
             .collect();
         let outer = outer_ctx(ctx);
+        let item_whose: Vec<&Check> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .collect();
         let outer_flaw = super::message::root_flaw_ordered(&whose, &outer, &counted, &nested);
+        let outer_flaw = if matches!(run.verdict.cause, Cause::Satisfied | Cause::Value) {
+            super::message::worse_key_cause(outer_flaw, &item_whose, &outer)
+        } else {
+            outer_flaw
+        };
         let forms: Vec<(Check, bool)> = self
             .sentences
             .iter()

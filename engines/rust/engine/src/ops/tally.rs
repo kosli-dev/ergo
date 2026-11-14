@@ -496,7 +496,7 @@ fn unusable_ref(check: &Check, ctx: &Ctx) -> Option<Cause> {
         let read = path::read(&reference, ctx);
         match (read.outcome.cause(), read.value) {
             (Some(cause), _) => Some(cause),
-            (None, Some(Value::String(_) | Value::Number(_))) => None,
+            (None, Some(Value::String(_))) => None,
             (None, _) if keys.contains(&reference) => Some(Cause::Unusable),
             (None, _) => None,
         }
@@ -1361,6 +1361,11 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                     found.push((found_cause, text));
                 }
             }
+        }
+        if walked.items.is_empty()
+            && let Some((Cause::Unusable, text)) = super::message::key_cause(&whose, &outer)
+        {
+            found.push((Cause::Unusable, text));
         }
         let mut at = outer.clone();
         for item in &walked.items {

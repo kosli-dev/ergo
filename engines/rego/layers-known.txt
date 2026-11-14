@@ -97,6 +97,7 @@ _input_path_name -> _visible
 _input_ref_inputs -> _right_ref_ops
 _is_key -> _out_of_range
 _joined -> _escaped
+_key_root_texts -> _m_isnt
 _keys_of -> _named
 _leaf_cause -> _leaf_passed
 _leaf_cause -> _leaf_paths

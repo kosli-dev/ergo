@@ -1593,6 +1593,65 @@ fn root_flaw_with(
         .map(|(cause, texts)| (cause, texts.join("; ")))
 }
 
+pub fn key_cause(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
+    worst_texts(key_problems(checks, ctx))
+}
+
+pub fn worse_key_cause(
+    flaw: Option<(Cause, String)>,
+    checks: &[&Check],
+    ctx: &Ctx,
+) -> Option<(Cause, String)> {
+    match (flaw, key_cause(checks, ctx)) {
+        (Some(flaw), Some(key)) if key.0 >= flaw.0 => Some(flaw),
+        (flaw, None) => flaw,
+        (_, key) => key,
+    }
+}
+
+fn key_problems(checks: &[&Check], ctx: &Ctx) -> Vec<(Cause, String)> {
+    let mut keys: Vec<Path> = Vec::new();
+    for check in checks {
+        let mut own: Vec<Path> = check
+            .paths()
+            .into_iter()
+            .flat_map(path::step_refs)
+            .collect();
+        own.sort_by_key(name::name);
+        for key in own {
+            if !keys.contains(&key) {
+                keys.push(key);
+            }
+        }
+    }
+    keys.iter()
+        .filter_map(|key| {
+            let read = path::read(key, ctx);
+            match (read.outcome.cause(), read.value) {
+                (Some(Cause::NotAnObject), _) => {
+                    Some((Cause::NotAnObject, isnt("$input", ctx.input, "an object")))
+                }
+                (Some(cause), _) => Some((cause, root_text(key, ctx, cause))),
+                (None, Some(value)) if !value.is_string() => {
+                    Some((Cause::Unusable, isnt(&name::name(key), value, "text")))
+                }
+                (None, _) => None,
+            }
+        })
+        .collect()
+}
+
+fn worst_texts(found: Vec<(Cause, String)>) -> Option<(Cause, String)> {
+    let worst = Cause::worst(found.iter().map(|(cause, _)| *cause))?;
+    let mut texts: Vec<String> = Vec::new();
+    for (cause, text) in found {
+        if cause == worst && !texts.contains(&text) {
+            texts.push(text);
+        }
+    }
+    Some((worst, joined(texts)))
+}
+
 pub fn walked_roots_ahead(
     message: Option<String>,
     checks: &[&Check],

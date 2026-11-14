@@ -140,7 +140,13 @@ _for_list_failures(r) if {
 	}
 }
 
-_for_rooted_row(check, subj, r) := object.union(r, {"cause": _worst_of({flaw, r.cause}), "other_roots": ms}) if {
+_for_rooted_row(check, subj, r) := object.union(r, {"cause": "unusable", "other_roots": ms}) if {
+	_for_list_failures(r)
+	r.cause == "value"
+	ms := _walk_key_texts(check, r)
+	ms != []
+	_key_beats_roots(check, subj)
+} else := object.union(r, {"cause": _worst_of({flaw, r.cause}), "other_roots": ms}) if {
 	_for_list_failures(r)
 	flaw := _walk_root_flaw(check, subj)
 	flaw != ""

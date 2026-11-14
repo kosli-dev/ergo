@@ -15635,5 +15635,129 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count whose whose reads a named by key from $input reads the key before any item, on an empty list too",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"count": "count of es whose zz is m named by $input.k is 0", "at_least": "count of es whose v is at least m named by $input.k is 0", "in": "count of es whose v is in m named by $input.k is 0"}}}},
+    "cases": [
+      {
+        "description": "the key is missing",
+        "rules": ["tally.whose", "path.ref_step", "walk.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}},
+        "results": [
+          {"cause": "absent", "check": "at_least", "inputs": [{"locations": [], "name": "count of es whose v is at least m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "count", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "in", "inputs": [{"locations": [], "name": "count of es whose v is in m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is null",
+        "rules": ["tally.whose", "path.ref_step", "walk.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}, "k": null},
+        "results": [
+          {"cause": "null", "check": "at_least", "inputs": [{"locations": [], "name": "count of es whose v is at least m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "null", "check": "count", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "null", "check": "in", "inputs": [{"locations": [], "name": "count of es whose v is in m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is a number",
+        "rules": ["tally.whose", "path.ref_step", "walk.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}, "k": 3},
+        "results": [
+          {"cause": "unusable", "check": "at_least", "inputs": [{"locations": [], "name": "count of es whose v is at least m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "in", "inputs": [{"locations": [], "name": "count of es whose v is in m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is true",
+        "rules": ["tally.whose", "path.ref_step", "walk.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}, "k": true},
+        "results": [
+          {"cause": "unusable", "check": "at_least", "inputs": [{"locations": [], "name": "count of es whose v is at least m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is true, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is true, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "in", "inputs": [{"locations": [], "name": "count of es whose v is in m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is true, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is a list",
+        "rules": ["tally.whose", "path.ref_step", "walk.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}, "k": []},
+        "results": [
+          {"cause": "unusable", "check": "at_least", "inputs": [{"locations": [], "name": "count of es whose v is at least m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is [], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is [], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "in", "inputs": [{"locations": [], "name": "count of es whose v is in m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is [], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is an object",
+        "rules": ["tally.whose", "path.ref_step", "walk.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}, "k": {}},
+        "results": [
+          {"cause": "unusable", "check": "at_least", "inputs": [{"locations": [], "name": "count of es whose v is at least m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is {}, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is {}, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "in", "inputs": [{"locations": [], "name": "count of es whose v is in m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is {}, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count or an every whose whose reads a named by key from $params reads the key before any item, on an empty list too",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"count": "count of es whose zz is m named by $params.k is 0", "every": "every es whose zz is m named by $params.k, if any, exists"}}}},
+    "params": {"k": 3},
+    "cases": [
+      {
+        "description": "the key is a number",
+        "rules": ["tally.whose", "path.ref_step", "walk.flaws", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "rs": [{"v": 2}], "es": []}], "m": {"a": 2}},
+        "results": [
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $params.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$params.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$params.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count with whose or that reads a named by key from $input that isn't text before the list, whether the list is empty, missing, null or not a list",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"whose": "count of es whose zz is m named by $input.k is 0", "that": "count of es.v that is m named by $input.k is 0"}}}},
+    "cases": [
+      {
+        "description": "the list is empty",
+        "rules": ["tally.whose", "tally.walk", "path.ref_step", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "es": []}], "k": 3},
+        "results": [
+          {"cause": "unusable", "check": "that", "inputs": [{"locations": [], "name": "count of es.v that equals m named by $input.k", "value": null}, {"locations": [], "name": "es[].v", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "whose", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $input.k", "value": null}, {"locations": [], "name": "es[]", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the list is missing",
+        "rules": ["tally.whose", "tally.walk", "path.ref_step", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}}], "k": 3},
+        "results": [
+          {"cause": "unusable", "check": "that", "inputs": [{"locations": [], "name": "count of es.v that equals m named by $input.k", "value": null}, {"locations": [], "name": "es.v", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "whose", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $input.k", "value": null}, {"locations": [], "name": "es", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the list is null",
+        "rules": ["tally.whose", "tally.walk", "path.ref_step", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "es": null}], "k": 3},
+        "results": [
+          {"cause": "unusable", "check": "that", "inputs": [{"locations": [], "name": "count of es.v that equals m named by $input.k", "value": null}, {"locations": [], "name": "es.v", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "whose", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $input.k", "value": null}, {"locations": [], "name": "es", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the list is text",
+        "rules": ["tally.whose", "tally.walk", "path.ref_step", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": 2}, "es": "s"}], "k": 3},
+        "results": [
+          {"cause": "unusable", "check": "that", "inputs": [{"locations": [], "name": "count of es.v that equals m named by $input.k", "value": null}, {"locations": [], "name": "es.v", "value": []}], "message": "es is \"s\", which isn't a list or an object; $input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "whose", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $input.k", "value": null}, {"locations": [], "name": "es", "value": []}], "message": "es is \"s\", which isn't a list or an object; $input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

@@ -58,10 +58,41 @@ _walk_parts(check, subj, raw, r) := fs if {
 	fs != []
 }
 
+_walk_parts(check, subj, raw, r) := ms if {
+	r.failed == []
+	raw.cause == "unusable"
+	_m_walk_faults(subj, check) == []
+	ms := _m_empty_walk_roots(check, subj, r)
+	ms != []
+}
+
 _walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
 	r.failed == []
 	raw.cause == "unusable"
 	_m_walk_faults(subj, check) == []
+	_m_empty_walk_roots(check, subj, r) == []
+}
+
+_m_empty_walk_roots(check, subj, r) := ms if {
+	_m_params_only_flaw(check, r)
+	ms := _walk_key_texts(check, r)
+	ms != []
+	_key_beats_roots(check, subj)
+} else := ms if {
+	_m_params_only_flaw(check, r)
+	ms := _walk_root_msgs(check, subj)
+	ms != []
+} else := ms if {
+	_m_params_only_flaw(check, r)
+	ms := _walk_key_texts(check, r)
+	ms != []
+} else := _walk_phrase_roots(check) if _m_params_only_flaw(check, r)
+
+else := []
+
+_m_params_only_flaw(check, r) if {
+	r.empty == true
+	_params_shape_only_unreadable(check)
 }
 
 _m_walk_faults(subj, check) := _once(array.concat(array.concat(array.concat(_m_key_faults(subj, check), _m_walk_blocked(subj, check)), [f | some c in object.get(check, "whose", []); some f in _m_ref_faults_text(c)]), [f | is_object(object.get(check, "check", null)); some f in _m_ref_faults_text(check.check)]))
@@ -239,7 +270,7 @@ _m_tally(subj, side) := array.concat(
 			[["root", m] | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); not _m_ref_first(m)],
 		),
 	),
-	_m_tally_items(subj, side),
+	array.concat(_m_tally_items(subj, side), [["root", m] | w.items == []; some c in side.whose; some m in _key_root_texts(c)]),
 ) if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
