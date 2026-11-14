@@ -113,7 +113,7 @@ CI also fails when a line of Rego isn't reached by any test. It runs the tests o
 
 Every change needs tests: new behaviour, bug fixes and changes to existing behaviour alike. A bug fix starts with a test that fails because of the bug. A change without tests isn't finished.
 
-Rust tests never live inline in a source file. Tests that need private items go in `<file>/tests.rs`, and tests of the public API in the crate's `tests/` folder. CI fails on an inline test module.
+Rust tests never live inline in a source file. Tests that need private items go in `<file>/tests.rs`, and tests of the public API in the crate's `tests/` folder. A test attribute like `#[test]` anywhere outside `tests.rs` or a `tests/` folder is an inline test, and CI fails on it, and on an inline test module.
 
 ## No comments
 
