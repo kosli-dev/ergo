@@ -8791,6 +8791,42 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of tags is m named by $input.k",
+        "count of tags equals m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "count of tags is n plus m named by $input.k",
+        "count of tags equals n plus m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "n is at least sum of xs.m named by $input.k",
+        "n is at least sum of xs.m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "sum of m named by $input.k is 1",
+        "sum of m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of x.m named by $input.k is 1",
+        "sum of x.m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of xs.m named by $input.k plus n is 2",
+        "sum of xs.m named by $input.k plus n is 2",
+        &[],
+        &[],
+    ),
+    (
         "every xs.m named by $input.k is \"a\"",
         "every xs.m named by $input.k is \"a\"",
         &[],

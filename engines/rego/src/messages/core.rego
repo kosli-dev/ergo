@@ -364,6 +364,11 @@ _m_message(check, subj, "unusable") := m if {
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := m if {
+	count(_m_tally_parts(check)) > 0
+	clauses := _m_ref_blocked(check)
+	count(clauses) > 0
+	m := concat(", and ", clauses)
+} else := m if {
 	clauses := [concat("", [side.text, " needs more than 15 digits"]) |
 		some side in _m_sides(check)
 		_side_form(side) in {"add", "sum_of"}

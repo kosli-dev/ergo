@@ -33,6 +33,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A `for` line whose sentence reads a path with a key from `$params` or `$input` that is missing or `null` names the key once, as spec 0.7 says ([for.roots](../../spec/semantics.md#for)), and its items no longer repeat the path: `r.zz is m named by $input.k` with `$input.k` `null` says `$input.k is null; item 1 of rs: r.zz is missing`, where it said `$input.k is null; item 1 of rs: r.zz is missing, and m named by $input.k is null`, and `k is m named by $input.k` says `k is missing; $input.k is null`, where it added `; m named by $input.k is null`. An `$applies` row that fails as `absent` or `null` names only what is in that state, as `ergo.rego` does and [message.cause](../../spec/semantics.md#messages) says: `from: things whose c.z is d.z` with `c` `{}` and `d` `null` says `c.z is missing`, where it said `c.z is missing, and d is null`. Changes the report of such checks.
 
+- A `count of`, a `sum of` or a `plus` that reads a `named by` key from `$input` when the input is a list says `$input is [...], which isn't an object`, as in `ergo.rego` and spec 0.7 ([path.not_an_object](../../spec/semantics.md#reading-a-path)), and still fails as `unusable`. `sum of xs.m named by $input.k is 1` said `sum of xs.m named by $input.k is 1 is false`. Under a `for` line, like `n plus x.m named by $input.k is 2`, the message no longer adds `; item 1 of xs: the check is false` after it.
+
 ## 0.4.0
 
 ### New
