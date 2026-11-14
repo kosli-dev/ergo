@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 import itertools
 import json
 import os
@@ -16,6 +17,7 @@ KEYS = [ABSENT, None, "a", 3, True, [], {}]
 LISTS = ["empty", "one", "two", "missing", "null", "text"]
 INPUTS = ["object", "list"]
 PARAMS = ["plain", "3"]
+GROUP_QUOTA = 12
 
 
 def spec_version():
@@ -54,7 +56,7 @@ def expand_all(value, expand):
     return value
 
 
-def build_cell(shape, key, k, es, input_shape, params_shape):
+def build_cell(shape, key, k, j, es, input_shape, params_shape):
     things = "things" if input_shape == "object" else "$input"
     two = key.replace("k", "j") if key.startswith("$") else "j"
 
@@ -77,7 +79,9 @@ def build_cell(shape, key, k, es, input_shape, params_shape):
     if items != ABSENT:
         thing["es"] = items
     if input_shape == "object":
-        data = {"things": [thing], "j": "a"}
+        data = {"things": [thing]}
+        if j != ABSENT:
+            data["j"] = j
         if k != ABSENT and key.startswith("$input"):
             data["k"] = k
     else:
@@ -85,7 +89,9 @@ def build_cell(shape, key, k, es, input_shape, params_shape):
     if params_shape == "3":
         params = 3
     elif key.startswith("$params"):
-        params = {"j": "a"}
+        params = {}
+        if j != ABSENT:
+            params["j"] = j
         if k != ABSENT:
             params["k"] = k
     else:
@@ -93,74 +99,130 @@ def build_cell(shape, key, k, es, input_shape, params_shape):
     return policy, data, params
 
 
+def has_two_keys(shape):
+    return "{key2}" in json.dumps([shape.get("check"), shape.get("from")])
+
+
+def root_is_dead(key, input_shape, params_shape):
+    return (key.startswith("$input") and input_shape == "list") or (key.startswith("$params") and params_shape == "3")
+
+
 def cells(shapes, only):
     out = []
     for shape in shapes:
         if only and shape["name"] not in only:
             continue
+        two = has_two_keys(shape)
         for key in shape["keys"]:
-            for k, es, input_shape, params_shape in itertools.product(KEYS, LISTS, INPUTS, PARAMS):
-                out.append({
-                    "shape": f"{shape['name']} [{key}]",
-                    "values": f"k={label(k)} es={es} input={input_shape} params={params_shape}",
-                    "build": (shape, key, k, es, input_shape, params_shape),
+            combos = [(k, "a") for k in KEYS]
+            if two:
+                combos += [("a", j) for j in KEYS if j != "a"]
+            seen = {}
+            for (k, j), es, input_shape, params_shape in itertools.product(combos, LISTS, INPUTS, PARAMS):
+                dead = root_is_dead(key, input_shape, params_shape)
+                shown = {"k": "any" if dead else label(k), "es": "any" if dead else es}
+                if two:
+                    shown["j"] = "any" if dead else label(j)
+                if dead:
+                    k, j, es = "a", "a", "two"
+                parts = [f"k={shown['k']}"] + ([f"j={shown['j']}"] if two else []) + [f"es={shown['es']}", f"input={input_shape}", f"params={params_shape}"]
+                values = " ".join(parts)
+                name = f"{shape['name']} [{key}] {values}"
+                seen.setdefault(name, {
+                    "group": f"{shape['name']} [{key}]",
+                    "name": name,
+                    "values": values,
+                    "id": hashlib.sha1(name.encode()).hexdigest()[:8],
+                    "bucket": (shown["k"], shown.get("j")),
+                    "rank": (input_shape != "object", params_shape != "3"),
+                    "build": (shape, key, k, j, es, input_shape, params_shape),
                 })
+            out.extend(seen.values())
+    ids = [cell["id"] for cell in out]
+    if len(set(ids)) != len(ids):
+        sys.exit("two cells have the same id")
     return out
 
 
 def sample(all_cells, limit):
     if len(all_cells) <= limit:
-        return all_cells
+        return sorted(all_cells, key=lambda c: c["name"])
     groups = {}
     for cell in all_cells:
-        groups.setdefault(cell["shape"], []).append(cell)
-    quota = max(1, limit // len(groups))
+        groups.setdefault(cell["group"], []).append(cell)
+    quota = min(GROUP_QUOTA, max(1, limit // len(groups)))
     chosen = []
     for group in groups.values():
-        if len(group) <= quota:
-            chosen.extend(group)
-        else:
-            chosen.extend(random.Random(group[0]["shape"]).sample(group, quota))
-    return chosen[:limit]
+        buckets = {}
+        for cell in sorted(group, key=lambda c: (c["rank"], c["id"])):
+            buckets.setdefault(cell["bucket"], []).append(cell)
+        lines = [buckets[b] for b in sorted(buckets, key=str)]
+        taken = []
+        while len(taken) < quota and any(lines):
+            for line in lines:
+                if line and len(taken) < quota:
+                    taken.append(line.pop(0))
+        chosen.extend(taken)
+    return sorted(chosen, key=lambda c: c["name"])
 
 
-def run_rego(opa, count):
-    query = "[object.remove(data.ergo.report(c.input, c.policy, c.params), [\"engine\"]) | some c in data.cases]"
-    out = subprocess.run(
-        shlex.split(opa) + ["eval", "-d", "dist/ergo.rego", "-d", os.path.join(WORK, "cases.json"), "--format", "raw", query],
-        cwd=ROOT, capture_output=True, text=True,
-    )
+def tail(text):
+    text = text.strip()
+    return text if len(text) <= 600 else "..." + text[-600:]
+
+
+def run_command(argv, shell, script):
+    shown = argv if shell else shlex.join(argv)
+    try:
+        out = subprocess.run(argv, shell=shell, cwd=ROOT, input=script, capture_output=True, text=True)
+    except OSError as error:
+        sys.exit(f"cannot run `{shown}`: {error}")
     if out.returncode != 0:
-        sys.exit(out.stdout + out.stderr)
-    reports = json.loads(out.stdout)
-    if len(reports) != count:
-        sys.exit(f"opa answered {len(reports)} reports for {count} cells")
-    return reports
+        sys.exit(f"`{shown}` exited with code {out.returncode}: {tail(out.stderr or out.stdout) or 'no output'}")
+    return out
 
 
-def run_rust(command, count):
+def run_rego(opa, ids):
+    query = "[object.remove(data.ergo.report(c.input, c.policy, c.params), [\"engine\"]) | some c in data.cases]"
+    argv = shlex.split(opa) + ["eval", "-d", "dist/ergo.rego", "-d", os.path.join(WORK, "cases.json"), "--format", "raw", query]
+    out = run_command(argv, False, None)
+    try:
+        reports = json.loads(out.stdout)
+    except ValueError:
+        sys.exit(f"`{shlex.join(argv)}` printed something that isn't JSON: {tail(out.stdout)}")
+    if not isinstance(reports, list) or len(reports) != len(ids):
+        sys.exit(f"`{shlex.join(argv)}` answered the wrong number of reports for {len(ids)} cells")
+    return [r if isinstance(r, dict) else {"error": f"report is {json.dumps(r)}"} for r in reports]
+
+
+def run_rust(command, ids):
     script = "\n".join([
         "cd dist/sweep/c",
+        "ergo --version > ../version.txt || exit 1",
         "for d in *; do",
-        "  ergo report --compact --policy $d/policy.json --input $d/input.json --params $d/params.json > $d/report.json 2> $d/error.txt",
+        "  ergo report --compact --policy $d/policy.json --input $d/input.json --params $d/params.json > $d/report.json 2> $d/error.txt || {",
+        "    code=$?",
+        "    echo \"ergo exited with code $code on cell $d: $(cat $d/error.txt)\" >&2",
+        "    exit 1",
+        "  }",
         "done",
     ])
-    out = subprocess.run(command, shell=True, cwd=ROOT, input=script, capture_output=True, text=True)
-    if out.returncode != 0:
-        sys.exit(out.stdout + out.stderr)
+    run_command(command, True, script)
+    with open(os.path.join(WORK, "version.txt")) as handle:
+        version = handle.read().strip()
     reports = []
-    for i in range(count):
-        folder = os.path.join(WORK, "c", f"{i:05d}")
+    for cell_id in ids:
+        folder = os.path.join(WORK, "c", cell_id)
         with open(os.path.join(folder, "report.json")) as handle:
             text = handle.read().strip()
         if text:
             report = json.loads(text)
         else:
             with open(os.path.join(folder, "error.txt")) as handle:
-                report = {"error": handle.read().strip()[:300]}
+                report = {"error": handle.read().strip()[:300] or "no output"}
         report.pop("engine", None)
         reports.append(report)
-    return reports
+    return version, reports
 
 
 def rows(report):
@@ -176,9 +238,15 @@ def short(value):
     return text if len(text) <= 160 else text[:157] + "..."
 
 
+def written_wrong(report):
+    return any(r.get("check") == "$well_formed" and not r.get("passed") for r in report.get("results", []))
+
+
 def differences(rego, rust):
     if rego == rust:
         return []
+    if "error" in rego or "error" in rust:
+        return [("report", ["error"], rego, rust)]
     found = []
     a, b = rows(rego), rows(rust)
     for key in sorted(set(a) | set(b)):
@@ -214,6 +282,9 @@ def main():
         if name not in names:
             sys.exit(f"no shape called {name}; --list shows them")
 
+    if args.limit < 1:
+        sys.exit("--limit must be 1 or more")
+
     all_cells = cells(shapes, set(args.shape or []))
     chosen = sample(all_cells, args.limit)
     note = "" if len(chosen) == len(all_cells) else f" (sampled from {len(all_cells)}; raise --limit or pick a --shape for the rest)"
@@ -222,10 +293,10 @@ def main():
     subprocess.run([os.path.join(ROOT, ".github", "build-ergo.sh")], cwd=ROOT, check=True)
     shutil.rmtree(WORK, ignore_errors=True)
     built = []
-    for i, cell in enumerate(chosen):
+    for cell in chosen:
         policy, data, params = build_cell(*cell["build"])
         built.append({"policy": policy, "input": data, "params": params})
-        folder = os.path.join(WORK, "c", f"{i:05d}")
+        folder = os.path.join(WORK, "c", cell["id"])
         os.makedirs(folder)
         for name, value in (("policy", policy), ("input", data), ("params", params)):
             with open(os.path.join(folder, name + ".json"), "w") as handle:
@@ -233,22 +304,30 @@ def main():
     with open(os.path.join(WORK, "cases.json"), "w") as handle:
         json.dump({"cases": built}, handle)
 
-    rego = run_rego(args.opa, len(chosen))
-    rust = run_rust(args.rust, len(chosen))
+    ids = [cell["id"] for cell in chosen]
+    rego = run_rego(args.opa, ids)
+    version, rust = run_rust(args.rust, ids)
+    print(f"rust engine: {version}")
 
     per_shape = {}
     total = 0
+    wrong = [0, 0]
     for i, cell in enumerate(chosen):
-        tally = per_shape.setdefault(cell["shape"], [0, 0, 0])
+        tally = per_shape.setdefault(cell["group"], [0, 0, 0, 0])
         tally[1] += 1
-        if any(r.get("check") == "$well_formed" and not r.get("passed") for r in rego[i].get("results", [])):
-            tally[2] += 1
+        flags = (written_wrong(rego[i]), written_wrong(rust[i]))
+        tally[2] += flags[0]
+        tally[3] += flags[1]
+        wrong[0] += flags[0]
+        wrong[1] += flags[1]
         found = differences(rego[i], rust[i])
+        if flags[0] != flags[1] and not found:
+            found.append(("report", ["written wrong"], {"written wrong": flags[0]}, {"written wrong": flags[1]}))
         if not found:
             continue
         tally[0] += 1
         total += 1
-        print(f"{cell['shape']} | {cell['values']} | cell {i:05d}")
+        print(f"{cell['group']} | {cell['values']} | cell {cell['id']}")
         for where, fields, left, right in found:
             print(f"  {where} differs in {', '.join(fields)}")
             if fields == ["entry"]:
@@ -260,8 +339,9 @@ def main():
                 print(f"      rego: {short((left or {}).get(field))}")
                 print(f"      rust: {short((right or {}).get(field))}")
     print()
-    for shape, (differ, ran, wrong) in per_shape.items():
-        print(f"{shape}: {differ} of {ran} differ, {wrong} written wrong")
+    for shape, (differ, ran, wrong_rego, wrong_rust) in per_shape.items():
+        print(f"{shape}: {differ} of {ran} differ, written wrong: rego {wrong_rego}, rust {wrong_rust}")
+    print(f"written wrong: rego {wrong[0]}, rust {wrong[1]}")
     print(f"{total} of {len(chosen)} cells differ")
 
 
