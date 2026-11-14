@@ -1,0 +1,24 @@
+{
+  "shapes": [
+    {"name": "every-whose-one-key", "keys": ["$input.k", "$params.k"], "check": "every es whose zz is m named by {key}, if any, exists"},
+    {"name": "every-whose-two-keys", "keys": ["$input.k", "$params.k"], "check": "every es whose zz is m named by {key} and whose v is m named by {key2}, if any, exists"},
+    {"name": "some-whose-two-keys", "keys": ["$input.k", "$params.k"], "check": "some es whose zz is m named by {key} and whose v is m named by {key2} exists"},
+    {"name": "every-phrase-named-by", "keys": ["$input.k", "$params.k"], "check": "every es.v, if any, is m named by {key}"},
+    {"name": "some-phrase-named-by", "keys": ["$input.k", "$params.k"], "check": "some es.v is m named by {key}"},
+    {"name": "right-side-named-by", "keys": ["$input.k", "$params.k"], "check": "every es whose zz is m named by {key}, if any, is m named by {key2}"},
+    {"name": "count-of-whose-two-keys", "keys": ["$input.k", "$params.k"], "check": "count of es whose zz is m named by {key} and whose v is m named by {key2} is 0"},
+    {"name": "count-of-that", "keys": ["$input.k", "$params.k"], "check": "count of es.v that is m named by {key} is 0"},
+    {"name": "sum-of-named-by", "keys": ["$input.k", "$params.k"], "check": "sum of es.v plus m named by {key} is 5"},
+    {"name": "sum-of-phrase", "keys": ["$input.k", "$params.k"], "check": "sum of es.v is m named by {key}"},
+    {"name": "bare-key-in-whose", "keys": ["k"], "check": "every es whose zz is m named by k, if any, exists"},
+    {"name": "for-two-keys", "keys": ["$input.k", "$params.k"], "check": {"for": "every es whose zz is m named by {key} and whose v is m named by {key2} as e", "assert": "e.v is 2"}},
+    {"name": "for-if-any", "keys": ["$input.k", "$params.k"], "check": {"for": "every es whose zz is m named by {key} and whose v is m named by {key2}, if any, as e", "assert": "e.v is 2"}},
+    {"name": "for-one-key", "keys": ["$input.k", "$params.k"], "check": {"for": "every es whose zz is m named by {key} as e", "assert": "e.v is 2"}},
+    {"name": "any-of-count", "keys": ["$input.k", "$params.k"], "check": {"any_of": {"a": "count of es whose zz is m named by {key} and whose v is m named by {key2} is 0", "b": "id is \"x\""}}},
+    {"name": "applies-some-phrase", "keys": ["$input.k", "$params.k"], "from": "{things} whose some es.v is m named by {key}"},
+    {"name": "applies-phrase", "keys": ["$input.k", "$params.k"], "from": "{things} whose every es.v, if any, is m named by {key}"},
+    {"name": "applies-count-is", "keys": ["$input.k", "$params.k"], "from": "{things} whose count of es is m named by {key}"},
+    {"name": "applies-plain", "keys": ["$input.k", "$params.k"], "from": "{things} whose m named by {key} is 2"},
+    {"name": "applies-two-conditions", "keys": ["$input.k", "$params.k"], "from": "{things} whose m named by {key} is 2 and whose some es.v is m named by {key2}"}
+  ]
+}

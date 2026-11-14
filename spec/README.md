@@ -84,3 +84,17 @@ opa eval -d engines/rego -d dist -d spec:spec --ignore src --format pretty 'data
 ```
 
 To run one folder of cases, give `opa test` its test: `opa test engines/rego dist spec:spec --ignore src --run 'test_the_present_cases_pass$'`, after `.github/build-ergo.sh`. When a case fails, the test prints its name, the case as written (`expected`) and the report `ergo.rego` gave (`actual`). The Rust engine runs every case in one test: `cargo test -p ergo-policy-engine --test cases every_case`. It prints the same three things for each case that fails and isn't in `known-failures.txt`. Neither engine can run a single case by itself.
+
+## Sweeping both engines
+
+`spec/sweep.py` builds the same policy for a grid of inputs, runs it through `ergo.rego` and the Rust `ergo` command, and prints only the cells where the two reports differ, with the fields that differ and both values. It reports and never fails, so it's not a check and CI doesn't run it. Run it before sending a change to how a message or a cause is worked out, and run it on `main` and on your branch and compare the two outputs.
+
+`spec/sweep-shapes.json` lists the shapes: a check or a `from` line with `{key}` and `{key2}` standing for a `named by` key read from `$input` or `$params`. Each shape runs over a key `k` that is missing, `null`, `"a"`, `3`, `true`, `[]` or `{}`, a list `es` that is empty, has one or two items, is missing, `null` or text, an input that is an object or a list, and params that are the ones the shape needs or `3`. To add a shape, add a line there.
+
+By default it runs 500 cells at most, spread evenly over the shapes. `--shape NAME` runs one shape in full (`--list` shows the names), and `--limit N` changes the cap. `--opa` takes the command that runs OPA. `--rust` takes a command that reads a shell script on its input and runs it from the root of the repo with `ergo` on the `PATH`. Without `--rust` that is `sh -s`, so build the CLI and put it on your `PATH`. With Docker and the `ergo-rust` image from [`engines/rust/README.md`](../engines/rust/README.md):
+
+```sh
+python3 spec/sweep.py --rust 'docker run --rm -i -v "$PWD":/src -w /src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c "find engines/rust -name \"*.rs\" -exec touch {} + && cargo build -j 4 --locked --release --manifest-path engines/rust/Cargo.toml -p ergo-policy-cli >&2 && PATH=/target/release:\$PATH exec sh -s"'
+```
+
+It builds `dist/ergo.rego` first and keeps the cells under `dist/sweep`, which Git ignores. The last lines say how many cells differ for each shape, and how many of the policies `ergo.rego` reads as written wrong, which both engines agree on, so those cells show nothing.
