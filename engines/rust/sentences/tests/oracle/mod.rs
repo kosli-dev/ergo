@@ -129,6 +129,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "z named by each of $params[0].v",
         "z named by each of $params[0].v",
     ),
+    ("every thing.us", "every thing.us"),
     (
         "$input.m named by each of $input.a.k",
         "$input.m named by each of $input.a.k",
