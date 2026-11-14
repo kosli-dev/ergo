@@ -151,7 +151,7 @@ The report must stay byte-identical for the same policy and input, whatever orde
 ## Spec rules
 
 - Ergo must be easy to reimplement outside Rego. Prefer rules that a TypeScript or Python version can follow to the same report over OPA behaviour.
-- Ergo never fails fast. Name every failed root and every problem, not the first one.
+- Ergo reports every failure. Name every failed root and every problem, not only the first one.
 
 ## Docs
 
