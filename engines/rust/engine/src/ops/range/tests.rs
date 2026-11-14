@@ -1,0 +1,92 @@
+use super::*;
+use crate::path::{Located, Location, Start, Step};
+use serde_json::json;
+use std::collections::BTreeMap;
+
+fn number(text: &str) -> Number {
+    match serde_json::from_str::<Value>(text).unwrap() {
+        Value::Number(n) => n,
+        _ => panic!("{text} isn't a number"),
+    }
+}
+
+fn cause(subject: &str, min: &str, max: &str) -> Cause {
+    outcome(subject, min, max, false)
+}
+
+fn outside(subject: &str, min: &str, max: &str) -> Cause {
+    outcome(subject, min, max, true)
+}
+
+fn outcome(subject: &str, min: &str, max: &str, outside: bool) -> Cause {
+    let input = json!({"things": [serde_json::from_str::<Value>(subject).unwrap()]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: None,
+        aliases: BTreeMap::new(),
+    };
+    let check = Range {
+        path: Path {
+            start: Start::Subject,
+            steps: vec![Step::Key("x".to_string())],
+        },
+        min: number(min),
+        max: number(max),
+        outside,
+    };
+    run(&check, &ctx).cause
+}
+
+#[test]
+fn passes_inside_the_range_bounds_included() {
+    assert_eq!(cause(r#"{"x": 2}"#, "1", "3"), Cause::Satisfied);
+    assert_eq!(cause(r#"{"x": 1}"#, "1", "3"), Cause::Satisfied);
+    assert_eq!(cause(r#"{"x": 3.0}"#, "1", "3"), Cause::Satisfied);
+    assert_eq!(cause(r#"{"x": 2}"#, "1.5", "2e1"), Cause::Satisfied);
+}
+
+#[test]
+fn fails_as_value_outside_the_range() {
+    assert_eq!(cause(r#"{"x": 0.5}"#, "1", "3"), Cause::Value);
+    assert_eq!(cause(r#"{"x": 4}"#, "1", "3"), Cause::Value);
+    assert_eq!(cause(r#"{"x": -2}"#, "-1", "1"), Cause::Value);
+}
+
+#[test]
+fn fails_as_unusable_on_anything_but_a_number() {
+    assert_eq!(cause(r#"{"x": "2"}"#, "1", "3"), Cause::Unusable);
+    assert_eq!(cause(r#"{"x": true}"#, "1", "3"), Cause::Unusable);
+    assert_eq!(cause(r#"{"x": [2]}"#, "1", "3"), Cause::Unusable);
+}
+
+#[test]
+fn outside_passes_below_and_above_and_fails_from_min_to_max_as_value() {
+    assert_eq!(outside(r#"{"x": 0.5}"#, "1", "3"), Cause::Satisfied);
+    assert_eq!(outside(r#"{"x": 3.5}"#, "1", "3"), Cause::Satisfied);
+    assert_eq!(outside(r#"{"x": 1}"#, "1", "3"), Cause::Value);
+    assert_eq!(outside(r#"{"x": 3.0}"#, "1", "3"), Cause::Value);
+    assert_eq!(outside(r#"{"x": 2}"#, "1", "3"), Cause::Value);
+}
+
+#[test]
+fn outside_never_passes_on_a_value_that_is_not_a_number_or_not_read() {
+    assert_eq!(outside(r#"{"x": "9"}"#, "1", "3"), Cause::Unusable);
+    assert_eq!(outside(r#"{"x": [9]}"#, "1", "3"), Cause::Unusable);
+    assert_eq!(outside(r#"{}"#, "1", "3"), Cause::Absent);
+    assert_eq!(outside(r#"{"x": null}"#, "1", "3"), Cause::Null);
+    assert_eq!(outside(r#""s""#, "1", "3"), Cause::NotAnObject);
+}
+
+#[test]
+fn fails_with_the_path_outcome_when_it_is_not_found() {
+    assert_eq!(cause(r#"{}"#, "1", "3"), Cause::Absent);
+    assert_eq!(cause(r#"{"x": null}"#, "1", "3"), Cause::Null);
+    assert_eq!(cause(r#""s""#, "1", "3"), Cause::NotAnObject);
+}
