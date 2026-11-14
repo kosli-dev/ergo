@@ -14,7 +14,16 @@ _failures(topic, groups) := {concat(" / ", [topic, group.description, c.descript
 	some group in groups
 	some c in group.cases
 	not _passes(group, c)
+	print(_failure_text(topic, group, c))
 }
+
+_failure_text(topic, group, c) := concat("\n", [
+	concat(" / ", [topic, group.description, c.description]),
+	"expected:",
+	json.marshal_with_options(object.remove(c, ["description"]), {"pretty": true}),
+	"actual:",
+	json.marshal_with_options(_report(group, c), {"pretty": true}),
+])
 
 _known_in(topic) := known_differences & _case_names(topic)
 

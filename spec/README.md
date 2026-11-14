@@ -82,3 +82,5 @@ To list the cases `ergo.rego` fails:
 .github/build-ergo.sh
 opa eval -d engines/rego -d dist -d spec:spec --ignore src --format pretty 'data.spec_test.failures'
 ```
+
+To run one folder of cases, give `opa test` its test: `opa test engines/rego dist spec:spec --ignore src --run 'test_the_present_cases_pass$'`, after `.github/build-ergo.sh`. When a case fails, the test prints its name, the case as written (`expected`) and the report `ergo.rego` gave (`actual`). The Rust engine runs every case in one test: `cargo test -p ergo-policy-engine --test cases every_case`. It prints the same three things for each case that fails and isn't in `known-failures.txt`. Neither engine can run a single case by itself.
