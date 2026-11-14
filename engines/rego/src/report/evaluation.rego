@@ -132,10 +132,10 @@ _check_def(check, here) := _with_refs(object.union(object.remove(_described(chec
 
 _with_refs(def, checked) := object.union(def, {"$refs_of": checked}) if {
 	data.ergo_reading == true
-	count(_check_refs(checked)) > 0
-} else := object.union(def, {"$refs": _ref_inputs(checked)}) if count(_check_refs(checked)) > 0
+	count(_listed_refs(checked)) > 0
+} else := object.union(def, {"$refs": _ref_entries(_listed_refs(checked))}) if count(_listed_refs(checked)) > 0
 
-_with_refs(def, checked) := def if count(_check_refs(checked)) == 0
+_with_refs(def, checked) := def if count(_listed_refs(checked)) == 0
 
 _evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _evaluation_with(doc, req, name, _fixed(req)))
 

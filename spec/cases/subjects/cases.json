@@ -29326,5 +29326,87 @@
         }
       }
     ]
+  },
+  {
+    "description": "a child of a parent named by each of params that are a list, read through a position and a key",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "z named by each of $params[0].v"
+        },
+        "u": {
+          "from": "every thing.us",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "u",
+          "checks": {
+            "c": "x is 1"
+          }
+        }
+      }
+    },
+    "params": [
+      [
+        1
+      ]
+    ],
+    "cases": [
+      {
+        "description": "the ref of $unique_ancestor_ids points at the item of the params where the read stopped",
+        "rules": [
+          "location.read",
+          "value.refs"
+        ],
+        "input": {
+          "z": {
+            "a": {
+              "us": [
+                {
+                  "id": "u",
+                  "x": 1
+                }
+              ]
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$unique_ancestor_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated thing ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "c": [],
+            "$unique_ancestor_ids": [
+              {
+                "locations": [
+                  "$params:/0"
+                ],
+                "name": "$params[0].v",
+                "value": null
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

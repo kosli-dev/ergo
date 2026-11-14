@@ -114,7 +114,7 @@ _ahead_check_defs(req, parts) := {n: _ahead_refs(def) | some n, def in parts.def
 	parts.defs
 } else := _requirement_check_defs(req)
 
-_ahead_refs(def) := object.union(object.remove(def, ["$refs_of"]), {"$refs": _ref_inputs(def["$refs_of"])}) if "$refs_of" in object.keys(def)
+_ahead_refs(def) := object.union(object.remove(def, ["$refs_of"]), {"$refs": _ref_entries(_listed_refs(def["$refs_of"]))}) if "$refs_of" in object.keys(def)
 
 else := def
 

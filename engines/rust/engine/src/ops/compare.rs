@@ -135,6 +135,9 @@ pub fn side_refs(left: &Side, right: &Side) -> Vec<Path> {
             Side::Join(pieces) => {
                 for piece in pieces {
                     if let Side::Path(path) = piece {
+                        if path::is_ref(path) {
+                            refs.push(path.clone());
+                        }
                         refs.extend(path::step_refs(path));
                     }
                 }

@@ -33,7 +33,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A `for` line's row lists an `every` or `some` that walks a `$params` list, like `$params.q[]` for `every $params.q is 1`, as in `ergo.rego` and spec 0.7 ([for.inputs](../../spec/semantics.md#for)), where it left it out.
 
-- A piece of a `followed by` from `$params` or `$input`, like `$params.x.y` in `tags contains v followed by $params.x.y`, isn't in the check's `$refs`, as in `ergo.rego` and spec 0.7 ([compare.join](../../spec/semantics.md#compare)), because it's a path, as one after `is` is. A `named by` key from `$params` inside a piece still is.
+- A piece of a `followed by` from `$params` or `$input` after `is` or another comparison, like `$params.x.y` in `w is v followed by $params.x.y`, is in the check's `$refs`, as in `ergo.rego` and spec 0.7 ([compare.join](../../spec/semantics.md#compare)). After `contains` it already was.
 
 ## 0.4.0
 

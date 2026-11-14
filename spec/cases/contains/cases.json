@@ -501,7 +501,7 @@
     ]
   },
   {
-    "description": "contains with a followed by that reads a piece from $params",
+    "description": "a followed by that reads a piece from $params",
     "policy": {
       "ergo_spec": "{{spec}}",
       "subjects": {
@@ -514,7 +514,18 @@
         "s": {
           "subject": "thing",
           "checks": {
-            "c": "tags contains v followed by $params.x.y"
+            "c": "tags contains v followed by $params.x.y",
+            "missing": "tags contains v followed by $params.z",
+            "null": "tags contains v followed by $params.n",
+            "number": "tags contains v followed by $params.w",
+            "object": "tags contains v followed by $params.x",
+            "joined": "w is v followed by $params.x.y",
+            "option": {
+              "any_of": {
+                "a": "tags contains v followed by $params.x.y",
+                "b": "v is \"q\""
+              }
+            }
           }
         }
       }
@@ -522,20 +533,25 @@
     "params": {
       "x": {
         "y": "b"
-      }
+      },
+      "n": null,
+      "w": 3
     },
     "cases": [
       {
-        "description": "the row lists the piece, and the check has no $refs, as a path on a side of a comparison has none",
+        "description": "the row lists the piece and the check's $refs lists it too, and a piece that is missing, null or isn't text fails the check",
         "rules": [
           "compare.join",
-          "value.refs"
+          "value.refs",
+          "value.ref",
+          "any_of.refs"
         ],
         "input": {
           "things": [
             {
               "id": "t",
               "v": "a",
+              "w": "ab",
               "tags": [
                 "ab"
               ]
@@ -577,11 +593,289 @@
               "id": "t",
               "type": "thing"
             }
+          },
+          {
+            "cause": "satisfied",
+            "check": "joined",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/w"
+                ],
+                "name": "w",
+                "value": "ab"
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": "b"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "missing",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/tags"
+                ],
+                "name": "tags",
+                "value": [
+                  "ab"
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.z",
+                "value": null
+              }
+            ],
+            "message": "$params.z is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "null",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/tags"
+                ],
+                "name": "tags",
+                "value": [
+                  "ab"
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "message": "$params.n is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "number",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/tags"
+                ],
+                "name": "tags",
+                "value": [
+                  "ab"
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "$params:/w"
+                ],
+                "name": "$params.w",
+                "value": 3
+              }
+            ],
+            "message": "$params.w is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "object",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/tags"
+                ],
+                "name": "tags",
+                "value": [
+                  "ab"
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "$params:/x"
+                ],
+                "name": "$params.x",
+                "value": {
+                  "y": "b"
+                }
+              }
+            ],
+            "message": "$params.x is {\"y\": \"b\"}, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "option",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": "b"
+              },
+              {
+                "locations": [
+                  "/things/0/tags"
+                ],
+                "name": "tags",
+                "value": [
+                  "ab"
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
           }
         ],
         "refs": {
           "s": {
-            "c": []
+            "c": [
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": "b"
+              }
+            ],
+            "missing": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.z",
+                "value": null
+              }
+            ],
+            "null": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "number": [
+              {
+                "locations": [
+                  "$params:/w"
+                ],
+                "name": "$params.w",
+                "value": 3
+              }
+            ],
+            "object": [
+              {
+                "locations": [
+                  "$params:/x"
+                ],
+                "name": "$params.x",
+                "value": {
+                  "y": "b"
+                }
+              }
+            ],
+            "joined": [
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": "b"
+              }
+            ],
+            "option": [
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": "b"
+              }
+            ]
           }
         }
       }

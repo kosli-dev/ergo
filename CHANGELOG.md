@@ -40,6 +40,8 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 - A `for` line's row lists each piece of a `followed by` that doesn't start at an alias, as spec 0.7 says ([for.inputs](spec/semantics.md#for), [compare.join](spec/semantics.md#compare)), where it listed only the lists the line walked. With `for: every ts as i` and params `{"x": {"y": "b"}}`, `i.tags contains i.v followed by $params.x.y` lists `$params.x.y` holding `"b"` before `ts[]`. The same goes for a piece from `$input` or the subject. The Rust engine already did this.
 
+- A piece of a `followed by` from `$params` or `$input` is in the check's `$refs`, as spec 0.7 says ([compare.join](spec/semantics.md#compare)), in a plain check, a `for` line and an `any_of` option alike. `tags contains v followed by $params.x.y` with params `{"x": {"y": "b"}}` lists `$params.x.y` holding `"b"` at `$params:/x/y`, where the check had no `$refs`. Changes the report of such checks.
+
 ## 0.6.0
 
 ### Changed

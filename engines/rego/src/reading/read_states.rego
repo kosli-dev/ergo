@@ -375,6 +375,18 @@ _check_refs(check) := {x.ref |
 	not _under_literal(check, p)
 }
 
+_listed_refs(check) := _check_refs(check) | {piece |
+	walk(check, [p, x])
+	_side_form(x) == "join"
+	not _under_literal(check, p)
+	some piece in x.join
+	is_array(piece)
+	piece[0] in {"$$params", "$$input"}
+	every s in array.slice(piece, 1, count(piece)) {
+		_is_key(s)
+	}
+}
+
 _step_refs(check) := {x.ref |
 	walk(check, [p, x])
 	_is_ref(x)
