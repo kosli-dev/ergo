@@ -24,6 +24,8 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 
 ## Checks
 
+`.github/checks.sh` runs most of the commands below, one at a time, and lists at the end the ones that failed. With no flag it runs the quick ones, `--rego` adds `opa test` and the strict `opa eval`, `--spec` adds the checks that need the virtual environment, `--rust` adds the Docker ones, and `--all` is all three. It leaves out the Wasm runs and the coverage run. The list below says what each check means, so change a command there and in the script together. `.github/checks_test.sh` tests the script.
+
 Run these before saying a change is done:
 
 ```sh
