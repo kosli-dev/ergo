@@ -405,6 +405,18 @@ pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
     {
         return Vec::new();
     }
+    blocked_along(path, ctx)
+}
+
+pub fn blocked_before_key(path: &Path, ctx: &Ctx) -> Vec<String> {
+    let read = path::read(path, ctx);
+    if read.outcome != Outcome::Unusable || !read.step_unreadable {
+        return Vec::new();
+    }
+    blocked_along(path, ctx)
+}
+
+fn blocked_along(path: &Path, ctx: &Ctx) -> Vec<String> {
     let Ok((mut value, _, _)) = path::start_of(&path.start, ctx) else {
         return Vec::new();
     };

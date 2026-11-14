@@ -8821,6 +8821,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of x.m named by $input.k is 1",
+        "count of x.m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of x.ys is sum of x.m named by $input.k",
+        "count of x.ys equals sum of x.m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
         "sum of xs.m named by $input.k plus n is 2",
         "sum of xs.m named by $input.k plus n is 2",
         &[],
@@ -12148,6 +12160,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every xs as pull", "every xs as pull", &[], &[]),
     ("every xs as x", "every xs as x", &[], &[]),
+    ("some xs as x", "some xs as x", &[], &[]),
     (
         "every xs as x, every ys.zs as y",
         "every xs as x, every ys.zs as y",
