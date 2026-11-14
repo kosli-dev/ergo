@@ -15635,5 +15635,363 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "count of xs whose tags contains $input.m named by key is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the item's own field before the root that isn't an object",
+        "rules": [
+          "message.items",
+          "tally.whose",
+          "sentence.derived.count",
+          "sentence.phrase.contains"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "key": "a",
+                  "tags": {
+                    "a": [
+                      "x"
+                    ]
+                  }
+                },
+                {
+                  "key": "a",
+                  "tags": [
+                    "x"
+                  ]
+                }
+              ]
+            }
+          ],
+          "m": 3
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "count of xs whose tags contains $input.m named by key",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "key": "a",
+                    "tags": {
+                      "a": [
+                        "x"
+                      ]
+                    }
+                  },
+                  {
+                    "key": "a",
+                    "tags": [
+                      "x"
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/m"
+                ],
+                "name": "$input.m",
+                "value": 3
+              }
+            ],
+            "message": "item 1 of xs: tags is {\"a\": [\"x\"]}, which isn't a list, and $input.m is 3, which isn't an object; item 2 of xs: $input.m is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "names the item's own field before the root that is text",
+        "rules": [
+          "message.items",
+          "tally.whose",
+          "sentence.derived.count",
+          "sentence.phrase.contains"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "key": "a",
+                  "tags": {
+                    "a": [
+                      "x"
+                    ]
+                  }
+                },
+                {
+                  "key": "a",
+                  "tags": [
+                    "x"
+                  ]
+                }
+              ]
+            }
+          ],
+          "m": "str"
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "count of xs whose tags contains $input.m named by key",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "key": "a",
+                    "tags": {
+                      "a": [
+                        "x"
+                      ]
+                    }
+                  },
+                  {
+                    "key": "a",
+                    "tags": [
+                      "x"
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/m"
+                ],
+                "name": "$input.m",
+                "value": "str"
+              }
+            ],
+            "message": "item 1 of xs: tags is {\"a\": [\"x\"]}, which isn't a list, and $input.m is \"str\", which isn't an object; item 2 of xs: $input.m is \"str\", which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "names a null root and then a missing key inside the item",
+        "rules": [
+          "message.items",
+          "tally.whose",
+          "sentence.derived.count",
+          "sentence.phrase.contains",
+          "path.ref_step"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "tags": [
+                    "x"
+                  ]
+                },
+                {
+                  "key": "a",
+                  "tags": [
+                    "x"
+                  ]
+                }
+              ]
+            }
+          ],
+          "m": null
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "count of xs whose tags contains $input.m named by key",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "tags": [
+                      "x"
+                    ]
+                  },
+                  {
+                    "key": "a",
+                    "tags": [
+                      "x"
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/m"
+                ],
+                "name": "$input.m",
+                "value": null
+              }
+            ],
+            "message": "item 1 of xs: $input.m is null; key is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "names a null root and then a null key inside the item",
+        "rules": [
+          "message.items",
+          "tally.whose",
+          "sentence.derived.count",
+          "sentence.phrase.contains",
+          "path.ref_step"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "key": null,
+                  "tags": [
+                    "x"
+                  ]
+                },
+                {
+                  "key": "a",
+                  "tags": [
+                    "x"
+                  ]
+                }
+              ]
+            }
+          ],
+          "m": null
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "count of xs whose tags contains $input.m named by key",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "key": null,
+                    "tags": [
+                      "x"
+                    ]
+                  },
+                  {
+                    "key": "a",
+                    "tags": [
+                      "x"
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/m"
+                ],
+                "name": "$input.m",
+                "value": null
+              }
+            ],
+            "message": "item 1 of xs: $input.m is null; key is null; item 2 of xs: $input.m is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

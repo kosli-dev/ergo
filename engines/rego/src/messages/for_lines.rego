@@ -160,13 +160,27 @@ _for_own_texts(item, e, names) := [t |
 	t := _m_aliased(concat(", and ", parts))
 ]
 
-_m_inner_text(check, f) := [_m_why_text(_m_for_item_name(check, f.path), f.own[0])] if count(object.get(f, "own", [])) > 0
+_m_whose_why(first, f) := _for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
+	wo := f.whose_of
+	_for_root_fails(wo[0], wo[1], wo[2])
+} else := f
+
+_m_inner_text(check, f) := _m_inner_text_of(check, _m_whose_why(false, f))
+
+_m_inner_text_of(check, f) := [_m_why_text(_m_for_item_name(check, f.path), f.own[0])] if count(object.get(f, "own", [])) > 0
 
 else := _m_root_why(f)
 
-_m_inner_free(f) := false if count(object.get(f, "own", [])) > 0
+_m_inner_free(f) := _m_inner_free_of(_m_whose_why(false, f))
+
+_m_inner_free_of(f) := false if count(object.get(f, "own", [])) > 0
 
 else := object.get(f, "free", false)
+
+_m_with_why(f) := object.union(f, {"msg": w.why}) if {
+	w := _m_whose_why(true, f)
+	"why" in object.keys(w)
+} else := f
 
 _m_own_said(said, roots) if {
 	some x in split(said, "; ")
@@ -184,9 +198,9 @@ _m_why_text(name, m) := concat("", [name, " ", trim_prefix(m, "the subject ")]) 
 
 else := concat("", [name, ": ", m])
 
-_m_strip(f) := object.union(object.remove(f, ["msg", "said", "raw", "bare", "hoisted"]), object.union({"failed_assertions": [_m_strip_line(l) | some l in f.failed_assertions]}, _m_strip_items(f))) if "failed_assertions" in object.keys(f)
+_m_strip(f) := object.union(object.remove(f, ["msg", "said", "raw", "bare", "hoisted", "whose_of"]), object.union({"failed_assertions": [_m_strip_line(l) | some l in f.failed_assertions]}, _m_strip_items(f))) if "failed_assertions" in object.keys(f)
 
-else := object.remove(f, ["msg", "said", "raw", "bare", "hoisted"])
+else := object.remove(f, ["msg", "said", "raw", "bare", "hoisted", "whose_of"])
 
 _m_strip_items(f) := {"failed_items": [object.remove(x, ["msg", "text", "free"]) | some x in f.failed_items]} if "failed_items" in object.keys(f)
 
@@ -346,7 +360,7 @@ _m_kept(e, shown, ents) if {
 	o.t in shown
 }
 
-_m_for_part(_, _, _, f) := _m_for_fail(f) if f.cause != "ambiguous"
+_m_for_part(_, _, _, f) := _m_for_fail(_m_with_why(f)) if f.cause != "ambiguous"
 
 _m_for_part(check, _, _, f) := [concat("", [object.get(f, "said", f.item), ": ", _m_tie(check, 1, f.failed_items)])] if {
 	f.cause == "ambiguous"

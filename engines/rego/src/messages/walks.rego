@@ -432,7 +432,7 @@ _m_shown_at(shown, _, "absent") := shown
 
 _m_shown_at(shown, i, "null") := array.slice(shown, 0, i)
 
-_m_cond_message(c, item, cause) := concat(", and ", cs) if {
+_m_cond_message(c, item, cause) := concat("; ", array.concat(_m_null_before_key(item, c), [concat(", and ", cs)])) if {
 	cause in {"absent", "null"}
 	cs := _m_key_states(item, c, cause)
 	cs != []
@@ -443,7 +443,7 @@ _m_cond_message(c, item, cause) := concat(", and ", cs) if {
 } else := concat(", and ", cs) if {
 	cause == "unusable"
 	wc := _m_walked(c, item)
-	cs := _once(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, wc), _m_blocked(item, wc)), _m_faults(item, wc)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
+	cs := _once(array.concat(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, wc), _m_blocked_early(item, wc)), _m_faults(item, wc)), _m_blocked_late(item, wc)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
 	cs != []
 } else := _m_fallback(c)
 
@@ -604,3 +604,21 @@ _row_message(check, subj, _) := concat("; ", ms) if {
 	]
 	ms != []
 } else := _m_fallback(check) if _any_of_run(check)
+
+_m_null_before_key(item, c) := _once([concat("", [_input_name(prefix), " is null"]) |
+	some side in _m_sides(c)
+	some p in _m_side_paths(side)
+	is_array(p)
+	_m_rooted_path(p)
+	some i, step in p
+	i > 0
+	_m_key_state(item, step) in {"absent", "null"}
+	prefix := array.slice(p, 0, i)
+	_m_resolved_prefix(item, prefix) == null
+])
+
+_m_rooted_path(p) if _part_start(p)
+
+_m_rooted_path(p) if _starts_at_name(p)
+
+_m_rooted_path(p) if _builtin(p)

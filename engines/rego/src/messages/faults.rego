@@ -199,6 +199,24 @@ _m_blocked(subj, check) := [c |
 	some c in _m_parent_clause(subj, check, s.name)
 ]
 
+_m_blocked_early(subj, check) := [c | some c in _m_blocked(subj, check); not c in _m_blocked_late(subj, check)]
+
+_m_params_faults_early(subj, check) := [c | some c in _m_params_faults(subj, check); not c in _m_blocked_late(subj, check)]
+
+_m_blocked_late(subj, check) := _once([c |
+	some side in _m_sides(check)
+	_m_late_side(check, side)
+	some c in array.concat(_m_parent_clause(subj, {"$sides": [side]}, _input_name(side)), _m_params_faults(subj, {"$sides": [side]}))
+])
+
+_m_late_side(check, side) if {
+	check.op == "compare"
+	check.cmp in _list_cmps
+	side == check.right
+	is_array(side)
+	side[0] in {"$$input", "$$input[]", "$$params", "$$params[]"}
+}
+
 _m_params_faults(subj, check) := [_m_isnt(_ref_name(prefix), v, _m_holder(k)) |
 	some side in _m_sides(check)
 	is_array(side)
