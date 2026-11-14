@@ -9,7 +9,7 @@ Runs the checks most changes need, one at a time, from the root of the repo.
 It keeps going after a failure and lists the failed checks at the end.
 
 With no flag it runs the quick checks: building dist/ergo.rego, opa check,
-opa fmt, regal lint, the folder, placeholder and no-comment checks, and the
+opa fmt, regal lint, the folder, folder-order, placeholder and no-comment checks, and the
 spec rules and sentences corpus checks.
 
   --rego   also run opa test and the opa eval with --strict-builtin-errors
@@ -111,6 +111,8 @@ check "opa fmt" "opa" "$fmt_command"
 check "regal lint" "regal" 'regal lint --disable-all --enable-category bugs --disable redundant-existence-check engines/rego examples engines/rust/sentences/tests/oracle'
 check "rego-folders.sh" "git" '.github/rego-folders.sh'
 check "rego-folders.sh test" "git" '.github/rego-folders_test.sh'
+check "rego-layers.py" "python3" 'python3 .github/rego-layers.py'
+check "rego-layers.py test" "git" '.github/rego-layers_test.sh'
 check "spec-placeholder.sh" "git" '.github/spec-placeholder.sh'
 check "spec-placeholder.sh test" "git" '.github/spec-placeholder_test.sh'
 check "spec rules" "python3" 'python3 spec/check_rules.py'

@@ -6,6 +6,7 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 
 - `engines/rego/src/` holds the Rego engine in parts, one folder per area and one file per topic, like `src/checks/compare.rego`. Each part starts with `package ergo` and `import rego.v1`. `src/package.rego` holds the license header and the `METADATA` annotation above `package ergo`, and nothing else.
 - `.github/build-ergo.sh` joins the parts into `dist/ergo.rego`, the single file people use, and writes `dist/ergo.rego.map`, which says which part each of its lines comes from. It puts `package.rego` first and the other parts after it, sorted by path, without their `package` and `import` lines. `dist/` isn't committed, so run it after changing a part and before any check. `.github/build-ergo.sh where` reads `dist/ergo.rego:<line>` lines and prints the part and line each one comes from.
+- `engines/rego/README.md` is the contributors' page for those parts: the order of the folders and the rule that a call may not point to a later one. `engines/rego/layers-known.txt` lists the calls that still do.
 - `engines/rego/tests/` holds its tests, all in `package ergo_test`. A test that calls a rule whose name starts with `_` sits beside that rule's part, like `tests/checks/leaf_ops_test.rego`. A test that goes through `report`, `violations`, `compile` or `as_sentences` sits in a file named after its feature, like `tests/for_lines_test.rego`, and helpers that more than one file uses are in `tests/support_test.rego`. Its name ends in `_test` so that Regal lets it call rules whose names start with `_`, as it does for test files.
 - `spec/` is the spec Ergo implements: what each check means as named rules, the syntax, JSON Schemas for a policy and a report, and cases that pin the rules down. `spec/README.md` explains it.
 - `engines/rego/tests/spec_test.rego` runs every case in `spec/cases` against `ergo.rego`.
@@ -41,6 +42,8 @@ opa eval --strict-builtin-errors -d engines/rego -d dist -d spec:spec -d example
 regal lint --disable-all --enable-category bugs --disable redundant-existence-check engines/rego examples engines/rust/sentences/tests/oracle
 .github/rego-folders.sh
 .github/rego-folders_test.sh
+python3 .github/rego-layers.py
+.github/rego-layers_test.sh
 .github/spec-placeholder.sh
 .github/spec-placeholder_test.sh
 python3 spec/check_rules.py
