@@ -128,6 +128,8 @@ pub struct Ctx<'a> {
     /// from such an input whose key can't be read ends with the key's
     /// outcome. When it's false, both end `NotAnObject`.
     pub item_by_item: bool,
+    /// True while a line of an `any_of` option runs.
+    pub in_option: bool,
 }
 
 impl<'a> Ctx<'a> {
@@ -467,6 +469,7 @@ mod tests {
             let ctx = Ctx {
                 label: None,
                 item_by_item,
+                in_option: false,
                 subject: Located {
                     value: &self.subject,
                     location: Location::input_root().key("s"),
@@ -572,6 +575,7 @@ mod tests {
         let ctx = Ctx {
             label: None,
             item_by_item: false,
+            in_option: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -608,6 +612,7 @@ mod tests {
             let ctx = Ctx {
                 label: None,
                 item_by_item: false,
+                in_option: false,
                 subject: Located {
                     value: &w.subject,
                     location: Location::input_root(),
@@ -630,6 +635,7 @@ mod tests {
         let ctx = Ctx {
             label: None,
             item_by_item: false,
+            in_option: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1141,6 +1147,7 @@ mod tests {
         let ctx = Ctx {
             label: None,
             item_by_item: false,
+            in_option: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1166,6 +1173,7 @@ mod tests {
         let ctx = Ctx {
             label: None,
             item_by_item: false,
+            in_option: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1185,6 +1193,7 @@ mod tests {
         let ctx = Ctx {
             label: None,
             item_by_item: false,
+            in_option: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1213,6 +1222,7 @@ mod tests {
         let ctx = Ctx {
             label: None,
             item_by_item: false,
+            in_option: false,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),

@@ -1352,7 +1352,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
 }
 
 fn in_a_for_line(ctx: &Ctx) -> bool {
-    ctx.label.is_none() && ctx.aliases.keys().any(|name| name != OUTER)
+    (ctx.label.is_none() || ctx.in_option) && ctx.aliases.keys().any(|name| name != OUTER)
 }
 
 fn first_list(path: &Path, ctx: &Ctx) -> String {
@@ -1414,7 +1414,7 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
         if row.verdict.cause != cause
             && !matches!(row.verdict.cause, Cause::Satisfied | Cause::Value)
         {
-            if ctx.label.is_some() && !row.parts.is_empty() {
+            if ctx.label.is_some() && !in_a_for_line(ctx) && !row.parts.is_empty() {
                 let parts = message::with_roots(std::mem::take(&mut row.parts), &text);
                 row.message = Some(message::joined(parts.clone()));
                 row.parts = parts;
@@ -1495,6 +1495,7 @@ mod tests {
         Ctx {
             label: None,
             item_by_item: false,
+            in_option: false,
             subject: Located {
                 value: subject,
                 location: Location::input_root().key("s"),

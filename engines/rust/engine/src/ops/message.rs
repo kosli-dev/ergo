@@ -571,6 +571,11 @@ fn unflawed_cause(line: &Check, ctx: &Ctx) -> Cause {
 }
 
 fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
+    let in_option = Ctx {
+        in_option: true,
+        ..ctx.clone()
+    };
+    let ctx = &in_option;
     let mut parts = Vec::new();
     for (at, option) in any.options.iter().enumerate() {
         let lines: Vec<String> = option
