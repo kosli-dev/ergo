@@ -418,11 +418,35 @@ _read_part(check) := object.remove(check, ["meta", "description"]) if is_object(
 
 else := check
 
-_read_refs(check) := _check_refs(check) | {_listed_ref(check, p, x) |
+_read_refs(check) := _check_refs(check) | {r |
 	walk(check, [p, x])
-	_whole_ref(x)
 	not _under_literal(check, p)
+	some r in _refs_at(check, p, x)
 }
+
+_refs_at(check, p, x) := {_listed_ref(check, p, x)} if _whole_ref(x)
+
+else := {_named_prefix(x)} if _named_ref(x)
+
+else := set()
+
+_named_ref(x) if {
+	is_array(x)
+	count(x) > 1
+	x[0] in {"$$params", "$$input"}
+	i := _first_name_step(x)
+	every s in array.slice(x, 1, i) {
+		_is_key(s)
+	}
+}
+
+_first_name_step(x) := min({j |
+	some j, s in x
+	j > 0
+	not _is_key(s)
+})
+
+_named_prefix(x) := array.slice(x, 0, _first_name_step(x))
 
 _listed_ref(check, p, x) := _s_walked(x) if _walked_at(check, p)
 

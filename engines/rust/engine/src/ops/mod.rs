@@ -344,8 +344,7 @@ impl Check {
         let own = |paths: Vec<&Path>, walks: bool| -> Vec<(Path, bool)> {
             paths
                 .into_iter()
-                .filter(|path| path::is_ref(path))
-                .map(|path| (path.clone(), walks))
+                .filter_map(|path| read_ref(path, walks))
                 .collect()
         };
         match self {
@@ -385,14 +384,32 @@ impl Check {
                 check
                     .paths()
                     .into_iter()
-                    .filter(|path| path::is_ref(path))
-                    .map(|path| {
+                    .filter_map(|path| {
                         let walks = counted.iter().any(|c| std::ptr::eq(*c, path));
-                        (path.clone(), walks)
+                        read_ref(path, walks)
                     })
                     .chain(check.counted_whose().flat_map(Check::read_refs))
                     .collect()
             }
+            Check::In(check) => own(check.paths(), false)
+                .into_iter()
+                .chain(named_prefixes(check.values.ref_paths()))
+                .collect(),
+            Check::Contains(check) => {
+                let right = match &check.wanted {
+                    lists::Wanted::One(right)
+                    | lists::Wanted::All(right)
+                    | lists::Wanted::Some(right) => right,
+                };
+                own(check.paths(), false)
+                    .into_iter()
+                    .chain(named_prefixes(right.ref_paths()))
+                    .collect()
+            }
+            Check::Matches(check) => own(check.paths(), false)
+                .into_iter()
+                .chain(named_prefixes(check.patterns.ref_paths()))
+                .collect(),
             _ => own(self.paths(), false),
         }
     }
@@ -425,6 +442,21 @@ impl Check {
             _ => false,
         }
     }
+}
+
+fn read_ref(path: &Path, walks: bool) -> Option<(Path, bool)> {
+    if path::is_ref(path) {
+        return Some((path.clone(), walks));
+    }
+    path::named_prefix(path).map(|prefix| (prefix, false))
+}
+
+fn named_prefixes(paths: Vec<&Path>) -> Vec<(Path, bool)> {
+    paths
+        .into_iter()
+        .filter_map(path::named_prefix)
+        .map(|prefix| (prefix, false))
+        .collect()
 }
 
 pub struct Ran {
