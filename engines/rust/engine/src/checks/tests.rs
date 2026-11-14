@@ -1,0 +1,610 @@
+use super::*;
+use crate::SPEC;
+use crate::policy::Policy;
+use serde_json::{Value, json};
+
+fn read(subjects: Value, checks: Value) -> BTreeMap<String, CheckRead> {
+    let policy = Policy::read(&json!({
+        "ergo_spec": SPEC,
+        "subjects": subjects,
+        "requirements": {"r": {"subject": "t", "checks": checks}}
+    }));
+    let reading = Reading::of(&policy);
+    read_checks(&reading, &policy.requirements["r"])
+}
+
+fn one(checks: Value) -> CheckRead {
+    read(json!({"t": {"from": "ts"}}), checks)
+        .remove("c")
+        .unwrap()
+}
+
+#[test]
+fn a_check_whose_for_is_not_a_string_keeps_the_dot_it_was_written_with() {
+    let read = one(json!({"c": {"for": ["every items as y"], "assert": "y.n is at least .y.k"}}));
+    assert_eq!(read.expression, "y.n is at least .y.k");
+    assert!(read.plan.is_none());
+}
+
+#[test]
+fn a_part_that_clashes_with_its_parent_still_prints_the_dot_of_a_field_called_like_it() {
+    let policy = Policy::read(&json!({
+        "ergo_spec": SPEC,
+        "subjects": {
+            "round": {"from": "rounds", "has": {"cov": "d.b"}},
+            "item": {"from": "round.items", "has": {"cov": "y"}}
+        },
+        "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1"}}}
+    }));
+    let reading = Reading::of(&policy);
+    let read = read_checks(&reading, &policy.requirements["r"]);
+    assert_eq!(read["c"].expression, ".cov is 1");
+}
+
+#[test]
+fn a_field_named_like_a_part_of_the_parent_only_prints_no_dot() {
+    let policy = Policy::read(&json!({
+        "ergo_spec": SPEC,
+        "subjects": {
+            "round": {"from": "rounds", "has": {"cov": "d.b"}},
+            "item": {"from": "round.items"}
+        },
+        "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1"}}}
+    }));
+    let reading = Reading::of(&policy);
+    let read = read_checks(&reading, &policy.requirements["r"]);
+    assert_eq!(read["c"].expression, "cov is 1");
+}
+
+fn problems(read: &CheckRead) -> Vec<&str> {
+    read.problems.iter().map(String::as_str).collect()
+}
+
+fn compare_to(path: crate::path::Path) -> Check {
+    use crate::ops::compare::{Cmp, Compare, Side};
+    Check::Compare(Compare {
+        left: Side::Path(crate::path::Path {
+            start: crate::path::Start::Subject,
+            steps: vec![crate::path::Step::Key("x".into())],
+        }),
+        right: Side::Path(path),
+        cmp: Cmp::Eq,
+        within: None,
+    })
+}
+
+fn in_list_at(path: crate::path::Path) -> Check {
+    use crate::ops::lists::{In, Right};
+    Check::In(In {
+        path: crate::path::Path {
+            start: crate::path::Start::Subject,
+            steps: vec![crate::path::Step::Key("x".into())],
+        },
+        values: Right::Ref(path),
+        not: false,
+    })
+}
+
+fn reference(start: crate::path::Start, key: &str) -> crate::path::Path {
+    crate::path::Path {
+        start,
+        steps: vec![crate::path::Step::Key(key.into())],
+    }
+}
+
+#[test]
+fn refs_are_read_once_from_the_params_and_the_input_and_sorted_by_name() {
+    use crate::path::Start;
+    let plan = Plan {
+        items: ["b", "a", "a"]
+            .iter()
+            .map(|k| Item {
+                text: String::new(),
+                check: in_list_at(reference(Start::Params, k)),
+            })
+            .chain(std::iter::once(Item {
+                text: String::new(),
+                check: in_list_at(reference(Start::Input, "i")),
+            }))
+            .collect(),
+        all_of: true,
+    };
+    let params = json!({"a": 1, "b": [2]});
+    let found = refs_of(&plan, &json!({"i": "z"}), Some(&params));
+    assert_eq!(
+        found,
+        [
+            json!({"name": "$input.i", "value": "z", "locations": ["/i"]}),
+            json!({"name": "$params.a", "value": 1, "locations": ["$params:/a"]}),
+            json!({"name": "$params.b", "value": [2], "locations": ["$params:/b"]}),
+        ]
+    );
+}
+
+#[test]
+fn a_ref_that_cannot_be_read_shows_null_where_the_read_stopped() {
+    use crate::path::Start;
+    let plan = Plan {
+        items: vec![Item {
+            text: String::new(),
+            check: in_list_at(reference(Start::Params, "k")),
+        }],
+        all_of: false,
+    };
+    assert_eq!(
+        refs_of(&plan, &json!({}), None),
+        [json!({"name": "$params.k", "value": null, "locations": ["$params:"]})]
+    );
+    let params = json!({});
+    assert_eq!(
+        refs_of(&plan, &json!({}), Some(&params))[0]["locations"],
+        json!(["$params:"])
+    );
+}
+
+#[test]
+fn a_ref_step_is_a_ref_and_a_plain_field_on_the_right_is_not() {
+    use crate::path::{Path, Start, Step};
+    let named = Path {
+        start: Start::Subject,
+        steps: vec![
+            Step::Key("m".into()),
+            Step::Ref(Box::new(reference(Start::Params, "k"))),
+        ],
+    };
+    let plan = Plan {
+        items: vec![
+            Item {
+                text: String::new(),
+                check: compare_to(named),
+            },
+            Item {
+                text: String::new(),
+                check: compare_to(reference(Start::Subject, "y")),
+            },
+        ],
+        all_of: true,
+    };
+    let params = json!({"k": "a"});
+    let found = refs_of(&plan, &json!({}), Some(&params));
+    assert_eq!(found.len(), 1);
+    assert_eq!(found[0]["name"], json!("$params.k"));
+}
+
+#[test]
+fn a_sentence_is_shown_in_its_canonical_spelling_and_lowers_to_one_assertion() {
+    let read = one(json!({"c": "  x   does not exist "}));
+    assert_eq!(read.expression, "x does not exist");
+    let plan = read.plan.unwrap();
+    assert_eq!(plan.items.len(), 1);
+    assert!(!plan.all_of);
+    assert!(matches!(&plan.items[0].check, Check::Present(p) if p.missing));
+}
+
+#[test]
+fn assertions_joined_with_and_or_listed_under_assert_are_one_all_of_check() {
+    let joined = one(json!({"c": "x exists and y exists"}));
+    let listed = one(json!({"c": {"assert": ["x exists", "y exists"]}}));
+    for read in [joined, listed] {
+        assert_eq!(read.expression, "x exists and y exists");
+        let plan = read.plan.unwrap();
+        assert!(plan.all_of);
+        assert_eq!(plan.items.len(), 2);
+        assert_eq!(plan.items[1].text, "y exists");
+    }
+}
+
+#[test]
+fn a_sentence_that_does_not_parse_keeps_its_text_and_the_parsers_message() {
+    let read = one(json!({"c": "  x is \"a  "}));
+    assert_eq!(read.expression, "x is \"a");
+    assert_eq!(problems(&read), ["unclosed quote at column 6"]);
+    assert!(read.plan.is_none());
+}
+
+#[test]
+fn a_problem_in_one_line_of_a_list_starts_with_the_lines_number() {
+    let read = one(json!({"c": {"assert": ["x exists", "y is \"a"]}}));
+    assert_eq!(problems(&read), ["line 2: unclosed quote at column 6"]);
+    let single = one(json!({"c": {"assert": ["y is \"a"]}}));
+    assert_eq!(problems(&single), ["unclosed quote at column 6"]);
+}
+
+#[test]
+fn a_sentence_that_reads_but_is_written_wrong_is_listed_and_has_no_plan() {
+    let read = one(json!({"c": "x equals x"}));
+    assert_eq!(problems(&read), ["x is compared with itself"]);
+    assert!(read.plan.is_none());
+}
+
+#[test]
+fn values_of_mixed_types_are_listed_beside_a_field_compared_with_itself_in_a_whose() {
+    let sentence = "every xs whose k is at least k is one of 1, 'a'";
+    let itself = "k is compared with itself, because in a whose it's read from the item: to read the subject's k, write t.k";
+    let read = one(json!({"c": sentence}));
+    assert_eq!(problems(&read), [itself, "values of mixed types"]);
+    let read = one(json!({"c": {"assert": ["x exists", sentence]}}));
+    let second = format!("line 2: {itself}");
+    assert_eq!(
+        problems(&read),
+        [second.as_str(), "line 2: values of mixed types"]
+    );
+}
+
+#[test]
+fn the_advice_to_write_the_subjects_name_is_left_out_when_the_name_needs_quotes() {
+    let policy = json!({
+        "ergo_spec": SPEC,
+        "subjects": {"my t": {"from": "things"}},
+        "requirements": {"r": {"subject": "my t", "checks": {
+            "c": "count of xs whose k equals k is 1",
+            "d": "sum of xs.v that is at least lo is 1"
+        }}}
+    });
+    let policy = Policy::read(&policy);
+    let reading = Reading::of(&policy);
+    let read = read_checks(&reading, &policy.requirements["r"]);
+    assert_eq!(
+        problems(&read["c"]),
+        ["k is compared with itself, because in a whose it's read from the item"]
+    );
+    assert_eq!(
+        problems(&read["d"]),
+        ["that lo: sum of adds up numbers, which have no fields, so lo can't be read from one"]
+    );
+}
+
+#[test]
+fn values_of_mixed_types_are_listed_beside_a_field_compared_with_itself() {
+    let sentence = "x is one of 1, 'a' and y is at least y";
+    let both = ["values of mixed types", "y is compared with itself"];
+    let read = one(json!({"c": sentence}));
+    assert_eq!(problems(&read), both);
+    let read = one(json!({"c": {"assert": ["x exists", sentence]}}));
+    assert_eq!(
+        problems(&read),
+        [
+            "line 2: values of mixed types",
+            "line 2: y is compared with itself"
+        ]
+    );
+    let read = one(json!({"c": {"any_of": {"p": sentence}}}));
+    assert_eq!(
+        problems(&read),
+        [
+            "option p: values of mixed types",
+            "option p: y is compared with itself"
+        ]
+    );
+    let read = one(
+        json!({"c": {"for": "every xs as i", "assert": "i is one of 1, 'a' and y is at least y"}}),
+    );
+    assert_eq!(problems(&read), both);
+}
+
+#[test]
+fn values_of_mixed_types_in_a_whose_of_the_for_line_start_with_for() {
+    let read =
+        one(json!({"c": {"for": "every xs whose v is one of 1, 'a' as x", "assert": "x exists"}}));
+    assert_eq!(problems(&read), ["for: values of mixed types"]);
+}
+
+#[test]
+fn every_problem_found_while_lowering_the_for_line_starts_with_for() {
+    let read =
+        one(json!({"c": {"for": "every xs whose k is one of 1, 'a' as x", "assert": "x exists"}}));
+    assert_eq!(problems(&read), ["for: values of mixed types"]);
+    let read = one(
+        json!({"c": {"for": "every xs whose k.a.b.c.d.e.f.g.h.i.j.l is 1 as x", "assert": "x exists"}}),
+    );
+    assert!(
+        problems(&read).iter().all(|p| p.starts_with("for: ")),
+        "{:?}",
+        problems(&read)
+    );
+    let read =
+        one(json!({"c": {"for": "every xs.a.b.c.d.e.f.g.h.i.j.k as x", "assert": "x exists"}}));
+    assert_eq!(
+        problems(&read),
+        ["for: every and some over more than ten steps aren't supported yet"]
+    );
+    let read =
+        one(json!({"c": {"for": "every xs as x", "assert": "x starts with count of ys plus 1"}}));
+    assert!(
+        problems(&read).iter().all(|p| !p.starts_with("for: ")),
+        "{:?}",
+        problems(&read)
+    );
+}
+
+#[test]
+fn a_phrase_that_cannot_take_a_count_or_a_plus_is_written_wrong() {
+    let read = one(json!({"c": "x ends with y plus z"}));
+    assert_eq!(
+        problems(&read),
+        ["\"ends with\" can't take a count of, a sum of or a plus"]
+    );
+    assert!(read.plan.is_none());
+    let read = one(json!({"c": "x does not contain y plus 1"}));
+    assert_eq!(
+        problems(&read),
+        ["\"does not contain\" can't take a count of, a sum of or a plus"]
+    );
+}
+
+#[test]
+fn a_written_wrong_for_check_keeps_its_for_line_in_the_expression() {
+    let read =
+        one(json!({"c": {"for": "every xs as  zz", "assert": ["zz.a is 1e2", "zz.b is \"a"]}}));
+    assert_eq!(
+        read.expression,
+        "for every xs as  zz: zz.a is 1e2 and zz.b is \"a"
+    );
+    let read = one(
+        json!({"c": {"for": "every xs as zz", "assert": ["zz.a is 1e2", "zz.b ends with y plus 1"]}}),
+    );
+    assert_eq!(
+        read.expression,
+        "for every xs as zz: zz.a is 1e2 and zz.b ends with y plus 1"
+    );
+    assert_eq!(
+        problems(&read),
+        ["line 2: \"ends with\" can't take a count of, a sum of or a plus"]
+    );
+}
+
+#[test]
+fn a_written_wrong_any_of_prints_each_option_as_written() {
+    let read = one(json!({"c": {"any_of": {"a": "x is   1e2", "b": ["y ends with z plus 1"]}}}));
+    assert_eq!(
+        read.expression,
+        "one of: a(x is   1e2) | b(y ends with z plus 1)"
+    );
+    assert!(read.plan.is_none());
+}
+
+#[test]
+fn an_option_with_a_syntax_problem_on_one_line_and_a_lowering_problem_on_another_lists_both() {
+    let read = one(json!({"c": {"any_of": {"a": ["x is \"a", "y ends with z plus 1"]}}}));
+    assert_eq!(
+        problems(&read),
+        [
+            "option a: line 1: unclosed quote at column 6",
+            "option a: line 2: \"ends with\" can't take a count of, a sum of or a plus"
+        ]
+    );
+}
+
+#[test]
+fn a_line_with_a_syntax_problem_is_not_lowered() {
+    let read = one(json!({"c": "every xs.y contains count of zs"}));
+    assert_eq!(
+        problems(&read),
+        [
+            "\"contains\" after every or some would check each item of the last list, not the list: put the walk on a for line"
+        ]
+    );
+}
+
+#[test]
+fn a_problem_found_while_lowering_one_of_several_lines_names_the_line() {
+    let read = one(json!({"c": {"assert": ["x exists", "y starts with z plus 1"]}}));
+    assert_eq!(
+        problems(&read),
+        ["line 2: \"starts with\" can't take a count of, a sum of or a plus"]
+    );
+}
+
+#[test]
+fn a_for_line_whose_with_a_phrase_that_cannot_take_a_count_is_written_wrong() {
+    let read = one(json!({"c": {
+        "for": "every xs whose k starts with count of ys as x",
+        "assert": ["x exists"]
+    }}));
+    assert_eq!(
+        problems(&read),
+        ["for: \"starts with\" can't take a count of, a sum of or a plus"]
+    );
+    assert!(read.plan.is_none());
+    assert_eq!(
+        read.expression,
+        "for every xs whose k starts with count of ys as x: x exists"
+    );
+}
+
+#[test]
+fn a_count_or_a_plus_after_every_or_some_is_written_wrong() {
+    let read = one(json!({"c": "every xs.y is less than k plus 1"}));
+    assert_eq!(
+        problems(&read),
+        ["count of, sum of and plus after every or some aren't supported yet"]
+    );
+    let read = one(json!({"c": "every xs.y starts with count of zs"}));
+    assert_eq!(
+        problems(&read),
+        [
+            "\"starts with\" can't take a count of, a sum of or a plus",
+            "count of, sum of and plus after every or some aren't supported yet"
+        ]
+    );
+    assert!(read.plan.is_none());
+}
+
+#[test]
+fn a_for_check_is_printed_with_its_line_and_gets_one_plan_that_runs_as_a_for_line() {
+    let read = one(json!({"c": {"for": "every xs as x", "assert": ["x.a exists", "x.b exists"]}}));
+    assert_eq!(
+        read.expression,
+        "for every xs as x: x.a exists and x.b exists"
+    );
+    let plan = read.plan.unwrap();
+    assert!(!plan.all_of);
+    assert!(matches!(plan.items[0].check, Check::For(_)));
+}
+
+#[test]
+fn a_for_line_problem_starts_with_for() {
+    let read = one(json!({"c": {"for": "every xs as x, every ys as x", "assert": "x exists"}}));
+    assert_eq!(problems(&read), ["for: x is given twice"]);
+    let read = one(json!({"c": {"for": "every xs", "assert": "x exists"}}));
+    assert!(problems(&read)[0].starts_with("for: "));
+}
+
+#[test]
+fn a_for_alias_named_like_a_subject_or_a_part_is_written_wrong() {
+    let read = read(
+        json!({"t": {"from": "ts", "has": {"cov": "d"}}, "other": {}}),
+        json!({"c": {"for": "every xs as cov, every ys as other", "assert": "cov exists"}}),
+    );
+    assert_eq!(
+        problems(&read["c"]),
+        [
+            "cov can't be an alias: it's a part of t",
+            "other can't be an alias: it's a subject's name"
+        ]
+    );
+}
+
+#[test]
+fn any_of_is_printed_with_its_options_sorted_and_each_option_problem_names_the_option() {
+    let read = one(json!({"c": {"any_of": {"b": "y exists", "a": ["x exists", "z exists"]}}}));
+    assert_eq!(
+        read.expression,
+        "one of: a(x exists and z exists) | b(y exists)"
+    );
+    let wrong = one(json!({"c": {"any_of": {"known": ["x exists", "y is \"a"]}}}));
+    assert_eq!(
+        problems(&wrong),
+        ["option known: line 2: unclosed quote at column 6"]
+    );
+}
+
+#[test]
+fn an_any_of_lowers_each_option_to_its_checks_and_names_a_problem_by_option_and_line() {
+    let read = one(json!({"c": {"any_of": {"b": "y exists", "a": ["x exists", "z exists"]}}}));
+    let plan = read.plan.unwrap();
+    let Check::AnyOf(found) = &plan.items[0].check else {
+        panic!("not any_of");
+    };
+    assert_eq!(found.options.len(), 2);
+    assert_eq!(found.options[0].len(), 2);
+    assert!(!plan.all_of);
+    let wrong = one(json!({"c": {"any_of": {"o": ["x exists", "x equals x"]}}}));
+    assert_eq!(
+        problems(&wrong),
+        ["option o: line 2: x is compared with itself"]
+    );
+    assert!(wrong.plan.is_none());
+}
+
+#[test]
+fn a_check_that_is_not_a_sentence_form_has_no_plan_and_keeps_what_was_written() {
+    let read = one(json!({"c": {"description": "d"}}));
+    assert_eq!(read.expression, "<missing assert>");
+    assert!(read.plan.is_none());
+    let read = one(json!({"c": 5}));
+    assert_eq!(read.expression, "<invalid check>");
+}
+
+#[test]
+fn a_part_alias_in_an_assertion_reads_the_part() {
+    let read = read(
+        json!({"t": {"from": "ts", "has": {"cov": "d.b"}}}),
+        json!({"c": "cov.x exists"}),
+    );
+    let plan = read["c"].plan.clone().unwrap();
+    let Check::Present(found) = &plan.items[0].check else {
+        panic!("not present");
+    };
+    assert!(matches!(found.path.start, crate::path::Start::Part(_)));
+}
+
+#[test]
+fn a_parent_name_in_an_assertion_reads_the_parent() {
+    let read = read(
+        json!({"p": {"from": "ps"}, "t": {"from": "p.ts"}}),
+        json!({"c": "p.owner exists"}),
+    );
+    let plan = read["c"].plan.clone().unwrap();
+    let Check::Present(found) = &plan.items[0].check else {
+        panic!("not present");
+    };
+    assert_eq!(found.path.start, crate::path::Start::Alias("p".into()));
+}
+
+#[test]
+fn a_sentence_written_wrong_where_it_is_lowered_keeps_the_text_as_written() {
+    let read = one(json!({"c": "n is count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11"}));
+    assert_eq!(
+        problems(&read),
+        ["every and some over more than ten steps aren't supported yet"]
+    );
+    assert_eq!(
+        read.expression,
+        "n is count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11"
+    );
+    assert_eq!(
+        one(json!({"c": "n is count of k1.k2"})).expression,
+        "n equals count of k1.k2"
+    );
+}
+
+#[test]
+fn an_any_of_with_a_field_no_check_has_keeps_the_words_it_was_written_with() {
+    let read = one(json!({"c": {"any_of": {"x": "x is one of $params.z"}, "zz": 1}}));
+    assert_eq!(read.expression, "one of: x(x is one of $params.z)");
+    assert!(read.plan.is_none());
+}
+
+#[test]
+fn an_assert_with_a_field_no_check_has_keeps_the_words_it_was_written_with() {
+    let read = one(json!({"c": {"assert": "x is one of $params.z", "zz": 1}}));
+    assert_eq!(read.expression, "x is one of $params.z");
+    assert!(read.plan.is_none());
+}
+
+#[test]
+fn a_description_that_is_not_text_still_prints_the_sentence_in_one_spelling() {
+    let read = one(json!({"c": {"assert": "x is one of $params.z", "description": 5}}));
+    assert_eq!(read.expression, "x is in $params.z");
+    assert!(read.plan.is_some());
+}
+
+fn has_problem(read: &CheckRead, text: &str) -> bool {
+    read.problems.iter().any(|problem| problem.contains(text))
+}
+
+#[test]
+fn an_assert_that_does_not_parse_next_to_a_field_no_check_has_keeps_its_problems() {
+    let read = one(json!({"c": {"assert": "nonsense words", "zz": 1}}));
+    assert_eq!(read.expression, "nonsense words");
+    assert!(has_problem(&read, "doesn't parse"));
+    assert!(read.plan.is_none());
+}
+
+#[test]
+fn an_assert_that_compares_a_path_with_itself_next_to_a_field_no_check_has_keeps_its_problems() {
+    let read = one(json!({"c": {"assert": "x is x", "zz": 1}}));
+    assert!(has_problem(&read, "x is compared with itself"));
+}
+
+#[test]
+fn an_assert_with_a_word_of_the_grammar_next_to_a_field_no_check_has_keeps_its_problems() {
+    let read = one(json!({"c": {"assert": "every", "zz": 1}}));
+    assert!(has_problem(
+        &read,
+        "every is a word of the grammar: write .every"
+    ));
+}
+
+#[test]
+fn an_any_of_with_a_bad_option_next_to_a_field_no_check_has_keeps_its_problems() {
+    let read = one(json!({"c": {"any_of": {"a": "nonsense words"}, "zz": 1}}));
+    assert!(has_problem(&read, "option a: doesn't parse"));
+}
+
+#[test]
+fn a_for_next_to_an_any_of_keeps_the_problems_of_the_options() {
+    let read = one(json!({"c": {"for": "every ts as t", "any_of": {"a": "nonsense words"}}}));
+    assert!(has_problem(&read, "option a: doesn't parse"));
+}
