@@ -50,6 +50,8 @@ jobs:
         run: |
           .github/rego-folders.sh
           .github/rego-folders_test.sh
+          python3 .github/rego-layers.py
+          .github/rego-layers_test.sh
       - name: Check the script that runs the common checks
         run: .github/checks_test.sh
       - name: Check the release workflow's latest flag, release notes and tag checks
