@@ -1741,9 +1741,11 @@ impl For {
             Named::Ahead(texts) => (texts, true),
         };
         let failed = !run.failed_items.is_empty();
+        let unread = self.unread_key_texts(ctx, &roots);
+        let hidden: Vec<String> = roots.iter().chain(&unread).cloned().collect();
         let free: Vec<String> = if failed || alone {
             free.iter()
-                .map(|text| unskipped(text, &roots))
+                .map(|text| unskipped(text, &hidden))
                 .filter(|text| !text.is_empty())
                 .collect()
         } else {
@@ -1764,6 +1766,7 @@ impl For {
             .unwrap_or_default();
         let (items, hoisted) = if failed {
             let mut skip = once.clone();
+            skip.extend(unread);
             if let Some((_, _, raw, _)) = self.second_roots(ctx) {
                 skip.extend(raw);
             }
@@ -1801,6 +1804,44 @@ impl For {
         }
         run.message = Some(super::message::joined(parts));
         run
+    }
+
+    fn unread_key_texts(&self, ctx: &Ctx, said: &[String]) -> Vec<String> {
+        let outer = outer_ctx(ctx);
+        let mut texts = Vec::new();
+        for sentence in &self.sentences {
+            let paths = sentence.check.paths();
+            let keys: Vec<&Path> = paths
+                .iter()
+                .flat_map(|root| {
+                    root.steps.iter().filter_map(|step| match step {
+                        Step::Ref(key) if matches!(key.start, Start::Params | Start::Input) => {
+                            Some(&**key)
+                        }
+                        _ => None,
+                    })
+                })
+                .collect();
+            for root in paths {
+                let Some(key) = unread_key(root, &keys, &outer) else {
+                    continue;
+                };
+                let word = match path::read(key, &outer).outcome {
+                    crate::path::Outcome::Null => "null",
+                    _ => "missing",
+                };
+                if !said.contains(&format!("{} is {word}", crate::name::name(key))) {
+                    continue;
+                }
+                let read = path::read(root, &outer).outcome;
+                let word = match read {
+                    crate::path::Outcome::Null => "null",
+                    _ => "missing",
+                };
+                texts.push(format!("{} is {word}", crate::name::name(root)));
+            }
+        }
+        texts
     }
 
     fn rooted(&self, run: &mut Run, ctx: &Ctx) -> Named {
@@ -3471,6 +3512,9 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
                     continue;
                 }
             }
+            if unread_key(root, &keys, ctx).is_some() {
+                continue;
+            }
             let read = path::read(root, ctx);
             let part = matches!(&root.start, Start::Part(part) if !part.steps.is_empty());
             if super::lists::right_paths(check).contains(&root)
@@ -3524,6 +3568,21 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
         }
     }
     Cause::worst(causes).map(|cause| (cause, texts))
+}
+
+fn unread_key<'p>(root: &'p Path, keys: &[&Path], ctx: &Ctx) -> Option<&'p Path> {
+    root.steps.iter().find_map(|step| match step {
+        Step::Ref(key)
+            if keys.contains(&&**key)
+                && matches!(
+                    path::read(key, ctx).outcome,
+                    crate::path::Outcome::Absent | crate::path::Outcome::Null
+                ) =>
+        {
+            Some(&**key)
+        }
+        _ => None,
+    })
 }
 
 fn list_failures(row: Cause, failed: &[Value]) -> bool {

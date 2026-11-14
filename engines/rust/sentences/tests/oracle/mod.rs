@@ -2194,6 +2194,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "things whose n is at least $params.p and whose count of $params.q is 1 and whose n is in $params.l",
         "things whose n is at least $params.p and whose count of $params.q is 1 and whose n is in $params.l",
     ),
+    ("things whose c.z is d.z", "things whose c.z equals d.z"),
+    (
+        "things whose k is m named by $input.k",
+        "things whose k equals m named by $input.k",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

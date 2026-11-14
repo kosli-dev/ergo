@@ -4573,5 +4573,227 @@
         "refs": {"s": {"c": []}}
       }
     ]
+  },
+  {
+    "description": "a check whose sides can't be read in different ways, with a named by key from $input.k",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"k_is_m": "k is m named by $input.k", "m_is_k": "m named by $input.k is k", "zz_is_m": "zz.y is m named by $input.k", "m_is_in_vs": "m named by $input.k is in vs", "beside": {"for": "every rs as r", "assert": "r.v is 1"}}}}},
+    "cases": [
+      {
+        "description": "the key is missing and k missing",
+        "rules": ["compare.fail", "path.ref_step", "path.field_step", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "vs": ["a", 4], "rs": [{"v": 1}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "beside", "failed_items": [], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "k_is_m", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "m_is_in_vs", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0/vs"], "name": "vs", "value": ["a", 4]}], "message": "vs is [\"a\", 4], which isn't a list of one kind of value", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "m_is_k", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0"], "name": "k", "value": null}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "zz_is_m", "inputs": [{"locations": ["/things/0"], "name": "zz.y", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is null and k missing",
+        "rules": ["compare.fail", "path.ref_step", "path.field_step", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "vs": ["a", 4], "rs": [{"v": 1}]}], "k": null},
+        "results": [
+          {"cause": "satisfied", "check": "beside", "failed_items": [], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "k_is_m", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "k is missing, and m named by $input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "m_is_in_vs", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0/vs"], "name": "vs", "value": ["a", 4]}], "message": "vs is [\"a\", 4], which isn't a list of one kind of value", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "m_is_k", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0"], "name": "k", "value": null}], "message": "m named by $input.k is null, and k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "zz_is_m", "inputs": [{"locations": ["/things/0"], "name": "zz.y", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "zz.y is missing, and m named by $input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is a number and k missing",
+        "rules": ["compare.fail", "path.ref_step", "path.field_step", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "vs": ["a", 4], "rs": [{"v": 1}]}], "k": 3},
+        "results": [
+          {"cause": "satisfied", "check": "beside", "failed_items": [], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "k_is_m", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "m_is_in_vs", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0/vs"], "name": "vs", "value": ["a", 4]}], "message": "$input.k is 3, which isn't text, and vs is [\"a\", 4], which isn't a list of one kind of value", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "m_is_k", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0"], "name": "k", "value": null}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "zz_is_m", "inputs": [{"locations": ["/things/0"], "name": "zz.y", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check whose sides can't be read in different ways, with a named by key from $params.k, the key is missing and k missing",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"k_is_m": "k is m named by $params.k", "m_is_k": "m named by $params.k is k", "zz_is_m": "zz.y is m named by $params.k", "m_is_in_vs": "m named by $params.k is in vs", "beside": {"for": "every rs as r", "assert": "r.v is 1"}}}}},
+    "cases": [
+      {
+        "description": "the key is missing and k missing",
+        "rules": ["compare.fail", "path.ref_step", "path.field_step", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "vs": ["a", 4], "rs": [{"v": 1}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "beside", "failed_items": [], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "k_is_m", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}], "message": "$params.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "m_is_in_vs", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}, {"locations": ["/things/0/vs"], "name": "vs", "value": ["a", 4]}], "message": "vs is [\"a\", 4], which isn't a list of one kind of value", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "m_is_k", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}, {"locations": ["/things/0"], "name": "k", "value": null}], "message": "$params.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "zz_is_m", "inputs": [{"locations": ["/things/0"], "name": "zz.y", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}], "message": "$params.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check whose sides can't be read in different ways, with a named by key from $params.k, the key is null and k missing",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"k_is_m": "k is m named by $params.k", "m_is_k": "m named by $params.k is k", "zz_is_m": "zz.y is m named by $params.k", "m_is_in_vs": "m named by $params.k is in vs", "beside": {"for": "every rs as r", "assert": "r.v is 1"}}}}},
+    "params": {"k": null},
+    "cases": [
+      {
+        "description": "the key is null and k missing",
+        "rules": ["compare.fail", "path.ref_step", "path.field_step", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "vs": ["a", 4], "rs": [{"v": 1}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "beside", "failed_items": [], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "k_is_m", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}], "message": "k is missing, and m named by $params.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "m_is_in_vs", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}, {"locations": ["/things/0/vs"], "name": "vs", "value": ["a", 4]}], "message": "vs is [\"a\", 4], which isn't a list of one kind of value", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "m_is_k", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}, {"locations": ["/things/0"], "name": "k", "value": null}], "message": "m named by $params.k is null, and k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "zz_is_m", "inputs": [{"locations": ["/things/0"], "name": "zz.y", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}], "message": "zz.y is missing, and m named by $params.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check whose sides can't be read in different ways, with a named by key from $params.k, the key is a number and k missing",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"k_is_m": "k is m named by $params.k", "m_is_k": "m named by $params.k is k", "zz_is_m": "zz.y is m named by $params.k", "m_is_in_vs": "m named by $params.k is in vs", "beside": {"for": "every rs as r", "assert": "r.v is 1"}}}}},
+    "params": {"k": 3},
+    "cases": [
+      {
+        "description": "the key is a number and k missing",
+        "rules": ["compare.fail", "path.ref_step", "path.field_step", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "vs": ["a", 4], "rs": [{"v": 1}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "beside", "failed_items": [], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"v": 1}]}], "passed": true, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "k_is_m", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}], "message": "$params.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "m_is_in_vs", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}, {"locations": ["/things/0/vs"], "name": "vs", "value": ["a", 4]}], "message": "$params.k is 3, which isn't text, and vs is [\"a\", 4], which isn't a list of one kind of value", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "m_is_k", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}, {"locations": ["/things/0"], "name": "k", "value": null}], "message": "$params.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "zz_is_m", "inputs": [{"locations": ["/things/0"], "name": "zz.y", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}], "message": "$params.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose sentence can't be read in different ways, with a named by key from $input, the key is missing",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"item_side": {"for": "every rs as r", "assert": "r.zz is m named by $input.k"}, "root_side": {"for": "every rs as r", "assert": "k is m named by $input.k"}, "params": {"for": "every rs as r", "assert": "r.zz is m named by $params.k"}}}}},
+    "cases": [
+      {
+        "description": "the key is missing",
+        "rules": ["compare.fail", "path.ref_step", "for.roots", "message.items"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "rs": [{"v": "a"}, {"v": 4}]}]},
+        "results": [
+          {"cause": "absent", "check": "item_side", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.zz equals m named by $input.k", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"v": "a"}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.zz equals m named by $input.k", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/1"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 2 of rs", "locations": ["/things/0/rs/1"], "path": "item 2 of rs", "value": {"v": 4}}], "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0/rs/0", "/things/0/rs/1"], "name": "rs[]", "value": [{"v": "a"}, {"v": 4}]}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "params", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.zz equals m named by $params.k", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"v": "a"}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.zz equals m named by $params.k", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/1"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}]}], "item": "item 2 of rs", "locations": ["/things/0/rs/1"], "path": "item 2 of rs", "value": {"v": 4}}], "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}, {"locations": ["/things/0/rs/0", "/things/0/rs/1"], "name": "rs[]", "value": [{"v": "a"}, {"v": 4}]}], "message": "$params.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "root_side", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "k equals m named by $input.k", "cause": "absent", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"v": "a"}}, {"cause": "absent", "failed_assertions": [{"assertion": "k equals m named by $input.k", "cause": "absent", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 2 of rs", "locations": ["/things/0/rs/1"], "path": "item 2 of rs", "value": {"v": 4}}], "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0/rs/0", "/things/0/rs/1"], "name": "rs[]", "value": [{"v": "a"}, {"v": 4}]}], "message": "$input.k is missing; k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose sentence can't be read in different ways, with a named by key from $input, the key is null",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"item_side": {"for": "every rs as r", "assert": "r.zz is m named by $input.k"}, "root_side": {"for": "every rs as r", "assert": "k is m named by $input.k"}, "params": {"for": "every rs as r", "assert": "r.zz is m named by $params.k"}}}}},
+    "params": {"k": null},
+    "cases": [
+      {
+        "description": "the key is null",
+        "rules": ["compare.fail", "path.ref_step", "for.roots", "message.items"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "rs": [{"v": "a"}, {"v": 4}]}], "k": null},
+        "results": [
+          {"cause": "absent", "check": "item_side", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.zz equals m named by $input.k", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"v": "a"}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.zz equals m named by $input.k", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/1"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 2 of rs", "locations": ["/things/0/rs/1"], "path": "item 2 of rs", "value": {"v": 4}}], "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0/rs/0", "/things/0/rs/1"], "name": "rs[]", "value": [{"v": "a"}, {"v": 4}]}], "message": "$input.k is null; item 1 of rs: r.zz is missing; item 2 of rs: r.zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "params", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.zz equals m named by $params.k", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"v": "a"}}, {"cause": "absent", "failed_assertions": [{"assertion": "r.zz equals m named by $params.k", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/1"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}]}], "item": "item 2 of rs", "locations": ["/things/0/rs/1"], "path": "item 2 of rs", "value": {"v": 4}}], "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}, {"locations": ["/things/0/rs/0", "/things/0/rs/1"], "name": "rs[]", "value": [{"v": "a"}, {"v": 4}]}], "message": "$params.k is null; item 1 of rs: r.zz is missing; item 2 of rs: r.zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "absent", "check": "root_side", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "k equals m named by $input.k", "cause": "absent", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"v": "a"}}, {"cause": "absent", "failed_assertions": [{"assertion": "k equals m named by $input.k", "cause": "absent", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 2 of rs", "locations": ["/things/0/rs/1"], "path": "item 2 of rs", "value": {"v": 4}}], "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0/rs/0", "/things/0/rs/1"], "name": "rs[]", "value": [{"v": "a"}, {"v": 4}]}], "message": "k is missing; $input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose sentence can't be read in different ways, with a named by key from $input, the key is a number",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"item_side": {"for": "every rs as r", "assert": "r.zz is m named by $input.k"}, "root_side": {"for": "every rs as r", "assert": "k is m named by $input.k"}, "params": {"for": "every rs as r", "assert": "r.zz is m named by $params.k"}}}}},
+    "params": {"k": 3},
+    "cases": [
+      {
+        "description": "the key is a number",
+        "rules": ["compare.fail", "path.ref_step", "for.roots", "message.items"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "rs": [{"v": "a"}, {"v": 4}]}], "k": 3},
+        "results": [
+          {"cause": "unusable", "check": "item_side", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.zz equals m named by $input.k", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"v": "a"}}, {"cause": "unusable", "failed_assertions": [{"assertion": "r.zz equals m named by $input.k", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/1"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 2 of rs", "locations": ["/things/0/rs/1"], "path": "item 2 of rs", "value": {"v": 4}}], "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0/rs/0", "/things/0/rs/1"], "name": "rs[]", "value": [{"v": "a"}, {"v": 4}]}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "params", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.zz equals m named by $params.k", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"v": "a"}}, {"cause": "unusable", "failed_assertions": [{"assertion": "r.zz equals m named by $params.k", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/1"], "name": "r.zz", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}]}], "item": "item 2 of rs", "locations": ["/things/0/rs/1"], "path": "item 2 of rs", "value": {"v": 4}}], "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}, {"locations": ["/things/0/rs/0", "/things/0/rs/1"], "name": "rs[]", "value": [{"v": "a"}, {"v": 4}]}], "message": "$params.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "root_side", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "k equals m named by $input.k", "cause": "unusable", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"v": "a"}}, {"cause": "unusable", "failed_assertions": [{"assertion": "k equals m named by $input.k", "cause": "unusable", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}]}], "item": "item 2 of rs", "locations": ["/things/0/rs/1"], "path": "item 2 of rs", "value": {"v": 4}}], "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0/rs/0", "/things/0/rs/1"], "name": "rs[]", "value": [{"v": "a"}, {"v": 4}]}], "message": "$input.k is 3, which isn't text; k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose condition can't be read in different ways, with a named by key from $input",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things whose k is m named by $input.k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "the key is missing and k missing",
+        "rules": ["compare.fail", "path.ref_step", "scope.filters", "message.applies", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}}]},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is null and k missing",
+        "rules": ["compare.fail", "path.ref_step", "scope.filters", "message.applies", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}}], "k": null},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is a number and k missing",
+        "rules": ["compare.fail", "path.ref_step", "scope.filters", "message.applies", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}}], "k": 3},
+        "results": [
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key names a field m doesn't have and k is null",
+        "rules": ["compare.fail", "path.ref_step", "scope.filters", "message.applies", "message.cause"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "k": null}], "k": "zz"},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0/k"], "name": "k", "value": null}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "m named by $input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose condition reads two paths that can't be read in different ways",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things whose c.z is d.z", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists", "d": "c.z is d.z"}}}},
+    "cases": [
+      {
+        "description": "one missing and one null",
+        "rules": ["scope.filters", "message.applies", "message.cause"],
+        "input": {"things": [{"id": "t", "c": {}, "d": null}]},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0/c"], "name": "c.z", "value": null}, {"locations": ["/things/0/d"], "name": "d.z", "value": null}], "message": "c.z is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a one-line every whose items and phrase can't be read in different ways, with a named by key from $input",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every rs.zz is m named by $input.k"}}}},
+    "cases": [
+      {
+        "description": "the key is missing",
+        "rules": ["compare.fail", "path.ref_step", "message.items"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "rs": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "rs[0].zz", "value": null}, {"cause": "absent", "item": "item 2 of rs", "locations": ["/things/0/rs/1"], "path": "rs[1].zz", "value": null}], "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0/rs/0", "/things/0/rs/1"], "name": "rs[].zz", "value": [null, null]}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the key is null",
+        "rules": ["compare.fail", "path.ref_step", "message.items"],
+        "input": {"things": [{"id": "t", "m": {"a": "a"}, "rs": [{"v": 1}, {"v": 2}]}], "k": null},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "rs[0].zz", "value": null}, {"cause": "absent", "item": "item 2 of rs", "locations": ["/things/0/rs/1"], "path": "rs[1].zz", "value": null}], "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}, {"locations": ["/things/0/rs/0", "/things/0/rs/1"], "name": "rs[].zz", "value": [null, null]}], "message": "item 1 of rs: zz is missing; item 2 of rs: zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

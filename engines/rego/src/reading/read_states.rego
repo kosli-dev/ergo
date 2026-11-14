@@ -18,6 +18,15 @@ _read_state(subj, path) := _plain_read_state(subj, path, object.get(subj, _plain
 	_plain_path(path)
 } else := _any_read_state(subj, path)
 
+_side_state(subj, side) := s if {
+	s := _unread_ref_state(side)
+} else := _read_state(subj, side)
+
+_unread_ref_state(path) := _worst_of({_ref_state(x.ref) | some x in path; _is_ref(x)} & {"absent", "null"}) if {
+	some x in path
+	_is_ref(x)
+}
+
 _plain_read_state(subj, path, v) := "value" if {
 	v != _absent
 	v != null
@@ -276,9 +285,29 @@ _cause_precedence := ["not_an_object", "ambiguous", "unusable", "absent", "null"
 
 _worst_read(subj, check) := _read_cause(subj, check, refs, {_used_ref_state(check, r) | some r in refs}) if refs := _check_refs(check)
 
-_read_cause(_, _, _, states) := _worst_of(states) if {
+_read_cause(subj, check, _, states) := _worst_of(states | _clear_path_states(subj, check)) if {
 	some state in states
 	state != "value"
+}
+
+_clear_path_states(subj, check) := set() if {
+	_list_cmp(check)
+	_reads_unreadable_ref(check, check.right)
+} else := _list_flaw(check, subj) - {"value"} if {
+	_list_cmp(check)
+	_list_flawed(check, subj)
+} else := {s |
+	_two_sided(check)
+	some p in _read_paths(check)
+	not _reads_unreadable_ref(check, p)
+	s := _state_at(check, subj, p)
+	s != "value"
+}
+
+_reads_unreadable_ref(check, p) if {
+	walk(p, [_, x])
+	_is_ref(x)
+	_used_ref_state(check, x.ref) != "value"
 }
 
 _read_cause(_, _, refs, states) := "value" if {

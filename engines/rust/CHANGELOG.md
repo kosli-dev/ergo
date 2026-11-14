@@ -39,6 +39,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - An `every` or a `some` whose list is missing, `null` or of the wrong type names a parent's part or a grandparent's part that its `whose` or `that` reads and that can't be read before the list, as a part of the subject already was and as in `ergo.rego` 0.7.0 and spec 0.7 ([walk.flaws](../../spec/semantics.md#every-and-some)). With the parent's part `art.cov` `null` and no `ys`, `every ys whose n is at least art.cov.z, if any, exists` says `art.cov is null; ys is missing`, where it said `ys is missing`. A child subject's check was treated as if it were a `for` line because it holds its parents' names. In an `any_of` option a part is still named only when it is in the same state as the list, as in `ergo.rego`, and otherwise the list is named. Changes the report of such checks.
 
+- A `for` line whose sentence reads a path with a key from `$params` or `$input` that is missing or `null` names the key once, as spec 0.7 says ([for.roots](../../spec/semantics.md#for)), and its items no longer repeat the path: `r.zz is m named by $input.k` with `$input.k` `null` says `$input.k is null; item 1 of rs: r.zz is missing`, where it said `$input.k is null; item 1 of rs: r.zz is missing, and m named by $input.k is null`, and `k is m named by $input.k` says `k is missing; $input.k is null`, where it added `; m named by $input.k is null`. An `$applies` row that fails as `absent` or `null` names only what is in that state, as `ergo.rego` does and [message.cause](../../spec/semantics.md#messages) says: `from: things whose c.z is d.z` with `c` `{}` and `d` `null` says `c.z is missing`, where it said `c.z is missing, and d is null`. Changes the report of such checks.
+
 ## 0.4.0
 
 ### New
