@@ -369,8 +369,11 @@ _tally_cond_cause(c, item, flaw) := _worst_of({flaw} | _item_states_beside_key(c
 
 _tally_cond_cause(_, _, flaw) := flaw if not flaw in {"", "absent", "null"}
 
-_item_states_beside_key(c, item) := {s |
-	is_object(item)
+_item_states_beside_key(c, item) := set() if {
+	_list_cmp(c)
+	_reads_unreadable_ref(c, c.right)
+} else := {s |
+	_two_sided(c)
 	some p in _read_paths(c)
 	not _reads_unreadable_ref(c, p)
 	s := _read_state(item, p)

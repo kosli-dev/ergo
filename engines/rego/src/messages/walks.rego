@@ -316,7 +316,15 @@ _m_key_root_state(side, m) := s if {
 	s := _ref_state(r)
 	s in {"absent", "null"}
 	m == concat("", [_ref_label(r), " is ", _m_state_word(s)])
+	_m_key_on_focus(c, r)
 } else := "root"
+
+_m_key_on_focus(c, r) if {
+	walk(c, [_, p])
+	is_array(p)
+	{"ref": r} in p
+	not _read_off_item(p)
+}
 
 _m_said_in(m, parts) if {
 	some p in parts

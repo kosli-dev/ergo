@@ -9189,8 +9189,26 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of ns whose zz is m named by $input.k is 1",
+        "count of ns whose zz equals m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
         "count of rs whose v.y is m named by $input.k is 1",
         "count of rs whose v.y equals m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rs whose zz is $input.m named by $input.k is 1",
+        "count of rs whose zz equals $input.m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rs whose zz is in m named by $input.k is 1",
+        "count of rs whose zz is in m named by $input.k is 1",
         &[],
         &[],
     ),
