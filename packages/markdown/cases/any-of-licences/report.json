@@ -42,6 +42,15 @@
                 "BSD-3-Clause",
                 "Apache-2.0"
               ]
+            },
+            {
+              "locations": [
+                "$params:/known_package_licenses"
+              ],
+              "name": "$params.known_package_licenses",
+              "value": {
+                "prometheus-client": "Apache-2.0"
+              }
             }
           ],
           "description": "The licence is allowed",
