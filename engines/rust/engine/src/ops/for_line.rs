@@ -615,15 +615,19 @@ impl For {
                                 .or_else(|| {
                                     (verdict.cause == Cause::Unusable)
                                         .then(|| {
-                                            check.paths().into_iter().find_map(|path| {
-                                                super::message::reads_from_a_root(path)
-                                                    .then(|| {
-                                                        super::message::root_kind_fault(
-                                                            check, path, &outer,
-                                                        )
-                                                    })
-                                                    .flatten()
-                                            })
+                                            check
+                                                .paths()
+                                                .into_iter()
+                                                .chain(walk::listed_refs(check))
+                                                .find_map(|path| {
+                                                    super::message::reads_from_a_root(path)
+                                                        .then(|| {
+                                                            super::message::root_kind_fault(
+                                                                check, path, &outer,
+                                                            )
+                                                        })
+                                                        .flatten()
+                                                })
                                         })
                                         .flatten()
                                 })

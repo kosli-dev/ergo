@@ -2152,6 +2152,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("every t.kids", "every t.kids"),
     ("every t.ws", "every t.ws"),
+    ("every art.ws", "every art.ws"),
     (
         "every t.ws whose lo is at least 1",
         "every t.ws whose lo is at least 1",
