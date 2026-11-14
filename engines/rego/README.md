@@ -8,14 +8,14 @@ The engine is written as parts under `src/`, one folder per layer, and `.github/
 
 From the lowest layer to the highest:
 
-1. `shared/` holds the small helpers everything else uses: basic value tests, names and paths of fields, JSON text, and the forms a reference can take.
-2. `reading/` reads values out of `input`, `$params` and the policy, and says in what state a read ended (found, missing, null, wrong type).
-3. `sentences/` reads a sentence into its parts and writes a parsed sentence back as text.
-4. `policy/` reads a whole policy, finds what is written wrong in it and compiles it into checks.
-5. `checks/` decides the outcome of a single check: the operators, the causes and the inputs a check read.
-6. `lines/` works out the lines of a check that runs over a list, with `for` and `from` and the walk down a path.
-7. `messages/` writes the plain English messages for what a check found.
-8. `report/` builds the entries of the report, the evaluation, the requirements and the violations.
+1. `shared/` holds helpers every other folder uses: paths and names, the engine version and spec constants, and the side forms.
+2. `reading/` reads a name or path from the input and gives its read states (value, absent and so on), and builds the `$refs` listing.
+3. `sentences/` reads a sentence into a policy object and writes one back.
+4. `policy/` reads a whole policy, resolves its subjects, finds what is written wrong in it and compiles it into checks.
+5. `checks/` judges each check: the operators, and the compare, number and time maths.
+6. `lines/` works out the roots, items and failed items of `from` and `for` lines.
+7. `messages/` writes the text of each cause.
+8. `report/` builds the evaluation, the requirements, the chains of parent rows and the violations.
 
 A rule may call rules in its own folder and in the folders above it in this list, which are the earlier ones. A call to a rule in a later folder points backwards.
 
