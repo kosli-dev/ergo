@@ -1418,13 +1418,13 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
     let outer_ctx = outer(ctx);
     let whose: Vec<&Check> = walk.whose.iter().collect();
     let unread = matches!(row.verdict.cause, Cause::Satisfied | Cause::Value);
-    let check_flaw = unread
+    let check_cause = unread
         .then(|| message::root_flaw(&[&*walk.check], &outer_ctx))
         .flatten();
     let keyed =
-        check_flaw.is_some() && check_flaw == message::key_cause(&[&*walk.check], &outer_ctx);
+        check_cause.is_some() && check_cause == message::key_cause(&[&*walk.check], &outer_ctx);
     let flaw = message::root_flaw(&whose, &outer_ctx)
-        .or_else(|| (unread && !keyed).then_some(check_flaw).flatten());
+        .or_else(|| (unread && !keyed).then_some(check_cause).flatten());
     let flaw = if unread {
         let mut keys = whose.clone();
         if keyed {
