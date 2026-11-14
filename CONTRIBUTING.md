@@ -33,6 +33,17 @@ rego: fail compare when either side is missing
 
 The rules are in [`AGENTS.md`](AGENTS.md#commits). If the change alters the report for an existing policy, say so in the description.
 
+- Open a pull request as a draft, and mark it ready when it has been reviewed.
+- One pull request per fix. Two or three related fixes may share one.
+- Push once per batch of changes, because every push restarts the checks.
+- Merge `main` into your branch only when GitHub reports a conflict. Being behind `main` is fine.
+- Don't squash or force-push before the merge. The pull request is squashed when it merges.
+- Fix the title and the description before calling it ready, because they become the commit on `main`.
+- Give every pull request and issue the current milestone, which is the first open one in the order of the `YY.x` prefix (ask when unsure), and a label from `gh label list`.
+- In issues and pull requests, write "Decided" and what was decided, and don't name people.
+- A tracking issue lists its steps as `- [ ]` task lists, so progress shows.
+- Rejected options go in their own "Not chosen" section after "Decided", not inside the decided items.
+
 ## Releases
 
 A release is a tag on the commit at the tip of `main`, pushed after the test workflow passed on that commit. `.github/release.sh` makes and pushes the tags:
