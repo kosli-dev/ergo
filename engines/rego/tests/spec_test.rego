@@ -451,10 +451,13 @@ test_the_for_cases_pass_compiled_part_19_of_20 if _differences_compiled("for", _
 
 test_the_for_cases_pass_compiled_part_20_of_20 if _differences_compiled("for", _case_part("for", 19, 20)) == set()
 
-test_the_walks_cases_pass if {
-	_topic_failures("walks") == _known_in("walks")
-	_compiled_differences("walks") == set()
-}
+test_the_walks_cases_pass_part_1_of_2 if _part_passes("walks", 0, 2)
+
+test_the_walks_cases_pass_part_2_of_2 if _part_passes("walks", 1, 2)
+
+test_the_walks_cases_pass_compiled_part_1_of_2 if _differences_compiled("walks", _part("walks", 0, 2)) == set()
+
+test_the_walks_cases_pass_compiled_part_2_of_2 if _differences_compiled("walks", _part("walks", 1, 2)) == set()
 
 test_a_case_with_the_wrong_rows_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{

@@ -1690,9 +1690,14 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
             failed_items = ran.failed_items.map(Value::Array);
             let mut own = ran.message;
             if unreadable {
+                let keeps_own = !matches!(verdict.cause, Cause::Satisfied | Cause::Value)
+                    && matches!(&filter.check, Check::Walk(w) if walk::walks_nothing(w, ctx))
+                    && ops::message::params_that_arent_an_object(&filter.check, ctx).is_none();
                 verdict.cause = Cause::Unusable;
                 failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
-                own = None;
+                if !keeps_own {
+                    own = None;
+                }
             }
             if !verdict.passed() {
                 said.push(own.unwrap_or_else(|| {

@@ -927,6 +927,24 @@ test_a_for_check_that_reads_params_says_only_that_params_is_not_an_object if {
 	rows_l.in_q == ["unusable", "$params is [], which isn't an object", 0]
 }
 
+test_an_empty_list_with_params_that_are_not_an_object_names_only_the_key_that_isnt_text_beside_a_root_that_isnt_a_number if {
+	policy := {
+		"ergo_spec": ergo._spec,
+		"subjects": {"pr": {"from": "prs", "identified_by": "id"}},
+		"requirements": {"r": {"subject": "pr", "checks": {
+			"bare": "every es whose zz is m named by $input.k, if any, is at least z",
+			"input": "every es whose zz is m named by $input.k, if any, is at least $input.z",
+		}}},
+	}
+	doc := {"prs": [{"id": "p0", "m": {"a": 2}, "z": "s", "es": []}], "k": 3, "z": "s"}
+	rows := {r.check: [r.cause, r.message] |
+		some r in ergo.report(doc, policy, 3).results
+		not startswith(r.check, "$")
+	}
+	rows.bare == ["unusable", "$input.k is 3, which isn't text"]
+	rows.input == ["unusable", "$input.k is 3, which isn't text"]
+}
+
 test_a_for_check_that_does_not_read_params_keeps_its_message_and_lists_every_item_when_params_is_not_an_object if {
 	every params in [3, "s", []] {
 		rows := _params_not_object_rows(_params_not_object_doc, params)
