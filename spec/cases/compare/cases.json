@@ -416,6 +416,4177 @@
       {"description": "compares them on every digit, in the other order", "rules": ["value.equal", "value.number", "message.print"], "input": {"things": [{"id": "a", "o": {"v": 2234567890.1209567990}, "p": {"v": 2234567890.1209567890}, "ls": [2234567890.1209567990], "ms": [2234567890.1209567890], "m": [2234567890.1209567890], "lls": [[2234567890.1209567990]]}]}, "results": [{"cause": "value", "check": "lls_contains_m", "inputs": [{"locations": ["/things/0/lls"], "name": "lls", "value": [[2234567890.120956799]]}, {"locations": ["/things/0/m"], "name": "m", "value": [2234567890.120956789]}], "message": "lls is [[2234567890.120956799]], and m is [2234567890.120956789]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}, {"cause": "value", "check": "ls_equals_ms", "inputs": [{"locations": ["/things/0/ls"], "name": "ls", "value": [2234567890.120956799]}, {"locations": ["/things/0/ms"], "name": "ms", "value": [2234567890.120956789]}], "message": "ls is [2234567890.120956799], and ms is [2234567890.120956789]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}, {"cause": "value", "check": "m_is_in_lls", "inputs": [{"locations": ["/things/0/m"], "name": "m", "value": [2234567890.120956789]}, {"locations": ["/things/0/lls"], "name": "lls", "value": [[2234567890.120956799]]}], "message": "m is [2234567890.120956789], and lls is [[2234567890.120956799]]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}, {"cause": "value", "check": "o_equals_p", "inputs": [{"locations": ["/things/0/o"], "name": "o", "value": {"v": 2234567890.120956799}}, {"locations": ["/things/0/p"], "name": "p", "value": {"v": 2234567890.120956789}}], "message": "o is {\"v\": 2234567890.120956799}, and p is {\"v\": 2234567890.120956789}", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}, {"cause": "value", "check": "o_equals_param", "inputs": [{"locations": ["/things/0/o"], "name": "o", "value": {"v": 2234567890.120956799}}, {"locations": ["$params:/o"], "name": "$params.o", "value": {"v": 2234567890.120956789}}], "message": "o is {\"v\": 2234567890.120956799}, and $params.o is {\"v\": 2234567890.120956789}", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}, {"cause": "satisfied", "check": "o_is_not_p", "inputs": [{"locations": ["/things/0/o"], "name": "o", "value": {"v": 2234567890.120956799}}, {"locations": ["/things/0/p"], "name": "p", "value": {"v": 2234567890.120956789}}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}}]}
   ]},
   {
+    "description": "$refs list each $params or $input path a check reads, wherever it is in the sentence",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "a": "v is $params.x.y",
+            "b": "n is at least $params.n",
+            "c": "v is $input.z",
+            "d": "$params.x.y is v",
+            "e": "name starts with $params.p",
+            "f": "opened is before $params.deadline",
+            "g": "count of $params.q is 1",
+            "h": "sum of $params.q is 1",
+            "i": "every $params.q is 1",
+            "j": "some $params.q is 1",
+            "k": "every tags is at most $params.n",
+            "l": "count of items whose w is at least $params.n is 1",
+            "m": "$params.flag exists",
+            "n": {
+              "any_of": {
+                "o1": "v is $params.x.y",
+                "o2": "v is $input.z"
+              }
+            },
+            "o": {
+              "for": "every items as it",
+              "assert": "it.w is at least $params.n"
+            },
+            "p": {
+              "for": "every items as it, every $params.q as x",
+              "assert": "x is at most it.w"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "x": {
+        "y": 1
+      },
+      "n": 2,
+      "p": "ab",
+      "deadline": "2026-02-01T00:00:00Z",
+      "q": [
+        1
+      ],
+      "flag": true
+    },
+    "cases": [
+      {
+        "description": "lists each path with the value it read and where",
+        "rules": [
+          "value.refs",
+          "location.refs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "v": 1,
+              "n": 3,
+              "name": "abc",
+              "opened": "2026-01-01T00:00:00Z",
+              "tags": [
+                1
+              ],
+              "items": [
+                {
+                  "w": 3
+                }
+              ]
+            }
+          ],
+          "z": 1
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "a",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "b",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/n"
+                ],
+                "name": "n",
+                "value": 3
+              },
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "e",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/name"
+                ],
+                "name": "name",
+                "value": "abc"
+              },
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "value": "ab"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "f",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/opened"
+                ],
+                "name": "opened",
+                "value": "2026-01-01T00:00:00Z"
+              },
+              {
+                "locations": [
+                  "$params:/deadline"
+                ],
+                "name": "$params.deadline",
+                "value": "2026-02-01T00:00:00Z"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "g",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/q/0"
+                ],
+                "name": "count of $params.q",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "$params:/q/0"
+                ],
+                "name": "$params.q[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "h",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/q/0"
+                ],
+                "name": "sum of $params.q",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "$params:/q/0"
+                ],
+                "name": "$params.q[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "i",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/q/0"
+                ],
+                "name": "$params.q[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "j",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/q/0"
+                ],
+                "name": "$params.q[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "k",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/tags/0"
+                ],
+                "name": "tags[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "l",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "count of items whose w is at least $params.n",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "m",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/flag"
+                ],
+                "name": "$params.flag",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "n",
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "o",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": 2
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "p",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/q/0"
+                ],
+                "name": "$params.q[]",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "a": [
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": 1
+              }
+            ],
+            "b": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": 2
+              }
+            ],
+            "c": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": 1
+              }
+            ],
+            "d": [
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": 1
+              }
+            ],
+            "e": [
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "value": "ab"
+              }
+            ],
+            "f": [
+              {
+                "locations": [
+                  "$params:/deadline"
+                ],
+                "name": "$params.deadline",
+                "value": "2026-02-01T00:00:00Z"
+              }
+            ],
+            "g": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "h": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "i": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "j": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "k": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": 2
+              }
+            ],
+            "l": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": 2
+              }
+            ],
+            "m": [
+              {
+                "locations": [
+                  "$params:/flag"
+                ],
+                "name": "$params.flag",
+                "value": true
+              }
+            ],
+            "n": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": 1
+              }
+            ],
+            "o": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": 2
+              }
+            ],
+            "p": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": [
+                  1
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "$refs list each $params or $input path a check reads, when the paths are missing",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "a": "v is $params.x.y",
+            "b": "n is at least $params.n",
+            "c": "v is $input.z",
+            "d": "$params.x.y is v",
+            "e": "name starts with $params.p",
+            "f": "opened is before $params.deadline",
+            "g": "count of $params.q is 1",
+            "h": "sum of $params.q is 1",
+            "i": "every $params.q is 1",
+            "j": "some $params.q is 1",
+            "k": "every tags is at most $params.n",
+            "l": "count of items whose w is at least $params.n is 1",
+            "m": "$params.flag exists",
+            "n": {
+              "any_of": {
+                "o1": "v is $params.x.y",
+                "o2": "v is $input.z"
+              }
+            },
+            "o": {
+              "for": "every items as it",
+              "assert": "it.w is at least $params.n"
+            },
+            "p": {
+              "for": "every items as it, every $params.q as x",
+              "assert": "x is at most it.w"
+            }
+          }
+        }
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "lists each path with null and where the read stopped, and the checks fail as before",
+        "rules": [
+          "value.refs",
+          "location.refs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "v": 1,
+              "n": 3,
+              "name": "abc",
+              "opened": "2026-01-01T00:00:00Z",
+              "tags": [
+                1
+              ],
+              "items": [
+                {
+                  "w": 3
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "a",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "message": "$params.x.y is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "b",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/n"
+                ],
+                "name": "n",
+                "value": 3
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "message": "$params.n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.z",
+                "value": null
+              }
+            ],
+            "message": "$input.z is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              }
+            ],
+            "message": "$params.x.y is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "e",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/name"
+                ],
+                "name": "name",
+                "value": "abc"
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.p",
+                "value": null
+              }
+            ],
+            "message": "$params.p is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "f",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/opened"
+                ],
+                "name": "opened",
+                "value": "2026-01-01T00:00:00Z"
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.deadline",
+                "value": null
+              }
+            ],
+            "message": "$params.deadline is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "g",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of $params.q",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "h",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of $params.q",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "i",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "$params.q",
+                "locations": [
+                  "$params:"
+                ],
+                "path": "$params.q",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "j",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "$params.q",
+                "locations": [
+                  "$params:"
+                ],
+                "path": "$params.q",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "k",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of tags",
+                "locations": [
+                  "/things/0/tags/0"
+                ],
+                "path": "item 1 of tags",
+                "value": 1
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/tags/0"
+                ],
+                "name": "tags[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "message": "$params.n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "l",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "count of items whose w is at least $params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params.n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "m",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.flag",
+                "value": null
+              }
+            ],
+            "message": "$params.flag is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "n",
+            "inputs": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.z",
+                "value": null
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              }
+            ],
+            "message": "o1: $params.x.y is missing; o2: $input.z is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "o",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "it.w is at least $params.n",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/items/0/w"
+                        ],
+                        "name": "it.w",
+                        "value": 3
+                      },
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params.n",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of items",
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "w": 3
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params.n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "p",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "$params.q",
+                "locations": [
+                  "$params:"
+                ],
+                "path": "$params.q",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params.q is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "a": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "b": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "c": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.z",
+                "value": null
+              }
+            ],
+            "d": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "e": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.p",
+                "value": null
+              }
+            ],
+            "f": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.deadline",
+                "value": null
+              }
+            ],
+            "g": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "h": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "i": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "j": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "k": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "l": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "m": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.flag",
+                "value": null
+              }
+            ],
+            "n": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.z",
+                "value": null
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "o": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "p": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "$refs list each $params or $input path a check reads, when the paths are null",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "a": "v is $params.x.y",
+            "b": "n is at least $params.n",
+            "c": "v is $input.z",
+            "d": "$params.x.y is v",
+            "e": "name starts with $params.p",
+            "f": "opened is before $params.deadline",
+            "g": "count of $params.q is 1",
+            "h": "sum of $params.q is 1",
+            "i": "every $params.q is 1",
+            "j": "some $params.q is 1",
+            "k": "every tags is at most $params.n",
+            "l": "count of items whose w is at least $params.n is 1",
+            "m": "$params.flag exists",
+            "n": {
+              "any_of": {
+                "o1": "v is $params.x.y",
+                "o2": "v is $input.z"
+              }
+            },
+            "o": {
+              "for": "every items as it",
+              "assert": "it.w is at least $params.n"
+            },
+            "p": {
+              "for": "every items as it, every $params.q as x",
+              "assert": "x is at most it.w"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "x": {
+        "y": null
+      },
+      "n": null,
+      "p": null,
+      "deadline": null,
+      "q": null,
+      "flag": null
+    },
+    "cases": [
+      {
+        "description": "lists each path with null, and the checks fail as before",
+        "rules": [
+          "value.refs",
+          "location.refs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "v": 1,
+              "n": 3,
+              "name": "abc",
+              "opened": "2026-01-01T00:00:00Z",
+              "tags": [
+                1
+              ],
+              "items": [
+                {
+                  "w": 3
+                }
+              ]
+            }
+          ],
+          "z": null
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "a",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "message": "$params.x.y is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "b",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/n"
+                ],
+                "name": "n",
+                "value": 3
+              },
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "message": "$params.n is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": null
+              }
+            ],
+            "message": "$input.z is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              }
+            ],
+            "message": "$params.x.y is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "e",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/name"
+                ],
+                "name": "name",
+                "value": "abc"
+              },
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "value": null
+              }
+            ],
+            "message": "$params.p is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "f",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/opened"
+                ],
+                "name": "opened",
+                "value": "2026-01-01T00:00:00Z"
+              },
+              {
+                "locations": [
+                  "$params:/deadline"
+                ],
+                "name": "$params.deadline",
+                "value": null
+              }
+            ],
+            "message": "$params.deadline is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "g",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of $params.q",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "h",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of $params.q",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "i",
+            "failed_items": [
+              {
+                "cause": "null",
+                "item": "$params.q",
+                "locations": [
+                  "$params:/q"
+                ],
+                "path": "$params.q",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "j",
+            "failed_items": [
+              {
+                "cause": "null",
+                "item": "$params.q",
+                "locations": [
+                  "$params:/q"
+                ],
+                "path": "$params.q",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "k",
+            "failed_items": [
+              {
+                "cause": "null",
+                "item": "item 1 of tags",
+                "locations": [
+                  "/things/0/tags/0"
+                ],
+                "path": "item 1 of tags",
+                "value": 1
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/tags/0"
+                ],
+                "name": "tags[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "message": "$params.n is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "l",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "count of items whose w is at least $params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params.n is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "m",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/flag"
+                ],
+                "name": "$params.flag",
+                "value": null
+              }
+            ],
+            "message": "$params.flag is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "n",
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": null
+              },
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              }
+            ],
+            "message": "o1: $params.x.y is null; o2: $input.z is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "o",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "it.w is at least $params.n",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/items/0/w"
+                        ],
+                        "name": "it.w",
+                        "value": 3
+                      },
+                      {
+                        "locations": [
+                          "$params:/n"
+                        ],
+                        "name": "$params.n",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of items",
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "w": 3
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params.n is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "p",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "$params.q",
+                "locations": [
+                  "$params:/q"
+                ],
+                "path": "$params.q",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params.q is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "a": [
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "b": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "c": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": null
+              }
+            ],
+            "d": [
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "e": [
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "value": null
+              }
+            ],
+            "f": [
+              {
+                "locations": [
+                  "$params:/deadline"
+                ],
+                "name": "$params.deadline",
+                "value": null
+              }
+            ],
+            "g": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "h": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "i": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "j": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "k": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "l": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "m": [
+              {
+                "locations": [
+                  "$params:/flag"
+                ],
+                "name": "$params.flag",
+                "value": null
+              }
+            ],
+            "n": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": null
+              },
+              {
+                "locations": [
+                  "$params:/x/y"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "o": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "p": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "$refs list each $params or $input path a check reads, when the paths hold the wrong type",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "a": "v is $params.x.y",
+            "b": "n is at least $params.n",
+            "c": "v is $input.z",
+            "d": "$params.x.y is v",
+            "e": "name starts with $params.p",
+            "f": "opened is before $params.deadline",
+            "g": "count of $params.q is 1",
+            "h": "sum of $params.q is 1",
+            "i": "every $params.q is 1",
+            "j": "some $params.q is 1",
+            "k": "every tags is at most $params.n",
+            "l": "count of items whose w is at least $params.n is 1",
+            "m": "$params.flag exists",
+            "n": {
+              "any_of": {
+                "o1": "v is $params.x.y",
+                "o2": "v is $input.z"
+              }
+            },
+            "o": {
+              "for": "every items as it",
+              "assert": "it.w is at least $params.n"
+            },
+            "p": {
+              "for": "every items as it, every $params.q as x",
+              "assert": "x is at most it.w"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "x": 5,
+      "n": "a",
+      "p": 1,
+      "deadline": 3,
+      "q": "s",
+      "flag": [
+        1
+      ]
+    },
+    "cases": [
+      {
+        "description": "lists what each path read, and the checks fail as before",
+        "rules": [
+          "value.refs",
+          "location.refs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "v": 1,
+              "n": 3,
+              "name": "abc",
+              "opened": "2026-01-01T00:00:00Z",
+              "tags": [
+                1
+              ],
+              "items": [
+                {
+                  "w": 3
+                }
+              ]
+            }
+          ],
+          "z": [
+            1
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "a",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "$params:/x"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "message": "$params.x is 5, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "b",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/n"
+                ],
+                "name": "n",
+                "value": 3
+              },
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": "a"
+              }
+            ],
+            "message": "$params.n is \"a\", which isn't a number",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "message": "v is 1, which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/x"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              }
+            ],
+            "message": "$params.x is 5, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "e",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/name"
+                ],
+                "name": "name",
+                "value": "abc"
+              },
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "value": 1
+              }
+            ],
+            "message": "$params.p is 1, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "f",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/opened"
+                ],
+                "name": "opened",
+                "value": "2026-01-01T00:00:00Z"
+              },
+              {
+                "locations": [
+                  "$params:/deadline"
+                ],
+                "name": "$params.deadline",
+                "value": 3
+              }
+            ],
+            "message": "opened is \"2026-01-01T00:00:00Z\", which isn't a time written like 3",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "g",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of $params.q",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "h",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of $params.q",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "i",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "item": "$params.q",
+                "locations": [
+                  "$params:/q"
+                ],
+                "path": "$params.q",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "j",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "item": "$params.q",
+                "locations": [
+                  "$params:/q"
+                ],
+                "path": "$params.q",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params.q is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "k",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "item": "item 1 of tags",
+                "locations": [
+                  "/things/0/tags/0"
+                ],
+                "path": "item 1 of tags",
+                "value": 1
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/tags/0"
+                ],
+                "name": "tags[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "message": "$params.n is \"a\", which isn't a number",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "l",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "count of items whose w is at least $params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params.n is \"a\", which isn't a number",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "m",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/flag"
+                ],
+                "name": "$params.flag",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "n",
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "$params:/x"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              }
+            ],
+            "message": "o1: $params.x is 5, which isn't an object; o2: v is 1, which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "o",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "it.w is at least $params.n",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/items/0/w"
+                        ],
+                        "name": "it.w",
+                        "value": 3
+                      },
+                      {
+                        "locations": [
+                          "$params:/n"
+                        ],
+                        "name": "$params.n",
+                        "value": "a"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of items",
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "w": 3
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params.n is \"a\", which isn't a number",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "p",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "$params.q",
+                "locations": [
+                  "$params:/q"
+                ],
+                "path": "$params.q",
+                "value": "s"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params.q is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "a": [
+              {
+                "locations": [
+                  "$params:/x"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "b": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": "a"
+              }
+            ],
+            "c": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "d": [
+              {
+                "locations": [
+                  "$params:/x"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "e": [
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "value": 1
+              }
+            ],
+            "f": [
+              {
+                "locations": [
+                  "$params:/deadline"
+                ],
+                "name": "$params.deadline",
+                "value": 3
+              }
+            ],
+            "g": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": "s"
+              }
+            ],
+            "h": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": "s"
+              }
+            ],
+            "i": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": "s"
+              }
+            ],
+            "j": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": "s"
+              }
+            ],
+            "k": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": "a"
+              }
+            ],
+            "l": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": "a"
+              }
+            ],
+            "m": [
+              {
+                "locations": [
+                  "$params:/flag"
+                ],
+                "name": "$params.flag",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "n": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "$params:/x"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "o": [
+              {
+                "locations": [
+                  "$params:/n"
+                ],
+                "name": "$params.n",
+                "value": "a"
+              }
+            ],
+            "p": [
+              {
+                "locations": [
+                  "$params:/q"
+                ],
+                "name": "$params.q",
+                "value": "s"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "$refs list each $params or $input path a check reads, when the params are null",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "a": "v is $params.x.y",
+            "b": "n is at least $params.n",
+            "c": "v is $input.z",
+            "d": "$params.x.y is v",
+            "e": "name starts with $params.p",
+            "f": "opened is before $params.deadline",
+            "g": "count of $params.q is 1",
+            "h": "sum of $params.q is 1",
+            "i": "every $params.q is 1",
+            "j": "some $params.q is 1",
+            "k": "every tags is at most $params.n",
+            "l": "count of items whose w is at least $params.n is 1",
+            "m": "$params.flag exists",
+            "n": {
+              "any_of": {
+                "o1": "v is $params.x.y",
+                "o2": "v is $input.z"
+              }
+            },
+            "o": {
+              "for": "every items as it",
+              "assert": "it.w is at least $params.n"
+            },
+            "p": {
+              "for": "every items as it, every $params.q as x",
+              "assert": "x is at most it.w"
+            }
+          }
+        }
+      }
+    },
+    "params": null,
+    "cases": [
+      {
+        "description": "lists each $params path with null, and the checks fail as before",
+        "rules": [
+          "value.refs",
+          "location.refs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "v": 1,
+              "n": 3,
+              "name": "abc",
+              "opened": "2026-01-01T00:00:00Z",
+              "tags": [
+                1
+              ],
+              "items": [
+                {
+                  "w": 3
+                }
+              ]
+            }
+          ],
+          "z": 1
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "a",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "message": "$params.x.y is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "b",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/n"
+                ],
+                "name": "n",
+                "value": 3
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "message": "$params.n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              }
+            ],
+            "message": "$params.x.y is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "e",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/name"
+                ],
+                "name": "name",
+                "value": "abc"
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.p",
+                "value": null
+              }
+            ],
+            "message": "$params.p is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "f",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/opened"
+                ],
+                "name": "opened",
+                "value": "2026-01-01T00:00:00Z"
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.deadline",
+                "value": null
+              }
+            ],
+            "message": "$params.deadline is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "g",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of $params.q",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "h",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of $params.q",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "i",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "$params",
+                "locations": [
+                  "$params:"
+                ],
+                "path": "$params",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "j",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "$params",
+                "locations": [
+                  "$params:"
+                ],
+                "path": "$params",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              }
+            ],
+            "message": "$params is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "k",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of tags",
+                "locations": [
+                  "/things/0/tags/0"
+                ],
+                "path": "item 1 of tags",
+                "value": 1
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/tags/0"
+                ],
+                "name": "tags[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "message": "$params.n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "l",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "count of items whose w is at least $params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params.n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "m",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.flag",
+                "value": null
+              }
+            ],
+            "message": "$params.flag is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "n",
+            "inputs": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "o",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "it.w is at least $params.n",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/items/0/w"
+                        ],
+                        "name": "it.w",
+                        "value": 3
+                      },
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params.n",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of items",
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "w": 3
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params.n is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "p",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "$params",
+                "locations": [
+                  "$params:"
+                ],
+                "path": "$params",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "w": 3
+                  }
+                ]
+              }
+            ],
+            "message": "$params is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "a": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "b": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "c": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": 1
+              }
+            ],
+            "d": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "e": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.p",
+                "value": null
+              }
+            ],
+            "f": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.deadline",
+                "value": null
+              }
+            ],
+            "g": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "h": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "i": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "j": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ],
+            "k": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "l": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "m": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.flag",
+                "value": null
+              }
+            ],
+            "n": [
+              {
+                "locations": [
+                  "/z"
+                ],
+                "name": "$input.z",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.x.y",
+                "value": null
+              }
+            ],
+            "o": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              }
+            ],
+            "p": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "value": null
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "$refs list a path that walks a list once, as is in lists it, whatever walks it",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "a": "every $params.objs.x is \"y\"",
+            "b": "some $input.objs.x is \"y\"",
+            "c": "count of $params.objs.n is 2",
+            "d": "sum of $params.objs.n is 3",
+            "e": {"for": "every $params.objs.x as o", "assert": "o is v"},
+            "f": "v is in $params.objs.x",
+            "g": {"any_of": {"a": "v is in $params.objs.x", "b": "every $params.objs.x is \"y\""}},
+            "h": {"any_of": {"a": "v is $params.objs.x", "b": "v is in $params.objs.x"}}
+          }
+        }
+      }
+    },
+    "params": {"objs": [{"x": "y", "n": 1}, {"x": "z", "n": 2}]},
+    "cases": [
+      {
+        "description": "lists the values each walk read, where it read them, and no entry for the path as written",
+        "rules": ["value.refs", "walk.right.inputs", "location.refs"],
+        "input": {"things": [{"id": "t1", "v": "y"}], "objs": [{"x": "y"}, {"x": "y"}]},
+        "results": [
+          {
+            "cause": "value",
+            "check": "a",
+            "failed_items": [{"cause": "value", "item": "item 2 of $params.objs", "locations": ["$params:/objs/1/x"], "path": "$params.objs[1].x", "value": "z"}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "message": "item 2 of $params.objs: x is \"z\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "b",
+            "failed_items": [],
+            "inputs": [{"locations": ["/objs/0/x", "/objs/1/x"], "name": "$input.objs[].x", "value": ["y", "y"]}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "count of $params.objs.n", "value": 2},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "d",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "sum of $params.objs.n", "value": 3},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "value",
+            "check": "e",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [{"assertion": "o equals v", "cause": "value", "inputs": [{"locations": ["$params:/objs/1/x"], "name": "o", "value": "z"}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}]}],
+                "item": "item 2 of $params.objs",
+                "locations": ["$params:/objs/1/x"],
+                "path": "item 2 of $params.objs",
+                "value": "z"
+              }
+            ],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "item 2 of $params.objs: o is \"z\", and v is \"y\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "f",
+            "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "g",
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "h",
+            "inputs": [
+              {"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null},
+              {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]},
+              {"locations": ["/things/0/v"], "name": "v", "value": "y"}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ],
+        "refs": {
+          "s": {
+            "a": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "b": [{"locations": ["/objs/0/x", "/objs/1/x"], "name": "$input.objs[].x", "value": ["y", "y"]}],
+            "c": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
+            "d": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
+            "e": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "f": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "g": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "h": [{"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null}, {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}]
+          }
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "a",
+            "description": "",
+            "expression": "every $params.objs.x is \"y\"",
+            "failed_items": [{"cause": "value", "item": "item 2 of $params.objs", "locations": ["$params:/objs/1/x"], "path": "$params.objs[1].x", "value": "z"}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "message": "item 2 of $params.objs: x is \"z\"",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "value",
+            "check": "e",
+            "description": "",
+            "expression": "for every $params.objs.x as o: o equals v",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [{"assertion": "o equals v", "cause": "value", "inputs": [{"locations": ["$params:/objs/1/x"], "name": "o", "value": "z"}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}]}],
+                "item": "item 2 of $params.objs",
+                "locations": ["$params:/objs/1/x"],
+                "path": "item 2 of $params.objs",
+                "value": "z"
+              }
+            ],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "item 2 of $params.objs: o is \"z\", and v is \"y\"",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ]
+      },
+      {
+        "description": "lists what the walk read when an item of the input has no x",
+        "rules": ["value.refs", "walk.right.inputs"],
+        "input": {"things": [{"id": "t1", "v": "y"}], "objs": [{"x": "y"}, {}]},
+        "results": [
+          {
+            "cause": "value",
+            "check": "a",
+            "failed_items": [{"cause": "value", "item": "item 2 of $params.objs", "locations": ["$params:/objs/1/x"], "path": "$params.objs[1].x", "value": "z"}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "message": "item 2 of $params.objs: x is \"z\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "b",
+            "failed_items": [],
+            "inputs": [{"locations": ["/objs/0/x", "/objs/1"], "name": "$input.objs[].x", "value": ["y", null]}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "count of $params.objs.n", "value": 2},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "d",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "sum of $params.objs.n", "value": 3},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "value",
+            "check": "e",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [{"assertion": "o equals v", "cause": "value", "inputs": [{"locations": ["$params:/objs/1/x"], "name": "o", "value": "z"}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}]}],
+                "item": "item 2 of $params.objs",
+                "locations": ["$params:/objs/1/x"],
+                "path": "item 2 of $params.objs",
+                "value": "z"
+              }
+            ],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "item 2 of $params.objs: o is \"z\", and v is \"y\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "f",
+            "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "g",
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "h",
+            "inputs": [
+              {"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null},
+              {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]},
+              {"locations": ["/things/0/v"], "name": "v", "value": "y"}
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ],
+        "refs": {
+          "s": {
+            "a": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "b": [{"locations": ["/objs/0/x", "/objs/1"], "name": "$input.objs[].x", "value": ["y", null]}],
+            "c": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
+            "d": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
+            "e": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "f": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "g": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
+            "h": [{"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null}, {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "$refs list a path whose walk fails on an item that isn't an object with what the walk read",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "a": "every $params.objs.x is \"y\"",
+            "b": "some $input.objs.x is \"y\"",
+            "c": "count of $params.objs.n is 2",
+            "d": "sum of $params.objs.n is 3",
+            "e": {"for": "every $params.objs.x as o", "assert": "o is v"},
+            "f": "v is in $params.objs.x",
+            "g": {"any_of": {"a": "v is in $params.objs.x", "b": "every $params.objs.x is \"y\""}},
+            "h": {"any_of": {"a": "v is $params.objs.x", "b": "v is in $params.objs.x"}}
+          }
+        }
+      }
+    },
+    "params": {"objs": [{"x": "y", "n": 1}, 3]},
+    "cases": [
+      {
+        "description": "lists the value read and the item the walk stopped at",
+        "rules": ["value.refs", "walk.right.inputs"],
+        "input": {"things": [{"id": "t1", "v": "y"}], "objs": [3]},
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "a",
+            "failed_items": [{"cause": "not_an_object", "item": "item 2 of $params.objs", "locations": ["$params:/objs/1"], "path": "$params.objs[1].x", "value": null}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "b",
+            "failed_items": [{"cause": "not_an_object", "item": "item 1 of $input.objs", "locations": ["/objs/0"], "path": "$input.objs[0].x", "value": null}],
+            "inputs": [{"locations": ["/objs/0"], "name": "$input.objs[].x", "value": [null]}],
+            "message": "item 1 of $input.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "count of $params.objs.n", "value": null},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}
+            ],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "d",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "sum of $params.objs.n", "value": null},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}
+            ],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "e",
+            "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of $params.objs", "locations": ["$params:/objs/1"], "path": "item 2 of $params.objs", "value": null}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "unusable",
+            "check": "f",
+            "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "g",
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "a: item 2 of $params.objs is 3, which isn't an object; b: item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "unusable",
+            "check": "h",
+            "inputs": [
+              {"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null},
+              {"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]},
+              {"locations": ["/things/0/v"], "name": "v", "value": "y"}
+            ],
+            "message": "a: $params.objs is [{\"n\": 1, \"x\": \"y\"}, 3], which isn't an object; b: item 2 of $params.objs is 3, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ],
+        "refs": {
+          "s": {
+            "a": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "b": [{"locations": ["/objs/0"], "name": "$input.objs[].x", "value": [null]}],
+            "c": [{"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}],
+            "d": [{"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}],
+            "e": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "f": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "g": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "h": [{"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null}, {"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}]
+          }
+        },
+        "violations": [
+          {
+            "cause": "not_an_object",
+            "check": "a",
+            "description": "",
+            "expression": "every $params.objs.x is \"y\"",
+            "failed_items": [{"cause": "not_an_object", "item": "item 2 of $params.objs", "locations": ["$params:/objs/1"], "path": "$params.objs[1].x", "value": null}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "b",
+            "description": "",
+            "expression": "some $input.objs.x is \"y\"",
+            "failed_items": [{"cause": "not_an_object", "item": "item 1 of $input.objs", "locations": ["/objs/0"], "path": "$input.objs[0].x", "value": null}],
+            "inputs": [{"locations": ["/objs/0"], "name": "$input.objs[].x", "value": [null]}],
+            "message": "item 1 of $input.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "description": "",
+            "expression": "count of $params.objs.n is 2",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "count of $params.objs.n", "value": null},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}
+            ],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "d",
+            "description": "",
+            "expression": "sum of $params.objs.n is 3",
+            "inputs": [
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "sum of $params.objs.n", "value": null},
+              {"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}
+            ],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "e",
+            "description": "",
+            "expression": "for every $params.objs.x as o: o equals v",
+            "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of $params.objs", "locations": ["$params:/objs/1"], "path": "item 2 of $params.objs", "value": null}],
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "unusable",
+            "check": "f",
+            "description": "",
+            "expression": "v is in $params.objs.x",
+            "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
+            "message": "item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "not_an_object",
+            "check": "g",
+            "description": "",
+            "expression": "one of: a(v is in $params.objs.x) | b(every $params.objs.x is \"y\")",
+            "inputs": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}, {"locations": ["/things/0/v"], "name": "v", "value": "y"}],
+            "message": "a: item 2 of $params.objs is 3, which isn't an object; b: item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          },
+          {
+            "cause": "unusable",
+            "check": "h",
+            "description": "",
+            "expression": "one of: a(v equals $params.objs.x) | b(v is in $params.objs.x)",
+            "inputs": [
+              {"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null},
+              {"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]},
+              {"locations": ["/things/0/v"], "name": "v", "value": "y"}
+            ],
+            "message": "a: $params.objs is [{\"n\": 1, \"x\": \"y\"}, 3], which isn't an object; b: item 2 of $params.objs is 3, which isn't an object",
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "$refs list nothing from a check's meta or description",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {"a": {"assert": "v exists", "meta": {"ref": ["$$params", "a"]}, "description": "reads v"}, "b": {"assert": "v is $params.a", "meta": {"from": ["$$params", "b"], "also": ["$$input", "z"]}}}
+        }
+      }
+    },
+    "params": {"a": "y", "b": 1},
+    "cases": [
+      {
+        "description": "lists only what the assertion reads",
+        "rules": ["value.refs"],
+        "input": {"things": [{"id": "t1", "v": "y"}], "z": 1},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {
+            "cause": "satisfied",
+            "check": "b",
+            "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["$params:/a"], "name": "$params.a", "value": "y"}],
+            "passed": true,
+            "requirement": "s",
+            "subject": {"id": "t1", "type": "thing"}
+          }
+        ],
+        "refs": {"s": {"a": [], "b": [{"locations": ["$params:/a"], "name": "$params.a", "value": "y"}]}},
+        "violations": []
+      }
+    ]
+  },
+  {
+    "description": "$refs list nothing from a meta that is written wrong",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+      "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": "v exists", "meta": ["$$input", "z"]}}}}
+    },
+    "cases": [
+      {
+        "description": "lists nothing, though the meta looks like a path from $input",
+        "rules": ["value.refs"],
+        "input": {"things": [{"id": "t1", "v": "y"}]},
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["invalid meta"]}],
+            "message": "checks.c: invalid meta",
+            "passed": false,
+            "requirement": "s",
+            "subject": {"id": null, "type": "thing"}
+          }
+        ],
+        "refs": {"s": {"c": []}}
+      }
+    ]
+  },
+  {"description": "$refs list the path before named by, with its whole value", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}, "picked": {"from": "things whose v is $params.m named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is $params.m named by k", "b": "v is $input.m named by k", "c": "$params.m named by k exists", "d": {"for": "every items as it", "assert": "it.w is $params.m named by k"}, "e": {"any_of": {"o1": "v is $params.m named by k", "o2": "v is 1"}}, "f": "count of $params.m named by k is 1", "g": "tags contains $params.m named by k", "h": "v is in $params.m named by k", "i": "v is $input.m named by $params.a"}}, "t": {"subject": "picked", "checks": {"c": "v exists"}}}}, "params": {"m": {"x": "a", "y": "b"}, "a": "x"}, "cases": [
+      {"description": "lists the path before named by with its whole value, where it was read, and the rows don't change", "rules": ["value.refs", "location.refs"], "input": {"things": [{"id": "t1", "v": "a", "k": "x", "tags": ["a"], "items": [{"w": "a"}]}], "m": {"x": "a", "y": "b"}}, "results": [{"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["/things/0/v"], "name": "v", "value": "a"}], "passed": true, "requirement": "t", "subject": {"id": "t1", "type": "picked"}}, {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/m/x"], "name": "$input.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "d", "failed_items": [], "inputs": [{"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/items/0"], "name": "items[]", "value": [{"w": "a"}]}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["/things/0/v"], "name": "v", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "f", "inputs": [{"locations": [], "name": "count of $params.m named by k", "value": null}, {"locations": [], "name": "$params.m named by k", "value": []}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m.x is \"a\", which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "g", "inputs": [{"locations": ["/things/0/tags"], "name": "tags", "value": ["a"]}, {"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "h", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m named by k is \"a\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "i", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/m/x"], "name": "$input.m named by $params.a", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}], "passed": true, "requirement": "t", "subject": {"id": "t1", "type": "picked"}}], "refs": {"s": {"a": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "b": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}], "c": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "d": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "e": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "f": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "g": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "h": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "i": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}, {"locations": ["$params:/a"], "name": "$params.a", "value": "x"}]}, "t": {"$applies": [], "c": []}}, "violations": [{"cause": "unusable", "check": "f", "description": "", "expression": "count of $params.m named by k is 1", "inputs": [{"locations": [], "name": "count of $params.m named by k", "value": null}, {"locations": [], "name": "$params.m named by k", "value": []}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "message": "$params.m.x is \"a\", which isn't a list or an object", "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "h", "description": "", "expression": "v is in $params.m named by k", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "message": "$params.m named by k is \"a\", which isn't a list", "requirement": "s", "subject": {"id": "t1", "type": "thing"}}]}
+  ]},
+  {"description": "$refs list the path before named by, when it is missing", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}, "picked": {"from": "things whose v is $params.m named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is $params.m named by k", "b": "v is $input.m named by k", "c": "$params.m named by k exists", "d": {"for": "every items as it", "assert": "it.w is $params.m named by k"}, "e": {"any_of": {"o1": "v is $params.m named by k", "o2": "v is 1"}}, "f": "count of $params.m named by k is 1", "g": "tags contains $params.m named by k", "h": "v is in $params.m named by k", "i": "v is $input.m named by $params.a"}}, "t": {"subject": "picked", "checks": {"c": "v exists"}}}}, "params": {}, "cases": [
+      {"description": "lists the path before named by with null and where the read stopped, and the rows don't change", "rules": ["value.refs", "location.refs"], "input": {"things": [{"id": "t1", "v": "a", "k": "x", "tags": ["a"], "items": [{"w": "a"}]}], "m": {"x": "a", "y": "b"}}, "results": [{"cause": "absent", "check": "$applies", "inputs": [{"locations": ["$params:"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["/things/0/v"], "name": "v", "value": "a"}], "message": "$params.m named by k is missing", "passed": false, "requirement": "t", "subject": {"id": "t1", "type": "picked"}}, {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["$params:"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m named by k is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/m/x"], "name": "$input.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "value", "check": "c", "inputs": [{"locations": ["$params:"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m named by k is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "absent", "check": "d", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "it.w equals $params.m named by k", "cause": "absent", "inputs": [{"locations": ["/things/0/items/0/w"], "name": "it.w", "value": "a"}, {"locations": ["$params:"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}]}], "item": "item 1 of items", "locations": ["/things/0/items/0"], "path": "item 1 of items", "value": {"w": "a"}}], "inputs": [{"locations": ["$params:"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/items/0"], "name": "items[]", "value": [{"w": "a"}]}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m named by k is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "e", "inputs": [{"locations": ["$params:"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["/things/0/v"], "name": "v", "value": "a"}], "message": "o1: $params.m named by k is missing; o2: v is \"a\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "absent", "check": "f", "inputs": [{"locations": [], "name": "count of $params.m named by k", "value": null}, {"locations": [], "name": "$params.m named by k", "value": []}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "absent", "check": "g", "inputs": [{"locations": ["/things/0/tags"], "name": "tags", "value": ["a"]}, {"locations": ["$params:"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m named by k is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "absent", "check": "h", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["$params:"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m named by k is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "absent", "check": "i", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/m"], "name": "$input.m named by $params.a", "value": null}], "message": "$params.a is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}], "refs": {"s": {"a": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "b": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}], "c": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "d": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "e": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "f": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "g": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "h": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "i": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}, {"locations": ["$params:"], "name": "$params.a", "value": null}]}, "t": {"$applies": [], "c": []}}}
+  ]},
+  {"description": "$refs list the path before named by, when it is null", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}, "picked": {"from": "things whose v is $params.m named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is $params.m named by k", "b": "v is $input.m named by k", "c": "$params.m named by k exists", "d": {"for": "every items as it", "assert": "it.w is $params.m named by k"}, "e": {"any_of": {"o1": "v is $params.m named by k", "o2": "v is 1"}}, "f": "count of $params.m named by k is 1", "g": "tags contains $params.m named by k", "h": "v is in $params.m named by k", "i": "v is $input.m named by $params.a"}}, "t": {"subject": "picked", "checks": {"c": "v exists"}}}}, "params": {"m": null, "a": null}, "cases": [
+      {"description": "lists the path before named by with null, and the rows don't change", "rules": ["value.refs", "location.refs"], "input": {"things": [{"id": "t1", "v": "a", "k": "x", "tags": ["a"], "items": [{"w": "a"}]}], "m": {"x": "a", "y": "b"}}, "results": [{"cause": "null", "check": "$applies", "inputs": [{"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["/things/0/v"], "name": "v", "value": "a"}], "message": "$params.m is null", "passed": false, "requirement": "t", "subject": {"id": "t1", "type": "picked"}}, {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/m/x"], "name": "$input.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "value", "check": "c", "inputs": [{"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "null", "check": "d", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "it.w equals $params.m named by k", "cause": "null", "inputs": [{"locations": ["/things/0/items/0/w"], "name": "it.w", "value": "a"}, {"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}]}], "item": "item 1 of items", "locations": ["/things/0/items/0"], "path": "item 1 of items", "value": {"w": "a"}}], "inputs": [{"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/items/0"], "name": "items[]", "value": [{"w": "a"}]}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "e", "inputs": [{"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["/things/0/v"], "name": "v", "value": "a"}], "message": "o1: $params.m is null; o2: v is \"a\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "null", "check": "f", "inputs": [{"locations": [], "name": "count of $params.m named by k", "value": null}, {"locations": [], "name": "$params.m named by k", "value": []}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "null", "check": "g", "inputs": [{"locations": ["/things/0/tags"], "name": "tags", "value": ["a"]}, {"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "null", "check": "h", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "null", "check": "i", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/m"], "name": "$input.m named by $params.a", "value": null}], "message": "$params.a is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}], "refs": {"s": {"a": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "b": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}], "c": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "d": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "e": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "f": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "g": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "h": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "i": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}, {"locations": ["$params:/a"], "name": "$params.a", "value": null}]}, "t": {"$applies": [], "c": []}}}
+  ]},
+  {"description": "$refs list the path before named by, when it is of the wrong type", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}, "picked": {"from": "things whose v is $params.m named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is $params.m named by k", "b": "v is $input.m named by k", "c": "$params.m named by k exists", "d": {"for": "every items as it", "assert": "it.w is $params.m named by k"}, "e": {"any_of": {"o1": "v is $params.m named by k", "o2": "v is 1"}}, "f": "count of $params.m named by k is 1", "g": "tags contains $params.m named by k", "h": "v is in $params.m named by k", "i": "v is $input.m named by $params.a"}}, "t": {"subject": "picked", "checks": {"c": "v exists"}}}}, "params": {"m": 3, "a": 3}, "cases": [
+      {"description": "lists the path before named by with what it read, and the rows don't change", "rules": ["value.refs", "location.refs"], "input": {"things": [{"id": "t1", "v": "a", "k": "x", "tags": ["a"], "items": [{"w": "a"}]}], "m": {"x": "a", "y": "b"}}, "results": [{"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["/things/0/v"], "name": "v", "value": "a"}], "message": "$params.m is 3, which isn't an object", "passed": false, "requirement": "t", "subject": {"id": "t1", "type": "picked"}}, {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/m/x"], "name": "$input.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "c", "inputs": [{"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "d", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "it.w equals $params.m named by k", "cause": "unusable", "inputs": [{"locations": ["/things/0/items/0/w"], "name": "it.w", "value": "a"}, {"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}]}], "item": "item 1 of items", "locations": ["/things/0/items/0"], "path": "item 1 of items", "value": {"w": "a"}}], "inputs": [{"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/items/0"], "name": "items[]", "value": [{"w": "a"}]}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "e", "inputs": [{"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["/things/0/v"], "name": "v", "value": "a"}], "message": "o1: $params.m is 3, which isn't an object; o2: v is \"a\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "f", "inputs": [{"locations": [], "name": "count of $params.m named by k", "value": null}, {"locations": [], "name": "$params.m named by k", "value": []}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is 3, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "g", "inputs": [{"locations": ["/things/0/tags"], "name": "tags", "value": ["a"]}, {"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "h", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["$params:/m"], "name": "$params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "message": "$params.m is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "i", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/m"], "name": "$input.m named by $params.a", "value": null}], "message": "$params.a is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}], "refs": {"s": {"a": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "b": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}], "c": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "d": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "e": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "f": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "g": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "h": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "i": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}, {"locations": ["$params:/a"], "name": "$params.a", "value": 3}]}, "t": {"$applies": [], "c": []}}}
+  ]},
+  {
     "description": "a check whose sides can't be read in different ways, with a named by key from $input.k",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"k_is_m": "k is m named by $input.k", "m_is_k": "m named by $input.k is k", "zz_is_m": "zz.y is m named by $input.k", "m_is_in_vs": "m named by $input.k is in vs", "beside": {"for": "every rs as r", "assert": "r.v is 1"}}}}},
     "cases": [

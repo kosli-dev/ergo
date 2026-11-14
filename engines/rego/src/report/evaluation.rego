@@ -130,12 +130,14 @@ _check_def(check, here) := _with_refs({"description": _reported_description(chec
 
 _check_def(check, here) := _with_refs(object.union(object.remove(_described(check), {"description", "meta"}), {"description": _reported_description(check), "meta": _reported_meta(check)}), check) if not _s_read(check, here)
 
-_with_refs(def, checked) := object.union(def, {"$refs_of": checked}) if {
-	data.ergo_reading == true
-	count(_check_refs(checked)) > 0
-} else := object.union(def, {"$refs": _ref_inputs(checked)}) if count(_check_refs(checked)) > 0
+_with_refs(def, checked) := _with_listed(def, checked, _listed_refs(checked))
 
-_with_refs(def, checked) := def if count(_check_refs(checked)) == 0
+_with_listed(def, checked, refs) := object.union(def, {"$refs_of": checked}) if {
+	data.ergo_reading == true
+	count(refs) > 0
+} else := object.union(def, {"$refs": _ref_entries(refs)}) if count(refs) > 0
+
+_with_listed(def, _, refs) := def if count(refs) == 0
 
 _evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _evaluation_with(doc, req, name, _fixed(req)))
 

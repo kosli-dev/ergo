@@ -213,6 +213,20 @@ pub fn is_ref(path: &Path) -> bool {
             .all(|step| matches!(step, Step::Key(_) | Step::Index(_)))
 }
 
+pub fn named_prefix(path: &Path) -> Option<Path> {
+    if !matches!(path.start, Start::Params | Start::Input) {
+        return None;
+    }
+    let at = path
+        .steps
+        .iter()
+        .position(|step| !matches!(step, Step::Key(_) | Step::Index(_)))?;
+    Some(Path {
+        start: path.start.clone(),
+        steps: path.steps[..at].to_vec(),
+    })
+}
+
 pub fn step_refs(path: &Path) -> Vec<Path> {
     path.steps
         .iter()

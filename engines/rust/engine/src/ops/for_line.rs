@@ -1645,6 +1645,7 @@ impl For {
         for path in paths {
             let own = walked.iter().find(|(p, _)| std::ptr::eq(*p, path));
             if matches!(path.start, Start::Params)
+                && own.is_none()
                 && in_walk.contains(&std::ptr::from_ref(path))
                 && !walk::has_root_field(path)
             {

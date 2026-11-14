@@ -525,6 +525,24 @@ fn a_whole_ref_is_listed_in_refs_and_a_params_path_with_a_field_step_only_by_its
     assert!(written(json!(["a"])).refs().is_empty());
 }
 
+#[test]
+fn a_piece_of_a_join_from_the_params_is_in_refs_with_the_ref_steps_of_the_others() {
+    let k = key_path(Start::Params, &["k"]);
+    let y = key_path(Start::Params, &["x", "y"]);
+    let named = Path {
+        start: Start::Subject,
+        steps: vec![Step::Key("m".into()), Step::Ref(Box::new(k.clone()))],
+    };
+    let join = Right::Join(vec![
+        Right::Field(key_path(Start::Subject, &["v"])),
+        Right::Ref(y.clone()),
+        Right::Field(named),
+        written(json!("-")),
+    ]);
+    assert_eq!(join.refs(), vec![y.clone(), k]);
+    assert_eq!(join.ref_paths(), vec![&y]);
+}
+
 fn lowered(sentence: &str) -> Option<Result<Check, Vec<String>>> {
     let check = tree::parse_check(sentence).unwrap();
     match &check.assertions[0] {

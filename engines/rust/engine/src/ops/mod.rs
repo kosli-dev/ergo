@@ -318,6 +318,102 @@ impl Check {
         }
     }
 
+    pub fn listed_refs(&self) -> Vec<(Path, bool)> {
+        if let Check::AnyOf(check) = self {
+            return check
+                .options
+                .iter()
+                .flatten()
+                .flat_map(Check::listed_refs)
+                .collect();
+        }
+        let walking = self.walking_refs();
+        let mut refs: Vec<(Path, bool)> = self
+            .refs()
+            .into_iter()
+            .map(|reference| {
+                let walks = walking.contains(&reference);
+                (reference, walks)
+            })
+            .collect();
+        refs.extend(self.read_refs());
+        refs
+    }
+
+    fn read_refs(&self) -> Vec<(Path, bool)> {
+        let own = |paths: Vec<&Path>, walks: bool| -> Vec<(Path, bool)> {
+            paths
+                .into_iter()
+                .filter_map(|path| read_ref(path, walks))
+                .collect()
+        };
+        match self {
+            Check::Walk(check) => own(vec![&check.path], true)
+                .into_iter()
+                .chain(
+                    check
+                        .whose
+                        .iter()
+                        .chain(std::iter::once(&*check.check))
+                        .flat_map(Check::read_refs),
+                )
+                .collect(),
+            Check::For(check) => check
+                .items
+                .iter()
+                .flat_map(|item| {
+                    own(vec![&item.path], true)
+                        .into_iter()
+                        .chain(item.whose.iter().flat_map(Check::read_refs))
+                })
+                .chain(
+                    check
+                        .sentences
+                        .iter()
+                        .flat_map(|sentence| sentence.check.read_refs()),
+                )
+                .collect(),
+            Check::AnyOf(check) => check
+                .options
+                .iter()
+                .flatten()
+                .flat_map(Check::read_refs)
+                .collect(),
+            Check::Tally(check) => {
+                let counted = check.counted_paths();
+                check
+                    .paths()
+                    .into_iter()
+                    .filter_map(|path| {
+                        let walks = counted.iter().any(|c| std::ptr::eq(*c, path));
+                        read_ref(path, walks)
+                    })
+                    .chain(check.counted_whose().flat_map(Check::read_refs))
+                    .collect()
+            }
+            Check::In(check) => own(check.paths(), false)
+                .into_iter()
+                .chain(named_prefixes(check.values.ref_paths()))
+                .collect(),
+            Check::Contains(check) => {
+                let right = match &check.wanted {
+                    lists::Wanted::One(right)
+                    | lists::Wanted::All(right)
+                    | lists::Wanted::Some(right) => right,
+                };
+                own(check.paths(), false)
+                    .into_iter()
+                    .chain(named_prefixes(right.ref_paths()))
+                    .collect()
+            }
+            Check::Matches(check) => own(check.paths(), false)
+                .into_iter()
+                .chain(named_prefixes(check.patterns.ref_paths()))
+                .collect(),
+            _ => own(self.paths(), false),
+        }
+    }
+
     pub fn walking_refs(&self) -> Vec<Path> {
         match self {
             Check::Tally(check) => check.walking_refs(),
@@ -346,6 +442,21 @@ impl Check {
             _ => false,
         }
     }
+}
+
+fn read_ref(path: &Path, walks: bool) -> Option<(Path, bool)> {
+    if path::is_ref(path) {
+        return Some((path.clone(), walks));
+    }
+    path::named_prefix(path).map(|prefix| (prefix, false))
+}
+
+fn named_prefixes(paths: Vec<&Path>) -> Vec<(Path, bool)> {
+    paths
+        .into_iter()
+        .filter_map(path::named_prefix)
+        .map(|prefix| (prefix, false))
+        .collect()
 }
 
 pub struct Ran {

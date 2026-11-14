@@ -815,3 +815,20 @@ fn a_path_that_does_not_start_at_a_part_has_no_tag() {
     };
     assert_eq!(part_tag(&subject_path(vec![key("a")]), &ctx), None);
 }
+
+#[test]
+fn the_path_before_a_named_by_is_its_prefix_and_a_path_of_keys_has_none() {
+    let field = Step::Field(Box::new(subject_path(vec![key("k")])));
+    let named = at(Start::Params, vec![key("m"), Step::Index(0), field.clone()]);
+    assert_eq!(
+        named_prefix(&named),
+        Some(at(Start::Params, vec![key("m"), Step::Index(0)]))
+    );
+    let by_ref = Step::Ref(Box::new(at(Start::Params, vec![key("a")])));
+    assert_eq!(
+        named_prefix(&at(Start::Input, vec![key("m"), by_ref, key("x")])),
+        Some(at(Start::Input, vec![key("m")]))
+    );
+    assert_eq!(named_prefix(&at(Start::Params, vec![key("m")])), None);
+    assert_eq!(named_prefix(&subject_path(vec![key("m"), field])), None);
+}

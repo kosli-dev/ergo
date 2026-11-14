@@ -404,6 +404,82 @@ _check_refs(check) := {x.ref |
 	not _under_literal(check, p)
 }
 
+_listed_refs(check) := _check_refs(check) | {piece |
+	walk(check, [p, x])
+	_side_form(x) == "join"
+	not _under_literal(check, p)
+	some piece in x.join
+	_whole_ref(piece)
+} if _applies_wrap(check)
+
+else := _read_refs(_read_part(check))
+
+_read_part(check) := object.remove(check, ["meta", "description"]) if is_object(check)
+
+else := check
+
+_read_refs(check) := _check_refs(check) | {r |
+	walk(check, [p, x])
+	not _under_literal(check, p)
+	some r in _refs_at(check, p, x)
+}
+
+_refs_at(check, p, x) := {_listed_ref(check, p, x)} if _whole_ref(x)
+
+else := {_named_prefix(x)} if _named_ref(x)
+
+else := set()
+
+_named_ref(x) if {
+	is_array(x)
+	count(x) > 1
+	x[0] in {"$$params", "$$input"}
+	i := _first_name_step(x)
+	every s in array.slice(x, 1, i) {
+		_is_key(s)
+	}
+}
+
+_first_name_step(x) := min({j |
+	some j, s in x
+	j > 0
+	not _is_key(s)
+})
+
+_named_prefix(x) := array.slice(x, 0, _first_name_step(x))
+
+_listed_ref(check, p, x) := _s_walked(x) if _walked_at(check, p)
+
+else := x
+
+_walked_at(_, p) if p[count(p) - 1] in {"count_of", "sum_of"}
+
+_walked_at(check, p) if {
+	p[count(p) - 1] == "path"
+	_walk_holder(object.get(check, array.slice(p, 0, count(p) - 1), null))
+}
+
+_walk_holder(x) if x.op in {"every", "some"}
+
+_walk_holder(x) if {
+	is_object(x)
+	"q" in object.keys(x)
+}
+
+_applies_wrap(check) if {
+	is_object(check)
+	object.keys(check) == {"$applies"}
+}
+
+_whole_ref(x) if {
+	is_array(x)
+	count(x) > 0
+	x[0] in {"$$params", "$$input"}
+	every s in array.slice(x, 1, count(x)) {
+		_is_key(s)
+	}
+}
+
 _step_refs(check) := {x.ref |
 	walk(check, [p, x])
 	_is_ref(x)

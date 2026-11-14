@@ -206,10 +206,10 @@ test_a_path_into_params_gives_its_location_after_the_params_prefix if {
 	}
 }
 
-test_a_ref_that_is_not_a_path_in_the_input_or_the_params_has_no_location if {
+test_a_ref_written_in_meta_is_not_read_so_it_is_not_in_refs if {
 	policy := {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": "x exists", "meta": {"ref": ["x"]}}}}}}
 	rep := ergo.report({"things": [{"id": "t1", "x": "a"}]}, policy, {})
-	rep.requirements.s.checks.c["$refs"] == [{"name": "<invalid ref>", "value": null, "locations": []}]
+	not "$refs" in object.keys(rep.requirements.s.checks.c)
 }
 
 test_a_params_path_that_starts_with_a_position_names_the_params_that_are_not_a_list if {

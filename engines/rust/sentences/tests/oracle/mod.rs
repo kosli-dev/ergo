@@ -126,6 +126,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "m named by each of $params.a.k",
     ),
     (
+        "z named by each of $params[0].v",
+        "z named by each of $params[0].v",
+    ),
+    ("every thing.us", "every thing.us"),
+    (
         "$input.m named by each of $input.a.k",
         "$input.m named by each of $input.a.k",
     ),
@@ -1422,6 +1427,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("x whose aa is equal to y", "x whose aa equals y"),
     ("x whose aa is false", "x whose aa is false"),
     ("x whose aa is in $params.l", "x whose aa is in $params.l"),
+    (
+        "things whose x is in $params[0].v",
+        "things whose x is in $params[0].v",
+    ),
     ("x whose aa is in 1", "x whose aa is one of 1"),
     ("x whose aa is in l", "x whose aa is in l"),
     ("x whose aa is in true", "x whose aa is one of true"),
@@ -2181,10 +2190,18 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("gs", "gs"),
     ("every c.kids", "every c.kids"),
     ("every cs", "every cs"),
+    (
+        "things whose n is at least $params.p and whose count of $params.q is 1 and whose n is in $params.l",
+        "things whose n is at least $params.p and whose count of $params.q is 1 and whose n is in $params.l",
+    ),
     ("things whose c.z is d.z", "things whose c.z equals d.z"),
     (
         "things whose k is m named by $input.k",
         "things whose k equals m named by $input.k",
+    ),
+    (
+        "things whose v is $params.m named by k",
+        "things whose v equals $params.m named by k",
     ),
 ];
 

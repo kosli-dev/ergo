@@ -1147,6 +1147,15 @@
               "meta": {}
             },
             "c": {
+              "$refs": [
+                {
+                  "locations": [
+                    "/top/n"
+                  ],
+                  "name": "$input.top.n",
+                  "value": 2
+                }
+              ],
               "description": "",
               "expression": "for first of items whose x is at least $input.top.n as z: z.x exists",
               "meta": {}
@@ -1334,6 +1343,15 @@
               "meta": {}
             },
             "c": {
+              "$refs": [
+                {
+                  "locations": [
+                    "/top/n"
+                  ],
+                  "name": "$input.top.n",
+                  "value": 2
+                }
+              ],
               "description": "",
               "expression": "for every items as z, every z.subs whose w is at most $input.top.n as y: y.w exists",
               "meta": {}
@@ -1537,6 +1555,15 @@
               "meta": {}
             },
             "c": {
+              "$refs": [
+                {
+                  "locations": [
+                    "/top/n"
+                  ],
+                  "name": "$input.top.n",
+                  "value": 2
+                }
+              ],
               "description": "",
               "expression": "for every items whose x is at least $input.top.n as z: z.x exists",
               "meta": {}
@@ -1729,6 +1756,15 @@
               "meta": {}
             },
             "c": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/p"
+                  ],
+                  "name": "$params.p",
+                  "value": 2
+                }
+              ],
               "description": "",
               "expression": "for every items whose x is at least $params.p as z: z.x exists",
               "meta": {}
@@ -1916,6 +1952,15 @@
               "meta": {}
             },
             "c": {
+              "$refs": [
+                {
+                  "locations": [
+                    "/top/n"
+                  ],
+                  "name": "$input.top.n",
+                  "value": 2
+                }
+              ],
               "description": "",
               "expression": "for every items whose x is at most $input.top.n plus 1, if any, as z: z.x exists",
               "meta": {}
@@ -2128,6 +2173,15 @@
               "meta": {}
             },
             "c": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/q"
+                  ],
+                  "name": "$params.q",
+                  "value": 3
+                }
+              ],
               "description": "",
               "expression": "for every items as x: x.v plus fa equals $params.q",
               "meta": {}
@@ -2463,6 +2517,25 @@
               "meta": {}
             },
             "c": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/q"
+                  ],
+                  "name": "$params.q",
+                  "value": 3
+                },
+                {
+                  "locations": [
+                    "$params:/r"
+                  ],
+                  "name": "$params.r",
+                  "value": {
+                    "a": 5,
+                    "b": 6
+                  }
+                }
+              ],
               "description": "",
               "expression": "for every items whose v equals $params.q as x: every items.v is at least $params.r named by k",
               "meta": {}
@@ -2756,6 +2829,15 @@
               "meta": {}
             },
             "c": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/q"
+                  ],
+                  "name": "$params.q",
+                  "value": 3
+                }
+              ],
               "description": "",
               "expression": "for every items as x: count of items whose v equals $params.q is 1",
               "meta": {}
@@ -3343,6 +3425,15 @@
               "meta": {}
             },
             "c": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/q"
+                  ],
+                  "name": "$params.q",
+                  "value": 3
+                }
+              ],
               "description": "",
               "expression": "for every items as x: count of items equals $params.q",
               "meta": {}
@@ -4044,6 +4135,15 @@
               "meta": {}
             },
             "c": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/q"
+                  ],
+                  "name": "$params.q",
+                  "value": 3
+                }
+              ],
               "description": "",
               "expression": "for every items as x: x.v equals $params.q",
               "meta": {}
@@ -4310,6 +4410,15 @@
               "meta": {}
             },
             "c": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/q"
+                  ],
+                  "name": "$params.q",
+                  "value": 3
+                }
+              ],
               "description": "",
               "expression": "for every items as x: x.v exists and fa equals $params.q",
               "meta": {}
