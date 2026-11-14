@@ -150,7 +150,7 @@ _for_own_texts(item, e, names) := [t |
 	some x in _walk_sides_paths(c)
 	is_array(x[0])
 	not _walk_outside(x[0])
-	own := _m_side_state(fe.iv, x[0])
+	own := _side_state(fe.iv, x[0])
 	own in {"absent", "null", "unusable", "not_an_object"}
 	subj := object.get(names, "ergo/subject", null)
 	roots := {piece | some r in array.concat(array.concat(_for_root_why(c, _m_undecided(own), subj), _m_keyed_off(subj, c, own)), _m_cond_root_texts(subj, c)); some piece in split(r, "; ")} with input as {"ergo/names": names}

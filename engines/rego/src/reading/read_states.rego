@@ -18,6 +18,15 @@ _read_state(subj, path) := _plain_read_state(subj, path, object.get(subj, _plain
 	_plain_path(path)
 } else := _any_read_state(subj, path)
 
+_side_state(subj, side) := s if {
+	s := _unread_ref_state(side)
+} else := _read_state(subj, side)
+
+_unread_ref_state(path) := _worst_of({_ref_state(x.ref) | some x in path; _is_ref(x)} & {"absent", "null"}) if {
+	some x in path
+	_is_ref(x)
+}
+
 _plain_read_state(subj, path, v) := "value" if {
 	v != _absent
 	v != null

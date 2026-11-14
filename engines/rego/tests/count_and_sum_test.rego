@@ -894,3 +894,14 @@ test_a_sum_or_count_that_reads_params_that_are_a_list_names_them_not_the_digits 
 		} with data.params as case[0]
 	}
 }
+
+_whose_null_row(check) := [[r.cause, r.message] |
+	some r in ergo.report({"things": [{"id": "t", "m": {"a": "a"}, "rs": [{"v": "a"}, {"v": 4}]}], "k": null}, _sentence_policy({"c": check}), {}).results
+	r.check == "c"
+]
+
+test_a_whose_value_from_the_input_that_is_null_is_named_beside_worse_items_but_a_key_is_not if {
+	_whose_null_row("count of rs whose zz is $input.k is 1") == [["absent", "$input.k is null; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
+	_whose_null_row("count of rs whose zz is m named by $input.k is 1") == [["absent", "item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
+	_whose_null_row("count of rs whose v is m named by $input.k is 1") == [["null", "$input.k is null"]]
+}

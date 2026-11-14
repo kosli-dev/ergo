@@ -108,7 +108,7 @@ _side_value(subj, side) := _add_numbers(side, nums) if {
 _add_numbers(side, nums) := _decimal_sum(nums) if "text" in object.keys(side)
 
 _number_states(x, path) := {s} if {
-	s := _read_state(x, path)
+	s := _side_state(x, path)
 	s != "value"
 }
 
@@ -320,7 +320,7 @@ _tally_judgement(side, e, flaws) := {"kept": kept, "read": read, "states": (unde
 
 _tally_focus_cause(c, e, flaw) := _tally_cond_cause(c, e.iv, flaw) if e.r == []
 
-else := flaw if flaw != ""
+else := _tally_cond_cause(c, e.v, flaw) if flaw != ""
 
 else := _focus_lost_state(e) if _focus_lost(e, c)
 
@@ -365,7 +365,17 @@ _cond_side(item, side) := {"v": [_written(side)], "found": [x | x := _simple_fou
 
 _tally_cond_cause(c, item, "") := _leaf_cause(c, item) if not _derived_once(c)
 
-_tally_cond_cause(_, _, flaw) := flaw if flaw != ""
+_tally_cond_cause(c, item, flaw) := _worst_of({flaw} | _item_states_beside_key(c, item)) if flaw in {"absent", "null"}
+
+_tally_cond_cause(_, _, flaw) := flaw if not flaw in {"", "absent", "null"}
+
+_item_states_beside_key(c, item) := {s |
+	is_object(item)
+	some p in _read_paths(c)
+	not _reads_unreadable_ref(c, p)
+	s := _read_state(item, p)
+	s != "value"
+}
 
 _cond_flaw(c) := "unusable" if {
 	_node_param_broken(c)

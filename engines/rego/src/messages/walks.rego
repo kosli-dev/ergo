@@ -235,8 +235,8 @@ _m_tally(subj, side) := array.concat(
 	array.concat(
 		[[x.cause, _m_fail(x, roots)] | some x in array.concat(w.fails, _walk_stop(w))],
 		array.concat(
-			[["root", m] | some m in sort([m | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); _m_ref_first(m)])],
-			[["root", m] | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w))],
+			[[_m_key_root_state(side, m), m] | some m in sort([m | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); _m_ref_first(m)])],
+			[["root", m] | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); not _m_ref_first(m)],
 		),
 	),
 	_m_tally_items(subj, side),
@@ -309,6 +309,14 @@ _m_ref_first(m) if {
 	some word in [" is missing", " is null"]
 	endswith(m, word)
 }
+
+_m_key_root_state(side, m) := s if {
+	some c in side.whose
+	some r in _step_refs(c)
+	s := _ref_state(r)
+	s in {"absent", "null"}
+	m == concat("", [_ref_label(r), " is ", _m_state_word(s)])
+} else := "root"
 
 _m_said_in(m, parts) if {
 	some p in parts

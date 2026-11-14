@@ -9182,6 +9182,54 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of es whose zz is m named by $input.k is 0",
+        "count of es whose zz equals m named by $input.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of rs whose v.y is m named by $input.k is 1",
+        "count of rs whose v.y equals m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rs whose zz is m named by $input.k is 1",
+        "count of rs whose zz equals m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of zzs is m named by $input.k",
+        "count of zzs equals m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "k is 1 plus m named by $input.k",
+        "k equals 1 plus m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "m named by $input.k plus 1 is k",
+        "m named by $input.k plus 1 equals k",
+        &[],
+        &[],
+    ),
+    (
+        "n is 1 plus m named by $input.k",
+        "n equals 1 plus m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "sum of zzs.n is m named by $input.k",
+        "sum of zzs.n equals m named by $input.k",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
