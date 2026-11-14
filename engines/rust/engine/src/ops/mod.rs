@@ -318,6 +318,60 @@ impl Check {
         }
     }
 
+    pub fn listed_refs(&self) -> Vec<Path> {
+        let mut refs = self.refs();
+        refs.extend(self.read_refs());
+        refs
+    }
+
+    fn read_refs(&self) -> Vec<Path> {
+        let own = |paths: Vec<&Path>| -> Vec<Path> {
+            paths
+                .into_iter()
+                .filter(|path| path::is_ref(path))
+                .cloned()
+                .collect()
+        };
+        match self {
+            Check::Walk(check) => own(vec![&check.path])
+                .into_iter()
+                .chain(
+                    check
+                        .whose
+                        .iter()
+                        .chain(std::iter::once(&*check.check))
+                        .flat_map(Check::read_refs),
+                )
+                .collect(),
+            Check::For(check) => check
+                .items
+                .iter()
+                .flat_map(|item| {
+                    own(vec![&item.path])
+                        .into_iter()
+                        .chain(item.whose.iter().flat_map(Check::read_refs))
+                })
+                .chain(
+                    check
+                        .sentences
+                        .iter()
+                        .flat_map(|sentence| sentence.check.read_refs()),
+                )
+                .collect(),
+            Check::AnyOf(check) => check
+                .options
+                .iter()
+                .flatten()
+                .flat_map(Check::read_refs)
+                .collect(),
+            Check::Tally(check) => own(check.paths())
+                .into_iter()
+                .chain(check.counted_whose().flat_map(Check::read_refs))
+                .collect(),
+            _ => own(self.paths()),
+        }
+    }
+
     pub fn walking_refs(&self) -> Vec<Path> {
         match self {
             Check::Tally(check) => check.walking_refs(),

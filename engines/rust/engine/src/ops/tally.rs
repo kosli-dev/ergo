@@ -268,18 +268,23 @@ impl Tally {
         for path in self.paths() {
             refs.extend(path::step_refs(path));
         }
-        for side in std::iter::once(&self.left).chain(self.right.as_ref()) {
-            if let Side::Derived(derived) = side {
-                for term in &derived.terms {
-                    if let Term::Counted(counted) = term {
-                        for check in &counted.whose {
-                            refs.extend(check.refs());
-                        }
-                    }
-                }
-            }
-        }
+        refs.extend(self.counted_whose().flat_map(Check::refs));
         refs
+    }
+
+    pub fn counted_whose(&self) -> impl Iterator<Item = &Check> {
+        std::iter::once(&self.left)
+            .chain(self.right.as_ref())
+            .filter_map(|side| match side {
+                Side::Derived(derived) => Some(&derived.terms),
+                _ => None,
+            })
+            .flatten()
+            .filter_map(|term| match term {
+                Term::Counted(counted) => Some(&counted.whose),
+                _ => None,
+            })
+            .flatten()
     }
 
     pub fn walking_refs(&self) -> Vec<Path> {

@@ -380,9 +380,25 @@ _listed_refs(check) := _check_refs(check) | {piece |
 	_side_form(x) == "join"
 	not _under_literal(check, p)
 	some piece in x.join
-	is_array(piece)
-	piece[0] in {"$$params", "$$input"}
-	every s in array.slice(piece, 1, count(piece)) {
+	_whole_ref(piece)
+} if _applies_wrap(check)
+
+else := _check_refs(check) | {x |
+	walk(check, [p, x])
+	_whole_ref(x)
+	not _under_literal(check, p)
+}
+
+_applies_wrap(check) if {
+	is_object(check)
+	object.keys(check) == {"$applies"}
+}
+
+_whole_ref(x) if {
+	is_array(x)
+	count(x) > 0
+	x[0] in {"$$params", "$$input"}
+	every s in array.slice(x, 1, count(x)) {
 		_is_key(s)
 	}
 }

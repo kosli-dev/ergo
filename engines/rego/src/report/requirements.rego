@@ -246,7 +246,7 @@ _applies_def(req) := {"$applies": _with_refs(
 		"description": _applies_description(req),
 		"expression": concat(" and ", [_expression_of(_applies_to_of(req)[name]) | some name in _applies_to_names(req)]),
 	},
-	_applies_to_of(req),
+	{"$applies": _applies_to_of(req)},
 )} if _size(_applies_to_of(req)) > 0
 
 _applies_def(req) := {} if {

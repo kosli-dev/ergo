@@ -29408,5 +29408,154 @@
         }
       }
     ]
+  },
+  {
+    "description": "a from line's conditions keep their $refs while a check lists every path it reads",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things whose n is at least $params.p and whose count of $params.q is 1 and whose n is in $params.l",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "n is at least $params.p"
+          }
+        }
+      }
+    },
+    "params": {
+      "p": 2,
+      "q": [
+        1
+      ],
+      "l": [
+        3
+      ]
+    },
+    "cases": [
+      {
+        "description": "$applies lists only the list after is in, and the check lists the path after is at least",
+        "rules": [
+          "value.refs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "n": 3
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "failed_assertions": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "value": [
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "value": 2
+              },
+              {
+                "locations": [
+                  "$params:/q/0"
+                ],
+                "name": "$params.q[]",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "$params:/q/0"
+                ],
+                "name": "count of $params.q",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/things/0/n"
+                ],
+                "name": "n",
+                "value": 3
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/n"
+                ],
+                "name": "n",
+                "value": 3
+              },
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "value": [
+                  3
+                ]
+              }
+            ],
+            "c": [
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "value": 2
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

@@ -9189,6 +9189,47 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("$params.x.y is v", "$params.x.y equals v", &[], &[]),
+    (
+        "count of items whose w is at least $params.n is 1",
+        "count of items whose w is at least $params.n is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every tags is at most $params.n",
+        "every tags is at most $params.n",
+        &[],
+        &[],
+    ),
+    (
+        "it.w is at least $params.n",
+        "it.w is at least $params.n",
+        &[],
+        &[],
+    ),
+    (
+        "n is at least $params.n",
+        "n is at least $params.n",
+        &[],
+        &[],
+    ),
+    (
+        "n is at least $params.p",
+        "n is at least $params.p",
+        &[],
+        &[],
+    ),
+    (
+        "name starts with $params.p",
+        "name starts with $params.p",
+        &[],
+        &[],
+    ),
+    ("some $params.q is 1", "some $params.q is 1", &[], &[]),
+    ("v is $input.z", "v equals $input.z", &[], &[]),
+    ("v is $params.x.y", "v equals $params.x.y", &[], &[]),
+    ("x is at most it.w", "x is at most it.w", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -13514,6 +13555,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every rows whose k is 1, if any, as r",
         "every rows whose k is 1, if any, as r",
+        &[],
+        &[],
+    ),
+    (
+        "every items as it, every $params.q as x",
+        "every items as it, every $params.q as x",
         &[],
         &[],
     ),
