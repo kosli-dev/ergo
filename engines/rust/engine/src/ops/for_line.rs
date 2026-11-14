@@ -1874,7 +1874,7 @@ impl For {
         let outer_flaw = super::message::root_flaw_ordered(&whose, &outer, &counted, &nested)
             .or_else(|| {
                 matches!(run.verdict.cause, Cause::Satisfied | Cause::Value)
-                    .then(|| super::message::key_cause(&item_whose, &outer))
+                    .then(|| super::message::key_cause_unread_first(&item_whose, &outer))
                     .flatten()
             });
         let forms: Vec<(Check, bool)> = self

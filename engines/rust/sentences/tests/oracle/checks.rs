@@ -9541,6 +9541,36 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of es.v that is m named by $input.k is 0",
+        "count of es.v that equals m named by $input.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose zz is m named by $input.k and whose v is m named by $input.j, if any, exists",
+        "every es whose zz equals m named by $input.k and whose v equals m named by $input.j, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es.v, if any, is m named by $params.k",
+        "every es.v, if any, equals m named by $params.k",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose v is m named by $params.k exists",
+        "some es whose v equals m named by $params.k exists",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose zz is m named by $input.k and whose v is m named by $input.j exists",
+        "some es whose zz equals m named by $input.k and whose v equals m named by $input.j exists",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -13891,6 +13921,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every es whose zz is m named by $input.k, if any, as e",
         "every es whose zz equals m named by $input.k, if any, as e",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose zz is m named by $input.k and whose v is m named by $input.j as e",
+        "every es whose zz equals m named by $input.k and whose v equals m named by $input.j as e",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose zz is m named by $params.k as e",
+        "every es whose zz equals m named by $params.k as e",
         &[],
         &[],
     ),

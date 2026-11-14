@@ -1414,7 +1414,7 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
         })
         .or_else(|| {
             unread
-                .then(|| message::key_cause(&whose, &outer_ctx))
+                .then(|| message::key_cause_unread_first(&whose, &outer_ctx))
                 .flatten()
         });
     if let Some((cause, text)) = flaw {

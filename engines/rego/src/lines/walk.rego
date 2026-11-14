@@ -29,7 +29,7 @@ _walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.c
 	not _walk_keys(check, subj)
 }
 
-_walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": failed, "fails": fails, "empty": w.items == []} if {
+_walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": failed, "fails": fails, "empty": _walk_none(w, cause)} if {
 	keys := _walk_keys(check, subj)
 	w := _walk(_walk_start(check, subj), keys, check.if_any == true)
 	judged := _walk_judged(check, w)
@@ -37,6 +37,13 @@ _walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": fail
 	cause := _walk_cause(check, w, judged, fails)
 	failed := _walk_failed(cause, fails, check.path)
 	inputs := _merged_inputs(array.concat(_walk_inputs(check, w), _walk_side_inputs(subj, check)))
+}
+
+default _walk_none(_, _) := false
+
+_walk_none(w, cause) if {
+	w.items == []
+	cause in {"satisfied", "value"}
 }
 
 _walk_side_inputs(subj, check) := array.concat(_conds_named_inputs(subj, array.concat([check.check], check.whose)), _input_ref_inputs(array.concat([check.check], check.whose))) if _walk_list_ref(check)

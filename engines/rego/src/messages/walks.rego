@@ -58,10 +58,36 @@ _walk_parts(check, subj, raw, r) := fs if {
 	fs != []
 }
 
+_walk_parts(check, subj, raw, r) := ms if {
+	r.failed == []
+	raw.cause == "unusable"
+	_m_walk_faults(subj, check) == []
+	ms := _m_empty_walk_roots(check, subj, r)
+	ms != []
+}
+
 _walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
 	r.failed == []
 	raw.cause == "unusable"
 	_m_walk_faults(subj, check) == []
+	_m_empty_walk_roots(check, subj, r) == []
+}
+
+_m_empty_walk_roots(check, subj, r) := ms if {
+	_m_params_only_flaw(check, r)
+	ms := _walk_root_msgs(check, subj)
+	ms != []
+} else := ms if {
+	_m_params_only_flaw(check, r)
+	ms := _walk_key_texts(check, r)
+	ms != []
+} else := _walk_phrase_roots(check) if _m_params_only_flaw(check, r)
+
+else := []
+
+_m_params_only_flaw(check, r) if {
+	r.empty == true
+	_params_shape_only_unreadable(check)
 }
 
 _m_walk_faults(subj, check) := _once(array.concat(array.concat(array.concat(_m_key_faults(subj, check), _m_walk_blocked(subj, check)), [f | some c in object.get(check, "whose", []); some f in _m_ref_faults_text(c)]), [f | is_object(object.get(check, "check", null)); some f in _m_ref_faults_text(check.check)]))
