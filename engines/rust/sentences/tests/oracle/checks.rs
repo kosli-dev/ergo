@@ -8827,6 +8827,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "sum of x.m named by $params.k is 1",
+        "sum of x.m named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of x.m named by $params.k is 1",
+        "count of x.m named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
         "count of x.ys is sum of x.m named by $input.k",
         "count of x.ys equals sum of x.m named by $input.k",
         &[],

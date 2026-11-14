@@ -1224,6 +1224,22 @@
     ]
   },
   {
+    "description": "a for line over items that aren't objects, with a sum of or a count of whose named by key is read from the params and isn't text, on an input that is an object",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"for_count": {"for": "every xs as x", "assert": "count of x.m named by $params.k is 1"}, "for_sum": {"for": "every xs as x", "assert": "sum of x.m named by $params.k is 1"}}}}},
+    "params": {"k": 3},
+    "cases": [
+      {
+        "description": "say the key isn't text, and then the item that isn't an object",
+        "rules": ["path.ref_step", "message.items"],
+        "input": {"things": [{"id": "t", "n": 1, "m": {"a": 1}, "xs": [1]}]},
+        "results": [
+          {"cause": "unusable", "check": "for_count", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of x.m named by $params.k is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "count of x.m named by $params.k", "value": null}, {"locations": [], "name": "x.m named by $params.k", "value": []}]}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": 1}], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [1]}], "message": "$params.k is 3, which isn't text; item 1 of xs: x is 1, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "unusable", "check": "for_sum", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "sum of x.m named by $params.k is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "sum of x.m named by $params.k", "value": null}, {"locations": [], "name": "x.m named by $params.k", "value": []}]}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": 1}], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [1]}], "message": "$params.k is 3, which isn't text; item 1 of xs: x is 1, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "the other phrases with a named by key that can't be read, missing, on an input that is a list",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"params_matches": "k matches $input.m named by $params.k", "params_is_at_least": "n is at least $input.m named by $params.k", "params_is_after": "ts is after $input.m named by $params.k", "params_is_a_string": "$input.m named by $params.k is a string", "params_is_empty": "$input.m named by $params.k is empty", "params_any_of": {"any_of": {"a": "k is $input.m named by $params.k", "b": "k is \"zz\""}}, "input_matches": "k matches m named by $input.k", "input_is_at_least": "n is at least m named by $input.k", "input_is_after": "ts is after m named by $input.k", "input_is_a_string": "m named by $input.k is a string", "input_is_empty": "m named by $input.k is empty", "input_any_of": {"any_of": {"a": "k is m named by $input.k", "b": "k is \"zz\""}}}}}},
     "params": {},
