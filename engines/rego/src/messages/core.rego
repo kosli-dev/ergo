@@ -360,7 +360,7 @@ _m_message(check, subj, cause) := m if {
 } else := _m_fallback(check) if cause in {"absent", "null"}
 
 _m_message(check, subj, "unusable") := m if {
-	clauses := _once(array.concat(array.concat(array.concat(array.concat(array.concat(_m_key_faults(subj, check), _m_blocked(subj, check)), _m_params_faults(subj, check)), _m_faults(subj, check)), _m_walk_ref_faults(subj, check)), _m_tallies(subj, check, "unusable")))
+	clauses := _once(array.concat(array.concat(array.concat(array.concat(array.concat(array.concat(_m_key_faults(subj, check), _m_blocked_early(subj, check)), _m_params_faults_early(subj, check)), _m_faults(subj, check)), _m_blocked_late(subj, check)), _m_walk_ref_faults(subj, check)), _m_tallies(subj, check, "unusable")))
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := m if {
