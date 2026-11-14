@@ -12,7 +12,7 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `README.md` says what Ergo is and walks a new user through a first policy and its report, the same for both engines.
 - `OPA.md` is the page for `ergo.rego`: install, how to run it with OPA, Wasm, numbers, `ergo.compile`. `CLI.md` is the page for the `ergo` command: install, how to run it, exit codes, how it reads YAML.
 - `REFERENCE.md` describes every field, operator, cause and report entry of the language, the same for both engines.
-- `GLOSSARY.md` says what the words the code uses mean (subject, entry, item, root, focus, fault, flaw, problem), the same for both engines, and lists where the code doesn't use them the same way yet.
+- `GLOSSARY.md` says what the words the code uses mean (subject, entry, item, root, focus, problem, fault, cause), the same for both engines, and lists where the code doesn't use them the same way yet.
 - `CONTRIBUTING.md` tells people how to report bugs and send changes, and points them here for the rules.
 - `CHANGELOG.md` says what each release of `ergo.rego` changed. The spec has its own in `spec/CHANGELOG.md`, and the Rust engine in `engines/rust/CHANGELOG.md`. A change in what a check means goes in `spec/CHANGELOG.md`, and an engine's own fixes go in that engine's file.
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
