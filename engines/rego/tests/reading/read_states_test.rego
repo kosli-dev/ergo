@@ -26,6 +26,14 @@ test_listed_refs_name_a_walked_path_as_is_in_does if {
 	ergo._listed_refs({"op": "compare", "left": {"count_of": ["$$params", "o"]}, "right": ["$$params", "n"]}) == {["$$params[]", "o"], ["$$params", "n"]}
 }
 
+test_listed_refs_name_the_path_before_named_by_and_not_a_walk_of_it if {
+	ergo._listed_refs({"op": "present", "path": ["$$params", "m", {"named_by_field": "k"}]}) == {["$$params", "m"]}
+	ergo._listed_refs({"op": "every", "path": ["$$params", "o", {"named_by_field": "k"}], "check": {"op": "present", "path": []}, "whose": []}) == {["$$params", "o"]}
+	ergo._listed_refs({"op": "compare", "left": ["v"], "right": ["$$input", "m", 0, {"named_by": "it"}, "k"]}) == {["$$input", "m", 0]}
+	ergo._listed_refs({"op": "compare", "left": ["v"], "right": ["$$input", "m", {"ref": ["$$params", "a"]}]}) == {["$$input", "m"], ["$$params", "a"]}
+	ergo._listed_refs({"op": "compare", "left": ["v"], "right": ["m", {"named_by_field": "k"}]}) == set()
+}
+
 test_a_null_on_the_path_stops_the_read_at_the_step_after_the_first_key if {
 	ergo._null_stop_at({"c": null}, ["c", "z"]) == 1
 }

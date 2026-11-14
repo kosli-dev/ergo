@@ -9390,6 +9390,54 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "$params.m named by k exists",
+        "$params.m named by k exists",
+        &[],
+        &[],
+    ),
+    (
+        "count of $params.m named by k is 1",
+        "count of $params.m named by k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "it.w is $params.m named by k",
+        "it.w equals $params.m named by k",
+        &[],
+        &[],
+    ),
+    (
+        "tags contains $params.m named by k",
+        "tags contains $params.m named by k",
+        &[],
+        &[],
+    ),
+    (
+        "v is $input.m named by $params.a",
+        "v equals $input.m named by $params.a",
+        &[],
+        &[],
+    ),
+    (
+        "v is $input.m named by k",
+        "v equals $input.m named by k",
+        &[],
+        &[],
+    ),
+    (
+        "v is $params.m named by k",
+        "v equals $params.m named by k",
+        &[],
+        &[],
+    ),
+    (
+        "v is in $params.m named by k",
+        "v is in $params.m named by k",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

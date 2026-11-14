@@ -2199,6 +2199,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "things whose k is m named by $input.k",
         "things whose k equals m named by $input.k",
     ),
+    (
+        "things whose v is $params.m named by k",
+        "things whose v equals $params.m named by k",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
