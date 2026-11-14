@@ -273,7 +273,7 @@ _for_with_free(check, subj, names, item, w, r) := object.union(r, {"cause": free
 _for_outer_of(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(check, subj, names, check.items[0], w), "failed": _for_failed(check, w.unread, [object.union(f, {"lines": []}) | some f in w.fails])} if {
 	w := _for_walk(check.items[0], subj, names)
 	"unread" in object.keys(w)
-} else := {"cause": cause, "inputs": _for_inputs(check, subj, names, check.items[0], _for_walk(check.items[0], subj, names)), "failed": _for_failed(check, cause, [object.union(f, {"lines": []}) | some f in _for_pick_fails(check, pre)])} if {
+} else := {"cause": cause, "inputs": _for_inputs(check, subj, names, check.items[0], _for_walk(check.items[0], subj, names)), "failed": _for_failed(check, cause, [_for_pick_why(check, names, object.union(f, {"lines": []})) | some f in _for_pick_fails(check, pre)])} if {
 	pre := _for_pre(check, subj, names)
 	pre != null
 	"pick" in object.keys(check.items[1])
@@ -335,6 +335,10 @@ _for_pick_fails(check, pre) := _for_unwalked(check, pre) if pre.walked == set()
 
 else := pre.fails
 
+_for_pick_why(check, names, f) := object.union(object.remove(f, ["pick_of"]), {"whose_of": [check.items[1], f.pick_of[0], names, f.pick_of[1]]}) if "pick_of" in object.keys(f)
+
+else := f
+
 _for_shared(_, fails, null, _) := fails
 
 _for_shared(check, fails, pre, names) := array.concat([trimmed[i] | some i, f in fails; not _for_only_shared(f, trimmed[i])], shared) if {
@@ -347,7 +351,7 @@ _for_shared(check, fails, pre, names) := array.concat([trimmed[i] | some i, f in
 
 _for_free_undecided(check, _, _) := [] if _for_whose_reads(check.items[1].whose, check.items[0].as)
 
-_for_free_undecided(check, pre, names) := [{"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_value(e.v, e, pre), "lines": [], "at": _walk_at(pre, e)} |
+_for_free_undecided(check, pre, names) := [{"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_value(e.v, e, pre), "lines": [], "at": _walk_at(pre, e), "whose_of": [check.items[1], e, names, wh]} |
 	some e in pre.items
 	wh := _for_whose(check.items[1], e, names)
 	wh.undecided != []
@@ -419,7 +423,7 @@ _for_picked(item, w, names) := _for_pick_sorted(item, object.union(w, {"items": 
 _for_picked(item, w, names) := object.union(w, {"items": [], "fails": array.concat(w.fails, whose_fails), "input": _for_list_input(item, w)}) if {
 	"pick" in object.keys(item)
 	w.walked != set()
-	whose_fails := [object.union({"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_value(e.v, e, w), "at": _walk_at(w, e)}, _for_raw(e)) | some e in w.items; wh := _for_whose(item, e, names); wh.undecided != []]
+	whose_fails := [object.union({"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": wh.undecided[0], "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "pick_of": [e, wh]}, _for_raw(e)) | some e in w.items; wh := _for_whose(item, e, names); wh.undecided != []]
 	not _for_no_fails(w, whose_fails)
 }
 
@@ -716,7 +720,7 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 } else := res if {
 	item := check.items[1]
 	judged := _for_copies_merged(item, names, w, [_for_judge_inner(check, subj, names, item, e, w) | some e in w.items])
-	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
+	fails := array.concat(array.concat([_for_pick_why(check, names, object.union(f, {"lines": []})) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
 	cause := _for_verdict(item, w, judged, fails)
 	res := _for_inner_result(check, subj, names, judged, fails, cause)
 }
@@ -868,7 +872,7 @@ _failed_name(path, roots) := _with_dot(_input_name(path), true) if _dotted_root(
 
 _for_failed(_, "satisfied", _) := []
 
-_for_failed(check, cause, fails) := [object.union(object.union({"path": _failed_name(f.path, _for_dotted(check)), "item": _failed_name(f.item, _for_dotted(check)), "cause": f.cause, "value": f.value, "failed_assertions": f.lines, "locations": _fail_locations(f), "said": _m_for_item_name(check, f.item), "bare": _m_rest_named(_m_for_item_name(check, f.item), f)}, _for_unchecked(check, object.get(f, "inner", []))), object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true})) |
+_for_failed(check, cause, fails) := [object.union(object.union({"path": _failed_name(f.path, _for_dotted(check)), "item": _failed_name(f.item, _for_dotted(check)), "cause": f.cause, "value": f.value, "failed_assertions": f.lines, "locations": _fail_locations(f), "said": _m_for_item_name(check, f.item), "bare": _m_rest_named(_m_for_item_name(check, f.item), f)}, _for_unchecked(check, object.get(f, "inner", []))), object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)})) |
 	some p in sort({f.path | some f in fails; not object.get(f, "nothing_picked", false)})
 	some f in fails
 	f.path == p

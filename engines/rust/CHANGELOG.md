@@ -47,6 +47,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A `for` line whose `sum of` or `count of` reads a `named by` key from `$params` that isn't text, on an input that is an object, adds what is wrong with an item that isn't an object after the key's message, like `$params.k is 3, which isn't text; item 1 of xs: x is 1, which isn't an object`, as `ergo.rego` does. It left the item out.
 
+- A root of the wrong type that the `whose` of a `for` line's second item reads after `is in` or `matches`, like `$params.z` in `every ws as w, every ys whose n is in $params.z as x`, is named once with no item of `ys`, as in `ergo.rego` 0.7.0 and spec 0.7 ([for.roots](../../spec/semantics.md#for)). With `$params.z` holding `"s"` the message is `$params.z is "s", which isn't a list`, where it added `item 1 of ys is {"n": 1, "ok": true}, which isn't a list` for each item. The same goes for `$input.z`, for `some`, `first of` and `last of` on the second item, and for an object like `{"a": 1}`. An item of `ys` that can't be read on its own still comes after the root: `$params.z is {"a": 1}, which isn't a list; item 1 of ys: n is missing`. Changes the message of such rows.
+
 ## 0.4.0
 
 ### New
