@@ -2524,6 +2524,16 @@
                   ],
                   "name": "$params.q",
                   "value": 3
+                },
+                {
+                  "locations": [
+                    "$params:/r"
+                  ],
+                  "name": "$params.r",
+                  "value": {
+                    "a": 5,
+                    "b": 6
+                  }
                 }
               ],
               "description": "",
