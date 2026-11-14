@@ -560,3 +560,13 @@ test_host_data_cannot_turn_on_reading_walked_roots if {
 	hosted := ergo.report(doc, policy, params) with data.ergo_walk_roots as true
 	hosted == plain
 }
+
+_null_key_whose_row(check) := [[r.cause, r.message] |
+	some r in ergo.report({"things": [{"id": "t", "m": {"a": "a"}, "rs": [{"v": "a"}, {"v": 4}]}], "k": null}, _sentence_policy({"c": check}), {}).results
+	r.check == "c"
+]
+
+test_a_whose_key_from_the_input_that_is_null_is_named_once_and_the_worse_cause_of_an_item_wins if {
+	_null_key_whose_row({"for": "every rs whose v is m named by $input.k as r", "assert": "r.v is 1"}) == [["null", "$input.k is null"]]
+	_null_key_whose_row({"for": "every rs whose zz is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
+}

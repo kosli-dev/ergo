@@ -705,11 +705,18 @@ test_subjects_that_narrow_each_other_lead_to_a_loop if {
 	_from_problems(rep) == [{"name": "subjects.x.from", "value": ["leads to a loop"], "locations": []}]
 }
 
-test_a_field_after_named_by_is_part_of_its_path_so_another_sides_cause_can_come_first_as_with_a_for_name_and_unlike_a_param if {
+test_a_field_after_named_by_is_part_of_its_path_so_another_sides_cause_can_come_first_as_with_a_for_name_and_a_param if {
 	doc := {"things": [{"id": 1, "s": null, "m": {}}]}
 	_sentence_rows({"c": "xs equals m named by s"}, doc, {})[0][2] == "absent"
 	_for_rows({"for": "every ks as s", "assert": "xs equals m named by s"}, [{"id": 1, "ks": [null], "m": {}}], {})[0][1] == "absent"
-	_sentence_rows({"c": "xs equals m named by $params.s"}, {"things": [{"id": 1, "m": {}}]}, {"s": null})[0][2] == "null"
+	_sentence_rows({"c": "xs equals m named by $params.s"}, {"things": [{"id": 1, "m": {}}]}, {"s": null})[0][2] == "absent"
+}
+
+test_a_param_key_that_cant_be_read_still_decides_when_the_other_side_can_be_read if {
+	doc := {"things": [{"id": 1, "xs": "a", "m": {"a": "a"}}]}
+	_sentence_rows({"c": "xs equals m named by $params.s"}, doc, {"s": null})[0][2] == "null"
+	_sentence_rows({"c": "xs equals m named by $params.s"}, doc, {})[0][2] == "absent"
+	_sentence_rows({"c": "xs equals m named by $params.s"}, doc, {"s": 3})[0][2] == "unusable"
 }
 
 test_named_by_a_for_name_in_the_second_items_path_reads_the_first_items_key if {

@@ -265,8 +265,18 @@ _m_state_clause(s) := concat("", [s.name, " is ", _m_state_word(s.state)]) if no
 
 _m_shown(subj, side) := {"name": _m_null_name(subj, side, state), "state": state, "value": object.get({"v": _value_at(subj, side)}, "v", null), "side": side} if {
 	is_array(side)
-	state := _read_state(subj, side)
+	state := _m_side_state(subj, side)
 }
+
+_m_side_state(subj, side) := s if {
+	s := _m_unread_ref_state(side)
+} else := _read_state(subj, side)
+
+_m_ref_read_state(subj, path) := s if {
+	s := _m_unread_ref_state(path)
+} else := _any_read_state(subj, path)
+
+_m_unread_ref_state(path) := _worst_of({_ref_state(x.ref) | walk(path, [_, x]); _is_ref(x)} & {"absent", "null"})
 
 _m_side_said(s, cause, _) if s.state == cause
 

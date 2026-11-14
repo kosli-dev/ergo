@@ -150,7 +150,7 @@ _for_own_texts(item, e, names) := [t |
 	some x in _walk_sides_paths(c)
 	is_array(x[0])
 	not _walk_outside(x[0])
-	own := _read_state(fe.iv, x[0])
+	own := _m_side_state(fe.iv, x[0])
 	own in {"absent", "null", "unusable", "not_an_object"}
 	subj := object.get(names, "ergo/subject", null)
 	roots := {piece | some r in array.concat(array.concat(_for_root_why(c, _m_undecided(own), subj), _m_keyed_off(subj, c, own)), _m_cond_root_texts(subj, c)); some piece in split(r, "; ")} with input as {"ergo/names": names}
@@ -615,18 +615,18 @@ _m_root_problem(leaf, shown, subj, cause) := _rwalk_text(subj, shown) if {
 else := concat("", [_input_name(shown), " is missing"]) if {
 	not _m_walks_root(leaf, shown, subj)
 	cause == "absent"
-	_any_read_state(subj, shown) == cause
+	_m_ref_read_state(subj, shown) == cause
 	i := min({j | some j in numbers.range(1, count(shown)); _any_read_state(subj, array.slice(shown, 0, j)) == cause})
 	i < count(shown)
 	not _has_field_step(array.slice(shown, 0, i))
 } else := _message({"op": "present", "path": shown}, subj, cause) if {
 	not _m_walks_root(leaf, shown, subj)
 	cause in {"absent", "null", "unusable"}
-	_any_read_state(subj, shown) == cause
+	_m_ref_read_state(subj, shown) == cause
 } else := _m_isnt(_input_name(shown), v, kind) if {
 	not _m_walks_root(leaf, shown, subj)
 	cause == "unusable"
-	_any_read_state(subj, shown) == "value"
+	_m_ref_read_state(subj, shown) == "value"
 	v := _value_at(subj, shown)
 	kind := _m_leaf_needs(leaf, v)
 }

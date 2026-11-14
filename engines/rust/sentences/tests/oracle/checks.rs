@@ -9116,6 +9116,72 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "k is m named by $params.k",
+        "k equals m named by $params.k",
+        &[],
+        &[],
+    ),
+    (
+        "m named by $input.k is in vs",
+        "m named by $input.k is in vs",
+        &[],
+        &[],
+    ),
+    (
+        "m named by $input.k is k",
+        "m named by $input.k equals k",
+        &[],
+        &[],
+    ),
+    (
+        "m named by $params.k is in vs",
+        "m named by $params.k is in vs",
+        &[],
+        &[],
+    ),
+    (
+        "m named by $params.k is k",
+        "m named by $params.k equals k",
+        &[],
+        &[],
+    ),
+    (
+        "r.zz is m named by $input.k",
+        "r.zz equals m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "r.zz is m named by $params.k",
+        "r.zz equals m named by $params.k",
+        &[],
+        &[],
+    ),
+    (
+        "zz.y is m named by $input.k",
+        "zz.y equals m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "zz.y is m named by $params.k",
+        "zz.y equals m named by $params.k",
+        &[],
+        &[],
+    ),
+    (
+        "every rs.zz is m named by $input.k",
+        "every rs.zz equals m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "every rs.zz is m named by $params.k",
+        "every rs.zz equals m named by $params.k",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

@@ -276,9 +276,29 @@ _cause_precedence := ["not_an_object", "ambiguous", "unusable", "absent", "null"
 
 _worst_read(subj, check) := _read_cause(subj, check, refs, {_used_ref_state(check, r) | some r in refs}) if refs := _check_refs(check)
 
-_read_cause(_, _, _, states) := _worst_of(states) if {
+_read_cause(subj, check, _, states) := _worst_of(states | _clear_path_states(subj, check)) if {
 	some state in states
 	state != "value"
+}
+
+_clear_path_states(subj, check) := set() if {
+	_list_cmp(check)
+	_reads_unreadable_ref(check, check.right)
+} else := _list_flaw(check, subj) - {"value"} if {
+	_list_cmp(check)
+	_list_flawed(check, subj)
+} else := {s |
+	_two_sided(check)
+	some p in _read_paths(check)
+	not _reads_unreadable_ref(check, p)
+	s := _state_at(check, subj, p)
+	s != "value"
+}
+
+_reads_unreadable_ref(check, p) if {
+	walk(p, [_, x])
+	_is_ref(x)
+	_used_ref_state(check, x.ref) != "value"
 }
 
 _read_cause(_, _, refs, states) := "value" if {
