@@ -226,19 +226,41 @@ fn every_case_passes_unless_known_to_fail() {
         .filter(|line| !line.is_empty())
         .map(String::from)
         .collect();
-    let failing: BTreeSet<String> = cases
-        .iter()
-        .filter(|c| {
-            let report =
-                ergo_policy_engine::report(&c.case["input"], &c.group["policy"], &params(&c.group));
-            !passes(&c.case, &report, &ergo_policy_engine::violations)
-        })
-        .map(|c| c.id.clone())
-        .collect();
+    let mut failing = BTreeSet::new();
+    let mut details = Vec::new();
+    for c in &cases {
+        let report =
+            ergo_policy_engine::report(&c.case["input"], &c.group["policy"], &params(&c.group));
+        if !passes(&c.case, &report, &ergo_policy_engine::violations) {
+            failing.insert(c.id.clone());
+            if !known.contains(&c.id) {
+                details.push(describe(c, &report));
+            }
+        }
+    }
     let ids: Vec<String> = cases.iter().map(|c| c.id.clone()).collect();
     println!("{} of {} cases pass", ids.len() - failing.len(), ids.len());
     let problems = list_problems(&ids, &failing, &known);
-    assert!(problems.is_empty(), "{}", problems.join("\n"));
+    assert!(
+        problems.is_empty(),
+        "{}\n\n{}",
+        problems.join("\n"),
+        details.join("\n\n")
+    );
+}
+
+fn describe(c: &Case, report: &Value) -> String {
+    let mut expected = c.case.clone();
+    expected
+        .as_object_mut()
+        .expect("a case is an object")
+        .remove("description");
+    format!(
+        "{}\nexpected:\n{}\nactual:\n{}",
+        c.id,
+        serde_json::to_string_pretty(&expected).unwrap(),
+        serde_json::to_string_pretty(report).unwrap()
+    )
 }
 
 fn sample_case() -> Value {
@@ -489,6 +511,19 @@ fn params_are_passed_as_written_and_default_to_an_empty_object() {
     assert_eq!(params(&json!({"params": null})), Value::Null);
     assert_eq!(params(&json!({"params": {"n": 1}})), json!({"n": 1}));
     assert_eq!(params(&json!({})), json!({}));
+}
+
+#[test]
+fn a_failure_is_described_with_its_id_and_both_reports() {
+    let case = Case {
+        id: "topic / group / case".to_string(),
+        group: json!({}),
+        case: json!({"description": "case", "report": {"description": "nope"}}),
+    };
+    assert_eq!(
+        describe(&case, &json!({"description": ""})),
+        "topic / group / case\nexpected:\n{\n  \"report\": {\n    \"description\": \"nope\"\n  }\n}\nactual:\n{\n  \"description\": \"\"\n}"
+    );
 }
 
 #[test]
