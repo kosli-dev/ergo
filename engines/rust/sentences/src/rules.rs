@@ -143,11 +143,10 @@ pub(crate) fn from_base(line: &FromLine) -> BTreeSet<String> {
             FromCondition::Quantified {
                 quantifier,
                 path,
-                if_any,
+                options,
                 phrase,
-                ..
             } => {
-                walk.if_any_with_some(*quantifier, *if_any);
+                walk.if_any_with_some(*quantifier, options.if_any);
                 walk.path(path);
                 walk.phrase(phrase, true);
             }
@@ -576,12 +575,11 @@ impl Walk {
             Assertion::Quantified {
                 quantifier,
                 path,
+                options,
                 whose,
-                if_any,
                 phrase,
-                ..
             } => {
-                self.if_any_with_some(*quantifier, *if_any);
+                self.if_any_with_some(*quantifier, options.if_any);
                 self.path(path);
                 for condition in whose {
                     self.condition(condition);

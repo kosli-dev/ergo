@@ -492,10 +492,12 @@ fn a_condition_may_start_with_some_or_every() {
     assert_eq!(
         from("x whose some l.m, if any, matches \"a\"").whose,
         vec![FromCondition::Quantified {
-            distinct: false,
+            options: ListOptions {
+                distinct: false,
+                if_any: true
+            },
             quantifier: Quantifier::Some,
             path: with_steps(key("l"), vec![dot("m")]),
-            if_any: true,
             phrase: Phrase::Matches {
                 not: false,
                 list: vals(vec![text("a")])
@@ -505,10 +507,9 @@ fn a_condition_may_start_with_some_or_every() {
     assert_eq!(
         from("x whose every l is 1").whose,
         vec![FromCondition::Quantified {
-            distinct: false,
+            options: ListOptions::PLAIN,
             quantifier: Quantifier::Every,
             path: key("l"),
-            if_any: false,
             phrase: Phrase::Is {
                 not: false,
                 operand: value(number("1")),
