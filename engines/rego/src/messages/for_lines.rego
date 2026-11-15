@@ -60,7 +60,12 @@ _for_root_why(c, cause, subj) := [t] if {
 	ts != []
 } else := []
 
-_for_why(first, item, e, names, wh, failure) := object.union(failure, _for_own_why_of(first, e, own)) if {
+_for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []}) if {
+	failure != null
+	wh.undecided != []
+	some c in item.whose
+	_reads_input_key(c)
+} else := object.union(failure, _for_own_why_of(first, e, own)) if {
 	failure != null
 	wh.undecided != []
 	_for_root_fails(item, e, names)

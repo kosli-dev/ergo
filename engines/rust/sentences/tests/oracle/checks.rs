@@ -9687,6 +9687,26 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of rs whose v is $params.m named by $input.k is 1",
+        "count of rs whose v equals $params.m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    ("g is 1", "g is 1", &[], &[]),
+    (
+        "some rs whose v is in ls exists",
+        "some rs whose v is in ls exists",
+        &[],
+        &[],
+    ),
+    (
+        "some rs whose v is in ls named by $input.k exists",
+        "some rs whose v is in ls named by $input.k exists",
+        &[],
+        &[],
+    ),
+    ("x.v is \"a\"", "x.v is \"a\"", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -14127,6 +14147,24 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every es whose zz is m named by $params.k as e",
         "every es whose zz equals m named by $params.k as e",
+        &[],
+        &[],
+    ),
+    (
+        "every rs as r, every ls named by $input.k as g",
+        "every rs as r, every ls named by $input.k as g",
+        &[],
+        &[],
+    ),
+    (
+        "every rs as r, every xs whose v is m named by $input.k as x",
+        "every rs as r, every xs whose v equals m named by $input.k as x",
+        &[],
+        &[],
+    ),
+    (
+        "every rs whose v is m named by $input.k as r",
+        "every rs whose v equals m named by $input.k as r",
         &[],
         &[],
     ),

@@ -735,6 +735,9 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                     .filter(|(cause, _)| *cause == Cause::Unusable)
                     .map(|(_, text)| text),
             );
+            if !lists::input_key_fault(check, ctx).is_empty() {
+                all.extend(params_that_arent_an_object(check, ctx));
+            }
             let digits = " needs more than 15 digits";
             if let Check::Tally(tally_check) = check
                 && all.iter().all(|c| c.ends_with(digits))

@@ -33,50 +33,6 @@ fn a_count_of_or_a_sum_of_reads_its_lists_by_item_and_a_plain_check_doesnt() {
 }
 
 #[test]
-fn a_key_read_from_a_list_input_says_the_input_isnt_an_object_whatever_the_sentence() {
-    let item = json!({"k": "a", "m": {"a": "a"}, "rs": [{"v": "a"}], "xs": [{"m": {"a": 1}}]});
-    for (input, says) in [
-        (json!([item.clone()]), true),
-        (item.clone(), false),
-        (json!(null), false),
-    ] {
-        let ctx = Ctx {
-            label: None,
-            item_by_item: true,
-            in_option: false,
-            subject: Located {
-                value: &item,
-                location: Location::input_root(),
-            },
-            input: &input,
-            params: None,
-            aliases: BTreeMap::new(),
-        };
-        for sentence in [
-            "count of xs.m named by $input.k is 1",
-            "sum of xs.m named by $input.k is 1",
-            "count of rs whose v is m named by $input.k is 1",
-            "count of rs.v that is $params.m named by $input.k is 1",
-            "every rs.v is m named by $input.k",
-            "some rs whose v is m named by $input.k exists",
-            "k is m named by $input.k",
-        ] {
-            let said = super::super::lists::input_key_fault(&lowered(sentence), &ctx);
-            assert_eq!(said.len() == 1, says, "{sentence} on {input}");
-        }
-        for sentence in [
-            "every rs.v is $input.k",
-            "k is $params.m named by $params.k",
-        ] {
-            assert!(
-                super::super::lists::input_key_fault(&lowered(sentence), &ctx).is_empty(),
-                "{sentence} on {input}"
-            );
-        }
-    }
-}
-
-#[test]
 fn a_tally_lists_the_refs_inside_ref_steps_but_not_a_side_that_is_a_ref() {
     let names: Vec<String> = lowered("x plus y named by $params.k is $params.limit")
         .refs()

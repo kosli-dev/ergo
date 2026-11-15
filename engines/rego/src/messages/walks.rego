@@ -311,6 +311,7 @@ _m_focus_text(subj, c, e, cause, roots) := _m_undecided_text(subj, c, _focus_of(
 _m_undecided_text(subj, c, e, cause, roots) := _m_isnt(_m_item_name(e.i, roots), e.iv, "an object") if {
 	cause == "not_an_object"
 	not is_object(e.iv)
+	not _reads_input_key(c)
 } else := t if {
 	t := _m_walked_root_text(c, cause)
 } else := concat(", and ", off) if {

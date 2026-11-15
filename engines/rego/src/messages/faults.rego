@@ -70,10 +70,7 @@ _reads_input_one(check) if {
 	_one_input_ref(check, r)
 }
 
-_reads_input_one(check) if {
-	some r in _check_refs(check)
-	_input_key_ref(r)
-}
+_reads_input_one(check) if _reads_input_key(check)
 
 _reads_input_one(check) if {
 	_one_right(check)

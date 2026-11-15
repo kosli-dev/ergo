@@ -713,8 +713,13 @@ impl For {
                         }
                     })
                 });
-            let fault = own_text.clone().or(fault);
-            let why = own_text.or(why);
+            let keyed_input = undecided_whose().find_map(|(check, _)| {
+                super::lists::input_key_fault(check, &outer)
+                    .into_iter()
+                    .next()
+            });
+            let fault = keyed_input.clone().or(own_text.clone()).or(fault);
+            let why = keyed_input.or(own_text).or(why);
             let dead_item = |cause: Cause| Dead {
                 raw: (w.end.is_none() && !w.item.value.is_object()).then(|| w.item.value.clone()),
                 msg: if undecided.is_some() && depth == 0 && !matches!(item.how, How::Pick { .. }) {
@@ -1183,6 +1188,10 @@ impl For {
                             crate::path::Outcome::Null,
                         ),
                         Cause::Unusable => super::message::key_faults_of(&item.path, &outer),
+                        Cause::NotAnObject => super::lists::input_key_fault_of(
+                            &crate::path::step_refs(&item.path),
+                            &outer,
+                        ),
                         _ => Vec::new(),
                     }
                 };

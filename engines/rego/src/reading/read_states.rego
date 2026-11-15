@@ -564,6 +564,11 @@ _input_key_ref(r) if {
 	is_string(r[1])
 }
 
+_reads_input_key(check) if {
+	some r in _check_refs(check)
+	_input_key_ref(r)
+}
+
 _params_null(r) if {
 	r[0] in _params_starts
 	data.ergo_params == null
