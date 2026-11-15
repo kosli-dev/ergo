@@ -53,6 +53,8 @@ def expand_all(value, expand):
         return expand(value)
     if isinstance(value, dict):
         return {name: expand_all(inner, expand) for name, inner in value.items()}
+    if isinstance(value, list):
+        return [expand_all(inner, expand) for inner in value]
     return value
 
 
