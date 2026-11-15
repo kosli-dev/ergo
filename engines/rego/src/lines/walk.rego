@@ -458,7 +458,7 @@ _walk_list_read("value", _)
 
 _walk_list_read("list", x) if is_array(x)
 
-_walk_sides_paths(c) := [e | some f in _compare_sides; some e in _walk_side_paths(c, c[f])] if _two_sided(c)
+_walk_sides_paths(c) := [e | some f in _compare_side_list; some e in _walk_side_paths(c, c[f])] if _two_sided(c)
 
 _walk_sides_paths(c) := [[p, "value"] | some p in _condition_paths(c)] if not _two_sided(c)
 

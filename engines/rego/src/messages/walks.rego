@@ -47,7 +47,7 @@ _walk_parts(check, _, raw, r) := _once(array.concat([concat("", [_path_name(chec
 
 _walk_phrase_roots(check) := [m |
 	is_object(object.get(check, "check", null))
-	some cause in _value_fault_causes
+	some cause in _value_fault_cause_list
 	m := _m_root_alone(check.check, cause)
 ]
 

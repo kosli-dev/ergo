@@ -491,7 +491,7 @@ _m_cond_walked_texts(c) := [t |
 	walk(c, [_, x])
 	is_object(x)
 	_list_phrase(x)
-	some cause in _value_fault_causes
+	some cause in _value_fault_cause_list
 	t := _m_walked_root_text(x, cause)
 ]
 

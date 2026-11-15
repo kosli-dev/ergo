@@ -1016,7 +1016,7 @@ _for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input
 }
 
 _for_read_paths(c) := array.concat(_leaf_paths(c), [piece |
-	some f in _compare_sides
+	some f in _compare_side_list
 	_side_form(object.get(c, f, null)) == "join"
 	some piece in c[f].join
 	is_array(piece)

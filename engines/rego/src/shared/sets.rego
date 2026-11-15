@@ -8,6 +8,8 @@ _no_read_fault_causes := {"", "absent", "null"}
 
 _value_fault_causes := {"absent", "null", "unusable"}
 
+_value_fault_cause_list := ["absent", "null", "unusable"]
+
 _failed_read_states := {"absent", "null", "unusable", "not_an_object"}
 
 _root_read_flaws := {"not_an_object", "ambiguous", "unusable"}
@@ -75,6 +77,8 @@ _term_keys := ["count", "sum", "elapsed_from", "elapsed_to"]
 _term_tally_keys := {"count", "sum"}
 
 _compare_sides := {"left", "right"}
+
+_compare_side_list := ["left", "right"]
 
 _ref_fields := {"path", "left", "right"}
 

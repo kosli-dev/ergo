@@ -486,7 +486,7 @@ _sentence_side(side) if {
 
 _where_children(node, names) := [[c, array.concat(at, ["whose", i]), "where", names] |
 	node.op == "compare"
-	some f in _compare_sides
+	some f in _compare_side_list
 	f in object.keys(node)
 	some [at, side] in _tallies(node[f], [f])
 	some i, c in side.whose

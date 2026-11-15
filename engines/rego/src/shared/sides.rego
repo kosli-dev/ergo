@@ -67,7 +67,7 @@ _side_form(side) := "join" if {
 
 default _derived_sides(_) := []
 
-_derived_sides(check) := [check[f] | some f in _compare_sides; f in object.keys(check); _derived(check[f])] if check.op == "compare"
+_derived_sides(check) := [check[f] | some f in _compare_side_list; f in object.keys(check); _derived(check[f])] if check.op == "compare"
 
 _basic_paths(side) := [side] if _basic_form(side) == "path"
 
