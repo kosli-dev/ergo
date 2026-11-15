@@ -263,8 +263,11 @@ _params_word(params) := "\"s\"" if params == "s"
 
 _params_word(params) := "true" if params == true
 
-test_params_that_are_not_an_object_leave_a_tie_ambiguous_when_the_check_does_not_read_them if {
-	every params in [3, [], "s", true, {}, null] {
+test_params_that_are_not_an_object_leave_a_tie_ambiguous_and_come_first_when_the_check_does_not_read_them if {
+	every params in [3, [], "s", true] {
+		_item_rows(_tie_policy, _tie_doc, params).plain == ["ambiguous", concat("", ["$params is ", _params_word(params), ", which isn't an object; ", _tie_text])]
+	}
+	every params in [{}, null] {
 		_item_rows(_tie_policy, _tie_doc, params).plain == ["ambiguous", _tie_text]
 	}
 }
@@ -294,6 +297,6 @@ test_params_that_are_not_an_object_still_fail_a_check_without_a_tie_as_unusable_
 	every params in [3, [], "s", true] {
 		rows := _item_rows(policy, {"prs": [{"id": "p0", "xs": ["s", null]}]}, params)
 		rows.plain[0] == "unusable"
-		rows.reads == ["unusable", concat("", ["$params is ", _params_word(params), ", which isn't an object"])]
+		rows.reads == ["unusable", concat("", ["$params is ", _params_word(params), ", which isn't an object; item 1 of xs is \"s\", which isn't an object; item 2 of xs is null, which isn't an object"])]
 	}
 }

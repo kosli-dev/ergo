@@ -6110,10 +6110,10 @@
         "rules": ["walk.flaws", "path.start", "tally.whose", "for.flaws", "message.cause"],
         "input": {"things": [{"id": "t", "m": {"a": 2}, "es": []}], "k": 3},
         "results": [
-          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
-          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is 3, which isn't text; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
-          {"cause": "unusable", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
-          {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$params is 3, which isn't an object; $input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$params is 3, which isn't an object; $input.k is 3, which isn't text; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$params is 3, which isn't an object; $input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$params is 3, which isn't an object; $input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
         ]
       },
       {
@@ -6121,10 +6121,10 @@
         "rules": ["walk.flaws", "path.start", "tally.whose", "for.flaws", "message.cause"],
         "input": {"things": [{"id": "t", "m": {"a": 2}, "es": []}]},
         "results": [
-          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
-          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is missing; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
-          {"cause": "unusable", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
-          {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$params is 3, which isn't an object; $input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$params is 3, which isn't an object; $input.k is missing; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$params is 3, which isn't an object; $input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$params is 3, which isn't an object; $input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
         ]
       },
       {
@@ -6132,10 +6132,10 @@
         "rules": ["walk.flaws", "path.start", "tally.whose", "for.flaws", "message.cause"],
         "input": {"things": [{"id": "t", "m": {"a": 2}, "es": []}], "k": null},
         "results": [
-          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
-          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is null; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
-          {"cause": "unusable", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
-          {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$params is 3, which isn't an object; $input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "es", "locations": ["/things/0/es"], "path": "es", "value": []}], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$params is 3, which isn't an object; $input.k is null; es is []", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "right", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$params is 3, which isn't an object; $input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": [], "name": "es[]", "value": []}], "message": "$params is 3, which isn't an object; $input.k is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
         ]
       }
     ]
@@ -6181,7 +6181,7 @@
         "rules": ["walk.flaws", "path.start", "sentence.subject.applies", "message.cause"],
         "input": {"things": [{"id": "t", "m": {"a": 2}, "es": []}], "k": 3},
         "results": [
-          {"cause": "unusable", "check": "$applies", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$params is 3, which isn't an object; $input.k is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
         ]
       },
       {
@@ -6189,7 +6189,7 @@
         "rules": ["walk.flaws", "path.start", "sentence.subject.applies", "message.cause"],
         "input": {"things": [{"id": "t", "m": {"a": 2}, "es": []}]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "failed_items": [], "inputs": [{"locations": [], "name": "es[].v", "value": []}, {"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "message": "$params is 3, which isn't an object; $input.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
         ]
       }
     ]
@@ -6262,6 +6262,27 @@
         "input": {"things": [{"id": "t", "m": {"a": 2}, "es": "s"}], "k": 3, "j": 3},
         "results": [
           {"cause": "unusable", "check": "count", "inputs": [{"locations": [], "name": "count of es whose zz equals m named by $input.k and whose v equals m named by $input.j", "value": null}, {"locations": [], "name": "es", "value": []}], "message": "es is \"s\", which isn't a list or an object; $input.k is 3, which isn't text; $input.j is 3, which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "with params that aren't an object, an every, a some and a from line's condition say so first, then what they say with no params, and list no failed items",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}, "kept": {"from": "things whose every es.v, if any, is m named by $input.k", "identified_by": "id"}, "mixed": {"from": "things whose x is 1 and whose id exists and whose y is $params.a", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"every": "every es.v is 1", "some": "some es.v is 9", "if_any": "every ns.v, if any, equals m named by $input.k", "reads_key": "every es.v is $params.a", "reads_key_on_text": "every s.v, if any, is at least $params.a"}}, "k": {"subject": "kept", "checks": {"c": "id exists"}}, "m": {"subject": "mixed", "checks": {"c": "id exists"}}}},
+    "params": 3,
+    "cases": [
+      {
+        "description": "the items' problems and the list's follow the params problem, and the $applies row says what the condition found",
+        "rules": ["params.not_an_object", "path.start", "walk.flaws", "message.items", "message.applies"],
+        "input": {"k": "a", "things": [{"id": "t", "m": {"a": 2}, "s": "s", "x": 2, "es": [{"v": 2}, {"v": 1}, {}]}]},
+        "results": [
+          {"cause": "unusable", "check": "$applies", "failed_items": [], "inputs": [{"locations": ["/things/0/es/0/v", "/things/0/es/1/v", "/things/0/es/2"], "name": "es[].v", "value": [2, 1, null]}, {"locations": ["/things/0/m/a"], "name": "m named by $input.k", "value": 2}], "message": "$params is 3, which isn't an object; item 2 of es: v is 1, and m named by $input.k is 2; item 3 of es: v is missing", "passed": false, "requirement": "k", "subject": {"id": "t", "type": "kept"}},
+          {"cause": "unusable", "check": "$applies", "failed_assertions": [{"assertion": "x is 1", "cause": "unusable"}, {"assertion": "id exists", "cause": "unusable"}, {"assertion": "y equals $params.a", "cause": "unusable"}], "inputs": [{"locations": ["$params:"], "name": "$params.a", "value": null}, {"locations": ["/things/0/id"], "name": "id", "value": "t"}, {"locations": ["/things/0/x"], "name": "x", "value": 2}, {"locations": ["/things/0"], "name": "y", "value": null}], "message": "$params is 3, which isn't an object; x is 2; y is missing", "passed": false, "requirement": "m", "subject": {"id": "t", "type": "mixed"}},
+          {"cause": "unusable", "check": "every", "failed_items": [], "inputs": [{"locations": ["/things/0/es/0/v", "/things/0/es/1/v", "/things/0/es/2"], "name": "es[].v", "value": [2, 1, null]}], "message": "$params is 3, which isn't an object; item 1 of es: v is 2; item 3 of es: v is missing", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "if_any", "failed_items": [], "inputs": [{"locations": ["/things/0/m/a"], "name": "m named by $input.k", "value": 2}, {"locations": [], "name": "ns.v", "value": []}], "message": "$params is 3, which isn't an object; ns is missing", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "reads_key", "failed_items": [], "inputs": [{"locations": ["/things/0/es/0/v", "/things/0/es/1/v", "/things/0/es/2"], "name": "es[].v", "value": [2, 1, null]}], "message": "$params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "reads_key_on_text", "failed_items": [], "inputs": [{"locations": [], "name": "s.v", "value": []}], "message": "$params is 3, which isn't an object; s is \"s\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": ["/things/0/es/0/v", "/things/0/es/1/v", "/things/0/es/2"], "name": "es[].v", "value": [2, 1, null]}], "message": "$params is 3, which isn't an object; item 1 of es: v is 2; item 2 of es: v is 1; item 3 of es: v is missing", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}}
         ]
       }
     ]

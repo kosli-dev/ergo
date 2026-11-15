@@ -1607,11 +1607,12 @@ fn a_count_whose_whose_reads_params_that_are_a_list_names_them_not_the_digits() 
 }
 
 #[test]
-fn a_ref_on_the_right_is_named_after_the_left_side_and_a_subject_field_before_it() {
+fn a_ref_on_the_right_is_named_after_the_left_side_and_a_subject_field_before_it_but_params_come_first()
+ {
     let input = json!({"things": [{"id": "t", "zz": "v", "y": 3}], "y": 3});
     assert_eq!(
         message_of(json!("zz contains $params.v"), input.clone(), json!(3)),
-        json!("zz is \"v\", which isn't a list, and $params is 3, which isn't an object")
+        json!("$params is 3, which isn't an object; zz is \"v\", which isn't a list")
     );
     assert_eq!(
         message_of(json!("zz contains $input.y.v"), input.clone(), json!({})),
@@ -1652,7 +1653,9 @@ fn a_count_through_a_position_names_the_item_once() {
             json!({"things": [{"id": "t"}]}),
             json!([{"v": 1}])
         ),
-        json!("item 1 of $params: v is 1, which isn't a list or an object")
+        json!(
+            "$params is [{\"v\": 1}], which isn't an object; item 1 of $params: v is 1, which isn't a list or an object"
+        )
     );
 }
 
@@ -1803,4 +1806,141 @@ fn merge_runs_keeps_the_rows_of_the_first_run_whatever_the_length_of_the_others(
     let ids: Vec<Value> = merged.iter().map(|r| r.subject_id.clone()).collect();
     assert_eq!(ids, [json!(1), json!(2)]);
     assert!(super::merge_runs(Vec::new(), &[&long]).is_empty());
+}
+
+fn params_rows(checks: Value, from: &str, input: Value) -> Value {
+    let p = json!({
+        "ergo_spec": SPEC,
+        "subjects": {"thing": {"from": from, "identified_by": "id"}},
+        "requirements": {"s": {"subject": "thing", "checks": checks}}
+    });
+    report(&input, &p, &json!(3))
+}
+
+#[test]
+fn params_that_are_not_an_object_come_first_then_what_a_check_that_reads_none_says_without_them() {
+    let r = params_rows(
+        json!({"plain": "x is 1", "passes": "id exists", "every": "every es.v is 1"}),
+        "things",
+        json!({"things": [{"id": "t", "x": 2, "es": [{"v": 2}, {"v": 1}, {}]}]}),
+    );
+    let said = |check: &str| rows(&r, check)[0]["message"].clone();
+    assert_eq!(
+        said("plain"),
+        json!("$params is 3, which isn't an object; x is 2")
+    );
+    assert_eq!(said("passes"), json!("$params is 3, which isn't an object"));
+    assert_eq!(
+        said("every"),
+        json!(
+            "$params is 3, which isn't an object; item 1 of es: v is 2; item 3 of es: v is missing"
+        )
+    );
+    assert_eq!(rows(&r, "every")[0]["failed_items"], json!([]));
+}
+
+#[test]
+fn params_that_are_not_an_object_come_first_in_an_applies_row_that_reads_none() {
+    let r = params_rows(
+        json!({"c": "id exists"}),
+        "things whose x is 1",
+        json!({"things": [{"id": "t", "x": 2}, {"id": "u", "x": 1}]}),
+    );
+    let applies = rows(&r, "$applies");
+    assert_eq!(
+        applies[0]["message"],
+        json!("$params is 3, which isn't an object; x is 2")
+    );
+    assert_eq!(
+        applies[1]["message"],
+        json!("$params is 3, which isn't an object")
+    );
+}
+
+#[test]
+fn params_that_are_not_an_object_are_said_once_by_a_count_whose_that_reads_them() {
+    let r = params_rows(
+        json!({"c": "count of es.v that is m named by $params.k is 0"}),
+        "things",
+        json!({"things": [{"id": "t", "m": {}, "es": [{"v": 1}, {"v": 2}]}]}),
+    );
+    assert_eq!(
+        rows(&r, "c")[0]["message"],
+        json!("$params is 3, which isn't an object")
+    );
+}
+
+#[test]
+fn params_that_are_not_an_object_come_first_whichever_sentence_of_a_check_reads_them() {
+    let r = params_rows(
+        json!({
+            "last": {"assert": ["x is 1", "y is $params.a"]},
+            "first": {"assert": ["y is $params.a", "x is 1"]},
+            "option": {"any_of": {"a": "y is $params.a", "b": "x is 1"}},
+        }),
+        "things",
+        json!({"things": [{"id": "t", "x": 2}]}),
+    );
+    let said = |check: &str| rows(&r, check)[0]["message"].clone();
+    assert_eq!(
+        said("last"),
+        json!("$params is 3, which isn't an object; x is 2; y is missing")
+    );
+    assert_eq!(
+        said("first"),
+        json!("$params is 3, which isn't an object; y is missing; x is 2")
+    );
+    assert_eq!(
+        said("option"),
+        json!("$params is 3, which isn't an object; a: y is missing; b: x is 2")
+    );
+}
+
+#[test]
+fn params_that_are_not_an_object_come_first_whichever_condition_of_a_from_line_reads_them() {
+    for (from, message) in [
+        (
+            "things whose x is 1 and whose y is $params.a",
+            "$params is 3, which isn't an object; x is 2; y is missing",
+        ),
+        (
+            "things whose y is $params.a and whose x is 1",
+            "$params is 3, which isn't an object; y is missing; x is 2",
+        ),
+    ] {
+        let r = params_rows(
+            json!({"c": "id exists"}),
+            from,
+            json!({"things": [{"id": "t", "x": 2}]}),
+        );
+        assert_eq!(rows(&r, "$applies")[0]["message"], json!(message));
+    }
+}
+
+#[test]
+fn params_that_are_not_an_object_leave_out_nothing_a_walk_that_reads_them_says_without_them() {
+    let r = params_rows(
+        json!({
+            "every": "every es.v is at least $params.a",
+            "some": "some es.v is $params.a",
+            "for": {"for": "every xs as m", "assert": ["m.v is at least z", "m.w is $params.a"]},
+        }),
+        "things",
+        json!({"things": [{"id": "t", "z": "s", "es": "s", "xs": [{"v": 1, "w": 1}, {"v": 2}]}]}),
+    );
+    let said = |check: &str| rows(&r, check)[0]["message"].clone();
+    for check in ["every", "some"] {
+        assert_eq!(
+            said(check),
+            json!(
+                "$params is 3, which isn't an object; es is \"s\", which isn't a list or an object"
+            )
+        );
+    }
+    assert_eq!(
+        said("for"),
+        json!(
+            "$params is 3, which isn't an object; z is \"s\", which isn't a number; item 2 of xs: m.w is missing"
+        )
+    );
 }

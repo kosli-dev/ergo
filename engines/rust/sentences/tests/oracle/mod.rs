@@ -5,6 +5,18 @@ pub mod checks;
 pub const FROM_OK: &[(&str, &str)] = &[
     ("commits", "commits"),
     (
+        "things whose x is 1 and whose id exists and whose y is $params.a",
+        "things whose x is 1 and whose id exists and whose y equals $params.a",
+    ),
+    (
+        "things whose x is 1 and whose y is $params.a",
+        "things whose x is 1 and whose y equals $params.a",
+    ),
+    (
+        "things whose y is $params.a and whose x is 1",
+        "things whose y equals $params.a and whose x is 1",
+    ),
+    (
         "$input whose k is $input.m named by $params.k",
         "$input whose k equals $input.m named by $params.k",
     ),

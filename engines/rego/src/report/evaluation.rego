@@ -139,7 +139,7 @@ _with_listed(def, checked, refs) := object.union(def, {"$refs_of": checked}) if 
 
 _with_listed(def, _, refs) := def if count(refs) == 0
 
-_evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _evaluation_with(doc, req, name, _fixed(req)))
+_evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _params_said_first(doc, req, name, _evaluation_with(doc, req, name, _fixed(req))))
 
 _fixed(req) := {
 	"filter_flaws": {n: _flaw(check, _from_names(req, here)) |

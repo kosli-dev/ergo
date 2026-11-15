@@ -1668,7 +1668,37 @@ fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
         && verdict.cause == Cause::Value
 }
 
+fn filter_message(filter: &Filter, ctx: &Ctx, verdict: &Verdict) -> String {
+    if matches!(verdict.cause, Cause::Absent | Cause::Null) {
+        let mut unlabelled = ctx.clone();
+        unlabelled.label = None;
+        ops::message::message(&filter.check, &unlabelled, verdict)
+    } else {
+        ops::message::message(&filter.check, ctx, verdict)
+    }
+}
+
 fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
+    let mut applied = apply_with(filters, ctx, unreadable);
+    if let (true, Some(said), Some(params)) = (unreadable, applied.message.clone(), ctx.params) {
+        let plain = Ctx {
+            params: None,
+            ..ctx.clone()
+        };
+        let natural = apply_with(filters, &plain, false);
+        let reads = filters
+            .iter()
+            .any(|filter| ops::message::reads_params(&filter.check));
+        applied.message = Some(ops::message::params_said_first(
+            params,
+            &reads.then_some(said).into_iter().collect::<Vec<_>>(),
+            &natural.message.into_iter().collect::<Vec<_>>(),
+        ));
+    }
+    applied
+}
+
+fn apply_with(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let mut failed_items = None;
     let mut said: Vec<String> = Vec::new();
     let verdicts: Vec<(&Filter, Verdict)> = filters
@@ -1678,6 +1708,19 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
             let mut verdict = ran.verdict;
             failed_items = ran.failed_items.map(Value::Array);
             let mut own = ran.message;
+            if unreadable && !ops::message::reads_params(&filter.check) {
+                if verdict.passed() {
+                    own = None;
+                } else if own.is_none() {
+                    own = Some(filter_message(filter, ctx, &verdict));
+                }
+                verdict.cause = Cause::Unusable;
+                failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
+                if let Some(text) = own {
+                    said.push(text);
+                }
+                return (filter, verdict);
+            }
             if unreadable {
                 let keeps_own = verdict.cause.is_failure()
                     && matches!(&filter.check, Check::Walk(w) if walk::walks_nothing(w, ctx))
@@ -1689,15 +1732,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                 }
             }
             if !verdict.passed() {
-                said.push(own.unwrap_or_else(|| {
-                    if matches!(verdict.cause, Cause::Absent | Cause::Null) {
-                        let mut unlabelled = ctx.clone();
-                        unlabelled.label = None;
-                        ops::message::message(&filter.check, &unlabelled, &verdict)
-                    } else {
-                        ops::message::message(&filter.check, ctx, &verdict)
-                    }
-                }));
+                said.push(own.unwrap_or_else(|| filter_message(filter, ctx, &verdict)));
             }
             (filter, verdict)
         })
@@ -2098,7 +2133,46 @@ fn walked_roots_run(check: &Check, ctx: &Ctx) -> ops::Ran {
     })
 }
 
+fn plain_message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
+    match check {
+        Check::Tally(tally) => {
+            ops::tally::with_walked_roots(tally, ctx, ops::message::message(check, ctx, verdict))
+        }
+        _ => ops::message::message(check, ctx, verdict),
+    }
+}
+
 fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc: &[Anc]) -> Row {
+    let broken = !env.unreadable.is_empty();
+    let mut row = check_row_with(env, broken, name, plan, ctx, judged, anc);
+    if let (true, Some(said), Some(params)) = (broken, row.message.clone(), ctx.params) {
+        let plain = Ctx {
+            params: None,
+            ..ctx.clone()
+        };
+        let natural = check_row_with(env, false, name, plan, &plain, judged, anc);
+        let reads = plan
+            .items
+            .iter()
+            .any(|item| ops::message::reads_params(&item.check));
+        row.message = Some(ops::message::params_said_first(
+            params,
+            &reads.then_some(said).into_iter().collect::<Vec<_>>(),
+            &natural.message.into_iter().collect::<Vec<_>>(),
+        ));
+    }
+    row
+}
+
+fn check_row_with(
+    env: &Env,
+    broken: bool,
+    name: &str,
+    plan: &Plan,
+    ctx: &Ctx,
+    judged: &Judged,
+    anc: &[Anc],
+) -> Row {
     let by_item;
     let ctx = if !ctx.item_by_item && plan.items.iter().any(|item| item.check.reads_by_item()) {
         by_item = ctx.item_by_item();
@@ -2123,7 +2197,20 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             failed_items = ran.failed_items.map(Value::Array);
             let mut verdict = ran.verdict;
             let mut own = ran.message;
-            if !env.unreadable.is_empty() && verdict.cause != Cause::Ambiguous {
+            if broken && !ops::message::reads_params(check) {
+                if !verdict.passed() && own.is_none() {
+                    own = Some(plain_message(check, ctx, &verdict));
+                }
+                if verdict.cause != Cause::Ambiguous {
+                    verdict.cause = Cause::Unusable;
+                }
+                if matches!(check, Check::Walk(_)) {
+                    failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
+                }
+                said.push(Some(own.unwrap_or_default()));
+                return verdict;
+            }
+            if broken && verdict.cause != Cause::Ambiguous {
                 verdict.cause = Cause::Unusable;
                 if ops::message::params_that_arent_an_object(check, ctx).is_some() {
                     failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
@@ -2152,12 +2239,10 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             .zip(&verdicts)
             .zip(&said)
             .filter(|((_, v), _)| !v.passed())
-            .map(|((check, v), own)| match (own, check) {
-                (Some(text), _) => text.clone(),
-                (None, Check::Tally(tally)) => {
-                    ops::tally::with_walked_roots(tally, ctx, ops::message::message(check, ctx, v))
-                }
-                (None, _) => ops::message::message(check, ctx, v),
+            .filter_map(|((check, v), own)| match own {
+                Some(text) if text.is_empty() => None,
+                Some(text) => Some(text.clone()),
+                None => Some(plain_message(check, ctx, v)),
             })
             .collect();
         let mut once: Vec<String> = Vec::new();

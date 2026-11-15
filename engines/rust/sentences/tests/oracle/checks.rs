@@ -9757,6 +9757,54 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("x.v is pl.z", "x.v equals pl.z", &[], &[]),
     ("y.n is at least w.min", "y.n is at least w.min", &[], &[]),
+    ("count of es is 5", "count of es is 5", &[], &[]),
+    (
+        "every es.v is $params.a",
+        "every es.v equals $params.a",
+        &[],
+        &[],
+    ),
+    ("every es.v is 1", "every es.v is 1", &[], &[]),
+    (
+        "every ns.v, if any, equals m named by $input.k",
+        "every ns.v, if any, equals m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "every s.v, if any, is at least $params.a",
+        "every s.v, if any, is at least $params.a",
+        &[],
+        &[],
+    ),
+    ("some es.v is 9", "some es.v is 9", &[], &[]),
+    (
+        "sum of es.v plus m named by $input.k is 5",
+        "sum of es.v plus m named by $input.k is 5",
+        &[],
+        &[],
+    ),
+    ("x is $params.a", "x equals $params.a", &[], &[]),
+    (
+        "every es.v is at least $params.a",
+        "every es.v is at least $params.a",
+        &[],
+        &[],
+    ),
+    (
+        "every es.v, if any, is in $params.q",
+        "every es.v, if any, is in $params.q",
+        &[],
+        &[],
+    ),
+    ("m.w is $params.a", "m.w equals $params.a", &[], &[]),
+    (
+        "some es.v is $params.a",
+        "some es.v equals $params.a",
+        &[],
+        &[],
+    ),
+    ("y is $params.a", "y equals $params.a", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

@@ -1634,7 +1634,8 @@ fn params_that_are_not_an_object_make_a_for_line_unusable_even_when_its_items_ar
 }
 
 #[test]
-fn params_that_are_not_an_object_leave_the_items_messages_of_a_for_line_that_does_not_read_them() {
+fn params_that_are_not_an_object_come_before_the_items_messages_of_a_for_line_that_does_not_read_them()
+ {
     let (cause, message) = pr_row(
         json!(null),
         "every xs as m",
@@ -1645,7 +1646,7 @@ fn params_that_are_not_an_object_leave_the_items_messages_of_a_for_line_that_doe
     assert_eq!(cause, "unusable");
     assert_eq!(
         message,
-        "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number"
+        "$params is 3, which isn't an object; item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number"
     );
     let (_, message) = pr_row(
         json!(null),
@@ -1654,7 +1655,10 @@ fn params_that_are_not_an_object_leave_the_items_messages_of_a_for_line_that_doe
         json!({"xs": [null, "s"]}),
         json!(3),
     );
-    assert_eq!(message, "$params is 3, which isn't an object");
+    assert_eq!(
+        message,
+        "$params is 3, which isn't an object; item 1 of xs is null, which isn't an object; item 2 of xs is \"s\", which isn't an object"
+    );
 }
 
 #[test]
@@ -1705,13 +1709,13 @@ const TIE_LINE: &str = "every xs as p, first of xs whose k is p.k sorted by v as
 
 #[test]
 fn params_that_are_not_an_object_leave_a_tie_ambiguous_when_the_check_does_not_read_them() {
-    for params in [
-        json!(3),
-        json!([]),
-        json!("s"),
-        json!(true),
-        json!({}),
-        json!(null),
+    for (params, said) in [
+        (json!(3), "$params is 3, which isn't an object; "),
+        (json!([]), "$params is [], which isn't an object; "),
+        (json!("s"), "$params is \"s\", which isn't an object; "),
+        (json!(true), "$params is true, which isn't an object; "),
+        (json!({}), ""),
+        (json!(null), ""),
     ] {
         let (cause, message) = pr_row(
             json!(null),
@@ -1721,7 +1725,7 @@ fn params_that_are_not_an_object_leave_a_tie_ambiguous_when_the_check_does_not_r
             params,
         );
         assert_eq!(cause, "ambiguous");
-        assert_eq!(message, TIED);
+        assert_eq!(message, format!("{said}{TIED}"));
     }
 }
 

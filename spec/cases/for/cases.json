@@ -27943,7 +27943,7 @@
         "rules": ["path.start", "path.unusable", "location.read"],
         "input": {"things": [{"id": "t"}]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["$params:/0"], "name": "item 1 of $params", "value": {"a": 1}}], "message": "item 1 of $params is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["$params:/0"], "name": "item 1 of $params", "value": {"a": 1}}], "message": "$params is [{\"a\": 1}], which isn't an object; item 1 of $params is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
         ]
       }
     ]
@@ -28063,7 +28063,7 @@
         "rules": ["path.start", "path.unusable", "message.cause"],
         "input": {"things": [{"id": "t", "zz": "v"}]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/zz"], "name": "zz", "value": "v"}, {"locations": ["$params:"], "name": "$params.v", "value": null}], "message": "zz is \"v\", which isn't a list, and $params is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/zz"], "name": "zz", "value": "v"}, {"locations": ["$params:"], "name": "$params.v", "value": null}], "message": "$params is 3, which isn't an object; zz is \"v\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
         ]
       }
     ]
@@ -28123,7 +28123,7 @@
         "rules": ["path.start", "path.unusable", "message.cause"],
         "input": {"things": [{"id": "t"}]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of $params[0].v", "value": null}, {"locations": [], "name": "$params[0].v", "value": []}], "message": "item 1 of $params: v is 1, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of $params[0].v", "value": null}, {"locations": [], "name": "$params[0].v", "value": []}], "message": "$params is [{\"v\": 1}], which isn't an object; item 1 of $params: v is 1, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
         ]
       }
     ]
@@ -29971,7 +29971,7 @@
         "results": [
           {"cause": "unusable", "check": "in_q", "failed_items": [], "inputs": [{"locations": ["$params:"], "name": "$params.q", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "$params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "unusable", "check": "least_q", "failed_items": [], "inputs": [{"locations": ["$params:"], "name": "$params.q", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "$params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
-          {"cause": "unusable", "check": "least_z", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m.v is at least z", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/0/v"], "name": "m.v", "value": 1}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "m.v is at least z", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/1/v"], "name": "m.v", "value": 2}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}]}], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"v": 2}}], "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+          {"cause": "unusable", "check": "least_z", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m.v is at least z", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/0/v"], "name": "m.v", "value": 1}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "m.v is at least z", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/1/v"], "name": "m.v", "value": 2}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}]}], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"v": 2}}], "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "$params is 3, which isn't an object; z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
         ]
       }
     ]
@@ -32569,7 +32569,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
+            "message": "$params is [], which isn't an object; item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -32694,7 +32694,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
+            "message": "$params is 3, which isn't an object; item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -32819,7 +32819,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
+            "message": "$params is \"s\", which isn't an object; item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -32900,7 +32900,7 @@
                 ]
               }
             ],
-            "message": "$params is 3, which isn't an object",
+            "message": "$params is 3, which isn't an object; item 1 of xs is null, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -33050,7 +33050,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
+            "message": "$params is 3, which isn't an object; item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -33200,7 +33200,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
+            "message": "$params is [], which isn't an object; item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -33350,7 +33350,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
+            "message": "$params is \"s\", which isn't an object; item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -33500,7 +33500,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
+            "message": "$params is true, which isn't an object; item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -58472,6 +58472,41 @@
               "type": "art"
             }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "with params that aren't an object, a for line says so first, then what it says with no params, and keeps its failed items",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"root": {"for": "every xs as m", "assert": "m.v is at least z"}, "items": {"for": "every xs as m", "assert": "m.v is 1"}}}}},
+    "params": 3,
+    "cases": [
+      {
+        "description": "a root and the items are said after the params problem",
+        "rules": ["params.not_an_object", "path.start", "for.roots", "for.flaws", "problems.all_said"],
+        "input": {"things": [{"id": "t", "z": "s", "xs": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "unusable", "check": "items", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "m.v is 1", "cause": "value", "inputs": [{"locations": ["/things/0/xs/1/v"], "name": "m.v", "value": 2}]}], "item": "item 2 of xs", "locations": ["/things/0/xs/1"], "path": "item 2 of xs", "value": {"v": 2}}], "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "$params is 3, which isn't an object; item 2 of xs: v is 2", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "root", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m.v is at least z", "cause": "unusable", "inputs": [{"locations": ["/things/0/xs/0/v"], "name": "m.v", "value": 1}, {"locations": ["/things/0/z"], "name": "z", "value": "s"}]}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "m.v is at least z", "cause": "unusable", "inputs": [{"locations": ["/things/0/xs/1/v"], "name": "m.v", "value": 2}, {"locations": ["/things/0/z"], "name": "z", "value": "s"}]}], "item": "item 2 of xs", "locations": ["/things/0/xs/1"], "path": "item 2 of xs", "value": {"v": 2}}], "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": ["/things/0/z"], "name": "z", "value": "s"}], "message": "$params is 3, which isn't an object; z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "with params that aren't an object, a for line that reads them by a key says the params problem first, then its other roots and its items",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"items": {"for": "every xs as m", "assert": ["m.v is 1", "m.w is $params.a"]}, "root": {"for": "every xs as m", "assert": ["m.v is at least z", "m.w is $params.a"]}}}}},
+    "params": 3,
+    "cases": [
+      {
+        "description": "the items and the root are said after the params problem",
+        "rules": ["params.not_an_object", "for.roots", "for.flaws", "problems.all_said"],
+        "input": {"things": [{"id": "t", "z": "s", "xs": [{"v": 1, "w": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "thing"}},
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": ["/things/0"], "name": "in-scope thing count", "value": 1}, {"locations": [], "name": "$params", "value": ["not an object"]}], "message": "in-scope thing count is 1", "passed": false, "requirement": "r", "subject": {"id": null, "type": "thing"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated thing ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "thing"}},
+          {"cause": "unusable", "check": "items", "failed_items": [], "inputs": [{"locations": ["$params:"], "name": "$params.a", "value": null}, {"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "xs[]", "value": [{"v": 1, "w": 1}, {"v": 2}]}], "message": "$params is 3, which isn't an object; item 2 of xs: m.v is 2, and m.w is missing", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}},
+          {"cause": "unusable", "check": "root", "failed_items": [], "inputs": [{"locations": ["$params:"], "name": "$params.a", "value": null}, {"locations": ["/things/0/xs/0", "/things/0/xs/1"], "name": "xs[]", "value": [{"v": 1, "w": 1}, {"v": 2}]}, {"locations": ["/things/0/z"], "name": "z", "value": "s"}], "message": "$params is 3, which isn't an object; z is \"s\", which isn't a number; item 2 of xs: m.w is missing", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}}
         ]
       }
     ]
