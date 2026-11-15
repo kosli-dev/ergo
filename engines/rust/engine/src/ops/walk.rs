@@ -1405,6 +1405,11 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
         row.verdict.cause = Cause::Unusable;
         row.failed_items = Vec::new();
         let outer_ctx = outer(ctx);
+        if let Some((_, roots)) = list_beside_roots(walk, &outer_ctx) {
+            row.parts = roots_then(roots, std::mem::take(&mut row.parts));
+            row.message = Some(message::joined(row.parts.clone()));
+            return row;
+        }
         row.parts = walk_faults(walk, &outer_ctx);
         let whose: Vec<&Check> = walk.whose.iter().collect();
         if let Some((_, text)) = message::root_flaw(&whose, &outer_ctx) {
@@ -1432,6 +1437,14 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
     } else {
         flaw
     };
+    if row.verdict.cause != Cause::Satisfied
+        && let Some((cause, roots)) = list_beside_roots(walk, &outer_ctx)
+    {
+        row.verdict.cause = Cause::worst([cause, row.verdict.cause]).unwrap_or(cause);
+        row.parts = roots_then(roots, std::mem::take(&mut row.parts));
+        row.message = Some(message::joined(row.parts.clone()));
+        return row;
+    }
     if let Some((cause, text)) = flaw {
         if row.verdict.cause != cause && row.verdict.cause.is_failure() {
             if ctx.label.is_some() && !in_a_for_line(ctx) && !row.parts.is_empty() {
@@ -1460,6 +1473,52 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
         row.failed_items = failed_items;
     }
     row
+}
+
+fn list_beside_roots(walk: &Walk, outer_ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
+    let whose: Vec<&Check> = walk.whose.iter().collect();
+    if whose
+        .iter()
+        .any(|check| check.paths().into_iter().any(has_key_step))
+    {
+        return None;
+    }
+    let walked = self::walk(
+        &walk.path,
+        outer_ctx,
+        Options {
+            if_any: walk.if_any,
+            empty_adds_nothing: false,
+        },
+    );
+    if !walked.own_failures() || (walked.unreadable.is_none() && !walked.items.is_empty()) {
+        return None;
+    }
+    message::root_flaw_texts(&whose, outer_ctx, &[])
+}
+
+impl Walked<'_> {
+    pub(super) fn own_failures(&self) -> bool {
+        self.failures
+            .iter()
+            .all(|f| !f.order.iter().any(|seg| matches!(seg, Seg::Index(_))))
+    }
+}
+
+pub(super) fn has_key_step(path: &Path) -> bool {
+    path.steps
+        .iter()
+        .any(|step| matches!(step, Step::Ref(_) | Step::Field(_)))
+}
+
+pub(super) fn roots_then(roots: Vec<String>, parts: Vec<String>) -> Vec<String> {
+    let mut out = roots;
+    for part in parts {
+        if !out.contains(&part) {
+            out.push(part);
+        }
+    }
+    out
 }
 
 pub(super) struct UpFront {

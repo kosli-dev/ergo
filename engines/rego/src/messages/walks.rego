@@ -268,17 +268,33 @@ _m_tally(subj, side) := [["unusable", c] | some c in _m_parent_clause(subj, {"op
 
 _m_tally(subj, side) := array.concat(
 	array.concat(
-		[[x.cause, _m_fail(x, roots)] | some x in array.concat(w.fails, _walk_stop(w))],
-		array.concat(
-			[[_m_key_root_state(side, m), m] | some m in sort([m | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); _m_ref_first(m)])],
-			[["root", m] | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); not _m_ref_first(m)],
-		),
+		[[x.cause, _m_fail(x, roots)] | some x in fs; not _m_tally_list_said(side, said, x)],
+		array.concat(said, [["root", _m_fail(x, roots)] | some x in fs; _m_tally_list_said(side, said, x)]),
 	),
 	array.concat(_m_tally_items(subj, side), [["root", m] | w.items == []; some c in side.whose; some m in _key_root_texts(c)]),
 ) if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	roots := _dotted_roots([side[f]])
+	fs := array.concat(w.fails, _walk_stop(w))
+	said := array.concat(
+		[[_m_key_root_state(side, m), m] | some m in sort([m | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); _m_ref_first(m)])],
+		[["root", m] | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); not _m_ref_first(m)],
+	)
+}
+
+_m_tally_list_said(side, said, x) if {
+	said != []
+	not _m_tally_keyed(side)
+	not _path_through_item(x.path)
+}
+
+_m_tally_keyed(side) if {
+	some c in side.whose
+	walk(c, [_, y])
+	is_array(y)
+	some step in y
+	_key_step(step)
 }
 
 _m_tally_walked(c, w) := _m_cond_walked_texts(c) if array.concat(w.fails, _walk_stop(w)) == []
@@ -540,7 +556,7 @@ _m_sentence(c, subj, cause) := _m_walk_sentence(c, subj, cause, _walk_row(c, sub
 
 _m_walk_sentence(c, subj, cause, r) := r.root_msgs if "root_msgs" in object.keys(r)
 
-else := _walk_parts(c, subj, {"cause": cause}, r)
+else := _parts_ahead(_walk_parts(c, subj, {"cause": cause}, r), r)
 
 _m_own_msg(check, c, m, one) := {"own_msg": [_m_aliased(_m_unalias(a, one, x)) | some x in m]} if {
 	a := check.items[count(check.items) - 1].as

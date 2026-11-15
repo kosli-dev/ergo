@@ -268,6 +268,7 @@ _walk_list_ref -> _right_ref_ops
 _walk_root_msgs -> _m_ref_first
 _walk_rooted_outcome -> _messaged
 _walk_row -> _walk_message
+_walk_row -> _walk_parts
 _walk_stop -> _m_walk_kind
 _walk_stop -> _walk_at
 _walk_stop -> _walk_stop_state
