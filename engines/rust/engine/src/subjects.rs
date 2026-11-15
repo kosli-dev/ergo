@@ -2098,6 +2098,15 @@ fn walked_roots_run(check: &Check, ctx: &Ctx) -> ops::Ran {
     })
 }
 
+fn default_message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
+    match check {
+        Check::Tally(tally) => {
+            ops::tally::with_walked_roots(tally, ctx, ops::message::message(check, ctx, verdict))
+        }
+        _ => ops::message::message(check, ctx, verdict),
+    }
+}
+
 fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc: &[Anc]) -> Row {
     let by_item;
     let ctx = if !ctx.item_by_item && plan.items.iter().any(|item| item.check.reads_by_item()) {
@@ -2123,6 +2132,20 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             failed_items = ran.failed_items.map(Value::Array);
             let mut verdict = ran.verdict;
             let mut own = ran.message;
+            if env.unreadable.is_empty()
+                && plan.items.len() == 1
+                && !verdict.passed()
+                && let Some((cause, text)) = ops::keyed_roots::rewritten(
+                    check,
+                    ctx,
+                    verdict.cause,
+                    &own.clone()
+                        .unwrap_or_else(|| default_message(check, ctx, &verdict)),
+                )
+            {
+                verdict.cause = cause;
+                own = Some(text);
+            }
             if !env.unreadable.is_empty() && verdict.cause != Cause::Ambiguous {
                 verdict.cause = Cause::Unusable;
                 if ops::message::params_that_arent_an_object(check, ctx).is_some() {
@@ -2152,12 +2175,9 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             .zip(&verdicts)
             .zip(&said)
             .filter(|((_, v), _)| !v.passed())
-            .map(|((check, v), own)| match (own, check) {
-                (Some(text), _) => text.clone(),
-                (None, Check::Tally(tally)) => {
-                    ops::tally::with_walked_roots(tally, ctx, ops::message::message(check, ctx, v))
-                }
-                (None, _) => ops::message::message(check, ctx, v),
+            .map(|((check, v), own)| match own {
+                Some(text) => text.clone(),
+                None => default_message(check, ctx, v),
             })
             .collect();
         let mut once: Vec<String> = Vec::new();

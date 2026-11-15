@@ -4986,6 +4986,24 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of xs whose tags contains $input.d.m named by key is 1",
+        "count of xs whose tags contains $input.d.m named by key is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose tags contains art.m named by key, if any, exists",
+        "every xs whose tags contains art.m named by key, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v matches art.m named by key, if any, exists",
+        "every xs whose v matches art.m named by key, if any, exists",
+        &[],
+        &[],
+    ),
+    (
         "s is \"a\" followed by t named by $input.k",
         "s is \"a\" followed by t named by $input.k",
         &[],

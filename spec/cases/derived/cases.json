@@ -15798,7 +15798,7 @@
                 "value": 3
               }
             ],
-            "message": "item 1 of xs: tags is {\"a\": [\"x\"]}, which isn't a list, and $input.m is 3, which isn't an object; item 2 of xs: $input.m is 3, which isn't an object",
+            "message": "$input.m is 3, which isn't an object; item 1 of xs: tags is {\"a\": [\"x\"]}, which isn't a list",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15884,7 +15884,7 @@
                 "value": "str"
               }
             ],
-            "message": "item 1 of xs: tags is {\"a\": [\"x\"]}, which isn't a list, and $input.m is \"str\", which isn't an object; item 2 of xs: $input.m is \"str\", which isn't an object",
+            "message": "$input.m is \"str\", which isn't an object; item 1 of xs: tags is {\"a\": [\"x\"]}, which isn't a list",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15965,7 +15965,7 @@
                 "value": null
               }
             ],
-            "message": "item 1 of xs: $input.m is null; key is missing",
+            "message": "$input.m is null; item 1 of xs: key is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16048,7 +16048,7 @@
                 "value": null
               }
             ],
-            "message": "item 1 of xs: $input.m is null; key is null; item 2 of xs: $input.m is null",
+            "message": "$input.m is null; item 1 of xs: key is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16166,7 +16166,7 @@
                 "value": null
               }
             ],
-            "message": "item 1 of xs: art.m is null; key is missing",
+            "message": "art.m is null; item 1 of xs: key is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16319,7 +16319,7 @@
                 "value": null
               }
             ],
-            "message": "item 1 of xs: art.m is null; key is missing",
+            "message": "art.m is null; item 1 of xs: key is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16333,5 +16333,575 @@
         ]
       }
     ]
-  }
+  },
+    {
+      "description": "a count whose whose reads a root outside the item through a key the item holds says the root once and first",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "m": "count of xs whose tags contains $input.m named by key is 1",
+              "dm": "count of xs whose tags contains $input.d.m named by key is 1"
+            }
+          }
+        }
+      },
+      "cases": [
+        {
+          "description": "the root is missing and the first item is null",
+          "rules": [
+            "problems.where_said",
+            "problems.item_order",
+            "problems.all_said",
+            "tally.whose",
+            "sentence.derived.count"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  null,
+                  {
+                    "key": "a",
+                    "tags": [
+                      "x"
+                    ],
+                    "v": "x"
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "not_an_object",
+              "check": "dm",
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "count of xs whose tags contains $input.d.m named by key",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "xs[]",
+                  "value": [
+                    null,
+                    {
+                      "key": "a",
+                      "tags": [
+                        "x"
+                      ],
+                      "v": "x"
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    ""
+                  ],
+                  "name": "$input.d.m",
+                  "value": null
+                }
+              ],
+              "message": "$input.d is missing; item 1 of xs is null, which isn't an object",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "not_an_object",
+              "check": "m",
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "count of xs whose tags contains $input.m named by key",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "xs[]",
+                  "value": [
+                    null,
+                    {
+                      "key": "a",
+                      "tags": [
+                        "x"
+                      ],
+                      "v": "x"
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    ""
+                  ],
+                  "name": "$input.m",
+                  "value": null
+                }
+              ],
+              "message": "$input.m is missing; item 1 of xs is null, which isn't an object",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "the root is null and the first item's key isn't text",
+          "rules": [
+            "problems.where_said",
+            "problems.item_order",
+            "problems.all_said",
+            "tally.whose",
+            "sentence.derived.count"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {
+                    "key": 3,
+                    "tags": [
+                      "x"
+                    ]
+                  },
+                  {
+                    "key": "a",
+                    "tags": [
+                      "x"
+                    ],
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "m": null
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "dm",
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "count of xs whose tags contains $input.d.m named by key",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "xs[]",
+                  "value": [
+                    {
+                      "key": 3,
+                      "tags": [
+                        "x"
+                      ]
+                    },
+                    {
+                      "key": "a",
+                      "tags": [
+                        "x"
+                      ],
+                      "v": "x"
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    ""
+                  ],
+                  "name": "$input.d.m",
+                  "value": null
+                }
+              ],
+              "message": "$input.d is missing; item 1 of xs: key is 3, which isn't text",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "m",
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "count of xs whose tags contains $input.m named by key",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "xs[]",
+                  "value": [
+                    {
+                      "key": 3,
+                      "tags": [
+                        "x"
+                      ]
+                    },
+                    {
+                      "key": "a",
+                      "tags": [
+                        "x"
+                      ],
+                      "v": "x"
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/m"
+                  ],
+                  "name": "$input.m",
+                  "value": null
+                }
+              ],
+              "message": "$input.m is null; item 1 of xs: key is 3, which isn't text",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "a root further back is null and the items have no key",
+          "rules": [
+            "problems.where_said",
+            "problems.item_order",
+            "problems.all_said",
+            "tally.whose",
+            "sentence.derived.count",
+            "path.ref_step"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {
+                    "tags": [
+                      "x"
+                    ]
+                  },
+                  {
+                    "tags": [
+                      "x"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "d": null
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "dm",
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "count of xs whose tags contains $input.d.m named by key",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "xs[]",
+                  "value": [
+                    {
+                      "tags": [
+                        "x"
+                      ]
+                    },
+                    {
+                      "tags": [
+                        "x"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/d"
+                  ],
+                  "name": "$input.d.m",
+                  "value": null
+                }
+              ],
+              "message": "$input.d is null; item 1 of xs: key is missing; item 2 of xs: key is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "m",
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "count of xs whose tags contains $input.m named by key",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "xs[]",
+                  "value": [
+                    {
+                      "tags": [
+                        "x"
+                      ]
+                    },
+                    {
+                      "tags": [
+                        "x"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    ""
+                  ],
+                  "name": "$input.m",
+                  "value": null
+                }
+              ],
+              "message": "$input.m is missing; item 1 of xs: key is missing; item 2 of xs: key is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "an every whose whose reads a field of the subject through a key the item holds says the field once and first",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "art": {
+            "from": "arts",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "art",
+            "checks": {
+              "contains": "every xs whose tags contains art.m named by key, if any, exists",
+              "matches": "every xs whose v matches art.m named by key, if any, exists"
+            }
+          }
+        }
+      },
+      "cases": [
+        {
+          "description": "the field is null and the first item is null",
+          "rules": [
+            "problems.where_said",
+            "problems.item_order",
+            "problems.all_said",
+            "walk.every"
+          ],
+          "input": {
+            "arts": [
+              {
+                "id": "a",
+                "m": null,
+                "xs": [
+                  null,
+                  {
+                    "key": "a",
+                    "tags": [
+                      "x"
+                    ],
+                    "v": "x"
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "not_an_object",
+              "check": "contains",
+              "failed_items": [
+                {
+                  "cause": "null",
+                  "item": "item 2 of xs",
+                  "locations": [
+                    "/arts/0/m"
+                  ],
+                  "path": "art.m named by key",
+                  "value": null
+                },
+                {
+                  "cause": "not_an_object",
+                  "item": "item 1 of xs",
+                  "locations": [
+                    "/arts/0/xs/0"
+                  ],
+                  "path": "xs[0].tags",
+                  "value": null
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/arts/0/m"
+                  ],
+                  "name": "art.m",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/arts/0/xs/0",
+                    "/arts/0/xs/1"
+                  ],
+                  "name": "xs[]",
+                  "value": [
+                    null,
+                    {
+                      "key": "a",
+                      "tags": [
+                        "x"
+                      ],
+                      "v": "x"
+                    }
+                  ]
+                }
+              ],
+              "message": "art.m is null; item 1 of xs is null, which isn't an object",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "a",
+                "type": "art"
+              }
+            },
+            {
+              "cause": "not_an_object",
+              "check": "matches",
+              "failed_items": [
+                {
+                  "cause": "null",
+                  "item": "item 2 of xs",
+                  "locations": [
+                    "/arts/0/m"
+                  ],
+                  "path": "art.m named by key",
+                  "value": null
+                },
+                {
+                  "cause": "not_an_object",
+                  "item": "item 1 of xs",
+                  "locations": [
+                    "/arts/0/xs/0"
+                  ],
+                  "path": "xs[0].v",
+                  "value": null
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/arts/0/m"
+                  ],
+                  "name": "art.m",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/arts/0/xs/0",
+                    "/arts/0/xs/1"
+                  ],
+                  "name": "xs[]",
+                  "value": [
+                    null,
+                    {
+                      "key": "a",
+                      "tags": [
+                        "x"
+                      ],
+                      "v": "x"
+                    }
+                  ]
+                }
+              ],
+              "message": "art.m is null; item 1 of xs is null, which isn't an object",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "a",
+                "type": "art"
+              }
+            }
+          ]
+        }
+      ]
+    }
 ]
