@@ -36,7 +36,7 @@ _s_quantifier_of(a) := "some" if "some" in object.keys(a)
 
 _s_quantifier_of(a) := "pick" if "pick" in object.keys(a)
 
-_s_quantifier_of(a) := "" if object.keys(a) & {"every", "some", "pick"} == set()
+_s_quantifier_of(a) := "" if object.keys(a) & _item_quantifier_keys == set()
 
 _s_if_any_text(a) := ", if any," if object.get(a, "if_any", false) == true
 
@@ -56,7 +56,7 @@ _s_itself(p) if object.get(p, "that", false) == true
 
 _s_cond_body(c) := concat(" ", [_s_left_text(c), _s_phrase_text(c.phrase)]) if _s_quantifier_of(c) == ""
 
-_s_cond_body(c) := concat(" ", [concat("", [_s_quantifier_of(c), " ", _s_distinct_text(c), _s_path_text(c[_s_quantifier_of(c)], "left"), _s_if_any_text(c)]), _s_phrase_text(c.phrase)]) if _s_quantifier_of(c) in {"every", "some"}
+_s_cond_body(c) := concat(" ", [concat("", [_s_quantifier_of(c), " ", _s_distinct_text(c), _s_path_text(c[_s_quantifier_of(c)], "left"), _s_if_any_text(c)]), _s_phrase_text(c.phrase)]) if _s_quantifier_of(c) in _quantifier_words
 
 _s_left_text(c) := _s_path_text(c.path, "left") if "path" in object.keys(c)
 
@@ -189,7 +189,7 @@ _s_phrase_words(ph) := "equals" if {
 
 _s_phrase_words(ph) := "is" if {
 	ph.op == "is"
-	object.keys(ph) & {"value", "join"} != set()
+	object.keys(ph) & _phrase_argument_keys != set()
 }
 
 _s_phrase_words(ph) := "does not equal" if {
@@ -199,7 +199,7 @@ _s_phrase_words(ph) := "does not equal" if {
 
 _s_phrase_words(ph) := "is not" if {
 	ph.op == "is not"
-	object.keys(ph) & {"value", "join"} != set()
+	object.keys(ph) & _phrase_argument_keys != set()
 }
 
 _s_phrase_words(ph) := "is one of" if {
@@ -246,7 +246,7 @@ _s_phrase_words(ph) := ph.op if not ph.op in {"is", "is not", "is one of", "is n
 
 _s_args_text(ph) := ph.type if ph.op in {"is a", "is not a"}
 
-_s_args_text(ph) := concat(" and ", [_json_text(ph.min), _json_text(ph.max)]) if ph.op in {"is between", "is not between"}
+_s_args_text(ph) := concat(" and ", [_json_text(ph.min), _json_text(ph.max)]) if ph.op in _between_phrases
 
 _s_args_text(ph) := concat(" within ", [_s_operand_text(ph), _json_text(ph.within)]) if "within" in object.keys(ph)
 
@@ -302,11 +302,11 @@ _s_id_read(text) := {"path": _s_model_path(fl.path)} if {
 
 _s_from_reads(subjects, _) := {} if not is_object(subjects)
 
-as_sentences(policy) := object.union(object.remove(policy, ["subjects", "requirements"]), object.union(_c_sections(policy), {"ergo_spec": _spec})) if is_object(policy)
+as_sentences(policy) := object.union(object.remove(policy, _policy_sections), object.union(_c_sections(policy), {"ergo_spec": _spec})) if is_object(policy)
 
 as_sentences(policy) := policy if not is_object(policy)
 
-_c_sections(policy) := {f: _c_section(f, policy[f], {"chains": _c_chains(policy), "aliases": _c_aliases(policy)}) | some f in ["subjects", "requirements"]; f in object.keys(policy)}
+_c_sections(policy) := {f: _c_section(f, policy[f], {"chains": _c_chains(policy), "aliases": _c_aliases(policy)}) | some f in _policy_sections; f in object.keys(policy)}
 
 _c_aliases(policy) := {name: {a | some a, _ in parts} | some name, parts in _p_parts(policy.subjects).effective} if is_object(object.get(policy, "subjects", null))
 
@@ -340,11 +340,11 @@ _c_check(check) := _c_written(check, text) if {
 	text := _c_sentence(_c_bare(check))
 } else := check
 
-_c_bare(check) := object.remove(check, ["description", "meta"]) if is_object(check)
+_c_bare(check) := object.remove(check, _check_note_fields) if is_object(check)
 
-_c_written(check, text) := text if object.keys(check) & {"description", "meta"} == set()
+_c_written(check, text) := text if object.keys(check) & _check_note_fields == set()
 
-_c_written(check, text) := object.union(object.filter(check, {"description", "meta"}), {"assert": text}) if object.keys(check) & {"description", "meta"} != set()
+_c_written(check, text) := object.union(object.filter(check, _check_note_fields), {"assert": text}) if object.keys(check) & _check_note_fields != set()
 
 _c_sentence(model) := [t | some t in _c_candidates(model); _c_reads_back(t, model)][0]
 
@@ -357,7 +357,7 @@ _c_reads_back(text, model) if {
 }
 
 _c_params_walked(model) := object.union(model, {f: {"ref": array.concat(["$$params[]"], array.slice(model[f].ref, 1, count(model[f].ref)))} |
-	some f in ["values", "patterns"]
+	some f in _list_argument_keys
 	_is_ref(object.get(model, f, null))
 	model[f].ref[0] == "$$params"
 })
@@ -481,7 +481,7 @@ _c_conditions(def) := conds if {
 		some n in sort(object.keys(def.applies_to))
 		f := def.applies_to[n]
 		is_object(f)
-		object.keys(f) & {"description", "meta"} == set()
+		object.keys(f) & _check_note_fields == set()
 		text := _c_sentence(f)
 	]
 	count(conds) == count(def.applies_to)

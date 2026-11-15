@@ -20,7 +20,7 @@ _operand(x) if {
 
 default _derived(_) := false
 
-_derived(side) if _side_form(side) in {"add", "join", "count_of", "sum_of", "elapsed"}
+_derived(side) if _side_form(side) in _derived_forms
 
 _simple_value(subj, side) := _value_at(subj, side) if is_array(side)
 
@@ -31,7 +31,7 @@ _basic_value(subj, side) := _simple_value(subj, side) if _basic_form(side) in {"
 _basic_value(subj, side) := _elapsed_units(side.unit, _value_at(subj, side.elapsed_from), _value_at(subj, side.elapsed_to)) if _basic_form(side) == "elapsed"
 
 _basic_value(subj, side) := r.value if {
-	_basic_form(side) in {"count_of", "sum_of"}
+	_basic_form(side) in _tally_forms
 	r := _tally(subj, side)
 	r.states == set()
 }
@@ -133,7 +133,7 @@ _usable_sides(check, l, r, subj) if {
 }
 
 _usable_sides(check, l, r, _) if {
-	check.cmp in {"includes", "excludes"}
+	check.cmp in _single_contain_ops
 	is_array(l)
 	is_string(r)
 	_items_fit(l, [r])
@@ -248,7 +248,7 @@ _basic_inputs(subj, side) := [_path_input(subj, side)] if _basic_form(side) == "
 _basic_inputs(_, side) := [] if _basic_form(side) == "literal"
 
 _basic_inputs(subj, side) := _tally_inputs(subj, side, r) if {
-	_basic_form(side) in {"count_of", "sum_of"}
+	_basic_form(side) in _tally_forms
 	r := _tally(subj, side)
 }
 
@@ -317,7 +317,7 @@ _tally_judge(side, e, flaws, _, false) := _tally_judgement(side, e, flaws)
 
 _tally_judgement(side, e, flaws) := {"kept": kept, "read": read, "states": (undecided | _tally_mark(read, e))} if {
 	causes := [_tally_focus_cause(c, e, flaws[i]) | some i, c in side.whose]
-	undecided := {c | some c in causes; not c in {"satisfied", "value", "missing"}}
+	undecided := {c | some c in causes; not c in _tally_decided_causes}
 	kept := count([c | some c in causes; c in {"value", "missing"}]) == 0
 	read := count([c | some c in causes; c != "satisfied"]) == 0
 }
@@ -369,9 +369,9 @@ _cond_side(item, side) := {"v": [_written(side)], "found": [x | x := _simple_fou
 
 _tally_cond_cause(c, item, "") := _leaf_cause(c, item) if not _derived_once(c)
 
-_tally_cond_cause(c, item, flaw) := _worst_of({flaw} | _item_states_beside_key(c, item)) if flaw in {"absent", "null"}
+_tally_cond_cause(c, item, flaw) := _worst_of({flaw} | _item_states_beside_key(c, item)) if flaw in _no_value_states
 
-_tally_cond_cause(_, _, flaw) := flaw if not flaw in {"", "absent", "null"}
+_tally_cond_cause(_, _, flaw) := flaw if not flaw in _no_read_fault_causes
 
 _item_states_beside_key(c, item) := set() if {
 	_list_cmp(c)
@@ -486,32 +486,32 @@ _sentence_side(side) if {
 
 _where_children(node, names) := [[c, array.concat(at, ["whose", i]), "where", names] |
 	node.op == "compare"
-	some f in ["left", "right"]
+	some f in _compare_sides
 	f in object.keys(node)
 	some [at, side] in _tallies(node[f], [f])
 	some i, c in side.whose
 ]
 
-_tallies(side, at) := [[at, side]] if _basic_form(side) in {"count_of", "sum_of"}
+_tallies(side, at) := [[at, side]] if _basic_form(side) in _tally_forms
 
-_tallies(side, at) := [[array.concat(at, ["add", i]), operand] | some i, operand in side.add; _basic_form(operand) in {"count_of", "sum_of"}] if _side_form(side) == "add"
+_tallies(side, at) := [[array.concat(at, ["add", i]), operand] | some i, operand in side.add; _basic_form(operand) in _tally_forms] if _side_form(side) == "add"
 
 _tallies(side, _) := [] if not _side_form(side) in {"count_of", "sum_of", "add"}
 
 _side_problem(node, here) := ({concat("", ["invalid ", f]) |
 	node.op == "compare"
-	some f in ["left", "right"]
+	some f in _compare_sides
 	f in object.keys(node)
 	not _side_form(node[f])
 } | {concat("", ["invalid ", f]) |
 	node.op == "compare"
-	some f in ["left", "right"]
+	some f in _compare_sides
 	f in object.keys(node)
 	_sentence_side(node[f])
 	not _s_read(node, here)
 }) | {concat("", ["invalid ", f]) |
 	node.op == "compare_time"
-	some f in ["left", "right"]
+	some f in _compare_sides
 	f in object.keys(node)
 	not is_array(node[f])
 	not _sentence_time_value(f, node, here)

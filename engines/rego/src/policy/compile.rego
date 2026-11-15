@@ -26,7 +26,7 @@ _s_new_subjects(subjects) := {name: _s_new_subject(def) | some name, def in subj
 
 else := subjects
 
-_s_new_subject(def) := object.union(object.remove(def, ["applies_to", "of", "from", "identified_by"]), {f: _s_new_field(def[f]) | some f in ["from", "identified_by"]; f in object.keys(def)}) if is_object(def)
+_s_new_subject(def) := object.union(object.remove(def, _subject_def_keys), {f: _s_new_field(def[f]) | some f in _subject_field_keys; f in object.keys(def)}) if is_object(def)
 
 else := def
 

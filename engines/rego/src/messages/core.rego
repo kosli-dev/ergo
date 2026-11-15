@@ -159,7 +159,7 @@ _m_with_sides(check) := object.union(check, {"$sides": sides}) if {
 }
 
 _message(check, subj, cause) := concat("; ", ps) if {
-	cause in {"absent", "null", "unusable"}
+	cause in _value_fault_causes
 	ps := _m_null_key_parts(subj, check)
 	ps != []
 } else := _m_message(_m_with_sides(_m_walked(check, subj)), subj, cause)
@@ -206,7 +206,7 @@ _m_key_text(subj, step) := t if {
 	t := _m_key_fault(subj, step)
 } else := concat("", [_m_key_name(step), " is ", _m_state_word(st)]) if {
 	st := _m_key_state(subj, step)
-	st in {"absent", "null"}
+	st in _no_value_states
 }
 
 _m_walked(check, subj) := object.union(check, {"right": {"walked": check.right}}) if {
@@ -282,7 +282,7 @@ _m_side_said(s, "absent", check) if {
 _m_side_said(s, cause, check) if {
 	object.get(check, "ergo/row", false) == true
 	s.state != cause
-	s.state in {"absent", "null"}
+	s.state in _no_value_states
 	is_array(object.get(s, "side", null))
 	not _m_off_path(s.side)
 }
@@ -297,7 +297,7 @@ _m_null_name(subj, side, "null") := _input_name(array.slice(side, 0, j)) if {
 _m_null_name(_, side, state) := _input_name(side) if state != "null"
 
 _m_shown(subj, side) := {"name": side.text, "state": "value", "value": v} if {
-	_side_form(side) in {"count_of", "sum_of", "elapsed", "add", "join"}
+	_side_form(side) in _derived_forms
 	[v] := _side_eval(subj, side).v
 }
 
@@ -320,7 +320,7 @@ _m_value_clause(s, _) := s.text if {
 	"text" in object.keys(s)
 }
 
-_m_value_clause(s, _) := _m_state_clause(s) if s.state in {"absent", "null"}
+_m_value_clause(s, _) := _m_state_clause(s) if s.state in _no_value_states
 
 _m_sources(subj, check) := _once([x | some side in _m_sides(check); some x in _m_side_sources(subj, side)])
 
@@ -339,7 +339,7 @@ _m_side_sources(subj, side) := [_m_shown(subj, p) | some p in _m_plain_paths(sid
 
 _m_side_sources(_, side) := [] if _m_tally_side(side)
 
-_m_tally_side(side) if _basic_form(side) in {"count_of", "sum_of"}
+_m_tally_side(side) if _basic_form(side) in _tally_forms
 
 _m_message(check, subj, "value") := m if {
 	clauses := _once([c | some side in _m_sides(check); some c in _m_value_clauses(subj, side)])
@@ -348,16 +348,16 @@ _m_message(check, subj, "value") := m if {
 } else := _m_fallback(check)
 
 _m_message(check, subj, cause) := m if {
-	cause in {"absent", "null"}
+	cause in _no_value_states
 	clauses := _m_key_states(subj, check, cause)
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := m if {
-	cause in {"absent", "null"}
+	cause in _no_value_states
 	clauses := _once(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tallies(subj, check, cause)))
 	count(clauses) > 0
 	m := concat(", and ", clauses)
-} else := _m_fallback(check) if cause in {"absent", "null"}
+} else := _m_fallback(check) if cause in _no_value_states
 
 _m_unusable_before_faults(subj, check) := array.concat(array.concat(_m_key_faults(subj, check), _m_blocked_early(subj, check)), _m_params_faults_early(subj, check))
 

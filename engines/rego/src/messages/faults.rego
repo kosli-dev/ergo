@@ -207,7 +207,7 @@ _m_late_side(check, side) if {
 	check.cmp in _list_cmps
 	side == check.right
 	is_array(side)
-	side[0] in {"$$input", "$$input[]", "$$params", "$$params[]"}
+	side[0] in _input_and_params_walk_roots
 }
 
 _m_params_faults(subj, check) := [_m_isnt(_ref_name(prefix), v, _m_holder(k)) |
@@ -331,7 +331,7 @@ _m_unusable_ref_walks(check) := [_ref_walk_text(r) | some r in sort(_check_refs(
 _m_unusable_side_walks(subj, check) := [t | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"; t := s.text]
 
 _m_ref_list_fault(check) := [[check[f], _m_right_kind(cmp, v)]] if {
-	some f in ["values", "patterns"]
+	some f in _list_argument_keys
 	_is_ref(check[f])
 	cmp := _m_ref_cmp(check.op, f)
 	_ref_state(check[f].ref) == "value"
@@ -344,8 +344,8 @@ _m_ref_cmp(op, "values") := "includes_all" if op == "includes"
 _m_ref_cmp(op, "values") := "excludes_all" if op == "excludes"
 
 _m_ref_cmp(op, f) := op if {
-	not op in {"includes", "excludes"}
-	f in {"values", "patterns"}
+	not op in _single_contain_ops
+	f in _list_argument_keys
 }
 
 _m_fault(subj, check) := [f | some g in array.concat(_m_fault_groups_early(subj, check), _m_fault_groups_late(subj, check)); some f in g]
@@ -355,17 +355,17 @@ _m_fault_groups_early(subj, check) := [_m_fault_1(subj, check), _m_fault_2(subj,
 _m_fault_groups_late(subj, check) := [_m_fault_7(subj, check), _m_fault_8(subj, check), _m_fault_9(subj, check), _m_fault_10(subj, check), _m_fault_11(subj, check), _m_ref_list_fault(check)]
 
 _m_fault_1(subj, check) := [[check.path, "a number"]] if {
-	check.op in {"range", "outside_range"}
+	check.op in _range_ops
 	not is_number(_found(subj, check.path))
 } else := []
 
 _m_fault_2(subj, check) := [[check.path, "text"]] if {
-	check.op in {"matches_any", "not_matches_any"}
+	check.op in _pattern_ops
 	not is_string(_found(subj, check.path))
 } else := []
 
 _m_fault_3(subj, check) := [[check.path, "text or a list"]] if {
-	check.op in {"empty_string_or_list", "not_empty_string_or_list"}
+	check.op in _empty_list_ops
 	not _string_or_list(_found(subj, check.path))
 } else := []
 
@@ -390,7 +390,7 @@ _m_fault_6(subj, check) := [[check.path, _m_kind(w)]] if {
 } else := []
 
 _m_fault_7(subj, check) := [[check.path, _m_kinds(vals)]] if {
-	check.op in {"in", "not_in"}
+	check.op in _membership_ops
 	v := _found(subj, check.path)
 	vals := _wants(check.values)
 	_value_list(vals)
@@ -419,7 +419,7 @@ _m_right_kind(_, r) := "a list" if not is_array(r)
 
 _m_right_kind(cmp, r) := "a list of patterns" if {
 	is_array(r)
-	cmp in {"matches_any", "not_matches_any"}
+	cmp in _pattern_ops
 }
 
 _m_right_kind(cmp, r) := "a list with at least one value" if {
@@ -430,17 +430,17 @@ _m_right_kind(cmp, r) := "a list with at least one value" if {
 _m_right_kind(cmp, r) := "a list of one kind of value" if {
 	is_array(r)
 	_mixed_types(r)
-	cmp in ({"in", "not_in"} | _all_cmps)
+	cmp in (_membership_ops | _all_cmps)
 }
 
 _m_list_left(subj, check) := [[check.left, "text"]] if {
-	check.cmp in {"matches_any", "not_matches_any"}
+	check.cmp in _pattern_ops
 	not is_string(_found(subj, check.left))
 } else := [[check.left, "a list"]] if {
-	check.cmp in ({"includes", "excludes"} | _all_cmps)
+	check.cmp in _list_left_cmps
 	not is_array(_found(subj, check.left))
 } else := [[check.left, _m_kinds(r)]] if {
-	check.cmp in {"in", "not_in"}
+	check.cmp in _membership_ops
 	r := _rfound(subj, check.right)
 	is_array(r)
 	not _mixed_types(r)
@@ -453,7 +453,7 @@ _m_list_left(subj, check) := [[check.left, "text"]] if {
 	_list_right_usable(check.cmp, r)
 	not _items_fit(l, r)
 } else := [[check.left, _m_list_of([r])]] if {
-	check.cmp in {"includes", "excludes"}
+	check.cmp in _single_contain_ops
 	l := _found(subj, check.left)
 	r := _found(subj, check.right)
 	is_array(l)
@@ -489,7 +489,7 @@ _m_side_value(_, side) := v if {
 }
 
 _m_side_value(subj, side) := v if {
-	_side_form(side) in {"count_of", "sum_of", "elapsed", "add", "join"}
+	_side_form(side) in _derived_forms
 	[v] := _side_eval(subj, side).v
 }
 
@@ -531,7 +531,7 @@ _m_side_kind(_, check, _) := "a number" if {
 }
 
 _m_side_kind(subj, check, side) := _m_contain_kind(_m_side_value(subj, side)) if {
-	check.cmp in {"includes", "excludes"}
+	check.cmp in _single_contain_ops
 	side == check.left
 }
 
@@ -544,7 +544,7 @@ _m_contain_kind(v) := _m_list_of([""]) if {
 
 _m_side_kind(subj, check, side) := _m_kind(o) if {
 	not "within" in object.keys(check)
-	check.cmp in {"eq", "ne"}
+	check.cmp in _equality_cmps
 	side == check.left
 	_basic_form(check.left) != "literal"
 	o := _m_side_value(subj, check.right)
@@ -552,7 +552,7 @@ _m_side_kind(subj, check, side) := _m_kind(o) if {
 
 _m_side_kind(subj, check, side) := _m_kind(o) if {
 	not "within" in object.keys(check)
-	check.cmp in {"eq", "ne"}
+	check.cmp in _equality_cmps
 	side == check.right
 	_basic_form(check.left) == "literal"
 	o := _m_side_value(subj, check.left)

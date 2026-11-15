@@ -218,10 +218,10 @@ _s_pick_problems(parsed) := (((({_s_distinct_misplaced |
 	object.get(item, "if_any", false) == true
 }) | {`"sorted by" reads a field of each item` |
 	some item in object.get(parsed, "items", [])
-	object.keys(item.sorted_by) & {"start", "position"} != set()
+	object.keys(item.sorted_by) & _sort_keys != set()
 }) | {concat("", [`"sorted by" reads a field of the item, not `, name, ": write .", name]) |
 	some item in object.get(parsed, "items", [])
-	object.keys(item.sorted_by) & {"start", "position"} == set()
+	object.keys(item.sorted_by) & _sort_keys == set()
 	object.get(item.sorted_by, "dot", false) != true
 	name := item.sorted_by.steps[0]
 	name in {i.as | some i in parsed.items}
@@ -410,7 +410,7 @@ _s_start_of("$input", steps) := {"start": "input", "steps": steps}
 
 _s_start_of(key, steps) := {"start": key, "steps": steps} if {
 	startswith(key, "$")
-	not key in {"$params", "$input"}
+	not key in _reserved_name_markers
 }
 
 _s_start_of(key, steps) := {"steps": array.concat([key], steps), "bare_word": key} if {
@@ -457,7 +457,7 @@ _s_ref_of(text) := {"start": "input", "steps": [_s_key_of(substring(text, 7, -1)
 _s_ref_of(text) := {"start": name, "steps": steps} if {
 	m := regex.find_all_string_submatch_n(`^(\$[A-Za-z_][A-Za-z0-9_]*)(?:\.(.*))?$`, text, 1)[0]
 	name := m[1]
-	not name in {"$params", "$input"}
+	not name in _reserved_name_markers
 	steps := [_s_key_of(m[2]) | m[2] != ""]
 }
 

@@ -142,7 +142,6 @@ _min_subjects_out_of_range -> _too_long_problem
 _name_step_state -> _has_name_step
 _named_by -> _builtin
 _nested_wrapper_problem -> _leaf_ops
-_node_param_broken -> _contain_ops
 _node_param_broken -> _mixed_types
 _node_param_broken -> _value_list
 _node_param_broken -> _wanted
@@ -233,7 +232,6 @@ _s_parent_key -> _s_words
 _s_time_value -> _date_shaped
 _s_time_value -> _rfc3339_shaped
 _s_walk_too_long -> _walk_steps
-_sentence_cmp -> _list_cmps
 _side_form -> _join_piece
 _side_form -> _operand
 _stale_read -> _policy_problem_inputs
@@ -260,8 +258,6 @@ _tally_root_fault -> _m_isnt
 _tally_step -> _m_isnt
 _tally_step -> _m_state_word
 _valid_patterns -> _value_list
-_value_or_values_problem -> _contain_ops
-_values_problem -> _contain_ops
 _values_problem -> _mixed_types
 _values_problem -> _value_list
 _walk_count_conds -> _m_tally_side

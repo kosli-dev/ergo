@@ -10,10 +10,10 @@ _for_row(check, subj) := _for_row_of(check, subj, _for_row_raw(check, subj))
 
 _for_row_of(check, subj, r) := r if {
 	r.cause == "satisfied"
-} else := object.union(object.remove(r, ["root_msgs", "other_roots", "natural"]), {"failed": [], "message": _m_fallback(check)}) if {
+} else := object.union(object.remove(r, _row_extra_keys), {"failed": [], "message": _m_fallback(check)}) if {
 	not r.cause in {"satisfied", "ambiguous"}
 	_m_params_unread(check)
-} else := object.union(object.remove(r, ["root_msgs", "other_roots", "natural"]), {"failed": [_m_strip(f) | some f in r.failed], "message": _for_row_text(check, subj, r)}) if {
+} else := object.union(object.remove(r, _row_extra_keys), {"failed": [_m_strip(f) | some f in r.failed], "message": _for_row_text(check, subj, r)}) if {
 	r.cause != "satisfied"
 }
 
@@ -173,7 +173,7 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	names := _bound(_for_names, item.as, e.v, _walk_at(w, e))
 	some c in conds
 	fl := _root_read_flaw(subj, c) with input as {"ergo/names": names}
-	not fl in {"", "not_an_object"}
+	not fl in _tolerated_root_flaws
 	said := array.concat(_m_cond_root_texts(subj, c), _m_walked_root_texts(c)) with input as {"ergo/names": names}
 	ms := [_m_under(_m_for_item_name(check, e.i), _m_aliased(m)) | some m in said; not m in outer]
 	ms != []
@@ -515,7 +515,7 @@ _m_sort_kind(true) := "text"
 
 _m_sort_kind(false) := "a number, a time or a date"
 
-_m_sort_text(item, e, state) := _message({"op": "present", "path": item.pick.by}, e.iv, state) if state in {"absent", "null"}
+_m_sort_text(item, e, state) := _message({"op": "present", "path": item.pick.by}, e.iv, state) if state in _no_value_states
 
 else := m if {
 	ms := _m_key_faults(e.iv, {"op": "present", "path": item.pick.by})
@@ -654,7 +654,7 @@ _under_location(l, at) if startswith(l, concat("", [at, "/"]))
 
 _for_whose(item, e, names) := {"undecided": _for_undecided(undecided, kept, e), "kept": kept} if {
 	causes := [_for_focus_cause(c, e) | some c in item.whose] with input as {"ergo/names": names}
-	undecided := [c | some c in causes; not c in {"satisfied", "value"}]
+	undecided := [c | some c in causes; not c in _not_failing_causes]
 	kept := count([c | some c in causes; c == "value"]) == 0
 }
 
@@ -822,7 +822,7 @@ _reads_name(c, name) if {
 
 _under_data(at) if {
 	some k in at
-	k in {"value", "values", "patterns", "min", "max"}
+	k in _check_argument_keys
 }
 
 _name_read(x, name) if {
@@ -1016,7 +1016,7 @@ _for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input
 }
 
 _for_read_paths(c) := array.concat(_leaf_paths(c), [piece |
-	some f in ["left", "right"]
+	some f in _compare_sides
 	_side_form(object.get(c, f, null)) == "join"
 	some piece in c[f].join
 	is_array(piece)
@@ -1144,9 +1144,9 @@ _tally_kept_inputs(check, subj, part) := array.concat(
 	)),
 ) if _tally_named(check, part)
 
-_tally_parts(side) := [side] if _basic_form(side) in {"count_of", "sum_of"}
+_tally_parts(side) := [side] if _basic_form(side) in _tally_forms
 
-_tally_parts(side) := [o | some o in side.add; _basic_form(o) in {"count_of", "sum_of"}] if _side_form(side) == "add"
+_tally_parts(side) := [o | some o in side.add; _basic_form(o) in _tally_forms] if _side_form(side) == "add"
 
 _for_list_name(check, path, walked) := substring(_walk_name(path, walked), 1, -1) if path[0] in {concat("", ["$", item.as]) | some item in check.items}
 

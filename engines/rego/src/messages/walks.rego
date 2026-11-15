@@ -22,7 +22,7 @@ _row_message(check, subj, raw) := _m_row_text(check, subj, raw.cause) if {
 }
 
 _m_row_text(check, subj, cause) := concat("; ", ps) if {
-	cause in {"absent", "null", "unusable"}
+	cause in _value_fault_causes
 	ps := _m_null_key_parts(subj, check)
 	ps != []
 } else := _m_message(object.union(_m_with_sides(_m_walked(check, subj)), {"ergo/row": true}), subj, cause)
@@ -42,12 +42,12 @@ _walk_parts(check, subj, raw, r) := [_m_not_object(check, subj)] if {
 
 _walk_parts(check, _, raw, r) := _once(array.concat([concat("", [_path_name(check.path), " is ", _m_state_word(raw.cause)])], _walk_phrase_roots(check))) if {
 	r.failed == []
-	raw.cause in {"absent", "null"}
+	raw.cause in _no_value_states
 }
 
 _walk_phrase_roots(check) := [m |
 	is_object(object.get(check, "check", null))
-	some cause in ["absent", "null", "unusable"]
+	some cause in _value_fault_causes
 	m := _m_root_alone(check.check, cause)
 ]
 
@@ -115,14 +115,14 @@ _m_walk_through_list(subj, path) if {
 
 _walk_parts(check, subj, raw, r) := fs if {
 	r.failed == []
-	not raw.cause in {"absent", "null", "not_an_object", "unusable"}
+	not raw.cause in _failed_read_states
 	fs := _m_list_found(subj, check.path)
 	fs != []
 }
 
 _walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
 	r.failed == []
-	not raw.cause in {"absent", "null", "not_an_object", "unusable"}
+	not raw.cause in _failed_read_states
 	_m_list_found(subj, check.path) == []
 }
 
@@ -130,7 +130,7 @@ _m_not_object(check, subj) := _m_message(check, subj, "not_an_object")
 
 _m_named_fail(f) := _m_is(f.path, f.value) if f.cause == "value"
 
-_m_named_fail(f) := concat("", [f.path, " is ", _m_state_word(f.cause)]) if f.cause in {"absent", "null"}
+_m_named_fail(f) := concat("", [f.path, " is ", _m_state_word(f.cause)]) if f.cause in _no_value_states
 
 _m_named_fail(f) := _m_isnt(f.path, f.value, _m_walk_kind(f.value)) if f.cause == "unusable"
 
@@ -189,22 +189,22 @@ _m_off_item_path(path) if {
 
 _m_fail(f, _) := f.msg if {
 	f.msg != ""
-	not f.msg in {"a list", "a list or an object"}
+	not f.msg in _list_expected_msgs
 }
 
 _m_fail(f, roots) := _m_is(_m_item_name(f.path, roots), f.value) if {
 	f.cause == "value"
-	object.get(f, "msg", "") in {"", "a list", "a list or an object"}
+	object.get(f, "msg", "") in _blank_or_list_expected_msgs
 }
 
 _m_fail(f, roots) := concat("", [_m_item_name(f.path, roots), " is ", _m_state_word(f.cause)]) if {
-	f.cause in {"absent", "null"}
-	object.get(f, "msg", "") in {"", "a list", "a list or an object"}
+	f.cause in _no_value_states
+	object.get(f, "msg", "") in _blank_or_list_expected_msgs
 }
 
 _m_fail(f, roots) := _m_isnt(_m_item_name(f.path, roots), object.get(f, "raw", f.value), object.get(f, "msg", _m_walk_kind(object.get(f, "raw", f.value)))) if {
 	f.cause == "unusable"
-	object.get(f, "msg", "") in {"a list", "a list or an object"}
+	object.get(f, "msg", "") in _list_expected_msgs
 }
 
 _m_fail_parts("satisfied", _, _) := []
@@ -257,7 +257,7 @@ _m_tally(subj, side) := [[s, concat("", [_path_name(path), " is ", _m_state_word
 	path := side[_basic_form(side)]
 	not _walk_keys({"path": path}, subj)
 	s := _walk_read_state(subj, path)
-	s in {"absent", "null"}
+	s in _no_value_states
 }
 
 _m_tally(subj, side) := [["unusable", c] | some c in _m_parent_clause(subj, {"op": "present", "path": path}, _input_name(path)); not _m_walk_through_list(subj, path)] if {
@@ -296,7 +296,7 @@ _m_tally_items(subj, side) := [x | some e in w.items; some x in array.concat(_m_
 _m_whose_undecided(subj, side, e, flaws, roots) := [[_m_focus_state(e, c, cause), _m_focus_text(subj, c, e, cause, roots)] |
 	some i, c in side.whose
 	cause := _tally_focus_cause(c, e, flaws[i])
-	not cause in {"satisfied", "value", "missing"}
+	not cause in _tally_decided_causes
 ]
 
 _m_focus_state(e, c, cause) := concat("", ["focus ", cause]) if {
@@ -350,7 +350,7 @@ _m_key_root_state(side, m) := s if {
 	some c in side.whose
 	some r in _step_refs(c)
 	s := _ref_state(r)
-	s in {"absent", "null"}
+	s in _no_value_states
 	m == concat("", [_ref_label(r), " is ", _m_state_word(s)])
 	_m_key_on_focus(c, r)
 } else := "root"
@@ -395,7 +395,7 @@ _m_keyed_off(subj, c, cause) := ks if {
 } else := _m_off_item(subj, c, cause)
 
 _m_root_key_text(step, cause) := concat("", [_fk_text(step), " is ", _m_state_word(cause)]) if {
-	cause in {"absent", "null"}
+	cause in _no_value_states
 	_key_state(object.get(_fb({}, step), _fk(step), _absent)) == cause
 } else := _m_isnt(_fk_text(step), v, "text") if {
 	cause == "unusable"
@@ -462,7 +462,7 @@ _m_off_item(subj, c, cause) := _once([concat("", [_input_name(shown_at), " is ",
 	shown := _as_subject_part(p)
 	i := min({j | some j in numbers.range(1, count(shown)); _read_state(subj, array.slice(shown, 0, j)) == cause})
 	shown_at := _m_shown_at(shown, i, cause)
-]) if cause in {"absent", "null"}
+]) if cause in _no_value_states
 
 _m_off_item(_, c, "not_an_object") := [_m_isnt("$input", data.ergo_document, "an object")] if {
 	some r in _step_refs(c)
@@ -474,11 +474,11 @@ _m_shown_at(shown, _, "absent") := shown
 _m_shown_at(shown, i, "null") := array.slice(shown, 0, i)
 
 _m_cond_message(c, item, cause) := concat("; ", array.concat(_m_null_before_key(item, c), [concat(", and ", cs)])) if {
-	cause in {"absent", "null"}
+	cause in _no_value_states
 	cs := _m_key_states(item, c, cause)
 	cs != []
 } else := concat(", and ", cs) if {
-	cause in {"absent", "null"}
+	cause in _no_value_states
 	cs := _once(array.concat([_m_state_clause(s) | some s in _m_sources(item, c); s.state == cause], _m_item_tallies(item, c, cause)))
 	cs != []
 } else := concat(", and ", cs) if {
@@ -502,9 +502,9 @@ _m_item_tallies(item, c, cause) := [concat("", [_input_name(array.slice(p, 0, i)
 	p := side[_basic_form(side)]
 	not _m_off_path(p)
 	i := min({j | some j in numbers.range(1, count(p)); _read_state(item, array.slice(p, 0, j)) == cause})
-] if cause in {"absent", "null"}
+] if cause in _no_value_states
 
-_m_tally_sides(c) := sort({y | walk(c, [_, y]); _basic_form(y) in {"count_of", "sum_of"}})
+_m_tally_sides(c) := sort({y | walk(c, [_, y]); _basic_form(y) in _tally_forms})
 
 _m_tally_item(_, e, roots) := [["not_an_object", _m_isnt(_m_item_name(e.i, roots), e.iv, "an object")]] if {
 	e.v == _absent
@@ -653,7 +653,7 @@ _m_null_before_key(item, c) := _once([concat("", [_input_name(prefix), " is null
 	_m_rooted_path(p)
 	some i, step in p
 	i > 0
-	_m_key_state(item, step) in {"absent", "null"}
+	_m_key_state(item, step) in _no_value_states
 	prefix := array.slice(p, 0, i)
 	_m_resolved_prefix(item, prefix) == null
 ])

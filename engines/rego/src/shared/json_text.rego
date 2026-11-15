@@ -72,10 +72,10 @@ _node_body(x) := "[]" if {
 	count(x) == 0
 }
 
-_node_body(x) := json.marshal(x) if not type_name(x) in {"object", "array", "set"}
+_node_body(x) := json.marshal(x) if not type_name(x) in _collection_types
 
 _opens(x) if {
-	type_name(x) in {"object", "array", "set"}
+	type_name(x) in _collection_types
 	count(x) > 0
 }
 

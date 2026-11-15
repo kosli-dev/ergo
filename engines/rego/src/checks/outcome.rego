@@ -49,7 +49,7 @@ default _once_shaped(_) := false
 _once_shaped(check) if {
 	check.op == "compare"
 	_derived_sides(check) != []
-	every f in ["left", "right"] {
+	every f in _compare_sides {
 		_side_form(object.get(check, f, null))
 	}
 }
@@ -100,9 +100,9 @@ _eval_cause(true, _, _) := "satisfied"
 
 _eval_cause(false, "", states) := _worst_or_value(states)
 
-_eval_cause(false, ref_cause, states) := _worst_of(states | {ref_cause}) if ref_cause in {"absent", "null"}
+_eval_cause(false, ref_cause, states) := _worst_of(states | {ref_cause}) if ref_cause in _no_value_states
 
-_eval_cause(false, ref_cause, _) := ref_cause if not ref_cause in {"", "absent", "null"}
+_eval_cause(false, ref_cause, _) := ref_cause if not ref_cause in _no_read_fault_causes
 
 _basic_eval(subj, side) := {"v": v, "found": [x | x := _simple_found(subj, side)], "states": {_side_state(subj, side)}, "inputs": _basic_inputs(subj, side)} if {
 	_basic_form(side) == "path"
@@ -112,7 +112,7 @@ _basic_eval(subj, side) := {"v": v, "found": [x | x := _simple_found(subj, side)
 _basic_eval(subj, side) := {"v": [_written(side)], "found": [x | x := _simple_found(subj, side)], "states": set(), "inputs": []} if _basic_form(side) == "literal"
 
 _basic_eval(subj, side) := {"v": v, "found": v, "states": t.states, "inputs": _tally_inputs(subj, side, t)} if {
-	_basic_form(side) in {"count_of", "sum_of"}
+	_basic_form(side) in _tally_forms
 	t := _tally(subj, side)
 	v := [x | x := t.value]
 }
@@ -264,7 +264,7 @@ _option_line_cause(c, cause, subj) := "missing" if {
 	cause == "value"
 	not _walks(c)
 	_asks_presence(c, subj)
-	_read_state(subj, c.path) in {"absent", "null"}
+	_read_state(subj, c.path) in _no_value_states
 } else := cause
 
 _any_of_lines_cause(_, _, flaw) := flaw if flaw != ""

@@ -282,10 +282,6 @@ _cmp("not_matches_any", l, r, _, _) if {
 	}
 }
 
-_all_cmps := {"includes_all", "excludes_all", "includes_some", "not_includes_all"}
-
-_list_cmps := {"in", "not_in", "includes", "excludes", "matches_any", "not_matches_any"} | _all_cmps
-
 _list_cmp(leaf) if {
 	leaf.op == "compare"
 	leaf.cmp in _list_cmps
@@ -321,12 +317,12 @@ _list_flaw(leaf, x) := {"unusable"} if {
 _list_flawed(leaf, x) if count(_list_flaw(leaf, x)) > 0
 
 _list_right_usable(cmp, r) if {
-	cmp in {"in", "not_in"}
+	cmp in _membership_ops
 	is_array(r)
 	not _mixed_types(r)
 }
 
-_list_right_usable(cmp, _) if cmp in {"includes", "excludes"}
+_list_right_usable(cmp, _) if cmp in _single_contain_ops
 
 _list_right_usable(cmp, r) if {
 	cmp in _all_cmps
@@ -335,7 +331,7 @@ _list_right_usable(cmp, r) if {
 }
 
 _list_right_usable(cmp, r) if {
-	cmp in {"matches_any", "not_matches_any"}
+	cmp in _pattern_ops
 	_valid_patterns(r)
 }
 

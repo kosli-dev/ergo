@@ -4,7 +4,7 @@ import rego.v1
 
 default _two_sided(_) := false
 
-_two_sided(check) if check.op in {"compare", "compare_time"}
+_two_sided(check) if check.op in _two_sided_ops
 
 _basic_form(side) := "path" if is_array(side)
 
@@ -15,7 +15,7 @@ _basic_form(side) := "literal" if {
 
 _basic_form(side) := f if {
 	is_object(side)
-	some f in ["count_of", "sum_of"]
+	some f in _tally_forms
 	object.keys(side) == {f, "whose", "text"}
 	is_array(side[f])
 	is_array(side.whose)
@@ -25,7 +25,7 @@ _basic_form(side) := f if {
 _basic_form(side) := f if {
 	is_object(side)
 	side.distinct == true
-	some f in ["count_of", "sum_of"]
+	some f in _tally_forms
 	object.keys(side) == {f, "whose", "text", "distinct"}
 	is_array(side[f])
 	is_array(side.whose)
@@ -67,7 +67,7 @@ _side_form(side) := "join" if {
 
 default _derived_sides(_) := []
 
-_derived_sides(check) := [check[f] | some f in ["left", "right"]; f in object.keys(check); _derived(check[f])] if check.op == "compare"
+_derived_sides(check) := [check[f] | some f in _compare_sides; f in object.keys(check); _derived(check[f])] if check.op == "compare"
 
 _basic_paths(side) := [side] if _basic_form(side) == "path"
 
@@ -77,7 +77,7 @@ _basic_paths(side) := [side.elapsed_from, side.elapsed_to] if _basic_form(side) 
 
 _basic_paths(side) := [side[f]] if {
 	f := _basic_form(side)
-	f in {"count_of", "sum_of"}
+	f in _tally_forms
 }
 
 _side_paths(side) := _basic_paths(side) if _basic_form(side)
