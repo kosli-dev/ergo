@@ -81,6 +81,17 @@ jobs:
             echo "$comments"
             exit 1
           fi
+
+  tests-strict-builtin-errors:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.22.0
+      - name: Build dist/ergo.rego from its parts
+        run: .github/build-ergo.sh
       - name: Check the tests give the same results with --strict-builtin-errors
         run: opa eval --strict-builtin-errors -d engines/rego -d dist -d spec:spec -d examples:examples --ignore src --format raw 'count(data) > 0'
 
