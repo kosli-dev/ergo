@@ -459,6 +459,11 @@ _m_off_item(subj, c, cause) := _once([concat("", [_input_name(shown_at), " is ",
 	shown_at := _m_shown_at(shown, i, cause)
 ]) if cause in {"absent", "null"}
 
+_m_off_item(_, c, "not_an_object") := [_m_isnt("$input", data.ergo_document, "an object")] if {
+	some r in _step_refs(c)
+	_input_key_ref(r)
+} else := []
+
 _m_shown_at(shown, _, "absent") := shown
 
 _m_shown_at(shown, i, "null") := array.slice(shown, 0, i)

@@ -1482,7 +1482,8 @@ fn walk_faults(walk: &Walk, outer_ctx: &Ctx) -> Vec<String> {
         .iter()
         .chain(std::iter::once(&*walk.check))
         .collect();
-    let mut faults = message::key_faults_of(&walk.path, outer_ctx);
+    let mut faults = super::lists::input_key_fault_of(&path::step_refs(&walk.path), outer_ctx);
+    faults.extend(message::key_faults_of(&walk.path, outer_ctx));
     if !through_a_list(&walk.path, outer_ctx) {
         faults.extend(message::blocked_of(&walk.path, outer_ctx));
     }

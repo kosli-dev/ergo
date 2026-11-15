@@ -1022,6 +1022,22 @@ pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
     }
 }
 
+/// Returns `$input is [...], which isn't an object` when the input is a list
+/// and the check reads `$input` with a key, like `m named by $input.k`.
+pub fn input_key_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
+    input_key_fault_of(&check.refs(), ctx)
+}
+
+/// Returns `$input is [...], which isn't an object` when the input is a list
+/// and one of the keys is read from it, like `$input.k`.
+pub fn input_key_fault_of(refs: &[Path], ctx: &Ctx) -> Vec<String> {
+    if refs.iter().any(|reference| input_one_path(reference, ctx)) {
+        vec![super::message::isnt("$input", ctx.input, "an object")]
+    } else {
+        Vec::new()
+    }
+}
+
 pub fn walked_in(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked> {
     if one_rights(check).contains(&path) {
         return None;

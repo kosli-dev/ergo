@@ -9601,6 +9601,92 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "c.v is t.m named by $input.k",
+        "c.v equals t.m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "count of r.tags that is m named by $input.k is 1",
+        "count of r.tags that equals m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rs is n plus m named by $input.k",
+        "count of rs equals n plus m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "count of rs.v that is $params.m named by $input.k is 1",
+        "count of rs.v that equals $params.m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of t.rs whose v is t.m named by $input.k is 1",
+        "count of t.rs whose v equals t.m named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every rs whose v is m named by $input.k, if any, exists",
+        "every rs whose v equals m named by $input.k, if any, exists",
+        &[],
+        &[],
+    ),
+    ("id is \"t\"", "id is \"t\"", &[], &[]),
+    ("k is \"b\"", "k is \"b\"", &[], &[]),
+    (
+        "r.v is m named by $input.k",
+        "r.v equals m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "some rs whose v is m named by $input.k exists",
+        "some rs whose v equals m named by $input.k exists",
+        &[],
+        &[],
+    ),
+    (
+        "some rs.v is m named by $input.k",
+        "some rs.v equals m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "sum of rs.n that is at least $params.q named by $input.k is 1",
+        "sum of rs.n that is at least $params.q named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of rs.n whose $params.q named by $input.k is 1 is 1",
+        "sum of rs.n whose $params.q named by $input.k is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "t.tags contains t.m named by $input.k",
+        "t.tags contains t.m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "v is $input.m named by $input.k",
+        "v equals $input.m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "v is t.m named by $input.k",
+        "v equals t.m named by $input.k",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

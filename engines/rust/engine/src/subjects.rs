@@ -1168,7 +1168,17 @@ fn unread_ref_cause(env: &Env, source: &Source, anc: &[Anc]) -> Option<Cause> {
     if first_bad_ref.is_some() {
         return first_bad_ref;
     }
-    let read = read_from(each_of?, &ctx);
+    let each_of = each_of?;
+    if each_of.start == Start::Input
+        && env.input.is_array()
+        && matches!(
+            each_of.steps.first(),
+            Some(Step::Key(_) | Step::Field(_) | Step::Ref(_))
+        )
+    {
+        return Some(Cause::NotAnObject);
+    }
+    let read = read_from(each_of, &ctx);
     match read.outcome {
         Outcome::Found => None,
         other => Some(other.cause().unwrap_or(Cause::Unusable)),

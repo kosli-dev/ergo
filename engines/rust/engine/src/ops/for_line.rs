@@ -3490,7 +3490,10 @@ fn sentence_root_flaw(forms: &[(Check, bool)], ctx: &Ctx) -> Option<(Cause, Vec<
         roots.retain(|root| bound_key(root, ctx));
         roots.sort_by_key(|root| (root_rank(root), crate::name::name(root)));
         roots.dedup();
-        let mut found: Vec<(Cause, String)> = Vec::new();
+        let mut found: Vec<(Cause, String)> = super::lists::input_key_fault(check, ctx)
+            .into_iter()
+            .map(|text| (Cause::NotAnObject, text))
+            .collect();
         for root in roots {
             if counts_root(check, root) {
                 if let Some(fault) = counted_root_fault(root, ctx) {

@@ -382,6 +382,13 @@ _m_message(check, subj, "unusable") := m if {
 _m_message(check, subj, "not_an_object") := _m_isnt(_m_label(check), subj, "an object") if {
 	not is_object(subj)
 	not _m_list_items(check, subj)
+	_m_input_one_refs(check) == []
+}
+
+_m_message(check, subj, "not_an_object") := concat(", and ", _m_input_one_refs(check)) if {
+	not is_object(subj)
+	not _m_list_items(check, subj)
+	_m_input_one_refs(check) != []
 }
 
 _m_message(check, subj, "not_an_object") := concat(", and ", _m_tallies(subj, check, "not_an_object")) if {

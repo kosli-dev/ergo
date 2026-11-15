@@ -2208,6 +2208,12 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "things whose every es.v, if any, is m named by $input.k",
         "things whose every es.v, if any, equals m named by $input.k",
     ),
+    ("every c.tags", "every c.tags"),
+    ("every t.rs", "every t.rs"),
+    (
+        "every t.rs whose v is t.m named by $input.k",
+        "every t.rs whose v equals t.m named by $input.k",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

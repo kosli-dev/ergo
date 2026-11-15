@@ -765,13 +765,17 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                     .collect(),
                 _ => Vec::new(),
             };
+            let keyed = lists::input_key_fault(check, ctx);
             if subject.is_object() {
                 let mut found = aliases_blocked(check, ctx);
                 found.extend(lists::input_one_fault(check, ctx));
+                found.extend(keyed);
                 found.extend(tallies);
                 found
             } else if subject.is_array() && !tallies.is_empty() && !list_read_plainly(check, ctx) {
                 tallies
+            } else if !keyed.is_empty() {
+                keyed
             } else {
                 vec![isnt(ctx.subject_label(), subject, "an object")]
             }
@@ -1857,6 +1861,7 @@ pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {
         Cause::Absent => Outcome::Absent,
         Cause::Null => Outcome::Null,
         Cause::Unusable => return off_item_lists(check, ctx),
+        Cause::NotAnObject => return lists::input_key_fault(check, ctx),
         _ => return Vec::new(),
     };
     let mut paths: Vec<&Path> = check

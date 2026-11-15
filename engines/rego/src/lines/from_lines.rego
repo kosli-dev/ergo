@@ -583,6 +583,9 @@ _from_unreadable(req) if {
 }
 
 _from_cause(req) := "unusable" if {
+	_unreadable_input
+	is_array(data.ergo_document)
+} else := "unusable" if {
 	some r in _m_from_ref_list(req)
 	_m_from_params_unread(r.ref)
 } else := flaws[0] if {

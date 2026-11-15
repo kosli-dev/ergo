@@ -103,7 +103,7 @@ fn a_path_without_steps_reads_the_subject_whatever_it_is() {
 }
 
 #[test]
-fn a_path_from_a_list_input_is_not_an_object_whatever_its_key_holds_but_item_by_item() {
+fn a_path_from_a_list_input_is_not_an_object_and_item_by_item_only_a_key_read_from_it_is() {
     let params_key = Step::Ref(Box::new(at(Start::Params, vec![key("k")])));
     let input_key = Step::Ref(Box::new(at(Start::Input, vec![key("k")])));
     for params in ["{}", r#"{"k": null}"#, r#"{"k": 3}"#, r#"{"k": "a"}"#] {
@@ -126,7 +126,17 @@ fn a_path_from_a_list_input_is_not_an_object_whatever_its_key_holds_but_item_by_
             r#"{"k": 3}"# => Outcome::Unusable,
             _ => Outcome::NotAnObject,
         };
-        assert_eq!(walked, (key_outcome, Outcome::Unusable), "{params}");
+        assert_eq!(walked, (key_outcome, Outcome::NotAnObject), "{params}");
+    }
+}
+
+#[test]
+fn a_key_read_from_an_input_that_is_not_a_list_or_an_object_stays_unusable_item_by_item() {
+    let input_key = Step::Ref(Box::new(at(Start::Input, vec![key("k")])));
+    for input in ["null", "3", r#""s""#] {
+        let w = World::new(r#"{"m": {"a": 1}}"#).with_input(input);
+        let keyed = subject_path(vec![key("m"), input_key.clone()]);
+        assert_eq!(w.run_item_by_item(&keyed).0, Outcome::Unusable, "{input}");
     }
 }
 
