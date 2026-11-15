@@ -4,13 +4,13 @@ import rego.v1
 
 _messaged(raw, _, _, _) := raw if raw.passed == true
 
-_messaged(raw, check, req, subj) := object.union(raw, {"message": m}) if {
+_messaged(raw, check, req, subj) := _keyed_rooted(object.union(raw, {"message": m}), check, subj) if {
 	raw.passed == false
 	not "message" in object.keys(raw)
 	m := _row_message(_labelled_for(check, req, subj), subj, raw)
 }
 
-_messaged(raw, _, _, _) := raw if {
+_messaged(raw, check, _, subj) := _keyed_rooted(raw, check, subj) if {
 	raw.passed == false
 	"message" in object.keys(raw)
 }

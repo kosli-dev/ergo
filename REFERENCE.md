@@ -1993,6 +1993,20 @@ the row fails as `unusable` with:
 $params.min is "s", which isn't a number; item 1 of xs: x.v is null; item 2 of xs: x.v is missing
 ```
 
+A root reached through a key the item holds is said once too, in a one-line `every … exists`, `some … exists` or `count of` compared with a value over a list like `xs`. With `count of xs whose tags contains $input.m named by key is 1` and this input:
+
+```json
+{"m": null, "things": [{"id": "a", "xs": [null, {"key": 3, "tags": ["x"]}]}]}
+```
+
+the row fails as `not_an_object` with:
+
+```text
+$input.m is null; item 1 of xs is null, which isn't an object; item 2 of xs: key is 3, which isn't text
+```
+
+Other sentences that read such a root, like one with a second `whose`, still say it in each item.
+
 An alias or a part is named as the policy calls it, never with a `$` before it: `item 1 of z: k is 1`, or `item 2 of lst: x is 2, and cov.x is 1` for a part on the right of an `every`. Names the policy writes with a `$`, like `$params.limit`, keep it. A value that spells an alias, like `"$z: x"`, prints as the input had it. A `count of`, a `sum of` or a `whose` that reads an item that isn't an object names it. With the check `count of commits whose signed is true is 3` and this input:
 
 ```json

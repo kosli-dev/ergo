@@ -2,6 +2,7 @@ pub mod any_of;
 pub mod compare;
 pub mod equals;
 pub mod for_line;
+pub mod keyed_roots;
 pub mod kinds;
 pub mod list_start;
 pub mod lists;

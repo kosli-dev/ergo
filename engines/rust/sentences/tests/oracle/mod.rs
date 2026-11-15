@@ -1973,6 +1973,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("prs whose x equals x", "prs whose x equals x"),
     ("art.kids", "art.kids"),
     ("c", "c"),
+    ("c.d", "c.d"),
     ("every ls", "every ls"),
     ("art.prs", "art.prs"),
     (
@@ -3337,6 +3338,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("it.x", "it.x"),
     ("v", "v"),
     ("c", "c"),
+    ("c.d", "c.d"),
     ("c.os", "c.os"),
     ("c.names", "c.names"),
     ("os", "os"),
