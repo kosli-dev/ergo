@@ -598,13 +598,19 @@ impl For {
             let name = walked.name_of(&w.item_segs, w.unaliased);
             let undecided = Cause::worst(causes.iter().copied().filter(|c| c.is_failure()));
             let first_alias = self.items[0].alias.as_str();
+            let rooted = item
+                .whose
+                .iter()
+                .zip(&verdicts)
+                .filter(|(_, verdict)| verdict.cause.is_failure())
+                .any(|(check, verdict)| root_fails(check, &outer, verdict.cause));
             let own_text = item
                 .whose
                 .iter()
                 .zip(&verdicts)
                 .filter(|(_, verdict)| verdict.cause.is_failure())
                 .find_map(|(check, verdict)| {
-                    if lost {
+                    if lost || !rooted {
                         return None;
                     }
                     let said = own_beside_root(check, &outer, &focus, verdict.cause)?;
@@ -2978,12 +2984,14 @@ fn unskipped(text: &str, skip: &[String]) -> String {
         .join("; ")
 }
 
+fn root_fails(check: &Check, outer: &Ctx, cause: Cause) -> bool {
+    super::message::root_flaw(&[check], outer).is_some()
+        || super::message::root_fault(check, outer, cause).is_some()
+}
+
 fn own_beside_root(check: &Check, outer: &Ctx, focus: &Ctx, cause: Cause) -> Option<String> {
     let flaw = super::message::root_flaw(&[check], outer);
     let fault = super::message::root_fault(check, outer, cause);
-    if flaw.is_none() && fault.is_none() {
-        return None;
-    }
     let own = check.paths().into_iter().find_map(|path| {
         if !matches!(path.start, Start::Subject | Start::Own) {
             return None;
