@@ -832,14 +832,12 @@ pub fn quoted_name_dotted_condition(condition: &s::FromCondition, name: &str) ->
         s::FromCondition::Quantified {
             quantifier,
             path,
-            distinct,
-            if_any,
+            options,
             phrase,
         } => s::FromCondition::Quantified {
             quantifier: *quantifier,
             path: quoted_name_dotted(path, name),
-            distinct: *distinct,
-            if_any: *if_any,
+            options: *options,
             phrase: phrase.clone(),
         },
     }
@@ -961,11 +959,10 @@ fn lower_assertion_phrase(assertion: &s::Assertion, scope: &Scope) -> Result<Che
         s::Assertion::Quantified {
             quantifier,
             path,
-            distinct,
+            options,
             whose,
-            if_any,
             phrase,
-        } => lower_quantified(*quantifier, path, *distinct, whose, *if_any, phrase, &scope),
+        } => lower_quantified(*quantifier, path, *options, whose, phrase, &scope),
         s::Assertion::Derived { .. } => tally::lower_assertion(assertion, &scope)
             .unwrap_or_else(|| Err(unsupported_assertion(assertion, &scope))),
     }
@@ -1008,12 +1005,12 @@ pub fn walk_too_long(path: &path::Path) -> Option<String> {
 pub fn lower_quantified(
     quantifier: s::Quantifier,
     path: &s::Path,
-    distinct: bool,
+    options: s::ListOptions,
     whose: &[s::Condition],
-    if_any: bool,
     phrase: &s::Phrase,
     scope: &Scope,
 ) -> Result<Check, Vec<String>> {
+    let s::ListOptions { distinct, if_any } = options;
     let mut problems = argument_problems(phrase);
     problems.extend(after_quantifier_problems(phrase));
     problems.extend(elapsed_after_quantifier_problems(phrase));

@@ -114,9 +114,8 @@ impl Parser {
                             let assertion = Assertion::Quantified {
                                 quantifier,
                                 path: path.clone(),
-                                distinct,
+                                options: ListOptions { distinct, if_any },
                                 whose: chain_items(&whose),
-                                if_any,
                                 phrase,
                             };
                             out.push(((assertion, Vec::new()), end));

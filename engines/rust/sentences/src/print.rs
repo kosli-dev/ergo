@@ -117,15 +117,14 @@ fn from_condition_text(
         FromCondition::Quantified {
             quantifier,
             path,
-            distinct,
-            if_any,
+            options,
             phrase,
         } => format!(
             "{} {}{}{} {}",
             quantifier_text(*quantifier),
-            distinct_text(*distinct),
+            distinct_text(options.distinct),
             left_of_whose(path, aliases, parents, false),
-            if_any_text(*if_any),
+            if_any_text(options.if_any),
             phrase_text(phrase, aliases)
         ),
     }
@@ -607,17 +606,16 @@ pub fn print_assertion(assertion: &Assertion, aliases: &[&str]) -> String {
         Assertion::Quantified {
             quantifier,
             path,
-            distinct,
+            options,
             whose,
-            if_any,
             phrase,
         } => format!(
             "{} {}{}{}{} {}",
             quantifier_text(*quantifier),
-            distinct_text(*distinct),
+            distinct_text(options.distinct),
             path_text(path, Side::Left, aliases, false),
             whose_text(whose, aliases),
-            if_any_text(*if_any),
+            if_any_text(options.if_any),
             phrase_text(phrase, aliases)
         ),
         Assertion::Derived { terms, phrase } => format!(
