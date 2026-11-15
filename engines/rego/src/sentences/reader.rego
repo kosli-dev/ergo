@@ -118,7 +118,12 @@ _s_patterns := {
 	for_item := concat("", [`(?:(?:every|some) +)?`, qpath, `(?: +`, conds, `)?(?: +sorted +by +`, path, `(?: +alphabetically)?)?(?:, +if +any,)? +as +`, key])
 }
 
-_s_words := {"a", "after", "alphabetically", "an", "and", "as", "at", "before", "between", "count", "days", "distinct", "each", "empty", "equal", "every", "false", "first", "hours", "in", "item", "last", "less", "minutes", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sorted", "sum", "that", "to", "true", "weeks", "whose", "within"}
+_s_words := {
+	"a", "after", "alphabetically", "an", "and", "as", "at", "before", "between", "count", "days", "distinct",
+	"each", "empty", "equal", "every", "false", "first", "hours", "in", "item", "last", "less", "minutes",
+	"more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sorted",
+	"sum", "that", "to", "true", "weeks", "whose", "within",
+}
 
 _s_pieces(pattern, text) := [m[1] | some m in matches] if {
 	matches := regex.find_all_string_submatch_n(pattern, text, -1)
