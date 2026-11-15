@@ -207,6 +207,19 @@ struct Broken {
 }
 
 impl Broken {
+    fn listed(msg: String, cause: Cause, value: Value, location: Option<String>) -> Broken {
+        Broken {
+            msg,
+            rank: 0,
+            listed: true,
+            order: Vec::new(),
+            path: String::new(),
+            cause,
+            value,
+            location,
+        }
+    }
+
     fn to_json(&self) -> Value {
         let locations: Vec<String> = self.location.iter().cloned().collect();
         json!({
@@ -362,10 +375,8 @@ fn each_of_entries<'a>(
         .collect();
     let shown_name = from_name(path, source, anc, &ctx, true);
     let broken = unread
-        .map(|cause| Broken {
-            rank: 0,
-            listed: true,
-            msg: if let Some(said) = &met {
+        .map(|cause| {
+            let msg = if let Some(said) = &met {
                 said.clone()
             } else if matches!(object.value, Some(Value::Array(_))) {
                 String::new()
@@ -378,12 +389,8 @@ fn each_of_entries<'a>(
                         "a list or an object",
                     )
                 })
-            },
-            order: Vec::new(),
-            path: String::new(),
-            cause,
-            value: Value::Null,
-            location: Some(location.render()),
+            };
+            Broken::listed(msg, cause, Value::Null, Some(location.render()))
         })
         .into_iter()
         .collect();
@@ -401,14 +408,14 @@ fn broken_from(failure: &walk::Failure) -> Broken {
         None => failure.msg.clone(),
     };
     Broken {
-        msg,
-        rank: 0,
-        listed: true,
         order: failure.order.clone(),
         path: failure.path.clone(),
-        cause: failure.cause,
-        value: failure.value.clone(),
-        location: failure.location.as_ref().map(Location::render),
+        ..Broken::listed(
+            msg,
+            failure.cause,
+            failure.value.clone(),
+            failure.location.as_ref().map(Location::render),
+        )
     }
 }
 
@@ -501,14 +508,10 @@ impl Note {
             .items
             .into_iter()
             .map(|(segs, value, at)| Broken {
-                msg: String::new(),
                 rank: 1,
-                listed: true,
                 path: start_name(&segs, root, child),
                 order: segs,
-                cause: Cause::Unusable,
-                value,
-                location: Some(at.render()),
+                ..Broken::listed(String::new(), Cause::Unusable, value, Some(at.render()))
             })
             .collect();
         out.push(note_broken(self.msg));
@@ -829,27 +832,17 @@ fn fl_broken(e: &Fe, cause: Cause, root: &str, child: bool) -> Broken {
         None => ops::message::stated(&from_item_name(&e.segs, root, child), cause, &shown, kind),
     };
     Broken {
-        msg,
-        rank: 0,
-        listed: true,
         order: e.segs.clone(),
         path: start_name(&e.segs, root, child),
-        cause,
-        value: shown,
-        location: Some(e.at.render()),
+        ..Broken::listed(msg, cause, shown, Some(e.at.render()))
     }
 }
 
 fn note_broken(msg: String) -> Broken {
     Broken {
-        msg,
         rank: 1,
         listed: false,
-        order: Vec::new(),
-        path: String::new(),
-        cause: Cause::Unusable,
-        value: Value::Null,
-        location: None,
+        ..Broken::listed(msg, Cause::Unusable, Value::Null, None)
     }
 }
 
@@ -1055,19 +1048,15 @@ fn walk_from<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>], base: Located<'a>)
         };
         return Read::Entries {
             entries: Vec::new(),
-            broken: vec![Broken {
-                msg: String::new(),
-                rank: 0,
-                listed: true,
-                order: Vec::new(),
-                path: String::new(),
+            broken: vec![Broken::listed(
+                String::new(),
                 cause,
-                value: match cause {
+                match cause {
                     Cause::Unusable => base.value.clone(),
                     _ => Value::Null,
                 },
-                location: Some(base.location.render()),
-            }],
+                Some(base.location.render()),
+            )],
         };
     }
     let last = walked.walked_last();
@@ -1094,19 +1083,19 @@ fn walk_from<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>], base: Located<'a>)
                     item.miss
                 };
                 broken.push(Broken {
-                    rank: 0,
-                    listed: true,
-                    msg: ops::message::stated(
-                        &walked.item_name(&item.end_segs),
-                        miss,
-                        &item.shown(),
-                        "a list or an object",
-                    ),
                     order: item.end_segs.clone(),
                     path: walked.name_of(&item.end_segs, false),
-                    cause: item.miss,
-                    value: item.shown(),
-                    location: Some(item.end_location.render()),
+                    ..Broken::listed(
+                        ops::message::stated(
+                            &walked.item_name(&item.end_segs),
+                            miss,
+                            &item.shown(),
+                            "a list or an object",
+                        ),
+                        item.miss,
+                        item.shown(),
+                        Some(item.end_location.render()),
+                    )
                 });
             }
         }

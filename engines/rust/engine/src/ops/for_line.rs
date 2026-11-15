@@ -363,6 +363,13 @@ fn merged_live(live: Vec<Live<'_>>) -> Vec<Live<'_>> {
     out
 }
 
+struct RunItems {
+    run: Run,
+    free: Vec<String>,
+    hoisted: Vec<String>,
+    alone: bool,
+}
+
 #[derive(Clone)]
 struct Dead {
     raw: Option<Value>,
@@ -379,6 +386,22 @@ struct Dead {
 }
 
 impl Dead {
+    fn at(name: String, cause: Cause, value: Value, location: Option<Location>) -> Dead {
+        Dead {
+            raw: None,
+            bare: None,
+            msg: None,
+            shared: false,
+            order: Vec::new(),
+            path: name.clone(),
+            name,
+            said: String::new(),
+            cause,
+            value,
+            location,
+        }
+    }
+
     fn shown(&self) -> &str {
         if self.said.is_empty() {
             &self.name
@@ -694,7 +717,6 @@ impl For {
             let why = own_text.or(why);
             let dead_item = |cause: Cause| Dead {
                 raw: (w.end.is_none() && !w.item.value.is_object()).then(|| w.item.value.clone()),
-                bare: None,
                 msg: if undecided.is_some() && depth == 0 && !matches!(item.how, How::Pick { .. }) {
                     why.clone()
                 } else if undecided.is_some() && depth > 0 {
@@ -702,19 +724,14 @@ impl For {
                 } else {
                     None
                 },
-                shared: false,
                 order: w.item_segs.clone(),
-                name: name.clone(),
                 said: if !w.rest.is_empty() && w.item.value.is_object() && cause != Cause::Unusable
                 {
                     walked.item_name_dotted(&w.end_segs)
                 } else {
                     walked.item_name_dotted(&w.item_segs)
                 },
-                path: name.clone(),
-                cause,
-                value: w.shown(),
-                location: Some(w.end_location.clone()),
+                ..Dead::at(name.clone(), cause, w.shown(), Some(w.end_location.clone()))
             };
             if let Some(cause) = undecided {
                 dead.push(dead_item(cause));
@@ -779,19 +796,7 @@ impl For {
             let through_first = depth > 0 && reads_path(&item.path, &self.items[0].alias);
             let nothing = through_first.then(|| {
                 let shown = crate::name::name(&item.path);
-                Dead {
-                    raw: None,
-                    bare: None,
-                    msg: None,
-                    shared: false,
-                    order: Vec::new(),
-                    name: shown.clone(),
-                    said: String::new(),
-                    path: shown,
-                    cause: Cause::Absent,
-                    value: Value::Null,
-                    location: None,
-                }
+                Dead::at(shown, Cause::Absent, Value::Null, None)
             });
             self.pick(
                 &mut cands,
@@ -954,17 +959,14 @@ impl For {
                 for i in tied {
                     let (found, _, value, location) = &keys[i];
                     cands.dead.push(Dead {
-                        raw: None,
-                        bare: None,
-                        msg: None,
-                        shared: false,
                         order: found.order.clone(),
-                        name: found.name.clone(),
                         said: found.said.clone(),
-                        path: found.name.clone(),
-                        cause: Cause::Ambiguous,
-                        value: value.clone(),
-                        location: location.clone(),
+                        ..Dead::at(
+                            found.name.clone(),
+                            Cause::Ambiguous,
+                            value.clone(),
+                            location.clone(),
+                        )
                     });
                 }
                 if through_first {
@@ -1037,17 +1039,10 @@ fn sort_failure(
         )
     };
     Dead {
-        raw: None,
-        bare: None,
         msg: Some(said),
-        shared: false,
         order: found.order.clone(),
-        name: found.name.clone(),
         said: found.said.clone(),
-        path: found.name.clone(),
-        cause,
-        value,
-        location,
+        ..Dead::at(found.name.clone(), cause, value, location)
     }
 }
 
@@ -1192,17 +1187,9 @@ impl For {
                     }
                 };
                 vec![Dead {
-                    raw: None,
-                    bare: None,
                     msg: (!keyed.is_empty()).then(|| keyed.join(", and ")),
                     shared: !reads_path(&item.path, &self.items[0].alias),
-                    order: Vec::new(),
-                    name: shown.clone(),
-                    said: String::new(),
-                    path: shown,
-                    cause,
-                    value: Value::Null,
-                    location: read.location,
+                    ..Dead::at(shown, cause, Value::Null, read.location)
                 }]
             } else {
                 Vec::new()
@@ -1220,17 +1207,15 @@ impl For {
             let mut bound = ctx.clone();
             bound.aliases.insert(item.alias.clone(), live.at.clone());
             let entry = Dead {
-                raw: None,
                 bare: live.bare.clone(),
-                msg: None,
-                shared: false,
                 order: live.order.clone(),
-                name: live.name.clone(),
                 said: live.said.clone(),
-                path: live.name.clone(),
-                cause: Cause::Satisfied,
-                value: live.shown.clone(),
-                location: Some(live.location.clone()),
+                ..Dead::at(
+                    live.name.clone(),
+                    Cause::Satisfied,
+                    live.shown.clone(),
+                    Some(live.location.clone()),
+                )
             };
             let into_non_object = !last && {
                 let next = &self.items[depth + 1].path;
@@ -1731,7 +1716,12 @@ impl For {
     }
 
     fn run_lines(&self, ctx: &Ctx) -> Run {
-        let (mut run, free, _, alone) = self.run_items(ctx, Vec::new());
+        let RunItems {
+            mut run,
+            free,
+            alone,
+            ..
+        } = self.run_items(ctx, Vec::new());
         let said = run.message.clone();
         let (roots, ahead) = match self.rooted(&mut run, ctx) {
             Named::Plain => (Vec::new(), false),
@@ -1766,7 +1756,11 @@ impl For {
             if let Some((_, _, raw, _)) = self.second_roots(ctx) {
                 skip.extend(raw);
             }
-            let (items, _, hoisted, _) = self.run_items(ctx, skip);
+            let RunItems {
+                run: items,
+                hoisted,
+                ..
+            } = self.run_items(ctx, skip);
             (items.message, hoisted)
         } else if ahead && !alone {
             (said, Vec::new())
@@ -2211,13 +2205,13 @@ impl For {
         Cause::worst(causes).map(|cause| (cause, texts))
     }
 
-    fn run_items(&self, ctx: &Ctx, skip: Vec<String>) -> (Run, Vec<String>, Vec<String>, bool) {
+    fn run_items(&self, ctx: &Ctx, skip: Vec<String>) -> RunItems {
         let (run, free, hoisted) = self.run_items_of(ctx, skip.clone());
         if run.verdict.cause != Cause::NotAnObject && !self.flawed(ctx) && self.none_kept(ctx) {
             if let Some(rest) = self.after_first() {
-                let (mut reduced, free, hoisted, alone) = rest.run_items(ctx, skip);
-                reduced.verdict.inputs = run.verdict.inputs;
-                return (reduced, free, hoisted, alone);
+                let mut reduced = rest.run_items(ctx, skip);
+                reduced.run.verdict.inputs = run.verdict.inputs;
+                return reduced;
             }
             if run.verdict.cause == Cause::Satisfied
                 && let Some((cause, texts)) = self.unaliased_failures(ctx)
@@ -2225,10 +2219,20 @@ impl For {
                 let mut run = run;
                 run.verdict.cause = cause;
                 run.message = Some(super::message::joined(texts.clone()));
-                return (run, texts, hoisted, true);
+                return RunItems {
+                    run,
+                    free: texts,
+                    hoisted,
+                    alone: true,
+                };
             }
         }
-        (run, free, hoisted, false)
+        RunItems {
+            run,
+            free,
+            hoisted,
+            alone: false,
+        }
     }
 
     fn walked_root_texts(&self, ctx: &Ctx) -> Vec<String> {

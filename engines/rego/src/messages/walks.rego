@@ -95,7 +95,11 @@ _m_params_only_flaw(check, r) if {
 	_params_shape_only_unreadable(check)
 }
 
-_m_walk_faults(subj, check) := _once(array.concat(array.concat(array.concat(_m_key_faults(subj, check), _m_walk_blocked(subj, check)), [f | some c in object.get(check, "whose", []); some f in _m_ref_faults_text(c)]), [f | is_object(object.get(check, "check", null)); some f in _m_ref_faults_text(check.check)]))
+_m_walk_faults(subj, check) := _once(array.concat(array.concat(array.concat(_m_key_faults(subj, check), _m_walk_blocked(subj, check)), _m_whose_ref_faults(check)), _m_assertion_ref_faults(check)))
+
+_m_whose_ref_faults(check) := [f | some c in object.get(check, "whose", []); some f in _m_ref_faults_text(c)]
+
+_m_assertion_ref_faults(check) := [f | is_object(object.get(check, "check", null)); some f in _m_ref_faults_text(check.check)]
 
 _m_walk_blocked(subj, check) := [c |
 	some c in _m_blocked(subj, {"op": "present", "path": check.path})

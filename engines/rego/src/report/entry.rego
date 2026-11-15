@@ -12,7 +12,17 @@ _run(doc, policy, rd, params) := r if {
 	raw := _section(policy, "requirements")
 	reqs := rd.reqs
 	unreadable := _unreadable_inputs(doc, params)
-	written := object.union(_report_of(doc, reqs, object.get(rd.ahead, "requirements", {})), {"description": _reported_description(policy), "meta": _reported_meta(policy), "subjects": _listed_of(policy, rd)}) with data.ergo_reading as false with data.ergo_policy_problems as _policy_problems_of(policy, rd) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
+	written := object.union(_report_of(doc, reqs, object.get(rd.ahead, "requirements", {})), {"description": _reported_description(policy), "meta": _reported_meta(policy), "subjects": _listed_of(policy, rd)})
+		with data.ergo_reading as false
+		with data.ergo_policy_problems as _policy_problems_of(policy, rd)
+		with data.ergo_document as doc
+		with data.ergo_params as params
+		with data.ergo_subjects as rd.subjects
+		with data.ergo_resolved as rd.resolved
+		with data.ergo_unreadable as unreadable
+		with data.ergo_sentences as rd.sentences
+		with data.ergo_subject_sentences as rd.subject_sentences
+		with input as {"ergo/names": {}}
 	used := _used_subjects(reqs, rd.subjects, rd.resolved)
 	r := _with_policy_row(object.union(_reported(written, unreadable, [raw, used]), {"ergo": _spec, "engine": _engine}), policy)
 }

@@ -109,6 +109,8 @@ CI also fails when a line of Rego isn't reached by any test. It runs the tests o
 .github/build-ergo.sh && opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | .github/build-ergo.sh where | sort -u
 ```
 
+When a change touches how a message or a cause is worked out, run `python3 spec/sweep.py` too, as `spec/README.md` says, on `main` and on your branch, and compare the cells that differ. It isn't a required check, and it never fails on a difference, but review has found message differences in odd shapes that nobody had probed.
+
 ## Tests
 
 Every change needs tests: new behaviour, bug fixes and changes to existing behaviour alike. A bug fix starts with a test that fails because of the bug. A change without tests isn't finished.

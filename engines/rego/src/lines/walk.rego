@@ -552,7 +552,9 @@ _walk_crosses(path, walked) if {
 	i < _part_of(path).n
 }
 
-_walk_shown_name(path, walked) := concat("", array.concat(array.concat(_walk_root_name(path), [concat("", [_walk_mark(i + _walk_hidden(path), walked), _step_name(i + count(_walk_root_name(path)), step)]) | some i, step in array.slice(_walk_steps(path), _walk_hidden(path), count(_walk_steps(path)))]), [_walk_mark(count(_walk_steps(path)), walked)]))
+_walk_shown_name(path, walked) := concat("", array.concat(array.concat(_walk_root_name(path), _walk_shown_steps(path, walked)), [_walk_mark(count(_walk_steps(path)), walked)]))
+
+_walk_shown_steps(path, walked) := [concat("", [_walk_mark(i + _walk_hidden(path), walked), _step_name(i + count(_walk_root_name(path)), step)]) | some i, step in array.slice(_walk_steps(path), _walk_hidden(path), count(_walk_steps(path)))]
 
 _walk_hidden(path) := max([_part_of(path).n, 0]) if _part_start(path)
 

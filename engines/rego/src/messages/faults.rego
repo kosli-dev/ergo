@@ -327,7 +327,11 @@ _m_walk_ref_faults(subj, check) := [] if {
 	count(_m_tally_parts(check)) > 0
 } else := _m_walk_ref_faults_of(subj, check)
 
-_m_walk_ref_faults_of(subj, check) := array.concat(array.concat(_m_ref_blocked(check), [_ref_walk_text(r) | some r in sort(_check_refs(check)); _ref_failed_walk(r); _ref_state(r) == "unusable"]), [t | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"; t := s.text])
+_m_walk_ref_faults_of(subj, check) := array.concat(array.concat(_m_ref_blocked(check), _m_unusable_ref_walks(check)), _m_unusable_side_walks(subj, check))
+
+_m_unusable_ref_walks(check) := [_ref_walk_text(r) | some r in sort(_check_refs(check)); _ref_failed_walk(r); _ref_state(r) == "unusable"]
+
+_m_unusable_side_walks(subj, check) := [t | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"; t := s.text]
 
 _m_ref_list_fault(check) := [[check[f], _m_right_kind(cmp, v)]] if {
 	some f in ["values", "patterns"]
@@ -347,7 +351,11 @@ _m_ref_cmp(op, f) := op if {
 	f in {"values", "patterns"}
 }
 
-_m_fault(subj, check) := [f | some g in [_m_fault_1(subj, check), _m_fault_2(subj, check), _m_fault_3(subj, check), _m_fault_4(subj, check), _m_fault_5(subj, check), _m_fault_6(subj, check), _m_fault_7(subj, check), _m_fault_8(subj, check), _m_fault_9(subj, check), _m_fault_10(subj, check), _m_fault_11(subj, check), _m_ref_list_fault(check)]; some f in g]
+_m_fault(subj, check) := [f | some g in array.concat(_m_fault_groups_early(subj, check), _m_fault_groups_late(subj, check)); some f in g]
+
+_m_fault_groups_early(subj, check) := [_m_fault_1(subj, check), _m_fault_2(subj, check), _m_fault_3(subj, check), _m_fault_4(subj, check), _m_fault_5(subj, check), _m_fault_6(subj, check)]
+
+_m_fault_groups_late(subj, check) := [_m_fault_7(subj, check), _m_fault_8(subj, check), _m_fault_9(subj, check), _m_fault_10(subj, check), _m_fault_11(subj, check), _m_ref_list_fault(check)]
 
 _m_fault_1(subj, check) := [[check.path, "a number"]] if {
 	check.op in {"range", "outside_range"}

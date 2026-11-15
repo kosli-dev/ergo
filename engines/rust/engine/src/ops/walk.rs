@@ -1441,7 +1441,11 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
             }
             return row;
         }
-        let (cause, failed_items, message) = read_up_front(
+        let UpFront {
+            cause,
+            failed_items,
+            message,
+        } = read_up_front(
             row.verdict.cause,
             std::mem::take(&mut row.failed_items),
             cause,
@@ -1458,21 +1462,39 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
     row
 }
 
+pub(super) struct UpFront {
+    pub(super) cause: Cause,
+    pub(super) failed_items: Vec<Value>,
+    pub(super) message: Option<String>,
+}
+
 pub(super) fn read_up_front(
     row: Cause,
     failed_items: Vec<Value>,
     flaw: Cause,
     text: &str,
     said: Option<&str>,
-) -> (Cause, Vec<Value>, Option<String>) {
+) -> UpFront {
     if row == flaw {
-        (row, failed_items, Some(text.to_string()))
+        UpFront {
+            cause: row,
+            failed_items,
+            message: Some(text.to_string()),
+        }
     } else if !row.is_failure() {
-        (flaw, Vec::new(), Some(text.to_string()))
+        UpFront {
+            cause: flaw,
+            failed_items: Vec::new(),
+            message: Some(text.to_string()),
+        }
     } else {
         let message =
             said.map(|said| message::joined(message::with_roots(vec![said.to_string()], text)));
-        (row, failed_items, message)
+        UpFront {
+            cause: row,
+            failed_items,
+            message,
+        }
     }
 }
 
