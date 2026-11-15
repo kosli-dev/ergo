@@ -58882,6 +58882,213 @@
     ]
   },
   {
+    "description": "a second for list whose whose reads a root through the first alias that is missing, and a field its items lack, says the root for each item of the first list, then each item of the second, when the root comes second",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "some": {
+              "for": "every ws as w, some ys whose n is at most u and whose n is at least w.z as y",
+              "assert": "y.n exists"
+            },
+            "first": {
+              "for": "every ws as w, first of ys whose n is at most u and whose n is at least w.z sorted by n as y",
+              "assert": "y.n exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "w.z is missing and no item of ys has u",
+        "rules": [
+          "problems.where_said",
+          "problems.all_said",
+          "problems.item_order",
+          "for.roots",
+          "for.second_items",
+          "for.failed_items",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ws": [
+                {}
+              ],
+              "ys": [
+                {
+                  "n": 1
+                },
+                {
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "first",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 2
+                    }
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": {}
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0",
+                  "/things/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ws: w.z is missing; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 2
+                    }
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": {}
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0",
+                  "/things/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ws: w.z is missing; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a second for list whose whose reads a root from the params that can't be read, and a field its items lack, says the root once, then each item, wherever the root is in the whose",
     "params": {
       "z": "s",

@@ -13456,6 +13456,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every ws as w, some ys whose n is at most u and whose n is at least w.z as y",
+        "every ws as w, some ys whose n is at most u and whose n is at least w.z as y",
+        &[],
+        &[],
+    ),
+    (
+        "every ws as w, first of ys whose n is at most u and whose n is at least w.z sorted by n as y",
+        "every ws as w, first of ys whose n is at most u and whose n is at least w.z sorted by n as y",
+        &[],
+        &[],
+    ),
+    (
         "every ws as w, first of ys whose n is at least w.z and whose n is at most u sorted by n as y",
         "every ws as w, first of ys whose n is at least w.z and whose n is at most u sorted by n as y",
         &[],
