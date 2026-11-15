@@ -330,66 +330,6 @@ fn synthesized(name: &str) -> s::FromLine {
     }
 }
 
-fn members_of(name: &str, raw: &BTreeMap<String, Raw>) -> BTreeSet<String> {
-    let mut seen = BTreeSet::new();
-    let mut todo = vec![name.to_string()];
-    while let Some(next) = todo.pop() {
-        if seen.insert(next.clone())
-            && let Some(Raw {
-                relation: Relation::Narrows(parent),
-                ..
-            }) = raw.get(&next)
-        {
-            todo.push(parent.clone());
-        }
-    }
-    seen
-}
-
-fn child_parent(name: &str, raw: &BTreeMap<String, Raw>) -> Option<String> {
-    match raw.get(name).map(|r| &r.relation) {
-        Some(Relation::Child(parent)) => Some(parent.clone()),
-        _ => None,
-    }
-}
-
-fn parent_is_self_compared(name: &str, raw: &BTreeMap<String, Raw>) -> bool {
-    let Some(parent) = child_parent(name, raw) else {
-        return false;
-    };
-    let above = ancestors_of(&parent, raw);
-    let above: Vec<&str> = above.iter().map(String::as_str).collect();
-    matches!(
-        raw.get(&parent).map(|r| &r.from),
-        Some(FromState::Parsed(line))
-            if s::from_problems(line).is_empty() && !s::from_self_problems(line, &above).is_empty()
-    )
-}
-
-fn blocked_ancestors(name: &str, raw: &BTreeMap<String, Raw>) -> Vec<String> {
-    let Some(parent) = child_parent(name, raw) else {
-        return Vec::new();
-    };
-    let broken = match raw.get(&parent).map(|r| &r.from) {
-        Some(FromState::Parsed(line)) if s::from_problems(line).is_empty() => {
-            let above = ancestors_of(&parent, raw);
-            let above: Vec<&str> = above.iter().map(String::as_str).collect();
-            !s::from_self_problems(line, &above).is_empty()
-                || lower::keyed_steps(&line.path).is_err()
-                || line
-                    .named_by_each_of
-                    .as_ref()
-                    .is_some_and(|each| lower::keyed_steps(each).is_err())
-        }
-        _ => false,
-    };
-    if broken {
-        ancestors_of(&parent, raw)
-    } else {
-        Vec::new()
-    }
-}
-
 fn reads_alias(text: &str, ancestor: &str) -> bool {
     text.match_indices(ancestor).any(|(at, _)| {
         let before = text[..at].chars().next_back();
@@ -412,44 +352,6 @@ fn right_side_text(condition: &s::FromCondition, scope: &Scope, wide: bool) -> S
     }
 }
 
-fn ancestors_of(name: &str, raw: &BTreeMap<String, Raw>) -> Vec<String> {
-    let mut out = Vec::new();
-    let mut at = name.to_string();
-    while let Some(parent) = child_parent(&at, raw) {
-        if out.contains(&parent) || parent == name {
-            break;
-        }
-        out.push(parent.clone());
-        at = parent;
-    }
-    out
-}
-
-fn effective_of(
-    name: &str,
-    raw: &BTreeMap<String, Raw>,
-    clashing: &BTreeMap<String, BTreeSet<String>>,
-) -> BTreeMap<String, PartRead> {
-    let mut members: Vec<String> = members_of(name, raw).into_iter().collect();
-    members.sort();
-    let mut out: BTreeMap<String, PartRead> = BTreeMap::new();
-    for member in members {
-        if let Some(found) = raw.get(&member) {
-            for (alias, part) in &found.own {
-                let mut part = part.clone();
-                if clashing
-                    .get(&member)
-                    .is_some_and(|aliases| aliases.contains(alias))
-                {
-                    part.def = None;
-                }
-                out.entry(alias.clone()).or_insert(part);
-            }
-        }
-    }
-    out
-}
-
 fn subject_defs(policy: &Policy) -> BTreeMap<String, Option<&SubjectDef>> {
     match &policy.subjects {
         Subjects::Map(map) => map
@@ -460,140 +362,370 @@ fn subject_defs(policy: &Policy) -> BTreeMap<String, Option<&SubjectDef>> {
     }
 }
 
-fn own_part_names(name: &str, raw: &BTreeMap<String, Raw>) -> BTreeSet<String> {
-    members_of(name, raw)
-        .iter()
-        .filter_map(|member| raw.get(member))
-        .flat_map(|found| found.own.keys().cloned())
-        .collect()
+#[derive(Clone, Copy)]
+struct Raws<'a, 'p> {
+    map: &'a BTreeMap<String, Raw<'p>>,
 }
 
-fn declarers_of(name: &str, raw: &BTreeMap<String, Raw>) -> BTreeMap<String, BTreeSet<String>> {
-    let mut owners: BTreeSet<String> = members_of(name, raw);
-    if let Some(parent) = child_parent(name, raw) {
-        owners.insert(parent.clone());
-        if let Some(grand) = child_parent(&parent, raw) {
-            owners.insert(grand);
+impl Raws<'_, '_> {
+    fn get(&self, name: &str) -> Option<&Raw<'_>> {
+        self.map.get(name)
+    }
+
+    fn members_of(&self, name: &str) -> BTreeSet<String> {
+        let mut seen = BTreeSet::new();
+        let mut todo = vec![name.to_string()];
+        while let Some(next) = todo.pop() {
+            if seen.insert(next.clone())
+                && let Some(Raw {
+                    relation: Relation::Narrows(parent),
+                    ..
+                }) = self.get(&next)
+            {
+                todo.push(parent.clone());
+            }
+        }
+        seen
+    }
+
+    fn child_parent(&self, name: &str) -> Option<String> {
+        match self.get(name).map(|r| &r.relation) {
+            Some(Relation::Child(parent)) => Some(parent.clone()),
+            _ => None,
         }
     }
-    let mut declarers = BTreeSet::new();
-    for owner in &owners {
-        declarers.extend(members_of(owner, raw));
+
+    fn parent_is_self_compared(&self, name: &str) -> bool {
+        let Some(parent) = self.child_parent(name) else {
+            return false;
+        };
+        let above = self.ancestors_of(&parent);
+        let above: Vec<&str> = above.iter().map(String::as_str).collect();
+        matches!(
+            self.get(&parent).map(|r| &r.from),
+            Some(FromState::Parsed(line))
+                if s::from_problems(line).is_empty() && !s::from_self_problems(line, &above).is_empty()
+        )
     }
-    let mut out: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
-    for declarer in declarers {
-        if let Some(found) = raw.get(&declarer) {
-            for alias in found.own.keys() {
-                out.entry(alias.clone())
-                    .or_default()
-                    .insert(declarer.clone());
+
+    fn blocked_ancestors(&self, name: &str) -> Vec<String> {
+        let Some(parent) = self.child_parent(name) else {
+            return Vec::new();
+        };
+        let broken = match self.get(&parent).map(|r| &r.from) {
+            Some(FromState::Parsed(line)) if s::from_problems(line).is_empty() => {
+                let above = self.ancestors_of(&parent);
+                let above: Vec<&str> = above.iter().map(String::as_str).collect();
+                !s::from_self_problems(line, &above).is_empty()
+                    || lower::keyed_steps(&line.path).is_err()
+                    || line
+                        .named_by_each_of
+                        .as_ref()
+                        .is_some_and(|each| lower::keyed_steps(each).is_err())
+            }
+            _ => false,
+        };
+        if broken {
+            self.ancestors_of(&parent)
+        } else {
+            Vec::new()
+        }
+    }
+
+    fn ancestors_of(&self, name: &str) -> Vec<String> {
+        let mut out = Vec::new();
+        let mut at = name.to_string();
+        while let Some(parent) = self.child_parent(&at) {
+            if out.contains(&parent) || parent == name {
+                break;
+            }
+            out.push(parent.clone());
+            at = parent;
+        }
+        out
+    }
+
+    fn effective_of(
+        &self,
+        name: &str,
+        clashing: &BTreeMap<String, BTreeSet<String>>,
+    ) -> BTreeMap<String, PartRead> {
+        let mut members: Vec<String> = self.members_of(name).into_iter().collect();
+        members.sort();
+        let mut out: BTreeMap<String, PartRead> = BTreeMap::new();
+        for member in members {
+            if let Some(found) = self.get(&member) {
+                for (alias, part) in &found.own {
+                    let mut part = part.clone();
+                    if clashing
+                        .get(&member)
+                        .is_some_and(|aliases| aliases.contains(alias))
+                    {
+                        part.def = None;
+                    }
+                    out.entry(alias.clone()).or_insert(part);
+                }
+            }
+        }
+        out
+    }
+
+    fn own_part_names(&self, name: &str) -> BTreeSet<String> {
+        self.members_of(name)
+            .iter()
+            .filter_map(|member| self.get(member))
+            .flat_map(|found| found.own.keys().cloned())
+            .collect()
+    }
+
+    fn declarers_of(&self, name: &str) -> BTreeMap<String, BTreeSet<String>> {
+        let mut owners: BTreeSet<String> = self.members_of(name);
+        if let Some(parent) = self.child_parent(name) {
+            owners.insert(parent.clone());
+            if let Some(grand) = self.child_parent(&parent) {
+                owners.insert(grand);
+            }
+        }
+        let mut declarers = BTreeSet::new();
+        for owner in &owners {
+            declarers.extend(self.members_of(owner));
+        }
+        let mut out: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+        for declarer in declarers {
+            if let Some(found) = self.get(&declarer) {
+                for alias in found.own.keys() {
+                    out.entry(alias.clone())
+                        .or_default()
+                        .insert(declarer.clone());
+                }
+            }
+        }
+        out
+    }
+
+    fn scope_of(
+        &self,
+        name: &str,
+        effective: &BTreeMap<String, BTreeMap<String, PartRead>>,
+    ) -> Scope {
+        let mut scope = Scope::new();
+        for (alias, part) in effective.get(name).into_iter().flatten() {
+            if let Some(def) = &part.def {
+                scope = scope.with_part(alias, def.clone());
+            }
+        }
+        for ancestor in self.ancestors_of(name) {
+            let parts: BTreeMap<String, PartDef> = effective
+                .get(&ancestor)
+                .into_iter()
+                .flatten()
+                .filter_map(|(alias, part)| part.def.clone().map(|def| (alias.clone(), def)))
+                .collect();
+            scope = scope.with_parent(&ancestor, parts);
+        }
+        scope
+    }
+
+    fn problems_in_from(
+        &self,
+        name: &str,
+        line: &s::FromLine,
+        names: &BTreeSet<String>,
+        links: &BTreeMap<String, Vec<String>>,
+    ) -> Vec<String> {
+        let mut problems = Vec::new();
+        let starts = names_a_subject(line, name, names).map(str::to_string);
+        let relation = &self.map[name].relation;
+        if let Some(parent) = &starts {
+            let on_loop = matches!(relation, Relation::Child(_) | Relation::Narrows(_)) && {
+                let reached = reach(links, std::slice::from_ref(parent));
+                reached.iter().any(|m| {
+                    let onward = links.get(m).cloned().unwrap_or_default();
+                    reach(links, &onward).contains(m)
+                })
+            };
+            if on_loop {
+                problems.push("leads to a loop".to_string());
+            } else if let Relation::Child(parent) = relation
+                && let Some(grand) = self.child_parent(parent)
+                && self.child_parent(&grand).is_some()
+            {
+                problems
+                    .push("a chain of more than three subjects isn't supported yet".to_string());
+            }
+            if parent.trim().is_empty() {
+                problems.push(format!("\"{parent}\" isn't a subject name"));
+            }
+            if line.every && matches!(relation, Relation::Narrows(_)) {
+                let shown = s::print_path(
+                    &s::Path {
+                        position: None,
+                        start: line.path.start.clone(),
+                        steps: Vec::new(),
+                    },
+                    s::Side::Left,
+                    &[],
+                );
+                problems.push(format!(
+                    "{shown} is a subject: write {shown} whose \u{2026} to narrow it, without every"
+                ));
+            }
+        }
+        if line.every && line.named_by_each_of.is_some() {
+            problems.push("every can't go with named by each of: start the from line at a subject to read its names one subject at a time".to_string());
+        }
+        if line.distinct && !line.every {
+            problems.push(DISTINCT_ON_FROM.to_string());
+        }
+        if line.path.start == s::Start::Params {
+            problems.push("a from reads the input, so it can't start at $params".to_string());
+        }
+        if let Some(each) = &line.named_by_each_of
+            && matches!(each.start, s::Start::Field { .. } | s::Start::Quoted(_))
+        {
+            problems.push(EACH_START_PROBLEM.to_string());
+        }
+        match lower::keyed_steps(&line.path) {
+            Ok(steps) => {
+                let counted =
+                    steps.len() + usize::from(matches!(line.path.start, s::Start::Field { .. }));
+                if line.every && counted > MAX_WALK_STEPS {
+                    problems.push("every over more than ten steps isn't supported yet".to_string());
+                }
+            }
+            Err(found) => problems.extend(found),
+        }
+        if let Some(each) = &line.named_by_each_of
+            && let Err(found) = lower::keyed_steps(each)
+        {
+            problems.extend(found);
+        }
+        problems
+    }
+
+    fn flatten(
+        &self,
+        name: &str,
+        owns: &BTreeMap<String, Own>,
+        visiting: &mut Vec<String>,
+    ) -> Option<Lowered> {
+        if visiting.iter().any(|seen| seen == name) {
+            return None;
+        }
+        let own = owns.get(name)?;
+        match &self.get(name)?.relation {
+            Relation::Narrows(parent) => {
+                visiting.push(name.to_string());
+                let base = self.flatten(parent, owns, visiting);
+                visiting.pop();
+                let mut base = base?;
+                if matches!(base.source, Source::Child { .. }) {
+                    return None;
+                }
+                base.filters.extend(own.filters.iter().cloned());
+                Some(base)
+            }
+            _ => Some(Lowered {
+                source: own.source.clone()?,
+                filters: own.filters.clone(),
+                id: own.id.clone(),
+                from_text: own.from_text.clone(),
+            }),
+        }
+    }
+
+    fn resolved_id_text(
+        &self,
+        name: &str,
+        problems: &BTreeMap<String, Problems>,
+    ) -> Option<String> {
+        let mut at = name.to_string();
+        let mut seen = BTreeSet::new();
+        while let Some(Raw {
+            relation: Relation::Narrows(parent),
+            ..
+        }) = self.get(&at)
+            && !parent.trim().is_empty()
+        {
+            if !seen.insert(at.clone()) {
+                return match self.get(name)?.def.identified_by {
+                    Text::Missing => None,
+                    _ => Some(INVALID_IDENTIFIED_BY.to_string()),
+                };
+            }
+            at = parent.clone();
+        }
+        let found = self.get(&at)?;
+        let id_at = field_name(&["subjects", &at, "identified_by"]);
+        match &found.def.identified_by {
+            Text::Missing => None,
+            Text::Invalid => Some(INVALID_IDENTIFIED_BY.to_string()),
+            Text::Written(text) => {
+                let other_problem = problems
+                    .get(&at)
+                    .and_then(|p| p.get(&id_at))
+                    .is_some_and(|texts| texts.iter().any(|text| text != KEYED_ID_PROBLEM));
+                if other_problem {
+                    Some(INVALID_IDENTIFIED_BY.to_string())
+                } else {
+                    Some(read_id(text).map_or(INVALID_IDENTIFIED_BY.to_string(), |r| r.1))
+                }
             }
         }
     }
-    out
-}
 
-fn scope_of(
-    name: &str,
-    raw: &BTreeMap<String, Raw>,
-    effective: &BTreeMap<String, BTreeMap<String, PartRead>>,
-) -> Scope {
-    let mut scope = Scope::new();
-    for (alias, part) in effective.get(name).into_iter().flatten() {
-        if let Some(def) = &part.def {
-            scope = scope.with_part(alias, def.clone());
+    fn entry_of(
+        &self,
+        name: &str,
+        found: &Raw,
+        problems: &BTreeMap<String, Problems>,
+        effective: &BTreeMap<String, BTreeMap<String, PartRead>>,
+        names: &BTreeSet<String>,
+        blocked: bool,
+    ) -> Value {
+        let from_at = field_name(&["subjects", name, "from"]);
+        let invalid = blocked || problems.get(name).is_some_and(|p| p.contains_key(&from_at));
+        let from = if invalid || found.def.says_how || matches!(found.from, FromState::NotText) {
+            INVALID_FROM.to_string()
+        } else {
+            match &found.from {
+                FromState::Parsed(line) if matches!(found.def.from, Text::Written(_)) => {
+                    let scope = self.scope_of(name, effective);
+                    let mut aliases = scope.aliases();
+                    aliases.extend(self.own_part_names(name));
+                    let refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
+                    let printed = s::print_from(line, &refs, &[]);
+                    if keeps_dot(line, name, names) {
+                        with_kept_dot(printed, line.every)
+                    } else {
+                        printed
+                    }
+                }
+                _ => name::name(&path::Path {
+                    start: Start::Subject,
+                    steps: vec![Step::Key(name.to_string())],
+                }),
+            }
+        };
+        let identified_by = self.resolved_id_text(name, problems);
+        let mut parts = Map::new();
+        for (alias, part) in effective.get(name).into_iter().flatten() {
+            parts.insert(
+                alias.clone(),
+                json!({"from": part.from_text, "identified_by": part.id_text}),
+            );
         }
+        json!({
+            "description": found.def.description,
+            "from": from,
+            "identified_by": identified_by,
+            "parts": Value::Object(parts),
+        })
     }
-    for ancestor in ancestors_of(name, raw) {
-        let parts: BTreeMap<String, PartDef> = effective
-            .get(&ancestor)
-            .into_iter()
-            .flatten()
-            .filter_map(|(alias, part)| part.def.clone().map(|def| (alias.clone(), def)))
-            .collect();
-        scope = scope.with_parent(&ancestor, parts);
-    }
-    scope
 }
 
 const DISTINCT_ON_FROM: &str =
     r#"on a from line, distinct goes after every, like "every distinct sbom.components""#;
-
-fn from_problems(
-    name: &str,
-    line: &s::FromLine,
-    raw: &BTreeMap<String, Raw>,
-    names: &BTreeSet<String>,
-    links: &BTreeMap<String, Vec<String>>,
-) -> Vec<String> {
-    let mut problems = Vec::new();
-    let starts = names_a_subject(line, name, names).map(str::to_string);
-    let relation = &raw[name].relation;
-    if let Some(parent) = &starts {
-        let on_loop = matches!(relation, Relation::Child(_) | Relation::Narrows(_)) && {
-            let reached = reach(links, std::slice::from_ref(parent));
-            reached.iter().any(|m| {
-                let onward = links.get(m).cloned().unwrap_or_default();
-                reach(links, &onward).contains(m)
-            })
-        };
-        if on_loop {
-            problems.push("leads to a loop".to_string());
-        } else if let Relation::Child(parent) = relation
-            && let Some(grand) = child_parent(parent, raw)
-            && child_parent(&grand, raw).is_some()
-        {
-            problems.push("a chain of more than three subjects isn't supported yet".to_string());
-        }
-        if parent.trim().is_empty() {
-            problems.push(format!("\"{parent}\" isn't a subject name"));
-        }
-        if line.every && matches!(relation, Relation::Narrows(_)) {
-            let shown = s::print_path(
-                &s::Path {
-                    position: None,
-                    start: line.path.start.clone(),
-                    steps: Vec::new(),
-                },
-                s::Side::Left,
-                &[],
-            );
-            problems.push(format!(
-                "{shown} is a subject: write {shown} whose \u{2026} to narrow it, without every"
-            ));
-        }
-    }
-    if line.every && line.named_by_each_of.is_some() {
-        problems.push("every can't go with named by each of: start the from line at a subject to read its names one subject at a time".to_string());
-    }
-    if line.distinct && !line.every {
-        problems.push(DISTINCT_ON_FROM.to_string());
-    }
-    if line.path.start == s::Start::Params {
-        problems.push("a from reads the input, so it can't start at $params".to_string());
-    }
-    if let Some(each) = &line.named_by_each_of
-        && matches!(each.start, s::Start::Field { .. } | s::Start::Quoted(_))
-    {
-        problems.push(EACH_START_PROBLEM.to_string());
-    }
-    match lower::keyed_steps(&line.path) {
-        Ok(steps) => {
-            let counted =
-                steps.len() + usize::from(matches!(line.path.start, s::Start::Field { .. }));
-            if line.every && counted > MAX_WALK_STEPS {
-                problems.push("every over more than ten steps isn't supported yet".to_string());
-            }
-        }
-        Err(found) => problems.extend(found),
-    }
-    if let Some(each) = &line.named_by_each_of
-        && let Err(found) = lower::keyed_steps(each)
-    {
-        problems.extend(found);
-    }
-    problems
-}
 
 fn plain_text(steps: &[Step]) -> String {
     if steps.is_empty() {
@@ -800,14 +932,16 @@ impl Reading {
         }
         let mut clashing: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
         let mut clash_problems: BTreeMap<String, Problems> = BTreeMap::new();
+        let raws = Raws { map: &raw };
         for (name, found) in &raw {
-            let mut owners: BTreeSet<String> = members_of(name, &raw)
+            let mut owners: BTreeSet<String> = raws
+                .members_of(name)
                 .into_iter()
                 .filter(|m| m != name)
                 .collect();
-            if let Some(parent) = child_parent(name, &raw) {
+            if let Some(parent) = raws.child_parent(name) {
                 owners.insert(parent.clone());
-                if let Some(grand) = child_parent(&parent, &raw) {
+                if let Some(grand) = raws.child_parent(&parent) {
                     owners.insert(grand);
                 }
             }
@@ -827,7 +961,7 @@ impl Reading {
                 }
                 let mut declarers = BTreeSet::new();
                 for owner in &owners {
-                    declarers.extend(members_of(owner, &raw));
+                    declarers.extend(raws.members_of(owner));
                 }
                 for declarer in declarers {
                     if raw
@@ -856,9 +990,10 @@ impl Reading {
                 merge_problems(&mut entry.own_problems, extra);
             }
         }
+        let raws = Raws { map: &raw };
         let effective: BTreeMap<String, BTreeMap<String, PartRead>> = raw
             .keys()
-            .map(|name| (name.clone(), effective_of(name, &raw, &clashing)))
+            .map(|name| (name.clone(), raws.effective_of(name, &clashing)))
             .collect();
         let mut links: BTreeMap<String, Vec<String>> = BTreeMap::new();
         for (name, found) in &raw {
@@ -887,10 +1022,10 @@ impl Reading {
                 }
                 FromState::NotText => {}
                 FromState::Parsed(line) => {
-                    let mut found_problems = from_problems(name, line, &raw, &names, &links);
-                    let scope = scope_of(name, &raw, &effective);
+                    let mut found_problems = raws.problems_in_from(name, line, &names, &links);
+                    let scope = raws.scope_of(name, &effective);
                     let mut aliases = scope.aliases();
-                    aliases.extend(own_part_names(name, &raw));
+                    aliases.extend(raws.own_part_names(name));
                     let alias_refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
                     let mut printed_aliases = alias_refs.clone();
                     printed_aliases.push(name.as_str());
@@ -908,11 +1043,11 @@ impl Reading {
                         found_problems.extend(s::from_self_problems(line, &alias_refs));
                     }
                     let mut filters = Vec::new();
-                    let blocked = blocked_ancestors(name, &raw);
+                    let blocked = raws.blocked_ancestors(name);
                     for condition in line.whose.iter().filter(|_| reads) {
                         for ancestor in &blocked {
                             let reduced = scope.clone().without_parent(ancestor);
-                            let wide = parent_is_self_compared(name, &raw);
+                            let wide = raws.parent_is_self_compared(name);
                             if reads_alias(
                                 &s::print_from_condition(condition, &printed_aliases, &parent_refs),
                                 ancestor,
@@ -1094,16 +1229,15 @@ impl Reading {
                 add_problem(&mut problems, format!("{LISTED_LAST}{at}"), text);
             }
             let lowered = if ok && !chain_problems.contains_key(name) {
-                flatten(name, &raw, &owns, &mut Vec::new())
+                raws.flatten(name, &owns, &mut Vec::new())
             } else {
                 None
             };
             let from_text = lowered.as_ref().map(|l: &Lowered| l.from_text.clone());
-            let entry = entry_of(
+            let entry = raws.entry_of(
                 name,
                 found,
                 &problems_by_subject,
-                &raw,
                 &effective,
                 &names,
                 chain_problems.contains_key(name),
@@ -1115,9 +1249,9 @@ impl Reading {
                     problems,
                     lowered,
                     from_text,
-                    scope: scope_of(name, &raw, &effective),
-                    declarers: declarers_of(name, &raw),
-                    own_part_names: own_part_names(name, &raw),
+                    scope: raws.scope_of(name, &effective),
+                    declarers: raws.declarers_of(name),
+                    own_part_names: raws.own_part_names(name),
                     unsupported: unsupported.contains(name),
                     from_read: ok && !unsupported.contains(name),
                     own_filters: owns
@@ -1273,126 +1407,6 @@ impl Reading {
             .flat_map(|info| info.own_filters.iter().cloned())
             .collect()
     }
-}
-
-fn flatten(
-    name: &str,
-    raw: &BTreeMap<String, Raw>,
-    owns: &BTreeMap<String, Own>,
-    visiting: &mut Vec<String>,
-) -> Option<Lowered> {
-    if visiting.iter().any(|seen| seen == name) {
-        return None;
-    }
-    let own = owns.get(name)?;
-    match &raw.get(name)?.relation {
-        Relation::Narrows(parent) => {
-            visiting.push(name.to_string());
-            let base = flatten(parent, raw, owns, visiting);
-            visiting.pop();
-            let mut base = base?;
-            if matches!(base.source, Source::Child { .. }) {
-                return None;
-            }
-            base.filters.extend(own.filters.iter().cloned());
-            Some(base)
-        }
-        _ => Some(Lowered {
-            source: own.source.clone()?,
-            filters: own.filters.clone(),
-            id: own.id.clone(),
-            from_text: own.from_text.clone(),
-        }),
-    }
-}
-
-fn resolved_id_text(
-    name: &str,
-    raw: &BTreeMap<String, Raw>,
-    problems: &BTreeMap<String, Problems>,
-) -> Option<String> {
-    let mut at = name.to_string();
-    let mut seen = BTreeSet::new();
-    while let Some(Raw {
-        relation: Relation::Narrows(parent),
-        ..
-    }) = raw.get(&at)
-        && !parent.trim().is_empty()
-    {
-        if !seen.insert(at.clone()) {
-            return match raw.get(name)?.def.identified_by {
-                Text::Missing => None,
-                _ => Some(INVALID_IDENTIFIED_BY.to_string()),
-            };
-        }
-        at = parent.clone();
-    }
-    let found = raw.get(&at)?;
-    let id_at = field_name(&["subjects", &at, "identified_by"]);
-    match &found.def.identified_by {
-        Text::Missing => None,
-        Text::Invalid => Some(INVALID_IDENTIFIED_BY.to_string()),
-        Text::Written(text) => {
-            let other_problem = problems
-                .get(&at)
-                .and_then(|p| p.get(&id_at))
-                .is_some_and(|texts| texts.iter().any(|text| text != KEYED_ID_PROBLEM));
-            if other_problem {
-                Some(INVALID_IDENTIFIED_BY.to_string())
-            } else {
-                Some(read_id(text).map_or(INVALID_IDENTIFIED_BY.to_string(), |r| r.1))
-            }
-        }
-    }
-}
-
-fn entry_of(
-    name: &str,
-    found: &Raw,
-    problems: &BTreeMap<String, Problems>,
-    raw: &BTreeMap<String, Raw>,
-    effective: &BTreeMap<String, BTreeMap<String, PartRead>>,
-    names: &BTreeSet<String>,
-    blocked: bool,
-) -> Value {
-    let from_at = field_name(&["subjects", name, "from"]);
-    let invalid = blocked || problems.get(name).is_some_and(|p| p.contains_key(&from_at));
-    let from = if invalid || found.def.says_how || matches!(found.from, FromState::NotText) {
-        INVALID_FROM.to_string()
-    } else {
-        match &found.from {
-            FromState::Parsed(line) if matches!(found.def.from, Text::Written(_)) => {
-                let scope = scope_of(name, raw, effective);
-                let mut aliases = scope.aliases();
-                aliases.extend(own_part_names(name, raw));
-                let refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
-                let printed = s::print_from(line, &refs, &[]);
-                if keeps_dot(line, name, names) {
-                    with_kept_dot(printed, line.every)
-                } else {
-                    printed
-                }
-            }
-            _ => name::name(&path::Path {
-                start: Start::Subject,
-                steps: vec![Step::Key(name.to_string())],
-            }),
-        }
-    };
-    let identified_by = resolved_id_text(name, raw, problems);
-    let mut parts = Map::new();
-    for (alias, part) in effective.get(name).into_iter().flatten() {
-        parts.insert(
-            alias.clone(),
-            json!({"from": part.from_text, "identified_by": part.id_text}),
-        );
-    }
-    json!({
-        "description": found.def.description,
-        "from": from,
-        "identified_by": identified_by,
-        "parts": Value::Object(parts),
-    })
 }
 
 #[cfg(test)]

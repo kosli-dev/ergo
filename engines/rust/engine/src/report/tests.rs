@@ -1052,10 +1052,12 @@ fn full_report() -> Value {
     }));
     let mut defs = json!({});
     let report_defs = check_defs(
-        &Reading::of(&read),
-        &read,
-        &requirement,
-        &Problems::new(),
+        &RequirementRead {
+            reading: &Reading::of(&read),
+            policy: &read,
+            requirement: &requirement,
+            extra: &Problems::new(),
+        },
         &Value::Null,
         &Value::Null,
     );
