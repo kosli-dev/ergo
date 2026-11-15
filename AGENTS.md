@@ -154,6 +154,7 @@ The report must stay byte-identical for the same policy and input, whatever orde
 
 - Ergo must be easy to reimplement outside Rego. Prefer rules that a TypeScript or Python version can follow to the same report over OPA behaviour.
 - Ergo reports every failure. Name every failed root and every problem, not only the first one.
+- Before you take an engine difference, or a question about a message or a cause, to a decision, check it against the four general rules under "Which problems a message says" in `spec/semantics.md`: `problems.same_path`, `problems.where_said`, `problems.all_said` and `problems.item_order`. They often answer it. A shape that breaks one of them and isn't fixed in the same change goes under "Differs from the general rules" in `spec/OPEN.md`.
 
 ## Docs
 

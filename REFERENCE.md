@@ -1981,6 +1981,18 @@ item 2 of items: ok is false; item 3 of items: ok is false; item 4 of items: ok 
 
 In a `for` line, the item's fields are named without its alias when everything the item's sentences read belongs to that item. With `for: every commits as c` and `c.signed is true`, the message is `item 1 of commits: signed is false`, and when the item itself is `null` it's `item 1 of commits is null`. When a sentence also reads something else, like a field of the subject, a param or a second item, every name stays as the policy wrote it, like `item 1 of approvers: approver.username is "ann", and author is "ann"`. A list inside an item is named without the alias, like `item 1 of commits: item 2 of reviews: ok is false`.
 
+Four rules hold for every message. A name gives the same cause in every sentence it is in. A problem with something read from outside the item, like a field of the subject, a part or `$params`, is said once, before any item, and a problem inside an item is said under that item. Every problem Ergo finds is said: the problems from outside first, then the list's own, like `xs is []`, then each item's, and the row takes the worst cause. Items come in the order of their list. With the params `{"min": "s"}`, `for: every xs as x`, `x.v is at least $params.min` and this input:
+
+```json
+{"things": [{"id": "a", "xs": [{"v": null}, {}]}]}
+```
+
+the row fails as `unusable` with:
+
+```text
+$params.min is "s", which isn't a number; item 1 of xs: x.v is null; item 2 of xs: x.v is missing
+```
+
 An alias or a part is named as the policy calls it, never with a `$` before it: `item 1 of z: k is 1`, or `item 2 of lst: x is 2, and cov.x is 1` for a part on the right of an `every`. Names the policy writes with a `$`, like `$params.limit`, keep it. A value that spells an alias, like `"$z: x"`, prints as the input had it. A `count of`, a `sum of` or a `whose` that reads an item that isn't an object names it. With the check `count of commits whose signed is true is 3` and this input:
 
 ```json

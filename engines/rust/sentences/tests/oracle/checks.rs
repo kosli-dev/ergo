@@ -9707,6 +9707,38 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("x.v is \"a\"", "x.v is \"a\"", &[], &[]),
+    (
+        "count of xs whose v is $params.q is 1",
+        "count of xs whose v equals $params.q is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is pl.z is 1",
+        "count of xs whose v equals pl.z is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.v is $params.q",
+        "every xs.v equals $params.q",
+        &[],
+        &[],
+    ),
+    ("every xs.v is 1", "every xs.v is 1", &[], &[]),
+    ("every xs.v is pl.z", "every xs.v equals pl.z", &[], &[]),
+    ("v is $params.q", "v equals $params.q", &[], &[]),
+    ("v is pl.z", "v equals pl.z", &[], &[]),
+    ("x.k is $params.k", "x.k equals $params.k", &[], &[]),
+    ("x.v is $params.q", "x.v equals $params.q", &[], &[]),
+    (
+        "x.v is at least $params.min",
+        "x.v is at least $params.min",
+        &[],
+        &[],
+    ),
+    ("x.v is pl.z", "x.v equals pl.z", &[], &[]),
+    ("y.n is at least w.min", "y.n is at least w.min", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -14165,6 +14197,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every rs whose v is m named by $input.k as r",
         "every rs whose v equals m named by $input.k as r",
+        &[],
+        &[],
+    ),
+    (
+        "every ws as w, every w.ys as y",
+        "every ws as w, every w.ys as y",
         &[],
         &[],
     ),
