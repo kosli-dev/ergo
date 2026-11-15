@@ -117,7 +117,7 @@ fn keyed(check: &Check) -> Option<Keyed<'_>> {
         }
         _ => return None,
     };
-    if !plain(list, Start::Subject) || whose.len() != 1 {
+    if !plain(list, Start::Subject) || list.steps.len() != 1 || whose.len() != 1 {
         return None;
     }
     let (operand, wants, right) = match &whose[0] {
@@ -168,7 +168,8 @@ fn keyed_root(root: &Path) -> bool {
 
 fn root_fault(root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
     let at = root.steps.len() - 1;
-    for end in 1..=at {
+    let first = usize::from(!matches!(root.start, Start::Part(_)));
+    for end in first..=at {
         let before = Path {
             start: root.start.clone(),
             steps: root.steps[..end].to_vec(),

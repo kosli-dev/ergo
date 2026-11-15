@@ -1,1 +1,2 @@
+derived / an every or some whose whose reads a part of the subject with a named by key from the item says the part once, first / the part is null and the first item is null
 derived / an every whose whose reads a field of the subject through a key the item holds says the field once and first / the field is null and the first item is null

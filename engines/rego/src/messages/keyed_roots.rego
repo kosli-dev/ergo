@@ -40,6 +40,7 @@ _keyed_list(check) := k if {
 }
 
 _keyed_side(side, other) := {"path": side.count_of, "clause": c} if {
+	is_object(side)
 	is_array(object.get(side, "whose", null))
 	object.keys(side) == {"count_of", "text", "whose"}
 	is_object(other)
@@ -49,6 +50,7 @@ _keyed_side(side, other) := {"path": side.count_of, "clause": c} if {
 
 _keyed_clause(path, whose) := c if {
 	_keyed_plain(path)
+	count(path) == 1
 	is_array(whose)
 	count(whose) == 1
 	c := whose[0]
