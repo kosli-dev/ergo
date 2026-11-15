@@ -235,7 +235,7 @@ _policy_problem_inputs(policy) := [{"name": concat(" ", ["policy", f]), "value":
 
 _policy_problems_at("ergo_spec", policy) := _spec_problems(object.get(policy, "ergo_spec", null))
 
-_policy_problems_at(f, policy) := _policy_field_problems(f, policy[f]) if f in _policy_note_fields
+_policy_problems_at(f, policy) := _policy_field_problems(f, policy[f]) if f in {"description", "meta"}
 
 _spec_problems(v) := {"missing"} if v == null
 

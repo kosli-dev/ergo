@@ -110,8 +110,6 @@ _within_keys := {"within", "max"}
 
 _sort_keys := {"start", "position"}
 
-_policy_note_fields := {"description", "meta"}
-
 _check_note_fields := {"description", "meta"}
 
 _policy_sections := ["subjects", "requirements"]
