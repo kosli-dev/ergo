@@ -58475,5 +58475,1143 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a second for list whose whose reads a root through the first alias that can't be read, and a field its items lack, says the root for each item of the first list, then each item of the second",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "some": {
+              "for": "every ws as w, some ys whose n is at least w.z and whose n is at most u as y",
+              "assert": "y.n exists"
+            },
+            "first": {
+              "for": "every ws as w, first of ys whose n is at least w.z and whose n is at most u sorted by n as y",
+              "assert": "y.n exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "w.z isn't a number and no item of ys has u",
+        "rules": [
+          "problems.where_said",
+          "problems.all_said",
+          "problems.item_order",
+          "for.roots",
+          "for.second_items",
+          "for.failed_items",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ws": [
+                {
+                  "z": "s"
+                }
+              ],
+              "ys": [
+                {
+                  "n": 1
+                },
+                {
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "first",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "unusable",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 2
+                    }
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": {
+                  "z": "s"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": "s"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0",
+                  "/things/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ws: w.z is \"s\", which isn't a number; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "unusable",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 2
+                    }
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": {
+                  "z": "s"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": "s"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0",
+                  "/things/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ws: w.z is \"s\", which isn't a number; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "w.z is null and no item of ys has u",
+        "rules": [
+          "problems.where_said",
+          "problems.all_said",
+          "problems.item_order",
+          "for.roots",
+          "for.second_items",
+          "for.failed_items",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ws": [
+                {
+                  "z": null
+                }
+              ],
+              "ys": [
+                {
+                  "n": 1
+                },
+                {
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "first",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 2
+                    }
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": {
+                  "z": null
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": null
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0",
+                  "/things/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ws: w.z is null; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 2
+                    }
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": {
+                  "z": null
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "z": null
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0",
+                  "/things/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ws: w.z is null; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second for list whose whose reads a root through the first alias that is missing, and a field its items lack, says the root for each item of the first list, then each item of the second, when the root comes second",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "some": {
+              "for": "every ws as w, some ys whose n is at most u and whose n is at least w.z as y",
+              "assert": "y.n exists"
+            },
+            "first": {
+              "for": "every ws as w, first of ys whose n is at most u and whose n is at least w.z sorted by n as y",
+              "assert": "y.n exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "w.z is missing and no item of ys has u",
+        "rules": [
+          "problems.where_said",
+          "problems.all_said",
+          "problems.item_order",
+          "for.roots",
+          "for.second_items",
+          "for.failed_items",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ws": [
+                {}
+              ],
+              "ys": [
+                {
+                  "n": 1
+                },
+                {
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "first",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 2
+                    }
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": {}
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0",
+                  "/things/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ws: w.z is missing; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of ys",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "path": "item 1 of ys",
+                    "value": {
+                      "n": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of ys",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "path": "item 2 of ys",
+                    "value": {
+                      "n": 2
+                    }
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": {}
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0",
+                  "/things/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ws: w.z is missing; item 1 of ws: item 1 of ys: u is missing; item 1 of ws: item 2 of ys: u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second for list whose whose reads a root from the params that can't be read, and a field its items lack, says the root once, then each item, wherever the root is in the whose",
+    "params": {
+      "z": "s",
+      "u": "s"
+    },
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "after": {
+              "for": "every ws as w, every ys whose n is at least z and whose n is at most $params.u as y",
+              "assert": "y.n exists"
+            },
+            "every": {
+              "for": "every ws as w, every ys whose n is at least $params.z and whose n is at most u as y",
+              "assert": "y.n exists"
+            },
+            "last": {
+              "for": "every ws as w, last of ys whose n is at least $params.z and whose n is at most u as y",
+              "assert": "y.n exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "$params.z and $params.u aren't numbers, and no item of ys has u or z",
+        "rules": [
+          "problems.where_said",
+          "problems.all_said",
+          "problems.item_order",
+          "for.roots",
+          "for.second_items",
+          "for.failed_items",
+          "sentence.for.comma"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ws": [
+                {}
+              ],
+              "ys": [
+                {
+                  "n": 1
+                },
+                {
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "after",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "n": 1
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/things/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0",
+                  "/things/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "message": "$params.u is \"s\", which isn't a number; item 1 of ys: z is missing; item 2 of ys: z is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "n": 1
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/things/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0",
+                  "/things/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "message": "$params.z is \"s\", which isn't a number; item 1 of ys: u is missing; item 2 of ys: u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "last",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of ys",
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "path": "item 1 of ys",
+                "value": {
+                  "n": 1
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of ys",
+                "locations": [
+                  "/things/0/ys/1"
+                ],
+                "path": "item 2 of ys",
+                "value": {
+                  "n": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0",
+                  "/things/0/ys/1"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "n": 1
+                  },
+                  {
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "message": "$params.z is \"s\", which isn't a number; item 1 of ys: u is missing; item 2 of ys: u is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "first of and last of an empty second for list whose whose reads params that are text, not a list, say the params, then the empty list",
+    "params": {
+      "z": "s"
+    },
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "first": {
+              "for": "every ws as w, first of ys whose n is in $params.z sorted by n as y",
+              "assert": "y.n exists"
+            },
+            "last": {
+              "for": "every ws as w, last of ys whose n is in $params.z sorted by n as y",
+              "assert": "y.n exists"
+            },
+            "one": {
+              "for": "first of ys whose n is in $params.z as y",
+              "assert": "y.n exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "ys is empty",
+        "rules": [
+          "problems.all_said",
+          "for.roots",
+          "for.pick",
+          "sentence.for.pick"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ws": [
+                {}
+              ],
+              "ys": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "ys[]",
+                "value": []
+              }
+            ],
+            "message": "$params.z is \"s\", which isn't a list; ys is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "last",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "ys[]",
+                "value": []
+              }
+            ],
+            "message": "$params.z is \"s\", which isn't a list; ys is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "one",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "ys[]",
+                "value": []
+              }
+            ],
+            "message": "$params.z is \"s\", which isn't a list; ys is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "first of and last of an empty second for list whose whose reads params that are an object, not a list, say the params, then the empty list",
+    "params": {
+      "z": {
+        "a": 1
+      }
+    },
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "first": {
+              "for": "every ws as w, first of ys whose n is in $params.z sorted by n as y",
+              "assert": "y.n exists"
+            },
+            "last": {
+              "for": "every ws as w, last of ys whose n is in $params.z sorted by n as y",
+              "assert": "y.n exists"
+            },
+            "one": {
+              "for": "first of ys whose n is in $params.z as y",
+              "assert": "y.n exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "ys is empty",
+        "rules": [
+          "problems.all_said",
+          "for.roots",
+          "for.pick",
+          "sentence.for.pick"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ws": [
+                {}
+              ],
+              "ys": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "first",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "ys[]",
+                "value": []
+              }
+            ],
+            "message": "$params.z is {\"a\": 1}, which isn't a list; ys is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "last",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {}
+                ]
+              },
+              {
+                "locations": [],
+                "name": "ys[]",
+                "value": []
+              }
+            ],
+            "message": "$params.z is {\"a\": 1}, which isn't a list; ys is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "one",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "ys[]",
+                "value": []
+              }
+            ],
+            "message": "$params.z is {\"a\": 1}, which isn't a list; ys is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
