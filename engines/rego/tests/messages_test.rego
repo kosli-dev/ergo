@@ -927,7 +927,7 @@ test_a_for_check_that_reads_params_says_only_that_params_is_not_an_object if {
 	rows_l.in_q == ["unusable", "$params is [], which isn't an object", 0]
 }
 
-test_an_empty_list_with_params_that_are_not_an_object_names_only_the_key_that_isnt_text_beside_a_root_that_isnt_a_number if {
+test_an_empty_list_with_params_that_are_not_an_object_names_the_params_then_what_it_says_with_no_params if {
 	policy := {
 		"ergo_spec": ergo._spec,
 		"subjects": {"pr": {"from": "prs", "identified_by": "id"}},
@@ -941,15 +941,16 @@ test_an_empty_list_with_params_that_are_not_an_object_names_only_the_key_that_is
 		some r in ergo.report(doc, policy, 3).results
 		not startswith(r.check, "$")
 	}
-	rows.bare == ["unusable", "$input.k is 3, which isn't text"]
-	rows.input == ["unusable", "$input.k is 3, which isn't text"]
+	rows.bare == ["unusable", "$params is 3, which isn't an object; z is \"s\", which isn't a number"]
+	rows.input == ["unusable", "$params is 3, which isn't an object; $input.z is \"s\", which isn't a number"]
 }
 
-test_a_for_check_that_does_not_read_params_keeps_its_message_and_lists_every_item_when_params_is_not_an_object if {
+test_a_for_check_that_does_not_read_params_says_them_first_and_lists_every_item_when_params_is_not_an_object if {
 	every params in [3, "s", []] {
 		rows := _params_not_object_rows(_params_not_object_doc, params)
-		rows.least_z == ["unusable", "z is \"s\", which isn't a number", 2]
-		rows.plain == ["unusable", "z is \"s\", which isn't a number", 2]
+		said := concat("", ["$params is ", _params_word(params), ", which isn't an object; z is \"s\", which isn't a number"])
+		rows.least_z == ["unusable", said, 2]
+		rows.plain == ["unusable", said, 2]
 	}
 }
 

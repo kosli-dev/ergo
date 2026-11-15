@@ -1804,3 +1804,65 @@ fn merge_runs_keeps_the_rows_of_the_first_run_whatever_the_length_of_the_others(
     assert_eq!(ids, [json!(1), json!(2)]);
     assert!(super::merge_runs(Vec::new(), &[&long]).is_empty());
 }
+
+fn params_rows(checks: Value, from: &str, input: Value) -> Value {
+    let p = json!({
+        "ergo_spec": SPEC,
+        "subjects": {"thing": {"from": from, "identified_by": "id"}},
+        "requirements": {"s": {"subject": "thing", "checks": checks}}
+    });
+    report(&input, &p, &json!(3))
+}
+
+#[test]
+fn params_that_are_not_an_object_come_first_then_what_a_check_that_reads_none_says_without_them() {
+    let r = params_rows(
+        json!({"plain": "x is 1", "passes": "id exists", "every": "every es.v is 1"}),
+        "things",
+        json!({"things": [{"id": "t", "x": 2, "es": [{"v": 2}, {"v": 1}, {}]}]}),
+    );
+    let said = |check: &str| rows(&r, check)[0]["message"].clone();
+    assert_eq!(
+        said("plain"),
+        json!("$params is 3, which isn't an object; x is 2")
+    );
+    assert_eq!(said("passes"), json!("$params is 3, which isn't an object"));
+    assert_eq!(
+        said("every"),
+        json!(
+            "$params is 3, which isn't an object; item 1 of es: v is 2; item 3 of es: v is missing"
+        )
+    );
+    assert_eq!(rows(&r, "every")[0]["failed_items"], json!([]));
+}
+
+#[test]
+fn params_that_are_not_an_object_come_first_in_an_applies_row_that_reads_none() {
+    let r = params_rows(
+        json!({"c": "id exists"}),
+        "things whose x is 1",
+        json!({"things": [{"id": "t", "x": 2}, {"id": "u", "x": 1}]}),
+    );
+    let applies = rows(&r, "$applies");
+    assert_eq!(
+        applies[0]["message"],
+        json!("$params is 3, which isn't an object; x is 2")
+    );
+    assert_eq!(
+        applies[1]["message"],
+        json!("$params is 3, which isn't an object")
+    );
+}
+
+#[test]
+fn params_that_are_not_an_object_are_said_once_by_a_count_whose_that_reads_them() {
+    let r = params_rows(
+        json!({"c": "count of es.v that is m named by $params.k is 0"}),
+        "things",
+        json!({"things": [{"id": "t", "m": {}, "es": [{"v": 1}, {"v": 2}]}]}),
+    );
+    assert_eq!(
+        rows(&r, "c")[0]["message"],
+        json!("$params is 3, which isn't an object")
+    );
+}

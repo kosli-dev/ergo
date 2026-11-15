@@ -54,13 +54,21 @@ _walk_phrase_roots(check) := [m |
 _walk_parts(check, subj, raw, r) := fs if {
 	r.failed == []
 	raw.cause == "unusable"
+	not _m_params_unread(check)
 	fs := _m_walk_faults(subj, check)
 	fs != []
+}
+
+_walk_parts(check, _, raw, r) := [_m_fallback(check)] if {
+	r.failed == []
+	raw.cause == "unusable"
+	_m_params_unread(check)
 }
 
 _walk_parts(check, subj, raw, r) := ms if {
 	r.failed == []
 	raw.cause == "unusable"
+	not _m_params_unread(check)
 	_m_walk_faults(subj, check) == []
 	ms := _m_empty_walk_roots(check, subj, r)
 	ms != []
@@ -69,6 +77,7 @@ _walk_parts(check, subj, raw, r) := ms if {
 _walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
 	r.failed == []
 	raw.cause == "unusable"
+	not _m_params_unread(check)
 	_m_walk_faults(subj, check) == []
 	_m_empty_walk_roots(check, subj, r) == []
 }
@@ -632,7 +641,7 @@ _row_message(check, subj, raw) := concat("; ", ms) if {
 
 _row_message(check, subj, _) := concat("; ", ms) if {
 	_any_of_run(check)
-	causes := [_m_undecided(_option_line_cause(c, _assertion_cause(c, subj, ""), subj)) | some c in check.checks]
+	causes := [_m_undecided(_option_line_cause(c, _assertion_cause(c, subj, _m_option_flaw(c)), subj)) | some c in check.checks]
 	ms := [concat("", [nm, ": ", concat(", and ", lines)]) |
 		some k, nm in check.option_of
 		not nm in array.slice(check.option_of, 0, k)
@@ -645,6 +654,10 @@ _row_message(check, subj, _) := concat("; ", ms) if {
 	]
 	ms != []
 } else := _m_fallback(check) if _any_of_run(check)
+
+_m_option_flaw(c) := "unusable" if _m_params_unread(c)
+
+else := ""
 
 _m_null_before_key(item, c) := _once([concat("", [_input_name(prefix), " is null"]) |
 	some side in _m_sides(c)

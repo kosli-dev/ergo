@@ -743,6 +743,18 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                 all.extend(input_key);
                 all.push(params);
             }
+            if let Some(problem) = params_problem(ctx) {
+                all = all
+                    .into_iter()
+                    .map(|c| {
+                        if c.starts_with("item ") && c.ends_with(&format!(": {problem}")) {
+                            problem.clone()
+                        } else {
+                            c
+                        }
+                    })
+                    .collect();
+            }
             let digits = " needs more than 15 digits";
             if let Check::Tally(tally_check) = check
                 && all.iter().all(|c| c.ends_with(digits))
@@ -847,6 +859,25 @@ pub fn params_that_arent_an_object(check: &Check, ctx: &Ctx) -> Option<String> {
     } else {
         Some(clauses.join(", and "))
     }
+}
+
+pub fn reads_params(check: &Check) -> bool {
+    let mut paths = Vec::new();
+    params_paths(check, &mut paths);
+    paths.iter().any(|path| path.start == Start::Params)
+}
+
+pub fn params_problem(ctx: &Ctx) -> Option<String> {
+    ctx.params
+        .filter(|p| !p.is_object() && !p.is_null())
+        .map(|p| isnt("$params", p, "an object"))
+}
+
+pub fn params_first(problem: String, rest: &[String]) -> String {
+    std::iter::once(problem)
+        .chain(rest.iter().cloned())
+        .collect::<Vec<_>>()
+        .join("; ")
 }
 
 pub fn params_break(path: &Path, params: &Value, ctx: &Ctx) -> Option<String> {

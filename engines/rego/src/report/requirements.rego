@@ -451,7 +451,7 @@ _applies_row(ref, entry, evals, req, req_name) := object.union(
 		"passed": matched,
 		"cause": _applies_cause(evals, matched),
 	},
-	object.union(_applies_failures(evals, req, _entry_anchor(entry)), _m_applies(evals, req, matched)),
+	object.union(_applies_failures(evals, req, _entry_anchor(entry)), _params_applies_message(evals, req, matched, entry)),
 ) if {
 	matched := _subject_matches(evals, req)
 }
