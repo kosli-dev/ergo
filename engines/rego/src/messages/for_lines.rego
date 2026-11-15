@@ -37,7 +37,7 @@ _for_why(_, _, _, _, wh, failure) := failure if {
 _for_counts_a_root(c) if {
 	walk(c, [_, y])
 	is_object(y)
-	some f in ["count_of", "sum_of"]
+	some f in _tally_forms
 	p := object.get(y, f, null)
 	is_array(p)
 	_m_off_path(p)
@@ -48,7 +48,7 @@ _for_own_read_fails(c, e) if {
 	some x in _walk_sides_paths(c)
 	is_array(x[0])
 	not _walk_outside(x[0])
-	_read_state(fe.iv, x[0]) in {"absent", "null", "unusable", "not_an_object"}
+	_read_state(fe.iv, x[0]) in _failed_read_states
 }
 
 _for_root_why(c, cause, subj) := [t] if {
@@ -78,7 +78,7 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 	ts := [t |
 		some c in item.whose
 		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-		not cause in {"satisfied", "value"}
+		not cause in _not_failing_causes
 		not _for_own_read_fails(c, e)
 		said := _for_root_why(c, _m_undecided(cause), object.get(names, "ergo/subject", null)) with input as {"ergo/names": names}
 		some t in said
@@ -95,7 +95,7 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 	ms := [[m, _for_is_free({"whose": [c]}, names)] |
 		some c in item.whose
 		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-		not cause in {"satisfied", "value"}
+		not cause in _not_failing_causes
 		off := [_m_aliased(t) | some t in _m_keyed_off(object.get(names, "ergo/subject", null), c, cause)] with input as {"ergo/names": names}
 		some m in off
 	]
@@ -108,7 +108,7 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 		some c in item.whose
 		fe := _focus_of(e, c)
 		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-		not cause in {"satisfied", "value"}
+		not cause in _not_failing_causes
 		said := _message(c, fe.iv, cause)
 		roots := _m_keyed_roots(object.get(names, "ergo/subject", null), c, cause)
 	] with input as {"ergo/names": names}
@@ -124,7 +124,7 @@ _for_own_why(true, item, e, names) if {
 	some c in item.whose
 	fe := _focus_of(e, c) with input as {"ergo/names": names}
 	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-	not cause in {"satisfied", "value"}
+	not cause in _not_failing_causes
 	roots := _m_keyed_roots(object.get(names, "ergo/subject", null), c, cause) with input as {"ergo/names": names}
 	_m_own_said(_message(c, fe.iv, cause), roots) with input as {"ergo/names": names}
 }
@@ -136,7 +136,7 @@ _for_own_why_of(false, _, own) := {"own": own}
 _for_root_fails(item, e, names) if {
 	some c in item.whose
 	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-	not cause in {"satisfied", "value"}
+	not cause in _not_failing_causes
 	subj := object.get(names, "ergo/subject", null)
 	count(array.concat(_for_root_why(c, _m_undecided(cause), subj), _m_keyed_off(subj, c, cause))) > 0 with input as {"ergo/names": names}
 }
@@ -144,20 +144,20 @@ _for_root_fails(item, e, names) if {
 _for_root_fails(item, e, names) if {
 	some c in item.whose
 	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-	not cause in {"satisfied", "value"}
-	not _root_read_flaw(object.get(names, "ergo/subject", null), c) in {"", "not_an_object"} with input as {"ergo/names": names}
+	not cause in _not_failing_causes
+	not _root_read_flaw(object.get(names, "ergo/subject", null), c) in _tolerated_root_flaws with input as {"ergo/names": names}
 }
 
 _for_own_texts(item, e, names) := [t |
 	some c in item.whose
 	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
-	not cause in {"satisfied", "value"}
+	not cause in _not_failing_causes
 	fe := _focus_of(e, c)
 	some x in _walk_sides_paths(c)
 	is_array(x[0])
 	not _walk_outside(x[0])
 	own := _side_state(fe.iv, x[0])
-	own in {"absent", "null", "unusable", "not_an_object"}
+	own in _failed_read_states
 	subj := object.get(names, "ergo/subject", null)
 	roots := {piece | some r in array.concat(array.concat(_for_root_why(c, _m_undecided(own), subj), _m_keyed_off(subj, c, own)), _m_cond_root_texts(subj, c)); some piece in split(r, "; ")} with input as {"ergo/names": names}
 	said := _message(c, fe.iv, own) with input as {"ergo/names": names}
@@ -204,17 +204,17 @@ _m_why_text(name, m) := concat("", [name, " ", trim_prefix(m, "the subject ")]) 
 
 else := concat("", [name, ": ", m])
 
-_m_strip(f) := object.union(object.remove(f, ["msg", "said", "raw", "bare", "hoisted", "whose_of"]), object.union({"failed_assertions": [_m_strip_line(l) | some l in f.failed_assertions]}, _m_strip_items(f))) if "failed_assertions" in object.keys(f)
+_m_strip(f) := object.union(object.remove(f, _failed_internal_keys), object.union({"failed_assertions": [_m_strip_line(l) | some l in f.failed_assertions]}, _m_strip_items(f))) if "failed_assertions" in object.keys(f)
 
-else := object.remove(f, ["msg", "said", "raw", "bare", "hoisted", "whose_of"])
+else := object.remove(f, _failed_internal_keys)
 
 _m_strip_items(f) := {"failed_items": [object.remove(x, ["msg", "text", "free"]) | some x in f.failed_items]} if "failed_items" in object.keys(f)
 
 else := {}
 
-_m_strip_line(l) := object.union(object.remove(l, ["msg", "own_msg"]), {"items": [object.remove(x, ["msg", "own"]) | some x in l.items]}) if "items" in object.keys(l)
+_m_strip_line(l) := object.union(object.remove(l, _line_internal_keys), {"items": [object.remove(x, ["msg", "own"]) | some x in l.items]}) if "items" in object.keys(l)
 
-else := object.remove(l, ["msg", "own_msg"])
+else := object.remove(l, _line_internal_keys)
 
 _for_message(check, subj, r) := _m_not_object(check, subj) if {
 	r.cause == "not_an_object"
@@ -227,11 +227,11 @@ _for_message(check, subj, r) := _m_joined(_m_for_empty(object.union(check, {"ite
 }
 
 _m_for_empty(check, subj, cause) := cs if {
-	cause in {"absent", "null"}
+	cause in _no_value_states
 	cs := _once([c | some item in check.items; some c in _m_key_states(subj, _m_for_item(item), cause)])
 	cs != []
 } else := cs if {
-	cause in {"absent", "null"}
+	cause in _no_value_states
 	cs := _once([concat("", [_m_unbound_name(check, s), " is ", _m_state_word(cause)]) | some item in check.items; some s in _m_sources(subj, _m_for_item(item)); s.state == cause])
 	cs != []
 } else := cs if {
@@ -292,7 +292,7 @@ _m_for_tally_lists(check) := {xs |
 	walk(check, [_, c])
 	is_object(c)
 	ys := _walked_tallies(c)
-	some cause in ["absent", "null", "unusable"]
+	some cause in _value_fault_causes
 	xs := _m_walked_tally_texts(subj, ys, cause)
 	xs != []
 }
@@ -320,7 +320,7 @@ _m_for_said(check) := {t |
 	walk(check, [_, c])
 	is_object(c)
 	_list_phrase(c)
-	some cause in ["absent", "null", "unusable"]
+	some cause in _value_fault_causes
 	t := _m_walked_root_text(c, cause)
 }
 
@@ -577,7 +577,7 @@ else := false
 
 _m_named_item(f) := _m_is(object.get(f, "said", f.item), f.value) if f.cause == "value"
 
-_m_named_item(f) := concat("", [object.get(f, "bare", object.get(f, "said", f.item)), " is ", _m_state_word(f.cause)]) if f.cause in {"absent", "null"}
+_m_named_item(f) := concat("", [object.get(f, "bare", object.get(f, "said", f.item)), " is ", _m_state_word(f.cause)]) if f.cause in _no_value_states
 
 _m_named_item(f) := _m_isnt(object.get(f, "bare", object.get(f, "said", f.item)), object.get(f, "raw", f.value), "an object") if f.cause == "not_an_object"
 
@@ -641,7 +641,7 @@ else := concat("", [_input_name(shown), " is missing"]) if {
 	not _has_field_step(array.slice(shown, 0, i))
 } else := _message({"op": "present", "path": shown}, subj, cause) if {
 	not _m_walks_root(leaf, shown, subj)
-	cause in {"absent", "null", "unusable"}
+	cause in _value_fault_causes
 	_m_ref_read_state(subj, shown) == cause
 } else := _m_isnt(_input_name(shown), v, kind) if {
 	not _m_walks_root(leaf, shown, subj)
@@ -663,7 +663,7 @@ _m_leaf_needs(leaf, v) := k if {
 	_list_cmp(leaf)
 	not _list_right_usable(leaf.cmp, v)
 } else := _m_right_kind(cmp, v) if {
-	some f in ["values", "patterns"]
+	some f in _list_argument_keys
 	_is_ref(object.get(leaf, f, null))
 	cmp := _m_ref_cmp(leaf.op, f)
 	not _list_right_usable(cmp, v)
@@ -671,11 +671,11 @@ _m_leaf_needs(leaf, v) := k if {
 
 _list_phrase(leaf) if _list_cmp(leaf)
 
-_list_phrase(leaf) if leaf.op in {"in", "not_in", "includes_some", "not_includes_all", "matches_any", "not_matches_any"}
+_list_phrase(leaf) if leaf.op in _list_phrase_ops
 
 _list_phrase(leaf) if {
 	_walk_roots_on
-	leaf.op in {"includes", "excludes"}
+	leaf.op in _single_contain_ops
 }
 
 _m_right_needs(leaf, v) := "a number" if {
@@ -687,14 +687,14 @@ _m_right_needs(leaf, v) := "a number" if {
 	not _s_time_value(v)
 } else := "text" if {
 	leaf.op == "compare"
-	leaf.cmp in {"starts_with", "ends_with", "not_starts_with", "not_ends_with", "alphabetically_before", "alphabetically_after", "alphabetically_lte", "alphabetically_gte"}
+	leaf.cmp in _text_cmps
 	not is_string(v)
 } else := "a list" if {
 	leaf.op == "compare"
 	leaf.cmp in {"in", "not_in", "includes_all", "excludes_all", "includes_some", "not_includes_all", "matches_any", "not_matches_any"}
 	not is_array(v)
 } else := "a list" if {
-	leaf.op in {"in", "not_in", "includes_some", "not_includes_all", "matches_any", "not_matches_any"}
+	leaf.op in _list_phrase_ops
 	not is_array(v)
 }
 
@@ -832,7 +832,7 @@ _m_from_ref_list(req) := array.concat(
 _m_from_ref_cause(r) := _ref_state(r.ref)
 
 _m_from_ref_text(r, state) := concat("", [_ref_name(r.ref), " is ", _m_state_word(state)]) if {
-	state in {"absent", "null"}
+	state in _no_value_states
 	_ref_state(r.ref) == state
 }
 

@@ -43,7 +43,7 @@ default _walk_none(_, _) := false
 
 _walk_none(w, cause) if {
 	w.items == []
-	cause in {"satisfied", "value"}
+	cause in _not_failing_causes
 }
 
 _walk_side_inputs(subj, check) := array.concat(_conds_named_inputs(subj, array.concat([check.check], check.whose)), _input_ref_inputs(array.concat([check.check], check.whose))) if _walk_list_ref(check)
@@ -114,7 +114,7 @@ default _walk_decided(_, _) := false
 
 _walk_decided(check, e) if {
 	every c in check.whose {
-		_focus_cause(c, e) in {"satisfied", "value"}
+		_focus_cause(c, e) in _not_failing_causes
 	}
 }
 
@@ -377,7 +377,7 @@ _walk_judge(check, w, e, true) := j if {
 _walk_judge(check, w, e, false) := _walk_judgement(check, w, e)
 
 _walk_judgement(check, w, e) := {"kept": kept, "passed": passed, "failure": failure} if {
-	undecided := [[c, cause] | some c in check.whose; cause := _focus_cause(c, e); not cause in {"satisfied", "value"}]
+	undecided := [[c, cause] | some c in check.whose; cause := _focus_cause(c, e); not cause in _not_failing_causes]
 	kept := count([c | some c in check.whose; _focus_cause(c, e) == "value"]) == 0
 	leaf := _walk_target(check.check, e.r)
 	passed := _walk_passed(undecided, kept, leaf, e.iv)
@@ -458,7 +458,7 @@ _walk_list_read("value", _)
 
 _walk_list_read("list", x) if is_array(x)
 
-_walk_sides_paths(c) := [e | some f in ["left", "right"]; some e in _walk_side_paths(c, c[f])] if _two_sided(c)
+_walk_sides_paths(c) := [e | some f in _compare_side_list; some e in _walk_side_paths(c, c[f])] if _two_sided(c)
 
 _walk_sides_paths(c) := [[p, "value"] | some p in _condition_paths(c)] if not _two_sided(c)
 
@@ -473,7 +473,7 @@ _walk_operands(side) := side.add if _side_form(side) == "add"
 
 else := [side]
 
-_walk_side_needs(side) := "list" if _basic_form(side) in {"count_of", "sum_of"}
+_walk_side_needs(side) := "list" if _basic_form(side) in _tally_forms
 
 else := "value"
 

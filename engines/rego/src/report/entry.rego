@@ -182,12 +182,12 @@ _subject_readable(name, def) if _subject_text(name, def)
 
 _subject_text(name, def) := _s_from_line_text(_s_marked_line(name, _s_dotted_line(name, data.ergo_subject_sentences.lines[name]))) if {
 	is_string(object.get(def, "from", null))
-	object.keys(def) & {"of", "applies_to"} == set()
+	object.keys(def) & _subject_scope_keys == set()
 }
 
 _subject_text(name, def) := _path_name([_subject_step(name)]) if {
 	not "from" in object.keys(def)
-	object.keys(def) & {"of", "applies_to"} == set()
+	object.keys(def) & _subject_scope_keys == set()
 }
 
 _s_marked_line(name, line) := object.union(line, {"where": [_s_from_cond(c, set(), ancestors | object.keys(object.get(data.ergo_subject_sentences.parts, name, {}))) | some c in line.where]}) if {

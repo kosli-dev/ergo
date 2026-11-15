@@ -260,7 +260,7 @@ _state_at(check, x, p) := _lstate(check, x) if {
 
 default _one_right(_) := false
 
-_one_right(leaf) if leaf.cmp in {"includes", "excludes"}
+_one_right(leaf) if leaf.cmp in _single_contain_ops
 
 _lfailed(leaf, x) if {
 	not _one_right(leaf)

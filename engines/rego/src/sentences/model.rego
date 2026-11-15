@@ -35,13 +35,13 @@ else := p
 
 _rooted(m) := object.union(m, {"checks": [_rooted_leaf(c) | some c in m.checks]}) if {
 	is_object(m)
-	object.get(m, "op", "") in {"all_of", "sentence_any_of", "for"}
+	object.get(m, "op", "") in _non_leaf_ops
 	is_array(object.get(m, "checks", null))
 } else := _rooted_leaf(m)
 
 _rooted_leaf(m) := object.union(m, {"check": object.union(m.check, {"right": _rooted_side(m.check.right)})}) if {
 	is_object(m)
-	object.get(m, "op", "") in {"every", "some"}
+	object.get(m, "op", "") in _walk_ops
 	is_object(object.get(m, "check", null))
 	is_array(object.get(m.check, "right", null))
 } else := m
@@ -96,22 +96,22 @@ _s_parent_named(written, model, names) := _s_named_model(model, names) if {
 	not "$sentence" in object.keys(model)
 }
 
-_s_named_model(m, names) := object.union(m, {"checks": [_s_named_model_leaf(c, names) | some c in m.checks]}) if m.op in {"all_of", "sentence_any_of"}
+_s_named_model(m, names) := object.union(m, {"checks": [_s_named_model_leaf(c, names) | some c in m.checks]}) if m.op in _group_ops
 
 _s_named_model(m, names) := object.union(m, {
 	"checks": [_s_named_model_leaf(c, names) | some c in m.checks],
 	"items": [object.union(item, {"path": _s_named_path(item.path, names), "whose": [_s_named(c, names) | some c in item.whose]}) | some item in m.items],
 }) if m.op == "for"
 
-_s_named_model(m, names) := _s_named_model_leaf(m, names) if not m.op in {"all_of", "sentence_any_of", "for"}
+_s_named_model(m, names) := _s_named_model_leaf(m, names) if not m.op in _non_leaf_ops
 
 _s_named_model_leaf(m, names) := object.union(m, {
 	"path": _s_named_path(m.path, names),
 	"whose": [_s_named(c, names) | some c in m.whose],
 	"check": object.union(_s_named(m.check, names), object.filter(m.check, {"path", "left"})),
-}) if m.op in {"every", "some"}
+}) if m.op in _walk_ops
 
-_s_named_model_leaf(m, names) := _s_named(m, names) if not m.op in {"every", "some"}
+_s_named_model_leaf(m, names) := _s_named(m, names) if not m.op in _walk_ops
 
 _s_written_check(check) := _p_written(check, set(), set(), _p_context({}, {}, _p_no_parts))
 
@@ -123,19 +123,19 @@ _p_for_form_problems(check, aliases, pc) := (_s_form_problems(check) | _p_for_cl
 
 _p_written(check, aliases, parents, pc) := _s_check_mixed([check], {}, ((_p_named_by_problems([check], "", aliases, object.get(pc, "subject", null)) | _p_part_walk_problems([check], "", pc)) | _p_subject_follow_problems(check, [check], "", pc)), aliases | parents) if is_string(check)
 
-_p_written(check, aliases, parents, pc) := _s_check_mixed(_s_lines(check.assert), object.filter(check, {"description", "meta"}), _p_plain_check_problems(check, aliases, pc), aliases | parents) if {
+_p_written(check, aliases, parents, pc) := _s_check_mixed(_s_lines(check.assert), object.filter(check, _check_note_fields), _p_plain_check_problems(check, aliases, pc), aliases | parents) if {
 	_s_assert_form(check)
 	"assert" in object.keys(check)
 	not "for" in object.keys(check)
 }
 
-_p_written(check, aliases, parents, pc) := _s_check_for_mixed(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), _p_for_check_problems(check, aliases, pc), aliases | parents) if {
+_p_written(check, aliases, parents, pc) := _s_check_for_mixed(_s_lines(check.assert), check.for, object.filter(check, _check_note_fields), _p_for_check_problems(check, aliases, pc), aliases | parents) if {
 	_s_assert_form(check)
 	"assert" in object.keys(check)
 	"for" in object.keys(check)
 }
 
-_p_written(check, _, _, _) := object.union(object.filter(check, {"description", "meta"}), {"expression": "<missing assert>", "$sentence": sort(_s_form_problems(check))}) if {
+_p_written(check, _, _, _) := object.union(object.filter(check, _check_note_fields), {"expression": "<missing assert>", "$sentence": sort(_s_form_problems(check))}) if {
 	_s_assert_form(check)
 	not "assert" in object.keys(check)
 }
@@ -160,7 +160,7 @@ _s_any_of_form(check) if {
 	not "assert" in object.keys(check)
 }
 
-_s_any_of(check, aliases, names, pc) := object.union(object.filter(check, {"description", "meta"}), {
+_s_any_of(check, aliases, names, pc) := object.union(object.filter(check, _check_note_fields), {
 	"op": "sentence_any_of",
 	"checks": [object.remove(p[0], ["expression"]) | some p in pairs],
 	"assertions": [p[1] | some p in pairs],
@@ -173,7 +173,7 @@ _s_any_of(check, aliases, names, pc) := object.union(object.filter(check, {"desc
 		not "$sentence" in object.keys(m)
 	}
 	pairs := [p | some nm in _names(options); some p in _s_option_lines(options[nm], nm)]
-} else := object.union(object.filter(check, {"description", "meta"}), {
+} else := object.union(object.filter(check, _check_note_fields), {
 	"expression": _s_any_of_written(check.any_of),
 	"$sentence": sort(_s_or_unrunnable(_s_any_of_problems(check) | _s_options_problems(check.any_of, aliases, names, pc))),
 })
@@ -408,7 +408,7 @@ _s_assertion_unsupported(a) := ((((_s_paths_unsupported(a) | _s_argument_unsuppo
 	terms := object.get(a.phrase, "terms", [])
 	terms != []
 	not _s_one_path(terms)
-} if object.keys(a) & {"every", "some"} != set()
+} if object.keys(a) & _quantifier_keys != set()
 
 _s_cond_unsupported(c) := _s_derived_unsupported(c) if "terms" in object.keys(c)
 
@@ -484,7 +484,7 @@ _s_join_unsupported(a) := {`"followed by" isn't supported yet after every or som
 	_s_join_misplaced(a, node)
 }
 
-_s_join_misplaced(a, _) if object.keys(a) & {"every", "some"} != set()
+_s_join_misplaced(a, _) if object.keys(a) & _quantifier_keys != set()
 
 _s_join_misplaced(a, node) if node in _s_nodes(object.get(a, "where", []))
 
@@ -504,18 +504,18 @@ _s_whose_stripped(a) := object.union(object.remove(a, ["where"]), {"where": [_s_
 
 _s_whose_stripped(a) := a if not "where" in object.keys(a)
 
-_s_cond_stripped(c) := object.union(object.remove(c, ["terms", "phrase"]), {"phrase": object.remove(c.phrase, ["terms"])})
+_s_cond_stripped(c) := object.union(object.remove(c, _assertion_phrase_keys), {"phrase": object.remove(c.phrase, ["terms"])})
 
-_s_without_terms(a) := object.union(object.remove(a, ["terms", "phrase"]), {"phrase": object.remove(a.phrase, ["terms"])}) if {
+_s_without_terms(a) := object.union(object.remove(a, _assertion_phrase_keys), {"phrase": object.remove(a.phrase, ["terms"])}) if {
 	"phrase" in object.keys(a)
-	object.keys(a) & {"every", "some"} == set()
+	object.keys(a) & _quantifier_keys == set()
 }
 
 _s_without_terms(a) := a if not _s_stripped(a)
 
 _s_stripped(a) if {
 	"phrase" in object.keys(a)
-	object.keys(a) & {"every", "some"} == set()
+	object.keys(a) & _quantifier_keys == set()
 }
 
 _s_from_paths_unsupported(a) := _s_paths_unsupported(a) | {concat("", ["unknown alias ", ref.steps[0]]) |
@@ -576,13 +576,13 @@ _s_time_cmps := {"is before": "lt", "is after": "gt", "is on or after": "gte", "
 
 _s_order_cmps := {"is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
 
-_s_leaf_model(a) := object.union({"op": "compare", "left": _s_left_side(a.terms, object.get(a, "where", [])), "cmp": _s_derived_cmps[a.phrase.op], "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within", "max"})) if "terms" in object.keys(a)
+_s_leaf_model(a) := object.union({"op": "compare", "left": _s_left_side(a.terms, object.get(a, "where", [])), "cmp": _s_derived_cmps[a.phrase.op], "right": _s_side(a.phrase)}, object.filter(a.phrase, _within_keys)) if "terms" in object.keys(a)
 
 _s_leaf_model(a) := _s_plain_model(a) if not "terms" in object.keys(a)
 
 _s_cond_model(c) := _s_plain_model(c) if not "terms" in object.keys(c)
 
-_s_cond_model(c) := object.union({"op": "compare", "left": _s_bare_side(c.terms), "cmp": _s_derived_cmps[c.phrase.op], "right": _s_side(c.phrase)}, object.filter(c.phrase, {"within", "max"})) if "terms" in object.keys(c)
+_s_cond_model(c) := object.union({"op": "compare", "left": _s_bare_side(c.terms), "cmp": _s_derived_cmps[c.phrase.op], "right": _s_side(c.phrase)}, object.filter(c.phrase, _within_keys)) if "terms" in object.keys(c)
 
 _s_derived_cmps := {"is between": "gte", "is not between": "outside", "is": "eq", "is not": "ne", "is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
 
@@ -628,12 +628,12 @@ _s_plain_model(a) := {"op": "empty_string_or_list", "path": _s_model_path(a.path
 _s_plain_model(a) := {"op": "not_empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is not empty"
 
 _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "value": _s_one(a.phrase)} if {
-	a.phrase.op in {"contains", "does not contain"}
+	a.phrase.op in _contains_phrases
 	not _s_field_arg(a.phrase)
 }
 
 _s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_side(a.phrase)} if {
-	a.phrase.op in {"contains", "does not contain"}
+	a.phrase.op in _contains_phrases
 	"join" in object.keys(a.phrase)
 }
 
@@ -643,7 +643,7 @@ _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(
 }
 
 _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "patterns": _s_list(a.phrase)} if {
-	a.phrase.op in {"matches", "does not match"}
+	a.phrase.op in _matches_phrases
 	not _s_field_arg(a.phrase)
 }
 
@@ -711,7 +711,7 @@ _s_side_given(ph) if "join" in object.keys(ph)
 
 _s_side(ph) := {"literal": ph.value} if "value" in object.keys(ph)
 
-_s_side(ph) := {"literal": ph.min} if ph.op in {"is between", "is not between"}
+_s_side(ph) := {"literal": ph.min} if ph.op in _between_phrases
 
 _s_side(ph) := _s_bare_side(ph.terms) if "terms" in object.keys(ph)
 
@@ -753,7 +753,7 @@ _s_term_side(t) := _s_model_path(t) if {
 
 _s_term_side(t) := object.union({concat("", [k, "_of"]): _s_model_path(t[k]), "whose": [], "text": _s_term_text(t)}, _s_distinct_of_node(t)) if {
 	is_object(t)
-	some k in ["count", "sum"]
+	some k in _term_tally_keys
 	k in object.keys(t)
 }
 
@@ -914,7 +914,7 @@ _s_picks_from_last(p) if p.position == "last"
 
 else := object.get(p, "from_last", false)
 
-_s_named(m, names) := object.union(object.union(m, {f: _s_named_side(m[f], names) | some f in ["path", "left", "right"]; f in object.keys(m)}), {"inputs": [_s_named_side(i, names) | some i in m.inputs] | is_array(object.get(m, "inputs", null))})
+_s_named(m, names) := object.union(object.union(m, {f: _s_named_side(m[f], names) | some f in _ref_fields; f in object.keys(m)}), {"inputs": [_s_named_side(i, names) | some i in m.inputs] | is_array(object.get(m, "inputs", null))})
 
 _s_named_side(side, names) := _s_named_path(side, names) if is_array(side)
 
@@ -938,7 +938,7 @@ _s_named_tally(side, names) := _s_named_path(side, names) if is_array(side)
 
 _s_named_tally(side, names) := object.union(side, {f: _s_named_path(side[f], names), "whose": [_s_named_cond(c, names) | some c in side.whose]}) if {
 	is_object(side)
-	some f in ["count_of", "sum_of"]
+	some f in _tally_forms
 	f in object.keys(side)
 }
 
@@ -952,9 +952,9 @@ _s_named_tally(side, _) := side if {
 	object.keys(side) & {"count_of", "sum_of", "elapsed_from"} == set()
 }
 
-_s_named_cond(c, names) := object.union(object.union(c, {f: _s_named_path(c[f], names) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))}), {"right": _s_named_right(c.right, names) | is_object(object.get(c, "right", null))})
+_s_named_cond(c, names) := object.union(object.union(c, {f: _s_named_path(c[f], names) | some f in _ref_fields; is_array(object.get(c, f, null))}), {"right": _s_named_right(c.right, names) | is_object(object.get(c, "right", null))})
 
-_s_named_right(side, names) := object.union(side, {f: _s_named_path(side[f], names) | some f in ["count_of", "sum_of", "elapsed_from", "elapsed_to"]; is_array(object.get(side, f, null))})
+_s_named_right(side, names) := object.union(side, {f: _s_named_path(side[f], names) | some f in _tally_path_keys; is_array(object.get(side, f, null))})
 
 _s_named_path(p, names) := [_s_named_step(i, step, names) | some i, step in p]
 

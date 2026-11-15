@@ -208,7 +208,7 @@ _parent_of(entry, ref, applies, i, preq) := [_parent_ref(entry, ref)] if {
 
 _parent_of(_, ref, applies, i, preq) := [{"id": ref.id, "cause": applies[i].cause}] if {
 	_size(_applies_to_of(preq)) > 0
-	not applies[i].cause in {"satisfied", "value"}
+	not applies[i].cause in _not_failing_causes
 }
 
 _parent_of(_, _, applies, i, preq) := [] if {

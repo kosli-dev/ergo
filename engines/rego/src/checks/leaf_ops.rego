@@ -198,7 +198,7 @@ _string_or_list(v) if is_array(v)
 _missing_at(x, path) if {
 	_keys_in(x, path)
 	_ := _start_of(x, path)
-	_read_state(x, path) in {"absent", "null"}
+	_read_state(x, path) in _no_value_states
 }
 
 _blocked(start, [k]) if not _can_hold(start, k)
@@ -381,7 +381,7 @@ _comparable(l, r) if {
 	type_name(l) == type_name(r)
 }
 
-_orderable(c, _) if c in {"eq", "ne"}
+_orderable(c, _) if c in _equality_cmps
 
 _orderable(c, v) if {
 	is_number(v)
@@ -396,13 +396,13 @@ _orderable(c, v) if {
 _unusable_states(leaf, x) := {"unusable" | _unusable(leaf, x)}
 
 _unusable(leaf, x) if {
-	leaf.op in {"range", "outside_range"}
+	leaf.op in _range_ops
 	v := _found(x, leaf.path)
 	not is_number(v)
 }
 
 _unusable(leaf, x) if {
-	leaf.op in {"matches_any", "not_matches_any"}
+	leaf.op in _pattern_ops
 	v := _found(x, leaf.path)
 	not is_string(v)
 }
@@ -420,8 +420,6 @@ _unusable(leaf, x) if {
 	not _items_fit(v, _leaf_wants(leaf))
 }
 
-_contain_ops := {"includes", "excludes", "includes_some", "not_includes_all"}
-
 _leaf_wants(leaf) := [_arg(leaf.value)] if "value" in object.keys(leaf)
 
 _leaf_wants(leaf) := vals if {
@@ -432,7 +430,7 @@ _leaf_wants(leaf) := vals if {
 _items_fit(items, wants) if not _mixed_types(array.concat(items, wants))
 
 _unusable(leaf, x) if {
-	leaf.op in {"empty_string_or_list", "not_empty_string_or_list"}
+	leaf.op in _empty_list_ops
 	v := _found(x, leaf.path)
 	not _string_or_list(v)
 }
@@ -455,7 +453,7 @@ _unusable(leaf, x) if {
 }
 
 _unusable(leaf, x) if {
-	leaf.op in {"in", "not_in"}
+	leaf.op in _membership_ops
 	v := _found(x, leaf.path)
 	vals := _wants(leaf.values)
 	_value_list(vals)
@@ -464,7 +462,7 @@ _unusable(leaf, x) if {
 
 _unusable(leaf, x) if {
 	_list_cmp(leaf)
-	leaf.cmp in {"in", "not_in"}
+	leaf.cmp in _membership_ops
 	l := _found(x, leaf.left)
 	r := _rfound(x, leaf.right)
 	is_array(r)
@@ -485,21 +483,21 @@ _mixed_types(vals) if count({type_name(w) | some w in vals; w != null}) > 1
 
 _unusable(leaf, x) if {
 	_list_cmp(leaf)
-	leaf.cmp in {"matches_any", "not_matches_any"}
+	leaf.cmp in _pattern_ops
 	v := _found(x, leaf.left)
 	not is_string(v)
 }
 
 _unusable(leaf, x) if {
 	_list_cmp(leaf)
-	leaf.cmp in ({"includes", "excludes"} | _all_cmps)
+	leaf.cmp in _list_left_cmps
 	v := _found(x, leaf.left)
 	not is_array(v)
 }
 
 _unusable(leaf, x) if {
 	_list_cmp(leaf)
-	leaf.cmp in {"includes", "excludes"}
+	leaf.cmp in _single_contain_ops
 	l := _found(x, leaf.left)
 	r := _found(x, leaf.right)
 	is_array(l)

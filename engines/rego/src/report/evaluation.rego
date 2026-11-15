@@ -49,7 +49,7 @@ _check_inputs(subj, check) := [_path_input(subj, check.left)] if {
 _check_inputs(subj, check) := array.concat(_side_inputs(subj, object.get(check, "left", null)), _side_inputs(subj, object.get(check, "right", null))) if {
 	not check.inputs
 	check.op == "compare"
-	every f in ["left", "right"] {
+	every f in _compare_sides {
 		_side_form(object.get(check, f, null))
 	}
 	not _derived_once(check)
@@ -59,7 +59,7 @@ _check_inputs(subj, check) := array.concat(_side_inputs(subj, object.get(check, 
 _check_inputs(subj, check) := array.concat(_side_inputs(subj, object.get(check, "left", null)), [{"name": w.name, "value": w.value, "locations": w.locations}]) if {
 	not check.inputs
 	check.op == "compare"
-	every f in ["left", "right"] {
+	every f in _compare_sides {
 		_side_form(object.get(check, f, null))
 	}
 	not _derived_once(check)
@@ -128,7 +128,7 @@ _key_fields(check) := sort({_fk(seg) |
 
 _check_def(check, here) := _with_refs({"description": _reported_description(check), "meta": _reported_meta(check), "expression": check.expression}, check) if _s_read(check, here)
 
-_check_def(check, here) := _with_refs(object.union(object.remove(_described(check), {"description", "meta"}), {"description": _reported_description(check), "meta": _reported_meta(check)}), check) if not _s_read(check, here)
+_check_def(check, here) := _with_refs(object.union(object.remove(_described(check), _check_note_fields), {"description": _reported_description(check), "meta": _reported_meta(check)}), check) if not _s_read(check, here)
 
 _with_refs(def, checked) := _with_listed(def, checked, _listed_refs(checked))
 
@@ -230,7 +230,7 @@ _with_ref_answer(check) := _ref_answered_compare(check) if {
 	check.op == "compare"
 } else := object.union(check, {"checks": [_ref_answered_compare(c) | some c in check.checks]}) if {
 	is_object(check)
-	check.op in {"all_of", "sentence_any_of", "for"}
+	check.op in _non_leaf_ops
 	is_array(check.checks)
 } else := check
 
@@ -248,7 +248,7 @@ _scope_readable(_, _, req) if {
 	_size(_applies_to_of(req)) == 0
 }
 
-_scope_readable(raw, applies, _) if count([row | some row in applies; row.cause in {"satisfied", "value"}]) == count(raw)
+_scope_readable(raw, applies, _) if count([row | some row in applies; row.cause in _not_failing_causes]) == count(raw)
 
 default _rows_complete(_, _, _) := false
 
@@ -312,7 +312,7 @@ _status(req, e) := "not_applicable" if {
 
 _status(req, e) := "not_met" if not _holds(req, e)
 
-_causes(status, _, _) := [] if status in {"met", "not_applicable"}
+_causes(status, _, _) := [] if status in _holding_statuses
 
 _causes("not_met", e, req) := _counted_causes(e, _shadowing_parents(req, e))
 

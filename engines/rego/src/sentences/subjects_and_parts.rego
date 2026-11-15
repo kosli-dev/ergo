@@ -31,11 +31,11 @@ _p_shape_problems(entry) := {"not a string or an object"} if {
 
 _p_shape_problems(entry) := (_p_unknown_entry_fields(entry) | _p_missing_from(entry)) | _p_invalid_entry_fields(entry) if is_object(entry)
 
-_p_unknown_entry_fields(entry) := {concat("", ["unknown field ", _text(f)]) | some f in object.keys(entry); not f in {"from", "identified_by"}}
+_p_unknown_entry_fields(entry) := {concat("", ["unknown field ", _text(f)]) | some f in object.keys(entry); not f in _subject_field_keys}
 
 _p_missing_from(entry) := {"missing from" | not "from" in object.keys(entry)}
 
-_p_invalid_entry_fields(entry) := {concat("", ["invalid ", f]) | some f in ["from", "identified_by"]; f in object.keys(entry); not is_string(entry[f])}
+_p_invalid_entry_fields(entry) := {concat("", ["invalid ", f]) | some f in _subject_field_keys; f in object.keys(entry); not is_string(entry[f])}
 
 _p_shape_problems(entry) := set() if is_string(entry)
 
@@ -236,7 +236,7 @@ _s_from_filter(name, c, names, keep, pc) := _p_applied(_s_parent_named(t, _s_che
 }
 
 _s_brackets_kept(c) := object.union(object.remove(c, ["path", "every", "some", "phrase"]), object.union(
-	{f: _p_as_written(c[f]) | some f in ["path", "every", "some"]; is_object(object.get(c, f, null))},
+	{f: _p_as_written(c[f]) | some f in _path_quantifier_keys; is_object(object.get(c, f, null))},
 	object.union(
 		{"terms": [_s_term_brackets_kept(t) | some t in c.terms] | is_array(object.get(c, "terms", null))},
 		{"phrase": _s_phrase_brackets_kept(c.phrase) | is_object(object.get(c, "phrase", null))},
@@ -255,8 +255,8 @@ _s_piece_brackets_kept(piece) := object.union(piece, {"terms": [_s_term_brackets
 
 else := piece
 
-_s_term_brackets_kept(t) := object.union(object.remove(t, ["count", "sum", "elapsed_from", "elapsed_to"]), {f: _p_as_written(t[f]) |
-	some f in ["count", "sum", "elapsed_from", "elapsed_to"]
+_s_term_brackets_kept(t) := object.union(object.remove(t, _term_keys), {f: _p_as_written(t[f]) |
+	some f in _term_keys
 	is_object(object.get(t, f, null))
 }) if {
 	is_object(t)
@@ -266,13 +266,13 @@ _s_term_brackets_kept(t) := object.union(object.remove(t, ["count", "sum", "elap
 else := t
 
 _s_left_dotted(c, name) := object.union(c, object.union(
-	{k: _s_name_dotted(c[k], name) | some k in ["path", "every", "some"]; is_object(object.get(c, k, null))},
+	{k: _s_name_dotted(c[k], name) | some k in _path_quantifier_keys; is_object(object.get(c, k, null))},
 	{"terms": [_s_term_dotted(t, name) | some t in c.terms] | is_array(object.get(c, "terms", null))},
 ))
 
 _s_term_dotted(t, name) := _s_name_dotted(
 	object.union(t, {f: _s_name_dotted(t[f], name) |
-		some f in ["count", "sum", "elapsed_from", "elapsed_to"]
+		some f in _term_keys
 		is_object(object.get(t, f, null))
 	}),
 	name,
@@ -308,7 +308,7 @@ else := concat("", ["whose: ", substring(p, 0, indexof(p, " is compared with its
 else := concat("", ["whose: ", p])
 
 _s_from_cond(c, names, keep) := object.union(c, object.union(
-	{q: _s_from_dot(c[q], names, keep) | some q in ["every", "some"]; is_object(object.get(c, q, null))},
+	{q: _s_from_dot(c[q], names, keep) | some q in _quantifier_keys; is_object(object.get(c, q, null))},
 	object.union(
 		{"path": _s_from_dot(c.path, names, keep) | is_object(object.get(c, "path", null))},
 		object.union(
@@ -324,7 +324,7 @@ _s_from_phrase(ph, keep) := object.union(ph, object.union(
 ))
 
 _s_from_term(t, names, keep) := object.union(t, {f: _s_from_dot(t[f], names, keep) |
-	some f in ["count", "sum", "elapsed_from", "elapsed_to"]
+	some f in _term_keys
 	f in object.keys(t)
 }) if {
 	is_object(t)
@@ -575,7 +575,7 @@ _s_subject_sentences(subjects, _, _) := {
 	"every_text": {},
 } if not is_object(subjects)
 
-_s_subject_problems(name, def, reads, lines) := {f: ps | some f in ["applies_to", "from", "identified_by", "of"]; ps := _s_field_problems(name, def, f, reads, lines); ps != []} if is_object(def)
+_s_subject_problems(name, def, reads, lines) := {f: ps | some f in _subject_def_keys; ps := _s_field_problems(name, def, f, reads, lines); ps != []} if is_object(def)
 
 _s_subject_problems(_, def, _, _) := {} if not is_object(def)
 
@@ -598,17 +598,17 @@ _s_field_problems(name, def, "identified_by", _, lines) := sort(array.concat(["n
 }
 
 _s_field_problems(_, def, f, _, _) := [] if {
-	f in {"from", "identified_by"}
+	f in _subject_field_keys
 	not f in object.keys(def)
 }
 
 _s_field_problems(_, def, f, _, _) := ["unknown field"] if {
-	f in {"applies_to", "of"}
+	f in _subject_scope_keys
 	f in object.keys(def)
 }
 
 _s_field_problems(_, def, f, _, _) := [] if {
-	f in {"applies_to", "of"}
+	f in _subject_scope_keys
 	not f in object.keys(def)
 }
 
@@ -724,15 +724,15 @@ _p_unaliased(ftext, names) := names - {item.as |
 	some item in object.get(_for_line(ftext), "items", [])
 }
 
-_p_walk_paths(x) := ({x[q] | some q in ["every", "some", "pick"]; is_object(object.get(x, q, null))} | {t[k] | some t in _s_nodes(object.remove(x, _p_item_keys(x))); some k in _p_derived_keys(t)}) | {t[k] | some t in _s_nodes(object.filter(x, _p_item_keys(x))); some k in _p_derived_keys(t)}
+_p_walk_paths(x) := ({x[q] | some q in _item_quantifier_keys; is_object(object.get(x, q, null))} | {t[k] | some t in _s_nodes(object.remove(x, _p_item_keys(x))); some k in _p_derived_keys(t)}) | {t[k] | some t in _s_nodes(object.filter(x, _p_item_keys(x))); some k in _p_derived_keys(t)}
 
 _p_derived_keys(t) := {k |
 	_s_derived_term(t)
-	some k in ["count", "sum"]
+	some k in _term_tally_keys
 	is_object(object.get(t, k, null))
 }
 
-_p_item_keys(x) := ["where", "phrase"] if object.keys(x) & {"every", "some", "pick"} != set()
+_p_item_keys(x) := ["where", "phrase"] if object.keys(x) & _item_quantifier_keys != set()
 
 else := ["where"]
 
@@ -852,24 +852,24 @@ _p_parent_path(path, pc) := array.concat(array.concat([_p_marker(path[1], count(
 	path[1] in object.keys(pc.ancestors[a])
 } else := path
 
-_p_smodel(m, pc) := object.union(m, {"checks": [_p_sleaf(c, pc) | some c in m.checks]}) if m.op in {"all_of", "sentence_any_of"}
+_p_smodel(m, pc) := object.union(m, {"checks": [_p_sleaf(c, pc) | some c in m.checks]}) if m.op in _group_ops
 
 _p_smodel(m, pc) := object.union(m, {
 	"checks": [_p_sleaf(c, pc) | some c in m.checks],
 	"items": [object.union(item, {"path": _p_path(item.path, pc, "s"), "whose": [_p_leaf(c, pc, "i") | some c in item.whose]}) | some item in m.items],
 }) if m.op == "for"
 
-_p_smodel(m, pc) := _p_sleaf(m, pc) if not m.op in {"all_of", "sentence_any_of", "for"}
+_p_smodel(m, pc) := _p_sleaf(m, pc) if not m.op in _non_leaf_ops
 
 _p_sleaf(m, pc) := object.union(m, {
 	"path": _p_path(m.path, pc, "s"),
 	"whose": [_p_leaf(c, pc, "i") | some c in m.whose],
 	"check": _p_leaf(m.check, pc, "i"),
-}) if m.op in {"every", "some"}
+}) if m.op in _walk_ops
 
-_p_sleaf(m, pc) := _p_leaf(m, pc, "s") if not m.op in {"every", "some"}
+_p_sleaf(m, pc) := _p_leaf(m, pc, "s") if not m.op in _walk_ops
 
-_p_leaf(m, pc, mode) := object.union(object.union(m, {f: _p_item_side(f, m[f], pc, mode) | some f in ["path", "left", "right"]; f in object.keys(m)}), {"inputs": [_p_side(i, pc, mode) | some i in m.inputs] | is_array(object.get(m, "inputs", null))})
+_p_leaf(m, pc, mode) := object.union(object.union(m, {f: _p_item_side(f, m[f], pc, mode) | some f in _ref_fields; f in object.keys(m)}), {"inputs": [_p_side(i, pc, mode) | some i in m.inputs] | is_array(object.get(m, "inputs", null))})
 
 _p_item_side(f, side, pc, mode) := _p_item_path(side, pc) if {
 	f == "right"
@@ -899,7 +899,7 @@ else := object.union(side, {"join": [_p_item_right_one(o, pc) | some o in side.j
 
 else := _p_item_right_one(side, pc)
 
-_p_flat_item_paths(side, pc) := {f: _p_item_path(side[f], pc) | some f in ["count_of", "sum_of", "elapsed_from", "elapsed_to"]; is_array(object.get(side, f, null))}
+_p_flat_item_paths(side, pc) := {f: _p_item_path(side[f], pc) | some f in _tally_path_keys; is_array(object.get(side, f, null))}
 
 _p_flat_whose(side, pc) := {"whose": [_p_cond_flat(c, pc, "i") | some c in side.whose] | is_array(object.get(side, "whose", null))}
 
@@ -939,7 +939,7 @@ _p_side_whose(side, pc, mode) := {"whose": [_p_cond(c, pc, _p_item_mode(mode)) |
 
 _p_side_where(side, pc, mode) := {"where": _p_cond(side.where, pc, _p_item_mode(mode)) | is_object(object.get(side, "where", null))}
 
-_p_tally(side, pc, mode) := object.union(side, {f: _p_path(side[f], pc, mode) | some f in ["count_of", "sum_of", "elapsed_from", "elapsed_to"]; is_array(object.get(side, f, null))})
+_p_tally(side, pc, mode) := object.union(side, {f: _p_path(side[f], pc, mode) | some f in _tally_path_keys; is_array(object.get(side, f, null))})
 
 _p_cond(c, pc, mode) := object.union(_p_cond_flat(c, pc, mode), {"right": _p_item_right(c.right, pc)}) if {
 	is_object(c)
@@ -947,7 +947,7 @@ _p_cond(c, pc, mode) := object.union(_p_cond_flat(c, pc, mode), {"right": _p_ite
 	is_object(object.get(c, "right", null))
 } else := _p_cond_flat(c, pc, mode)
 
-_p_cond_flat(c, pc, mode) := object.union(c, {f: _p_cond_side(f, c[f], pc, mode) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))}) if is_object(c)
+_p_cond_flat(c, pc, mode) := object.union(c, {f: _p_cond_side(f, c[f], pc, mode) | some f in _ref_fields; is_array(object.get(c, f, null))}) if is_object(c)
 
 _p_cond_side(f, side, pc, mode) := _p_item_path(side, pc) if {
 	f == "right"

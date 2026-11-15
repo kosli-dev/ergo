@@ -172,7 +172,7 @@ _well_formed(req) if {
 	_req_meta_problems(req) == set()
 	_unknown_req_fields(req) == []
 	count(_checks_of(req)) > 0
-	_require_of(req) in {"every", "some"}
+	_require_of(req) in _require_modes
 	_from_well_formed(req)
 	not _out_of_range([_from_of(req), _id_of(req), _min_subjects_of(req)])
 	_wrapped_in_where(_id_of(req)) == set()

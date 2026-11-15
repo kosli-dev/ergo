@@ -82,7 +82,7 @@ _is_violation(requirements, row) if {
 	not _reported_as_holding(requirements, row.requirement)
 }
 
-_reported_as_holding(requirements, name) if requirements[name].status in {"met", "not_applicable"}
+_reported_as_holding(requirements, name) if requirements[name].status in _holding_statuses
 
 _out_of_scope_row(row) if {
 	row.check == "$applies"

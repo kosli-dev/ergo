@@ -43,7 +43,7 @@ _resolved_def(members) := {"def": def, "filter_owners": owners} if {
 	root := _raw_subject(r)
 	owners := {n: _filter_owner_in(members, n) | some m in members; some n, _ in _object_or_empty(_filters_of(m))}
 	def := object.union(
-		{f: _root_field(f, root[f], r, members) | some f in ["from", "identified_by"]; f in object.keys(root)},
+		{f: _root_field(f, root[f], r, members) | some f in _subject_field_keys; f in object.keys(root)},
 		{"applies_to": _merged_filters(members, owners)},
 	)
 } else := {}

@@ -162,7 +162,7 @@ _req_json_problems(req) := {["checks", "holds a key that isn't a string"] |
 }
 
 _def_json_problems(def) := {[f, p] |
-	some f in ["from", "identified_by"]
+	some f in _subject_field_keys
 	v := object.get(def, f, null)
 	is_array(v)
 	some p in _json_problems(v)
@@ -289,7 +289,7 @@ _edge_tag_chars := {
 	"\udb40\udc79", "\udb40\udc7a", "\udb40\udc7b", "\udb40\udc7c", "\udb40\udc7d", "\udb40\udc7e", "\udb40\udc7f",
 }
 
-_require_problems(req) := {["require", "neither every nor some"] | is_object(req); not _require_of(req) in {"every", "some"}}
+_require_problems(req) := {["require", "neither every nor some"] | is_object(req); not _require_of(req) in _require_modes}
 
 _path_problems(req, f) := {[f, "number out of range"] | is_array(_req_field(req, f, null)); _out_of_range(req[f])}
 
@@ -402,7 +402,7 @@ _children(node, names) := array.concat(_where_children(node, names), _assertion_
 default _assertion_children(_, _) := []
 
 _assertion_children(node, names) := [[c, ["checks", i], "assertion", names] | some i, c in node.checks] if {
-	node.op in {"all_of", "sentence_any_of"}
+	node.op in _group_ops
 	is_array(node.checks)
 }
 
@@ -424,7 +424,7 @@ _assertion_children(node, names) := array.concat(_assertion_check_children(node,
 
 _for_item_names(items, n) := {item.as | some item in array.slice(items, 0, n); _valid_name(object.get(item, "as", null))}
 
-_walks(check) if check.op in {"every", "some"}
+_walks(check) if check.op in _walk_ops
 
 _node_problems(node, _, _, _) := {"invalid check"} if not is_object(node)
 
@@ -451,10 +451,10 @@ _missing_fields_problem(node) := {concat("", ["missing ", f]) |
 
 _value_or_values_problem(node) := {"missing value or values" |
 	node.op in _contain_ops
-	count({"value", "values"} & object.keys(node)) == 0
+	count(_value_keys & object.keys(node)) == 0
 } | {"both value and values" |
 	node.op in _contain_ops
-	count({"value", "values"} & object.keys(node)) == 2
+	count(_value_keys & object.keys(node)) == 2
 }
 
 _unknown_fields_problem(node, here) := {concat("", ["unknown field ", _text(f)]) |
@@ -530,13 +530,13 @@ _range_order_problem(node) := {"min above max" |
 }
 
 _values_problem(node) := ({"invalid values" |
-	node.op in ({"in", "not_in"} | _contain_ops)
+	node.op in _list_values_ops
 	"values" in object.keys(node)
 	not _value_list(_written(node.values))
 	not is_set(_written(node.values))
 	not _is_ref(node.values)
 } | {"values of mixed types" |
-	node.op in ({"in", "not_in"} | _contain_ops)
+	node.op in _list_values_ops
 	vals := _written(node.values)
 	_value_list(vals)
 	_mixed_types([_written(w) | some w in vals; not _is_ref(w)])
@@ -547,7 +547,7 @@ _values_problem(node) := ({"invalid values" |
 }
 
 _patterns_problem(node) := {"invalid patterns" |
-	node.op in {"matches_any", "not_matches_any"}
+	node.op in _pattern_ops
 	"patterns" in object.keys(node)
 	not _is_ref(node.patterns)
 	not is_set(_written(node.patterns))
@@ -565,7 +565,7 @@ _written_pattern(p) if _valid_pattern(_written(p))
 
 _nested_wrapper_problem(node) := {concat("", [_wrapper(x), " inside ", f]) |
 	node.op in _leaf_ops
-	some f in ["value", "values", "patterns", "min", "max"]
+	some f in _check_argument_keys
 	f in object.keys(node)
 	walk(node[f], [p, x])
 	_wrapper(x)
@@ -598,8 +598,6 @@ _cmp_problem(node, here) := {"invalid cmp" |
 	not _sentence_cmp(node, here)
 }
 
-_text_cmps := {"starts_with", "ends_with", "not_starts_with", "not_ends_with", "alphabetically_before", "alphabetically_after", "alphabetically_lte", "alphabetically_gte"}
-
 _sentence_cmp(node, here) if {
 	node.op == "compare"
 	node.cmp in ((_text_cmps | _list_cmps) | {"outside"})
@@ -615,7 +613,7 @@ _refs_problem(node) := {"invalid ref" |
 
 _known_ref(r) if {
 	is_array(r)
-	r[0] in {"$$input", "$$input[]", "$$params", "$$params[]"}
+	r[0] in _input_and_params_walk_roots
 	every seg in array.slice(r, 1, count(r)) {
 		_is_key(seg)
 	}
@@ -641,7 +639,7 @@ _own_paths(node, f) := _side_paths(node[f]) if _side_field(node, f)
 
 _side_field(node, f) if {
 	node.op == "compare"
-	f in {"left", "right"}
+	f in _compare_sides
 	f in object.keys(node)
 }
 
@@ -660,7 +658,7 @@ _unknown_name_problem(node, names) := {concat("", ["unknown alias ", p[0]]) |
 	not _name_known(p[0], names)
 }
 
-_name_known(start, _) if start in {"$$input", "$$input[]", "$$params", "$$params[]"}
+_name_known(start, _) if start in _input_and_params_walk_roots
 
 _name_known(start, _) if start == _root_marker
 
@@ -677,7 +675,7 @@ _name_known(start, names) if {
 }
 
 _name_known(start, names) if {
-	not start in {"$$input", "$$input[]", "$$params", "$$params[]"}
+	not start in _input_and_params_walk_roots
 	substring(start, 1, -1) in names
 }
 
@@ -689,14 +687,14 @@ _param_broken(check, names) if {
 }
 
 _node_param_broken(node) if {
-	node.op in {"in", "not_in"}
+	node.op in _membership_ops
 	_is_ref(node.values)
 	v := _arg(node.values)
 	not _value_list(v)
 }
 
 _node_param_broken(node) if {
-	node.op in ({"in", "not_in"} | _contain_ops)
+	node.op in _list_values_ops
 	vals := _wants(node.values)
 	_value_list(vals)
 	_mixed_types(vals)
@@ -710,7 +708,7 @@ _node_param_broken(node) if {
 }
 
 _node_param_broken(node) if {
-	node.op in {"matches_any", "not_matches_any"}
+	node.op in _pattern_ops
 	_is_ref(node.patterns)
 	v := _arg(node.patterns)
 	not _valid_patterns(v)

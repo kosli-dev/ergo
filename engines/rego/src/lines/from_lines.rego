@@ -69,7 +69,7 @@ _valid_name(n) if {
 	is_string(n)
 	n != ""
 	not startswith(n, "$")
-	not n in {"params", "input"}
+	not n in _reserved_names
 }
 
 _listed_keys(step) := v if {
@@ -936,10 +936,10 @@ _may_hide_a_root(_, c) if {
 	_walks_in_a_sentence(x)
 }
 
-_walks_in_a_sentence(x) if x.op in {"every", "some"}
+_walks_in_a_sentence(x) if x.op in _walk_ops
 
 _walks_in_a_sentence(x) if {
-	some f in ["count_of", "sum_of"]
+	some f in _tally_forms
 	f in object.keys(x)
 }
 
@@ -957,7 +957,7 @@ _reads_root_field(check) if {
 }
 
 _ls_check(check, l) := object.union(check, {"checks": [_ls_unit(c, l) | some c in check.checks]}) if {
-	check.op in {"all_of", "sentence_any_of"}
+	check.op in _group_ops
 	is_array(object.get(check, "checks", null))
 } else := check if {
 	_ls_plain_read(check)
@@ -1008,7 +1008,7 @@ _ls_top_read(x) if {
 	not _from_root(step)
 }
 
-_ls_walk_pos(_, jp) if jp[count(jp) - 1] in {"count_of", "sum_of"}
+_ls_walk_pos(_, jp) if jp[count(jp) - 1] in _tally_forms
 
 _ls_walk_pos(c, jp) if {
 	jp[count(jp) - 1] == "right"
@@ -1023,7 +1023,7 @@ _ls_walk_pos(c, jp) if {
 	_ls_walker(parent)
 }
 
-_ls_walker(parent) if parent.op in {"every", "some"}
+_ls_walker(parent) if parent.op in _walk_ops
 
 _ls_walker(parent) if is_string(object.get(parent, "as", null))
 
@@ -1036,7 +1036,7 @@ _ls_item(it, l) := object.union(it, {"path": _ls_path(it.path, l, false), "whose
 else := it
 
 _ls_leaf(c, l) := object.union(c, {"path": _ls_path(c.path, l, false), "check": _ls_sides(c.check, l, true), "whose": [_ls_sides(w, l, true) | some w in c.whose]}) if {
-	c.op in {"every", "some"}
+	c.op in _walk_ops
 	is_array(object.get(c, "whose", null))
 } else := _ls_sides(c, l, false)
 
@@ -1055,8 +1055,8 @@ _ls_tally(side, l, rooted) := object.union(side, {"add": [_ls_operand(o, l, root
 	is_array(object.get(side, "add", null))
 } else := _ls_operand(side, l, rooted)
 
-_ls_operand(side, l, rooted) := object.union(side, object.union({f: _ls_path(side[f], l, rooted) | some f in ["count_of", "sum_of"]; is_array(object.get(side, f, null))}, {"whose": [_ls_cond(w, l) | some w in side.whose]})) if {
-	_basic_form(side) in {"count_of", "sum_of"}
+_ls_operand(side, l, rooted) := object.union(side, object.union({f: _ls_path(side[f], l, rooted) | some f in _tally_forms; is_array(object.get(side, f, null))}, {"whose": [_ls_cond(w, l) | some w in side.whose]})) if {
+	_basic_form(side) in _tally_forms
 } else := side
 
 _ls_cond(c, l) := object.union(c, {"left": _ls_cond_tally(c.left, l), "right": _ls_right_flat(c, l)}) if {
@@ -1069,8 +1069,8 @@ _ls_right_flat(c, l) := _ls_path(c.right, l, true) if {
 	not _one_right(c)
 } else := _ls_cond_tally(c.right, l)
 
-_ls_cond_tally(side, l) := object.union(side, {f: _ls_path(side[f], l, true) | some f in ["count_of", "sum_of"]; is_array(object.get(side, f, null))}) if {
-	_basic_form(side) in {"count_of", "sum_of"}
+_ls_cond_tally(side, l) := object.union(side, {f: _ls_path(side[f], l, true) | some f in _tally_forms; is_array(object.get(side, f, null))}) if {
+	_basic_form(side) in _tally_forms
 } else := side
 
 _ls_path(p, l, rooted) := array.concat([_p_marker(l, 0, null, false)], p) if {

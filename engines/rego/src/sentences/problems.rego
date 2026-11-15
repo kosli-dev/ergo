@@ -81,7 +81,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 	node != parsed
 	is_object(node)
 	"where" in object.keys(node)
-	object.keys(node) & {"every", "some", "pick"} == set()
+	object.keys(node) & _item_quantifier_keys == set()
 	not _s_derived_term(object.get(node, "terms", [null])[count(object.get(node, "terms", [null])) - 1])
 }) | {concat("", [node.phrase.op, " can't follow a count of, a sum of or a plus"]) |
 	some node in _s_nodes(parsed)
@@ -96,7 +96,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 }) | {"min above max" |
 	some node in _s_nodes(parsed)
 	is_object(node)
-	node.op in {"is between", "is not between"}
+	node.op in _between_phrases
 	is_number(node.min)
 	is_number(node.max)
 	node.min > node.max
@@ -111,7 +111,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 }) | {concat("", ["invalid pattern ", _json_text(v)]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
-	node.op in {"matches", "does not match"}
+	node.op in _matches_phrases
 	some v in object.get(node, "values", [])
 	not is_object(v)
 	not _s_valid_pattern(v)
@@ -136,7 +136,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 }) | {concat("", [`"`, node.phrase.op, `" after every or some would check each item of the last list, not the list: put the walk on a for line`]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
-	object.keys(node) & {"every", "some"} != set()
+	object.keys(node) & _quantifier_keys != set()
 	node.phrase.op in {"contains", "does not contain", "contains all of", "contains none of", "contains some of", "does not contain all of"}
 }) | {`"within" only compares numbers` |
 	some node in _s_nodes(parsed)
@@ -158,12 +158,12 @@ _s_valid_pattern(v) if {
 
 _s_derived_term(t) if {
 	is_object(t)
-	object.keys(t) & {"count", "sum"} != set()
+	object.keys(t) & _term_tally_keys != set()
 }
 
 _s_bad_name(name) if name in _s_words
 
-_s_bad_name(name) if name in {"params", "input"}
+_s_bad_name(name) if name in _reserved_names
 
 _s_nodes(x) := {y | walk(x, [_, y])}
 
@@ -180,7 +180,7 @@ _s_self_term(node) := node.phrase.terms[0] if {
 
 _s_self_compared(node) if {
 	is_object(node.path)
-	object.remove(node.path, ["dot", "own"]) == object.remove(_s_self_term(node), ["dot", "own"])
+	object.remove(node.path, _term_mark_keys) == object.remove(_s_self_term(node), _term_mark_keys)
 }
 
 _s_self_problems(assertions) := ({concat("", [_s_path_text(a.path, "left"), " is compared with itself"]) |
@@ -210,7 +210,7 @@ _s_sums(a) if {
 _s_focus_names(c) := array.concat(
 	array.concat(
 		[_s_unmarked_text(c.path) | is_object(object.get(c, "path", null)); not _s_that(c); not "start" in object.keys(c.path)],
-		[_s_unmarked_text(t[k]) | some t in object.get(c, "terms", []); is_object(t); some k in ["count", "sum", "elapsed_from", "elapsed_to"]; is_object(object.get(t, k, null)); not "start" in object.keys(t[k])],
+		[_s_unmarked_text(t[k]) | some t in object.get(c, "terms", []); is_object(t); some k in _term_keys; is_object(object.get(t, k, null)); not "start" in object.keys(t[k])],
 	),
 	array.concat(
 		[_s_unmarked_text(p) | some p in _s_cond_right_paths(c.phrase); _s_focus_read(p)],
@@ -234,7 +234,7 @@ _s_named_key(key, names) if {
 _s_cond_paths(c) := array.concat(
 	array.concat(
 		[c.path | is_object(object.get(c, "path", null))],
-		[t[k] | some t in object.get(c, "terms", []); is_object(t); some k in ["count", "sum", "elapsed_from", "elapsed_to"]; is_object(object.get(t, k, null))],
+		[t[k] | some t in object.get(c, "terms", []); is_object(t); some k in _term_keys; is_object(object.get(t, k, null))],
 	),
 	_s_cond_right_paths(object.get(c, "phrase", {})),
 )
@@ -243,7 +243,7 @@ _s_cond_right_paths(ph) := array.concat(array.concat(_s_cond_step_terms(ph), _s_
 
 _s_cond_step_terms(ph) := [t | some t in object.get(ph, "terms", []); is_object(t); "steps" in object.keys(t)]
 
-_s_cond_count_terms(ph) := [t[k] | some t in object.get(ph, "terms", []); is_object(t); some k in ["count", "sum", "elapsed_from", "elapsed_to"]; is_object(object.get(t, k, null))]
+_s_cond_count_terms(ph) := [t[k] | some t in object.get(ph, "terms", []); is_object(t); some k in _term_keys; is_object(object.get(t, k, null))]
 
 _s_cond_own_path(ph) := [ph.path | is_object(object.get(ph, "path", null))]
 
@@ -292,7 +292,7 @@ _s_own_field(p, aliases, true) if p.steps[0] in aliases
 _s_own_field(p, _, _) if object.get(p, "dot", false) == true
 
 _s_marked_term(t, names) := object.union(t, {f: _s_marked(t[f], names, false) |
-	some f in ["count", "sum", "elapsed_from", "elapsed_to"]
+	some f in _term_keys
 	f in object.keys(t)
 }) if {
 	is_object(t)
@@ -310,11 +310,11 @@ _s_marked_cond(c, names) := object.union(c, {"path": _s_marked(c.path, names, tr
 else := object.union(c, {"terms": [_s_own_term(t, names) | some t in c.terms], "phrase": _s_marked_phrase(c.phrase, names), "names": names.all})
 
 _s_own_term(t, names) := object.union(t, {f: _s_marked(t[f], names, true) |
-	some f in ["count", "sum", "elapsed_from", "elapsed_to"]
+	some f in _term_keys
 	f in object.keys(t)
 })
 
-_s_aliased(a, names) := object.union(object.union(a, {k: _s_marked(a[k], names, false) | some k in ["path", "every", "some"]; k in object.keys(a)}), object.union(
+_s_aliased(a, names) := object.union(object.union(a, {k: _s_marked(a[k], names, false) | some k in _path_quantifier_keys; k in object.keys(a)}), object.union(
 	{"phrase": _s_marked_phrase(a.phrase, names)},
 	object.union(
 		{"terms": [_s_marked_term(t, names) | some t in a.terms] | is_array(object.get(a, "terms", null))},
@@ -324,7 +324,7 @@ _s_aliased(a, names) := object.union(object.union(a, {k: _s_marked(a[k], names, 
 
 _s_names(aliases, parts) := {"for": aliases, "all": (aliases | parts)}
 
-_s_aliased_item(item, names) := object.union(object.union(item, {q: _s_marked(item[q], names, false) | some q in ["every", "some", "pick"]; q in object.keys(item)}), {"where": [_s_marked_cond(c, names) | some c in item.where] | is_array(object.get(item, "where", null))})
+_s_aliased_item(item, names) := object.union(object.union(item, {q: _s_marked(item[q], names, false) | some q in _item_quantifier_keys; q in object.keys(item)}), {"where": [_s_marked_cond(c, names) | some c in item.where] | is_array(object.get(item, "where", null))})
 
 _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(count(closed) + 1)])] if {
 	closed := regex.find_all_string_submatch_n(pat.quotes, text, 1)[0][0]
@@ -365,11 +365,11 @@ _s_distinct_misplaced_in(text, pat) if {
 	not _s_distinct_after(array.slice(tokens, max([0, i - 2]), i))
 }
 
-_s_distinct_after(before) if before[count(before) - 1] in {"every", "some"}
+_s_distinct_after(before) if before[count(before) - 1] in _quantifier_words
 
 _s_distinct_after(before) if {
 	count(before) == 2
-	before[0] in {"count", "sum"}
+	before[0] in _term_tally_keys
 	before[1] == "of"
 }
 

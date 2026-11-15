@@ -22,7 +22,7 @@ _side_state(subj, side) := s if {
 	s := _unread_ref_state(side)
 } else := _read_state(subj, side)
 
-_unread_ref_state(path) := _worst_of({_ref_state(x.ref) | some x in path; _is_ref(x)} & {"absent", "null"}) if {
+_unread_ref_state(path) := _worst_of({_ref_state(x.ref) | some x in path; _is_ref(x)} & _no_value_states) if {
 	some x in path
 	_is_ref(x)
 }
@@ -346,7 +346,7 @@ _leaf_cause(leaf, x) := "satisfied" if {
 	_leaf_passed(leaf, x)
 } else := "missing" if {
 	_asks_presence(leaf, x)
-	_read_state(x, leaf.path) in {"absent", "null"}
+	_read_state(x, leaf.path) in _no_value_states
 } else := _worst_or_value(_list_flaw(leaf, x)) if {
 	_list_flawed(leaf, x)
 } else := _worst_or_value({_state_at(leaf, x, p) | some p in _leaf_paths(leaf)} | _unusable_states(leaf, x))
@@ -369,9 +369,9 @@ _params_not_given(path) if {
 	not is_object(data.ergo_params)
 }
 
-_presence_state(s) := "missing" if s in {"absent", "null"}
+_presence_state(s) := "missing" if s in _no_value_states
 
-_presence_state(s) := s if not s in {"absent", "null"}
+_presence_state(s) := s if not s in _no_value_states
 
 default _unreadable_ref(_) := false
 
@@ -414,7 +414,7 @@ _listed_refs(check) := _check_refs(check) | {piece |
 
 else := _read_refs(_read_part(check))
 
-_read_part(check) := object.remove(check, ["meta", "description"]) if is_object(check)
+_read_part(check) := object.remove(check, _check_note_fields) if is_object(check)
 
 else := check
 
@@ -433,7 +433,7 @@ else := set()
 _named_ref(x) if {
 	is_array(x)
 	count(x) > 1
-	x[0] in {"$$params", "$$input"}
+	x[0] in _reserved_ref_roots
 	i := _first_name_step(x)
 	every s in array.slice(x, 1, i) {
 		_is_key(s)
@@ -452,14 +452,14 @@ _listed_ref(check, p, x) := _s_walked(x) if _walked_at(check, p)
 
 else := x
 
-_walked_at(_, p) if p[count(p) - 1] in {"count_of", "sum_of"}
+_walked_at(_, p) if p[count(p) - 1] in _tally_forms
 
 _walked_at(check, p) if {
 	p[count(p) - 1] == "path"
 	_walk_holder(object.get(check, array.slice(p, 0, count(p) - 1), null))
 }
 
-_walk_holder(x) if x.op in {"every", "some"}
+_walk_holder(x) if x.op in _walk_ops
 
 _walk_holder(x) if {
 	is_object(x)
@@ -474,7 +474,7 @@ _applies_wrap(check) if {
 _whole_ref(x) if {
 	is_array(x)
 	count(x) > 0
-	x[0] in {"$$params", "$$input"}
+	x[0] in _reserved_ref_roots
 	every s in array.slice(x, 1, count(x)) {
 		_is_key(s)
 	}
@@ -532,7 +532,7 @@ _input_one_root(_, p) if {
 }
 
 _one_input_ref(check, r) if {
-	check.op in {"includes", "excludes"}
+	check.op in _single_contain_ops
 	_is_ref(object.get(check, "value", null))
 	check.value.ref == r
 	r[0] == "$$input"
@@ -674,5 +674,5 @@ _answers_presence(check, subj, "") if {
 	_ := _start_of(subj, check.path)
 	not _unreadable_ref(check)
 	not _params_not_given(check.path)
-	_read_state(subj, check.path) in {"absent", "null"}
+	_read_state(subj, check.path) in _no_value_states
 }
