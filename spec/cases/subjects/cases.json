@@ -29115,11 +29115,11 @@
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input named by each of $input.ks"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "v is 1"}}}},
     "cases": [
       {
-        "description": "fails min_subjects as unusable and says the input is a list",
+        "description": "fails min_subjects as not_an_object and says the input is a list",
         "rules": ["subjects.keyed.list", "subjects.keyed.list_before"],
         "input": [{"m": {"x": {"v": 1}}, "ks": ["x"]}],
         "results": [
-          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "$input is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}}
+          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "$input is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}}
         ]
       }
     ]

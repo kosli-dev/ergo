@@ -306,7 +306,11 @@ _for_unwalked(check, w) := [f | some f in array.concat(w.fails, _walk_stop(w))] 
 
 else := w.fails if w.fails != []
 
-else := [object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {}))]
+else := [object.union(object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {})), _for_input_key_why(check.items[1].path))]
+
+_for_input_key_why(path) := {"why": [_m_isnt("$input", data.ergo_document, "an object")]} if _reads_input_key({"path": path})
+
+else := {}
 
 _m_unread_text(f) := f.msg if is_array(object.get(f, "msg", null))
 

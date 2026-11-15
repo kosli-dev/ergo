@@ -965,7 +965,7 @@ test_a_whose_key_that_isnt_text_fails_each_item_as_unusable if {
 	_whose_number_row("count of rs whose zz is in $input.k is 1") == [["unusable", "$input.k is 3, which isn't a list"]]
 }
 
-test_a_count_sum_or_plus_with_a_key_from_a_list_input_says_the_input_is_not_an_object_not_that_it_needs_more_digits if {
+test_a_count_sum_or_plus_with_a_key_from_a_list_input_fails_as_not_an_object_not_that_it_needs_more_digits if {
 	doc := [{"id": "t", "k": "a", "n": 1, "m": {"a": 1}, "tags": ["a"], "xs": [{"m": {"a": 1}}]}]
 	message := "$input is [an object with 6 keys], which isn't an object"
 	every check in [
@@ -976,6 +976,6 @@ test_a_count_sum_or_plus_with_a_key_from_a_list_input_says_the_input_is_not_an_o
 		"sum of xs.m named by $input.ka.k is 1",
 	] {
 		policy := {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"c": check}}}}
-		[[r.cause, r.message] | some r in ergo.report(doc, policy, {}).results; r.check == "c"] == [["unusable", message]]
+		[[r.cause, r.message] | some r in ergo.report(doc, policy, {}).results; r.check == "c"] == [["not_an_object", message]]
 	}
 }

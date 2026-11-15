@@ -361,7 +361,12 @@ _m_message(check, subj, cause) := m if {
 
 _m_unusable_before_faults(subj, check) := array.concat(array.concat(_m_key_faults(subj, check), _m_blocked_early(subj, check)), _m_params_faults_early(subj, check))
 
-_m_unusable_after_faults(subj, check) := array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tallies(subj, check, "unusable"))
+_m_unusable_after_faults(subj, check) := array.concat(array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tallies(subj, check, "unusable")), _m_params_beside_input(check))
+
+_m_params_beside_input(check) := array.concat([_m_isnt("$input", data.ergo_document, "an object")], sort({c | walk(check, [_, v]); some c in _m_params_break(v)})) if {
+	_reads_input_key(check)
+	_m_params_unread(check)
+} else := []
 
 _m_message(check, subj, "unusable") := m if {
 	clauses := _once(array.concat(array.concat(_m_unusable_before_faults(subj, check), _m_faults(subj, check)), _m_unusable_after_faults(subj, check)))
@@ -386,6 +391,13 @@ _m_message(check, subj, "unusable") := m if {
 _m_message(check, subj, "not_an_object") := _m_isnt(_m_label(check), subj, "an object") if {
 	not is_object(subj)
 	not _m_list_items(check, subj)
+	_m_input_one_refs(check) == []
+}
+
+_m_message(check, subj, "not_an_object") := concat(", and ", _m_input_one_refs(check)) if {
+	not is_object(subj)
+	not _m_list_items(check, subj)
+	_m_input_one_refs(check) != []
 }
 
 _m_message(check, subj, "not_an_object") := concat(", and ", _m_tallies(subj, check, "not_an_object")) if {

@@ -1793,11 +1793,11 @@ test_a_ref_that_starts_at_a_list_input_fails_when_an_item_cant_be_read if {
 	}
 }
 
-test_named_by_each_of_a_ref_into_a_list_input_reads_one_list_and_does_not_walk_the_items if {
+test_named_by_each_of_a_ref_into_a_list_input_reads_one_list_and_fails_as_not_an_object if {
 	m := {"x": {"v": 1}, "y": {"v": 2}}
 	every doc in [[{"id": "a", "k": "x", "m": m}, {"id": "b", "k": "y"}], [{"id": "a", "k": "x", "m": m}]] {
 		rep := ergo.report(doc, _list_key_policy({"from": "$input[0].m named by each of $input.k"}, "v is 1"), {})
-		[[r.passed, r.cause] | some r in rep.results; r.check in {"$min_subjects", "c"}] == [[false, "unusable"]]
+		[[r.passed, r.cause] | some r in rep.results; r.check in {"$min_subjects", "c"}] == [[false, "not_an_object"]]
 		rep.requirements.r.subjects == {"matching": 0, "total": 0}
 	}
 }
@@ -1847,8 +1847,8 @@ test_a_count_of_a_child_subject_and_a_from_line_read_a_named_by_key_on_a_list_in
 		rows == {
 			"plain": ["not_an_object", listed],
 			"count_whose": [said[1], said[3]],
-			"count_input": ["unusable", listed],
-			"any_of_count": ["unusable", concat("", ["a: ", said[2], "; b: ", listed])],
+			"count_input": ["not_an_object", listed],
+			"any_of_count": ["not_an_object", concat("", ["a: ", said[2], "; b: ", listed])],
 			"child": [said[1], said[2]],
 			"$applies": [said[1], said[2]],
 		}

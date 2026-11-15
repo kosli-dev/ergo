@@ -123,10 +123,12 @@ pub struct Ctx<'a> {
     pub label: Option<String>,
     /// False only while a plain check of a subject that isn't a child subject
     /// runs: not a `for` line, a one-line `every` or `some`, a `count of` or
-    /// a `sum of`, nor a `from` line. When it's true, a key read from an
-    /// input that is a list, like `$input.k`, ends `Unusable`, and a path
-    /// from such an input whose key can't be read ends with the key's
-    /// outcome. When it's false, both end `NotAnObject`.
+    /// a `sum of`, nor a `from` line. A key read from an input that is a
+    /// list, like `$input.k`, ends `NotAnObject` either way. When it's true,
+    /// a path from such an input whose key can't be read, like
+    /// `$input.m named by $params.k`, ends with the key's outcome, and a key
+    /// read from an input that is neither a list nor an object ends
+    /// `Unusable`. When it's false, the path ends `NotAnObject`.
     pub item_by_item: bool,
     /// True while a line of an `any_of` option runs.
     pub in_option: bool,
@@ -256,6 +258,7 @@ pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
             if reference.start == Start::Input
                 && read.outcome == Outcome::NotAnObject
                 && ctx.item_by_item
+                && !ctx.input.is_array()
             {
                 return Err(Outcome::Unusable);
             }

@@ -473,11 +473,11 @@
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "$input[0].m named by $input.k"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "v is 1"}}}},
     "cases": [
       {
-        "description": "reads one key and doesn't walk the items, so it can't read one from a list",
+        "description": "reads one key and doesn't walk the items, so it can't read one from a list, and fails min_subjects as not_an_object",
         "rules": ["path.ref_step", "path.unusable"],
         "input": [{"id": "a", "k": "x", "m": {"x": {"v": 1}, "y": {"v": 2}}}, {"id": "b", "k": "y"}],
         "results": [
-          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope thing count", "value": 0}], "message": "in-scope thing count is 0", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope thing count", "value": 0}], "message": "in-scope thing count is 0", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
         ],
         "requirements": {"s": {"subjects": {"matching": 0, "total": 0}}}
       }

@@ -564,6 +564,11 @@ _input_key_ref(r) if {
 	is_string(r[1])
 }
 
+_reads_input_key(check) if {
+	some r in _check_refs(check)
+	_input_key_ref(r)
+}
+
 _params_null(r) if {
 	r[0] in _params_starts
 	data.ergo_params == null
@@ -583,9 +588,12 @@ _ref_null_partway(r) if {
 	_ref_read(array.slice(r, 0, j)) == null
 }
 
+_ref_state_read(r) := "not_an_object" if _input_key_ref(r)
+
 _ref_state_read(r) := "unusable" if {
 	_ref_read(r) == _absent
 	not _ref_walks(r)
+	not _input_key_ref(r)
 	_blocked(_start_of(null, r), [seg | some seg in array.slice(r, 1, count(r))])
 }
 

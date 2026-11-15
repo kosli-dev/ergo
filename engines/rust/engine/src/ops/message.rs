@@ -735,6 +735,14 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                     .filter(|(cause, _)| *cause == Cause::Unusable)
                     .map(|(_, text)| text),
             );
+            let input_key = lists::input_key_fault(check, ctx);
+            if matches!(check, Check::Tally(_))
+                && !input_key.is_empty()
+                && let Some(params) = params_that_arent_an_object(check, ctx)
+            {
+                all.extend(input_key);
+                all.push(params);
+            }
             let digits = " needs more than 15 digits";
             if let Check::Tally(tally_check) = check
                 && all.iter().all(|c| c.ends_with(digits))
@@ -765,13 +773,17 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                     .collect(),
                 _ => Vec::new(),
             };
+            let keyed = lists::input_key_fault(check, ctx);
             if subject.is_object() {
                 let mut found = aliases_blocked(check, ctx);
                 found.extend(lists::input_one_fault(check, ctx));
+                found.extend(keyed);
                 found.extend(tallies);
                 found
             } else if subject.is_array() && !tallies.is_empty() && !list_read_plainly(check, ctx) {
                 tallies
+            } else if !keyed.is_empty() {
+                keyed
             } else {
                 vec![isnt(ctx.subject_label(), subject, "an object")]
             }
@@ -1857,6 +1869,7 @@ pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {
         Cause::Absent => Outcome::Absent,
         Cause::Null => Outcome::Null,
         Cause::Unusable => return off_item_lists(check, ctx),
+        Cause::NotAnObject => return lists::input_key_fault(check, ctx),
         _ => return Vec::new(),
     };
     let mut paths: Vec<&Path> = check
@@ -1945,3 +1958,6 @@ fn off_item_rights(check: &Check, ctx: &Ctx) -> Vec<String> {
     }
     out
 }
+
+#[cfg(test)]
+mod tests;

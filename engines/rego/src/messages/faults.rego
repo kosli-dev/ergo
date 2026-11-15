@@ -70,14 +70,7 @@ _reads_input_one(check) if {
 	_one_input_ref(check, r)
 }
 
-_reads_input_one(check) if {
-	is_array(data.ergo_document)
-	_plain_check(check)
-	some r in _check_refs(check)
-	count(r) > 1
-	r[0] == "$$input"
-	is_string(r[1])
-}
+_reads_input_one(check) if _reads_input_key(check)
 
 _reads_input_one(check) if {
 	_one_right(check)
@@ -308,7 +301,7 @@ _m_faults(subj, check) := [_m_isnt(s.name, s.value, kind) |
 
 _m_ref_blocked(check) := [m |
 	some r in sort(_check_refs(check))
-	_ref_state(r) == "unusable"
+	_ref_state(r) in {"unusable", "not_an_object"}
 	not _ref_walks(r)
 	some m in _m_ref_breaks(r)
 ]

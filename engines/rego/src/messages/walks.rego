@@ -311,6 +311,7 @@ _m_focus_text(subj, c, e, cause, roots) := _m_undecided_text(subj, c, _focus_of(
 _m_undecided_text(subj, c, e, cause, roots) := _m_isnt(_m_item_name(e.i, roots), e.iv, "an object") if {
 	cause == "not_an_object"
 	not is_object(e.iv)
+	not _reads_input_key(c)
 } else := t if {
 	t := _m_walked_root_text(c, cause)
 } else := concat(", and ", off) if {
@@ -462,6 +463,11 @@ _m_off_item(subj, c, cause) := _once([concat("", [_input_name(shown_at), " is ",
 	i := min({j | some j in numbers.range(1, count(shown)); _read_state(subj, array.slice(shown, 0, j)) == cause})
 	shown_at := _m_shown_at(shown, i, cause)
 ]) if cause in {"absent", "null"}
+
+_m_off_item(_, c, "not_an_object") := [_m_isnt("$input", data.ergo_document, "an object")] if {
+	some r in _step_refs(c)
+	_input_key_ref(r)
+}
 
 _m_shown_at(shown, _, "absent") := shown
 

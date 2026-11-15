@@ -1004,3 +1004,55 @@ fn right_paths_lists_every_ref_and_field_inside_a_join_and_skips_written_values(
     written.paths(&mut none);
     assert!(none.is_empty());
 }
+
+fn assertion(sentence: &str) -> Check {
+    crate::lower::lower_assertion(
+        &tree::parse_check(sentence).unwrap().assertions[0],
+        &Scope::new(),
+    )
+    .unwrap()
+}
+
+#[test]
+fn a_key_read_from_a_list_input_says_the_input_isnt_an_object_whatever_the_sentence() {
+    let item = json!({"k": "a", "m": {"a": "a"}, "rs": [{"v": "a"}], "xs": [{"m": {"a": 1}}]});
+    for (input, says) in [
+        (json!([item.clone()]), true),
+        (item.clone(), false),
+        (json!(null), false),
+    ] {
+        let ctx = Ctx {
+            label: None,
+            item_by_item: true,
+            in_option: false,
+            subject: Located {
+                value: &item,
+                location: Location::input_root(),
+            },
+            input: &input,
+            params: None,
+            aliases: BTreeMap::new(),
+        };
+        for sentence in [
+            "count of xs.m named by $input.k is 1",
+            "sum of xs.m named by $input.k is 1",
+            "count of rs whose v is m named by $input.k is 1",
+            "count of rs.v that is $params.m named by $input.k is 1",
+            "every rs.v is m named by $input.k",
+            "some rs whose v is m named by $input.k exists",
+            "k is m named by $input.k",
+        ] {
+            let said = input_key_fault(&assertion(sentence), &ctx);
+            assert_eq!(said.len() == 1, says, "{sentence} on {input}");
+        }
+        for sentence in [
+            "every rs.v is $input.k",
+            "k is $params.m named by $params.k",
+        ] {
+            assert!(
+                input_key_fault(&assertion(sentence), &ctx).is_empty(),
+                "{sentence} on {input}"
+            );
+        }
+    }
+}
