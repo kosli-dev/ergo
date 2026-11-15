@@ -2135,13 +2135,11 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             if env.unreadable.is_empty()
                 && plan.items.len() == 1
                 && !verdict.passed()
-                && let Some((cause, text)) = ops::keyed_roots::rewritten(
-                    check,
-                    ctx,
-                    verdict.cause,
-                    &own.clone()
-                        .unwrap_or_else(|| default_message(check, ctx, &verdict)),
-                )
+                && let Some((cause, text)) =
+                    ops::keyed_roots::rewritten(check, ctx, verdict.cause, || {
+                        own.clone()
+                            .unwrap_or_else(|| default_message(check, ctx, &verdict))
+                    })
             {
                 verdict.cause = cause;
                 own = Some(text);
