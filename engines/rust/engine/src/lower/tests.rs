@@ -433,3 +433,23 @@ fn an_alias_is_a_step_and_a_part_counts_its_own_path_in_place_of_its_alias() {
     };
     assert_eq!(walk_steps(&part), 11);
 }
+
+#[test]
+fn lookup_all_turns_every_kind_on_and_none_turns_every_kind_off() {
+    assert_eq!(
+        Lookup::ALL,
+        Lookup {
+            parents: true,
+            parts: true,
+            aliases: true
+        }
+    );
+    assert_eq!(
+        Lookup::NONE,
+        Lookup {
+            parents: false,
+            parts: false,
+            aliases: false
+        }
+    );
+}

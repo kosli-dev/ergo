@@ -35,6 +35,32 @@ pub fn in_place(place: &str, problem: &str) -> String {
 
 const FOLLOW_MARK: &str = ", which means the subject: for a field called ";
 
+/// Which kinds of name a path may start from when it is read.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Lookup {
+    /// Start from a parent field.
+    pub parents: bool,
+    /// Start from a named part.
+    pub parts: bool,
+    /// Start from an alias.
+    pub aliases: bool,
+}
+
+impl Lookup {
+    /// Every kind of name may start a path.
+    pub const ALL: Lookup = Lookup {
+        parents: true,
+        parts: true,
+        aliases: true,
+    };
+    /// No kind of name may start a path.
+    pub const NONE: Lookup = Lookup {
+        parents: false,
+        parts: false,
+        aliases: false,
+    };
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct Scope {
     left_reads_parents: bool,
@@ -323,14 +349,14 @@ impl Scope {
     }
 
     pub fn path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
-        self.read_path(path, true, true, true)
+        self.read_path(path, Lookup::ALL)
     }
 
     pub fn counted_path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
         if self.item && self.as_left {
-            self.read_path(path, false, false, false)
+            self.read_path(path, Lookup::NONE)
         } else if self.item {
-            self.read_path(path, true, true, true)
+            self.read_path(path, Lookup::ALL)
         } else if self.as_left {
             self.left_path(path)
         } else {
@@ -359,9 +385,16 @@ impl Scope {
 
     pub fn left_path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
         if self.item {
-            self.read_path(path, false, false, false)
+            self.read_path(path, Lookup::NONE)
         } else {
-            self.read_path(path, self.left_reads_parents, true, self.left_reads_parents)
+            self.read_path(
+                path,
+                Lookup {
+                    parents: self.left_reads_parents,
+                    parts: true,
+                    aliases: self.left_reads_parents,
+                },
+            )
         }
     }
 
@@ -441,16 +474,10 @@ impl Scope {
         names.into_iter().collect()
     }
 
-    fn read_path(
-        &self,
-        written: &s::Path,
-        parents: bool,
-        parts: bool,
-        aliases: bool,
-    ) -> Result<path::Path, Vec<String>> {
+    fn read_path(&self, written: &s::Path, lookup: Lookup) -> Result<path::Path, Vec<String>> {
         let mut problems = Vec::new();
         let mut steps = Vec::new();
-        problems.extend(self.follow_problem(written, parts));
+        problems.extend(self.follow_problem(written, lookup.parts));
         let mut written_steps = written.steps.iter().peekable();
         while let Some(step) = written_steps.next() {
             if let Some(key) = self.subject_key(step, written_steps.peek().copied()) {
@@ -476,10 +503,8 @@ impl Scope {
             s::Start::Params => (Start::Params, steps),
             s::Start::Input => (Start::Input, steps),
             s::Start::Unknown(name) => return Err(vec![format!("{UNKNOWN_NAME}{name}")]),
-            s::Start::Field { key, dot } => {
-                self.field_start(key, *dot, parents, parts, aliases, steps)
-            }
-            s::Start::Quoted(key) => self.field_start(key, false, parents, parts, aliases, steps),
+            s::Start::Field { key, dot } => self.field_start(key, *dot, lookup, steps),
+            s::Start::Quoted(key) => self.field_start(key, false, lookup, steps),
         };
         Ok(path::Path { start, steps })
     }
@@ -488,23 +513,25 @@ impl Scope {
         &self,
         key: &str,
         dot: bool,
-        parents: bool,
-        parts: bool,
-        aliases: bool,
+        lookup: Lookup,
         mut steps: Vec<Step>,
     ) -> (Start, Vec<Step>) {
         if !dot {
-            if parts && self.subject.as_deref() == Some(key) {
+            if lookup.parts && self.subject.as_deref() == Some(key) {
                 let whole = PartDef {
                     steps: Vec::new(),
                     id: None,
                 };
                 return (part_start(key, self.base(), &whole), steps);
             }
-            if parts && let Some(part) = self.parts.get(key) {
+            if lookup.parts
+                && let Some(part) = self.parts.get(key)
+            {
                 return (part_start(key, self.base(), part), steps);
             }
-            if parents && let Some(found) = self.parents.get(key) {
+            if lookup.parents
+                && let Some(found) = self.parents.get(key)
+            {
                 if let Some(Step::Key(next)) = steps.first()
                     && let Some(part) = found.get(next)
                 {
@@ -519,14 +546,14 @@ impl Scope {
                 }
                 return (Start::Alias(key.to_string()), steps);
             }
-            if aliases && self.for_aliases.contains(key) {
+            if lookup.aliases && self.for_aliases.contains(key) {
                 return (Start::Alias(key.to_string()), steps);
             }
         }
         if self.parents.contains_key(key)
             || self.parts.contains_key(key)
             || self.for_aliases.contains(key)
-            || ((dot || !parts) && self.subject.as_deref() == Some(key))
+            || ((dot || !lookup.parts) && self.subject.as_deref() == Some(key))
         {
             steps.insert(0, Step::Key(key.to_string()));
             return (self.field_root(Start::Own, true), steps);
