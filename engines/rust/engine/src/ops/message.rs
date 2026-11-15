@@ -736,7 +736,8 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                     .map(|(_, text)| text),
             );
             let input_key = lists::input_key_fault(check, ctx);
-            if !input_key.is_empty()
+            if matches!(check, Check::Tally(_))
+                && !input_key.is_empty()
                 && let Some(params) = params_that_arent_an_object(check, ctx)
             {
                 all.extend(input_key);
@@ -1957,3 +1958,6 @@ fn off_item_rights(check: &Check, ctx: &Ctx) -> Vec<String> {
     }
     out
 }
+
+#[cfg(test)]
+mod tests;

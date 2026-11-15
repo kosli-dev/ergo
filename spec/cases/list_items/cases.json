@@ -1409,6 +1409,24 @@
     ]
   },
   {
+    "description": "a named by key read from an input that is a list, in a one-line every and on a for line, when the params aren't an object",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"every_params": "every rs.v is $params.m named by $input.k", "for_whose_params": {"for": "every rs whose v is $params.m named by $input.k as r", "assert": "r.v is \"a\""}, "for_second_whose_params": {"for": "every rs as r, every xs whose v is $params.m named by $input.k as x", "assert": "x.v is \"a\""}, "for_count_plus": {"for": "every rs as r", "assert": "count of xs is r.n plus $params.q named by $input.k"}}}}},
+    "params": 3,
+    "cases": [
+      {
+        "description": "say only that the params aren't an object",
+        "rules": ["path.not_an_object", "path.ref_step", "path.start"],
+        "input": [{"id": "t", "k": "a", "m": {"a": "a"}, "rs": [{"v": "a", "n": 1}, {"v": "b", "n": 2}], "xs": [{"v": "a"}]}],
+        "results": [
+          {"cause": "unusable", "check": "every_params", "failed_items": [], "inputs": [{"locations": ["/0/rs/0/v", "/0/rs/1/v"], "name": "rs[].v", "value": ["a", "b"]}], "message": "$params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "unusable", "check": "for_count_plus", "failed_items": [], "inputs": [{"locations": ["/0/xs/0"], "name": "count of xs", "value": 1}, {"locations": ["/0/rs/0", "/0/rs/1"], "name": "rs[]", "value": [{"n": 1, "v": "a"}, {"n": 2, "v": "b"}]}, {"locations": ["/0/xs/0"], "name": "xs[]", "value": [{"v": "a"}]}], "message": "$params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "unusable", "check": "for_second_whose_params", "failed_items": [], "inputs": [{"locations": ["/0/rs/0", "/0/rs/1"], "name": "rs[]", "value": [{"n": 1, "v": "a"}, {"n": 2, "v": "b"}]}, {"locations": ["/0/xs/0"], "name": "xs[]", "value": [{"v": "a"}]}], "message": "$params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "unusable", "check": "for_whose_params", "failed_items": [], "inputs": [{"locations": ["/0/rs/0", "/0/rs/1"], "name": "rs[]", "value": [{"n": 1, "v": "a"}, {"n": 2, "v": "b"}]}], "message": "$params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a for line over items that aren't objects, with a sum of or a count of whose named by key is read from the params and isn't text, on an input that is an object",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"for_count": {"for": "every xs as x", "assert": "count of x.m named by $params.k is 1"}, "for_sum": {"for": "every xs as x", "assert": "sum of x.m named by $params.k is 1"}}}}},
     "params": {"k": 3},

@@ -9712,6 +9712,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every rs.v is $params.m named by $input.k",
+        "every rs.v equals $params.m named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs is r.n plus $params.q named by $input.k",
+        "count of xs equals r.n plus $params.q named by $input.k",
+        &[],
+        &[],
+    ),
     ("x.v is \"a\"", "x.v is \"a\"", &[], &[]),
     (
         "count of xs whose v is $params.q is 1",
@@ -14197,6 +14209,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every rs as r, every xs whose v is m named by $input.k as x",
         "every rs as r, every xs whose v equals m named by $input.k as x",
+        &[],
+        &[],
+    ),
+    (
+        "every rs as r, every xs whose v is $params.m named by $input.k as x",
+        "every rs as r, every xs whose v equals $params.m named by $input.k as x",
+        &[],
+        &[],
+    ),
+    (
+        "every rs whose v is $params.m named by $input.k as r",
+        "every rs whose v equals $params.m named by $input.k as r",
         &[],
         &[],
     ),
