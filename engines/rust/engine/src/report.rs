@@ -273,50 +273,6 @@ fn is_zero(value: &Value) -> bool {
     }
 }
 
-fn from_readable(reading: &Reading, subject_name: &str, extra: &Problems) -> bool {
-    let at = field_name(&["subjects", subject_name, "from"]);
-    reading
-        .infos
-        .get(subject_name)
-        .is_some_and(|info| !info.problems.contains_key(&at) && info.from_text.is_some())
-        && !extra.contains_key(&at)
-}
-
-fn from_text(
-    reading: &Reading,
-    policy: &Policy,
-    requirement: &Requirement,
-    extra: &Problems,
-) -> String {
-    let Some((name, _)) = policy.subject_of(requirement) else {
-        return INVALID_FROM.to_string();
-    };
-    if !from_readable(reading, name, extra) {
-        return INVALID_FROM.to_string();
-    }
-    reading.infos[name].from_text.clone().unwrap_or_default()
-}
-
-fn filters_text(
-    reading: &Reading,
-    policy: &Policy,
-    requirement: &Requirement,
-    extra: &Problems,
-) -> Option<String> {
-    let (name, _) = policy.subject_of(requirement)?;
-    let blocked = extra
-        .get(&field_name(&["subjects", name, "from"]))
-        .is_some_and(|texts| {
-            texts
-                .iter()
-                .any(|text| text != crate::reading::NARROWING_A_CHILD_PROBLEM)
-        });
-    if blocked {
-        return None;
-    }
-    reading.filters_text(name)
-}
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct CheckDef {
     pub description: String,
@@ -347,64 +303,140 @@ impl CheckDef {
     }
 }
 
-fn ancestor_def(
-    reading: &Reading,
-    policy: &Policy,
-    requirement: &Requirement,
-    extra: &Problems,
-    input: &Value,
-    params: &Value,
-) -> Option<CheckDef> {
-    let (name, _) = policy.subject_of(requirement)?;
-    let mut levels: Vec<String> = Vec::new();
-    let mut at = name.to_string();
-    while levels.len() < 2 && from_readable(reading, &at, extra) {
-        let Some(crate::reading::Relation::Child(parent)) = reading
+#[derive(Clone, Copy)]
+pub struct RequirementRead<'a> {
+    pub reading: &'a Reading,
+    pub policy: &'a Policy,
+    pub requirement: &'a Requirement,
+    pub extra: &'a Problems,
+}
+
+impl RequirementRead<'_> {
+    fn reads_from(&self, subject_name: &str) -> bool {
+        let at = field_name(&["subjects", subject_name, "from"]);
+        self.reading
             .infos
-            .get(at.as_str())
-            .map(|info| info.relation.clone())
-        else {
-            break;
+            .get(subject_name)
+            .is_some_and(|info| !info.problems.contains_key(&at) && info.from_text.is_some())
+            && !self.extra.contains_key(&at)
+    }
+
+    fn printed_from(&self) -> String {
+        let Some((name, _)) = self.policy.subject_of(self.requirement) else {
+            return INVALID_FROM.to_string();
         };
-        levels.insert(0, parent.clone());
-        at = parent;
+        if !self.reads_from(name) {
+            return INVALID_FROM.to_string();
+        }
+        self.reading.infos[name]
+            .from_text
+            .clone()
+            .unwrap_or_default()
     }
-    if levels.is_empty() {
-        return None;
+
+    fn filters_text(&self) -> Option<String> {
+        let (name, _) = self.policy.subject_of(self.requirement)?;
+        let blocked = self
+            .extra
+            .get(&field_name(&["subjects", name, "from"]))
+            .is_some_and(|texts| {
+                texts
+                    .iter()
+                    .any(|text| text != crate::reading::NARROWING_A_CHILD_PROBLEM)
+            });
+        if blocked {
+            return None;
+        }
+        self.reading.filters_text(name)
     }
-    let mut descriptions = Vec::new();
-    let mut expressions = Vec::new();
-    let mut refs: Vec<Value> = Vec::new();
-    for (at, level) in levels.iter().enumerate() {
-        let every = if at == 0 { "Every" } else { "every" };
-        descriptions.push(format!("{every} {level} id is unique"));
-        let from = if from_readable(reading, level, extra) {
-            refs.extend(crate::checks::refs_read(
-                &reading.source_refs(level),
-                input,
-                Some(params),
-            ));
-            reading.infos[level].from_text.clone().unwrap_or_default()
-        } else {
-            INVALID_FROM.to_string()
+
+    fn ancestor_def(&self, input: &Value, params: &Value) -> Option<CheckDef> {
+        let reading = self.reading;
+        let (name, _) = self.policy.subject_of(self.requirement)?;
+        let mut levels: Vec<String> = Vec::new();
+        let mut at = name.to_string();
+        while levels.len() < 2 && self.reads_from(&at) {
+            let Some(crate::reading::Relation::Child(parent)) = reading
+                .infos
+                .get(at.as_str())
+                .map(|info| info.relation.clone())
+            else {
+                break;
+            };
+            levels.insert(0, parent.clone());
+            at = parent;
+        }
+        if levels.is_empty() {
+            return None;
+        }
+        let mut descriptions = Vec::new();
+        let mut expressions = Vec::new();
+        let mut refs: Vec<Value> = Vec::new();
+        for (at, level) in levels.iter().enumerate() {
+            let every = if at == 0 { "Every" } else { "every" };
+            descriptions.push(format!("{every} {level} id is unique"));
+            let from = if self.reads_from(level) {
+                refs.extend(crate::checks::refs_read(
+                    &reading.source_refs(level),
+                    input,
+                    Some(params),
+                ));
+                reading.infos[level].from_text.clone().unwrap_or_default()
+            } else {
+                INVALID_FROM.to_string()
+            };
+            expressions.push(format!("count(repeated(ids({from}))) == 0"));
+        }
+        refs.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
+        refs.dedup();
+        let mut def = CheckDef::added(descriptions.join(" and "), expressions.join(" and "));
+        def.refs = refs;
+        Some(def)
+    }
+
+    fn subject_entry(&self, name: &str) -> Value {
+        let (reading, extra) = (self.reading, self.extra);
+        let Some(info) = reading.infos.get(name) else {
+            return json!({
+                "description": "",
+                "from": INVALID_FROM,
+                "identified_by": null,
+                "parts": {},
+            });
         };
-        expressions.push(format!("count(repeated(ids({from}))) == 0"));
+        let mut entry = info.entry.clone();
+        if extra.contains_key(&field_name(&["subjects", name, "from"])) {
+            entry["from"] = json!(INVALID_FROM);
+        }
+        let follows_parent = matches!(
+            &info.relation,
+            crate::reading::Relation::Narrows(parent) if !parent.trim().is_empty()
+        );
+        let id_unreadable = extra
+            .get(&field_name(&["subjects", name, "identified_by"]))
+            .is_some_and(|texts| {
+                texts
+                    .iter()
+                    .any(|text| text != crate::reading::KEYED_ID_PROBLEM)
+            });
+        if id_unreadable && !follows_parent {
+            entry["identified_by"] = json!(crate::reading::INVALID_IDENTIFIED_BY);
+        }
+        entry
     }
-    refs.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
-    refs.dedup();
-    let mut def = CheckDef::added(descriptions.join(" and "), expressions.join(" and "));
-    def.refs = refs;
-    Some(def)
 }
 
 pub fn check_defs(
-    reading: &Reading,
-    policy: &Policy,
-    requirement: &Requirement,
-    extra: &Problems,
+    read: &RequirementRead,
     input: &Value,
     params: &Value,
 ) -> BTreeMap<String, CheckDef> {
+    let RequirementRead {
+        reading,
+        policy,
+        requirement,
+        ..
+    } = *read;
     let expressions = crate::checks::read_checks(reading, requirement);
     let mut defs: BTreeMap<String, CheckDef> = requirement
         .checks
@@ -429,7 +461,7 @@ pub fn check_defs(
         })
         .collect();
     let kind = type_text(&subject_type(requirement));
-    let from = from_text(reading, policy, requirement, extra);
+    let from = read.printed_from();
     let min = crate::value::literal_text(&requirement.min_subjects);
     let keyed = policy.subject_of(requirement).is_some_and(|(name, _)| {
         reading
@@ -448,7 +480,7 @@ pub fn check_defs(
         )
     };
     let from_refs = match policy.subject_of(requirement) {
-        Some((name, _)) if from_readable(reading, name, extra) => {
+        Some((name, _)) if read.reads_from(name) => {
             crate::checks::refs_read(&reading.source_refs(name), input, Some(params))
         }
         _ => Vec::new(),
@@ -462,7 +494,7 @@ pub fn check_defs(
     );
     unique_def.refs = from_refs;
     defs.insert("$unique_ids".to_string(), unique_def);
-    if let Some(def) = ancestor_def(reading, policy, requirement, extra, input, params) {
+    if let Some(def) = read.ancestor_def(input, params) {
         defs.insert("$unique_ancestor_ids".to_string(), def);
     }
     defs.insert(
@@ -472,7 +504,7 @@ pub fn check_defs(
             "count(problems) == 0".to_string(),
         ),
     );
-    match filters_text(reading, policy, requirement, extra) {
+    match read.filters_text() {
         Some(filters) => {
             let mut applies_def = CheckDef::added(format!("The {kind} is in scope"), filters);
             if let Some((name, _)) = policy.subject_of(requirement)
@@ -684,36 +716,6 @@ fn causes(
     )
 }
 
-fn subject_entry(reading: &Reading, name: &str, extra: &Problems) -> Value {
-    let Some(info) = reading.infos.get(name) else {
-        return json!({
-            "description": "",
-            "from": INVALID_FROM,
-            "identified_by": null,
-            "parts": {},
-        });
-    };
-    let mut entry = info.entry.clone();
-    if extra.contains_key(&field_name(&["subjects", name, "from"])) {
-        entry["from"] = json!(INVALID_FROM);
-    }
-    let follows_parent = matches!(
-        &info.relation,
-        crate::reading::Relation::Narrows(parent) if !parent.trim().is_empty()
-    );
-    let id_unreadable = extra
-        .get(&field_name(&["subjects", name, "identified_by"]))
-        .is_some_and(|texts| {
-            texts
-                .iter()
-                .any(|text| text != crate::reading::KEYED_ID_PROBLEM)
-        });
-    if id_unreadable && !follows_parent {
-        entry["identified_by"] = json!(crate::reading::INVALID_IDENTIFIED_BY);
-    }
-    entry
-}
-
 fn engine() -> Value {
     json!({"name": "ergo-rust", "version": env!("CARGO_PKG_VERSION")})
 }
@@ -771,7 +773,13 @@ pub fn assemble_with(
         if status == "not_met" {
             compliant = false;
         }
-        let defs = check_defs(reading, policy, requirement, extra_problems, input, params);
+        let read = RequirementRead {
+            reading,
+            policy,
+            requirement,
+            extra: extra_problems,
+        };
+        let defs = check_defs(&read, input, params);
         let reported_subject = policy.subject_of(requirement).map(|(n, _)| n);
         requirements.insert(
             name.clone(),
@@ -793,11 +801,11 @@ pub fn assemble_with(
             && policy.subject_of(requirement).is_some()
         {
             for used in reading.listed(subject_name) {
-                subjects.insert(used.clone(), subject_entry(reading, &used, extra_problems));
+                subjects.insert(used.clone(), read.subject_entry(&used));
             }
             subjects
                 .entry(subject_name.clone())
-                .or_insert_with(|| subject_entry(reading, subject_name, extra_problems));
+                .or_insert_with(|| read.subject_entry(subject_name));
         }
         well_formed_rows.push(well_formed);
         min_rows.extend(evaluation.min_subjects);
