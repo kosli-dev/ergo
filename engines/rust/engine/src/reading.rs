@@ -972,15 +972,13 @@ impl Reading {
                             s::FromCondition::Quantified {
                                 quantifier,
                                 path,
-                                distinct,
-                                if_any,
+                                options,
                                 phrase,
                             } => match lower::lower_quantified(
                                 *quantifier,
                                 &lower::name_dotted(path, name),
-                                *distinct,
+                                *options,
                                 &[],
-                                *if_any,
                                 phrase,
                                 &scope.clone().with_subject(name).for_from_line(),
                             ) {

@@ -1114,8 +1114,7 @@ impl Parser {
                                 FromCondition::Quantified {
                                     quantifier,
                                     path: path.clone(),
-                                    distinct,
-                                    if_any,
+                                    options: ListOptions { distinct, if_any },
                                     phrase,
                                 },
                                 end,

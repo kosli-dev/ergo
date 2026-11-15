@@ -43,7 +43,10 @@ fn a_quantified_assertion_keeps_its_whose_and_if_any() {
     assert_eq!(
         assertion("every items.x whose k is 1, if any, is empty"),
         Assertion::Quantified {
-            distinct: false,
+            options: ListOptions {
+                distinct: false,
+                if_any: true
+            },
             quantifier: Quantifier::Every,
             path: with_steps(key("items"), vec![dot("x")]),
             whose: vec![Condition {
@@ -51,7 +54,6 @@ fn a_quantified_assertion_keeps_its_whose_and_if_any() {
                 phrase: is(number("1")),
                 that: false
             }],
-            if_any: true,
             phrase: Phrase::Empty { not: false }
         }
     );
@@ -59,7 +61,7 @@ fn a_quantified_assertion_keeps_its_whose_and_if_any() {
         assertion("some items exists"),
         Assertion::Quantified {
             quantifier: Quantifier::Some,
-            if_any: false,
+            options: ListOptions::PLAIN,
             ..
         }
     ));

@@ -237,3 +237,15 @@ fn every_part_of_a_for_line_survives_a_trip_through_json() {
         }
     }
 }
+
+#[test]
+fn list_options_stay_flat_in_json_and_distinct_is_left_out_when_false() {
+    let json = serde_json::to_value(assertion("every distinct xs, if any, exists")).unwrap();
+    let quantified = &json["Quantified"];
+    assert_eq!(quantified["distinct"], true);
+    assert_eq!(quantified["if_any"], true);
+    assert!(quantified.get("options").is_none());
+    let plain = serde_json::to_value(assertion("every xs exists")).unwrap();
+    assert!(plain["Quantified"].get("distinct").is_none());
+    assert_eq!(plain["Quantified"]["if_any"], false);
+}
