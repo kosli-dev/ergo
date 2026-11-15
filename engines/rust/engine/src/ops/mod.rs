@@ -180,26 +180,6 @@ impl Check {
             Check::Compare(check) => vec![plain(&check.left), plain(&check.right)],
             Check::CompareTime(check) => vec![plain(&check.left), plain(&check.right)],
             Check::Tally(check) => check.sides(),
-            Check::In(check) => match &check.values {
-                lists::Right::Ref(path) | lists::Right::Field(path)
-                    if path.start == path::Start::Subject =>
-                {
-                    vec![
-                        vec![SidePath {
-                            path: &check.path,
-                            needs_list: false,
-                        }],
-                        vec![SidePath {
-                            path,
-                            needs_list: true,
-                        }],
-                    ]
-                }
-                _ => vec![vec![SidePath {
-                    path: &check.path,
-                    needs_list: false,
-                }]],
-            },
             other => other
                 .left_path()
                 .map(|path| {

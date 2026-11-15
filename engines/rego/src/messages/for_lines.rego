@@ -65,6 +65,7 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 	wh.undecided != []
 	some c in item.whose
 	_reads_input_key(c)
+	_for_is_free({"whose": [c]}, names)
 } else := object.union(failure, _for_own_why_of(first, e, own)) if {
 	failure != null
 	wh.undecided != []

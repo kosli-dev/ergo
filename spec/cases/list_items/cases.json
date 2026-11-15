@@ -1371,16 +1371,15 @@
     ]
   },
   {
-    "description": "a named by key read from an input that is a list, in the second list of a for line, in the whose of a for line and on the right of is in in a whose",
-    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"second": {"for": "every rs as r, every ls named by $input.k as g", "assert": "g is 1"}, "whose": {"for": "every rs whose v is m named by $input.k as r", "assert": "r.v is \"a\""}, "second_whose": {"for": "every rs as r, every xs whose v is m named by $input.k as x", "assert": "x.v is \"a\""}, "is_in": "some rs whose v is in ls named by $input.k exists"}}}},
+    "description": "a named by key read from an input that is a list, in the second list of a for line and in the whose of a for line",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"second": {"for": "every rs as r, every ls named by $input.k as g", "assert": "g is 1"}, "whose": {"for": "every rs whose v is m named by $input.k as r", "assert": "r.v is \"a\""}, "second_whose": {"for": "every rs as r, every xs whose v is m named by $input.k as x", "assert": "x.v is \"a\""}}}}},
     "params": {},
     "cases": [
       {
         "description": "say once that the input isn't an object, with no item in front and nothing about the items, which are objects",
-        "rules": ["path.not_an_object", "path.ref_step", "walk.failed_items"],
+        "rules": ["path.not_an_object", "path.ref_step"],
         "input": [{"id": "t", "k": "a", "ls": {"a": [1]}, "m": {"a": "a"}, "rs": [{"v": "a", "m": {"a": "a"}}, {"v": "b"}], "xs": [{"v": "a", "m": {"a": "a"}}]}],
         "results": [
-          {"cause": "not_an_object", "check": "is_in", "failed_items": [{"cause": "not_an_object", "item": "item 1 of rs", "locations": ["/0/rs/0"], "path": "rs[0].ls named by $input.k", "value": null}, {"cause": "not_an_object", "item": "item 2 of rs", "locations": ["/0/rs/1"], "path": "rs[1].ls named by $input.k", "value": null}], "inputs": [{"locations": ["/0/rs/0", "/0/rs/1"], "name": "rs[]", "value": [{"m": {"a": "a"}, "v": "a"}, {"v": "b"}]}], "message": "$input is [an object with 6 keys], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
           {"cause": "not_an_object", "check": "second", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "ls named by $input.k", "locations": ["/0/ls"], "path": "ls named by $input.k", "value": null}], "inputs": [{"locations": [], "name": "ls named by $input.k", "value": []}, {"locations": ["/0/rs/0", "/0/rs/1"], "name": "rs[]", "value": [{"m": {"a": "a"}, "v": "a"}, {"v": "b"}]}], "message": "$input is [an object with 6 keys], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
           {"cause": "not_an_object", "check": "second_whose", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/0/xs/0"], "path": "item 1 of xs", "value": {"m": {"a": "a"}, "v": "a"}}], "inputs": [{"locations": ["/0/rs/0", "/0/rs/1"], "name": "rs[]", "value": [{"m": {"a": "a"}, "v": "a"}, {"v": "b"}]}, {"locations": ["/0/xs/0"], "name": "xs[]", "value": [{"m": {"a": "a"}, "v": "a"}]}], "message": "$input is [an object with 6 keys], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
           {"cause": "not_an_object", "check": "whose", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 1 of rs", "locations": ["/0/rs/0"], "path": "item 1 of rs", "value": {"m": {"a": "a"}, "v": "a"}}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of rs", "locations": ["/0/rs/1"], "path": "item 2 of rs", "value": {"v": "b"}}], "inputs": [{"locations": ["/0/rs/0", "/0/rs/1"], "name": "rs[]", "value": [{"m": {"a": "a"}, "v": "a"}, {"v": "b"}]}], "message": "$input is [an object with 6 keys], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
@@ -1389,23 +1388,8 @@
     ]
   },
   {
-    "description": "an undecided item of a whose with is in names the list on the right, the field that couldn't decide",
-    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"is_in": "some rs whose v is in ls exists"}}}},
-    "params": {},
-    "cases": [
-      {
-        "description": "the list on the right is missing on each item",
-        "rules": ["walk.failed_items"],
-        "input": {"id": "t", "rs": [{"v": "a"}, {"v": "b"}]},
-        "results": [
-          {"cause": "absent", "check": "is_in", "failed_items": [{"cause": "absent", "item": "item 1 of rs", "locations": ["/rs/0"], "path": "rs[0].ls", "value": null}, {"cause": "absent", "item": "item 2 of rs", "locations": ["/rs/1"], "path": "rs[1].ls", "value": null}], "inputs": [{"locations": ["/rs/0", "/rs/1"], "name": "rs[]", "value": [{"v": "a"}, {"v": "b"}]}], "message": "item 1 of rs: ls is missing; item 2 of rs: ls is missing", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a named by key read from an input that is a list, in a count of or a sum of with whose or that, when the params aren't an object",
-    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count_that_params": "count of rs.v that is $params.m named by $input.k is 1", "sum_that_params": "sum of rs.n that is at least $params.q named by $input.k is 1", "count_that": "count of rs.v that is m named by $input.k is 1", "count_whose_params": "count of rs whose v is $params.m named by $input.k is 1"}}}},
+    "description": "a named by key read from an input that is a list, in a count of or a sum of with whose, that or plus, when the params aren't an object",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count_that_params": "count of rs.v that is $params.m named by $input.k is 1", "sum_that_params": "sum of rs.n that is at least $params.q named by $input.k is 1", "count_that": "count of rs.v that is m named by $input.k is 1", "count_whose_params": "count of rs whose v is $params.m named by $input.k is 1", "count_plus": "count of rs is n plus $params.q named by $input.k", "sum_plus": "sum of rs.n plus $params.q named by $input.k is 1", "count_plus_params_key": "count of rs is n plus $input.m named by $params.k"}}}},
     "params": 3,
     "cases": [
       {
@@ -1413,9 +1397,12 @@
         "rules": ["path.not_an_object", "path.ref_step", "path.start"],
         "input": [{"id": "t", "k": "a", "m": {"a": "a"}, "rs": [{"v": "a", "n": 1}, {"v": "b", "n": 2}]}],
         "results": [
+          {"cause": "unusable", "check": "count_plus", "inputs": [{"locations": ["/0/rs/0", "/0/rs/1"], "name": "count of rs", "value": 2}, {"locations": ["/0/rs/0", "/0/rs/1"], "name": "rs[]", "value": [{"n": 1, "v": "a"}, {"n": 2, "v": "b"}]}, {"locations": ["/0", "$params:"], "name": "n plus $params.q named by $input.k", "value": null}, {"locations": ["/0"], "name": "n", "value": null}, {"locations": ["$params:"], "name": "$params.q named by $input.k", "value": null}], "message": "$input is [an object with 4 keys], which isn't an object, and $params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "unusable", "check": "count_plus_params_key", "inputs": [{"locations": ["/0/rs/0", "/0/rs/1"], "name": "count of rs", "value": 2}, {"locations": ["/0/rs/0", "/0/rs/1"], "name": "rs[]", "value": [{"n": 1, "v": "a"}, {"n": 2, "v": "b"}]}, {"locations": ["/0", ""], "name": "n plus $input.m named by $params.k", "value": null}, {"locations": ["/0"], "name": "n", "value": null}, {"locations": [""], "name": "$input.m named by $params.k", "value": null}], "message": "$params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
           {"cause": "unusable", "check": "count_that", "inputs": [{"locations": ["/0/rs/0/v", "/0/rs/1/v"], "name": "count of rs.v that equals m named by $input.k", "value": null}, {"locations": ["/0/rs/0/v", "/0/rs/1/v"], "name": "rs[].v", "value": ["a", "b"]}], "message": "$input is [an object with 4 keys], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
           {"cause": "unusable", "check": "count_that_params", "inputs": [{"locations": ["/0/rs/0/v", "/0/rs/1/v"], "name": "count of rs.v that equals $params.m named by $input.k", "value": null}, {"locations": ["/0/rs/0/v", "/0/rs/1/v"], "name": "rs[].v", "value": ["a", "b"]}], "message": "$input is [an object with 4 keys], which isn't an object, and $params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
           {"cause": "unusable", "check": "count_whose_params", "inputs": [{"locations": ["/0/rs/0", "/0/rs/1"], "name": "count of rs whose v equals $params.m named by $input.k", "value": null}, {"locations": ["/0/rs/0", "/0/rs/1"], "name": "rs[]", "value": [{"n": 1, "v": "a"}, {"n": 2, "v": "b"}]}], "message": "$input is [an object with 4 keys], which isn't an object, and $params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "unusable", "check": "sum_plus", "inputs": [{"locations": ["/0/rs/0/n", "/0/rs/1/n", "$params:"], "name": "sum of rs.n plus $params.q named by $input.k", "value": null}, {"locations": ["/0/rs/0/n", "/0/rs/1/n"], "name": "sum of rs.n", "value": 3}, {"locations": ["/0/rs/0/n", "/0/rs/1/n"], "name": "rs[].n", "value": [1, 2]}, {"locations": ["$params:"], "name": "$params.q named by $input.k", "value": null}], "message": "$input is [an object with 4 keys], which isn't an object, and $params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
           {"cause": "unusable", "check": "sum_that_params", "inputs": [{"locations": ["/0/rs/0/n", "/0/rs/1/n"], "name": "sum of rs.n that is at least $params.q named by $input.k", "value": null}, {"locations": ["/0/rs/0/n", "/0/rs/1/n"], "name": "rs[].n", "value": [1, 2]}], "message": "$input is [an object with 4 keys], which isn't an object, and $params is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
         ]
       }

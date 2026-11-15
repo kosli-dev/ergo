@@ -363,7 +363,7 @@ _m_unusable_before_faults(subj, check) := array.concat(array.concat(_m_key_fault
 
 _m_unusable_after_faults(subj, check) := array.concat(array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tallies(subj, check, "unusable")), _m_params_beside_input(check))
 
-_m_params_beside_input(check) := sort({c | walk(check, [_, v]); some c in _m_params_break(v)}) if {
+_m_params_beside_input(check) := array.concat([_m_isnt("$input", data.ergo_document, "an object")], sort({c | walk(check, [_, v]); some c in _m_params_break(v)})) if {
 	_reads_input_key(check)
 	_m_params_unread(check)
 } else := []
