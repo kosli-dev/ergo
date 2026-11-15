@@ -743,18 +743,6 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                 all.extend(input_key);
                 all.push(params);
             }
-            if let Some(problem) = params_problem(ctx) {
-                all = all
-                    .into_iter()
-                    .map(|c| {
-                        if c.starts_with("item ") && c.ends_with(&format!(": {problem}")) {
-                            problem.clone()
-                        } else {
-                            c
-                        }
-                    })
-                    .collect();
-            }
             let digits = " needs more than 15 digits";
             if let Check::Tally(tally_check) = check
                 && all.iter().all(|c| c.ends_with(digits))
@@ -867,17 +855,88 @@ pub fn reads_params(check: &Check) -> bool {
     paths.iter().any(|path| path.start == Start::Params)
 }
 
-pub fn params_problem(ctx: &Ctx) -> Option<String> {
-    ctx.params
-        .filter(|p| !p.is_object() && !p.is_null())
-        .map(|p| isnt("$params", p, "an object"))
+/// Returns the message of a row when the params aren't an object: the
+/// params problem first, once, then what the row says with no params,
+/// without the lines that say a path into the params is missing, then
+/// what `said` holds besides the params problem. `said` is what the row
+/// says with these params, and `natural` what it says with no params.
+#[must_use]
+pub fn params_said_first(params: &Value, said: &[String], natural: &[String]) -> String {
+    let problem = said
+        .iter()
+        .flat_map(|m| m.split("; "))
+        .flat_map(|chunk| chunk.split(", and "))
+        .find_map(params_problem_in)
+        .unwrap_or_else(|| isnt("$params", params, "an object"));
+    let mut all = vec![problem];
+    for m in natural {
+        for c in params_rest(m) {
+            push_new(&mut all, c);
+        }
+    }
+    for m in said {
+        for chunk in m.split("; ") {
+            if chunk == "the check is false" {
+                continue;
+            }
+            let kept: Vec<&str> = chunk
+                .split(", and ")
+                .filter(|part| params_problem_in(part).is_none())
+                .collect();
+            if !kept.is_empty() {
+                push_new(&mut all, kept.join(", and "));
+            }
+        }
+    }
+    all.join("; ")
 }
 
-pub fn params_first(problem: String, rest: &[String]) -> String {
-    std::iter::once(problem)
-        .chain(rest.iter().cloned())
-        .collect::<Vec<_>>()
-        .join("; ")
+fn params_problem_in(part: &str) -> Option<String> {
+    let found = regex::Regex::new(
+        r"(?:^|: )((?:item [0-9]+ of )?\$params is .+, which isn't (?:an object|a list|a list of text|a list or an object))$",
+    )
+    .ok()?;
+    found
+        .captures(part)
+        .and_then(|c| c.get(1))
+        .map(|m| m.as_str().to_string())
+}
+
+fn params_missing_part(part: &str) -> bool {
+    part.strip_suffix(" is missing")
+        .is_some_and(|name| name.contains("$params"))
+}
+
+fn params_rest(m: &str) -> Vec<String> {
+    let dropped = m
+        .split("; ")
+        .flat_map(|chunk| chunk.split(", and "))
+        .any(params_missing_part);
+    let prefix = regex::Regex::new(r"^(?:item [0-9]+ of [^:]+: )+").ok();
+    m.split("; ")
+        .filter_map(|chunk| {
+            let parts: Vec<&str> = chunk.split(", and ").collect();
+            let keep: Vec<&str> = parts
+                .iter()
+                .copied()
+                .filter(|p| !params_missing_part(p))
+                .collect();
+            let first = *keep.first()?;
+            let text = if params_missing_part(parts[0]) {
+                let pre = prefix
+                    .as_ref()
+                    .and_then(|re| re.find(parts[0]))
+                    .map_or("", |found| found.as_str());
+                std::iter::once(format!("{pre}{first}"))
+                    .chain(keep[1..].iter().map(ToString::to_string))
+                    .collect::<Vec<_>>()
+                    .join(", and ")
+            } else {
+                keep.join(", and ")
+            };
+            (!(dropped && cap_note(&text).is_some())).then_some(text)
+        })
+        .collect()
 }
 
 pub fn params_break(path: &Path, params: &Value, ctx: &Ctx) -> Option<String> {

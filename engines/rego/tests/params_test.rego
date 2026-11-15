@@ -297,6 +297,6 @@ test_params_that_are_not_an_object_still_fail_a_check_without_a_tie_as_unusable_
 	every params in [3, [], "s", true] {
 		rows := _item_rows(policy, {"prs": [{"id": "p0", "xs": ["s", null]}]}, params)
 		rows.plain[0] == "unusable"
-		rows.reads == ["unusable", concat("", ["$params is ", _params_word(params), ", which isn't an object"])]
+		rows.reads == ["unusable", concat("", ["$params is ", _params_word(params), ", which isn't an object; item 1 of xs is \"s\", which isn't an object; item 2 of xs is null, which isn't an object"])]
 	}
 }

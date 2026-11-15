@@ -2144,7 +2144,7 @@ test_every_root_that_failed_is_named_whatever_its_cause if {
 test_a_bare_params_in_a_whose_is_read_once_with_no_item_in_front if {
 	whose := {"c": {"for": "every xs whose v is in $params as m", "assert": "m.v is 1"}}
 	_root_rows(whose, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, null).c == ["absent", "$params is missing"]
-	_root_rows(whose, {"id": "p", "xs": []}, 3).c == ["unusable", "$params is 3, which isn't an object"]
+	_root_rows(whose, {"id": "p", "xs": []}, 3).c == ["unusable", "$params is 3, which isn't an object; xs is []"]
 	count_whose := {"c": "count of xs whose v is in $params is 0"}
 	_root_rows(count_whose, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, 3).c == ["unusable", "$params is 3, which isn't a list"]
 	_root_rows(count_whose, {"id": "p", "xs": []}, null).c == ["absent", "$params is missing"]

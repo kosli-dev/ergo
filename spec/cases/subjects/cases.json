@@ -29557,5 +29557,29 @@
         }
       }
     ]
+  },
+  {
+    "description": "with params that aren't an object, a from line says the params problem first, whichever condition reads them",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"last": {"from": "things whose x is 1 and whose y is $params.a", "identified_by": "id"}, "first": {"from": "things whose y is $params.a and whose x is 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "last", "checks": {"c": "id exists"}}, "s": {"subject": "first", "checks": {"c": "id exists"}}}},
+    "params": 3,
+    "cases": [
+      {
+        "description": "the other condition and a missing field come after it",
+        "rules": ["params.not_an_object", "path.start"],
+        "input": {"things": [{"id": "t", "x": 2}, {"id": "u", "x": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "last"}},
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "first"}},
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope last count", "value": 0}, {"locations": [], "name": "$params", "value": ["not an object"]}], "message": "in-scope last count is 0", "passed": false, "requirement": "r", "subject": {"id": null, "type": "last"}},
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope first count", "value": 0}, {"locations": [], "name": "$params", "value": ["not an object"]}], "message": "in-scope first count is 0", "passed": false, "requirement": "s", "subject": {"id": null, "type": "first"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated last ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "last"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated first ids", "value": []}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "first"}},
+          {"cause": "unusable", "check": "$applies", "failed_assertions": [{"assertion": "x is 1", "cause": "unusable"}, {"assertion": "y equals $params.a", "cause": "unusable"}], "inputs": [{"locations": ["$params:"], "name": "$params.a", "value": null}, {"locations": ["/things/0/x"], "name": "x", "value": 2}, {"locations": ["/things/0"], "name": "y", "value": null}], "message": "$params is 3, which isn't an object; x is 2; y is missing", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "last"}},
+          {"cause": "unusable", "check": "$applies", "failed_assertions": [{"assertion": "x is 1", "cause": "unusable"}, {"assertion": "y equals $params.a", "cause": "unusable"}], "inputs": [{"locations": ["$params:"], "name": "$params.a", "value": null}, {"locations": ["/things/1/x"], "name": "x", "value": 1}, {"locations": ["/things/1"], "name": "y", "value": null}], "message": "$params is 3, which isn't an object; y is missing", "passed": false, "requirement": "r", "subject": {"id": "u", "type": "last"}},
+          {"cause": "unusable", "check": "$applies", "failed_assertions": [{"assertion": "y equals $params.a", "cause": "unusable"}, {"assertion": "x is 1", "cause": "unusable"}], "inputs": [{"locations": ["$params:"], "name": "$params.a", "value": null}, {"locations": ["/things/0/x"], "name": "x", "value": 2}, {"locations": ["/things/0"], "name": "y", "value": null}], "message": "$params is 3, which isn't an object; y is missing; x is 2", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "first"}},
+          {"cause": "unusable", "check": "$applies", "failed_assertions": [{"assertion": "y equals $params.a", "cause": "unusable"}, {"assertion": "x is 1", "cause": "unusable"}], "inputs": [{"locations": ["$params:"], "name": "$params.a", "value": null}, {"locations": ["/things/1/x"], "name": "x", "value": 1}, {"locations": ["/things/1"], "name": "y", "value": null}], "message": "$params is 3, which isn't an object; y is missing", "passed": false, "requirement": "s", "subject": {"id": "u", "type": "first"}}
+        ]
+      }
+    ]
   }
 ]

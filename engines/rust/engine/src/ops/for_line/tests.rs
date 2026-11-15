@@ -1655,7 +1655,10 @@ fn params_that_are_not_an_object_come_before_the_items_messages_of_a_for_line_th
         json!({"xs": [null, "s"]}),
         json!(3),
     );
-    assert_eq!(message, "$params is 3, which isn't an object");
+    assert_eq!(
+        message,
+        "$params is 3, which isn't an object; item 1 of xs is null, which isn't an object; item 2 of xs is \"s\", which isn't an object"
+    );
 }
 
 #[test]

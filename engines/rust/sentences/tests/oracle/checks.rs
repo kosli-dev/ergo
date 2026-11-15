@@ -9785,6 +9785,26 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("x is $params.a", "x equals $params.a", &[], &[]),
+    (
+        "every es.v is at least $params.a",
+        "every es.v is at least $params.a",
+        &[],
+        &[],
+    ),
+    (
+        "every es.v, if any, is in $params.q",
+        "every es.v, if any, is in $params.q",
+        &[],
+        &[],
+    ),
+    ("m.w is $params.a", "m.w equals $params.a", &[], &[]),
+    (
+        "some es.v is $params.a",
+        "some es.v equals $params.a",
+        &[],
+        &[],
+    ),
+    ("y is $params.a", "y equals $params.a", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

@@ -478,7 +478,7 @@ test_a_for_line_reads_a_bare_params_once_before_any_item_whatever_the_list_holds
 	_root_rows(least, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, null).c == ["absent", "$params is missing"]
 	_root_rows(least, {"id": "p", "xs": []}, {}).c == ["unusable", "$params is {}, which isn't a number; xs is []"]
 	_root_rows(least, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, {}).c == ["unusable", "$params is {}, which isn't a number"]
-	_root_rows(least, {"id": "p", "xs": []}, "s").c == ["unusable", "$params is \"s\", which isn't an object"]
+	_root_rows(least, {"id": "p", "xs": []}, "s").c == ["unusable", "$params is \"s\", which isn't an object; xs is []"]
 }
 
 test_a_for_line_compares_a_bare_params_before_any_item_and_names_the_empty_list_after_it if {
@@ -486,7 +486,7 @@ test_a_for_line_compares_a_bare_params_before_any_item_and_names_the_empty_list_
 	_root_rows(is_3, {"id": "p", "xs": []}, null).c == ["absent", "$params is missing; xs is []"]
 	_root_rows(is_3, {"id": "p", "xs": [{"v": 1}]}, null).c == ["absent", "$params is missing"]
 	_root_rows(is_3, {"id": "p", "xs": []}, {}).c == ["unusable", "$params is {}, which isn't a number; xs is []"]
-	_root_rows(is_3, {"id": "p", "xs": []}, 3).c == ["unusable", "$params is 3, which isn't an object"]
+	_root_rows(is_3, {"id": "p", "xs": []}, 3).c == ["unusable", "$params is 3, which isn't an object; xs is []"]
 }
 
 test_a_for_line_reads_a_bare_input_before_any_item_and_names_the_empty_list_after_it if {
@@ -524,10 +524,10 @@ test_params_that_arent_an_object_make_a_for_line_unusable_even_when_its_items_ar
 	}
 }
 
-test_params_that_arent_an_object_name_themselves_in_a_for_line_that_reads_them_whatever_its_items_are if {
+test_params_that_arent_an_object_come_before_the_items_in_a_for_line_that_reads_them if {
 	rows := _item_rows(_params_cause_policy, {"prs": [{"id": "p0", "xs": [null, "s"]}]}, 3)
-	rows.reads == ["unusable", "$params is 3, which isn't an object"]
-	rows.whose == ["unusable", "$params is 3, which isn't an object"]
+	rows.reads == ["unusable", "$params is 3, which isn't an object; item 1 of xs is null, which isn't an object; item 2 of xs is \"s\", which isn't an object"]
+	rows.whose == ["unusable", "$params is 3, which isn't an object; item 1 of xs is null, which isn't an object; item 2 of xs is \"s\", which isn't an object"]
 }
 
 test_a_part_that_holds_a_list_is_walked_by_a_count_of_whose_under_a_for_line if {
