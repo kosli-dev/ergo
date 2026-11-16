@@ -536,7 +536,17 @@ _leaf_root_msgs(check, flaw) := [m] if {
 	is_string(m)
 }
 
-_rooted_row(check, subj, r) := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": ms}) if {
+_rooted_row(check, subj, r) := object.union(object.remove(_rooted_main(check, subj, r), ["other_roots"]), {"cause": _worst_of({flaw, r.cause}), "root_msgs": _with_roots(_walk_parts(check, subj, r, r), ms)}) if {
+	check.op != "for"
+	_walk_list_fails(r)
+	not _walk_keyed(check)
+	flaw := _walk_root_flaw(check, subj)
+	flaw != ""
+	ms := _walk_root_msgs(check, subj)
+	ms != []
+} else := _rooted_main(check, subj, r)
+
+_rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": ms}) if {
 	r.cause in _not_failing_causes
 	ms := _walk_key_texts(check, r)
 	ms != []
@@ -558,6 +568,34 @@ _rooted_row(check, subj, r) := object.union(r, {"cause": "unusable", "failed": [
 _parts_ahead(parts, r) := _with_roots(parts, r.other_roots) if "other_roots" in object.keys(r)
 
 else := parts
+
+_walk_list_fails(r) if {
+	r.cause != "satisfied"
+	r.failed != []
+	r.fails != []
+	every f in r.fails {
+		not _path_through_item(f.item)
+	}
+}
+
+_path_through_item(path) if {
+	some step in path
+	is_number(step)
+}
+
+_walk_keyed(check) if {
+	some c in _walk_whose_conds(check)
+	walk(c, [_, x])
+	is_array(x)
+	some step in x
+	_key_step(step)
+}
+
+_key_step(step) if _is_ref(step)
+
+_key_step(step) if _name_step(step)
+
+_key_step(step) if _field_step(step)
 
 _rooted_failed(r) := [] if r.cause in _not_failing_causes
 

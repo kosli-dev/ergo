@@ -1,5 +1,102 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
+        "every es whose n is at least $input.z exists",
+        "every es whose n is at least $input.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose n is at least $input.z, if any, is at most 5",
+        "every es whose n is at least $input.z, if any, is at most 5",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose n is at least $params.z exists",
+        "every es whose n is at least $params.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose n is at least $params.z, if any, is at most 5",
+        "every es whose n is at least $params.z, if any, is at most 5",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose n is at least $input.z exists",
+        "some es whose n is at least $input.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose n is at least $params.z exists",
+        "some es whose n is at least $params.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose v is in $params.z is in $params.y",
+        "some es whose v is in $params.z is in $params.y",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose v is in $params.z and whose v is in $input.y exists",
+        "some es whose v is in $params.z and whose v is in $input.y exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es.v whose v is in $params.z is in $params.y",
+        "every es.v whose v is in $params.z is in $params.y",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in t.z and whose v is in $input.y exists",
+        "every es whose v is in t.z and whose v is in $input.y exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in pl.z and whose v is in $input.y exists",
+        "every es whose v is in pl.z and whose v is in $input.y exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in $params.z, if any, is in $params.y",
+        "every es whose v is in $params.z, if any, is in $params.y",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in $input.z exists",
+        "every es whose v is in $input.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in $input.z and whose v is in $input.y exists",
+        "every es whose v is in $input.z and whose v is in $input.y exists",
+        &[],
+        &[],
+    ),
+    ("e.v exists", "e.v exists", &[], &[]),
+    (
+        "count of es whose v is in $params.z is 0 plus $params.q",
+        "count of es whose v is in $params.z equals 0 plus $params.q",
+        &[],
+        &[],
+    ),
+    (
+        "count of es whose v is in $input.z is 0",
+        "count of es whose v is in $input.z is 0",
+        &[],
+        &[],
+    ),
+    (
         "approved_by is a non-empty string",
         "approved_by is a non-empty string",
         &[],
@@ -24,8 +121,44 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of es whose v is in t.z is 0",
+        "count of es whose v is in t.z is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of es whose v is in $params.z is 0",
+        "count of es whose v is in $params.z is 0",
+        &[],
+        &[],
+    ),
+    (
         "count of xs whose v is more than $params.r equals 1",
         "count of xs whose v is more than $params.r is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in w.z, if any, exists",
+        "every es whose v is in w.z, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in t.z exists",
+        "every es whose v is in t.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in pl.z, if any, exists",
+        "every es whose v is in pl.z, if any, exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in $params.z exists",
+        "every es whose v is in $params.z exists",
         &[],
         &[],
     ),
@@ -110,10 +243,44 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("o equals $params.o", "o equals $params.o", &[], &[]),
     ("o equals p", "o equals p", &[], &[]),
     ("o is not p", "o does not equal p", &[], &[]),
+    (
+        "some es whose v is in pl.z exists",
+        "some es whose v is in pl.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose v is in $params.z exists",
+        "some es whose v is in $params.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose v is in $input.z exists",
+        "some es whose v is in $input.z exists",
+        &[],
+        &[],
+    ),
     ("some xs is more than r", "some xs is more than r", &[], &[]),
     (
         "some xs.v is more than $params.r",
         "some xs.v is more than $params.r",
+        &[],
+        &[],
+    ),
+    (
+        "sum of es.v that is in pl.z is 0",
+        "sum of es.v that is in pl.z is 0",
+        &[
+            "that pl.z: sum of adds up numbers, which have no fields, so pl.z can't be read from one: to read the subject's pl.z, write \u{1}.pl.z",
+        ],
+        &[
+            "that pl.z: sum of adds up numbers, which have no fields, so pl.z can't be read from one: to read the subject's pl.z, write \u{1}.pl.z",
+        ],
+    ),
+    (
+        "sum of es.v that is in $params.z is 0",
+        "sum of es.v that is in $params.z is 0",
         &[],
         &[],
     ),
@@ -12119,6 +12286,12 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every es whose v is in pl.z and whose v is in $input.y as e",
+        "every es whose v is in pl.z and whose v is in $input.y as e",
+        &[],
+        &[],
+    ),
     (
         "every a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11 as t",
         "every a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11 as t",

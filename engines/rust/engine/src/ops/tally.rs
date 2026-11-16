@@ -1269,15 +1269,22 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                 empty_adds_nothing: true,
             },
         );
+        let keyed = whose
+            .iter()
+            .any(|check| check.paths().into_iter().any(walk::has_key_step));
+        let roots = (!keyed && !walk::params_unreadable(&outer))
+            .then(|| super::message::root_flaw_texts(&whose, &outer, &whose))
+            .flatten();
         if let Some(outcome) = walked.unreadable {
+            let shown = |own: Cause| roots.is_some() || own == cause;
             match outcome.cause() {
-                Some(Cause::Absent) if cause == Cause::Absent => {
+                Some(Cause::Absent) if shown(Cause::Absent) => {
                     out.push(format!("{} is missing", walked.name));
                 }
-                Some(Cause::Null) if cause == Cause::Null => {
+                Some(Cause::Null) if shown(Cause::Null) => {
                     out.push(format!("{} is null", walked.name));
                 }
-                Some(Cause::Unusable) if cause == Cause::Unusable => {
+                Some(Cause::Unusable) if shown(Cause::Unusable) => {
                     let blocked = if walk::through_a_list(&counted.path, &outer) {
                         Vec::new()
                     } else {
@@ -1306,12 +1313,23 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                 }
                 _ => {}
             }
-            out.extend(root);
+            if let Some((_, roots)) = roots {
+                out = walk::roots_then(roots, out);
+            } else {
+                out.extend(root);
+            }
             return if out.is_empty() {
                 None
             } else {
                 Some(super::message::joined(out))
             };
+        }
+        if let Some((_, roots)) = roots
+            && !walked.failures.is_empty()
+            && walked.own_failures()
+        {
+            let said = walked.failures.iter().map(|f| f.msg.clone()).collect();
+            return Some(super::message::joined(walk::roots_then(roots, said)));
         }
         if let Some(text) = root {
             let mut said: Vec<String> = walked

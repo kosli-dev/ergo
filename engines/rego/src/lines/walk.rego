@@ -2,7 +2,19 @@ package ergo
 
 import rego.v1
 
-_walk_row(check, subj) := object.union(r, {"root_msgs": ms | ms := _flawed_root_msgs(check, subj, _walk_message(check, subj, r, r)); ms != []}) if {
+_walk_row(check, subj) := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": _with_roots(_walk_parts(check, subj, raw, raw), ms)}) if {
+	_walk_flawed(check)
+	not _unreadable_input
+	raw := _walk_read_row(check, subj)
+	_walk_list_fails(raw)
+	not _walk_keyed(check)
+	_m_walk_blocked(subj, check) == []
+	_walk_root_flaw(check, subj) != ""
+	_walk_root_msgs(check, subj) != []
+	r := object.union(raw, {"cause": "unusable", "failed": []})
+	ms := _flawed_root_msgs(check, subj, _walk_message(check, subj, r, r))
+	ms != []
+} else := object.union(r, {"root_msgs": ms | ms := _flawed_root_msgs(check, subj, _walk_message(check, subj, r, r)); ms != []}) if {
 	_walk_flawed(check)
 	r := object.union(_walk_read_row(check, subj), {"cause": "unusable", "failed": []})
 } else := {"cause": "not_an_object", "inputs": [], "failed": []} if {
@@ -18,7 +30,9 @@ _list_start(path, subj) if {
 	is_array(_start_of(subj, path))
 }
 
-_walk_rooted(check, subj, r) := _rooted_row(check, subj, r)
+_walk_rooted(check, subj, r) := _rooted_row(check, subj, r) if _walk_keyed(check)
+
+else := _worse_root(check, subj, _rooted_row(check, subj, r))
 
 _walk_flawed(check) if _param_broken(check, set())
 
