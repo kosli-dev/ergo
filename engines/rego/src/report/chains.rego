@@ -135,7 +135,15 @@ else := object.union(e, {
 	c := {"from": token, "to": p.ats}
 }
 
-_copied_row(row, c) := object.union(row, object.union({"inputs": _copied_inputs(row.inputs, c)}, {"failed_items": [_copied_failed(f, c) | some f in row.failed_items] | "failed_items" in object.keys(row)}))
+_copied_row(row, c) := object.union(row, object.union(object.union({"inputs": _copied_inputs(row.inputs, c)}, {"failed_items": [_copied_failed(f, c) | some f in row.failed_items] | "failed_items" in object.keys(row)}), {"failures": [_copied_e1(e, c) | some e in row.failures] | "failures" in object.keys(row)}))
+
+_copied_e1(e, c) := object.union(_copied_leaf(e, c), {"failures": [_copied_e2(x, c) | some x in e.failures]})
+
+_copied_e2(e, c) := object.union(_copied_leaf(e, c), {"failures": [_copied_e3(x, c) | some x in e.failures]})
+
+_copied_e3(e, c) := object.union(_copied_leaf(e, c), {"failures": [_copied_leaf(x, c) | some x in e.failures]})
+
+_copied_leaf(e, c) := object.union(e, object.union({"inputs": _copied_inputs(e.inputs, c)}, {"locations": _copied_locations(e.locations, c) | "locations" in object.keys(e)}))
 
 _copied_failed(f, c) := object.union(f, object.union(
 	{"locations": _copied_locations(f.locations, c)},

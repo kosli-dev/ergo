@@ -877,9 +877,13 @@ _m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(c
 
 _m_filter_walk(_, _, true, _, _) := {}
 
-_m_filter_walk(_, _, false, _, w) := {"message": _m_joined(w.root_msgs)} if "root_msgs" in object.keys(w)
+_m_filter_walk(_, _, false, _, w) := {"message": _m_joined(w.root_msgs), "ergo/own": w.root_msgs, "ergo/texts": []} if "root_msgs" in object.keys(w)
 
-_m_filter_walk(check, subj, false, cause, w) := {"message": _m_joined(_walk_parts(check, subj, {"cause": cause}, w))} if not "root_msgs" in object.keys(w)
+_m_filter_walk(check, subj, false, cause, w) := {"message": _m_joined(parts), "ergo/own": [p | some p in parts; not p in items], "ergo/texts": items} if {
+	not "root_msgs" in object.keys(w)
+	parts := _walk_parts(check, subj, {"cause": cause}, w)
+	items := _walk_item_texts(parts, w)
+}
 
 _m_applies(_, _, true) := {}
 

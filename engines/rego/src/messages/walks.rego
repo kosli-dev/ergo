@@ -4,11 +4,64 @@ import rego.v1
 
 _messaged(raw, _, _, _) := raw if raw.passed == true
 
-_messaged(raw, check, req, subj) := _keyed_rooted(object.union(raw, {"message": m}), check, subj) if {
+_messaged(raw, check, req, subj) := _keyed_rooted(object.union(raw, said), check, subj) if {
 	raw.passed == false
 	not "message" in object.keys(raw)
-	m := _row_message(_labelled_for(check, req, subj), subj, raw)
+	said := _row_said(_labelled_for(check, req, subj), subj, raw)
 }
+
+_row_said(check, subj, raw) := {"message": _row_message(check, subj, raw)} if {
+	not _all_of_run(check)
+	not _any_of_run(check)
+}
+
+_row_said(check, subj, raw) := {"message": concat("; ", ms), "ergo/texts": _first_texts(ts)} if {
+	_all_of_run(check)
+	ts := [_m_joined(_m_line(check.checks[i], subj, fa.cause)) |
+		some fa in raw.failed_assertions
+		i := min({j | some j, a in check.assertions; a == fa.assertion})
+	]
+	ms := _once(ts)
+	ms != []
+} else := {"message": _m_fallback(check)} if _all_of_run(check)
+
+_first_texts(ts) := [_first_text(ts, i) | some i, _ in ts]
+
+_first_text(ts, i) := "" if ts[i] in array.slice(ts, 0, i)
+
+else := ts[i]
+
+_row_said(check, subj, _) := {"message": concat("; ", ms), "ergo/texts": [_or_blank(t) | some t in texts]} if {
+	_any_of_run(check)
+	causes := [_m_undecided(_option_line_cause(c, _assertion_cause(c, subj, ""), subj)) | some c in check.checks]
+	said := [_option_said(c, subj, causes[i]) | some i, c in check.checks]
+	texts := [_option_first(check.option_of, said, i) | some i, _ in said]
+	ms := [concat("", [nm, ": ", concat(", and ", lines)]) |
+		some k, nm in check.option_of
+		not nm in array.slice(check.option_of, 0, k)
+		lines := [t | some i, t in texts; check.option_of[i] == nm; t != null]
+		lines != []
+	]
+	ms != []
+} else := {"message": _m_fallback(check)} if _any_of_run(check)
+
+_option_said(_, _, "satisfied") := null
+
+_option_said(c, subj, cause) := _m_joined(_m_line(c, subj, cause)) if cause != "satisfied"
+
+_option_first(option_of, said, i) := null if said[i] == null
+
+else := null if {
+	some j, _ in array.slice(said, 0, i)
+	option_of[j] == option_of[i]
+	said[j] == said[i]
+}
+
+else := said[i]
+
+_or_blank(null) := ""
+
+_or_blank(t) := t if t != null
 
 _messaged(raw, check, _, subj) := _keyed_rooted(raw, check, subj) if {
 	raw.passed == false
@@ -637,31 +690,6 @@ _m_first_marked(xs) := array.concat([xs[0]], [_m_unmarked(x) | some x in array.s
 _m_unmarked(x) := strings.replace_n({"\u0001": ""}, x)
 
 _m_aliased(m) := strings.replace_n({"\u0002": ""}, m)
-
-_row_message(check, subj, raw) := concat("; ", ms) if {
-	_all_of_run(check)
-	ms := _once([_m_joined(_m_line(check.checks[i], subj, fa.cause)) |
-		some fa in raw.failed_assertions
-		i := min({j | some j, a in check.assertions; a == fa.assertion})
-	])
-	ms != []
-} else := _m_fallback(check) if _all_of_run(check)
-
-_row_message(check, subj, _) := concat("; ", ms) if {
-	_any_of_run(check)
-	causes := [_m_undecided(_option_line_cause(c, _assertion_cause(c, subj, ""), subj)) | some c in check.checks]
-	ms := [concat("", [nm, ": ", concat(", and ", lines)]) |
-		some k, nm in check.option_of
-		not nm in array.slice(check.option_of, 0, k)
-		lines := _once([_m_joined(_m_line(c, subj, causes[i])) |
-			some i, c in check.checks
-			check.option_of[i] == nm
-			causes[i] != "satisfied"
-		])
-		lines != []
-	]
-	ms != []
-} else := _m_fallback(check) if _any_of_run(check)
 
 _m_null_before_key(item, c) := _once([concat("", [_input_name(prefix), " is null"]) |
 	some side in _m_sides(c)

@@ -36,10 +36,10 @@ _violations(report, shadowing) := [object.union(
 		"check": row.check,
 		"description": _definition_field(report.requirements, row, "description"),
 		"expression": _definition_field(report.requirements, row, "expression"),
-		"inputs": array.concat(row.inputs, [r | some r in _recorded_refs(report.requirements, row); not r in row.inputs]),
+		"inputs": array.concat(row.inputs, [r | some r in _recorded_refs(report.requirements, row); not r in [object.remove(i, ["outcome"]) | some i in row.inputs]]),
 		"cause": row.cause,
 	},
-	object.union(object.union(_failed_items_of(row), _failed_assertions_of(row)), _message_of(row)),
+	object.filter(row, {"failures", "failed_items", "message"}),
 ) |
 	some row in _unshadowed_results(report, shadowing)
 	_is_violation(report.requirements, row)
@@ -54,18 +54,6 @@ _shadowed_in_report(row, shadowing) if {
 	not startswith(row.check, "$")
 	[row.requirement, object.get(row.subject, "in", {})] in shadowing
 }
-
-_message_of(row) := {"message": row.message} if "message" in object.keys(row)
-
-_message_of(row) := {} if not "message" in object.keys(row)
-
-_failed_items_of(row) := {"failed_items": row.failed_items} if "failed_items" in object.keys(row)
-
-_failed_items_of(row) := {} if not "failed_items" in object.keys(row)
-
-_failed_assertions_of(row) := {"failed_assertions": row.failed_assertions} if "failed_assertions" in object.keys(row)
-
-_failed_assertions_of(row) := {} if not "failed_assertions" in object.keys(row)
 
 default _recorded_refs(_, _) := []
 

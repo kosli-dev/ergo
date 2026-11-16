@@ -9,17 +9,27 @@ _keyed_rooted(o, check, subj) := _keyed_said(o, k, fault, subj) if {
 	fault := _keyed_root_fault(subj, k.clause.right)
 } else := o
 
-_keyed_said(o, k, fault, subj) := object.union(o, {"cause": _worst_of(causes), "message": _m_joined(array.concat([fault.text], [x.text | some x in items; x.text != ""]))}) if {
+_keyed_said(o, k, fault, subj) := object.union(o, {"cause": _worst_of(causes), "message": _m_joined(array.concat([fault.text], said)), "ergo/own": [fault.text], "ergo/texts": [_keyed_said_text(said, f.item) | some f in object.get(o, "failed_items", [])]}) if {
 	w := _walk(_walk_start({"path": k.path}, subj), _walk_keys({"path": k.path}, subj), true)
 	_keyed_list_read(w)
 	items := [x | some e in w.items; x := _keyed_item(e, k)]
 	count(items) == count(w.items)
 	causes := {fault.cause} | {c | some x in items; some c in x.causes}
-} else := object.union(o, {"cause": _worst_of({fault.cause, o.cause}), "message": _m_joined([fault.text, o.message])}) if {
+	said := [x.text | some x in items; x.text != ""]
+} else := object.union(o, {"cause": _worst_of({fault.cause, o.cause}), "message": _m_joined([fault.text, o.message]), "ergo/own": array.concat([fault.text], object.get(o, "ergo/own", [o.message]))}) if {
 	is_string(object.get(o, "message", null))
 	w := _walk(_walk_start({"path": k.path}, subj), _walk_keys({"path": k.path}, subj), true)
 	not _keyed_list_read(w)
 } else := o
+
+_keyed_said_text(said, name) := ts[0] if {
+	ts := [t | some t in said; _names_item(t, name)]
+	ts != []
+} else := ""
+
+_names_item(t, name) if startswith(t, concat("", [name, ": "]))
+
+_names_item(t, name) if startswith(t, concat("", [name, " "]))
 
 _keyed_list_read(w) if {
 	w.fails == []

@@ -202,15 +202,22 @@ _check_outcome(check, subj, _) := object.union(
 
 _m_walk_outcome(_, _, r) := {} if r.cause == "satisfied"
 
-_m_walk_outcome(_, _, r) := {"message": _m_joined(r.root_msgs)} if {
+_m_walk_outcome(_, _, r) := {"message": _m_joined(r.root_msgs), "ergo/own": r.root_msgs, "ergo/texts": []} if {
 	r.cause != "satisfied"
 	"root_msgs" in object.keys(r)
 }
 
-_m_walk_outcome(check, subj, r) := {"message": _m_joined(_parts_ahead(_walk_parts(check, subj, r, r), r))} if {
+_m_walk_outcome(check, subj, r) := {"message": _m_joined(ps), "ergo/own": [p | some p in ps; not p in items], "ergo/texts": items} if {
 	r.cause != "satisfied"
 	not "root_msgs" in object.keys(r)
+	parts := _walk_parts(check, subj, r, r)
+	items := _walk_item_texts(parts, r)
+	ps := _parts_ahead(parts, r)
 }
+
+_walk_item_texts(parts, r) := parts if count(parts) == count(r.failed)
+
+else := []
 
 _walk_run(check) if {
 	check.op in {"every", "some", "for"}
@@ -242,23 +249,30 @@ _check_outcome(check, subj, flaw) := {
 } if {
 	_all_of_run(check)
 	outs := [_assertion_out(c, subj, flaw) | some c in check.checks]
-	failed := [{"assertion": check.assertions[i], "cause": o.cause} | some i, o in outs; o.cause != "satisfied"]
+	failed := [{"assertion": check.assertions[i], "cause": o.cause, "inputs": o.inputs, "at": i} | some i, o in outs; o.cause != "satisfied"]
 }
 
 _any_of_run(check) if {
 	check.op == "sentence_any_of"
 }
 
-_check_outcome(check, subj, flaw) := {
-	"inputs": _merged_inputs([i | some o in outs; some i in o.inputs]),
-	"passed": cause == "satisfied",
-	"cause": cause,
-} if {
+_check_outcome(check, subj, flaw) := object.union(
+	{
+		"inputs": _merged_inputs([i | some o in outs; some i in o.inputs]),
+		"passed": cause == "satisfied",
+		"cause": cause,
+	},
+	_option_outs(outs, lines, cause),
+) if {
 	_any_of_run(check)
 	outs := [_assertion_out(c, subj, flaw) | some c in check.checks]
 	lines := [_option_line_cause(c, outs[i].cause, subj) | some i, c in check.checks]
 	cause := _any_of_lines_cause(check.option_of, lines, flaw)
 }
+
+_option_outs(_, _, "satisfied") := {}
+
+_option_outs(outs, lines, cause) := {"ergo/outs": [{"cause": lines[i], "inputs": o.inputs} | some i, o in outs]} if cause != "satisfied"
 
 _option_line_cause(c, cause, subj) := "missing" if {
 	cause == "value"

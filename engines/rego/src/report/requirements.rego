@@ -324,7 +324,7 @@ _subject_rows(entry, ref, req, req_name, flaws, prepared) := [row |
 			"subject": ref,
 			"check": check_name,
 		},
-		_anchored(_outcome(req, prepared[check_name], flaws[check_name], entry.subject), anchor),
+		_parted(_anchored(_outcome(req, prepared[check_name], flaws[check_name], entry.subject), anchor), anchor, {"check": prepared[check_name], "req": req_name, "name": check_name}),
 	)
 ]
 
@@ -442,7 +442,9 @@ _applies_rows(_, _, _, req, _) := [] if {
 	_size(_applies_to_of(req)) == 0
 }
 
-_applies_row(ref, entry, evals, req, req_name) := object.union(
+_applies_row(ref, entry, evals, req, req_name) := _parted_applies(_applies_raw_row(ref, entry, evals, req, req_name), _entry_anchor(entry), evals, req)
+
+_applies_raw_row(ref, entry, evals, req, req_name) := object.union(
 	{
 		"requirement": req_name,
 		"subject": ref,

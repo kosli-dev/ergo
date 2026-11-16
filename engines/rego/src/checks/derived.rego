@@ -254,7 +254,7 @@ _basic_inputs(subj, side) := _tally_inputs(subj, side, r) if {
 
 _tally_inputs(subj, side, t) := array.concat(
 	[
-		{"name": side.text, "value": object.get(t, "value", null), "locations": t.locations},
+		{"name": side.text, "value": object.get(t, "value", null), "locations": t.locations, "ergo/worked": true},
 		_tally_list_input(t),
 	],
 	_merged_inputs(array.concat(

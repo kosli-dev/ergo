@@ -232,7 +232,7 @@ _starts_group(sorted, j) if {
 	sorted[j][0] != sorted[j - 1][0]
 }
 
-_number_input(name, value, inputs) := {"name": name, "value": value, "locations": _first_seen([l | some i in inputs; some l in i.locations])}
+_number_input(name, value, inputs) := {"name": name, "value": value, "locations": _first_seen([l | some i in inputs; some l in i.locations]), "ergo/worked": true}
 
 _locations_of(subj, path) := [at] if at := _at(subj, path)
 
@@ -250,9 +250,17 @@ _at(subj, path) := _joined(_subject_at, keys) if {
 	start := _start_of(subj, path)
 }
 
-_path_input(subj, path) := {"name": _input_name(path), "value": _value_at(subj, path), "locations": [at]} if at := _at(subj, path)
+_path_input(subj, path) := _read_outcome(subj, path, {"name": _input_name(path), "value": _value_at(subj, path), "locations": [at]}) if at := _at(subj, path)
 
-else := {"name": _input_name(path), "value": _value_at(subj, path), "locations": []}
+else := _read_outcome(subj, path, {"name": _input_name(path), "value": _value_at(subj, path), "locations": []})
+
+_read_outcome(subj, path, i) := object.union(i, {"ergo/outcome": _outcome_word(_read_state(subj, path))}) if i.value == null
+
+else := i
+
+_outcome_word("value") := "found"
+
+_outcome_word(s) := s if s != "value"
 
 _input_name(path) := _path_name(path) if not _has_parents
 
@@ -278,7 +286,9 @@ _dot_kept(path) if {
 	_ := _parent_names[path[0].literal]
 }
 
-_merged_inputs(inputs) := [object.union(_with_part({"name": t[0], "value": t[1]}, t[2]), {"locations": t[3]}) | some t in sort({[i.name, i.value, object.get(i, "part", null), i.locations] | some i in inputs})]
+_merged_inputs(inputs) := [object.union(object.union(_with_part({"name": t[0], "value": t[1]}, t[2]), {"locations": t[3]}), t[4]) | some t in sort({[i.name, i.value, object.get(i, "part", null), i.locations, object.filter(i, _input_stash_keys)] | some i in inputs})]
+
+_input_stash_keys := {"ergo/outcome", "ergo/worked"}
 
 _with_part(entry, null) := entry
 
