@@ -131,9 +131,15 @@ _item_input(i, lists) if {
 }
 
 _list_base(name) := substring(n, 0, indexof(n, "[")) if {
-	n := regex.replace(name, `^item [1-9][0-9]* of `, "")
+	n := _unitemed(name)
 	contains(n, "[")
-} else := regex.replace(name, `^item [1-9][0-9]* of `, "")
+} else := _unitemed(name)
+
+_unitemed(name) := concat(" of ", array.slice(ps, 1, count(ps))) if {
+	startswith(name, "item ")
+	ps := split(name, " of ")
+	count(ps) > 1
+} else := name
 
 _walk_entries(_, [], _) := []
 
