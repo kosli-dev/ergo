@@ -8,7 +8,25 @@
         "rules": ["patterns.pass", "patterns.syntax", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": "my_svc_x"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "my_svc_x", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": "my_svc_x"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ],
         "expressions": {"s": {"c": "x matches \"z\", \"^b\", \"svc_\""}}
       },
@@ -17,7 +35,49 @@
         "rules": ["patterns.fail"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "found",
+                    "value": "a"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is \"a\"",
+                "name": "x matches \"z\", \"^b\", \"svc_\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "found",
+                "value": "a"
+              }
+            ],
+            "message": "x is \"a\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -25,7 +85,49 @@
         "rules": ["patterns.fail"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is 1, which isn't text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "found",
+                    "value": 1
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is 1, which isn't text",
+                "name": "x matches \"z\", \"^b\", \"svc_\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "found",
+                "value": 1
+              }
+            ],
+            "message": "x is 1, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -33,7 +135,49 @@
         "rules": ["patterns.fail", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is missing",
+                "name": "x matches \"z\", \"^b\", \"svc_\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -47,7 +191,25 @@
         "rules": ["patterns.pass", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ],
         "expressions": {"s": {"c": "x does not match \"^b\""}}
       },
@@ -56,7 +218,49 @@
         "rules": ["patterns.fail"],
         "input": {"things": [{"id": "t1", "x": "bob"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"bob\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "bob", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "found",
+                    "value": "bob"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is \"bob\"",
+                "name": "x does not match \"^b\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "found",
+                "value": "bob"
+              }
+            ],
+            "message": "x is \"bob\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -64,7 +268,49 @@
         "rules": ["patterns.fail"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is 1, which isn't text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "found",
+                    "value": 1
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is 1, which isn't text",
+                "name": "x does not match \"^b\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "found",
+                "value": 1
+              }
+            ],
+            "message": "x is 1, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -72,7 +318,49 @@
         "rules": ["patterns.fail", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is missing",
+                "name": "x does not match \"^b\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -86,7 +374,49 @@
         "rules": ["patterns.syntax"],
         "input": {"things": [{"id": "t1", "x": "a\nb"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\\nb\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a\nb", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "found",
+                    "value": "a\nb"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is \"a\\nb\"",
+                "name": "x matches \"^a.b$\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "found",
+                "value": "a\nb"
+              }
+            ],
+            "message": "x is \"a\\nb\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -100,7 +430,49 @@
         "rules": ["patterns.syntax"],
         "input": {"things": [{"id": "t1", "x": "a\n"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\\n\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a\n", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "found",
+                    "value": "a\n"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is \"a\\n\"",
+                "name": "x matches \"a$\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "found",
+                "value": "a\n"
+              }
+            ],
+            "message": "x is \"a\\n\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -114,7 +486,25 @@
         "rules": ["patterns.syntax"],
         "input": {"things": [{"id": "t1", "x": "abc"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": "abc"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -128,7 +518,25 @@
         "rules": ["patterns.syntax"],
         "input": {"things": [{"id": "t1", "x": "été"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "été", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": "été"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -143,7 +551,34 @@
         "rules": ["patterns.list", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": "abc"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}, {"name": "$params.ps", "value": ["c"], "locations": ["$params:/ps"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": "abc"
+              },
+              {
+                "locations": [
+                  "$params:/ps"
+                ],
+                "name": "$params.ps",
+                "value": [
+                  "c"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ],
         "expressions": {"s": {"c": "x matches $params.ps"}}
       }
@@ -159,7 +594,65 @@
         "rules": ["patterns.list"],
         "input": {"things": [{"id": "t1", "x": "abc"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.ps is \"c\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}, {"name": "$params.ps", "value": "c", "locations": ["$params:/ps"]}]}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "found",
+                    "value": "abc"
+                  },
+                  {
+                    "locations": [
+                      "$params:/ps"
+                    ],
+                    "name": "$params.ps",
+                    "outcome": "found",
+                    "value": "c"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.ps is \"c\", which isn't a list",
+                "name": "x matches $params.ps"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "found",
+                "value": "abc"
+              },
+              {
+                "locations": [
+                  "$params:/ps"
+                ],
+                "name": "$params.ps",
+                "outcome": "found",
+                "value": "c"
+              }
+            ],
+            "message": "$params.ps is \"c\", which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -173,10 +666,154 @@
         "rules": ["patterns.syntax"],
         "input": {"things": [{"id": "t1", "x": "٣", "y": "é", "z": "\u000b\u00a0", "v": "aé"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "v", "value": "aé", "locations": ["/things/0/v"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "d", "message": "x is \"٣\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "٣", "locations": ["/things/0/x"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "s", "message": "z is \"\\u000b \"", "passed": false, "cause": "value", "inputs": [{"name": "z", "value": "\u000b\u00a0", "locations": ["/things/0/z"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "w", "message": "y is \"é\"", "passed": false, "cause": "value", "inputs": [{"name": "y", "value": "é", "locations": ["/things/0/y"]}]}
+          {
+            "cause": "satisfied",
+            "check": "b",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/v"
+                ],
+                "name": "v",
+                "value": "aé"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "d",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "found",
+                    "value": "٣"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/d"
+                ],
+                "message": "x is \"٣\"",
+                "name": "x matches '^\\d$'"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "found",
+                "value": "٣"
+              }
+            ],
+            "message": "x is \"٣\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "s",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/z"
+                    ],
+                    "name": "z",
+                    "outcome": "found",
+                    "value": "\u000b "
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/s"
+                ],
+                "message": "z is \"\\u000b \"",
+                "name": "z matches '^\\s+$'"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/z"
+                ],
+                "name": "z",
+                "outcome": "found",
+                "value": "\u000b "
+              }
+            ],
+            "message": "z is \"\\u000b \"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "w",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/y"
+                    ],
+                    "name": "y",
+                    "outcome": "found",
+                    "value": "é"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/w"
+                ],
+                "message": "y is \"é\"",
+                "name": "y matches '^\\w$'"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/y"
+                ],
+                "name": "y",
+                "outcome": "found",
+                "value": "é"
+              }
+            ],
+            "message": "y is \"é\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]

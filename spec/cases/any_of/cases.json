@@ -25,12 +25,30 @@
         "input": {"things": [{"id": "t1", "type": "Chore"}]},
         "results": [
           {
-            "requirement": "s",
-            "subject": {"type": "thing", "id": "t1"},
-            "check": "c",
-            "passed": true,
             "cause": "satisfied",
-            "inputs": [{"name": "state", "value": null, "locations": ["/things/0"]}, {"name": "type", "value": "Chore", "locations": ["/things/0/type"]}]
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "state",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/type"
+                ],
+                "name": "type",
+                "value": "Chore"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
           }
         ],
         "expressions": {"s": {"c": "one of: safe(type is \"Chore\") | standard(type is \"Story\" and state is \"Done\")"}}
@@ -41,13 +59,99 @@
         "input": {"things": [{"id": "t1", "state": "Open", "type": "Story"}]},
         "results": [
           {
-            "requirement": "s",
-            "subject": {"type": "thing", "id": "t1"},
+            "cause": "value",
             "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/type"
+                        ],
+                        "name": "type",
+                        "outcome": "found",
+                        "value": "Story"
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/safe"
+                    ],
+                    "message": "type is \"Story\"",
+                    "name": "type is \"Chore\""
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/any_of/safe"
+                ],
+                "message": "type is \"Story\"",
+                "name": "safe"
+              },
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/state"
+                        ],
+                        "name": "state",
+                        "outcome": "found",
+                        "value": "Open"
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/standard/1"
+                    ],
+                    "message": "state is \"Open\"",
+                    "name": "state is \"Done\""
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/any_of/standard"
+                ],
+                "message": "state is \"Open\"",
+                "name": "standard"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/state"
+                ],
+                "name": "state",
+                "outcome": "found",
+                "value": "Open"
+              },
+              {
+                "locations": [
+                  "/things/0/type"
+                ],
+                "name": "type",
+                "outcome": "found",
+                "value": "Story"
+              }
+            ],
             "message": "safe: type is \"Story\"; standard: state is \"Open\"",
             "passed": false,
-            "cause": "value",
-            "inputs": [{"name": "state", "value": "Open", "locations": ["/things/0/state"]}, {"name": "type", "value": "Story", "locations": ["/things/0/type"]}]
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
           }
         ]
       },
@@ -57,13 +161,99 @@
         "input": {"things": [{"id": "t1", "state": "Done"}]},
         "results": [
           {
-            "requirement": "s",
-            "subject": {"type": "thing", "id": "t1"},
+            "cause": "absent",
             "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "type",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/safe"
+                    ],
+                    "message": "type is missing",
+                    "name": "type is \"Chore\""
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/any_of/safe"
+                ],
+                "message": "type is missing",
+                "name": "safe"
+              },
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "type",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/standard/0"
+                    ],
+                    "message": "type is missing",
+                    "name": "type is \"Story\""
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/any_of/standard"
+                ],
+                "message": "type is missing",
+                "name": "standard"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/state"
+                ],
+                "name": "state",
+                "outcome": "found",
+                "value": "Done"
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "type",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
             "message": "safe: type is missing; standard: type is missing",
             "passed": false,
-            "cause": "absent",
-            "inputs": [{"name": "state", "value": "Done", "locations": ["/things/0/state"]}, {"name": "type", "value": null, "locations": ["/things/0"]}]
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
           }
         ]
       }
@@ -92,7 +282,121 @@
         "rules": ["any_of.cause", "present.missing"],
         "input": {"things": [{"id": "t1", "y": 2}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "a: x is missing; b: y is 2", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}, {"name": "y", "value": 2, "locations": ["/things/0/y"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "x",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/a/0"
+                    ],
+                    "message": "x is missing",
+                    "name": "x exists"
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "x",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/a/1"
+                    ],
+                    "message": "",
+                    "name": "x is 1"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/any_of/a"
+                ],
+                "message": "x is missing",
+                "name": "a"
+              },
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/y"
+                        ],
+                        "name": "y",
+                        "outcome": "found",
+                        "value": 2
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/b"
+                    ],
+                    "message": "y is 2",
+                    "name": "y is 1"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/any_of/b"
+                ],
+                "message": "y is 2",
+                "name": "b"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x",
+                "outcome": "absent",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/y"
+                ],
+                "name": "y",
+                "outcome": "found",
+                "value": 2
+              }
+            ],
+            "message": "a: x is missing; b: y is 2",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -134,11 +438,11 @@
             "check": "c",
             "inputs": [
               {
-                "name": "x",
-                "value": 1,
                 "locations": [
                   "/things/0/x"
-                ]
+                ],
+                "name": "x",
+                "value": 1
               }
             ],
             "passed": true,
@@ -198,18 +502,18 @@
             "check": "c",
             "inputs": [
               {
-                "name": "$params.l",
-                "value": null,
                 "locations": [
                   "$params:"
-                ]
+                ],
+                "name": "$params.l",
+                "value": null
               },
               {
-                "name": "x",
-                "value": 1,
                 "locations": [
                   "/things/0/x"
-                ]
+                ],
+                "name": "x",
+                "value": 1
               }
             ],
             "passed": true,
@@ -222,20 +526,94 @@
           {
             "cause": "absent",
             "check": "c",
-            "inputs": [
+            "failures": [
               {
-                "name": "$params.l",
-                "value": null,
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/x"
+                        ],
+                        "name": "x",
+                        "outcome": "found",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params.l",
+                        "value": null
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/listed"
+                    ],
+                    "message": "$params.l is missing",
+                    "name": "x is in $params.l"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
                 "locations": [
-                  "$params:"
-                ]
+                  "$policy:/requirements/s/checks/c/any_of/listed"
+                ],
+                "message": "$params.l is missing",
+                "name": "listed"
               },
               {
-                "name": "x",
-                "value": 2,
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/x"
+                        ],
+                        "name": "x",
+                        "outcome": "found",
+                        "value": 2
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/one"
+                    ],
+                    "message": "x is 2",
+                    "name": "x is 1"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/any_of/one"
+                ],
+                "message": "x is 2",
+                "name": "one"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.l",
+                "value": null
+              },
+              {
                 "locations": [
                   "/things/1/x"
-                ]
+                ],
+                "name": "x",
+                "outcome": "found",
+                "value": 2
               }
             ],
             "message": "listed: $params.l is missing; one: x is 2",
@@ -288,20 +666,75 @@
           {
             "cause": "unusable",
             "check": "c",
-            "inputs": [
+            "failures": [
               {
-                "name": "$params.l",
-                "value": "text",
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/x"
+                        ],
+                        "name": "x",
+                        "outcome": "found",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "$params:/l"
+                        ],
+                        "name": "$params.l",
+                        "outcome": "found",
+                        "value": "text"
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/c/any_of/listed"
+                    ],
+                    "message": "x is 1, and $params.l is \"text\"",
+                    "name": "x is in $params.l"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
                 "locations": [
-                  "$params:/l"
-                ]
+                  "$policy:/requirements/s/checks/c/any_of/listed"
+                ],
+                "message": "x is 1, and $params.l is \"text\"",
+                "name": "listed"
               },
               {
-                "name": "x",
-                "value": 1,
+                "cause": "value",
+                "failures": [],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/any_of/one"
+                ],
+                "message": "",
+                "name": "one"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "found",
+                "value": "text"
+              },
+              {
                 "locations": [
                   "/things/0/x"
-                ]
+                ],
+                "name": "x",
+                "outcome": "found",
+                "value": 1
               }
             ],
             "message": "listed: x is 1, and $params.l is \"text\"",
@@ -325,7 +758,25 @@
         "rules": ["location.merged"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
-          {"cause": "satisfied", "check": "c", "failed_assertions": [], "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]

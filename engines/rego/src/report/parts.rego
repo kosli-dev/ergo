@@ -6,10 +6,18 @@ _row_stash_keys := ["failed_items", "failed_assertions", "ergo/texts", "ergo/own
 
 _parted(row, _, _) := _passed_row(row) if row.passed == true
 
-_parted(row, _, where) := row if {
+_parted(row, _, where) := object.union(row, {"inputs": _with_outcomes(row.inputs), "failed_items": [_for_item_clean(f) | some f in row.failed_items]}) if {
 	row.passed == false
 	where.check.op == "for"
 }
+
+_for_item_clean(f) := object.union(f, {"failed_assertions": [_for_line_clean(l) | some l in f.failed_assertions]}) if "failed_assertions" in object.keys(f)
+
+else := f
+
+_for_line_clean(l) := object.union(l, object.union({"inputs": _unstashed_inputs(l.inputs) | "inputs" in object.keys(l)}, {"items": [object.union(x, {"inputs": _unstashed_inputs(x.inputs)}) | some x in l.items] | "items" in object.keys(l)}))
+
+_unstashed_inputs(inputs) := [object.remove(i, _input_stash_keys) | some i in inputs]
 
 _parted(row, at, where) := object.union(object.remove(row, _row_stash_keys), {
 	"inputs": _with_outcomes(row.inputs),
@@ -83,9 +91,9 @@ _row_failures(row, at, where) := [_policy_entry(
 _row_failures(row, at, where) := [_policy_entry(
 	"option",
 	nm,
-	_group_cause({row["ergo/outs"][i].cause | some i, n in where.check.option_of; n == nm}),
+	_group_cause({row["ergo/outs"][i].line | some i, n in where.check.option_of; n == nm}),
 	[],
-	[_option_assertion(row, at, where, nm, i) | some i, n in where.check.option_of; n == nm; row["ergo/outs"][i].cause != "satisfied"],
+	[_option_assertion(row, at, where, nm, i) | some i, n in where.check.option_of; n == nm; row["ergo/outs"][i].line != "satisfied"],
 	concat(", and ", [t | some i, n in where.check.option_of; n == nm; t := row["ergo/texts"][i]; t != ""]),
 	[_option_at(where, nm)],
 ) |
@@ -140,12 +148,16 @@ _walk_entry(row, texts, name, at) := object.union(
 		_walk_kind(name),
 		name,
 		_worst_or_value({f.cause | some f in row.failed_items; f.item == name}),
-		[_item_read(f) | some f in row.failed_items; f.item == name; f.path != name],
+		[_item_read(f) | some f in row.failed_items; f.item == name; _reads_inside(f, name)],
 		[],
 		concat("; ", _once([_entry_text(texts[k], name) | some k, f in row.failed_items; f.item == name; texts[k] != ""])),
 	),
 	_item_seen(row, name, at),
 )
+
+_reads_inside(f, name) if f.path != name
+
+_reads_inside(_, name) if _walk_kind(name) == "list"
 
 _walk_kind(name) := "item" if startswith(name, "item ")
 

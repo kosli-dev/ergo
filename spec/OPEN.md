@@ -104,6 +104,8 @@ The spec doesn't settle these yet, because the two engines give different report
 
 - **A bad ref before `named by each of`, with a good list.** [subjects.sentence](semantics.md#requirements) says each key is a subject even when the path before `named by each of` doesn't end `found` on an object. With `from: scans named by $params.env named by each of $params.k`, `env` holding `1` and `k` holding `["a"]`, neither engine makes a subject of `a`: both give no subjects, and `$min_subjects` fails as `unusable`. The rule should either make the keys subjects there too, or say that a bad ref in the path gives none.
 
+- **Rows that don't list their parts yet.** [row.parts](semantics.md#what-a-row-shows) says every failed row lists its parts in `failures`. The rows of a `for` check and the `$min_subjects` row of a subject whose `from` line has `every` still have `failed_items`, and the Rust engine still gives `failed_items` and `failed_assertions` everywhere. Inside `failures`, the items of a list walked several levels deep are named like `item 1 of groups[0].teams[1].units`, one entry per innermost item, not an item under an item. An item a `count of` or `sum of` couldn't read, and a list walked inside a check with several sentences, aren't parts yet.
+
 ## Differs from the general rules
 
 These shapes break one of the rules under [Which problems a message says](semantics.md#which-problems-a-message-says), in one engine or in both, on `main`. Each line says which rule. The last ones are about other rules, and are here because they were found with the rest.

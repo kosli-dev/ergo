@@ -272,7 +272,7 @@ _check_outcome(check, subj, flaw) := object.union(
 
 _option_outs(_, _, "satisfied") := {}
 
-_option_outs(outs, lines, cause) := {"ergo/outs": [{"cause": lines[i], "inputs": o.inputs} | some i, o in outs]} if cause != "satisfied"
+_option_outs(outs, lines, cause) := {"ergo/outs": [{"cause": o.cause, "line": lines[i], "inputs": o.inputs} | some i, o in outs]} if cause != "satisfied"
 
 _option_line_cause(c, cause, subj) := "missing" if {
 	cause == "value"

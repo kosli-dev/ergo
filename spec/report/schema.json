@@ -113,6 +113,7 @@
         "name": {"type": "string"},
         "value": true,
         "locations": {"$ref": "#/$defs/locations"},
+        "outcome": {"enum": ["found", "absent", "null", "unusable", "not_an_object"], "description": "Only on failed rows, on an entry that reads a path: how the read ended. A value Ergo works out, like a count of or a sum of, has none."},
         "part": {
           "type": "object",
           "description": "Present when the input was read through a part: the part's alias as the check writes it, and the id read inside the part, or null.",
@@ -145,7 +146,7 @@
         "message": {"type": "string", "minLength": 1, "description": "Only on failed rows: what Ergo found, in plain words, like approver is \"ana\", and author is \"ana\"."},
         "failed_items": {
           "type": "array",
-          "description": "Only on rows of every, some and for checks, on the $applies row of a subject whose from line has one condition, a some or an every, and on the $min_subjects row of a subject whose from line has every.",
+          "description": "Only on failed rows of for checks, and on the $min_subjects row of a subject whose from line has every.",
           "items": {
             "type": "object",
             "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The list item the entry belongs to, like item 2 of tests. For a list that failed while walking, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "locations": {"$ref": "#/$defs/locations"}, "failed_assertions": {"$ref": "#/$defs/for_failed_assertions", "description": "Only on entries of for checks: the sentences that failed for that item, in the order written."}, "failed_items": {"type": "array", "description": "Only on entries of for checks with two items, when the second item failed for that item before any sentence was checked: those failures, in path order.", "items": {"type": "object", "properties": {"path": {"type": "string"}, "item": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "locations": {"$ref": "#/$defs/locations"}}, "required": ["path", "item", "cause", "value", "locations"], "additionalProperties": false}}},
@@ -153,7 +154,7 @@
             "additionalProperties": false
           }
         },
-        "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on rows of checks written as several sentences without a for line, and on the $applies row of a subject whose from line has several conditions: the ones that failed, in the order written."}
+        "failures": {"type": "array", "description": "Only on failed rows of checks and on failed $applies rows, apart from for checks: every part that failed, at every level, as the rule row.parts says.", "items": {"$ref": "#/$defs/entry"}}
       },
       "required": ["requirement", "subject", "check", "inputs", "passed", "cause"],
       "additionalProperties": false,
@@ -178,14 +179,27 @@
         "else": {"required": ["inputs"]}
       }
     },
-    "failed_assertions": {
+    "policy_locations": {
       "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {"assertion": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "items": {"type": "array", "description": "Only on entries of for checks with two items, for a sentence that reads the second item's alias: the items of the second list the sentence failed for, in path order.", "items": {"type": "object", "properties": {"item": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}}, "required": ["item", "cause"], "additionalProperties": false}}},
-        "required": ["assertion", "cause"],
-        "additionalProperties": false
-      }
+      "items": {"type": "string", "pattern": "^\\$policy:(/([^~/]|~[01])*)+$"}
+    },
+    "entry": {
+      "type": "object",
+      "properties": {
+        "kind": {"enum": ["option", "assertion", "item", "list"]},
+        "name": {"type": "string", "description": "The option's name, the sentence as written, the item like item 2 of xs, or the list as the message names it."},
+        "cause": {"allOf": [{"$ref": "#/$defs/cause"}, {"not": {"const": "satisfied"}}]},
+        "inputs": {"type": "array", "description": "What this part read at its own level.", "items": {"$ref": "#/$defs/input"}},
+        "failures": {"type": "array", "description": "The parts under this one that failed.", "items": {"$ref": "#/$defs/entry"}},
+        "message": {"type": "string", "description": "What the row's message says about this part, without the names in front, or empty."},
+        "value": {"description": "Only on items: the item."},
+        "locations": {"type": "array", "items": {"type": "string"}}
+      },
+      "required": ["kind", "name", "cause", "inputs", "failures", "message"],
+      "additionalProperties": false,
+      "if": {"properties": {"kind": {"enum": ["option", "assertion"]}}},
+      "then": {"required": ["locations"], "not": {"required": ["value"]}, "properties": {"locations": {"$ref": "#/$defs/policy_locations"}}},
+      "else": {"properties": {"locations": {"$ref": "#/$defs/locations"}}}
     }
   }
 }

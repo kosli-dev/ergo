@@ -377,12 +377,16 @@ _results(policy, evaluations) := [_m_row_one_line(row) | some row in rows] if {
 	)
 }
 
-_m_row_one_line(row) := object.union(row, {"message": _m_one_line(row.message)}) if {
+_m_row_one_line(row) := object.union(row, object.union({"message": _m_one_line(row.message)}, {"failures": [_m_entry_one_line(e) | some e in row.failures] | "failures" in object.keys(row)})) if {
 	is_string(object.get(row, "message", null))
 	_m_separator_in(row.message)
 }
 
 else := row
+
+_m_entry_one_line(e) := object.union(e, {"message": _m_one_line(e.message), "failures": [_m_inner_one_line(x) | some x in e.failures]})
+
+_m_inner_one_line(e) := object.union(e, {"message": _m_one_line(e.message), "failures": [object.union(x, {"message": _m_one_line(x.message)}) | some x in e.failures]})
 
 _m_separator_in(m) if contains(m, "\u2028")
 
