@@ -3154,5 +3154,38 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a root of the wrong type in a whose, beside items that fail on a list that can be read, is said first and the check fails as unusable",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "ts", "has": {"pl": "p"}}}, "requirements": {"r": {"subject": "t", "checks": {"ev_p": "every es whose n is at least $params.z exists", "so_p": "some es whose n is at least $params.z exists", "ia_p": "every es whose n is at least $params.z, if any, is at most 5", "ev_i": "every es whose n is at least $input.z exists", "so_i": "some es whose n is at least $input.z exists", "ia_i": "every es whose n is at least $input.z, if any, is at most 5"}}}},
+    "params": {"z": "s"},
+    "cases": [
+      {
+        "description": "a root of the wrong type beside items that fail as absent is said first and the check fails as unusable",
+        "rules": ["problems.all_said", "walk.flaws"],
+        "input": {"z": "s", "ts": [{"id": "a", "es": [{}], "p": {}}]},
+        "results": [
+          {"cause": "unusable", "check": "ev_i", "failed_items": [{"cause": "absent", "item": "item 1 of es", "locations": ["/ts/0/es/0"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/z"], "name": "$input.z", "value": "s"}, {"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{}]}], "message": "$input.z is \"s\", which isn't a number; item 1 of es: n is missing", "passed": false, "requirement": "r", "subject": {"id": {"es": [{}], "id": "a", "p": {}}, "type": "t"}},
+          {"cause": "unusable", "check": "ev_p", "failed_items": [{"cause": "absent", "item": "item 1 of es", "locations": ["/ts/0/es/0"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{}]}], "message": "$params.z is \"s\", which isn't a number; item 1 of es: n is missing", "passed": false, "requirement": "r", "subject": {"id": {"es": [{}], "id": "a", "p": {}}, "type": "t"}},
+          {"cause": "unusable", "check": "ia_i", "failed_items": [{"cause": "absent", "item": "item 1 of es", "locations": ["/ts/0/es/0"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/z"], "name": "$input.z", "value": "s"}, {"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{}]}], "message": "$input.z is \"s\", which isn't a number; item 1 of es: n is missing", "passed": false, "requirement": "r", "subject": {"id": {"es": [{}], "id": "a", "p": {}}, "type": "t"}},
+          {"cause": "unusable", "check": "ia_p", "failed_items": [{"cause": "absent", "item": "item 1 of es", "locations": ["/ts/0/es/0"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{}]}], "message": "$params.z is \"s\", which isn't a number; item 1 of es: n is missing", "passed": false, "requirement": "r", "subject": {"id": {"es": [{}], "id": "a", "p": {}}, "type": "t"}},
+          {"cause": "unusable", "check": "so_i", "failed_items": [{"cause": "absent", "item": "item 1 of es", "locations": ["/ts/0/es/0"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/z"], "name": "$input.z", "value": "s"}, {"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{}]}], "message": "$input.z is \"s\", which isn't a number; item 1 of es: n is missing", "passed": false, "requirement": "r", "subject": {"id": {"es": [{}], "id": "a", "p": {}}, "type": "t"}},
+          {"cause": "unusable", "check": "so_p", "failed_items": [{"cause": "absent", "item": "item 1 of es", "locations": ["/ts/0/es/0"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{}]}], "message": "$params.z is \"s\", which isn't a number; item 1 of es: n is missing", "passed": false, "requirement": "r", "subject": {"id": {"es": [{}], "id": "a", "p": {}}, "type": "t"}}
+        ]
+      },
+      {
+        "description": "a root of the wrong type beside items that fail as null is said first and the check fails as unusable",
+        "rules": ["problems.all_said", "walk.flaws"],
+        "input": {"z": "s", "ts": [{"id": "a", "es": [{"n": null}], "p": {}}]},
+        "results": [
+          {"cause": "unusable", "check": "ev_i", "failed_items": [{"cause": "null", "item": "item 1 of es", "locations": ["/ts/0/es/0/n"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/z"], "name": "$input.z", "value": "s"}, {"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{"n": null}]}], "message": "$input.z is \"s\", which isn't a number; item 1 of es: n is null", "passed": false, "requirement": "r", "subject": {"id": {"es": [{"n": null}], "id": "a", "p": {}}, "type": "t"}},
+          {"cause": "unusable", "check": "ev_p", "failed_items": [{"cause": "null", "item": "item 1 of es", "locations": ["/ts/0/es/0/n"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{"n": null}]}], "message": "$params.z is \"s\", which isn't a number; item 1 of es: n is null", "passed": false, "requirement": "r", "subject": {"id": {"es": [{"n": null}], "id": "a", "p": {}}, "type": "t"}},
+          {"cause": "unusable", "check": "ia_i", "failed_items": [{"cause": "null", "item": "item 1 of es", "locations": ["/ts/0/es/0/n"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/z"], "name": "$input.z", "value": "s"}, {"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{"n": null}]}], "message": "$input.z is \"s\", which isn't a number; item 1 of es: n is null", "passed": false, "requirement": "r", "subject": {"id": {"es": [{"n": null}], "id": "a", "p": {}}, "type": "t"}},
+          {"cause": "unusable", "check": "ia_p", "failed_items": [{"cause": "null", "item": "item 1 of es", "locations": ["/ts/0/es/0/n"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{"n": null}]}], "message": "$params.z is \"s\", which isn't a number; item 1 of es: n is null", "passed": false, "requirement": "r", "subject": {"id": {"es": [{"n": null}], "id": "a", "p": {}}, "type": "t"}},
+          {"cause": "unusable", "check": "so_i", "failed_items": [{"cause": "null", "item": "item 1 of es", "locations": ["/ts/0/es/0/n"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/z"], "name": "$input.z", "value": "s"}, {"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{"n": null}]}], "message": "$input.z is \"s\", which isn't a number; item 1 of es: n is null", "passed": false, "requirement": "r", "subject": {"id": {"es": [{"n": null}], "id": "a", "p": {}}, "type": "t"}},
+          {"cause": "unusable", "check": "so_p", "failed_items": [{"cause": "null", "item": "item 1 of es", "locations": ["/ts/0/es/0/n"], "path": "es[0].n", "value": null}], "inputs": [{"locations": ["/ts/0/es/0"], "name": "es[]", "value": [{"n": null}]}], "message": "$params.z is \"s\", which isn't a number; item 1 of es: n is null", "passed": false, "requirement": "r", "subject": {"id": {"es": [{"n": null}], "id": "a", "p": {}}, "type": "t"}}
+        ]
+      }
+    ]
   }
 ]

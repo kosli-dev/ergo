@@ -1,5 +1,41 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
+        "every es whose n is at least $input.z exists",
+        "every es whose n is at least $input.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose n is at least $input.z, if any, is at most 5",
+        "every es whose n is at least $input.z, if any, is at most 5",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose n is at least $params.z exists",
+        "every es whose n is at least $params.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose n is at least $params.z, if any, is at most 5",
+        "every es whose n is at least $params.z, if any, is at most 5",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose n is at least $input.z exists",
+        "some es whose n is at least $input.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose n is at least $params.z exists",
+        "some es whose n is at least $params.z exists",
+        &[],
+        &[],
+    ),
+    (
         "some es whose v is in $params.z is in $params.y",
         "some es whose v is in $params.z is in $params.y",
         &[],
