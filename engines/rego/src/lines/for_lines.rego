@@ -152,9 +152,9 @@ _for_rooted_row(check, subj, r) := object.union(r, {"cause": "unusable", "other_
 	flaw != ""
 	ms := _walk_root_msgs(check, subj)
 	ms != []
-} else := _for_worse_root(check, subj, _rooted_row(check, subj, r))
+} else := _worse_root(check, subj, _rooted_row(check, subj, r))
 
-_for_worse_root(check, subj, rr) := object.union(rr, {"cause": _worst_of({rr.cause, flaw})}) if {
+_worse_root(check, subj, rr) := object.union(rr, {"cause": _worst_of({rr.cause, flaw})}) if {
 	"other_roots" in object.keys(rr)
 	flaw := _walk_root_flaw(check, subj)
 	flaw != ""

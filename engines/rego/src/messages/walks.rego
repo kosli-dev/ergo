@@ -285,6 +285,7 @@ _m_tally(subj, side) := array.concat(
 
 _m_tally_list_said(side, said, x) if {
 	said != []
+	not _unreadable_input
 	not _m_tally_keyed(side)
 	not _path_through_item(x.path)
 }
@@ -556,7 +557,7 @@ _m_sentence(c, subj, cause) := _m_walk_sentence(c, subj, cause, _walk_row(c, sub
 
 _m_walk_sentence(c, subj, cause, r) := r.root_msgs if "root_msgs" in object.keys(r)
 
-else := _parts_ahead(_walk_parts(c, subj, {"cause": cause}, r), r)
+else := _walk_parts(c, subj, {"cause": cause}, r)
 
 _m_own_msg(check, c, m, one) := {"own_msg": [_m_aliased(_m_unalias(a, one, x)) | some x in m]} if {
 	a := check.items[count(check.items) - 1].as

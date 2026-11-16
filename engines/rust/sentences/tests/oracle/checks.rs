@@ -1,5 +1,66 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
+        "some es whose v is in $params.z is in $params.y",
+        "some es whose v is in $params.z is in $params.y",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose v is in $params.z and whose v is in $input.y exists",
+        "some es whose v is in $params.z and whose v is in $input.y exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es.v whose v is in $params.z is in $params.y",
+        "every es.v whose v is in $params.z is in $params.y",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in t.z and whose v is in $input.y exists",
+        "every es whose v is in t.z and whose v is in $input.y exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in pl.z and whose v is in $input.y exists",
+        "every es whose v is in pl.z and whose v is in $input.y exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in $params.z, if any, is in $params.y",
+        "every es whose v is in $params.z, if any, is in $params.y",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in $input.z exists",
+        "every es whose v is in $input.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is in $input.z and whose v is in $input.y exists",
+        "every es whose v is in $input.z and whose v is in $input.y exists",
+        &[],
+        &[],
+    ),
+    ("e.v exists", "e.v exists", &[], &[]),
+    (
+        "count of es whose v is in $params.z is 0 plus $params.q",
+        "count of es whose v is in $params.z equals 0 plus $params.q",
+        &[],
+        &[],
+    ),
+    (
+        "count of es whose v is in $input.z is 0",
+        "count of es whose v is in $input.z is 0",
+        &[],
+        &[],
+    ),
+    (
         "approved_by is a non-empty string",
         "approved_by is a non-empty string",
         &[],
@@ -12189,6 +12250,12 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every es whose v is in pl.z and whose v is in $input.y as e",
+        "every es whose v is in pl.z and whose v is in $input.y as e",
+        &[],
+        &[],
+    ),
     (
         "every a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11 as t",
         "every a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11 as t",

@@ -192,6 +192,7 @@ _root_kind -> _m_right_kind
 _root_kind -> _m_right_needs
 _root_reads -> _m_key_ref_failed
 _root_reads -> _m_off_path
+_rooted_row -> _walk_parts
 _rooted_steps_name -> _names
 _rooted_steps_name -> _visible
 _row_cause -> _derived_eval
@@ -267,6 +268,7 @@ _walk_failure -> _m_walk_leaf
 _walk_list_ref -> _right_ref_ops
 _walk_root_msgs -> _m_ref_first
 _walk_rooted_outcome -> _messaged
+_walk_row -> _m_walk_blocked
 _walk_row -> _walk_message
 _walk_row -> _walk_parts
 _walk_stop -> _m_walk_kind

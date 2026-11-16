@@ -1272,7 +1272,7 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
         let keyed = whose
             .iter()
             .any(|check| check.paths().into_iter().any(walk::has_key_step));
-        let roots = (!keyed)
+        let roots = (!keyed && !walk::params_unreadable(&outer))
             .then(|| super::message::root_flaw_texts(&whose, &outer, &whose))
             .flatten();
         if let Some(outcome) = walked.unreadable {

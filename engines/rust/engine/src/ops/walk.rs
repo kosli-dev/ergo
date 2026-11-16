@@ -1405,12 +1405,17 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
         row.verdict.cause = Cause::Unusable;
         row.failed_items = Vec::new();
         let outer_ctx = outer(ctx);
-        if let Some((_, roots)) = list_beside_roots(walk, &outer_ctx) {
-            row.parts = roots_then(roots, std::mem::take(&mut row.parts));
+        let faults = walk_faults(walk, &outer_ctx);
+        let blocked = !through_a_list(&walk.path, &outer_ctx)
+            && !message::blocked_of(&walk.path, &outer_ctx).is_empty();
+        if !blocked && let Some((_, roots)) = list_beside_roots(walk, &outer_ctx) {
+            let mut said = faults;
+            said.extend(std::mem::take(&mut row.parts));
+            row.parts = roots_then(roots, said);
             row.message = Some(message::joined(row.parts.clone()));
             return row;
         }
-        row.parts = walk_faults(walk, &outer_ctx);
+        row.parts = faults;
         let whose: Vec<&Check> = walk.whose.iter().collect();
         if let Some((_, text)) = message::root_flaw(&whose, &outer_ctx) {
             row.parts = message::with_roots(std::mem::take(&mut row.parts), &text);
@@ -1419,34 +1424,49 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
         return row;
     }
     let outer_ctx = outer(ctx);
+    let raw_cause = row.verdict.cause;
+    let raw_parts = row.parts.clone();
+    let beside = if raw_cause == Cause::Satisfied {
+        None
+    } else {
+        list_beside_roots(walk, &outer_ctx)
+    };
+    let mut row = rooted_row(walk, ctx, &outer_ctx, row);
+    if let Some((cause, roots)) = beside {
+        row.verdict.cause = Cause::worst([cause, raw_cause]).unwrap_or(cause);
+        row.parts = roots_then(roots, raw_parts);
+        row.message = Some(message::joined(row.parts.clone()));
+    }
+    row
+}
+
+fn rooted_row(walk: &Walk, ctx: &Ctx, outer_ctx: &Ctx, mut row: Run) -> Run {
     let whose: Vec<&Check> = walk.whose.iter().collect();
     let unread = !row.verdict.cause.is_failure();
     let check_cause = unread
-        .then(|| message::root_flaw(&[&*walk.check], &outer_ctx))
+        .then(|| message::root_flaw(&[&*walk.check], outer_ctx))
         .flatten();
     let keyed =
-        check_cause.is_some() && check_cause == message::key_cause(&[&*walk.check], &outer_ctx);
-    let flaw = message::root_flaw(&whose, &outer_ctx)
+        check_cause.is_some() && check_cause == message::key_cause(&[&*walk.check], outer_ctx);
+    let flaw = message::root_flaw(&whose, outer_ctx)
         .or_else(|| (unread && !keyed).then_some(check_cause).flatten());
     let flaw = if unread {
         let mut keys = whose.clone();
         if keyed {
             keys.push(&*walk.check);
         }
-        message::worse_key_cause(flaw, &keys, &outer_ctx)
+        message::worse_key_cause(flaw, &keys, outer_ctx)
     } else {
         flaw
     };
-    if row.verdict.cause != Cause::Satisfied
-        && let Some((cause, roots)) = list_beside_roots(walk, &outer_ctx)
-    {
-        row.verdict.cause = Cause::worst([cause, row.verdict.cause]).unwrap_or(cause);
-        row.parts = roots_then(roots, std::mem::take(&mut row.parts));
-        row.message = Some(message::joined(row.parts.clone()));
-        return row;
-    }
     if let Some((cause, text)) = flaw {
         if row.verdict.cause != cause && row.verdict.cause.is_failure() {
+            if !whose
+                .iter()
+                .any(|check| check.paths().into_iter().any(has_key_step))
+            {
+                row.verdict.cause = Cause::worst([cause, row.verdict.cause]).unwrap_or(cause);
+            }
             if ctx.label.is_some() && !in_a_for_line(ctx) && !row.parts.is_empty() {
                 let parts = message::with_roots(std::mem::take(&mut row.parts), &text);
                 row.message = Some(message::joined(parts.clone()));
@@ -1477,9 +1497,10 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
 
 fn list_beside_roots(walk: &Walk, outer_ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
     let whose: Vec<&Check> = walk.whose.iter().collect();
-    if whose
-        .iter()
-        .any(|check| check.paths().into_iter().any(has_key_step))
+    if params_unreadable(outer_ctx)
+        || whose
+            .iter()
+            .any(|check| check.paths().into_iter().any(has_key_step))
     {
         return None;
     }
@@ -1491,7 +1512,8 @@ fn list_beside_roots(walk: &Walk, outer_ctx: &Ctx) -> Option<(Cause, Vec<String>
             empty_adds_nothing: false,
         },
     );
-    if !walked.own_failures() || (walked.unreadable.is_none() && !walked.items.is_empty()) {
+    let list_fails = walked.unreadable.is_some() || !walked.failures.is_empty();
+    if !list_fails || !walked.own_failures() {
         return None;
     }
     message::root_flaw_texts(&whose, outer_ctx, &[])
@@ -1503,6 +1525,10 @@ impl Walked<'_> {
             .iter()
             .all(|f| !f.order.iter().any(|seg| matches!(seg, Seg::Index(_))))
     }
+}
+
+pub(super) fn params_unreadable(ctx: &Ctx) -> bool {
+    ctx.params.is_some_and(|p| !p.is_object() && !p.is_null())
 }
 
 pub(super) fn has_key_step(path: &Path) -> bool {
