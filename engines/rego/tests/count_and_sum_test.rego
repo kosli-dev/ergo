@@ -386,7 +386,7 @@ test_a_count_can_go_in_a_whose_of_every_and_an_item_it_cant_decide_fails_the_wal
 }
 
 test_a_count_whose_named_by_cant_be_read_fails_with_its_cause if {
-	_tally_rows("count of m named by $params.k is 2", [{"id": 1, "m": {"a": [1, 2]}}], {}) == [[1, "absent", [{"name": "count of m named by $params.k", "value": null, "locations": []}, {"name": "m named by $params.k", "value": [], "locations": []}]]]
+	_tally_rows("count of m named by $params.k is 2", [{"id": 1, "m": {"a": [1, 2]}}], {}) == [[1, "absent", [_in("count of m named by $params.k", null, []), _seen("m named by $params.k", [], [], "absent")]]]
 }
 
 _sum_whose_cause(check, items) := [row[1] | some row in _tally_rows(check, [{"id": "t", "items": items}], {})]
@@ -461,19 +461,16 @@ test_a_count_whose_whose_reads_a_for_name_shows_its_list_and_not_its_number if {
 }
 
 test_a_count_whose_whose_reads_a_param_it_cant_use_shows_null if {
-	_tally_rows("count of xs whose s is one of $params.v is 1", [{"id": 1, "xs": [{"s": "a"}]}], {"v": 5}) == [[1, "unusable", [{"name": "count of xs whose s is in $params.v", "value": null, "locations": ["/things/0/xs/0"]}, {"name": "xs[]", "value": [{"s": "a"}], "locations": ["/things/0/xs/0"]}]]]
+	_tally_rows("count of xs whose s is one of $params.v is 1", [{"id": 1, "xs": [{"s": "a"}]}], {"v": 5}) == [[1, "unusable", [_in("count of xs whose s is in $params.v", null, ["/things/0/xs/0"]), _seen("xs[]", [{"s": "a"}], ["/things/0/xs/0"], "found")]]]
 }
 
 test_a_count_whose_ref_cant_be_read_is_read_the_slow_way_and_fails_with_the_refs_cause if {
-	_tally_rows(`count of xs whose s is one of $params.missing is 1`, [{"id": 1, "xs": [{"s": "a"}]}], {}) == [[1, "absent", [{"name": "count of xs whose s is in $params.missing", "value": null, "locations": ["/things/0/xs/0"]}, {"name": "xs[]", "value": [{"s": "a"}], "locations": ["/things/0/xs/0"]}]]]
+	_tally_rows(`count of xs whose s is one of $params.missing is 1`, [{"id": 1, "xs": [{"s": "a"}]}], {}) == [[1, "absent", [_in("count of xs whose s is in $params.missing", null, ["/things/0/xs/0"]), _seen("xs[]", [{"s": "a"}], ["/things/0/xs/0"], "found")]]]
 }
 
 test_a_count_whose_whose_reads_a_missing_param_fails_even_when_it_would_count_zero if {
 	things := [{"id": 1, "xs": []}, {"id": 2, "xs": [{"k": "a"}]}]
-	_tally_rows("count of xs whose k is one of $params.missing is 0", things, {}) == [
-		[1, "absent", [{"name": "count of xs whose k is in $params.missing", "value": null, "locations": []}, {"name": "xs[]", "value": [], "locations": []}]],
-		[2, "absent", [{"name": "count of xs whose k is in $params.missing", "value": null, "locations": ["/things/1/xs/0"]}, {"name": "xs[]", "value": [{"k": "a"}], "locations": ["/things/1/xs/0"]}]],
-	]
+	_tally_rows("count of xs whose k is one of $params.missing is 0", things, {}) == [[1, "absent", [_in("count of xs whose k is in $params.missing", null, []), _seen("xs[]", [], [], "found")]], [2, "absent", [_in("count of xs whose k is in $params.missing", null, ["/things/1/xs/0"]), _seen("xs[]", [{"k": "a"}], ["/things/1/xs/0"], "found")]]]
 	[row[1] | some row in _tally_rows("count of xs whose k is one of $params.v is 0", things, {"v": null})] == ["null", "null"]
 }
 
@@ -549,10 +546,7 @@ test_elapsed_fails_a_number_outside_the_years_rfc_3339_times_cover_so_millisecon
 }
 
 test_elapsed_fails_as_value_when_the_end_is_before_the_start if {
-	_elapsed_rows("days elapsed from p to q is at most 5", [{"id": 1, "p": "2026-01-02T00:00:00Z", "q": "2026-01-01T00:00:00Z"}, {"id": 2, "p": 5, "q": 4}], {}) == [
-		[1, false, "value", [{"name": "days elapsed from p to q", "value": null, "locations": ["/things/0/p", "/things/0/q"]}, {"name": "p", "value": "2026-01-02T00:00:00Z", "locations": ["/things/0/p"]}, {"name": "q", "value": "2026-01-01T00:00:00Z", "locations": ["/things/0/q"]}]],
-		[2, false, "value", [{"name": "days elapsed from p to q", "value": null, "locations": ["/things/1/p", "/things/1/q"]}, {"name": "p", "value": 5, "locations": ["/things/1/p"]}, {"name": "q", "value": 4, "locations": ["/things/1/q"]}]],
-	]
+	_elapsed_rows("days elapsed from p to q is at most 5", [{"id": 1, "p": "2026-01-02T00:00:00Z", "q": "2026-01-01T00:00:00Z"}, {"id": 2, "p": 5, "q": 4}], {}) == [[1, false, "value", [_in("days elapsed from p to q", null, ["/things/0/p", "/things/0/q"]), _seen("p", "2026-01-02T00:00:00Z", ["/things/0/p"], "found"), _seen("q", "2026-01-01T00:00:00Z", ["/things/0/q"], "found")]], [2, false, "value", [_in("days elapsed from p to q", null, ["/things/1/p", "/things/1/q"]), _seen("p", 5, ["/things/1/p"], "found"), _seen("q", 4, ["/things/1/q"], "found")]]]
 }
 
 test_elapsed_fails_closed_on_a_side_it_cant_read if {
@@ -733,10 +727,7 @@ test_a_count_named_by_a_missing_or_wrong_key_in_a_whose_fails_closed if {
 
 test_a_failed_line_that_counts_through_an_alias_lists_the_number_then_the_list if {
 	rows := _for_rows_full({"for": "every commits as commit", "assert": "count of commit.files is at least 2"}, [{"id": 1, "commits": [{"files": ["a", "b"]}, {"files": ["c"]}]}], {})
-	rows[0][2][0].failed_assertions[0].inputs == [
-		{"name": "count of commit.files", "value": 1, "locations": ["/things/0/commits/1/files/0"]},
-		{"name": "commit.files[]", "value": ["c"], "locations": ["/things/0/commits/1/files/0"]},
-	]
+	rows[0][2][0].failures[0].inputs == [_in("count of commit.files", 1, ["/things/0/commits/1/files/0"]), _seen("commit.files[]", ["c"], ["/things/0/commits/1/files/0"], "found")]
 }
 
 test_a_ref_step_adds_the_key_it_read_and_stops_before_it_when_it_cannot_be_read if {
