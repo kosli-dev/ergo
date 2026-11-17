@@ -19949,7 +19949,7 @@
                 "locations": [
                   "$policy:/subjects/thing/from#2"
                 ],
-                "message": "",
+                "message": "state is \"old\"",
                 "name": "state is not \"old\""
               }
             ],

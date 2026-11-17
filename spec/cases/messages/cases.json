@@ -10733,7 +10733,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert/1"
                 ],
-                "message": "",
+                "message": "x is 5",
                 "name": "x is 2"
               }
             ],
@@ -10816,7 +10816,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/d/assert/2"
                 ],
-                "message": "",
+                "message": "x is 5",
                 "name": "x is 3"
               }
             ],
@@ -10917,7 +10917,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/e/assert/1"
                 ],
-                "message": "",
+                "message": "count of xs is 3",
                 "name": "count of xs is 2"
               }
             ],
@@ -11002,7 +11002,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert/1"
                 ],
-                "message": "",
+                "message": "x is missing",
                 "name": "x is 2"
               }
             ],
@@ -11085,7 +11085,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/d/assert/2"
                 ],
-                "message": "",
+                "message": "x is missing",
                 "name": "x is 3"
               }
             ],
@@ -11186,7 +11186,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/e/assert/1"
                 ],
-                "message": "",
+                "message": "count of xs is 3",
                 "name": "count of xs is 2"
               }
             ],

@@ -15,7 +15,7 @@ _row_said(check, subj, raw) := {"message": _row_message(check, subj, raw)} if {
 	not _any_of_run(check)
 }
 
-_row_said(check, subj, raw) := {"message": concat("; ", ms), "ergo/texts": _first_texts(ts)} if {
+_row_said(check, subj, raw) := {"message": concat("; ", ms), "ergo/texts": ts} if {
 	_all_of_run(check)
 	ts := [_m_joined(_m_line(check.checks[i], subj, fa.cause)) |
 		some fa in raw.failed_assertions
@@ -25,13 +25,7 @@ _row_said(check, subj, raw) := {"message": concat("; ", ms), "ergo/texts": _firs
 	ms != []
 } else := {"message": _m_fallback(check)} if _all_of_run(check)
 
-_first_texts(ts) := [_first_text(ts, i) | some i, _ in ts]
-
-_first_text(ts, i) := "" if ts[i] in array.slice(ts, 0, i)
-
-else := ts[i]
-
-_row_said(check, subj, _) := {"message": concat("; ", ms), "ergo/texts": [_or_blank(t) | some t in texts]} if {
+_row_said(check, subj, _) := {"message": concat("; ", ms), "ergo/texts": [_or_blank(t) | some t in said]} if {
 	_any_of_run(check)
 	causes := [_m_undecided(_option_line_cause(c, _assertion_cause(c, subj, ""), subj)) | some c in check.checks]
 	said := [_option_said(c, subj, causes[i]) | some i, c in check.checks]

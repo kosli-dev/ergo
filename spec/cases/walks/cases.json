@@ -898,20 +898,33 @@
                   },
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1"
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1"
+                            ],
+                            "name": "pull_requests[1].commits",
+                            "outcome": "absent",
+                            "value": null
+                          }
                         ],
-                        "name": "pull_requests[1].commits",
-                        "outcome": "absent",
-                        "value": null
+                        "kind": "list",
+                        "message": "commits is missing",
+                        "name": "commits"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of pull_requests: commits is missing",
-                    "name": "pull_requests[1].commits"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {}
                   },
                   {
                     "cause": "absent",
@@ -1005,20 +1018,35 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1/commits"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/commits"
+                            ],
+                            "name": "pull_requests[1].commits",
+                            "outcome": "found",
+                            "value": []
+                          }
                         ],
-                        "name": "pull_requests[1].commits",
-                        "outcome": "found",
-                        "value": []
+                        "kind": "list",
+                        "message": "commits is []",
+                        "name": "commits"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of pull_requests: commits is []",
-                    "name": "pull_requests[1].commits"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "commits": []
+                    }
                   }
                 ],
                 "inputs": [],
@@ -1066,20 +1094,35 @@
                 "failures": [
                   {
                     "cause": "null",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1/commits"
+                        "cause": "null",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/commits"
+                            ],
+                            "name": "pull_requests[1].commits",
+                            "outcome": "null",
+                            "value": null
+                          }
                         ],
-                        "name": "pull_requests[1].commits",
-                        "outcome": "null",
-                        "value": null
+                        "kind": "list",
+                        "message": "commits is null",
+                        "name": "commits"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of pull_requests: commits is null",
-                    "name": "pull_requests[1].commits"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "commits": null
+                    }
                   }
                 ],
                 "inputs": [],
@@ -1127,20 +1170,35 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1/commits"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/commits"
+                            ],
+                            "name": "pull_requests[1].commits",
+                            "outcome": "unusable",
+                            "value": "x"
+                          }
                         ],
-                        "name": "pull_requests[1].commits",
-                        "outcome": "unusable",
-                        "value": "x"
+                        "kind": "list",
+                        "message": "commits is \"x\", which isn't a list",
+                        "name": "commits"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of pull_requests: commits is \"x\", which isn't a list",
-                    "name": "pull_requests[1].commits"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "commits": "x"
+                    }
                   }
                 ],
                 "inputs": [],
@@ -1230,54 +1288,97 @@
                   },
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1/commits"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/commits"
+                            ],
+                            "name": "pull_requests[1].commits",
+                            "outcome": "unusable",
+                            "value": "x"
+                          }
                         ],
-                        "name": "pull_requests[1].commits",
-                        "outcome": "unusable",
-                        "value": "x"
+                        "kind": "list",
+                        "message": "commits is \"x\", which isn't a list",
+                        "name": "commits"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of pull_requests: commits is \"x\", which isn't a list",
-                    "name": "pull_requests[1].commits"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "commits": "x"
+                    }
                   },
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/2"
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/2"
+                            ],
+                            "name": "pull_requests[2].commits",
+                            "outcome": "absent",
+                            "value": null
+                          }
                         ],
-                        "name": "pull_requests[2].commits",
-                        "outcome": "absent",
-                        "value": null
+                        "kind": "list",
+                        "message": "commits is missing",
+                        "name": "commits"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 3 of pull_requests: commits is missing",
-                    "name": "pull_requests[2].commits"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/2"
+                    ],
+                    "message": "",
+                    "name": "item 3 of pull_requests",
+                    "value": {}
                   },
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/3/commits"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/3/commits"
+                            ],
+                            "name": "pull_requests[3].commits",
+                            "outcome": "found",
+                            "value": []
+                          }
                         ],
-                        "name": "pull_requests[3].commits",
-                        "outcome": "found",
-                        "value": []
+                        "kind": "list",
+                        "message": "commits is []",
+                        "name": "commits"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 4 of pull_requests: commits is []",
-                    "name": "pull_requests[3].commits"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/3"
+                    ],
+                    "message": "",
+                    "name": "item 4 of pull_requests",
+                    "value": {
+                      "commits": []
+                    }
                   }
                 ],
                 "inputs": [],
@@ -1893,20 +1994,35 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1/labels"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/labels"
+                            ],
+                            "name": "pull_requests[1].labels",
+                            "outcome": "found",
+                            "value": []
+                          }
                         ],
-                        "name": "pull_requests[1].labels",
-                        "outcome": "found",
-                        "value": []
+                        "kind": "list",
+                        "message": "labels is []",
+                        "name": "labels"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of pull_requests: labels is []",
-                    "name": "pull_requests[1].labels"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "labels": []
+                    }
                   }
                 ],
                 "inputs": [],
@@ -2196,20 +2312,33 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1"
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1"
+                            ],
+                            "name": "pull_requests[1].commits",
+                            "outcome": "absent",
+                            "value": null
+                          }
                         ],
-                        "name": "pull_requests[1].commits",
-                        "outcome": "absent",
-                        "value": null
+                        "kind": "list",
+                        "message": "commits is missing",
+                        "name": "commits"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of pull_requests: commits is missing",
-                    "name": "pull_requests[1].commits"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {}
                   }
                 ],
                 "inputs": [],
@@ -2257,20 +2386,35 @@
                 "failures": [
                   {
                     "cause": "null",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1/commits"
+                        "cause": "null",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/commits"
+                            ],
+                            "name": "pull_requests[1].commits",
+                            "outcome": "null",
+                            "value": null
+                          }
                         ],
-                        "name": "pull_requests[1].commits",
-                        "outcome": "null",
-                        "value": null
+                        "kind": "list",
+                        "message": "commits is null",
+                        "name": "commits"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of pull_requests: commits is null",
-                    "name": "pull_requests[1].commits"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "commits": null
+                    }
                   }
                 ],
                 "inputs": [],
@@ -2318,20 +2462,35 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1/commits"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/commits"
+                            ],
+                            "name": "pull_requests[1].commits",
+                            "outcome": "unusable",
+                            "value": 3
+                          }
                         ],
-                        "name": "pull_requests[1].commits",
-                        "outcome": "unusable",
-                        "value": 3
+                        "kind": "list",
+                        "message": "commits is 3, which isn't a list",
+                        "name": "commits"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of pull_requests: commits is 3, which isn't a list",
-                    "name": "pull_requests[1].commits"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "commits": 3
+                    }
                   }
                 ],
                 "inputs": [],
@@ -3258,37 +3417,65 @@
                   },
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1/approvers"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/approvers"
+                            ],
+                            "name": "pull_requests[1].approvers",
+                            "outcome": "found",
+                            "value": []
+                          }
                         ],
-                        "name": "pull_requests[1].approvers",
-                        "outcome": "found",
-                        "value": []
+                        "kind": "list",
+                        "message": "approvers is []",
+                        "name": "approvers"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of pull_requests: approvers is []",
-                    "name": "pull_requests[1].approvers"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "approvers": []
+                    }
                   },
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/2"
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/2"
+                            ],
+                            "name": "pull_requests[2].approvers",
+                            "outcome": "absent",
+                            "value": null
+                          }
                         ],
-                        "name": "pull_requests[2].approvers",
-                        "outcome": "absent",
-                        "value": null
+                        "kind": "list",
+                        "message": "approvers is missing",
+                        "name": "approvers"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 3 of pull_requests: approvers is missing",
-                    "name": "pull_requests[2].approvers"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/2"
+                    ],
+                    "message": "",
+                    "name": "item 3 of pull_requests",
+                    "value": {}
                   }
                 ],
                 "inputs": [],
@@ -7746,20 +7933,35 @@
                   },
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1/commits"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/commits"
+                            ],
+                            "name": "pull_requests[1].commits",
+                            "outcome": "unusable",
+                            "value": "none"
+                          }
                         ],
-                        "name": "pull_requests[1].commits",
-                        "outcome": "unusable",
-                        "value": "none"
+                        "kind": "list",
+                        "message": "commits is \"none\", which isn't a list",
+                        "name": "commits"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of pull_requests: commits is \"none\", which isn't a list",
-                    "name": "pull_requests[1].commits"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "commits": "none"
+                    }
                   }
                 ],
                 "inputs": [],

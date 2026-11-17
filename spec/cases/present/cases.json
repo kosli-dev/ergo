@@ -1090,7 +1090,7 @@
                 "locations": [
                   "$policy:/subjects/thing/from#2"
                 ],
-                "message": "",
+                "message": "status is missing",
                 "name": "status exists"
               }
             ],
@@ -1162,7 +1162,7 @@
                 "locations": [
                   "$policy:/subjects/thing/from#2"
                 ],
-                "message": "",
+                "message": "status is null",
                 "name": "status exists"
               }
             ],

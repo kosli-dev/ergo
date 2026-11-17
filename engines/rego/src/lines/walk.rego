@@ -254,7 +254,7 @@ _walk(start, keys, if_any) := {"items": items, "fails": fails, "walked": walked,
 	r9 := _walk_level(r8.entries, keys, 9, if_any, start)
 	r10 := _walk_level(r9.entries, keys, 10, if_any, start)
 	levels := [r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10]
-	fails := [object.union(f, {"at": _pointer(start.a, start.v, array.slice(f.path, count(start.c), count(f.path)))}) | some r in levels; some f in r.fails]
+	fails := [object.union(f, {"at": _pointer(start.a, start.v, array.slice(f.path, count(start.c), count(f.path))), "lv": _list_levels(start, f.path)}) | some r in levels; some f in r.fails]
 	walked := {i | some i, r in levels; r.walked}
 	items := [e | some e in r10.entries; e.i != null]
 	trail := array.concat([start], [r.entries[0] | some i, r in levels; i < count(keys); count(r.entries) == 1])
@@ -553,7 +553,10 @@ _walk_failed(cause, fails, path) := [{"path": _failed_name(f.path, _dotted_roots
 
 _fail_item(f) := {"value": f.iv, "locations": _item_locations(f), "levels": object.get(f, "lv", [])} if "iv" in object.keys(f)
 
-else := null
+else := {"levels": f.lv} if {
+	"lv" in object.keys(f)
+	f.lv != []
+} else := null
 
 _item_locations(f) := [f.iat] if not "ats" in object.keys(f)
 
@@ -649,4 +652,14 @@ _item_levels(w, e) := [{"value": object.get(w.trail[0].v, s, null), "locations":
 	is_array(e.i)
 	count(e.i) - count(w.trail[0].c) > 2
 	rel := array.slice(e.i, count(w.trail[0].c), count(e.i))
+} else := []
+
+_list_levels(start, path) := [{"value": object.get(start.v, s, null), "locations": [_pointer(start.a, start.v, s)]} |
+	some k, step in rel
+	is_number(step)
+	s := array.slice(rel, 0, k + 1)
+] if {
+	is_array(path)
+	count(path) - count(start.c) > 1
+	rel := array.slice(path, count(start.c), count(path))
 } else := []

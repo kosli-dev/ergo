@@ -898,7 +898,7 @@ else := raw
 
 _for_texts(check, subj, r, once, line) := {
 	"items": items,
-	"said": [concat("; ", _for_grouped(check, _uncovered(array.concat([m | some m in roots; owners[m] == i], object.get(frees, a, []))))) | some i, a in check.assertions],
+	"said": [concat("; ", _for_grouped(check, _uncovered(array.concat([m | some m in roots; i in owners[m]], object.get(frees, a, []))))) | some i, a in check.assertions],
 	"walk": array.concat(array.concat([["list", _for_list_label(check), m] | some m in line], [["list", _for_list_label(check), concat("; ", _for_grouped(check, unowned))] | unowned != []]), seconds),
 	"free": [object.remove(l, ["msg", "own_msg"]) | some l in object.get(r, "free_lines", [])],
 } if {
@@ -911,7 +911,7 @@ _for_texts(check, subj, r, once, line) := {
 	roots := _once(array.concat([m | once != []; some m in rs; not m in second], [t | some x in items; some t in x.roots]))
 	frees := _for_free_said(r, rs, once, free_as)
 	owners := {m: _for_root_owner(check, subj, m, _for_free_said(r, [], once, free_as)) | some m in roots}
-	unowned := _uncovered([m | some m in roots; owners[m] == -1])
+	unowned := _uncovered([m | some m in roots; -1 in owners[m]])
 	seconds := [["item", _m_lead_of(m), _m_after_lead(_m_lead_of(m), m)] | once != []; some m in rs; m in second]
 }
 
@@ -940,19 +940,19 @@ _for_once_skip(check, once) := array.concat(once, [m | some x in _for_second_roo
 
 _for_list_label(check) := _input_name(check.items[0].path)
 
-_for_root_owner(check, subj, m, frees) := min({i | some i, a in check.assertions; _for_free_root(m, frees[a])}) if {
-	some a, ts in frees
-	_for_free_root(m, ts)
-} else := -1 if {
+_for_root_owner(check, subj, m, frees) := free | {i | some i, _ in check.assertions; not i in free; _for_root_of(check, subj, i, m)} if {
+	free := {i | some i, a in check.assertions; _for_free_root(m, frees[a])}
+	count(free) > 0
+} else := {-1} if {
 	some it in check.items
 	count(object.get(it, "whose", [])) > 0
 	_for_root_of(object.union(check, {"checks": [], "assertions": []}), subj, -1, m)
-} else := 0 if count(check.checks) == 1
+} else := {0} if count(check.checks) == 1
 
-else := min(owners) if {
+else := owners if {
 	owners := {i | some i, _ in check.checks; _for_root_of(check, subj, i, m)}
 	count(owners) > 0
-} else := -1
+} else := {-1}
 
 _for_free_root(m, ts) if m in ts
 

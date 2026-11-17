@@ -9549,33 +9549,52 @@
                     "failures": [
                       {
                         "cause": "value",
-                        "failures": [],
-                        "inputs": [
+                        "failures": [
                           {
-                            "locations": [
-                              "/pull_requests/0/approvers/1/t"
+                            "cause": "value",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/pull_requests/0/approvers/1/t"
+                                ],
+                                "name": "approver.t",
+                                "outcome": "found",
+                                "value": 0
+                              },
+                              {
+                                "locations": [
+                                  "/pull_requests/0/commits/0/files/0/t"
+                                ],
+                                "name": "file.t",
+                                "outcome": "found",
+                                "value": 1
+                              }
                             ],
-                            "name": "approver.t",
-                            "outcome": "found",
-                            "value": 0
-                          },
-                          {
+                            "kind": "item",
                             "locations": [
-                              "/pull_requests/0/commits/0/files/0/t"
+                              "/pull_requests/0/commits/0/files/0"
                             ],
-                            "name": "file.t",
-                            "outcome": "found",
-                            "value": 1
+                            "message": "approver.t is 0, and file.t is 1",
+                            "name": "item 1 of files",
+                            "value": {
+                              "t": 1
+                            }
                           }
                         ],
+                        "inputs": [],
                         "kind": "item",
                         "locations": [
-                          "/pull_requests/0/commits/0/files/0"
+                          "/pull_requests/0/commits/0"
                         ],
-                        "message": "item 1 of files: approver.t is 0, and file.t is 1",
-                        "name": "item 1 of commits[0].files",
+                        "message": "",
+                        "name": "item 1 of commits",
                         "value": {
-                          "t": 1
+                          "files": [
+                            {
+                              "t": 1
+                            }
+                          ]
                         }
                       }
                     ],
@@ -9601,20 +9620,33 @@
               },
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/pull_requests/0/commits/1"
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/commits/1"
+                        ],
+                        "name": "commits[1].files",
+                        "outcome": "absent",
+                        "value": null
+                      }
                     ],
-                    "name": "commits[1].files",
-                    "outcome": "absent",
-                    "value": null
+                    "kind": "list",
+                    "message": "files is missing",
+                    "name": "files"
                   }
                 ],
-                "kind": "list",
-                "message": "item 2 of commits: files is missing",
-                "name": "commits[1].files"
+                "inputs": [],
+                "kind": "item",
+                "locations": [
+                  "/pull_requests/0/commits/1"
+                ],
+                "message": "",
+                "name": "item 2 of commits",
+                "value": {}
               }
             ],
             "inputs": [
@@ -18938,33 +18970,52 @@
                     "failures": [
                       {
                         "cause": "value",
-                        "failures": [],
-                        "inputs": [
+                        "failures": [
                           {
-                            "locations": [
-                              "/pr/xs/1/t"
+                            "cause": "value",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/pr/xs/1/t"
+                                ],
+                                "name": "x.t",
+                                "outcome": "found",
+                                "value": 0
+                              },
+                              {
+                                "locations": [
+                                  "/pr/ys/0/zs/0/t"
+                                ],
+                                "name": "y.t",
+                                "outcome": "found",
+                                "value": 1
+                              }
                             ],
-                            "name": "x.t",
-                            "outcome": "found",
-                            "value": 0
-                          },
-                          {
+                            "kind": "item",
                             "locations": [
-                              "/pr/ys/0/zs/0/t"
+                              "/pr/ys/0/zs/0"
                             ],
-                            "name": "y.t",
-                            "outcome": "found",
-                            "value": 1
+                            "message": "x.t is 0, and y.t is 1",
+                            "name": "item 1 of zs",
+                            "value": {
+                              "t": 1
+                            }
                           }
                         ],
+                        "inputs": [],
                         "kind": "item",
                         "locations": [
-                          "/pr/ys/0/zs/0"
+                          "/pr/ys/0"
                         ],
-                        "message": "item 1 of zs: x.t is 0, and y.t is 1",
-                        "name": "item 1 of ys[0].zs",
+                        "message": "",
+                        "name": "item 1 of ys",
                         "value": {
-                          "t": 1
+                          "zs": [
+                            {
+                              "t": 1
+                            }
+                          ]
                         }
                       }
                     ],
@@ -18990,20 +19041,33 @@
               },
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/pr/ys/1"
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pr/ys/1"
+                        ],
+                        "name": "ys[1].zs",
+                        "outcome": "absent",
+                        "value": null
+                      }
                     ],
-                    "name": "ys[1].zs",
-                    "outcome": "absent",
-                    "value": null
+                    "kind": "list",
+                    "message": "zs is missing",
+                    "name": "zs"
                   }
                 ],
-                "kind": "list",
-                "message": "item 2 of ys: zs is missing",
-                "name": "ys[1].zs"
+                "inputs": [],
+                "kind": "item",
+                "locations": [
+                  "/pr/ys/1"
+                ],
+                "message": "",
+                "name": "item 2 of ys",
+                "value": {}
               }
             ],
             "inputs": [

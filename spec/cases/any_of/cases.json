@@ -326,7 +326,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/c/any_of/a/1"
                     ],
-                    "message": "",
+                    "message": "x is missing",
                     "name": "x is 1"
                   }
                 ],

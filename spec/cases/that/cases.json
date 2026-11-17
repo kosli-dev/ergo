@@ -111,7 +111,7 @@
                 "locations": [
                   "$policy:/subjects/word/from#2"
                 ],
-                "message": "",
+                "message": "word is null",
                 "name": "word starts with \"b\""
               }
             ],
@@ -749,7 +749,7 @@
                 "locations": [
                   "$policy:/subjects/w/from#2"
                 ],
-                "message": "",
+                "message": "w is null",
                 "name": "w ends with \"y\""
               }
             ],
@@ -812,7 +812,7 @@
                 "locations": [
                   "$policy:/subjects/w/from#2"
                 ],
-                "message": "",
+                "message": "w is 3, which isn't text",
                 "name": "w ends with \"y\""
               }
             ],

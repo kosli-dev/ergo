@@ -620,12 +620,12 @@ _for_from_first(check) if {
 	step.named_by == check.items[0].as
 }
 
-_for_judge_outer(check, subj, names, item, e, pre, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(true, item, e, names, wh, _for_failure(e, wh.undecided, wh.kept, res, _walk_at(w, e))), "lines": res.lines} if {
+_for_judge_outer(check, subj, names, item, e, pre, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(true, item, e, names, wh, _for_failure(e, wh.undecided, wh.kept, res, w)), "lines": res.lines} if {
 	wh := _for_whose(item, e, names)
 	res := _for_outer_next(check, subj, _bound(names, item.as, e.v, _walk_at(w, e)), wh.undecided, wh.kept, pre)
 }
 
-_for_judge_inner(check, subj, names, item, e, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(false, item, e, names, wh, _for_failure(e, wh.undecided, wh.kept, res, _walk_at(w, e))), "lines": res.lines} if {
+_for_judge_inner(check, subj, names, item, e, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(false, item, e, names, wh, _for_failure(e, wh.undecided, wh.kept, res, w)), "lines": res.lines} if {
 	wh := _for_whose(item, e, names)
 	res := _for_inner_next(check, subj, _bound(names, item.as, e.v, _walk_at(w, e)), wh.undecided, wh.kept)
 }
@@ -709,9 +709,15 @@ _for_inner_next(check, subj, bound, [], true) := _for_lines(check, subj, bound)
 
 _for_failure(_, [], false, _, _) := null
 
-_for_failure(e, undecided, _, res, at) := object.union({"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": res.cause, "value": _walk_value(e.v, e, at), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at}, _for_raw(e)) if undecided != []
+_for_failure(e, undecided, _, res, w) := object.union({"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": res.cause, "value": _walk_value(e.v, e, at), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at, "lv": _item_levels(w, e)}, _for_raw(e)) if {
+	undecided != []
+	at := _walk_at(w, e)
+}
 
-_for_failure(e, [], true, res, at) := {"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": res.cause, "value": _walk_value(e.v, e, at), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at, "nothing_picked": object.get(res, "nothing_picked", false)} if not res.passed
+_for_failure(e, [], true, res, w) := {"path": e.i, "item": e.i, "rest": _for_rest(e), "cause": res.cause, "value": _walk_value(e.v, e, at), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at, "lv": _item_levels(w, e), "nothing_picked": object.get(res, "nothing_picked", false)} if {
+	not res.passed
+	at := _walk_at(w, e)
+}
 
 _for_failure(_, [], true, res, _) := null if res.passed
 
@@ -805,7 +811,7 @@ _alias_rest("")
 
 _alias_rest(rest) if regex.match(`^[.\[ ]`, rest)
 
-_for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(check, f.path), "cause": l.cause, "inputs": l.inputs, "value": f.value, "locations": _fail_locations(f), "msg": [_m_under(_m_for_item_name(check, f.path), x) | some x in l.msg], "own": _m_own_under(_m_for_item_name(check, f.path), object.get(l, "own_msg", null))} |
+_for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(check, f.path), "cause": l.cause, "inputs": l.inputs, "value": f.value, "locations": _fail_locations(f), "msg": [_m_under(_m_for_item_name(check, f.path), x) | some x in l.msg], "own": _m_own_under(_m_for_item_name(check, f.path), object.get(l, "own_msg", null)), "ergo/levels": object.get(f, "lv", [])} |
 	some p in sort({f.path | some f in fails; some l in f.lines; l.assertion == a})
 	some f in fails
 	f.path == p
@@ -908,7 +914,12 @@ _for_failed_base(check, f) := {
 	"bare": _m_rest_named(_m_for_item_name(check, f.item), f),
 }
 
-_for_failed_flags(f) := object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)})
+_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), _fail_levels(f))
+
+_fail_levels(f) := {"ergo/levels": f.lv} if {
+	"lv" in object.keys(f)
+	f.lv != []
+} else := {}
 
 _for_unchecked(_, []) := {}
 

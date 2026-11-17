@@ -27,12 +27,16 @@ _for_texted(row) if _ = row["ergo/for_texts"]
 
 _for_failures(row, at, where, t) := array.concat(
 	[e | some i, a in where.check.assertions; e := _for_assertion_entry(row, at, where, t, i, a)],
-	[e | some kind in ["list", "item"]; some e in _for_row_breaks(row, t); e.kind == kind],
+	_nested_items([e | some kind in ["list", "item"]; some e in _for_row_breaks(row, t, at); _leveled_kind(e) == kind]),
 )
 
-_for_row_breaks(row, t) := array.concat(
+_leveled_kind(e) := "item" if _has_levels(e)
+
+else := e.kind
+
+_for_row_breaks(row, t, at) := array.concat(
 	[_entry(w[0], w[1], row.cause, [], [], w[2]) | some w in t.walk],
-	[e | some k, f in row.failed_items; rec := t.items[k]; "walk" in object.keys(rec); e := _for_walk_entry(f, rec)],
+	[e | some k, f in row.failed_items; rec := t.items[k]; "walk" in object.keys(rec); e := _for_walk_entry(f, rec, at)],
 )
 
 _for_assertion_entry(row, at, where, t, i, a) := _policy_entry(
@@ -50,7 +54,7 @@ _for_assertion_entry(row, at, where, t, i, a) := _policy_entry(
 	i == min({j | some j, b in where.check.assertions; b == a})
 	aliases := {item.as | some item in where.check.items}
 	lines := [[k, j, l] | some k, f in row.failed_items; "lines" in object.keys(t.items[k]); some j, l in f.failed_assertions; l.assertion == a]
-	items := [_for_item_entry(row.failed_items[k], l, t.items[k].lines[j], aliases) | some [k, j, l] in lines; _for_item_said(t.items[k].lines[j])]
+	items := _nested_items([_for_item_entry(row.failed_items[k], l, t.items[k].lines[j], aliases, at) | some [k, j, l] in lines; _for_item_said(t.items[k].lines[j])])
 	causes := ({l.cause | some [_, _, l] in lines} | {l.cause | some l in t.free; l.assertion == a}) | {row.cause | lines == []; not a in {l.assertion | some l in t.free}}
 	_for_assertion_said(t.said[i], items)
 }
@@ -77,19 +81,25 @@ _alias_name_start(name, a) if startswith(name, concat("", [a, "."]))
 
 _alias_name_start(name, a) if startswith(name, concat("", [a, "["]))
 
-_for_item_entry(f, l, x, aliases) := object.union(
-	_entry(
-		_walk_kind(f.item),
-		f.item,
-		l.cause,
-		[y | some y in _with_outcomes(object.get(l, "inputs", [])); _alias_named(y.name, aliases)],
-		[object.union(_entry(_walk_kind(y.item), y.item, y.cause, _with_outcomes(y.inputs), [], x.xs[n]), object.filter(y, {"value", "locations"})) | some n, y in object.get(l, "items", []); x.xs[n] != ""],
-		x.m,
+_for_item_entry(f, l, x, aliases, at) := _leveled_by(
+	object.union(
+		_entry(
+			_walk_kind(f.item),
+			f.item,
+			l.cause,
+			[y | some y in _with_outcomes(object.get(l, "inputs", [])); _alias_named(y.name, aliases)],
+			_nested_items([_leveled_by(object.union(_entry(_walk_kind(y.item), y.item, y.cause, _with_outcomes(y.inputs), [], x.xs[n]), object.filter(y, {"value", "locations"})), object.get(y, "ergo/levels", []), at) | some n, y in object.get(l, "items", []); x.xs[n] != ""]),
+			x.m,
+		),
+		{"value": f.value, "locations": f.locations},
 	),
-	{"value": f.value, "locations": f.locations},
+	object.get(f, "ergo/levels", []),
+	at,
 )
 
-_for_walk_entry(f, rec) := object.union(
+_for_walk_entry(f, rec, at) := _leveled_by(_for_walk_entry_of(f, rec), object.get(f, "ergo/levels", []), at)
+
+_for_walk_entry_of(f, rec) := object.union(
 	_entry(_walk_kind(f.item), f.item, f.cause, [], [_for_inner_entry(x, rec.inner[n]) | some n, x in f.failed_items; rec.inner[n] != []], ""),
 	{"value": f.value, "locations": f.locations},
 ) if rec.inner != []
@@ -175,7 +185,7 @@ _row_failures(row, at, where, _) := [_policy_entry(
 	_group_cause({row["ergo/outs"][i].line | some i, n in where.check.option_of; n == nm}),
 	[],
 	[_option_assertion(row, at, where, nm, i) | some i, n in where.check.option_of; n == nm; row["ergo/outs"][i].line != "satisfied"],
-	concat(", and ", [t | some i, n in where.check.option_of; n == nm; t := row["ergo/texts"][i]; t != ""]),
+	concat(", and ", _once([t | some i, n in where.check.option_of; n == nm; t := row["ergo/texts"][i]; t != ""])),
 	[where.option_ats[nm]],
 ) |
 	some nm in sort({n | some n in where.check.option_of})
@@ -255,27 +265,48 @@ _said_for(row, texts, name) if {
 	texts[k] != ""
 }
 
-_leveled(e, row, name, at) := object.union(e, {
+_leveled(e, row, name, at) := _leveled_by(e, _item_levels_of(row, name), at)
+
+_leveled_by(e, levels, at) := object.union(e, {
 	"name": names[count(levels)],
-	"message": _entry_text(e.message, concat(": ", names)),
+	"message": _level_text(e.message, _level_said(e.kind, names)),
 	"ergo/levels": [object.union(_anchored_all([lv], at)[0], {"name": names[j]}) | some j, lv in levels],
 }) if {
-	_walk_kind(name) == "item"
-	levels := _item_levels_of(row, name)
 	count(levels) > 0
 	count(levels) < 4
-	names := _level_names(name, count(levels))
+	names := _level_names(e.name, count(levels))
 	count(names) == count(levels) + 1
 } else := e
 
-_item_levels_of(row, name) := [ls | some f in row.failed_items; f.item == name; ls := f["ergo/item"].levels][0]
+_level_said("item", names) := names
 
-_level_names(name, m) := array.concat(
-	[concat("", ["item ", format_int(to_number(idx[j + 1]) + 1, 10), " of ", fields[j]]) | some j in numbers.range(0, m - 1)],
-	[concat("", ["item ", substring(name, 5, at - 5), " of ", fields[m]])],
-) if {
+_level_said("list", names) := array.slice(names, 0, count(names) - 1)
+
+_level_text(text, names) := substring(text, count(p) + 2, -1) if {
+	p := concat(": ", names)
+	startswith(text, concat("", [p, ": "]))
+} else := _entry_text(text, names[count(names) - 1])
+
+_item_levels_of(row, name) := ls[0] if {
+	ls := [x | some f in row.failed_items; f.item == name; x := f["ergo/item"].levels]
+	count(ls) > 0
+} else := []
+
+_level_names(name, m) := array.concat(_outer_level_names(b, m), [concat("", ["item ", substring(name, 5, at - 5), " of ", b.fields[m]])]) if {
+	startswith(name, "item ")
 	at := indexof(name, " of ")
-	pieces := split(substring(name, at + 4, -1), "[")
+	b := _level_bits(substring(name, at + 4, -1), m)
+}
+
+_level_names(name, m) := array.concat(_outer_level_names(b, m), [b.fields[m]]) if {
+	not startswith(name, "item ")
+	b := _level_bits(name, m)
+}
+
+_outer_level_names(b, m) := [concat("", ["item ", format_int(to_number(b.idx[j + 1]) + 1, 10), " of ", b.fields[j]]) | some j in numbers.range(0, m - 1)]
+
+_level_bits(path, m) := {"idx": idx, "fields": fields} if {
+	pieces := split(path, "[")
 	count(pieces) == m + 1
 	idx := array.concat([""], [substring(p, 0, indexof(p, "]")) | some p in array.slice(pieces, 1, count(pieces))])
 	every j in numbers.range(1, m) {
@@ -481,7 +512,7 @@ _applies_entries(_, at, evals, req, conds, _) := [_policy_entry(
 	evals[name].assertion_cause,
 	_with_outcomes(_anchored_inputs(evals[name].inputs, at)),
 	[],
-	_first_text(texts, k),
+	texts[k],
 	[conds[name].at],
 ) |
 	some k, name in failed

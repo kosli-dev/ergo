@@ -2859,7 +2859,7 @@
                     "locations": [
                       "$policy:/requirements/allowed/checks/c/any_of/str/1"
                     ],
-                    "message": "",
+                    "message": "region is null",
                     "name": "region is \"a\""
                   }
                 ],
@@ -12503,7 +12503,7 @@
                 "locations": [
                   "$policy:/subjects/t/from#2"
                 ],
-                "message": "",
+                "message": ".t is 2",
                 "name": ".t is 1"
               }
             ],
