@@ -36,7 +36,7 @@ _violations(report, shadowing) := [object.union(
 		"check": row.check,
 		"description": _definition_field(report.requirements, row, "description"),
 		"expression": _definition_field(report.requirements, row, "expression"),
-		"inputs": array.concat(row.inputs, [r | some r in _recorded_refs(report.requirements, row); not r in [object.remove(i, ["outcome"]) | some i in row.inputs]]),
+		"inputs": array.concat(row.inputs, [r | some r in _recorded_refs(report.requirements, row); not object.remove(r, ["outcome"]) in [object.remove(i, ["outcome"]) | some i in row.inputs]]),
 		"cause": row.cause,
 	},
 	object.filter(row, {"failures", "failed_items", "message"}),
