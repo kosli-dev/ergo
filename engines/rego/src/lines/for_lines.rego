@@ -10,11 +10,13 @@ _for_row(check, subj) := _for_row_of(check, subj, _for_row_raw(check, subj))
 
 _for_row_of(check, subj, r) := r if {
 	r.cause == "satisfied"
-} else := object.union(object.remove(r, _row_extra_keys), {"failed": [], "message": _m_fallback(check)}) if {
+} else := object.union(object.remove(r, _row_extra_keys), {"failed": [], "message": m, "ergo/for_raw": {"check": check, "subj": subj, "r": object.union(r, {"failed": []}), "once": [], "line": [m]}}) if {
 	not r.cause in {"satisfied", "ambiguous"}
 	_m_params_unread(check)
-} else := object.union(object.remove(r, _row_extra_keys), {"failed": [_m_strip(f) | some f in r.failed], "message": _for_row_text(check, subj, r)}) if {
+	m := _m_fallback(check)
+} else := object.union(object.remove(r, _row_extra_keys), {"failed": [_m_strip(f) | some f in r.failed], "message": said.message, "ergo/for_raw": {"check": check, "subj": subj, "r": r, "once": said.once, "line": object.get(said, "line", [])}}) if {
 	r.cause != "satisfied"
+	said := _for_row_text(check, subj, r)
 }
 
 _for_row_raw(check, subj) := object.union(r, {"cause": _for_shape_cause(r), "natural": r.cause}) if {
@@ -57,7 +59,10 @@ _params_not_an_object if {
 	"not an object" in p.value
 }
 
-_for_row_text(check, _, r) := _m_fallback(check) if object.get(r, "natural", null) == "satisfied"
+_for_row_text(check, _, r) := {"message": m, "once": [], "line": [m]} if {
+	object.get(r, "natural", null) == "satisfied"
+	m := _m_fallback(check)
+}
 
 _for_row_text(check, subj, r) := _for_row_message(check, subj, r) if object.get(r, "natural", null) != "satisfied"
 
@@ -179,12 +184,13 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 	ms != []
 ]
 
-_for_row_message(check, subj, r) := _m_joined(array.concat(_m_tally_grouped(check, once), [t | some t in _for_item_parts(check, subj, r, once); t != ""; not t in once])) if {
+_for_row_message(check, subj, r) := {"message": _m_joined(array.concat(_m_tally_grouped(check, once), parts)), "once": once, "line": [t | r.failed == []; some t in parts]} if {
 	rs := object.get(r, "root_msgs", object.get(r, "other_roots", []))
 	second := {m | some x in _for_second_roots(check, subj); some m in x.ms}
 	once := _once(array.concat(array.concat(array.concat([m | some m in rs; not m in second], [t | some p in _for_free_texts(check, r); t := _m_unskipped(p, _m_root_skip(rs)); t != ""]), _for_hoisted_texts(check, r)), [m | some m in rs; m in second]))
 	once != []
-} else := _for_message(check, subj, r)
+	parts := [t | some t in _for_item_parts(check, subj, r, once); t != ""; not t in once]
+} else := {"message": m, "once": [], "line": [m | r.failed == []]} if m := _for_message(check, subj, r)
 
 _m_root_skip(rs) := [x | some m in rs; some x in split(m, "; ")] if _walk_roots_on
 
@@ -799,7 +805,7 @@ _alias_rest("")
 
 _alias_rest(rest) if regex.match(`^[.\[ ]`, rest)
 
-_for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(check, f.path), "cause": l.cause, "inputs": l.inputs, "msg": [_m_under(_m_for_item_name(check, f.path), x) | some x in l.msg], "own": _m_own_under(_m_for_item_name(check, f.path), object.get(l, "own_msg", null))} |
+_for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(check, f.path), "cause": l.cause, "inputs": l.inputs, "value": f.value, "locations": _fail_locations(f), "msg": [_m_under(_m_for_item_name(check, f.path), x) | some x in l.msg], "own": _m_own_under(_m_for_item_name(check, f.path), object.get(l, "own_msg", null))} |
 	some p in sort({f.path | some f in fails; some l in f.lines; l.assertion == a})
 	some f in fails
 	f.path == p

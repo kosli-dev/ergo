@@ -63,7 +63,7 @@ _or_blank(null) := ""
 
 _or_blank(t) := t if t != null
 
-_messaged(raw, check, _, subj) := _keyed_rooted(raw, check, subj) if {
+_messaged(raw, check, _, subj) := _keyed_rooted(_for_said(raw), check, subj) if {
 	raw.passed == false
 	"message" in object.keys(raw)
 }

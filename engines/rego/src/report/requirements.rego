@@ -289,7 +289,7 @@ _anchored_line_inputs(l, at) := {"inputs": _anchored_inputs(l.inputs, at)} if "i
 
 else := {}
 
-_anchored_line_items(l, at) := {"items": [object.union(x, {"inputs": _anchored_inputs(x.inputs, at)}) | some x in l.items]} if "items" in object.keys(l)
+_anchored_line_items(l, at) := {"items": [object.union(_anchored_all([x], at)[0], {"inputs": _anchored_inputs(x.inputs, at)}) | some x in l.items]} if "items" in object.keys(l)
 
 else := {}
 

@@ -230,7 +230,7 @@ _check_outcome(check, subj, _) := object.union(
 		"cause": r.cause,
 		"failed_items": r.failed,
 	},
-	object.filter(r, {"message"}),
+	object.filter(r, {"message", "ergo/for_raw"}),
 ) if {
 	check.op == "for"
 	_walk_run(check)

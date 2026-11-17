@@ -2,31 +2,109 @@ package ergo
 
 import rego.v1
 
-_row_stash_keys := ["failed_items", "failed_assertions", "ergo/texts", "ergo/own", "ergo/outs"]
+_row_stash_keys := ["failed_items", "failed_assertions", "ergo/texts", "ergo/own", "ergo/outs", "ergo/for_texts"]
 
 _parted(row, _, _) := _passed_row(row) if row.passed == true
 
-_parted(row, _, where) := object.union(row, {"inputs": _with_outcomes(row.inputs), "failed_items": [_for_item_clean(f) | some f in row.failed_items]}) if {
+_parted(row, at, where) := object.union(object.remove(row, _row_stash_keys), {
+	"inputs": _with_outcomes(row.inputs),
+	"failures": _for_failures(row, at, where, t),
+}) if {
 	row.passed == false
-	where.check.op == "for"
+	t := row["ergo/for_texts"]
 }
-
-_for_item_clean(f) := object.union(f, {"failed_assertions": [_for_line_clean(l) | some l in f.failed_assertions]}) if "failed_assertions" in object.keys(f)
-
-else := f
-
-_for_line_clean(l) := object.union(l, object.union({"inputs": _unstashed_inputs(l.inputs) | "inputs" in object.keys(l)}, {"items": [object.union(x, {"inputs": _unstashed_inputs(x.inputs)}) | some x in l.items] | "items" in object.keys(l)}))
-
-_unstashed_inputs(inputs) := [object.remove(i, _input_stash_keys) | some i in inputs]
 
 _parted(row, at, where) := object.union(object.remove(row, _row_stash_keys), {
 	"inputs": ins,
 	"failures": _row_failures(row, at, where, ins),
 }) if {
 	row.passed == false
-	where.check.op != "for"
+	not _for_texted(row)
 	ins := _with_outcomes(row.inputs)
 }
+
+_for_texted(row) if _ = row["ergo/for_texts"]
+
+_for_failures(row, at, where, t) := array.concat(
+	[e | some i, a in where.check.assertions; e := _for_assertion_entry(row, at, where, t, i, a)],
+	[e | some kind in ["list", "item"]; some e in _for_row_breaks(row, t); e.kind == kind],
+)
+
+_for_row_breaks(row, t) := array.concat(
+	[_entry(w[0], w[1], row.cause, [], [], w[2]) | some w in t.walk],
+	[e | some k, f in row.failed_items; rec := t.items[k]; "walk" in object.keys(rec); e := _for_walk_entry(f, rec)],
+)
+
+_for_assertion_entry(row, at, where, t, i, a) := _policy_entry(
+	"assertion",
+	a,
+	_worst_or_value(causes),
+	_once(array.concat(
+		[x | some [_, _, l] in lines; some x in _with_outcomes(object.get(l, "inputs", [])); not _alias_named(x.name, aliases)],
+		[x | some l in t.free; l.assertion == a; some x in _with_outcomes(_anchored_inputs(l.inputs, at))],
+	)),
+	items,
+	t.said[i],
+	[_assertion_at(where, null, i)],
+) if {
+	i == min({j | some j, b in where.check.assertions; b == a})
+	aliases := {item.as | some item in where.check.items}
+	lines := [[k, j, l] | some k, f in row.failed_items; "lines" in object.keys(t.items[k]); some j, l in f.failed_assertions; l.assertion == a]
+	items := [_for_item_entry(row.failed_items[k], l, t.items[k].lines[j], aliases) | some [k, j, l] in lines; _for_item_said(t.items[k].lines[j])]
+	causes := ({l.cause | some [_, _, l] in lines} | {l.cause | some l in t.free; l.assertion == a}) | {row.cause | lines == []; not a in {l.assertion | some l in t.free}}
+	_for_assertion_said(t.said[i], items)
+}
+
+_for_assertion_said(said, _) if said != ""
+
+_for_assertion_said(_, items) if items != []
+
+_for_item_said(x) if x.m != ""
+
+_for_item_said(x) if {
+	some m in x.xs
+	m != ""
+}
+
+_alias_named(name, aliases) if {
+	some a in aliases
+	_alias_name_start(name, a)
+}
+
+_alias_name_start(name, a) if name == a
+
+_alias_name_start(name, a) if startswith(name, concat("", [a, "."]))
+
+_alias_name_start(name, a) if startswith(name, concat("", [a, "["]))
+
+_for_item_entry(f, l, x, aliases) := object.union(
+	_entry(
+		_walk_kind(f.item),
+		f.item,
+		l.cause,
+		[y | some y in _with_outcomes(object.get(l, "inputs", [])); _alias_named(y.name, aliases)],
+		[object.union(_entry(_walk_kind(y.item), y.item, y.cause, _with_outcomes(y.inputs), [], x.xs[n]), object.filter(y, {"value", "locations"})) | some n, y in object.get(l, "items", []); x.xs[n] != ""],
+		x.m,
+	),
+	{"value": f.value, "locations": f.locations},
+)
+
+_for_walk_entry(f, rec) := object.union(
+	_entry(_walk_kind(f.item), f.item, f.cause, [], [_for_inner_entry(x, rec.inner[n]) | some n, x in f.failed_items; rec.inner[n] != []], ""),
+	{"value": f.value, "locations": f.locations},
+) if rec.inner != []
+
+else := object.union(
+	_entry(_walk_kind(f.item), f.item, f.cause, [_item_read(f) | _walk_kind(f.item) == "list"], [], concat("; ", [_entry_text(m, f.item) | some m in rec.walk])),
+	{"value": f.value, "locations": f.locations},
+) if {
+	rec.walk != []
+	_walk_kind(f.item) == "item"
+} else := _entry("list", f.item, f.cause, [_item_read(f)], [], concat("; ", rec.walk)) if rec.walk != []
+
+_for_inner_entry(x, ts) := object.union(_entry("item", x.item, x.cause, [], [], concat("; ", ts)), {"value": x.value, "locations": x.locations}) if _walk_kind(x.item) == "item"
+
+else := _entry("list", x.item, x.cause, [_item_read(x)], [], concat("; ", ts))
 
 _passed_row(row) := row if {
 	not _row_stashed(row)
@@ -76,6 +154,8 @@ _row_failures(row, _, where, ins) := [_policy_entry("assertion", where.check.exp
 	not _any_of_run(where.check)
 	not where.check.op == "for"
 }
+
+_row_failures(row, _, where, ins) := [_policy_entry("assertion", a, row.cause, ins, [], row.message, [_assertion_at(where, null, i)]) | some i, a in where.check.assertions] if where.check.op == "for"
 
 _row_failures(row, at, where, _) := [_policy_entry(
 	"assertion",
