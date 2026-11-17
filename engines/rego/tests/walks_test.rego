@@ -31,10 +31,7 @@ test_each_under_any_fails_when_no_element_passes if {
 }
 
 test_any_of_echoes_every_field_it_read_once_each if {
-	inputs_of({"type": "Story", "state": "DONE"}, flavoured) == [
-		{"name": "state", "value": "DONE", "locations": ["/items/0/state"]},
-		{"name": "type", "value": "Story", "locations": ["/items/0/type"]},
-	]
+	inputs_of({"type": "Story", "state": "DONE"}, flavoured) == [_seen("state", "DONE", ["/items/0/state"], "found"), _seen("type", "Story", ["/items/0/type"], "found")]
 }
 
 test_a_string_never_picks_a_list_item_and_a_number_never_picks_an_object_key if {
@@ -381,7 +378,7 @@ test_every_assertion_is_unusable_when_the_input_holds_something_json_cant if {
 
 test_an_any_of_row_reads_every_input_once_and_lists_no_failed_lines if {
 	r := ergo.report({"things": [{"id": "a", "x": 2, "y": 1}]}, _sentence_policy({"c": {"any_of": {"a": "x is 1 and y is 1", "b": ["x is 3", "y exists"]}}}), {})
-	[row | some row in r.results; row.check == "c"] == [{"requirement": "s", "subject": {"type": "thing", "id": "a"}, "check": "c", "passed": false, "cause": "value", "message": "a: x is 2; b: x is 2", "inputs": [{"name": "x", "value": 2, "locations": ["/things/0/x"]}, {"name": "y", "value": 1, "locations": ["/things/0/y"]}]}]
+	[row | some row in r.results; row.check == "c"] == [{"cause": "value", "check": "c", "failures": [{"cause": "value", "failures": [{"cause": "value", "failures": [], "inputs": [{"locations": ["/things/0/x"], "name": "x", "outcome": "found", "value": 2}], "kind": "assertion", "locations": ["$policy:/requirements/s/checks/c/any_of/a#1"], "message": "x is 2", "name": "x is 1"}], "inputs": [], "kind": "option", "locations": ["$policy:/requirements/s/checks/c/any_of/a"], "message": "x is 2", "name": "a"}, {"cause": "value", "failures": [{"cause": "value", "failures": [], "inputs": [{"locations": ["/things/0/x"], "name": "x", "outcome": "found", "value": 2}], "kind": "assertion", "locations": ["$policy:/requirements/s/checks/c/any_of/b/0"], "message": "x is 2", "name": "x is 3"}], "inputs": [], "kind": "option", "locations": ["$policy:/requirements/s/checks/c/any_of/b"], "message": "x is 2", "name": "b"}], "inputs": [_seen("x", 2, ["/things/0/x"], "found"), _seen("y", 1, ["/things/0/y"], "found")], "message": "a: x is 2; b: x is 2", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}]
 }
 
 test_an_option_of_an_any_of_reads_a_part_by_its_alias if {
@@ -403,7 +400,7 @@ test_a_walk_starts_where_its_path_starts_and_steps_past_a_position_without_walki
 
 test_a_walk_whose_key_comes_from_a_param_that_cant_be_read_fails_with_its_cause if {
 	doc := {"things": [{"id": "a", "o": {"k": [1]}}]}
-	_walk_rows({"w": "every o named by $params.key is 1"}, doc, {}) == [["a", "w", "absent", []]]
+	_walk_rows({"w": "every o named by $params.key is 1"}, doc, {}) == [["a", "w", "absent", [_assertion("every o named by $params.key is 1", "absent", ["$policy:/requirements/s/checks/w"], [_seen("o named by $params.key", [], [], "absent")], "o named by $params.key is missing", [])]]]
 	_walk_rows({"w": "every o named by $params.key is 1"}, doc, {"key": "k"}) == [["a", "w", "satisfied", []]]
 }
 
@@ -416,7 +413,7 @@ test_a_walk_that_reads_no_list_stops_at_the_end_when_every_value_along_the_path_
 
 test_an_item_a_whose_condition_cant_decide_is_undecided_even_when_another_condition_leaves_it_out if {
 	doc := {"things": [{"id": "a", "xs": [{"kind": "b"}]}]}
-	_walk_rows({"e": `every xs whose kind is "a" and whose state is "open" is not empty`}, doc, {}) == [["a", "e", "absent", [{"path": "xs[0].state", "item": "item 1 of xs", "cause": "absent", "value": null, "locations": ["/things/0/xs/0"]}]]]
+	_walk_rows({"e": `every xs whose kind is "a" and whose state is "open" is not empty`}, doc, {}) == [["a", "e", "absent", [_assertion("every xs whose kind is \"a\" and whose state is \"open\" is not empty", "absent", ["$policy:/requirements/s/checks/e"], [], "", [_item("item 1 of xs", "absent", {"kind": "b"}, ["/things/0/xs/0"], [_seen("xs[0].state", null, ["/things/0/xs/0"], "absent")], "state is missing", [])])]]]
 }
 
 test_a_walk_whose_param_cant_be_used_fails_as_unusable_even_with_if_any if {
@@ -489,16 +486,13 @@ test_an_item_that_no_approver_passes_fails_without_lines_when_whose_left_every_o
 	check := {"for": `every pull_requests as pr, some pr.approvers whose state is "APPROVED" as approver`, "assert": "approver.username does not equal pr.author"}
 	rows := _for_rows(check, [{"id": 1, "pull_requests": [{"author": "ann", "approvers": [{"username": "bob", "state": "COMMENTED"}]}]}], {})
 	rows[0][1] == "value"
-	rows[0][2] == [{"path": "item 1 of pull_requests", "item": "item 1 of pull_requests", "cause": "value", "value": {"author": "ann", "approvers": [{"username": "bob", "state": "COMMENTED"}]}, "failed_assertions": [], "locations": ["/things/0/pull_requests/0"]}]
+	rows[0][2] == [_item("item 1 of pull_requests", "value", {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "ann"}, ["/things/0/pull_requests/0"], [], "item 1 of pull_requests is {\"approvers\": [{\"state\": \"COMMENTED\", \"username\": \"bob\"}], \"author\": \"ann\"}", [])]
 }
 
 test_an_item_a_whose_cant_decide_fails_with_its_cause_before_any_line_is_read if {
 	check := {"for": "every xs whose s is at least 1 as x", "assert": `x.k is "a"`}
 	rows := _for_rows(check, [{"id": 1, "xs": [{"k": "a", "s": 1}, {"k": "a"}]}, {"id": 2, "xs": [{"k": "a", "s": "1"}]}], {})
-	[[row[0], row[1], row[2]] | some row in rows] == [
-		[1, "absent", [{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "absent", "value": {"k": "a"}, "failed_assertions": [], "locations": ["/things/0/xs/1"]}]],
-		[2, "unusable", [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "unusable", "value": {"k": "a", "s": "1"}, "failed_assertions": [], "locations": ["/things/1/xs/0"]}]],
-	]
+	[[row[0], row[1], row[2]] | some row in rows] == [[1, "absent", [_item("item 2 of xs", "absent", {"k": "a"}, ["/things/0/xs/1"], [], "s is missing", [])]], [2, "unusable", [_item("item 1 of xs", "unusable", {"k": "a", "s": "1"}, ["/things/1/xs/0"], [], "s is \"1\", which isn't a number", [])]]]
 }
 
 test_a_whose_on_an_item_reads_its_own_field_even_when_it_has_the_items_name if {
@@ -519,7 +513,7 @@ test_an_every_in_the_assertion_walks_inside_the_named_item if {
 test_each_item_lists_every_line_it_failed_with_the_first_cause_of_each if {
 	check := {"for": "every xs as x", "assert": ["x.a is 2", "x.b is 2", "x.c is 1"]}
 	rows := _for_rows(check, [{"id": 1, "xs": [{"a": 1, "b": 2}, {"a": 2, "b": 2, "c": 1}]}], {})
-	rows[0][2] == [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "absent", "value": {"a": 1, "b": 2}, "failed_assertions": [{"assertion": "x.a is 2", "cause": "value"}, {"assertion": "x.c is 1", "cause": "absent"}], "locations": ["/things/0/xs/0"]}]
+	rows[0][2] == [_assertion("x.a is 2", "value", ["$policy:/requirements/s/checks/c/assert/0"], [], "", [_item("item 1 of xs", "value", {"a": 1, "b": 2}, ["/things/0/xs/0"], [_seen("x.a", 1, ["/things/0/xs/0/a"], "found")], "a is 1", [])]), _assertion("x.c is 1", "absent", ["$policy:/requirements/s/checks/c/assert/2"], [], "", [_item("item 1 of xs", "absent", {"a": 1, "b": 2}, ["/things/0/xs/0"], [_seen("x.c", null, ["/things/0/xs/0"], "absent")], "c is missing", [])])]
 }
 
 test_a_second_item_a_whose_cant_decide_fails_the_first_item_with_its_cause if {
@@ -625,7 +619,7 @@ test_the_applies_row_of_a_some_condition_whose_param_cant_be_used_fails_as_unusa
 	as_check := _from_report(_releases, {"release": {"from": "releases", "identified_by": "id"}}, {"c": sentence}, {"pattern": 5})
 	_applies_failures_of(as_condition) == _check_failures_of(as_check)
 	every _, row in _applies_failures_of(as_condition) {
-		row == {"failed_items": []}
+		row == {}
 	}
 	{[r.passed, r.cause] | some r in as_condition.results; r.check == "$applies"} == {[false, "unusable"]}
 }
@@ -634,7 +628,7 @@ test_that_names_the_item_by_the_plain_subject_name_and_writes_the_expression_the
 	every name, written in {"w": "w", "my w": `"my w"`, "item": `"item"`, "that": `"that"`} {
 		rep := _from_report({"ws": ["bay", "apple"]}, {name: {"from": `every ws that starts with "b"`}}, {"c": "it is not empty"}, {})
 		apple := [r | some r in rep.results; r.check == "$applies"; r.subject.id == "apple"][0]
-		apple.inputs == [{"name": name, "value": "apple", "locations": ["/ws/1"]}]
+		apple.inputs == [_seen(name, "apple", ["/ws/1"], "found")]
 		apple.message == sprintf("%s is \"apple\"", [name])
 		rep.requirements.r.checks["$applies"].expression == sprintf("%s starts with \"b\"", [written])
 	}
@@ -838,7 +832,7 @@ test_the_names_in_a_row_keep_the_alias_and_the_values_are_the_full_paths if {
 	}
 	d := {"items": [{"x": 1}, {"x": 2}], "b": {"x": 1, "n": 2}}
 	rep := _parts_report(has, checks, d)
-	_untagged(_parts_row(rep, "every").inputs) == [{"name": "lst[].x", "value": [1, 2], "locations": ["/trail/dd/items/0/x", "/trail/dd/items/1/x"]}]
+	_untagged(_parts_row(rep, "every").inputs) == [_seen("lst[].x", [1, 2], ["/trail/dd/items/0/x", "/trail/dd/items/1/x"], "found")]
 	_parts_row(rep, "every").failed_items == [{"cause": "value", "item": "item 2 of lst", "path": "lst[1].x", "value": 2, "locations": ["/trail/dd/items/1/x"]}]
 	_untagged(_parts_row(rep, "count").inputs) == [{"name": "count of lst", "value": 2, "locations": ["/trail/dd/items/0", "/trail/dd/items/1"]}, {"name": "lst[]", "value": [{"x": 1}, {"x": 2}], "locations": ["/trail/dd/items/0", "/trail/dd/items/1"]}]
 	_untagged(_parts_row(rep, "pos").inputs) == [{"name": "pos.x", "value": 2, "locations": ["/trail/dd/items/1/x"]}]
@@ -1119,7 +1113,7 @@ test_a_field_of_an_item_named_like_a_part_is_not_tagged_because_it_is_not_read_t
 test_a_walk_through_a_list_inside_a_part_that_names_the_full_path_is_still_tagged if {
 	has := {"reviews": {"from": "pull_requests.reviews", "identified_by": "id"}}
 	rep := ergo.report(_hidden_doc, _swap_policy2(has, {"c": "every reviews.state is \"ok\""}), {})
-	_parts_row(rep, "c").inputs == [{"name": "pull_requests[].reviews[].state", "part": {"id": null, "name": "reviews"}, "value": ["ok", "ok", "ok", "bad", "ok"], "locations": ["/pull_requests/0/reviews/0/state", "/pull_requests/1/reviews/0/state", "/pull_requests/1/reviews/1/state", "/pull_requests/2/reviews/0/state", "/pull_requests/2/reviews/1/state"]}]
+	_parts_row(rep, "c").inputs == [{"locations": ["/pull_requests/0/reviews/0/state", "/pull_requests/1/reviews/0/state", "/pull_requests/1/reviews/1/state", "/pull_requests/2/reviews/0/state", "/pull_requests/2/reviews/1/state"], "name": "pull_requests[].reviews[].state", "outcome": "found", "part": {"id": null, "name": "reviews"}, "value": ["ok", "ok", "ok", "bad", "ok"]}]
 }
 
 test_a_failed_item_and_a_ref_are_not_tagged_because_only_inputs_are if {
@@ -1494,12 +1488,7 @@ test_the_applies_row_of_a_some_or_every_condition_gives_one_location_per_item_an
 		{"id": 4, "files": []},
 	]}
 	every_rep := _from_report(doc, {"release": {"from": `releases whose every files.path, if any, matches "^docs/"`, "identified_by": "id"}}, {"c": "id exists"}, {})
-	{r.subject.id: r.inputs | some r in every_rep.results; r.check == "$applies"} == {
-		1: [{"name": "files[].path", "value": ["docs/a", "src/b"], "locations": ["/releases/0/files/0/path", "/releases/0/files/1/path"]}],
-		2: [{"name": "files[].path", "value": ["docs/a", null], "locations": ["/releases/1/files/0/path", "/releases/1/files/1"]}],
-		3: [{"name": "files.path", "value": [], "locations": []}],
-		4: [{"name": "files[].path", "value": [], "locations": []}],
-	}
+	{r.subject.id: r.inputs | some r in every_rep.results; r.check == "$applies"} == {"1": [_seen("files[].path", ["docs/a", "src/b"], ["/releases/0/files/0/path", "/releases/0/files/1/path"], "found")], "2": [_seen("files[].path", ["docs/a", null], ["/releases/1/files/0/path", "/releases/1/files/1"], "found")], "3": [_seen("files.path", [], [], "absent")], "4": [_in("files[].path", [], [])]}
 	some_rep := _from_report(doc, {"release": {"from": `releases whose some files.path does not match "^docs/"`, "identified_by": "id"}}, {"c": "id exists"}, {})
 	{r.subject.id: r.inputs | some r in some_rep.results; r.check == "$applies"} == {
 		1: [{"name": "files[].path", "value": ["docs/a", "src/b"], "locations": ["/releases/0/files/0/path", "/releases/0/files/1/path"]}],
@@ -1511,7 +1500,7 @@ test_the_applies_row_of_a_some_or_every_condition_gives_one_location_per_item_an
 
 test_subject_in_an_every_names_an_empty_list_and_a_missing_one if {
 	rows := _subject_rows({"xs": [[], null]}, "every xs", "every s is a string", {})
-	rows[1][3] == [{"name": "s", "value": [], "locations": []}]
+	rows[1][3] == [_seen("s", [], [], "null")]
 	rep := _subject_report({"xs": [[]]}, "every xs", {"c": "every s is a string"}, {})
 	[r.failed_items | some r in rep.results; r.check == "c"] == [[{"cause": "value", "item": "s", "path": "s", "value": [], "locations": ["/xs/0"]}]]
 }
@@ -1549,10 +1538,7 @@ test_subject_reads_the_location_of_the_subject_itself_and_of_each_item_of_a_list
 	plain := _subject_report(doc, "every values", {"c": "s is 1"}, {})
 	[r.inputs | some r in plain.results; r.check == "c"] == [[{"name": "s", "value": 1, "locations": ["/values/0"]}]]
 	list := _subject_report(doc, "every lists", {"c": "every s is 1 and count of s is 2"}, {})
-	[r.inputs | some r in list.results; r.check == "c"] == [[
-		{"name": "count of s", "value": 2, "locations": ["/lists/0/0", "/lists/0/1"]},
-		{"name": "s[]", "value": [1, 2], "locations": ["/lists/0/0", "/lists/0/1"]},
-	]]
+	[r.inputs | some r in list.results; r.check == "c"] == [[_in("count of s", 2, ["/lists/0/0", "/lists/0/1"]), _seen("s[]", [1, 2], ["/lists/0/0", "/lists/0/1"], "found")]]
 	kept := _subject_report({"sets": [{"s": [3]}]}, "every sets whose some s is 1", {"c": ".s is not empty"}, {})
 	[[r.inputs, r.failed_items] | some r in kept.results; r.check == "$applies"] == [[
 		[{"name": ".s[]", "value": [3], "locations": ["/sets/0/s/0"]}],
