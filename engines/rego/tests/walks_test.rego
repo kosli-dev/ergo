@@ -364,9 +364,9 @@ test_the_left_of_a_whose_is_the_items_field_and_its_right_can_read_an_alias if {
 	r.requirements.s.checks.left.expression == `for every environments as env, some deployments whose env is "prod" as deployment: deployment.ok is true`
 }
 
-test_a_check_with_several_assertions_that_passes_has_no_failed_assertions_and_reads_every_input_once if {
+test_a_check_with_several_assertions_that_passes_has_no_failures_and_reads_every_input_once if {
 	r := ergo.report({"things": [{"id": "a", "x": 1, "y": 2}]}, _sentence_policy({"c": "x is 1 and y is 2 and x is at least 1"}), {})
-	[[row.cause, row.failed_assertions, row.inputs] | some row in r.results; row.check == "c"] == [["satisfied", [], [{"name": "x", "value": 1, "locations": ["/things/0/x"]}, {"name": "y", "value": 2, "locations": ["/things/0/y"]}]]]
+	[[row.cause, object.keys(row), row.inputs] | some row in r.results; row.check == "c"] == [["satisfied", {"cause", "check", "inputs", "passed", "requirement", "subject"}, [{"name": "x", "value": 1, "locations": ["/things/0/x"]}, {"name": "y", "value": 2, "locations": ["/things/0/y"]}]]]
 }
 
 test_an_assertion_whose_param_cant_be_read_is_the_only_one_listed_as_unusable if {

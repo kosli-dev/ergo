@@ -78,7 +78,7 @@ test_a_list_a_for_line_tolerates_still_fails_when_it_is_missing_null_or_not_a_li
 	[[row[0], row[1]] | some row in _for_rows(check, things, {})] == [[1, "absent"], [2, "null"], [3, "unusable"], [4, "satisfied"]]
 }
 
-_said_rows(check, things) := [[r.subject.id, r.cause, object.get(r, "message", null), _bare_failed(r.failed_items)] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), {}).results; r.check == "c"]
+_said_rows(check, things) := [[r.subject.id, r.cause, object.get(r, "message", null), _old_for_items(r)] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), {}).results; r.check == "c"]
 
 test_an_empty_first_list_a_for_line_tolerates_still_runs_the_sentences_that_dont_read_it if {
 	approvers := [{"u": "ada"}, {"u": "g", "state": "REJECTED"}]

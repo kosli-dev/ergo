@@ -104,7 +104,7 @@ test_min_subjects_lists_only_the_count_when_the_input_and_params_are_json if {
 	rows_for(ergo.report({"items": [{"id": "a", "x": 1}]}, lifted(json_only_req), {"allowed": ["MIT"]}), "s", "$min_subjects")[0].inputs == [{"name": "in-scope thing count", "value": 1, "locations": ["/items/0"]}]
 }
 
-derived_row(subj, check) := [r.passed, r.cause, r.inputs] if {
+derived_row(subj, check) := [r.passed, r.cause, _plain(r.inputs)] if {
 	r := rows_for(ergo.report({"items": [object.union({"id": 1}, subj)]}, lifted({"s": {"from": "items", "identified_by": "id", "checks": {"c": check}}}), {}), "s", "c")[0]
 }
 

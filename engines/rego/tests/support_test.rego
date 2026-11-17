@@ -46,7 +46,7 @@ verdict(subj, check) := row.passed if {
 	row.check == "c"
 }
 
-inputs_of(subj, check) := row.inputs if {
+inputs_of(subj, check) := _plain(row.inputs) if {
 	some row in solo(subj, check).results
 	row.check == "c"
 }
@@ -322,7 +322,7 @@ row_in(top, subj, check) := r if {
 
 params_req(check) := {"s": {"from": "items", "identified_by": "id", "checks": {"c": check}}}
 
-params_rows(doc, check) := [[r.passed, r.cause, r.inputs] | some r in rows_for(report(doc, params_req(check)), "s", "c")]
+params_rows(doc, check) := [[r.passed, r.cause, _plain(r.inputs)] | some r in rows_for(report(doc, params_req(check)), "s", "c")]
 
 empty_report := {"compliant": false, "description": "", "engine": {"name": "ergo-rego", "version": ergo.version}, "ergo": ergo._spec, "meta": {}, "subjects": {}}
 
@@ -469,11 +469,50 @@ _sentence_policy(checks) := {
 	"requirements": {"s": {"subject": "thing", "checks": checks}},
 }
 
-_sentence_rows(checks, doc, params) := [[r.check, r.passed, r.cause, r.inputs] | some r in ergo.report(doc, _sentence_policy(checks), params).results; not startswith(r.check, "$")]
+_sentence_rows(checks, doc, params) := [[r.check, r.passed, r.cause, _plain(r.inputs)] | some r in ergo.report(doc, _sentence_policy(checks), params).results; not startswith(r.check, "$")]
 
 _sentence_problems(check) := [i.value | some i in ergo.report({"things": []}, _sentence_policy({"c": check}), {}).results[0].inputs; i.name == "checks.c"][0]
 
-_walk_rows(checks, doc, params) := [[r.subject.id, r.check, r.cause, object.get(r, "failed_items", object.get(r, "failed_assertions", []))] | some r in ergo.report(doc, _sentence_policy(checks), params).results; not startswith(r.check, "$")]
+_walk_rows(checks, doc, params) := [[r.subject.id, r.check, r.cause, _failed_parts(r)] | some r in ergo.report(doc, _sentence_policy(checks), params).results; not startswith(r.check, "$")]
+
+_failed_parts(r) := _flat_parts(r.failures) if {
+	count(r.failures) == 1
+	count(r.failures[0].failures) > 0
+}
+
+_failed_parts(r) := [{"assertion": f.name, "cause": f.cause} | some f in r.failures] if {
+	count(r.failures) != 1
+}
+
+_failed_parts(r) := [{"assertion": f.name, "cause": f.cause} | some f in r.failures] if {
+	count(r.failures) == 1
+	count(r.failures[0].failures) == 0
+	contains(r.failures[0].locations[0], "#")
+}
+
+_failed_parts(r) := [] if {
+	count(r.failures) == 1
+	count(r.failures[0].failures) == 0
+	not contains(r.failures[0].locations[0], "#")
+}
+
+_failed_parts(r) := [] if not "failures" in object.keys(r)
+
+_flat_parts(failures) := [_old_part(p) | some f in failures; some p in f.failures]
+
+_old_part(p) := {"path": _part_path(p), "item": p.name, "cause": p.cause, "value": _part_value(p), "locations": _part_locations(p)}
+
+_part_path(p) := p.inputs[0].name if count(p.inputs) > 0
+
+_part_path(p) := p.name if count(p.inputs) == 0
+
+_part_value(p) := p.value if p.kind == "item"
+
+_part_value(p) := p.inputs[0].value if p.kind == "list"
+
+_part_locations(p) := p.locations if p.kind == "item"
+
+_part_locations(p) := p.inputs[0].locations if p.kind == "list"
 
 _ten := "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10"
 
@@ -519,7 +558,7 @@ _parent_part_policy(has, check) := {
 
 _parent_part_problems(has, check) := [i.value | some r in ergo.report({"bs": []}, _parent_part_policy(has, check), {}).results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"]
 
-_for_rows(check, things, params) := [[r.subject.id, r.cause, _bare_failed(r.failed_items), r.inputs] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
+_for_rows(check, things, params) := [[r.subject.id, r.cause, _old_for_items(r), _plain(r.inputs)] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
 
 _for_rows_full(check, things, params) := [[r.subject.id, r.cause, r.failed_items, r.inputs] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
 
@@ -546,7 +585,7 @@ _peer_things := [
 	{"id": "nostate", "author": "ann", "commits": [], "approvers": [{"username": "carl", "timestamp": "2026-10-01T12:00:00Z"}]},
 ]
 
-_tally_rows(check, things, params) := [[r.subject.id, r.cause, r.inputs] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
+_tally_rows(check, things, params) := [[r.subject.id, r.cause, _plain(r.inputs)] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
 
 _review := {
 	"id": "pr-7",
@@ -559,7 +598,7 @@ _review := {
 
 _from_report(doc, subjects, checks, params) := ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": subjects, "requirements": {"r": {"subject": object.keys(subjects)[_], "checks": checks}}}, params) if count(subjects) == 1
 
-_from_rows(rep) := [[r.subject.id, r.check, r.cause, r.inputs] | some r in rep.results; not r.check in {"$min_subjects", "$unique_ids", "$well_formed"}]
+_from_rows(rep) := [[r.subject.id, r.check, r.cause, _plain(r.inputs)] | some r in rep.results; not r.check in {"$min_subjects", "$unique_ids", "$well_formed"}]
 
 _from_problems(rep) := [i | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; startswith(i.name, "subjects.")]
 
@@ -601,7 +640,7 @@ _owner_subjects := {"artifact": {"identified_by": "name"}, "pr": {"from": "every
 
 _owner_authors := {"name": "commits[].author", "value": ["bob", "ann"], "locations": ["/artifact/pull_requests/0/commits/0/author", "/artifact/pull_requests/0/commits/1/author"]}
 
-_owner_rows(checks) := {r.check: r.inputs |
+_owner_rows(checks) := {r.check: _plain(r.inputs) |
 	some r in ergo.report(_owner_doc, {"ergo_spec": ergo._spec, "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
 	r.check in object.keys(checks)
 }
@@ -684,7 +723,7 @@ _list_same_as_params(words, suffix, right) if {
 
 _snyk := {"id": "v1", "first_seen_ts": "2026-10-01T00:00:00Z", "now_ts": "2026-10-04T12:00:00Z", "severity": "high"}
 
-_elapsed_rows(check, things, params) := [[r.subject.id, r.passed, r.cause, r.inputs] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
+_elapsed_rows(check, things, params) := [[r.subject.id, r.passed, r.cause, _plain(r.inputs)] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
 
 _elapsed_first(check, things, params) := [_elapsed_rows(check, things, params)[0][1], _elapsed_rows(check, things, params)[0][2]]
 
@@ -972,7 +1011,11 @@ _picked_author(item, ts) := a if {
 	[row[1] | some row in _for_rows({"for": concat("", [item, " as c"]), "assert": concat("", [`c.author is "`, a, `"`])}, [{"id": 1, "commits": _commits(ts)}], {})] == ["satisfied"]
 }
 
-_line_inputs(check, things) := [l.inputs | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), {}).results; r.check == "c"; some f in r.failed_items; some l in f.failed_assertions]
+_line_inputs(check, things) := [l | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), {}).results; r.check == "c"; some a in r.failures; a.kind == "assertion"; some i in a.failures; l := _item_line_inputs(i)]
+
+_item_line_inputs(i) := _plain(array.concat(i.inputs, [inp | some c in i.failures; some inp in c.inputs]))
+
+_plain(inputs) := [object.remove(i, ["outcome"]) | some i in inputs]
 
 reserved_check_rows(name) := report({"items": [{"id": 1}]}, {"s": object.union(object.remove(typed_req, ["checks"]), {"checks": {name: "id exists"}})})
 
@@ -983,7 +1026,7 @@ subject_problems(subjects, subject, inp) := [i |
 	not i.name in {"count(checks)", "require"}
 ]
 
-named_by_rows(subjects, subject, check, inp) := [[r.passed, r.inputs] |
+named_by_rows(subjects, subject, check, inp) := [[r.passed, _plain(r.inputs)] |
 	some r in ergo.report(inp, {"ergo_spec": ergo._spec, "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": check}}}}, {"allowed": {"a": [1]}}).results
 	r.check == "c"
 ]
@@ -998,7 +1041,7 @@ _subject_policy(from, checks) := {
 
 _subject_report(doc, from, checks, params) := ergo.report(doc, _subject_policy(from, checks), params)
 
-_subject_rows(doc, from, check, params) := [[r.subject.id, r.passed, r.cause, r.inputs] | some r in _subject_report(doc, from, {"c": check}, params).results; r.check == "c"]
+_subject_rows(doc, from, check, params) := [[r.subject.id, r.passed, r.cause, _plain(r.inputs)] | some r in _subject_report(doc, from, {"c": check}, params).results; r.check == "c"]
 
 _subject_problems(from, checks) := [i.value | some i in _subject_report({"xs": []}, from, checks, {}).results[0].inputs; i.name == "checks.c"][0]
 
@@ -1183,3 +1226,43 @@ _count_part_policy := _item_policy({"has": {"pl": "c"}}, {
 	"ys": {"for": "every xs as m", "assert": "count of m.ys whose v is in pl.z is 0"},
 	"at_least": {"for": "every xs as m", "assert": "count of xs whose v is in pl.z is at least 0"},
 })
+
+_old_for_items(r) := array.concat(
+	[_old_for_item(name, r) | some name in _first_item_names(r)],
+	[_old_for_break(f) | some f in r.failures; f.kind != "assertion"],
+) if "failures" in object.keys(r)
+
+_old_for_items(r) := [] if not "failures" in object.keys(r)
+
+_first_item_names(r) := [n |
+	names := [i.name | some a in r.failures; a.kind == "assertion"; some i in a.failures]
+	some idx, n in names
+	not n in array.slice(names, 0, idx)
+]
+
+_old_for_item(name, r) := {
+	"path": name,
+	"item": name,
+	"cause": cases[0].item.cause,
+	"value": cases[0].item.value,
+	"failed_assertions": [_old_for_line(c) | some c in cases],
+	"locations": cases[0].item.locations,
+} if {
+	cases := [{"a": a, "item": i} | some a in r.failures; a.kind == "assertion"; some i in a.failures; i.name == name]
+}
+
+_old_for_line(c) := {"assertion": c.a.name, "cause": c.item.cause} if count(c.item.failures) == 0
+
+_old_for_line(c) := {"assertion": c.a.name, "cause": c.item.cause, "items": [{"item": i.name, "cause": i.cause} | some i in c.item.failures]} if count(c.item.failures) > 0
+
+_old_for_break(f) := {"path": f.name, "item": f.name, "cause": f.cause, "value": f.inputs[0].value, "failed_assertions": [], "locations": f.inputs[0].locations} if f.kind == "list"
+
+_old_for_break(f) := {"path": f.name, "item": f.name, "cause": f.cause, "value": f.value, "failed_assertions": [], "failed_items": [_old_part(c) | some c in f.failures], "locations": f.locations} if {
+	f.kind == "item"
+	count(f.failures) > 0
+}
+
+_old_for_break(f) := {"path": f.name, "item": f.name, "cause": f.cause, "value": f.value, "failed_assertions": [], "locations": f.locations} if {
+	f.kind == "item"
+	count(f.failures) == 0
+}

@@ -217,7 +217,7 @@ _kids_doc := {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "v": 1}, {"id": 
 
 _kids_report(from) := ergo.report(_kids_doc, {"ergo_spec": ergo._spec, "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": from, "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
 
-_applies_of(rep) := [[r.subject.id, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"]
+_applies_of(rep) := [[r.subject.id, r.cause, _plain(r.inputs)] | some r in rep.results; r.check == "$applies"]
 
 test_a_whose_in_a_childs_from_line_reads_the_parent_by_its_name if {
 	_applies_of(_kids_report("every b.kids whose v equals b.x")) == [
