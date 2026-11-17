@@ -467,7 +467,9 @@ else := _walk_worst(fails) if {
 	fails != []
 }
 
-_for_list_input(item, w) := [_walk_name(item.path, w.walked), [], [], _walk_stop_state(_walk_stopped_at(w.trail).v)] if w.walked == set()
+_for_list_input(item, w) := [_walk_name(item.path, w.walked), [], [], s] if {
+	s := _ref_step_state(item.path)
+} else := [_walk_name(item.path, w.walked), [], [], _walk_stop_state(_walk_stopped_at(w.trail).v)] if w.walked == set()
 
 else := [_walk_name(item.path, w.walked), [_walk_value(e.v, e, w) | some e in w.items], _walk_locations(w)]
 
@@ -948,7 +950,7 @@ _for_pair(subj, path) := [n, v, l] if {
 	v := _value_at(subj, path)
 	v != null
 	l := _locations_of(subj, path)
-} else := [_input_name(path), null, _locations_of(subj, path), _outcome_word(_read_state(subj, path))]
+} else := [_input_name(path), null, _locations_of(subj, path), _outcome_word(_input_state(subj, path))]
 
 _for_tuple(i) := [i.name, i.value, i.locations] if i.value != null
 

@@ -6334,7 +6334,7 @@
               {
                 "locations": [],
                 "name": "shas named by $params.k",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -21143,7 +21143,7 @@
                           "/things/0/rs/0/x"
                         ],
                         "name": "r.x.y named by $params.i",
-                        "outcome": "absent",
+                        "outcome": "null",
                         "value": null
                       }
                     ],
@@ -35421,7 +35421,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -35439,7 +35439,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -35478,7 +35478,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -35496,7 +35496,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -35535,7 +35535,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -35553,7 +35553,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -35592,7 +35592,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -35610,7 +35610,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -35649,7 +35649,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -35667,7 +35667,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -35706,7 +35706,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -35724,7 +35724,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -35763,7 +35763,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -35781,7 +35781,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -35820,7 +35820,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -35838,7 +35838,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -35877,7 +35877,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -35895,7 +35895,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -35934,7 +35934,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -35952,7 +35952,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -35991,7 +35991,7 @@
                       "$params:"
                     ],
                     "name": "$params.a named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36017,7 +36017,7 @@
                   "$params:"
                 ],
                 "name": "$params.a named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36064,7 +36064,7 @@
                       "$params:"
                     ],
                     "name": "$params.a named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36090,7 +36090,7 @@
                   "$params:"
                 ],
                 "name": "$params.a named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36137,7 +36137,7 @@
                       "$params:"
                     ],
                     "name": "$params.a named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36163,7 +36163,7 @@
                   "$params:"
                 ],
                 "name": "$params.a named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36210,7 +36210,7 @@
                       "$params:"
                     ],
                     "name": "$params.a named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36236,7 +36236,7 @@
                   "$params:"
                 ],
                 "name": "$params.a named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36283,7 +36283,7 @@
                       "$params:"
                     ],
                     "name": "$params.a named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36309,7 +36309,7 @@
                   "$params:"
                 ],
                 "name": "$params.a named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36356,7 +36356,7 @@
                       "$params:"
                     ],
                     "name": "$params[0] named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36382,7 +36382,7 @@
                   "$params:"
                 ],
                 "name": "$params[0] named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36429,7 +36429,7 @@
                       "$params:"
                     ],
                     "name": "$params[0] named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36455,7 +36455,7 @@
                   "$params:"
                 ],
                 "name": "$params[0] named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36502,7 +36502,7 @@
                       "$params:"
                     ],
                     "name": "$params[0] named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36528,7 +36528,7 @@
                   "$params:"
                 ],
                 "name": "$params[0] named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36575,7 +36575,7 @@
                       "$params:"
                     ],
                     "name": "$params[0] named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36601,7 +36601,7 @@
                   "$params:"
                 ],
                 "name": "$params[0] named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36721,7 +36721,7 @@
                       "$params:"
                     ],
                     "name": "$params[0].a named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36747,7 +36747,7 @@
                   "$params:"
                 ],
                 "name": "$params[0].a named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36794,7 +36794,7 @@
                       "$params:"
                     ],
                     "name": "$params[0].a named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36820,7 +36820,7 @@
                   "$params:"
                 ],
                 "name": "$params[0].a named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36867,7 +36867,7 @@
                       "$params:"
                     ],
                     "name": "$params[0].a named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36893,7 +36893,7 @@
                   "$params:"
                 ],
                 "name": "$params[0].a named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -36940,7 +36940,7 @@
                       "$params:"
                     ],
                     "name": "$params[0].a named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -36966,7 +36966,7 @@
                   "$params:"
                 ],
                 "name": "$params[0].a named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -39248,7 +39248,7 @@
                       "$params:/0"
                     ],
                     "name": "$params[0].a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -39266,7 +39266,7 @@
                   "$params:/0"
                 ],
                 "name": "$params[0].a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -39423,7 +39423,7 @@
                       "$params:/0"
                     ],
                     "name": "$params[0].a",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -39441,7 +39441,7 @@
                   "$params:/0"
                 ],
                 "name": "$params[0].a",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -39633,7 +39633,7 @@
                       "/things/0/x"
                     ],
                     "name": "x named by $params.v",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -39651,7 +39651,7 @@
                   "/things/0/x"
                 ],
                 "name": "x named by $params.v",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -40201,7 +40201,7 @@
                       "$params:"
                     ],
                     "name": "$params[0] named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -40227,7 +40227,7 @@
                   "$params:"
                 ],
                 "name": "$params[0] named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -40304,7 +40304,7 @@
                       "$params:"
                     ],
                     "name": "$params[0] named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -40330,7 +40330,7 @@
                   "$params:"
                 ],
                 "name": "$params[0] named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -40407,7 +40407,7 @@
                       "$params:"
                     ],
                     "name": "$params[0] named by zz",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -40433,7 +40433,7 @@
                   "$params:"
                 ],
                 "name": "$params[0] named by zz",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -56053,7 +56053,7 @@
                       "$params:"
                     ],
                     "name": "$params.q",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -56071,7 +56071,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -59216,7 +59216,7 @@
                       "$params:"
                     ],
                     "name": "$params.n",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -59234,7 +59234,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -60314,7 +60314,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -60546,7 +60546,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -78185,7 +78185,7 @@
                     "locations": [
                       "$params:/l/0"
                     ],
-                    "message": "item 1 of $params.l: v is missing",
+                    "message": "v is missing",
                     "name": "item 1 of $params.l",
                     "value": {
                       "w": 1
@@ -78404,7 +78404,7 @@
                     "locations": [
                       "$params:/l/0"
                     ],
-                    "message": "item 1 of $params.l: v is null",
+                    "message": "v is null",
                     "name": "item 1 of $params.l",
                     "value": {
                       "v": null
@@ -99784,7 +99784,7 @@
                     "locations": [
                       "/things/0/ys/0"
                     ],
-                    "message": "item 1 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 1 of ys",
                     "value": {
                       "n": 1
@@ -99798,7 +99798,7 @@
                     "locations": [
                       "/things/0/ys/1"
                     ],
-                    "message": "item 2 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 2 of ys",
                     "value": {
                       "n": 2
@@ -99881,7 +99881,7 @@
                     "locations": [
                       "/things/0/ys/0"
                     ],
-                    "message": "item 1 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 1 of ys",
                     "value": {
                       "n": 1
@@ -99895,7 +99895,7 @@
                     "locations": [
                       "/things/0/ys/1"
                     ],
-                    "message": "item 2 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 2 of ys",
                     "value": {
                       "n": 2
@@ -100012,7 +100012,7 @@
                     "locations": [
                       "/things/0/ys/0"
                     ],
-                    "message": "item 1 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 1 of ys",
                     "value": {
                       "n": 1
@@ -100026,7 +100026,7 @@
                     "locations": [
                       "/things/0/ys/1"
                     ],
-                    "message": "item 2 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 2 of ys",
                     "value": {
                       "n": 2
@@ -100109,7 +100109,7 @@
                     "locations": [
                       "/things/0/ys/0"
                     ],
-                    "message": "item 1 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 1 of ys",
                     "value": {
                       "n": 1
@@ -100123,7 +100123,7 @@
                     "locations": [
                       "/things/0/ys/1"
                     ],
-                    "message": "item 2 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 2 of ys",
                     "value": {
                       "n": 2
@@ -100267,7 +100267,7 @@
                     "locations": [
                       "/things/0/ys/0"
                     ],
-                    "message": "item 1 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 1 of ys",
                     "value": {
                       "n": 1
@@ -100281,7 +100281,7 @@
                     "locations": [
                       "/things/0/ys/1"
                     ],
-                    "message": "item 2 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 2 of ys",
                     "value": {
                       "n": 2
@@ -100360,7 +100360,7 @@
                     "locations": [
                       "/things/0/ys/0"
                     ],
-                    "message": "item 1 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 1 of ys",
                     "value": {
                       "n": 1
@@ -100374,7 +100374,7 @@
                     "locations": [
                       "/things/0/ys/1"
                     ],
-                    "message": "item 2 of ys: u is missing",
+                    "message": "u is missing",
                     "name": "item 2 of ys",
                     "value": {
                       "n": 2

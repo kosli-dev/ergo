@@ -252,9 +252,23 @@ _path_input(subj, path) := _read_outcome(subj, path, {"name": _input_name(path),
 
 else := _read_outcome(subj, path, {"name": _input_name(path), "value": _value_at(subj, path), "locations": []})
 
-_read_outcome(subj, path, i) := object.union(i, {"ergo/outcome": _outcome_word(_read_state(subj, path))}) if i.value == null
+_read_outcome(subj, path, i) := object.union(i, {"ergo/outcome": _outcome_word(_input_state(subj, path))}) if i.value == null
 
 else := i
+
+_input_state(subj, path) := _input_state_of(path, _read_state(subj, path))
+
+_input_state_of(path, state) := state if state == "not_an_object"
+
+else := s if {
+	s := _ref_step_state(path)
+} else := _ref_state(path) if {
+	path[0] in _params_starts
+	_params_not_given(path)
+	data.ergo_params != null
+} else := state
+
+_ref_step_state(path) := _worst_of({_ref_state(x.ref) | some x in path; _is_ref(x)} - {"value"})
 
 _outcome_word("value") := "found"
 

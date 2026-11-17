@@ -3595,8 +3595,12 @@
                     "failures": [],
                     "inputs": [],
                     "kind": "item",
+                    "locations": [
+                      "/xs/0/0"
+                    ],
                     "message": "item 1 of region is 1, which isn't a list or an object",
-                    "name": "item 1 of region"
+                    "name": "item 1 of region",
+                    "value": 1
                   }
                 ],
                 "inputs": [
@@ -3646,8 +3650,12 @@
                     "failures": [],
                     "inputs": [],
                     "kind": "item",
+                    "locations": [
+                      "/xs/1/0"
+                    ],
                     "message": "item 1 of region is 2, which isn't a list or an object",
-                    "name": "item 1 of region"
+                    "name": "item 1 of region",
+                    "value": 2
                   }
                 ],
                 "inputs": [
@@ -3696,8 +3704,12 @@
                     "failures": [],
                     "inputs": [],
                     "kind": "item",
+                    "locations": [
+                      "/xs/2"
+                    ],
                     "message": "item 1 of region is missing",
-                    "name": "item 1 of region"
+                    "name": "item 1 of region",
+                    "value": null
                   }
                 ],
                 "inputs": [
@@ -8975,8 +8987,12 @@
                     "failures": [],
                     "inputs": [],
                     "kind": "item",
+                    "locations": [
+                      "/xs/0/0"
+                    ],
                     "message": "item 1 of region is 1, which isn't a list or an object",
-                    "name": "item 1 of region"
+                    "name": "item 1 of region",
+                    "value": 1
                   }
                 ],
                 "inputs": [
@@ -9182,8 +9198,12 @@
                     "failures": [],
                     "inputs": [],
                     "kind": "item",
+                    "locations": [
+                      "/xs/1/0"
+                    ],
                     "message": "item 1 of region is 1, which isn't a list or an object",
-                    "name": "item 1 of region"
+                    "name": "item 1 of region",
+                    "value": 1
                   }
                 ],
                 "inputs": [

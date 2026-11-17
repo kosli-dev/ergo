@@ -153,7 +153,7 @@ _for_sorted_entry(x, s, text, at) := object.union(
 	{"value": s.value, "locations": _anchored_all([{"locations": [s.at]}], at)[0].locations},
 )
 
-_for_inner_entry(x, ts) := object.union(_entry("item", x.item, x.cause, [], [], concat("; ", ts)), {"value": x.value, "locations": x.locations}) if _walk_kind(x.item) == "item"
+_for_inner_entry(x, ts) := object.union(_entry("item", x.item, x.cause, [], [], concat("; ", [_entry_text(t, x.item) | some t in ts])), {"value": x.value, "locations": x.locations}) if _walk_kind(x.item) == "item"
 
 else := _entry("list", x.item, x.cause, [_item_read(x)], [], concat("; ", ts))
 
@@ -326,6 +326,9 @@ _level_said("list", names) := array.slice(names, 0, count(names) - 1)
 _level_text(text, names) := substring(text, count(p) + 2, -1) if {
 	p := concat(": ", names)
 	startswith(text, concat("", [p, ": "]))
+} else := substring(text, count(p) + 2, -1) if {
+	p := concat(": ", array.slice(names, 0, count(names) - 1))
+	startswith(text, concat("", [p, ": "]))
 } else := _entry_text(text, names[count(names) - 1])
 
 _item_levels_of(row, name) := ls[0] if {
@@ -421,6 +424,9 @@ _item_seen(row, name, at) := {"value": item.value, "locations": _anchored_all([i
 	f.item == name
 	item := f["ergo/item"]
 	is_object(item)
+} else := {"value": f.value, "locations": _anchored_all([f], at)[0].locations} if {
+	_walk_kind(name) == "item"
+	f := [g | some g in row.failed_items; g.item == name][0]
 } else := {}
 
 _item_read(f) := {"name": f.path, "value": f.value, "locations": f.locations, "outcome": _item_outcome(f.cause, f.value)}
