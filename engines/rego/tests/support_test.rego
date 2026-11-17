@@ -1185,3 +1185,5 @@ _assertion(name, cause, locations, inputs, message, failures) := {"kind": "asser
 _item(name, cause, value, locations, inputs, message, failures) := {"kind": "item", "name": name, "cause": cause, "value": value, "locations": locations, "inputs": inputs, "message": message, "failures": failures}
 
 _list(name, cause, inputs, message) := {"kind": "list", "name": name, "cause": cause, "inputs": inputs, "message": message, "failures": []}
+
+_applies_failures_by_subject(rep) := {r.subject.id: object.get(r, "failures", []) | some r in rep.results; r.check == "$applies"}
