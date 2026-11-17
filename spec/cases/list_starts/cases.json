@@ -5895,7 +5895,16 @@
           {
             "cause": "not_an_object",
             "check": "for_one",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, {\"c\": {\"z\": \"bob\"}, \"name\": \"bob\", \"rows\": [{\"n\": 2, \"v\": \"bob\"}]}], which isn't an object",
+                "name": "rows"
+              }
+            ],
             "inputs": [],
             "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, {\"c\": {\"z\": \"bob\"}, \"name\": \"bob\", \"rows\": [{\"n\": 2, \"v\": \"bob\"}]}], which isn't an object",
             "passed": false,
@@ -6313,82 +6322,30 @@
           {
             "cause": "absent",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in name",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/name",
-                          "/teams/0/1"
-                        ],
-                        "name": "t[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/teams/0/0/name",
+                      "/teams/0/1"
+                    ],
+                    "name": "t[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of t[0].rows",
+                "kind": "assertion",
                 "locations": [
-                  "/teams/0/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of t[0].rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
-              },
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "r.v is in name",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/1/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "bob"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/name",
-                          "/teams/0/1"
-                        ],
-                        "name": "t[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of t[1].rows",
-                "locations": [
-                  "/teams/0/1/rows/0"
-                ],
-                "path": "item 1 of t[1].rows",
-                "value": {
-                  "n": 2,
-                  "v": "bob"
-                }
+                "message": "item 2 of t: name is missing",
+                "name": "r.v is in name"
               }
             ],
             "inputs": [
@@ -6456,7 +6413,16 @@
           {
             "cause": "not_an_object",
             "check": "for_one",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, {\"c\": {}, \"rows\": [{\"n\": 2, \"v\": \"bob\"}]}], which isn't an object",
+                "name": "rows"
+              }
+            ],
             "inputs": [],
             "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, {\"c\": {}, \"rows\": [{\"n\": 2, \"v\": \"bob\"}]}], which isn't an object",
             "passed": false,
@@ -6491,82 +6457,30 @@
           {
             "cause": "absent",
             "check": "for_part",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in pl.z",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/c/z",
-                          "/teams/0/1/c"
-                        ],
-                        "name": "t[].c.z",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/teams/0/0/c/z",
+                      "/teams/0/1/c"
+                    ],
+                    "name": "t[].c.z",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of t[0].rows",
+                "kind": "assertion",
                 "locations": [
-                  "/teams/0/0/rows/0"
+                  "$policy:/requirements/r/checks/for_part/assert"
                 ],
-                "path": "item 1 of t[0].rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
-              },
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "r.v is in pl.z",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/1/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "bob"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/c/z",
-                          "/teams/0/1/c"
-                        ],
-                        "name": "t[].c.z",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of t[1].rows",
-                "locations": [
-                  "/teams/0/1/rows/0"
-                ],
-                "path": "item 1 of t[1].rows",
-                "value": {
-                  "n": 2,
-                  "v": "bob"
-                }
+                "message": "item 2 of t: c.z is missing",
+                "name": "r.v is in pl.z"
               }
             ],
             "inputs": [
@@ -7100,82 +7014,30 @@
           {
             "cause": "null",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in name",
-                    "cause": "null",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/name",
-                          "/teams/0/1/name"
-                        ],
-                        "name": "t[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/teams/0/0/name",
+                      "/teams/0/1/name"
+                    ],
+                    "name": "t[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of t[0].rows",
+                "kind": "assertion",
                 "locations": [
-                  "/teams/0/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of t[0].rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
-              },
-              {
-                "cause": "null",
-                "failed_assertions": [
-                  {
-                    "assertion": "r.v is in name",
-                    "cause": "null",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/1/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "bob"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/name",
-                          "/teams/0/1/name"
-                        ],
-                        "name": "t[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of t[1].rows",
-                "locations": [
-                  "/teams/0/1/rows/0"
-                ],
-                "path": "item 1 of t[1].rows",
-                "value": {
-                  "n": 2,
-                  "v": "bob"
-                }
+                "message": "item 2 of t: name is null",
+                "name": "r.v is in name"
               }
             ],
             "inputs": [
@@ -7246,7 +7108,16 @@
           {
             "cause": "not_an_object",
             "check": "for_one",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, {\"c\": {\"z\": null}, \"name\": null, \"rows\": [{\"n\": 2, \"v\": \"bob\"}]}], which isn't an object",
+                "name": "rows"
+              }
+            ],
             "inputs": [],
             "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, {\"c\": {\"z\": null}, \"name\": null, \"rows\": [{\"n\": 2, \"v\": \"bob\"}]}], which isn't an object",
             "passed": false,
@@ -7284,82 +7155,30 @@
           {
             "cause": "null",
             "check": "for_part",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in pl.z",
-                    "cause": "null",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/c/z",
-                          "/teams/0/1/c/z"
-                        ],
-                        "name": "t[].c.z",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/teams/0/0/c/z",
+                      "/teams/0/1/c/z"
+                    ],
+                    "name": "t[].c.z",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of t[0].rows",
+                "kind": "assertion",
                 "locations": [
-                  "/teams/0/0/rows/0"
+                  "$policy:/requirements/r/checks/for_part/assert"
                 ],
-                "path": "item 1 of t[0].rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
-              },
-              {
-                "cause": "null",
-                "failed_assertions": [
-                  {
-                    "assertion": "r.v is in pl.z",
-                    "cause": "null",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/1/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "bob"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/c/z",
-                          "/teams/0/1/c/z"
-                        ],
-                        "name": "t[].c.z",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of t[1].rows",
-                "locations": [
-                  "/teams/0/1/rows/0"
-                ],
-                "path": "item 1 of t[1].rows",
-                "value": {
-                  "n": 2,
-                  "v": "bob"
-                }
+                "message": "item 2 of t: c.z is null",
+                "name": "r.v is in pl.z"
               }
             ],
             "inputs": [
@@ -7885,54 +7704,47 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in name",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/name",
-                          "/teams/0/1"
-                        ],
-                        "name": "t[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/teams/0/0/name",
+                      "/teams/0/1"
+                    ],
+                    "name": "t[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of t[0].rows",
+                "kind": "assertion",
                 "locations": [
-                  "/teams/0/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of t[0].rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
+                "message": "item 2 of t is null, which isn't an object",
+                "name": "r.v is in name"
               },
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "t[1].rows",
-                "locations": [
-                  "/teams/0/1"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/teams/0/1"
+                    ],
+                    "name": "t[1].rows",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "t[1].rows",
-                "value": null
+                "kind": "list",
+                "message": "item 2 of t: rows is missing",
+                "name": "t[1].rows"
               }
             ],
             "inputs": [
@@ -7987,7 +7799,16 @@
           {
             "cause": "not_an_object",
             "check": "for_one",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, null], which isn't an object",
+                "name": "rows"
+              }
+            ],
             "inputs": [],
             "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, null], which isn't an object",
             "passed": false,
@@ -8014,54 +7835,47 @@
           {
             "cause": "unusable",
             "check": "for_part",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in pl.z",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/c/z",
-                          "/teams/0/1"
-                        ],
-                        "name": "t[].c.z",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/teams/0/0/c/z",
+                      "/teams/0/1"
+                    ],
+                    "name": "t[].c.z",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of t[0].rows",
+                "kind": "assertion",
                 "locations": [
-                  "/teams/0/0/rows/0"
+                  "$policy:/requirements/r/checks/for_part/assert"
                 ],
-                "path": "item 1 of t[0].rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
+                "message": "item 2 of t is null, which isn't an object",
+                "name": "r.v is in pl.z"
               },
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "t[1].rows",
-                "locations": [
-                  "/teams/0/1"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/teams/0/1"
+                    ],
+                    "name": "t[1].rows",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "t[1].rows",
-                "value": null
+                "kind": "list",
+                "message": "item 2 of t: rows is missing",
+                "name": "t[1].rows"
               }
             ],
             "inputs": [
@@ -8517,54 +8331,47 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in name",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/name",
-                          "/teams/0/1"
-                        ],
-                        "name": "t[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/teams/0/0/name",
+                      "/teams/0/1"
+                    ],
+                    "name": "t[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of t[0].rows",
+                "kind": "assertion",
                 "locations": [
-                  "/teams/0/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of t[0].rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
+                "message": "item 2 of t is 3, which isn't an object",
+                "name": "r.v is in name"
               },
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "t[1].rows",
-                "locations": [
-                  "/teams/0/1"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/teams/0/1"
+                    ],
+                    "name": "t[1].rows",
+                    "outcome": "unusable",
+                    "value": null
+                  }
                 ],
-                "path": "t[1].rows",
-                "value": null
+                "kind": "list",
+                "message": "item 2 of t: rows is null, which isn't a list or an object",
+                "name": "t[1].rows"
               }
             ],
             "inputs": [
@@ -8619,7 +8426,16 @@
           {
             "cause": "not_an_object",
             "check": "for_one",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, 3], which isn't an object",
+                "name": "rows"
+              }
+            ],
             "inputs": [],
             "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, 3], which isn't an object",
             "passed": false,
@@ -8646,54 +8462,47 @@
           {
             "cause": "unusable",
             "check": "for_part",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in pl.z",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/c/z",
-                          "/teams/0/1"
-                        ],
-                        "name": "t[].c.z",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/teams/0/0/c/z",
+                      "/teams/0/1"
+                    ],
+                    "name": "t[].c.z",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of t[0].rows",
+                "kind": "assertion",
                 "locations": [
-                  "/teams/0/0/rows/0"
+                  "$policy:/requirements/r/checks/for_part/assert"
                 ],
-                "path": "item 1 of t[0].rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
+                "message": "item 2 of t is 3, which isn't an object",
+                "name": "r.v is in pl.z"
               },
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "t[1].rows",
-                "locations": [
-                  "/teams/0/1"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/teams/0/1"
+                    ],
+                    "name": "t[1].rows",
+                    "outcome": "unusable",
+                    "value": null
+                  }
                 ],
-                "path": "t[1].rows",
-                "value": null
+                "kind": "list",
+                "message": "item 2 of t: rows is null, which isn't a list or an object",
+                "name": "t[1].rows"
               }
             ],
             "inputs": [
@@ -9153,54 +8962,47 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in name",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/name",
-                          "/teams/0/1"
-                        ],
-                        "name": "t[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/teams/0/0/name",
+                      "/teams/0/1"
+                    ],
+                    "name": "t[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of t[0].rows",
+                "kind": "assertion",
                 "locations": [
-                  "/teams/0/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of t[0].rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
+                "message": "item 2 of t is [{\"name\": \"bob\"}], which isn't an object",
+                "name": "r.v is in name"
               },
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "t[1].rows",
-                "locations": [
-                  "/teams/0/1"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/teams/0/1"
+                    ],
+                    "name": "t[1].rows",
+                    "outcome": "unusable",
+                    "value": null
+                  }
                 ],
-                "path": "t[1].rows",
-                "value": null
+                "kind": "list",
+                "message": "item 2 of t: rows is null, which isn't a list or an object",
+                "name": "t[1].rows"
               }
             ],
             "inputs": [
@@ -9259,7 +9061,16 @@
           {
             "cause": "not_an_object",
             "check": "for_one",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, [{\"name\": \"bob\"}]], which isn't an object",
+                "name": "rows"
+              }
+            ],
             "inputs": [],
             "message": "t is [{\"c\": {\"z\": \"ann\"}, \"name\": \"ann\", \"rows\": [{\"n\": 2, \"v\": \"ann\"}]}, [{\"name\": \"bob\"}]], which isn't an object",
             "passed": false,
@@ -9290,54 +9101,47 @@
           {
             "cause": "unusable",
             "check": "for_part",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in pl.z",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/teams/0/0/c/z",
-                          "/teams/0/1"
-                        ],
-                        "name": "t[].c.z",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/teams/0/0/c/z",
+                      "/teams/0/1"
+                    ],
+                    "name": "t[].c.z",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of t[0].rows",
+                "kind": "assertion",
                 "locations": [
-                  "/teams/0/0/rows/0"
+                  "$policy:/requirements/r/checks/for_part/assert"
                 ],
-                "path": "item 1 of t[0].rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
+                "message": "item 2 of t is [{\"name\": \"bob\"}], which isn't an object",
+                "name": "r.v is in pl.z"
               },
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "t[1].rows",
-                "locations": [
-                  "/teams/0/1"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/teams/0/1"
+                    ],
+                    "name": "t[1].rows",
+                    "outcome": "unusable",
+                    "value": null
+                  }
                 ],
-                "path": "t[1].rows",
-                "value": null
+                "kind": "list",
+                "message": "item 2 of t: rows is null, which isn't a list or an object",
+                "name": "t[1].rows"
               }
             ],
             "inputs": [

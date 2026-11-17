@@ -8586,43 +8586,54 @@
           {
             "cause": "value",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "some f.tags equals artifact.owner",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/trail/artifacts/0/releases/0/files/1/tags/0"
                         ],
                         "name": "f.tags[]",
+                        "outcome": "found",
                         "value": [
                           "bob"
                         ]
-                      },
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/owner"
-                        ],
-                        "name": "artifact.owner",
-                        "value": "ann"
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/trail/artifacts/0/releases/0/files/1"
+                    ],
+                    "message": "item 1 of tags is \"bob\", and artifact.owner is \"ann\"",
+                    "name": "item 2 of files",
+                    "value": {
+                      "tags": [
+                        "bob"
+                      ]
+                    }
                   }
                 ],
-                "item": "item 2 of files",
-                "locations": [
-                  "/trail/artifacts/0/releases/0/files/1"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/trail/artifacts/0/owner"
+                    ],
+                    "name": "artifact.owner",
+                    "outcome": "found",
+                    "value": "ann"
+                  }
                 ],
-                "path": "item 2 of files",
-                "value": {
-                  "tags": [
-                    "bob"
-                  ]
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "",
+                "name": "some f.tags equals artifact.owner"
               }
             ],
             "inputs": [
@@ -9827,41 +9838,51 @@
           {
             "cause": "absent",
             "check": "walk",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "some rows.n is at least artifact.nums named by k",
                     "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/nums"
-                        ],
-                        "name": "artifact.nums named by k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/prs/0/rows/0/n",
-                          "/trail/artifacts/0/prs/0/rows/1/n"
-                        ],
-                        "name": "rows[].n",
-                        "value": [
-                          1,
-                          2
-                        ]
-                      }
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/trail/artifacts/0/prs/0/keys/1"
+                    ],
+                    "message": "artifact.nums named by k is missing",
+                    "name": "item 2 of keys",
+                    "value": "k2"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/trail/artifacts/0/nums"
+                    ],
+                    "name": "artifact.nums named by k",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/trail/artifacts/0/prs/0/rows/0/n",
+                      "/trail/artifacts/0/prs/0/rows/1/n"
+                    ],
+                    "name": "rows[].n",
+                    "outcome": "found",
+                    "value": [
+                      1,
+                      2
                     ]
                   }
                 ],
-                "item": "item 2 of keys",
+                "kind": "assertion",
                 "locations": [
-                  "/trail/artifacts/0/prs/0/keys/1"
+                  "$policy:/requirements/s/checks/walk/assert"
                 ],
-                "path": "item 2 of keys",
-                "value": "k2"
+                "message": "",
+                "name": "some rows.n is at least artifact.nums named by k"
               }
             ],
             "inputs": [
@@ -9959,41 +9980,51 @@
           {
             "cause": "null",
             "check": "walk",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "some rows.n is at least artifact.nums named by k",
                     "cause": "null",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/nums"
-                        ],
-                        "name": "artifact.nums named by k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/prs/0/rows/0/n",
-                          "/trail/artifacts/0/prs/0/rows/1/n"
-                        ],
-                        "name": "rows[].n",
-                        "value": [
-                          1,
-                          2
-                        ]
-                      }
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/trail/artifacts/0/prs/0/keys/1"
+                    ],
+                    "message": "k is null",
+                    "name": "item 2 of keys",
+                    "value": null
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/trail/artifacts/0/nums"
+                    ],
+                    "name": "artifact.nums named by k",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/trail/artifacts/0/prs/0/rows/0/n",
+                      "/trail/artifacts/0/prs/0/rows/1/n"
+                    ],
+                    "name": "rows[].n",
+                    "outcome": "found",
+                    "value": [
+                      1,
+                      2
                     ]
                   }
                 ],
-                "item": "item 2 of keys",
+                "kind": "assertion",
                 "locations": [
-                  "/trail/artifacts/0/prs/0/keys/1"
+                  "$policy:/requirements/s/checks/walk/assert"
                 ],
-                "path": "item 2 of keys",
-                "value": null
+                "message": "",
+                "name": "some rows.n is at least artifact.nums named by k"
               }
             ],
             "inputs": [
@@ -10090,41 +10121,51 @@
           {
             "cause": "unusable",
             "check": "walk",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "some rows.n is at least artifact.nums named by k",
                     "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/nums/k1"
-                        ],
-                        "name": "artifact.nums named by k",
-                        "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/prs/0/rows/0/n",
-                          "/trail/artifacts/0/prs/0/rows/1/n"
-                        ],
-                        "name": "rows[].n",
-                        "value": [
-                          1,
-                          2
-                        ]
-                      }
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/trail/artifacts/0/prs/0/keys/0"
+                    ],
+                    "message": "artifact.nums named by k is \"a\", which isn't a number",
+                    "name": "item 1 of keys",
+                    "value": "k1"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/trail/artifacts/0/nums/k1"
+                    ],
+                    "name": "artifact.nums named by k",
+                    "outcome": "found",
+                    "value": "a"
+                  },
+                  {
+                    "locations": [
+                      "/trail/artifacts/0/prs/0/rows/0/n",
+                      "/trail/artifacts/0/prs/0/rows/1/n"
+                    ],
+                    "name": "rows[].n",
+                    "outcome": "found",
+                    "value": [
+                      1,
+                      2
                     ]
                   }
                 ],
-                "item": "item 1 of keys",
+                "kind": "assertion",
                 "locations": [
-                  "/trail/artifacts/0/prs/0/keys/0"
+                  "$policy:/requirements/s/checks/walk/assert"
                 ],
-                "path": "item 1 of keys",
-                "value": "k1"
+                "message": "",
+                "name": "some rows.n is at least artifact.nums named by k"
               }
             ],
             "inputs": [
@@ -10252,48 +10293,46 @@
           {
             "cause": "absent",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "some rows.n is at least artifact.nums named by key",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/nums"
-                        ],
-                        "name": "artifact.nums named by key",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/prs/0"
-                        ],
-                        "name": "key",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/prs/0/rows/0/n",
-                          "/trail/artifacts/0/prs/0/rows/1/n"
-                        ],
-                        "name": "rows[].n",
-                        "value": [
-                          1,
-                          2
-                        ]
-                      }
+                    "locations": [
+                      "/trail/artifacts/0/nums"
+                    ],
+                    "name": "artifact.nums named by key",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/trail/artifacts/0/prs/0"
+                    ],
+                    "name": "key",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/trail/artifacts/0/prs/0/rows/0/n",
+                      "/trail/artifacts/0/prs/0/rows/1/n"
+                    ],
+                    "name": "rows[].n",
+                    "outcome": "found",
+                    "value": [
+                      1,
+                      2
                     ]
                   }
                 ],
-                "item": "item 1 of keys",
+                "kind": "assertion",
                 "locations": [
-                  "/trail/artifacts/0/prs/0/keys/0"
+                  "$policy:/requirements/s/checks/for/assert"
                 ],
-                "path": "item 1 of keys",
-                "value": "k1"
+                "message": "key is missing",
+                "name": "some rows.n is at least artifact.nums named by key"
               }
             ],
             "inputs": [
@@ -10302,6 +10341,7 @@
                   "/trail/artifacts/0/nums"
                 ],
                 "name": "artifact.nums named by key",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -10309,6 +10349,7 @@
                   "/trail/artifacts/0/prs/0"
                 ],
                 "name": "key",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -10518,48 +10559,46 @@
           {
             "cause": "absent",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "some rows.n is at least artifact.nums named by key",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/nums"
-                        ],
-                        "name": "artifact.nums named by key",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/prs/0"
-                        ],
-                        "name": "key",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/prs/0/rows/0/n",
-                          "/trail/artifacts/0/prs/0/rows/1/n"
-                        ],
-                        "name": "rows[].n",
-                        "value": [
-                          1,
-                          2
-                        ]
-                      }
+                    "locations": [
+                      "/trail/artifacts/0/nums"
+                    ],
+                    "name": "artifact.nums named by key",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/trail/artifacts/0/prs/0"
+                    ],
+                    "name": "key",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/trail/artifacts/0/prs/0/rows/0/n",
+                      "/trail/artifacts/0/prs/0/rows/1/n"
+                    ],
+                    "name": "rows[].n",
+                    "outcome": "found",
+                    "value": [
+                      1,
+                      2
                     ]
                   }
                 ],
-                "item": "item 1 of keys",
+                "kind": "assertion",
                 "locations": [
-                  "/trail/artifacts/0/prs/0/keys/0"
+                  "$policy:/requirements/s/checks/for/assert"
                 ],
-                "path": "item 1 of keys",
-                "value": "k1"
+                "message": "key is missing",
+                "name": "some rows.n is at least artifact.nums named by key"
               }
             ],
             "inputs": [
@@ -10568,6 +10607,7 @@
                   "/trail/artifacts/0/nums"
                 ],
                 "name": "artifact.nums named by key",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -10575,6 +10615,7 @@
                   "/trail/artifacts/0/prs/0"
                 ],
                 "name": "key",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -15534,16 +15575,31 @@
           {
             "cause": "absent",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$input.k is missing",
+                "name": "es"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -15565,7 +15621,16 @@
           {
             "cause": "absent",
             "check": "for_if_any",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$input.k is missing",
+                "name": "es"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
@@ -15725,16 +15790,31 @@
           {
             "cause": "null",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$input.k is null",
+                "name": "es"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -15756,7 +15836,16 @@
           {
             "cause": "null",
             "check": "for_if_any",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$input.k is null",
+                "name": "es"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
@@ -15916,16 +16005,34 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$input.k is 3, which isn't text",
+                "name": "e.v is 2"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -15947,7 +16054,19 @@
           {
             "cause": "unusable",
             "check": "for_if_any",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for_if_any/assert"
+                ],
+                "message": "$input.k is 3, which isn't text",
+                "name": "e.v is 2"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
@@ -16107,16 +16226,34 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$input.k is true, which isn't text",
+                "name": "e.v is 2"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -16138,7 +16275,19 @@
           {
             "cause": "unusable",
             "check": "for_if_any",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for_if_any/assert"
+                ],
+                "message": "$input.k is true, which isn't text",
+                "name": "e.v is 2"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
@@ -16298,16 +16447,34 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$input.k is [], which isn't text",
+                "name": "e.v is 2"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -16329,7 +16496,19 @@
           {
             "cause": "unusable",
             "check": "for_if_any",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for_if_any/assert"
+                ],
+                "message": "$input.k is [], which isn't text",
+                "name": "e.v is 2"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
@@ -16489,16 +16668,34 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$input.k is {}, which isn't text",
+                "name": "e.v is 2"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -16520,7 +16717,19 @@
           {
             "cause": "unusable",
             "check": "for_if_any",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for_if_any/assert"
+                ],
+                "message": "$input.k is {}, which isn't text",
+                "name": "e.v is 2"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
@@ -16687,16 +16896,31 @@
           {
             "cause": "absent",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$params.k is missing",
+                "name": "es"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -16865,16 +17089,31 @@
           {
             "cause": "null",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$params.k is null",
+                "name": "es"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -17043,16 +17282,34 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$input.k is 3, which isn't text",
+                "name": "e.v is 2"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -17214,16 +17471,31 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$input.k is missing",
+                "name": "es"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -17385,16 +17657,31 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$input.k is null",
+                "name": "es"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -17926,16 +18213,34 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$input.j is 3, which isn't text",
+                "name": "e.v is 2"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -18146,16 +18451,34 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$input.j is 3, which isn't text",
+                "name": "e.v is 2"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [
@@ -18366,16 +18689,34 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$input.k is 3, which isn't text; $input.j is 3, which isn't text",
+                "name": "e.v is 2"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "es",
-                "locations": [
-                  "/things/0/es"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es"
+                    ],
+                    "name": "es",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "es",
-                "value": []
+                "kind": "list",
+                "message": "es is []",
+                "name": "es"
               }
             ],
             "inputs": [

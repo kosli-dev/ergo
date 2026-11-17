@@ -514,6 +514,8 @@ for / a for line assertion whose followed by reads a piece from $params, $input 
 for / a for line on a child subject that reads the parent's field named like the parent and its own / keeps the dot in the name of the child's own field
 for / a for line on a child subject whose assertion reads the parent / shows the parent's field in its inputs
 for / a for line on a child subject whose sentence reads the parent and its own field of the same name / lists the parent's field and the child's own field of the same name in the order they were read
+for / a for line on a subject that isn't an object / fails as not_an_object when the first path starts at the subject
+for / a for line on a subject that isn't an object names the subject / the message names thing, never the subject
 for / a for line over $input whose sentence reads a list on the right, as in MI-18.11 / passes when each agent lacks one of the grants, and fails when an agent holds them all
 for / a for line over a key of the params, with params as a number / fails as unusable and names the params and what they are
 for / a for line over the params, with params as a number / fails as unusable and names the params and what they are
@@ -568,6 +570,7 @@ for / a for line whose assert joins sentences with and / gives each sentence its
 for / a for line whose first item has no whose, over a list where one value is missing / shows nothing of the second item under the value that's missing, and fails as absent
 for / a for line whose item path is the subject's own name walks a subject that is a list, and fails one that isn't an object / a list of objects as the subject is walked, and an object item isn't a number
 for / a for line whose item path is the subject's own name walks a subject that is a list, and fails one that isn't an object / a list subject is walked, whatever it holds
+for / a for line whose item path is the subject's own name walks a subject that is a list, and fails one that isn't an object / a text subject is not an object
 for / a for line whose item path is the subject's own name walks a subject that is a list, and fails one that isn't an object / an empty list subject fails as value
 for / a for line whose second item is a list from the params and whose whose reads the first item: with a list item whose v is null / an item whose t can be read and a list whose item has a null v: the cause stays null
 for / a for line whose second item is a list from the params and whose whose reads the first item: with a list item whose v is null / an item whose t can't be read and a list whose item has a null v: the cause is unusable, not null
@@ -1091,6 +1094,7 @@ list_items / a count of or a sum of inside a whose reads its path as it does on 
 list_items / a count or sum that can't read a named by key names the key, not the list it reads / only the key is named
 list_items / a for item on a subject that is a list names an item that isn't an object by its value / a number, a list and null are named as they are
 list_items / a for item that starts at a part on a subject that is a list / reads the part in each item
+list_items / a for item that starts at a part, with a sentence that reads the part plainly, on a subject that is a list / fails as a whole, naming the subject once
 list_items / a for line and a one-line every beside a check with a named by key that can't be read, a number, on an input that is a list / the plain check and the every and for line that read a key from $input fail as not_an_object, and the for lines that read a key from $params fail as before
 list_items / a for line and a one-line every beside a check with a named by key that can't be read, missing, on an input that is a list / the plain check and the every and for line that read a key from $input fail as not_an_object, and the for lines that read a key from $params fail as before
 list_items / a for line and a one-line every beside a check with a named by key that can't be read, null, on an input that is a list / the plain check and the every and for line that read a key from $input fail as not_an_object, and the for lines that read a key from $params fail as before

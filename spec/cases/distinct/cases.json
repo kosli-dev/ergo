@@ -2914,31 +2914,40 @@
           {
             "cause": "value",
             "check": "f",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "who is \"ann\"",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/s/commits/1/author"
                         ],
                         "name": "who",
+                        "outcome": "found",
                         "value": "bob"
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/commits/1/author",
+                      "/s/commits/2/author"
+                    ],
+                    "message": "item 2 of commits is \"bob\"",
+                    "name": "item 2 of commits",
+                    "value": "bob"
                   }
                 ],
-                "item": "item 2 of commits",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/s/commits/1/author",
-                  "/s/commits/2/author"
+                  "$policy:/requirements/r/checks/f/assert"
                 ],
-                "path": "item 2 of commits",
-                "value": "bob"
+                "message": "",
+                "name": "who is \"ann\""
               }
             ],
             "inputs": [
@@ -2999,42 +3008,58 @@
           {
             "cause": "value",
             "check": "g",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "review is \"ok\"",
                     "cause": "value",
-                    "items": [
+                    "failures": [
                       {
                         "cause": "value",
+                        "failures": [],
                         "inputs": [
                           {
                             "locations": [
                               "/s/commits/1/reviews/0"
                             ],
                             "name": "review",
+                            "outcome": "found",
                             "value": "no"
                           }
                         ],
-                        "item": "item 1 of commit.reviews"
+                        "kind": "item",
+                        "locations": [
+                          "/s/commits/1/reviews/0"
+                        ],
+                        "message": "item 1 of reviews is \"no\"",
+                        "name": "item 1 of commit.reviews",
+                        "value": "no"
                       }
-                    ]
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/s/commits/1",
+                      "/s/commits/2"
+                    ],
+                    "message": "",
+                    "name": "item 2 of commits",
+                    "value": {
+                      "author": "bob",
+                      "reviews": [
+                        "no"
+                      ]
+                    }
                   }
                 ],
-                "item": "item 2 of commits",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/s/commits/1",
-                  "/s/commits/2"
+                  "$policy:/requirements/r/checks/g/assert"
                 ],
-                "path": "item 2 of commits",
-                "value": {
-                  "author": "bob",
-                  "reviews": [
-                    "no"
-                  ]
-                }
+                "message": "",
+                "name": "review is \"ok\""
               }
             ],
             "inputs": [
@@ -3122,42 +3147,61 @@
           {
             "cause": "value",
             "check": "h",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "r.ok is true",
                     "cause": "value",
-                    "items": [
+                    "failures": [
                       {
                         "cause": "value",
+                        "failures": [],
                         "inputs": [
                           {
                             "locations": [
                               "/s/reviewers/1/ok"
                             ],
                             "name": "r.ok",
+                            "outcome": "found",
                             "value": false
                           }
                         ],
-                        "item": "item 2 of reviewers"
+                        "kind": "item",
+                        "locations": [
+                          "/s/reviewers/1"
+                        ],
+                        "message": "ok is false",
+                        "name": "item 2 of reviewers",
+                        "value": {
+                          "by": "bob",
+                          "ok": false
+                        }
                       }
-                    ]
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/s/commits/1",
+                      "/s/commits/2"
+                    ],
+                    "message": "",
+                    "name": "item 2 of commits",
+                    "value": {
+                      "author": "bob",
+                      "reviews": [
+                        "no"
+                      ]
+                    }
                   }
                 ],
-                "item": "item 2 of commits",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/s/commits/1",
-                  "/s/commits/2"
+                  "$policy:/requirements/r/checks/h/assert"
                 ],
-                "path": "item 2 of commits",
-                "value": {
-                  "author": "bob",
-                  "reviews": [
-                    "no"
-                  ]
-                }
+                "message": "",
+                "name": "r.ok is true"
               }
             ],
             "inputs": [
@@ -5795,19 +5839,20 @@
           {
             "cause": "value",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "x.k is at least x.lo",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/s/xs/2/k"
                         ],
                         "name": "x.k",
+                        "outcome": "found",
                         "value": 5
                       },
                       {
@@ -5815,20 +5860,29 @@
                           "/s/xs/2/lo"
                         ],
                         "name": "x.lo",
+                        "outcome": "found",
                         "value": 9
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/xs/2"
+                    ],
+                    "message": "k is 5, and lo is 9",
+                    "name": "item 3 of xs",
+                    "value": {
+                      "k": 5,
+                      "lo": 9
+                    }
                   }
                 ],
-                "item": "item 3 of xs",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/s/xs/2"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 3 of xs",
-                "value": {
-                  "k": 5,
-                  "lo": 9
-                }
+                "message": "",
+                "name": "x.k is at least x.lo"
               }
             ],
             "inputs": [
@@ -6248,13 +6302,13 @@
           {
             "cause": "value",
             "check": "n",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "note is \"fine\"",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
@@ -6262,18 +6316,27 @@
                           "/sbom/components/2/licenses/0/notes/0"
                         ],
                         "name": "note",
+                        "outcome": "found",
                         "value": "bad"
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/sbom/components/0/licenses/0/notes/0",
+                      "/sbom/components/2/licenses/0/notes/0"
+                    ],
+                    "message": "item 1 of notes is \"bad\"",
+                    "name": "item 1 of notes",
+                    "value": "bad"
                   }
                 ],
-                "item": "item 1 of notes",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/sbom/components/0/licenses/0/notes/0",
-                  "/sbom/components/2/licenses/0/notes/0"
+                  "$policy:/requirements/l/checks/n/assert"
                 ],
-                "path": "item 1 of notes",
-                "value": "bad"
+                "message": "",
+                "name": "note is \"fine\""
               }
             ],
             "inputs": [
@@ -7203,58 +7266,26 @@
           {
             "cause": "absent",
             "check": "forin",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "some distinct t.fs.k is in ok",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
-                        ],
-                        "name": "t.fs[].k",
-                        "value": [
-                          5,
-                          5
-                        ]
-                      },
-                      {
-                        "locations": [
-                          "/s"
-                        ],
-                        "name": "ok",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/s"
+                    ],
+                    "name": "ok",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of ts",
+                "kind": "assertion",
                 "locations": [
-                  "/s/ts/0"
+                  "$policy:/requirements/r/checks/forin/assert"
                 ],
-                "path": "item 1 of ts",
-                "value": {
-                  "fs": [
-                    {
-                      "k": 5,
-                      "lo": 1,
-                      "ok": [
-                        1
-                      ]
-                    },
-                    {
-                      "k": 5,
-                      "lo": 9,
-                      "ok": [
-                        1
-                      ]
-                    }
-                  ]
-                }
+                "message": "ok is missing",
+                "name": "some distinct t.fs.k is in ok"
               }
             ],
             "inputs": [
@@ -7263,6 +7294,7 @@
                   "/s"
                 ],
                 "name": "ok",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -7420,57 +7452,26 @@
           {
             "cause": "absent",
             "check": "forin",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "some distinct t.fs.k is in ok",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
-                        ],
-                        "name": "t.fs[].k",
-                        "value": [
-                          5,
-                          5
-                        ]
-                      },
-                      {
-                        "locations": [
-                          "/s"
-                        ],
-                        "name": "ok",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/s"
+                    ],
+                    "name": "ok",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of ts",
+                "kind": "assertion",
                 "locations": [
-                  "/s/ts/0"
+                  "$policy:/requirements/r/checks/forin/assert"
                 ],
-                "path": "item 1 of ts",
-                "value": {
-                  "fs": [
-                    {
-                      "k": 5,
-                      "lo": 1,
-                      "ok": [
-                        1
-                      ]
-                    },
-                    {
-                      "k": 5,
-                      "ok": [
-                        1
-                      ]
-                    }
-                  ]
-                }
+                "message": "ok is missing",
+                "name": "some distinct t.fs.k is in ok"
               }
             ],
             "inputs": [
@@ -7479,6 +7480,7 @@
                   "/s"
                 ],
                 "name": "ok",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -7636,58 +7638,26 @@
           {
             "cause": "absent",
             "check": "forin",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "some distinct t.fs.k is in ok",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
-                        ],
-                        "name": "t.fs[].k",
-                        "value": [
-                          5,
-                          5
-                        ]
-                      },
-                      {
-                        "locations": [
-                          "/s"
-                        ],
-                        "name": "ok",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/s"
+                    ],
+                    "name": "ok",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of ts",
+                "kind": "assertion",
                 "locations": [
-                  "/s/ts/0"
+                  "$policy:/requirements/r/checks/forin/assert"
                 ],
-                "path": "item 1 of ts",
-                "value": {
-                  "fs": [
-                    {
-                      "k": 5,
-                      "lo": 1,
-                      "ok": [
-                        1
-                      ]
-                    },
-                    {
-                      "k": 5,
-                      "lo": null,
-                      "ok": [
-                        1
-                      ]
-                    }
-                  ]
-                }
+                "message": "ok is missing",
+                "name": "some distinct t.fs.k is in ok"
               }
             ],
             "inputs": [
@@ -7696,6 +7666,7 @@
                   "/s"
                 ],
                 "name": "ok",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -7855,58 +7826,26 @@
           {
             "cause": "absent",
             "check": "forin",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "some distinct t.fs.k is in ok",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
-                        ],
-                        "name": "t.fs[].k",
-                        "value": [
-                          5,
-                          5
-                        ]
-                      },
-                      {
-                        "locations": [
-                          "/s"
-                        ],
-                        "name": "ok",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/s"
+                    ],
+                    "name": "ok",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of ts",
+                "kind": "assertion",
                 "locations": [
-                  "/s/ts/0"
+                  "$policy:/requirements/r/checks/forin/assert"
                 ],
-                "path": "item 1 of ts",
-                "value": {
-                  "fs": [
-                    {
-                      "k": 5,
-                      "lo": 1,
-                      "ok": [
-                        1
-                      ]
-                    },
-                    {
-                      "k": 5,
-                      "lo": "x",
-                      "ok": [
-                        1
-                      ]
-                    }
-                  ]
-                }
+                "message": "ok is missing",
+                "name": "some distinct t.fs.k is in ok"
               }
             ],
             "inputs": [
@@ -7915,6 +7854,7 @@
                   "/s"
                 ],
                 "name": "ok",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -8801,13 +8741,13 @@
           {
             "cause": "not_an_object",
             "check": "forwhose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "every distinct t.fs.k whose lo is 1 is at least lo",
                     "cause": "not_an_object",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
@@ -8815,44 +8755,55 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
+                        "outcome": "found",
                         "value": [
                           5,
                           5
                         ]
-                      },
-                      {
-                        "locations": [
-                          "/s/lo"
-                        ],
-                        "name": "lo",
-                        "value": 1
                       }
-                    ]
-                  }
-                ],
-                "item": "item 1 of ts",
-                "locations": [
-                  "/s/ts/0"
-                ],
-                "path": "item 1 of ts",
-                "value": {
-                  "fs": [
-                    {
-                      "k": 5,
-                      "lo": 1,
-                      "ok": [
-                        1
-                      ]
-                    },
-                    {
-                      "k": 5,
-                      "lo": 9,
-                      "ok": [
-                        1
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/ts/0"
+                    ],
+                    "message": "item 1 of fs: k is 5, which isn't an object; item 2 of fs: k is 5, which isn't an object",
+                    "name": "item 1 of ts",
+                    "value": {
+                      "fs": [
+                        {
+                          "k": 5,
+                          "lo": 1,
+                          "ok": [
+                            1
+                          ]
+                        },
+                        {
+                          "k": 5,
+                          "lo": 9,
+                          "ok": [
+                            1
+                          ]
+                        }
                       ]
                     }
-                  ]
-                }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/s/lo"
+                    ],
+                    "name": "lo",
+                    "outcome": "found",
+                    "value": 1
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/forwhose/assert"
+                ],
+                "message": "",
+                "name": "every distinct t.fs.k whose lo is 1 is at least lo"
               }
             ],
             "inputs": [
@@ -9041,13 +8992,13 @@
           {
             "cause": "not_an_object",
             "check": "forwhose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "every distinct t.fs.k whose lo is 1 is at least lo",
                     "cause": "not_an_object",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
@@ -9055,43 +9006,54 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
+                        "outcome": "found",
                         "value": [
                           5,
                           5
                         ]
-                      },
-                      {
-                        "locations": [
-                          "/s/lo"
-                        ],
-                        "name": "lo",
-                        "value": 1
                       }
-                    ]
-                  }
-                ],
-                "item": "item 1 of ts",
-                "locations": [
-                  "/s/ts/0"
-                ],
-                "path": "item 1 of ts",
-                "value": {
-                  "fs": [
-                    {
-                      "k": 5,
-                      "lo": 1,
-                      "ok": [
-                        1
-                      ]
-                    },
-                    {
-                      "k": 5,
-                      "ok": [
-                        1
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/ts/0"
+                    ],
+                    "message": "item 1 of fs: k is 5, which isn't an object; item 2 of fs: k is 5, which isn't an object",
+                    "name": "item 1 of ts",
+                    "value": {
+                      "fs": [
+                        {
+                          "k": 5,
+                          "lo": 1,
+                          "ok": [
+                            1
+                          ]
+                        },
+                        {
+                          "k": 5,
+                          "ok": [
+                            1
+                          ]
+                        }
                       ]
                     }
-                  ]
-                }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/s/lo"
+                    ],
+                    "name": "lo",
+                    "outcome": "found",
+                    "value": 1
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/forwhose/assert"
+                ],
+                "message": "",
+                "name": "every distinct t.fs.k whose lo is 1 is at least lo"
               }
             ],
             "inputs": [
@@ -9281,13 +9243,13 @@
           {
             "cause": "not_an_object",
             "check": "forwhose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "every distinct t.fs.k whose lo is 1 is at least lo",
                     "cause": "not_an_object",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
@@ -9295,44 +9257,55 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
+                        "outcome": "found",
                         "value": [
                           5,
                           5
                         ]
-                      },
-                      {
-                        "locations": [
-                          "/s/lo"
-                        ],
-                        "name": "lo",
-                        "value": 1
                       }
-                    ]
-                  }
-                ],
-                "item": "item 1 of ts",
-                "locations": [
-                  "/s/ts/0"
-                ],
-                "path": "item 1 of ts",
-                "value": {
-                  "fs": [
-                    {
-                      "k": 5,
-                      "lo": 1,
-                      "ok": [
-                        1
-                      ]
-                    },
-                    {
-                      "k": 5,
-                      "lo": null,
-                      "ok": [
-                        1
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/ts/0"
+                    ],
+                    "message": "item 1 of fs: k is 5, which isn't an object; item 2 of fs: k is 5, which isn't an object",
+                    "name": "item 1 of ts",
+                    "value": {
+                      "fs": [
+                        {
+                          "k": 5,
+                          "lo": 1,
+                          "ok": [
+                            1
+                          ]
+                        },
+                        {
+                          "k": 5,
+                          "lo": null,
+                          "ok": [
+                            1
+                          ]
+                        }
                       ]
                     }
-                  ]
-                }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/s/lo"
+                    ],
+                    "name": "lo",
+                    "outcome": "found",
+                    "value": 1
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/forwhose/assert"
+                ],
+                "message": "",
+                "name": "every distinct t.fs.k whose lo is 1 is at least lo"
               }
             ],
             "inputs": [
@@ -9524,13 +9497,13 @@
           {
             "cause": "not_an_object",
             "check": "forwhose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "every distinct t.fs.k whose lo is 1 is at least lo",
                     "cause": "not_an_object",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
@@ -9538,44 +9511,55 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
+                        "outcome": "found",
                         "value": [
                           5,
                           5
                         ]
-                      },
-                      {
-                        "locations": [
-                          "/s/lo"
-                        ],
-                        "name": "lo",
-                        "value": 1
                       }
-                    ]
-                  }
-                ],
-                "item": "item 1 of ts",
-                "locations": [
-                  "/s/ts/0"
-                ],
-                "path": "item 1 of ts",
-                "value": {
-                  "fs": [
-                    {
-                      "k": 5,
-                      "lo": 1,
-                      "ok": [
-                        1
-                      ]
-                    },
-                    {
-                      "k": 5,
-                      "lo": "x",
-                      "ok": [
-                        1
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/ts/0"
+                    ],
+                    "message": "item 1 of fs: k is 5, which isn't an object; item 2 of fs: k is 5, which isn't an object",
+                    "name": "item 1 of ts",
+                    "value": {
+                      "fs": [
+                        {
+                          "k": 5,
+                          "lo": 1,
+                          "ok": [
+                            1
+                          ]
+                        },
+                        {
+                          "k": 5,
+                          "lo": "x",
+                          "ok": [
+                            1
+                          ]
+                        }
                       ]
                     }
-                  ]
-                }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/s/lo"
+                    ],
+                    "name": "lo",
+                    "outcome": "found",
+                    "value": 1
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/forwhose/assert"
+                ],
+                "message": "",
+                "name": "every distinct t.fs.k whose lo is 1 is at least lo"
               }
             ],
             "inputs": [
@@ -9971,13 +9955,13 @@
           {
             "cause": "unusable",
             "check": "aliasmatch",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "every distinct t.fs.k matches t.pats",
                     "cause": "unusable",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
@@ -9985,6 +9969,7 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
+                        "outcome": "found",
                         "value": [
                           5,
                           5
@@ -9995,40 +9980,49 @@
                           "/s/ts/0/pats"
                         ],
                         "name": "t.pats",
+                        "outcome": "found",
                         "value": [
                           "5"
                         ]
                       }
-                    ]
-                  }
-                ],
-                "item": "item 1 of ts",
-                "locations": [
-                  "/s/ts/0"
-                ],
-                "path": "item 1 of ts",
-                "value": {
-                  "fs": [
-                    {
-                      "k": 5,
-                      "lo": 9,
-                      "ok": []
-                    },
-                    {
-                      "k": 5,
-                      "lo": 1,
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/ts/0"
+                    ],
+                    "message": "item 1 of fs: k is 5, which isn't text",
+                    "name": "item 1 of ts",
+                    "value": {
+                      "fs": [
+                        {
+                          "k": 5,
+                          "lo": 9,
+                          "ok": []
+                        },
+                        {
+                          "k": 5,
+                          "lo": 1,
+                          "ok": [
+                            5
+                          ]
+                        }
+                      ],
                       "ok": [
                         5
+                      ],
+                      "pats": [
+                        "5"
                       ]
                     }
-                  ],
-                  "ok": [
-                    5
-                  ],
-                  "pats": [
-                    "5"
-                  ]
-                }
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/aliasmatch/assert"
+                ],
+                "message": "",
+                "name": "every distinct t.fs.k matches t.pats"
               }
             ],
             "inputs": [
@@ -10103,13 +10097,13 @@
           {
             "cause": "value",
             "check": "aliasnot",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "every distinct t.fs.k is not in t.ok",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
@@ -10117,6 +10111,7 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
+                        "outcome": "found",
                         "value": [
                           5,
                           5
@@ -10127,40 +10122,49 @@
                           "/s/ts/0/ok"
                         ],
                         "name": "t.ok",
+                        "outcome": "found",
                         "value": [
                           5
                         ]
                       }
-                    ]
-                  }
-                ],
-                "item": "item 1 of ts",
-                "locations": [
-                  "/s/ts/0"
-                ],
-                "path": "item 1 of ts",
-                "value": {
-                  "fs": [
-                    {
-                      "k": 5,
-                      "lo": 9,
-                      "ok": []
-                    },
-                    {
-                      "k": 5,
-                      "lo": 1,
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/ts/0"
+                    ],
+                    "message": "item 1 of fs: k is 5, and ok is [5]",
+                    "name": "item 1 of ts",
+                    "value": {
+                      "fs": [
+                        {
+                          "k": 5,
+                          "lo": 9,
+                          "ok": []
+                        },
+                        {
+                          "k": 5,
+                          "lo": 1,
+                          "ok": [
+                            5
+                          ]
+                        }
+                      ],
                       "ok": [
                         5
+                      ],
+                      "pats": [
+                        "5"
                       ]
                     }
-                  ],
-                  "ok": [
-                    5
-                  ],
-                  "pats": [
-                    "5"
-                  ]
-                }
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/aliasnot/assert"
+                ],
+                "message": "",
+                "name": "every distinct t.fs.k is not in t.ok"
               }
             ],
             "inputs": [

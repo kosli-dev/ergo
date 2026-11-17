@@ -9893,47 +9893,57 @@
           {
             "cause": "value",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of pr.reviews is at least 2",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/releases/0/pull_requests/1/reviews/0"
                         ],
-                        "name": "count of pr.reviews",
-                        "value": 1
-                      },
-                      {
-                        "locations": [
-                          "/releases/0/pull_requests/1/reviews/0"
-                        ],
                         "name": "pr.reviews[]",
+                        "outcome": "found",
                         "value": [
                           {
                             "id": 0
                           }
                         ]
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "count of pr.reviews is 1",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "reviews": [
+                        {
+                          "id": 0
+                        }
+                      ]
+                    }
                   }
                 ],
-                "item": "item 2 of pull_requests",
-                "locations": [
-                  "/releases/0/pull_requests/1"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/pull_requests/1/reviews/0"
+                    ],
+                    "name": "count of pr.reviews",
+                    "value": 1
+                  }
                 ],
-                "path": "item 2 of pull_requests",
-                "value": {
-                  "reviews": [
-                    {
-                      "id": 0
-                    }
-                  ]
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "",
+                "name": "count of pr.reviews is at least 2"
               }
             ],
             "inputs": [
@@ -10007,35 +10017,45 @@
           {
             "cause": "value",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of pr.reviews is at least 2",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [],
-                        "name": "count of pr.reviews",
-                        "value": 0
-                      },
-                      {
-                        "locations": [],
                         "name": "pr.reviews[]",
+                        "outcome": "found",
                         "value": []
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/0"
+                    ],
+                    "message": "count of pr.reviews is 0",
+                    "name": "item 1 of pull_requests",
+                    "value": {
+                      "reviews": []
+                    }
                   }
                 ],
-                "item": "item 1 of pull_requests",
-                "locations": [
-                  "/releases/0/pull_requests/0"
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of pr.reviews",
+                    "value": 0
+                  }
                 ],
-                "path": "item 1 of pull_requests",
-                "value": {
-                  "reviews": []
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "",
+                "name": "count of pr.reviews is at least 2"
               }
             ],
             "inputs": [
@@ -10105,33 +10125,43 @@
           {
             "cause": "absent",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of pr.reviews is at least 2",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [],
-                        "name": "count of pr.reviews",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
                         "name": "pr.reviews",
+                        "outcome": "found",
                         "value": []
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "message": "pr.reviews is missing",
+                    "name": "item 2 of pull_requests",
+                    "value": {}
                   }
                 ],
-                "item": "item 2 of pull_requests",
-                "locations": [
-                  "/releases/0/pull_requests/1"
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of pr.reviews",
+                    "value": null
+                  }
                 ],
-                "path": "item 2 of pull_requests",
-                "value": {}
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "",
+                "name": "count of pr.reviews is at least 2"
               }
             ],
             "inputs": [
@@ -10202,35 +10232,45 @@
           {
             "cause": "null",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of pr.reviews is at least 2",
                     "cause": "null",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [],
-                        "name": "count of pr.reviews",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
                         "name": "pr.reviews",
+                        "outcome": "found",
                         "value": []
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/0"
+                    ],
+                    "message": "pr.reviews is null",
+                    "name": "item 1 of pull_requests",
+                    "value": {
+                      "reviews": null
+                    }
                   }
                 ],
-                "item": "item 1 of pull_requests",
-                "locations": [
-                  "/releases/0/pull_requests/0"
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of pr.reviews",
+                    "value": null
+                  }
                 ],
-                "path": "item 1 of pull_requests",
-                "value": {
-                  "reviews": null
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "",
+                "name": "count of pr.reviews is at least 2"
               }
             ],
             "inputs": [
@@ -10292,35 +10332,45 @@
           {
             "cause": "unusable",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of pr.reviews is at least 2",
                     "cause": "unusable",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [],
-                        "name": "count of pr.reviews",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
                         "name": "pr.reviews",
+                        "outcome": "found",
                         "value": []
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/pull_requests/0"
+                    ],
+                    "message": "pr.reviews is \"two\", which isn't a list or an object",
+                    "name": "item 1 of pull_requests",
+                    "value": {
+                      "reviews": "two"
+                    }
                   }
                 ],
-                "item": "item 1 of pull_requests",
-                "locations": [
-                  "/releases/0/pull_requests/0"
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of pr.reviews",
+                    "value": null
+                  }
                 ],
-                "path": "item 1 of pull_requests",
-                "value": {
-                  "reviews": "two"
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "",
+                "name": "count of pr.reviews is at least 2"
               }
             ],
             "inputs": [
@@ -16609,27 +16659,20 @@
           {
             "cause": "value",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "days elapsed from pr.opened to pr.closed is at most 2",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "/vulns/0/pull_requests/1/opened",
-                          "/vulns/0/pull_requests/1/closed"
-                        ],
-                        "name": "days elapsed from pr.opened to pr.closed",
-                        "value": 3
-                      },
                       {
                         "locations": [
                           "/vulns/0/pull_requests/1/opened"
                         ],
                         "name": "pr.opened",
+                        "outcome": "found",
                         "value": 0
                       },
                       {
@@ -16637,20 +16680,38 @@
                           "/vulns/0/pull_requests/1/closed"
                         ],
                         "name": "pr.closed",
+                        "outcome": "found",
                         "value": 259200
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/vulns/0/pull_requests/1"
+                    ],
+                    "message": "days elapsed from pr.opened to pr.closed is 3",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "closed": 259200,
+                      "opened": 0
+                    }
                   }
                 ],
-                "item": "item 2 of pull_requests",
-                "locations": [
-                  "/vulns/0/pull_requests/1"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/vulns/0/pull_requests/1/opened",
+                      "/vulns/0/pull_requests/1/closed"
+                    ],
+                    "name": "days elapsed from pr.opened to pr.closed",
+                    "value": 3
+                  }
                 ],
-                "path": "item 2 of pull_requests",
-                "value": {
-                  "closed": 259200,
-                  "opened": 0
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "",
+                "name": "days elapsed from pr.opened to pr.closed is at most 2"
               }
             ],
             "inputs": [
@@ -16720,27 +16781,20 @@
           {
             "cause": "absent",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "days elapsed from pr.opened to pr.closed is at most 2",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "/vulns/0/pull_requests/0/opened",
-                          "/vulns/0/pull_requests/0"
-                        ],
-                        "name": "days elapsed from pr.opened to pr.closed",
-                        "value": null
-                      },
                       {
                         "locations": [
                           "/vulns/0/pull_requests/0/opened"
                         ],
                         "name": "pr.opened",
+                        "outcome": "found",
                         "value": 0
                       },
                       {
@@ -16748,19 +16802,37 @@
                           "/vulns/0/pull_requests/0"
                         ],
                         "name": "pr.closed",
+                        "outcome": "absent",
                         "value": null
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/vulns/0/pull_requests/0"
+                    ],
+                    "message": "pr.closed is missing",
+                    "name": "item 1 of pull_requests",
+                    "value": {
+                      "opened": 0
+                    }
                   }
                 ],
-                "item": "item 1 of pull_requests",
-                "locations": [
-                  "/vulns/0/pull_requests/0"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/vulns/0/pull_requests/0/opened",
+                      "/vulns/0/pull_requests/0"
+                    ],
+                    "name": "days elapsed from pr.opened to pr.closed",
+                    "value": null
+                  }
                 ],
-                "path": "item 1 of pull_requests",
-                "value": {
-                  "opened": 0
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "",
+                "name": "days elapsed from pr.opened to pr.closed is at most 2"
               }
             ],
             "inputs": [

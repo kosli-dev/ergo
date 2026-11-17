@@ -7537,23 +7537,14 @@
           {
             "cause": "absent",
             "check": "g",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "item 1 of items",
-                "locations": [
-                  "/kids/0/items/0"
-                ],
-                "path": "item 1 of items",
-                "value": {
-                  "hi": 1,
-                  "lo": 5,
-                  "pa": {
-                    "w": 1
-                  },
-                  "status": "ok"
-                }
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "pa.w is missing",
+                "name": "items"
               }
             ],
             "inputs": [
@@ -9322,19 +9313,20 @@
           {
             "cause": "absent",
             "check": "alias",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "every x.items whose lo is at least x.w plus hi exists",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/kids/0/xs/0/items/0"
                         ],
                         "name": "x.items[]",
+                        "outcome": "found",
                         "value": [
                           {
                             "hi": 1,
@@ -9352,29 +9344,38 @@
                           "/kids/0/xs/0"
                         ],
                         "name": "x.w",
+                        "outcome": "absent",
                         "value": null
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/kids/0/xs/0"
+                    ],
+                    "message": "x.w is missing",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "items": [
+                        {
+                          "hi": 1,
+                          "lo": 5,
+                          "status": "ok",
+                          "w": 1,
+                          "x": {
+                            "w": 1
+                          }
+                        }
+                      ]
+                    }
                   }
                 ],
-                "item": "item 1 of xs",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/kids/0/xs/0"
+                  "$policy:/requirements/r/checks/alias/assert"
                 ],
-                "path": "item 1 of xs",
-                "value": {
-                  "items": [
-                    {
-                      "hi": 1,
-                      "lo": 5,
-                      "status": "ok",
-                      "w": 1,
-                      "x": {
-                        "w": 1
-                      }
-                    }
-                  ]
-                }
+                "message": "",
+                "name": "every x.items whose lo is at least x.w plus hi exists"
               }
             ],
             "inputs": [
@@ -12625,28 +12626,21 @@
           {
             "cause": "absent",
             "check": "f",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of g.xs that equals count of g.z is 1",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/fams/0/kids/0/gs/0/xs/0",
                           "/fams/0/kids/0/gs/0/xs/1"
                         ],
-                        "name": "count of g.xs that equals count of g.z",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/fams/0/kids/0/gs/0/xs/0",
-                          "/fams/0/kids/0/gs/0/xs/1"
-                        ],
                         "name": "g.xs[]",
+                        "outcome": "found",
                         "value": [
                           2,
                           5
@@ -12657,22 +12651,40 @@
                           "/fams/0/kids/0/gs/0"
                         ],
                         "name": "g.z",
+                        "outcome": "absent",
                         "value": null
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/fams/0/kids/0/gs/0"
+                    ],
+                    "message": "g.z is missing",
+                    "name": "item 1 of gs",
+                    "value": {
+                      "xs": [
+                        2,
+                        5
+                      ]
+                    }
                   }
                 ],
-                "item": "item 1 of gs",
-                "locations": [
-                  "/fams/0/kids/0/gs/0"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/fams/0/kids/0/gs/0/xs/0",
+                      "/fams/0/kids/0/gs/0/xs/1"
+                    ],
+                    "name": "count of g.xs that equals count of g.z",
+                    "value": null
+                  }
                 ],
-                "path": "item 1 of gs",
-                "value": {
-                  "xs": [
-                    2,
-                    5
-                  ]
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/f/assert"
+                ],
+                "message": "",
+                "name": "count of g.xs that equals count of g.z is 1"
               }
             ],
             "inputs": [
@@ -15827,43 +15839,54 @@
           {
             "cause": "value",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "entry.x equals cov.x",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/trail/d/items/0/x"
                         ],
                         "name": "entry.x",
+                        "outcome": "found",
                         "value": 1
-                      },
-                      {
-                        "locations": [
-                          "/trail/d/b/x"
-                        ],
-                        "name": "cov.x",
-                        "part": {
-                          "id": "b-7",
-                          "name": "cov"
-                        },
-                        "value": 2
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/trail/d/items/0"
+                    ],
+                    "message": "entry.x is 1, and cov.x is 2",
+                    "name": "item 1 of lst",
+                    "value": {
+                      "x": 1
+                    }
                   }
                 ],
-                "item": "item 1 of lst",
-                "locations": [
-                  "/trail/d/items/0"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/trail/d/b/x"
+                    ],
+                    "name": "cov.x",
+                    "outcome": "found",
+                    "part": {
+                      "id": "b-7",
+                      "name": "cov"
+                    },
+                    "value": 2
+                  }
                 ],
-                "path": "item 1 of lst",
-                "value": {
-                  "x": 1
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
+                "message": "",
+                "name": "entry.x equals cov.x"
               }
             ],
             "inputs": [
@@ -18408,32 +18431,41 @@
           {
             "cause": "value",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "w.k is 1",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/things/0/ws/0/k"
                         ],
                         "name": "w.k",
+                        "outcome": "found",
                         "value": 2
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ws/0"
+                    ],
+                    "message": "k is 2",
+                    "name": "item 1 of lst",
+                    "value": {
+                      "k": 2
+                    }
                   }
                 ],
-                "item": "item 1 of lst",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/ws/0"
+                  "$policy:/requirements/s/checks/c/assert"
                 ],
-                "path": "item 1 of lst",
-                "value": {
-                  "k": 2
-                }
+                "message": "",
+                "name": "w.k is 1"
               }
             ],
             "inputs": [

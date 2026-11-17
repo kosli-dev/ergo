@@ -1325,30 +1325,39 @@
           {
             "cause": "value",
             "check": "f",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "w ends with \"y\"",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/deployments/0/ws/1"
                         ],
                         "name": "w",
+                        "outcome": "found",
                         "value": "bee"
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/deployments/0/ws/1"
+                    ],
+                    "message": "item 2 of ws is \"bee\"",
+                    "name": "item 2 of ws",
+                    "value": "bee"
                   }
                 ],
-                "item": "item 2 of ws",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/deployments/0/ws/1"
+                  "$policy:/requirements/r/checks/f/assert"
                 ],
-                "path": "item 2 of ws",
-                "value": "bee"
+                "message": "",
+                "name": "w ends with \"y\""
               }
             ],
             "inputs": [
@@ -1938,15 +1947,17 @@
           {
             "cause": "unusable",
             "check": "f",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 2 of ws",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/deployments/0/ws/1"
                 ],
-                "path": "item 2 of ws",
+                "message": "item 2 of ws is 3, which isn't text",
+                "name": "item 2 of ws",
                 "value": 3
               }
             ],
@@ -1988,15 +1999,17 @@
           {
             "cause": "unusable",
             "check": "f",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 2 of ws",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/deployments/0/ws/1"
                 ],
-                "path": "item 2 of ws",
+                "message": "item 2 of ws is 3, which isn't text",
+                "name": "item 2 of ws",
                 "value": 3
               }
             ],
@@ -2250,16 +2263,23 @@
           {
             "cause": "absent",
             "check": "f",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "ws",
-                "locations": [
-                  "/deployments/0"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/deployments/0"
+                    ],
+                    "name": "ws",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "ws",
-                "value": null
+                "kind": "list",
+                "message": "ws is missing",
+                "name": "ws"
               }
             ],
             "inputs": [
@@ -2288,16 +2308,23 @@
           {
             "cause": "null",
             "check": "f",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [],
-                "item": "ws",
-                "locations": [
-                  "/deployments/0/ws"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/deployments/0/ws"
+                    ],
+                    "name": "ws",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "ws",
-                "value": null
+                "kind": "list",
+                "message": "ws is null",
+                "name": "ws"
               }
             ],
             "inputs": [
@@ -2332,15 +2359,17 @@
           {
             "cause": "not_an_object",
             "check": "f",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 1 of items",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/t/items/0"
                 ],
-                "path": "item 1 of items",
+                "message": "item 1 of items is {\"kind\": \"a\", \"qty\": 1}, which isn't text or a list",
+                "name": "item 1 of items",
                 "value": {
                   "kind": "a",
                   "qty": 1
@@ -2348,12 +2377,14 @@
               },
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 2 of items",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/t/items/1"
                 ],
-                "path": "item 2 of items",
+                "message": "item 2 of items is 5, which isn't text or a list",
+                "name": "item 2 of items",
                 "value": 5
               }
             ],
@@ -2406,15 +2437,17 @@
           {
             "cause": "not_an_object",
             "check": "f",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 1 of items",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/t/items/0"
                 ],
-                "path": "item 1 of items",
+                "message": "item 1 of items is {\"kind\": \"a\", \"qty\": 1}, which isn't text or a list",
+                "name": "item 1 of items",
                 "value": {
                   "kind": "a",
                   "qty": 1
@@ -2422,12 +2455,14 @@
               },
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 2 of items",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/t/items/1"
                 ],
-                "path": "item 2 of items",
+                "message": "item 2 of items is 5, which isn't an object",
+                "name": "item 2 of items",
                 "value": 5
               }
             ],
@@ -3348,27 +3383,31 @@
           {
             "cause": "absent",
             "check": "that",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "c is missing",
+                "name": "item 1 of xs",
                 "value": {
                   "n": 1
                 }
               },
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "item 2 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
                 ],
-                "path": "item 2 of xs",
+                "message": "c is missing",
+                "name": "item 2 of xs",
                 "value": {
                   "n": 2
                 }
@@ -3403,27 +3442,31 @@
           {
             "cause": "absent",
             "check": "whose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "c is missing",
+                "name": "item 1 of xs",
                 "value": {
                   "n": 1
                 }
               },
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "item 2 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
                 ],
-                "path": "item 2 of xs",
+                "message": "c is missing",
+                "name": "item 2 of xs",
                 "value": {
                   "n": 2
                 }
@@ -3465,15 +3508,17 @@
           {
             "cause": "null",
             "check": "that",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [],
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "c is null",
+                "name": "item 1 of xs",
                 "value": {
                   "c": null,
                   "n": 1
@@ -3481,12 +3526,14 @@
               },
               {
                 "cause": "null",
-                "failed_assertions": [],
-                "item": "item 2 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
                 ],
-                "path": "item 2 of xs",
+                "message": "c is null",
+                "name": "item 2 of xs",
                 "value": {
                   "c": null,
                   "n": 2
@@ -3524,15 +3571,17 @@
           {
             "cause": "null",
             "check": "whose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [],
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "c is null",
+                "name": "item 1 of xs",
                 "value": {
                   "c": null,
                   "n": 1
@@ -3540,12 +3589,14 @@
               },
               {
                 "cause": "null",
-                "failed_assertions": [],
-                "item": "item 2 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
                 ],
-                "path": "item 2 of xs",
+                "message": "c is null",
+                "name": "item 2 of xs",
                 "value": {
                   "c": null,
                   "n": 2
@@ -3590,15 +3641,17 @@
           {
             "cause": "unusable",
             "check": "that",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is {\"c\": \"s\", \"n\": 1}, which isn't a number, and c is \"s\", which isn't a number",
+                "name": "item 1 of xs",
                 "value": {
                   "c": "s",
                   "n": 1
@@ -3606,12 +3659,14 @@
               },
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 2 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
                 ],
-                "path": "item 2 of xs",
+                "message": "item 2 of xs is {\"c\": \"s\", \"n\": 2}, which isn't a number, and c is \"s\", which isn't a number",
+                "name": "item 2 of xs",
                 "value": {
                   "c": "s",
                   "n": 2
@@ -3649,15 +3704,17 @@
           {
             "cause": "unusable",
             "check": "whose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "c is \"s\", which isn't a number",
+                "name": "item 1 of xs",
                 "value": {
                   "c": "s",
                   "n": 1
@@ -3665,12 +3722,14 @@
               },
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 2 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
                 ],
-                "path": "item 2 of xs",
+                "message": "c is \"s\", which isn't a number",
+                "name": "item 2 of xs",
                 "value": {
                   "c": "s",
                   "n": 2
@@ -3715,25 +3774,29 @@
           {
             "cause": "not_an_object",
             "check": "that",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is 1, which isn't an object",
+                "name": "item 1 of xs",
                 "value": 1
               },
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 2 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
                 ],
-                "path": "item 2 of xs",
+                "message": "item 2 of xs is {\"c\": 0, \"n\": 1}, which isn't a number",
+                "name": "item 2 of xs",
                 "value": {
                   "c": 0,
                   "n": 1
@@ -3768,15 +3831,17 @@
           {
             "cause": "not_an_object",
             "check": "whose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is 1, which isn't an object",
+                "name": "item 1 of xs",
                 "value": 1
               }
             ],

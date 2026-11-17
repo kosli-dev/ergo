@@ -155,13 +155,13 @@
           {
             "cause": "absent",
             "check": "every",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "every rows.v is in d.name",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
@@ -169,34 +169,45 @@
                           "/things/0/deps/0/1"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
-                      },
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "rows[].v",
-                        "value": [
-                          "a"
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d: name is missing",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      {}
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
-                  },
-                  {}
-                ]
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "rows[].v",
+                    "outcome": "found",
+                    "value": [
+                      "a"
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every/assert"
+                ],
+                "message": "",
+                "name": "every rows.v is in d.name"
               }
             ],
             "inputs": [
@@ -237,46 +248,57 @@
           {
             "cause": "absent",
             "check": "plain",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "$params.w is in d.name",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "$params:/w"
-                        ],
-                        "name": "$params.w",
-                        "value": "a"
-                      },
                       {
                         "locations": [
                           "/things/0/deps/0/0/name",
                           "/things/0/deps/0/1"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d: name is missing",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      {}
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
-                  },
-                  {}
-                ]
+                    "locations": [
+                      "$params:/w"
+                    ],
+                    "name": "$params.w",
+                    "outcome": "found",
+                    "value": "a"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/plain/assert"
+                ],
+                "message": "",
+                "name": "$params.w is in d.name"
               }
             ],
             "inputs": [
@@ -315,55 +337,66 @@
           {
             "cause": "absent",
             "check": "that",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of rows.v that is in d.name is 1",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "count of rows.v that is in d.name",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "rows[].v",
-                        "value": [
-                          "a"
-                        ]
-                      },
                       {
                         "locations": [
                           "/things/0/deps/0/0/name",
                           "/things/0/deps/0/1"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d: name is missing",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      {}
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "count of rows.v that is in d.name",
+                    "value": null
                   },
-                  {}
-                ]
+                  {
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "rows[].v",
+                    "outcome": "found",
+                    "value": [
+                      "a"
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/that/assert"
+                ],
+                "message": "",
+                "name": "count of rows.v that is in d.name is 1"
               }
             ],
             "inputs": [
@@ -404,57 +437,68 @@
           {
             "cause": "absent",
             "check": "whose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of rows whose v is in d.name is 1",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rows/0"
-                        ],
-                        "name": "count of rows whose v is in d.name",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/rows/0"
-                        ],
-                        "name": "rows[]",
-                        "value": [
-                          {
-                            "v": "a"
-                          }
-                        ]
-                      },
                       {
                         "locations": [
                           "/things/0/deps/0/0/name",
                           "/things/0/deps/0/1"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d: name is missing",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      {}
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
+                    "locations": [
+                      "/things/0/rows/0"
+                    ],
+                    "name": "count of rows whose v is in d.name",
+                    "value": null
                   },
-                  {}
-                ]
+                  {
+                    "locations": [
+                      "/things/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "a"
+                      }
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/whose/assert"
+                ],
+                "message": "",
+                "name": "count of rows whose v is in d.name is 1"
               }
             ],
             "inputs": [
@@ -504,13 +548,13 @@
           {
             "cause": "null",
             "check": "every",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "every rows.v is in d.name",
                     "cause": "null",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
@@ -518,36 +562,47 @@
                           "/things/0/deps/0/1/name"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d: name is null",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
                       },
                       {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "rows[].v",
-                        "value": [
-                          "a"
-                        ]
+                        "name": null
                       }
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
-                  },
-                  {
-                    "name": null
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "rows[].v",
+                    "outcome": "found",
+                    "value": [
+                      "a"
+                    ]
                   }
-                ]
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every/assert"
+                ],
+                "message": "",
+                "name": "every rows.v is in d.name"
               }
             ],
             "inputs": [
@@ -590,48 +645,59 @@
           {
             "cause": "null",
             "check": "plain",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "$params.w is in d.name",
                     "cause": "null",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "$params:/w"
-                        ],
-                        "name": "$params.w",
-                        "value": "a"
-                      },
                       {
                         "locations": [
                           "/things/0/deps/0/0/name",
                           "/things/0/deps/0/1/name"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d: name is null",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      {
+                        "name": null
+                      }
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
-                  },
-                  {
-                    "name": null
+                    "locations": [
+                      "$params:/w"
+                    ],
+                    "name": "$params.w",
+                    "outcome": "found",
+                    "value": "a"
                   }
-                ]
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/plain/assert"
+                ],
+                "message": "",
+                "name": "$params.w is in d.name"
               }
             ],
             "inputs": [
@@ -672,57 +738,68 @@
           {
             "cause": "null",
             "check": "that",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of rows.v that is in d.name is 1",
                     "cause": "null",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "count of rows.v that is in d.name",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "rows[].v",
-                        "value": [
-                          "a"
-                        ]
-                      },
                       {
                         "locations": [
                           "/things/0/deps/0/0/name",
                           "/things/0/deps/0/1/name"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d: name is null",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      {
+                        "name": null
+                      }
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "count of rows.v that is in d.name",
+                    "value": null
                   },
                   {
-                    "name": null
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "rows[].v",
+                    "outcome": "found",
+                    "value": [
+                      "a"
+                    ]
                   }
-                ]
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/that/assert"
+                ],
+                "message": "",
+                "name": "count of rows.v that is in d.name is 1"
               }
             ],
             "inputs": [
@@ -765,59 +842,70 @@
           {
             "cause": "null",
             "check": "whose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of rows whose v is in d.name is 1",
                     "cause": "null",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rows/0"
-                        ],
-                        "name": "count of rows whose v is in d.name",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/rows/0"
-                        ],
-                        "name": "rows[]",
-                        "value": [
-                          {
-                            "v": "a"
-                          }
-                        ]
-                      },
                       {
                         "locations": [
                           "/things/0/deps/0/0/name",
                           "/things/0/deps/0/1/name"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d: name is null",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      {
+                        "name": null
+                      }
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
+                    "locations": [
+                      "/things/0/rows/0"
+                    ],
+                    "name": "count of rows whose v is in d.name",
+                    "value": null
                   },
                   {
-                    "name": null
+                    "locations": [
+                      "/things/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "a"
+                      }
+                    ]
                   }
-                ]
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/whose/assert"
+                ],
+                "message": "",
+                "name": "count of rows whose v is in d.name is 1"
               }
             ],
             "inputs": [
@@ -869,13 +957,13 @@
           {
             "cause": "unusable",
             "check": "every",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "every rows.v is in d.name",
                     "cause": "unusable",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
@@ -883,34 +971,45 @@
                           "/things/0/deps/0/1"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
-                      },
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "rows[].v",
-                        "value": [
-                          "a"
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d is 3, which isn't an object",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      3
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
-                  },
-                  3
-                ]
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "rows[].v",
+                    "outcome": "found",
+                    "value": [
+                      "a"
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every/assert"
+                ],
+                "message": "",
+                "name": "every rows.v is in d.name"
               }
             ],
             "inputs": [
@@ -951,46 +1050,57 @@
           {
             "cause": "unusable",
             "check": "plain",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "$params.w is in d.name",
                     "cause": "unusable",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "$params:/w"
-                        ],
-                        "name": "$params.w",
-                        "value": "a"
-                      },
                       {
                         "locations": [
                           "/things/0/deps/0/0/name",
                           "/things/0/deps/0/1"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d is 3, which isn't an object",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      3
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
-                  },
-                  3
-                ]
+                    "locations": [
+                      "$params:/w"
+                    ],
+                    "name": "$params.w",
+                    "outcome": "found",
+                    "value": "a"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/plain/assert"
+                ],
+                "message": "",
+                "name": "$params.w is in d.name"
               }
             ],
             "inputs": [
@@ -1029,55 +1139,66 @@
           {
             "cause": "unusable",
             "check": "that",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of rows.v that is in d.name is 1",
                     "cause": "unusable",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "count of rows.v that is in d.name",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "rows[].v",
-                        "value": [
-                          "a"
-                        ]
-                      },
                       {
                         "locations": [
                           "/things/0/deps/0/0/name",
                           "/things/0/deps/0/1"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d is 3, which isn't an object",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      3
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "count of rows.v that is in d.name",
+                    "value": null
                   },
-                  3
-                ]
+                  {
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "rows[].v",
+                    "outcome": "found",
+                    "value": [
+                      "a"
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/that/assert"
+                ],
+                "message": "",
+                "name": "count of rows.v that is in d.name is 1"
               }
             ],
             "inputs": [
@@ -1118,57 +1239,68 @@
           {
             "cause": "unusable",
             "check": "whose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of rows whose v is in d.name is 1",
                     "cause": "unusable",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rows/0"
-                        ],
-                        "name": "count of rows whose v is in d.name",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/rows/0"
-                        ],
-                        "name": "rows[]",
-                        "value": [
-                          {
-                            "v": "a"
-                          }
-                        ]
-                      },
                       {
                         "locations": [
                           "/things/0/deps/0/0/name",
                           "/things/0/deps/0/1"
                         ],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": [
                           "a",
                           null
                         ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "item 2 of d is 3, which isn't an object",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      3
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": [
+                "inputs": [
                   {
-                    "name": "a"
+                    "locations": [
+                      "/things/0/rows/0"
+                    ],
+                    "name": "count of rows whose v is in d.name",
+                    "value": null
                   },
-                  3
-                ]
+                  {
+                    "locations": [
+                      "/things/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "a"
+                      }
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/whose/assert"
+                ],
+                "message": "",
+                "name": "count of rows whose v is in d.name is 1"
               }
             ],
             "inputs": [
@@ -1218,37 +1350,48 @@
           {
             "cause": "value",
             "check": "every",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "every rows.v is in d.name",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": []
-                      },
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "rows[].v",
-                        "value": [
-                          "a"
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "d is []",
+                    "name": "item 1 of deps",
+                    "value": []
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "rows[].v",
+                    "outcome": "found",
+                    "value": [
+                      "a"
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/deps/0"
+                  "$policy:/requirements/r/checks/every/assert"
                 ],
-                "path": "item 1 of deps",
-                "value": []
+                "message": "",
+                "name": "every rows.v is in d.name"
               }
             ],
             "inputs": [
@@ -1284,35 +1427,46 @@
           {
             "cause": "value",
             "check": "plain",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "$params.w is in d.name",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "$params:/w"
-                        ],
-                        "name": "$params.w",
-                        "value": "a"
-                      },
                       {
                         "locations": [],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": []
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "$params.w is \"a\", and d is []",
+                    "name": "item 1 of deps",
+                    "value": []
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/things/0/deps/0"
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/w"
+                    ],
+                    "name": "$params.w",
+                    "outcome": "found",
+                    "value": "a"
+                  }
                 ],
-                "path": "item 1 of deps",
-                "value": []
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/plain/assert"
+                ],
+                "message": "",
+                "name": "$params.w is in d.name"
               }
             ],
             "inputs": [
@@ -1346,44 +1500,55 @@
           {
             "cause": "value",
             "check": "that",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of rows.v that is in d.name is 1",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "count of rows.v that is in d.name",
-                        "value": 0
-                      },
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "rows[].v",
-                        "value": [
-                          "a"
-                        ]
-                      },
                       {
                         "locations": [],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": []
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "count of rows.v that is in d.name is 0",
+                    "name": "item 1 of deps",
+                    "value": []
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "count of rows.v that is in d.name",
+                    "value": 0
+                  },
+                  {
+                    "locations": [
+                      "/things/0/rows/0/v"
+                    ],
+                    "name": "rows[].v",
+                    "outcome": "found",
+                    "value": [
+                      "a"
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/deps/0"
+                  "$policy:/requirements/r/checks/that/assert"
                 ],
-                "path": "item 1 of deps",
-                "value": []
+                "message": "",
+                "name": "count of rows.v that is in d.name is 1"
               }
             ],
             "inputs": [
@@ -1419,46 +1584,57 @@
           {
             "cause": "value",
             "check": "whose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of rows whose v is in d.name is 1",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rows/0"
-                        ],
-                        "name": "count of rows whose v is in d.name",
-                        "value": 0
-                      },
-                      {
-                        "locations": [
-                          "/things/0/rows/0"
-                        ],
-                        "name": "rows[]",
-                        "value": [
-                          {
-                            "v": "a"
-                          }
-                        ]
-                      },
                       {
                         "locations": [],
                         "name": "d[].name",
+                        "outcome": "found",
                         "value": []
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "count of rows whose v is in d.name is 0",
+                    "name": "item 1 of deps",
+                    "value": []
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/rows/0"
+                    ],
+                    "name": "count of rows whose v is in d.name",
+                    "value": 0
+                  },
+                  {
+                    "locations": [
+                      "/things/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "a"
                       }
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/deps/0"
+                  "$policy:/requirements/r/checks/whose/assert"
                 ],
-                "path": "item 1 of deps",
-                "value": []
+                "message": "",
+                "name": "count of rows whose v is in d.name is 1"
               }
             ],
             "inputs": [
@@ -2095,40 +2271,26 @@
           {
             "cause": "unusable",
             "check": "for_one",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v equals os.name",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/objs/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "bob"
-                      },
-                      {
-                        "locations": [
-                          "/objs/0/os"
-                        ],
-                        "name": "os.name",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/objs/0/os"
+                    ],
+                    "name": "os.name",
+                    "outcome": "unusable",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rows",
+                "kind": "assertion",
                 "locations": [
-                  "/objs/0/rows/0"
+                  "$policy:/requirements/r/checks/for_one/assert"
                 ],
-                "path": "item 1 of rows",
-                "value": {
-                  "n": 2,
-                  "v": "bob"
-                }
+                "message": "os is [{\"name\": \"ann\"}, {\"name\": \"bob\"}], which isn't an object",
+                "name": "r.v equals os.name"
               }
             ],
             "inputs": [
@@ -2137,6 +2299,7 @@
                   "/objs/0/os"
                 ],
                 "name": "os.name",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -2760,44 +2923,55 @@
           {
             "cause": "absent",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "r.v is in os.name",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/objs/0/rows/0/v"
                         ],
                         "name": "r.v",
+                        "outcome": "found",
                         "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/objs/0/os/0/name",
-                          "/objs/0/os/1"
-                        ],
-                        "name": "os[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/objs/0/rows/0"
+                    ],
+                    "message": "item 2 of os: name is missing",
+                    "name": "item 1 of rows",
+                    "value": {
+                      "n": 2,
+                      "v": "ann"
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/objs/0/os/0/name",
+                      "/objs/0/os/1"
+                    ],
+                    "name": "os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of rows",
+                "kind": "assertion",
                 "locations": [
-                  "/objs/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
+                "message": "",
+                "name": "r.v is in os.name"
               }
             ],
             "inputs": [
@@ -2863,40 +3037,26 @@
           {
             "cause": "unusable",
             "check": "for_one",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v equals os.name",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/objs/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/objs/0/os"
-                        ],
-                        "name": "os.name",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/objs/0/os"
+                    ],
+                    "name": "os.name",
+                    "outcome": "unusable",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rows",
+                "kind": "assertion",
                 "locations": [
-                  "/objs/0/rows/0"
+                  "$policy:/requirements/r/checks/for_one/assert"
                 ],
-                "path": "item 1 of rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
+                "message": "os is [{\"name\": \"ann\"}, {\"x\": 1}], which isn't an object",
+                "name": "r.v equals os.name"
               }
             ],
             "inputs": [
@@ -2905,6 +3065,7 @@
                   "/objs/0/os"
                 ],
                 "name": "os.name",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -3713,44 +3874,55 @@
           {
             "cause": "null",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "r.v is in os.name",
                     "cause": "null",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/objs/0/rows/0/v"
                         ],
                         "name": "r.v",
+                        "outcome": "found",
                         "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/objs/0/os/0/name",
-                          "/objs/0/os/1/name"
-                        ],
-                        "name": "os[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/objs/0/rows/0"
+                    ],
+                    "message": "item 2 of os: name is null",
+                    "name": "item 1 of rows",
+                    "value": {
+                      "n": 2,
+                      "v": "ann"
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/objs/0/os/0/name",
+                      "/objs/0/os/1/name"
+                    ],
+                    "name": "os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of rows",
+                "kind": "assertion",
                 "locations": [
-                  "/objs/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
+                "message": "",
+                "name": "r.v is in os.name"
               }
             ],
             "inputs": [
@@ -3816,40 +3988,26 @@
           {
             "cause": "unusable",
             "check": "for_one",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v equals os.name",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/objs/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/objs/0/os"
-                        ],
-                        "name": "os.name",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/objs/0/os"
+                    ],
+                    "name": "os.name",
+                    "outcome": "unusable",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rows",
+                "kind": "assertion",
                 "locations": [
-                  "/objs/0/rows/0"
+                  "$policy:/requirements/r/checks/for_one/assert"
                 ],
-                "path": "item 1 of rows",
-                "value": {
-                  "n": 2,
-                  "v": "ann"
-                }
+                "message": "os is [{\"name\": \"ann\"}, {\"name\": null}], which isn't an object",
+                "name": "r.v equals os.name"
               }
             ],
             "inputs": [
@@ -3858,6 +4016,7 @@
                   "/objs/0/os"
                 ],
                 "name": "os.name",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -4553,43 +4712,30 @@
           {
             "cause": "absent",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in rel.os.name",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/rels/0/kids/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/rels/0/os/0/name",
-                          "/rels/0/os/1"
-                        ],
-                        "name": "rel.os[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/rels/0/os/0/name",
+                      "/rels/0/os/1"
+                    ],
+                    "name": "rel.os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of rows",
+                "kind": "assertion",
                 "locations": [
-                  "/rels/0/kids/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of rows",
-                "value": {
-                  "v": "ann"
-                }
+                "message": "item 2 of rel.os: name is missing",
+                "name": "r.v is in rel.os.name"
               }
             ],
             "inputs": [
@@ -4865,43 +5011,30 @@
           {
             "cause": "null",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in rel.os.name",
-                    "cause": "null",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/rels/0/kids/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/rels/0/os/0/name",
-                          "/rels/0/os/1/name"
-                        ],
-                        "name": "rel.os[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/rels/0/os/0/name",
+                      "/rels/0/os/1/name"
+                    ],
+                    "name": "rel.os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of rows",
+                "kind": "assertion",
                 "locations": [
-                  "/rels/0/kids/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of rows",
-                "value": {
-                  "v": "ann"
-                }
+                "message": "item 2 of rel.os: name is null",
+                "name": "r.v is in rel.os.name"
               }
             ],
             "inputs": [
@@ -5179,43 +5312,30 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in rel.os.name",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/rels/0/kids/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/rels/0/os/0/name",
-                          "/rels/0/os/1"
-                        ],
-                        "name": "rel.os[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/rels/0/os/0/name",
+                      "/rels/0/os/1"
+                    ],
+                    "name": "rel.os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of rows",
+                "kind": "assertion",
                 "locations": [
-                  "/rels/0/kids/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of rows",
-                "value": {
-                  "v": "ann"
-                }
+                "message": "item 2 of rel.os is null, which isn't an object",
+                "name": "r.v is in rel.os.name"
               }
             ],
             "inputs": [
@@ -5489,43 +5609,30 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in rel.os.name",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/rels/0/kids/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/rels/0/os/0/name",
-                          "/rels/0/os/1"
-                        ],
-                        "name": "rel.os[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/rels/0/os/0/name",
+                      "/rels/0/os/1"
+                    ],
+                    "name": "rel.os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of rows",
+                "kind": "assertion",
                 "locations": [
-                  "/rels/0/kids/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of rows",
-                "value": {
-                  "v": "ann"
-                }
+                "message": "item 2 of rel.os is 3, which isn't an object",
+                "name": "r.v is in rel.os.name"
               }
             ],
             "inputs": [
@@ -5803,43 +5910,30 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v is in rel.os.name",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/rels/0/kids/0/rows/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "ann"
-                      },
-                      {
-                        "locations": [
-                          "/rels/0/os/0/name",
-                          "/rels/0/os/1"
-                        ],
-                        "name": "rel.os[].name",
-                        "value": [
-                          "ann",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/rels/0/os/0/name",
+                      "/rels/0/os/1"
+                    ],
+                    "name": "rel.os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "ann",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of rows",
+                "kind": "assertion",
                 "locations": [
-                  "/rels/0/kids/0/rows/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of rows",
-                "value": {
-                  "v": "ann"
-                }
+                "message": "item 2 of rel.os is [{\"name\": \"bob\"}], which isn't an object",
+                "name": "r.v is in rel.os.name"
               }
             ],
             "inputs": [
@@ -11010,7 +11104,16 @@
           {
             "cause": "unusable",
             "check": "for_whose_rev",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value; pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+                "name": "rows"
+              }
+            ],
             "inputs": [
               {
                 "locations": [
@@ -11325,7 +11428,16 @@
           {
             "cause": "unusable",
             "check": "for_whose_rev",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value; item 2 of pos: name is missing",
+                "name": "rows"
+              }
+            ],
             "inputs": [
               {
                 "locations": [
@@ -11679,18 +11791,14 @@
           {
             "cause": "unusable",
             "check": "for_whose_rev",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 1 of rows",
-                "locations": [
-                  "/cs/0/rows/0"
-                ],
-                "path": "item 1 of rows",
-                "value": {
-                  "v": "bob"
-                }
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "item 2 of $params.os: name is missing; pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+                "name": "rows"
               }
             ],
             "inputs": [
@@ -12007,18 +12115,14 @@
           {
             "cause": "absent",
             "check": "for_whose_rev",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "item 1 of rows",
-                "locations": [
-                  "/cs/0/rows/0"
-                ],
-                "path": "item 1 of rows",
-                "value": {
-                  "v": "bob"
-                }
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "item 2 of $params.os: name is missing; item 2 of pos: name is missing",
+                "name": "rows"
               }
             ],
             "inputs": [
@@ -12367,18 +12471,14 @@
           {
             "cause": "unusable",
             "check": "for_whose_rev",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 1 of rows",
-                "locations": [
-                  "/cs/0/rows/0"
-                ],
-                "path": "item 1 of rows",
-                "value": {
-                  "v": "bob"
-                }
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$params.os.name is missing; pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+                "name": "rows"
               }
             ],
             "inputs": [
@@ -12695,18 +12795,14 @@
           {
             "cause": "absent",
             "check": "for_whose_rev",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "item 1 of rows",
-                "locations": [
-                  "/cs/0/rows/0"
-                ],
-                "path": "item 1 of rows",
-                "value": {
-                  "v": "bob"
-                }
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$params.os.name is missing; item 2 of pos: name is missing",
+                "name": "rows"
               }
             ],
             "inputs": [
@@ -15020,19 +15116,14 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 1 of rows",
-                "locations": [
-                  "/cs/0/rows/0"
-                ],
-                "path": "item 1 of rows",
-                "value": {
-                  "v": "a",
-                  "w": "a"
-                }
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "pos is [{\"name\": \"a\"}], which isn't an object",
+                "name": "rows"
               }
             ],
             "inputs": [
@@ -17359,43 +17450,59 @@
           {
             "cause": "value",
             "check": "every",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "n is \"a\"",
                     "cause": "value",
-                    "items": [
+                    "failures": [
                       {
                         "cause": "value",
+                        "failures": [],
                         "inputs": [
                           {
                             "locations": [
                               "/things/0/deps/0/1/name"
                             ],
                             "name": "n",
+                            "outcome": "found",
                             "value": "b"
                           }
                         ],
-                        "item": "item 2 of d"
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/deps/0/1/name"
+                        ],
+                        "message": "item 2 of d is \"b\"",
+                        "name": "item 2 of d",
+                        "value": "b"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/deps/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of deps",
+                    "value": [
+                      {
+                        "name": "a"
+                      },
+                      {
+                        "name": "b"
                       }
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/deps/0"
+                  "$policy:/requirements/r/checks/every/assert"
                 ],
-                "path": "item 1 of deps",
-                "value": [
-                  {
-                    "name": "a"
-                  },
-                  {
-                    "name": "b"
-                  }
-                ]
+                "message": "",
+                "name": "n is \"a\""
               }
             ],
             "inputs": [
@@ -17486,47 +17593,47 @@
           {
             "cause": "not_an_object",
             "check": "every",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "failed_items": [
+                "failures": [
                   {
                     "cause": "value",
-                    "item": "d",
-                    "locations": [
-                      "/things/0/deps/0"
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/deps/0"
+                        ],
+                        "name": "d",
+                        "outcome": "found",
+                        "value": []
+                      }
                     ],
-                    "path": "d",
-                    "value": []
+                    "kind": "list",
+                    "message": "d is []",
+                    "name": "d"
                   }
                 ],
-                "item": "item 1 of deps",
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/things/0/deps/0"
                 ],
-                "path": "item 1 of deps",
+                "message": "",
+                "name": "item 1 of deps",
                 "value": []
               },
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "failed_items": [
-                  {
-                    "cause": "not_an_object",
-                    "item": "item 1 of d",
-                    "locations": [
-                      "/things/0/deps/1/0"
-                    ],
-                    "path": "item 1 of d",
-                    "value": null
-                  }
-                ],
-                "item": "item 2 of deps",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/things/0/deps/1"
                 ],
-                "path": "item 2 of deps",
+                "message": "item 2 of deps is [3], which isn't an object",
+                "name": "item 2 of deps",
                 "value": [
                   3
                 ]
@@ -17569,47 +17676,47 @@
           {
             "cause": "not_an_object",
             "check": "some",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "failed_items": [
+                "failures": [
                   {
                     "cause": "value",
-                    "item": "d",
-                    "locations": [
-                      "/things/0/deps/0"
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/deps/0"
+                        ],
+                        "name": "d",
+                        "outcome": "found",
+                        "value": []
+                      }
                     ],
-                    "path": "d",
-                    "value": []
+                    "kind": "list",
+                    "message": "d is []",
+                    "name": "d"
                   }
                 ],
-                "item": "item 1 of deps",
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/things/0/deps/0"
                 ],
-                "path": "item 1 of deps",
+                "message": "",
+                "name": "item 1 of deps",
                 "value": []
               },
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "failed_items": [
-                  {
-                    "cause": "not_an_object",
-                    "item": "item 1 of d",
-                    "locations": [
-                      "/things/0/deps/1/0"
-                    ],
-                    "path": "item 1 of d",
-                    "value": null
-                  }
-                ],
-                "item": "item 2 of deps",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/things/0/deps/1"
                 ],
-                "path": "item 2 of deps",
+                "message": "item 2 of deps is [3], which isn't an object",
+                "name": "item 2 of deps",
                 "value": [
                   3
                 ]
@@ -24379,38 +24486,23 @@
           {
             "cause": "not_an_object",
             "check": "for_sum",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "sum of x.m named by $input.k is 1",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "sum of x.m named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "x.m named by $input.k",
-                        "value": []
-                      }
-                    ]
+                    "locations": [],
+                    "name": "sum of x.m named by $input.k",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of xs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/xs/0"
+                  "$policy:/requirements/r/checks/for_sum/assert"
                 ],
-                "path": "item 1 of xs",
-                "value": {
-                  "m": {
-                    "a": 1
-                  },
-                  "v": "a"
-                }
+                "message": "$input is [an object with 6 keys], which isn't an object",
+                "name": "sum of x.m named by $input.k is 1"
               }
             ],
             "inputs": [
@@ -24953,16 +25045,34 @@
           {
             "cause": "not_an_object",
             "check": "for_sum",
-            "failed_items": [
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for_sum/assert"
+                ],
+                "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"n\": 1, \"tags\": [], \"xs\": []}], which isn't an object",
+                "name": "sum of x.m named by $input.k is 1"
+              },
               {
                 "cause": "value",
-                "failed_assertions": [],
-                "item": "xs",
-                "locations": [
-                  "/0/xs"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/xs"
+                    ],
+                    "name": "xs",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "xs",
-                "value": []
+                "kind": "list",
+                "message": "xs is []",
+                "name": "xs"
               }
             ],
             "inputs": [
@@ -26336,44 +26446,26 @@
           {
             "cause": "not_an_object",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v equals m named by $input.k",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/0/m"
+                    ],
+                    "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "id": "r1",
-                  "n": 1,
-                  "tags": [
-                    "a"
-                  ],
-                  "v": "a"
-                }
+                "message": "$input is [an object with 7 keys], which isn't an object",
+                "name": "r.v equals m named by $input.k"
               }
             ],
             "inputs": [
@@ -26382,6 +26474,7 @@
                   "/0/m"
                 ],
                 "name": "m named by $input.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -26413,46 +26506,25 @@
           {
             "cause": "not_an_object",
             "check": "for_count",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "count of r.tags that equals m named by $input.k is 1",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/tags/0"
-                        ],
-                        "name": "count of r.tags that equals m named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/0/rs/0/tags/0"
-                        ],
-                        "name": "r.tags[]",
-                        "value": [
-                          "a"
-                        ]
-                      }
-                    ]
+                    "locations": [
+                      "/0/rs/0/tags/0"
+                    ],
+                    "name": "count of r.tags that equals m named by $input.k",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for_count/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "id": "r1",
-                  "n": 1,
-                  "tags": [
-                    "a"
-                  ],
-                  "v": "a"
-                }
+                "message": "$input is [an object with 7 keys], which isn't an object",
+                "name": "count of r.tags that equals m named by $input.k is 1"
               }
             ],
             "inputs": [
@@ -27949,44 +28021,26 @@
           {
             "cause": "not_an_object",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v equals m named by $input.k",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/0/m"
+                    ],
+                    "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "id": "r1",
-                  "n": 1,
-                  "tags": [
-                    "a"
-                  ],
-                  "v": "a"
-                }
+                "message": "$input is [an object with 6 keys], which isn't an object",
+                "name": "r.v equals m named by $input.k"
               }
             ],
             "inputs": [
@@ -27995,6 +28049,7 @@
                   "/0/m"
                 ],
                 "name": "m named by $input.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -28026,46 +28081,25 @@
           {
             "cause": "not_an_object",
             "check": "for_count",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "count of r.tags that equals m named by $input.k is 1",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/tags/0"
-                        ],
-                        "name": "count of r.tags that equals m named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/0/rs/0/tags/0"
-                        ],
-                        "name": "r.tags[]",
-                        "value": [
-                          "a"
-                        ]
-                      }
-                    ]
+                    "locations": [
+                      "/0/rs/0/tags/0"
+                    ],
+                    "name": "count of r.tags that equals m named by $input.k",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for_count/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "id": "r1",
-                  "n": 1,
-                  "tags": [
-                    "a"
-                  ],
-                  "v": "a"
-                }
+                "message": "$input is [an object with 6 keys], which isn't an object",
+                "name": "count of r.tags that equals m named by $input.k is 1"
               }
             ],
             "inputs": [
@@ -29562,44 +29596,26 @@
           {
             "cause": "not_an_object",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v equals m named by $input.k",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/0/m"
+                    ],
+                    "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "id": "r1",
-                  "n": 1,
-                  "tags": [
-                    "a"
-                  ],
-                  "v": "a"
-                }
+                "message": "$input is [an object with 7 keys], which isn't an object",
+                "name": "r.v equals m named by $input.k"
               }
             ],
             "inputs": [
@@ -29608,6 +29624,7 @@
                   "/0/m"
                 ],
                 "name": "m named by $input.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -29639,46 +29656,25 @@
           {
             "cause": "not_an_object",
             "check": "for_count",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "count of r.tags that equals m named by $input.k is 1",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/tags/0"
-                        ],
-                        "name": "count of r.tags that equals m named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/0/rs/0/tags/0"
-                        ],
-                        "name": "r.tags[]",
-                        "value": [
-                          "a"
-                        ]
-                      }
-                    ]
+                    "locations": [
+                      "/0/rs/0/tags/0"
+                    ],
+                    "name": "count of r.tags that equals m named by $input.k",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for_count/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "id": "r1",
-                  "n": 1,
-                  "tags": [
-                    "a"
-                  ],
-                  "v": "a"
-                }
+                "message": "$input is [an object with 7 keys], which isn't an object",
+                "name": "count of r.tags that equals m named by $input.k is 1"
               }
             ],
             "inputs": [
@@ -31175,44 +31171,26 @@
           {
             "cause": "not_an_object",
             "check": "for",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.v equals m named by $input.k",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "r.v",
-                        "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/0/m"
+                    ],
+                    "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "id": "r1",
-                  "n": 1,
-                  "tags": [
-                    "a"
-                  ],
-                  "v": "a"
-                }
+                "message": "$input is [an object with 7 keys], which isn't an object",
+                "name": "r.v equals m named by $input.k"
               }
             ],
             "inputs": [
@@ -31221,6 +31199,7 @@
                   "/0/m"
                 ],
                 "name": "m named by $input.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -31252,46 +31231,25 @@
           {
             "cause": "not_an_object",
             "check": "for_count",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "count of r.tags that equals m named by $input.k is 1",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/tags/0"
-                        ],
-                        "name": "count of r.tags that equals m named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/0/rs/0/tags/0"
-                        ],
-                        "name": "r.tags[]",
-                        "value": [
-                          "a"
-                        ]
-                      }
-                    ]
+                    "locations": [
+                      "/0/rs/0/tags/0"
+                    ],
+                    "name": "count of r.tags that equals m named by $input.k",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for_count/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "id": "r1",
-                  "n": 1,
-                  "tags": [
-                    "a"
-                  ],
-                  "v": "a"
-                }
+                "message": "$input is [an object with 7 keys], which isn't an object",
+                "name": "count of r.tags that equals m named by $input.k is 1"
               }
             ],
             "inputs": [
@@ -31634,32 +31592,28 @@
           {
             "cause": "not_an_object",
             "check": "for_count",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
-                  {
-                    "assertion": "count of x.m named by $input.k is 1",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "count of x.m named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "x.m named by $input.k",
-                        "value": []
-                      }
-                    ]
-                  }
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for_count/assert"
                 ],
-                "item": "item 1 of xs",
+                "message": "$input is [{\"id\": \"t\", \"k\": 3, \"m\": 5, \"tags\": \"x\", \"xs\": [1]}], which isn't an object",
+                "name": "count of x.m named by $input.k is 1"
+              },
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is 1, which isn't an object",
+                "name": "item 1 of xs",
                 "value": 1
               }
             ],
@@ -31686,42 +31640,28 @@
           {
             "cause": "not_an_object",
             "check": "for_count_sum",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
-                  {
-                    "assertion": "count of x.ys equals sum of x.m named by $input.k",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "count of x.ys",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "x.ys",
-                        "value": []
-                      },
-                      {
-                        "locations": [],
-                        "name": "sum of x.m named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "x.m named by $input.k",
-                        "value": []
-                      }
-                    ]
-                  }
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for_count_sum/assert"
                 ],
-                "item": "item 1 of xs",
+                "message": "$input is [{\"id\": \"t\", \"k\": 3, \"m\": 5, \"tags\": \"x\", \"xs\": [1]}], which isn't an object",
+                "name": "count of x.ys equals sum of x.m named by $input.k"
+              },
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is 1, which isn't an object",
+                "name": "item 1 of xs",
                 "value": 1
               }
             ],
@@ -31748,32 +31688,28 @@
           {
             "cause": "not_an_object",
             "check": "for_sum",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
-                  {
-                    "assertion": "sum of x.m named by $input.k is 1",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "sum of x.m named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "x.m named by $input.k",
-                        "value": []
-                      }
-                    ]
-                  }
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for_sum/assert"
                 ],
-                "item": "item 1 of xs",
+                "message": "$input is [{\"id\": \"t\", \"k\": 3, \"m\": 5, \"tags\": \"x\", \"xs\": [1]}], which isn't an object",
+                "name": "sum of x.m named by $input.k is 1"
+              },
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is 1, which isn't an object",
+                "name": "item 1 of xs",
                 "value": 1
               }
             ],
@@ -31800,32 +31736,28 @@
           {
             "cause": "not_an_object",
             "check": "some_sum",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
-                  {
-                    "assertion": "sum of x.m named by $input.k is 1",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "sum of x.m named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "x.m named by $input.k",
-                        "value": []
-                      }
-                    ]
-                  }
+                "failures": [],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some_sum/assert"
                 ],
-                "item": "item 1 of xs",
+                "message": "$input is [{\"id\": \"t\", \"k\": 3, \"m\": 5, \"tags\": \"x\", \"xs\": [1]}], which isn't an object",
+                "name": "sum of x.m named by $input.k is 1"
+              },
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/0/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is 1, which isn't an object",
+                "name": "item 1 of xs",
                 "value": 1
               }
             ],
@@ -31866,16 +31798,23 @@
           {
             "cause": "not_an_object",
             "check": "second",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "ls named by $input.k",
-                "locations": [
-                  "/0/ls"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/ls"
+                    ],
+                    "name": "ls named by $input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
                 ],
-                "path": "ls named by $input.k",
-                "value": null
+                "kind": "list",
+                "message": "$input is [an object with 6 keys], which isn't an object",
+                "name": "ls named by $input.k"
               }
             ],
             "inputs": [
@@ -31916,21 +31855,14 @@
           {
             "cause": "not_an_object",
             "check": "second_whose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 1 of xs",
-                "locations": [
-                  "/0/xs/0"
-                ],
-                "path": "item 1 of xs",
-                "value": {
-                  "m": {
-                    "a": "a"
-                  },
-                  "v": "a"
-                }
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$input is [an object with 6 keys], which isn't an object",
+                "name": "rs"
               }
             ],
             "inputs": [
@@ -31980,33 +31912,14 @@
           {
             "cause": "not_an_object",
             "check": "whose",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 1 of rs",
-                "locations": [
-                  "/0/rs/0"
-                ],
-                "path": "item 1 of rs",
-                "value": {
-                  "m": {
-                    "a": "a"
-                  },
-                  "v": "a"
-                }
-              },
-              {
-                "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 2 of rs",
-                "locations": [
-                  "/0/rs/1"
-                ],
-                "path": "item 2 of rs",
-                "value": {
-                  "v": "b"
-                }
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$input is [an object with 6 keys], which isn't an object",
+                "name": "rs"
               }
             ],
             "inputs": [
@@ -32755,7 +32668,16 @@
           {
             "cause": "unusable",
             "check": "for_count_plus",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$params is 3, which isn't an object",
+                "name": "rs"
+              }
+            ],
             "inputs": [
               {
                 "locations": [
@@ -32807,7 +32729,16 @@
           {
             "cause": "unusable",
             "check": "for_second_whose_params",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$params is 3, which isn't an object",
+                "name": "rs"
+              }
+            ],
             "inputs": [
               {
                 "locations": [
@@ -32851,7 +32782,16 @@
           {
             "cause": "unusable",
             "check": "for_whose_params",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "$params is 3, which isn't an object",
+                "name": "rs"
+              }
+            ],
             "inputs": [
               {
                 "locations": [
@@ -32897,33 +32837,43 @@
           {
             "cause": "unusable",
             "check": "for_count",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of x.m named by $params.k is 1",
                     "cause": "unusable",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [],
-                        "name": "count of x.m named by $params.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
                         "name": "x.m named by $params.k",
+                        "outcome": "found",
                         "value": []
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "message": "x is 1, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": 1
                   }
                 ],
-                "item": "item 1 of xs",
-                "locations": [
-                  "/things/0/xs/0"
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "count of x.m named by $params.k",
+                    "value": null
+                  }
                 ],
-                "path": "item 1 of xs",
-                "value": 1
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for_count/assert"
+                ],
+                "message": "$params.k is 3, which isn't text",
+                "name": "count of x.m named by $params.k is 1"
               }
             ],
             "inputs": [
@@ -32949,33 +32899,43 @@
           {
             "cause": "unusable",
             "check": "for_sum",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "sum of x.m named by $params.k is 1",
                     "cause": "unusable",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [],
-                        "name": "sum of x.m named by $params.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
                         "name": "x.m named by $params.k",
+                        "outcome": "found",
                         "value": []
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "message": "x is 1, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": 1
                   }
                 ],
-                "item": "item 1 of xs",
-                "locations": [
-                  "/things/0/xs/0"
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "sum of x.m named by $params.k",
+                    "value": null
+                  }
                 ],
-                "path": "item 1 of xs",
-                "value": 1
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for_sum/assert"
+                ],
+                "message": "$params.k is 3, which isn't text",
+                "name": "sum of x.m named by $params.k is 1"
               }
             ],
             "inputs": [
@@ -35330,35 +35290,23 @@
           {
             "cause": "not_an_object",
             "check": "for_count",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "count of r.v named by $input.k is 1",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "count of r.v named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "r.v named by $input.k",
-                        "value": []
-                      }
-                    ]
+                    "locations": [],
+                    "name": "count of r.v named by $input.k",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for_count/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
+                "message": "$input is [an object with 7 keys], which isn't an object",
+                "name": "count of r.v named by $input.k is 1"
               }
             ],
             "inputs": [
@@ -35386,39 +35334,34 @@
           {
             "cause": "absent",
             "check": "for_followed_by",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "k is \"a\" followed by $input.m named by $params.k",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/k"
-                        ],
-                        "name": "k",
-                        "value": "a"
-                      },
-                      {
-                        "locations": [
-                          ""
-                        ],
-                        "name": "$input.m named by $params.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/0/k"
+                    ],
+                    "name": "k",
+                    "outcome": "found",
+                    "value": "a"
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.m named by $params.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for_followed_by/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
+                "message": "$params.k is missing",
+                "name": "k is \"a\" followed by $input.m named by $params.k"
               }
             ],
             "inputs": [
@@ -35427,6 +35370,7 @@
                   ""
                 ],
                 "name": "$input.m named by $params.k",
+                "outcome": "not_an_object",
                 "value": null
               },
               {
@@ -35634,35 +35578,23 @@
           {
             "cause": "not_an_object",
             "check": "for_count",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "count of r.v named by $input.k is 1",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "count of r.v named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "r.v named by $input.k",
-                        "value": []
-                      }
-                    ]
+                    "locations": [],
+                    "name": "count of r.v named by $input.k",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for_count/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
+                "message": "$input is [an object with 7 keys], which isn't an object",
+                "name": "count of r.v named by $input.k is 1"
               }
             ],
             "inputs": [
@@ -35690,39 +35622,34 @@
           {
             "cause": "null",
             "check": "for_followed_by",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "k is \"a\" followed by $input.m named by $params.k",
-                    "cause": "null",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/k"
-                        ],
-                        "name": "k",
-                        "value": "a"
-                      },
-                      {
-                        "locations": [
-                          ""
-                        ],
-                        "name": "$input.m named by $params.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/0/k"
+                    ],
+                    "name": "k",
+                    "outcome": "found",
+                    "value": "a"
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.m named by $params.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for_followed_by/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
+                "message": "$params.k is null",
+                "name": "k is \"a\" followed by $input.m named by $params.k"
               }
             ],
             "inputs": [
@@ -35731,6 +35658,7 @@
                   ""
                 ],
                 "name": "$input.m named by $params.k",
+                "outcome": "not_an_object",
                 "value": null
               },
               {
@@ -35938,35 +35866,23 @@
           {
             "cause": "not_an_object",
             "check": "for_count",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "count of r.v named by $input.k is 1",
-                    "cause": "not_an_object",
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "count of r.v named by $input.k",
-                        "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "r.v named by $input.k",
-                        "value": []
-                      }
-                    ]
+                    "locations": [],
+                    "name": "count of r.v named by $input.k",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for_count/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
+                "message": "$input is [an object with 7 keys], which isn't an object",
+                "name": "count of r.v named by $input.k is 1"
               }
             ],
             "inputs": [
@@ -35994,39 +35910,34 @@
           {
             "cause": "unusable",
             "check": "for_followed_by",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "k is \"a\" followed by $input.m named by $params.k",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/k"
-                        ],
-                        "name": "k",
-                        "value": "a"
-                      },
-                      {
-                        "locations": [
-                          ""
-                        ],
-                        "name": "$input.m named by $params.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/0/k"
+                    ],
+                    "name": "k",
+                    "outcome": "found",
+                    "value": "a"
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.m named by $params.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/0/rs/0"
+                  "$policy:/requirements/r/checks/for_followed_by/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
+                "message": "$params.k is 3, which isn't text",
+                "name": "k is \"a\" followed by $input.m named by $params.k"
               }
             ],
             "inputs": [
@@ -36035,6 +35946,7 @@
                   ""
                 ],
                 "name": "$input.m named by $params.k",
+                "outcome": "not_an_object",
                 "value": null
               },
               {
@@ -36828,7 +36740,16 @@
           {
             "cause": "not_an_object",
             "check": "for",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "t is [{\"name\": \"a\", \"owner\": \"ana\", \"stage\": \"build\"}, {\"name\": \"b\", \"owner\": \"bo\", \"stage\": \"test\"}], which isn't an object",
+                "name": "owner"
+              }
+            ],
             "inputs": [],
             "message": "t is [{\"name\": \"a\", \"owner\": \"ana\", \"stage\": \"build\"}, {\"name\": \"b\", \"owner\": \"bo\", \"stage\": \"test\"}], which isn't an object",
             "passed": false,
@@ -36852,7 +36773,16 @@
           {
             "cause": "not_an_object",
             "check": "named",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "t is [{\"name\": \"a\", \"owner\": \"ana\", \"stage\": \"build\"}, {\"name\": \"b\", \"owner\": \"bo\", \"stage\": \"test\"}], which isn't an object",
+                "name": "owner"
+              }
+            ],
             "inputs": [],
             "message": "t is [{\"name\": \"a\", \"owner\": \"ana\", \"stage\": \"build\"}, {\"name\": \"b\", \"owner\": \"bo\", \"stage\": \"test\"}], which isn't an object",
             "passed": false,
@@ -37852,15 +37782,17 @@
           {
             "cause": "not_an_object",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 2 of t",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/things/0/1"
                 ],
-                "path": "item 2 of t",
+                "message": "item 2 of t is 3, which isn't an object",
+                "name": "item 2 of t",
                 "value": null
               }
             ],
@@ -37894,15 +37826,17 @@
           {
             "cause": "not_an_object",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 1 of t",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/things/1/0"
                 ],
-                "path": "item 1 of t",
+                "message": "item 1 of t is [{\"owner\": \"ana\"}], which isn't an object",
+                "name": "item 1 of t",
                 "value": null
               }
             ],
@@ -37935,15 +37869,17 @@
           {
             "cause": "not_an_object",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 2 of t",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/things/2/1"
                 ],
-                "path": "item 2 of t",
+                "message": "item 2 of t is null, which isn't an object",
+                "name": "item 2 of t",
                 "value": null
               }
             ],
@@ -38324,30 +38260,39 @@
           {
             "cause": "value",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "n is \"a\"",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/things/0/1/c/name"
                         ],
                         "name": "n",
+                        "outcome": "found",
                         "value": "b"
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/1/c/name"
+                    ],
+                    "message": "item 2 of t is \"b\"",
+                    "name": "item 2 of t",
+                    "value": "b"
                   }
                 ],
-                "item": "item 2 of t",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/1/c/name"
+                  "$policy:/requirements/r/checks/c/assert"
                 ],
-                "path": "item 2 of t",
-                "value": "b"
+                "message": "",
+                "name": "n is \"a\""
               }
             ],
             "inputs": [
@@ -38399,7 +38344,16 @@
           {
             "cause": "not_an_object",
             "check": "c",
-            "failed_items": [],
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [],
+                "kind": "list",
+                "message": "t is [{\"c\": {\"name\": \"a\"}, \"owner\": \"a\"}], which isn't an object",
+                "name": "owner"
+              }
+            ],
             "inputs": [],
             "message": "t is [{\"c\": {\"name\": \"a\"}, \"owner\": \"a\"}], which isn't an object",
             "passed": false,

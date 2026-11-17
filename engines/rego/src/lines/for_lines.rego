@@ -920,12 +920,29 @@ _for_unchecked(check, inner) := {"failed_items": [_for_unchecked_item(check, f) 
 
 _for_unchecked_item(check, f) := {"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_inner_text(check, f), "free": _m_inner_free(f)}
 
-_for_inputs(check, subj, names, item, w) := _merged_inputs([{"name": t[0], "value": t[1], "locations": t[2]} | some t in ((_for_input_pairs(check, subj, names, item, w) | _for_listed_pairs(check, subj)) | _for_whose_pairs(check, subj))])
+_for_inputs(check, subj, names, item, w) := _merged_inputs([_for_input_of(t) | some t in ((_for_input_pairs(check, subj, names, item, w) | _for_listed_pairs(check, subj)) | _for_whose_pairs(check, subj))])
+
+_for_pair(subj, path) := [n, v, l] if {
+	n := _input_name(path)
+	v := _value_at(subj, path)
+	v != null
+	l := _locations_of(subj, path)
+} else := [_input_name(path), null, _locations_of(subj, path), _outcome_word(_read_state(subj, path))]
+
+_for_tuple(i) := [i.name, i.value, i.locations] if i.value != null
+
+else := [i.name, i.value, i.locations, o] if o := i["ergo/outcome"]
+
+else := [i.name, i.value, i.locations]
+
+_for_input_of(t) := {"name": t[0], "value": t[1], "locations": t[2]} if count(t) == 3
+
+else := {"name": t[0], "value": t[1], "locations": t[2], "ergo/outcome": t[3]}
 
 _for_whose_pairs(check, subj) := {[x[1].name, x[1].value, x[1].locations] |
 	some item in check.items
 	some x in _listed_reads(subj, object.get(item, "whose", []))
-} | {[i.name, i.value, i.locations] |
+} | {_for_tuple(i) |
 	some item in check.items
 	some i in _input_ref_inputs(object.get(item, "whose", []))
 }
@@ -969,13 +986,13 @@ _for_listed_right(c, p) if {
 	p == c.right
 }
 
-_for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_input_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
+_for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {_for_pair(subj, shown) |
 	some c in check.checks
 	not _walks(c)
 	some p in _for_read_paths(c)
 	not _for_listed(subj, c, p)
 	shown := _before_names(p)
-}) | {[_input_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
+}) | {_for_pair(subj, shown) |
 	some c in check.checks
 	not _walks(c)
 	some p in _for_read_paths(c)
@@ -983,39 +1000,39 @@ _for_input_pairs(check, subj, names, item, w) := (((((((((({object.get(w, "input
 	not p[0] in {concat("", ["$", item.as]) | some item in check.items}
 	not _for_listed(subj, c, p)
 	shown := _before_later_names(p)
-}) | {[i.name, i.value, i.locations] |
+}) | {_for_tuple(i) |
 	some c in check.checks
 	some side in _derived_sides(c)
 	not _tally_named(check, side)
 	some i in _side_inputs(subj, side)
-}) | {[i.name, i.value, i.locations] |
+}) | {_for_tuple(i) |
 	some c in check.checks
 	some side in _derived_sides(c)
 	_tally_named(check, side)
 	some part in _tally_parts(side)
 	some i in _tally_kept_inputs(check, subj, part)
-}) | {[i.name, i.value, i.locations] |
+}) | {_for_tuple(i) |
 	some c in check.checks
 	_walks(c)
 	not _for_alias_path(check, c.path)
 	some i in _walk_read_row(c, subj).inputs
 	not i in _named_inputs(subj, [p | some p in _walk_condition_paths(c); _for_alias_path(check, p)])
-}) | {[i.name, i.value, i.locations] |
+}) | {_for_tuple(i) |
 	some c in check.checks
 	_walks(c)
 	_for_alias_path(check, c.path)
 	some i in array.concat(_conds_named_inputs_but(subj, array.concat([c.check], c.whose), {p | some p in _walk_condition_paths(c); _for_alias_path(check, p)}), _input_ref_inputs(array.concat([c.check], c.whose)))
-}) | {[_input_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
+}) | {_for_pair(subj, shown) |
 	some c in check.checks
 	_walks(c)
 	shown := _before_alias_name(check, subj, c.path)
-}) | {[i.name, i.value, i.locations] |
+}) | {_for_tuple(i) |
 	some c in check.checks
 	_walks(c)
 	some i in _named_inputs(subj, [shown | some p in _walk_condition_paths(c); shown := _before_alias_name(check, subj, p)])
-}) | {[_input_name([f]), _value_at(subj, [f]), _locations_of(subj, [f])] |
+}) | {_for_pair(subj, [f]) |
 	some f in _for_key_fields(check)
-}) | {[i.name, i.value, i.locations] |
+}) | {_for_tuple(i) |
 	some c in check.checks
 	c.op in _right_ref_ops
 	some i in _ref_inputs(object.remove(c, ["path"]))

@@ -9750,80 +9750,30 @@
           {
             "cause": "absent",
             "check": "f",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "d.name is in $input.sbom.components.name",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/repos/0/deps/0/name"
-                        ],
-                        "name": "d.name",
-                        "value": "click"
-                      },
-                      {
-                        "locations": [
-                          "/sbom/components/0/name",
-                          "/sbom/components/1"
-                        ],
-                        "name": "$input.sbom.components[].name",
-                        "value": [
-                          "click",
-                          null
-                        ]
-                      }
+                    "locations": [
+                      "/sbom/components/0/name",
+                      "/sbom/components/1"
+                    ],
+                    "name": "$input.sbom.components[].name",
+                    "outcome": "found",
+                    "value": [
+                      "click",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of deps",
+                "kind": "assertion",
                 "locations": [
-                  "/repos/0/deps/0"
+                  "$policy:/requirements/s/checks/f/assert"
                 ],
-                "path": "item 1 of deps",
-                "value": {
-                  "name": "click"
-                }
-              },
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "d.name is in $input.sbom.components.name",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/repos/0/deps/1/name"
-                        ],
-                        "name": "d.name",
-                        "value": "attrs"
-                      },
-                      {
-                        "locations": [
-                          "/sbom/components/0/name",
-                          "/sbom/components/1"
-                        ],
-                        "name": "$input.sbom.components[].name",
-                        "value": [
-                          "click",
-                          null
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 2 of deps",
-                "locations": [
-                  "/repos/0/deps/1"
-                ],
-                "path": "item 2 of deps",
-                "value": {
-                  "name": "attrs"
-                }
+                "message": "item 2 of $input.sbom.components: name is missing",
+                "name": "d.name is in $input.sbom.components.name"
               }
             ],
             "inputs": [
@@ -9867,80 +9817,77 @@
           {
             "cause": "null",
             "check": "g",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "d.name is in allowed.name",
                     "cause": "null",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/repos/0/deps/0/name"
                         ],
                         "name": "d.name",
+                        "outcome": "found",
                         "value": "click"
-                      },
-                      {
-                        "locations": [
-                          "/repos/0/allowed/0/name",
-                          "/repos/0/allowed/1/name"
-                        ],
-                        "name": "allowed[].name",
-                        "value": [
-                          "click",
-                          null
-                        ]
                       }
-                    ]
-                  }
-                ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/repos/0/deps/0"
-                ],
-                "path": "item 1 of deps",
-                "value": {
-                  "name": "click"
-                }
-              },
-              {
-                "cause": "null",
-                "failed_assertions": [
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/deps/0"
+                    ],
+                    "message": "item 2 of allowed: name is null",
+                    "name": "item 1 of deps",
+                    "value": {
+                      "name": "click"
+                    }
+                  },
                   {
-                    "assertion": "d.name is in allowed.name",
                     "cause": "null",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/repos/0/deps/1/name"
                         ],
                         "name": "d.name",
+                        "outcome": "found",
                         "value": "attrs"
-                      },
-                      {
-                        "locations": [
-                          "/repos/0/allowed/0/name",
-                          "/repos/0/allowed/1/name"
-                        ],
-                        "name": "allowed[].name",
-                        "value": [
-                          "click",
-                          null
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/deps/1"
+                    ],
+                    "message": "item 2 of allowed: name is null",
+                    "name": "item 2 of deps",
+                    "value": {
+                      "name": "attrs"
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/repos/0/allowed/0/name",
+                      "/repos/0/allowed/1/name"
+                    ],
+                    "name": "allowed[].name",
+                    "outcome": "found",
+                    "value": [
+                      "click",
+                      null
                     ]
                   }
                 ],
-                "item": "item 2 of deps",
+                "kind": "assertion",
                 "locations": [
-                  "/repos/0/deps/1"
+                  "$policy:/requirements/s/checks/g/assert"
                 ],
-                "path": "item 2 of deps",
-                "value": {
-                  "name": "attrs"
-                }
+                "message": "",
+                "name": "d.name is in allowed.name"
               }
             ],
             "inputs": [
@@ -9991,37 +9938,48 @@
           {
             "cause": "value",
             "check": "f",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "d.name is in $input.sbom.components.name",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/repos/0/deps/0/name"
                         ],
                         "name": "d.name",
+                        "outcome": "found",
                         "value": "click"
-                      },
-                      {
-                        "locations": [],
-                        "name": "$input.sbom.components[].name",
-                        "value": []
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/deps/0"
+                    ],
+                    "message": "d.name is \"click\", and $input.sbom.components is []",
+                    "name": "item 1 of deps",
+                    "value": {
+                      "name": "click"
+                    }
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/repos/0/deps/0"
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$input.sbom.components[].name",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "item 1 of deps",
-                "value": {
-                  "name": "click"
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/f/assert"
+                ],
+                "message": "",
+                "name": "d.name is in $input.sbom.components.name"
               }
             ],
             "inputs": [
@@ -10055,37 +10013,48 @@
           {
             "cause": "value",
             "check": "g",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "d.name is in allowed.name",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/repos/0/deps/0/name"
                         ],
                         "name": "d.name",
+                        "outcome": "found",
                         "value": "click"
-                      },
-                      {
-                        "locations": [],
-                        "name": "allowed[].name",
-                        "value": []
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/deps/0"
+                    ],
+                    "message": "d.name is \"click\", and allowed is []",
+                    "name": "item 1 of deps",
+                    "value": {
+                      "name": "click"
+                    }
                   }
                 ],
-                "item": "item 1 of deps",
-                "locations": [
-                  "/repos/0/deps/0"
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "allowed[].name",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "item 1 of deps",
-                "value": {
-                  "name": "click"
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/g/assert"
+                ],
+                "message": "",
+                "name": "d.name is in allowed.name"
               }
             ],
             "inputs": [
@@ -10927,37 +10896,48 @@
           {
             "cause": "value",
             "check": "alias",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "p.name is in .p.name",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/repos/0/items/0/name"
                         ],
                         "name": "p.name",
+                        "outcome": "found",
                         "value": "a"
-                      },
-                      {
-                        "locations": [],
-                        "name": ".p[].name",
-                        "value": []
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/items/0"
+                    ],
+                    "message": "p.name is \"a\", and .p is []",
+                    "name": "item 1 of items",
+                    "value": {
+                      "name": "a"
+                    }
                   }
                 ],
-                "item": "item 1 of items",
-                "locations": [
-                  "/repos/0/items/0"
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": ".p[].name",
+                    "outcome": "found",
+                    "value": []
+                  }
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "name": "a"
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/alias/assert"
+                ],
+                "message": "",
+                "name": "p.name is in .p.name"
               }
             ],
             "inputs": [
@@ -10991,41 +10971,52 @@
           {
             "cause": "value",
             "check": "alias_list",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "q.name is in .q.name",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/repos/0/items/0/name"
                         ],
                         "name": "q.name",
+                        "outcome": "found",
                         "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/repos/0/q/0/name"
-                        ],
-                        "name": ".q[].name",
-                        "value": [
-                          "b"
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/items/0"
+                    ],
+                    "message": "q.name is \"a\", and .q[].name is [\"b\"]",
+                    "name": "item 1 of items",
+                    "value": {
+                      "name": "a"
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/repos/0/q/0/name"
+                    ],
+                    "name": ".q[].name",
+                    "outcome": "found",
+                    "value": [
+                      "b"
                     ]
                   }
                 ],
-                "item": "item 1 of items",
+                "kind": "assertion",
                 "locations": [
-                  "/repos/0/items/0"
+                  "$policy:/requirements/s/checks/alias_list/assert"
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "name": "a"
-                }
+                "message": "",
+                "name": "q.name is in .q.name"
               }
             ],
             "inputs": [
@@ -11063,41 +11054,52 @@
           {
             "cause": "value",
             "check": "other",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "i.name is in q.name",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/repos/0/items/0/name"
                         ],
                         "name": "i.name",
+                        "outcome": "found",
                         "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/repos/0/q/0/name"
-                        ],
-                        "name": "q[].name",
-                        "value": [
-                          "b"
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/items/0"
+                    ],
+                    "message": "i.name is \"a\", and q[].name is [\"b\"]",
+                    "name": "item 1 of items",
+                    "value": {
+                      "name": "a"
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/repos/0/q/0/name"
+                    ],
+                    "name": "q[].name",
+                    "outcome": "found",
+                    "value": [
+                      "b"
                     ]
                   }
                 ],
-                "item": "item 1 of items",
+                "kind": "assertion",
                 "locations": [
-                  "/repos/0/items/0"
+                  "$policy:/requirements/s/checks/other/assert"
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "name": "a"
-                }
+                "message": "",
+                "name": "i.name is in q.name"
               }
             ],
             "inputs": [
@@ -11142,39 +11144,26 @@
           {
             "cause": "absent",
             "check": "alias",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "p.name is in .p.name",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/repos/0/items/0/name"
-                        ],
-                        "name": "p.name",
-                        "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/repos/0"
-                        ],
-                        "name": ".p.name",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/repos/0"
+                    ],
+                    "name": ".p.name",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of items",
+                "kind": "assertion",
                 "locations": [
-                  "/repos/0/items/0"
+                  "$policy:/requirements/s/checks/alias/assert"
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "name": "a"
-                }
+                "message": ".p.name is missing",
+                "name": "p.name is in .p.name"
               }
             ],
             "inputs": [
@@ -11183,6 +11172,7 @@
                   "/repos/0"
                 ],
                 "name": ".p.name",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -11209,43 +11199,54 @@
           {
             "cause": "absent",
             "check": "alias_list",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "q.name is in .q.name",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/repos/0/items/0/name"
                         ],
                         "name": "q.name",
+                        "outcome": "found",
                         "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/repos/0/q/0/name",
-                          "/repos/0/q/1"
-                        ],
-                        "name": ".q[].name",
-                        "value": [
-                          "a",
-                          null
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/items/0"
+                    ],
+                    "message": "item 2 of .q: name is missing",
+                    "name": "item 1 of items",
+                    "value": {
+                      "name": "a"
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/repos/0/q/0/name",
+                      "/repos/0/q/1"
+                    ],
+                    "name": ".q[].name",
+                    "outcome": "found",
+                    "value": [
+                      "a",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of items",
+                "kind": "assertion",
                 "locations": [
-                  "/repos/0/items/0"
+                  "$policy:/requirements/s/checks/alias_list/assert"
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "name": "a"
-                }
+                "message": "",
+                "name": "q.name is in .q.name"
               }
             ],
             "inputs": [
@@ -11285,43 +11286,54 @@
           {
             "cause": "absent",
             "check": "other",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "i.name is in q.name",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/repos/0/items/0/name"
                         ],
                         "name": "i.name",
+                        "outcome": "found",
                         "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/repos/0/q/0/name",
-                          "/repos/0/q/1"
-                        ],
-                        "name": "q[].name",
-                        "value": [
-                          "a",
-                          null
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/items/0"
+                    ],
+                    "message": "item 2 of q: name is missing",
+                    "name": "item 1 of items",
+                    "value": {
+                      "name": "a"
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/repos/0/q/0/name",
+                      "/repos/0/q/1"
+                    ],
+                    "name": "q[].name",
+                    "outcome": "found",
+                    "value": [
+                      "a",
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of items",
+                "kind": "assertion",
                 "locations": [
-                  "/repos/0/items/0"
+                  "$policy:/requirements/s/checks/other/assert"
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "name": "a"
-                }
+                "message": "",
+                "name": "i.name is in q.name"
               }
             ],
             "inputs": [
@@ -11707,41 +11719,52 @@
           {
             "cause": "unusable",
             "check": "every",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "p.name is in .p.name",
                     "cause": "unusable",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/repos/0/items/0/name"
                         ],
                         "name": "p.name",
+                        "outcome": "found",
                         "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/repos/0/p/0"
-                        ],
-                        "name": ".p[].name",
-                        "value": [
-                          null
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/items/0"
+                    ],
+                    "message": "item 1 of .p is \"t\", which isn't an object",
+                    "name": "item 1 of items",
+                    "value": {
+                      "name": "a"
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/repos/0/p/0"
+                    ],
+                    "name": ".p[].name",
+                    "outcome": "found",
+                    "value": [
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of items",
+                "kind": "assertion",
                 "locations": [
-                  "/repos/0/items/0"
+                  "$policy:/requirements/s/checks/every/assert"
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "name": "a"
-                }
+                "message": "",
+                "name": "p.name is in .p.name"
               }
             ],
             "inputs": [
@@ -11779,41 +11802,52 @@
           {
             "cause": "unusable",
             "check": "some",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "q.name is in .q.name",
                     "cause": "unusable",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/repos/0/items/0/name"
                         ],
                         "name": "q.name",
+                        "outcome": "found",
                         "value": "a"
-                      },
-                      {
-                        "locations": [
-                          "/repos/0/q/0"
-                        ],
-                        "name": ".q[].name",
-                        "value": [
-                          null
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/items/0"
+                    ],
+                    "message": "item 1 of .q is \"t\", which isn't an object",
+                    "name": "item 1 of items",
+                    "value": {
+                      "name": "a"
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/repos/0/q/0"
+                    ],
+                    "name": ".q[].name",
+                    "outcome": "found",
+                    "value": [
+                      null
                     ]
                   }
                 ],
-                "item": "item 1 of items",
+                "kind": "assertion",
                 "locations": [
-                  "/repos/0/items/0"
+                  "$policy:/requirements/s/checks/some/assert"
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "name": "a"
-                }
+                "message": "",
+                "name": "q.name is in .q.name"
               }
             ],
             "inputs": [
@@ -16632,45 +16666,56 @@
           {
             "cause": "value",
             "check": "e_for_in_params",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "x.n is in $params.l",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/prs/0/xs/0/n"
                         ],
                         "name": "x.n",
+                        "outcome": "found",
                         "value": 1
-                      },
-                      {
-                        "locations": [
-                          "$params:/l"
-                        ],
-                        "name": "$params.l",
-                        "value": [
-                          2
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "x.n is 1, and $params.l is [2]",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "n": 1,
+                      "s": "ab",
+                      "w": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "found",
+                    "value": [
+                      2
                     ]
                   }
                 ],
-                "item": "item 1 of xs",
+                "kind": "assertion",
                 "locations": [
-                  "/prs/0/xs/0"
+                  "$policy:/requirements/r/checks/e_for_in_params/assert"
                 ],
-                "path": "item 1 of xs",
-                "value": {
-                  "n": 1,
-                  "s": "ab",
-                  "w": [
-                    1
-                  ]
-                }
+                "message": "",
+                "name": "x.n is in $params.l"
               }
             ],
             "inputs": [
@@ -16712,43 +16757,54 @@
           {
             "cause": "value",
             "check": "e_for_least_params",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "x.n is at least $params.z",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/prs/0/xs/0/n"
                         ],
                         "name": "x.n",
+                        "outcome": "found",
                         "value": 1
-                      },
-                      {
-                        "locations": [
-                          "$params:/z"
-                        ],
-                        "name": "$params.z",
-                        "value": 5
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "x.n is 1, and $params.z is 5",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "n": 1,
+                      "s": "ab",
+                      "w": [
+                        1
+                      ]
+                    }
                   }
                 ],
-                "item": "item 1 of xs",
-                "locations": [
-                  "/prs/0/xs/0"
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "found",
+                    "value": 5
+                  }
                 ],
-                "path": "item 1 of xs",
-                "value": {
-                  "n": 1,
-                  "s": "ab",
-                  "w": [
-                    1
-                  ]
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/e_for_least_params/assert"
+                ],
+                "message": "",
+                "name": "x.n is at least $params.z"
               }
             ],
             "inputs": [
@@ -16788,47 +16844,58 @@
           {
             "cause": "value",
             "check": "f_for_contains_input",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "x.w contains all of $input.l",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/prs/0/xs/0/w"
                         ],
                         "name": "x.w",
+                        "outcome": "found",
                         "value": [
                           1
                         ]
-                      },
-                      {
-                        "locations": [
-                          "/l"
-                        ],
-                        "name": "$input.l",
-                        "value": [
-                          2
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "x.w is [1], and $input.l is [2]",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "n": 1,
+                      "s": "ab",
+                      "w": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/l"
+                    ],
+                    "name": "$input.l",
+                    "outcome": "found",
+                    "value": [
+                      2
                     ]
                   }
                 ],
-                "item": "item 1 of xs",
+                "kind": "assertion",
                 "locations": [
-                  "/prs/0/xs/0"
+                  "$policy:/requirements/r/checks/f_for_contains_input/assert"
                 ],
-                "path": "item 1 of xs",
-                "value": {
-                  "n": 1,
-                  "s": "ab",
-                  "w": [
-                    1
-                  ]
-                }
+                "message": "",
+                "name": "x.w contains all of $input.l"
               }
             ],
             "inputs": [
@@ -16870,43 +16937,54 @@
           {
             "cause": "value",
             "check": "f_for_least_input",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "x.n is at least $input.z",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/prs/0/xs/0/n"
                         ],
                         "name": "x.n",
+                        "outcome": "found",
                         "value": 1
-                      },
-                      {
-                        "locations": [
-                          "/z"
-                        ],
-                        "name": "$input.z",
-                        "value": 5
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "x.n is 1, and $input.z is 5",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "n": 1,
+                      "s": "ab",
+                      "w": [
+                        1
+                      ]
+                    }
                   }
                 ],
-                "item": "item 1 of xs",
-                "locations": [
-                  "/prs/0/xs/0"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/z"
+                    ],
+                    "name": "$input.z",
+                    "outcome": "found",
+                    "value": 5
+                  }
                 ],
-                "path": "item 1 of xs",
-                "value": {
-                  "n": 1,
-                  "s": "ab",
-                  "w": [
-                    1
-                  ]
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/f_for_least_input/assert"
+                ],
+                "message": "",
+                "name": "x.n is at least $input.z"
               }
             ],
             "inputs": [
@@ -17547,45 +17625,56 @@
           {
             "cause": "value",
             "check": "e_for_in_params",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "x.n is in $params.l",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/prs/0/xs/0/n"
                         ],
                         "name": "x.n",
+                        "outcome": "found",
                         "value": 1
-                      },
-                      {
-                        "locations": [
-                          "$params:/l"
-                        ],
-                        "name": "$params.l",
-                        "value": [
-                          2
-                        ]
                       }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "x.n is 1, and $params.l is [2]",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "n": 1,
+                      "s": "ab",
+                      "w": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "found",
+                    "value": [
+                      2
                     ]
                   }
                 ],
-                "item": "item 1 of xs",
+                "kind": "assertion",
                 "locations": [
-                  "/prs/0/xs/0"
+                  "$policy:/requirements/r/checks/e_for_in_params/assert"
                 ],
-                "path": "item 1 of xs",
-                "value": {
-                  "n": 1,
-                  "s": "ab",
-                  "w": [
-                    1
-                  ]
-                }
+                "message": "",
+                "name": "x.n is in $params.l"
               }
             ],
             "inputs": [
@@ -17627,43 +17716,54 @@
           {
             "cause": "value",
             "check": "e_for_least_params",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "x.n is at least $params.z",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/prs/0/xs/0/n"
                         ],
                         "name": "x.n",
+                        "outcome": "found",
                         "value": 1
-                      },
-                      {
-                        "locations": [
-                          "$params:/z"
-                        ],
-                        "name": "$params.z",
-                        "value": 5
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "x.n is 1, and $params.z is 5",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "n": 1,
+                      "s": "ab",
+                      "w": [
+                        1
+                      ]
+                    }
                   }
                 ],
-                "item": "item 1 of xs",
-                "locations": [
-                  "/prs/0/xs/0"
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "found",
+                    "value": 5
+                  }
                 ],
-                "path": "item 1 of xs",
-                "value": {
-                  "n": 1,
-                  "s": "ab",
-                  "w": [
-                    1
-                  ]
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/e_for_least_params/assert"
+                ],
+                "message": "",
+                "name": "x.n is at least $params.z"
               }
             ],
             "inputs": [
@@ -17703,45 +17803,26 @@
           {
             "cause": "unusable",
             "check": "f_for_contains_input",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "x.w contains all of $input.l",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/prs/0/xs/0/w"
-                        ],
-                        "name": "x.w",
-                        "value": [
-                          1
-                        ]
-                      },
-                      {
-                        "locations": [
-                          "/l"
-                        ],
-                        "name": "$input.l",
-                        "value": "s"
-                      }
-                    ]
+                    "locations": [
+                      "/l"
+                    ],
+                    "name": "$input.l",
+                    "outcome": "found",
+                    "value": "s"
                   }
                 ],
-                "item": "item 1 of xs",
+                "kind": "assertion",
                 "locations": [
-                  "/prs/0/xs/0"
+                  "$policy:/requirements/r/checks/f_for_contains_input/assert"
                 ],
-                "path": "item 1 of xs",
-                "value": {
-                  "n": 1,
-                  "s": "ab",
-                  "w": [
-                    1
-                  ]
-                }
+                "message": "$input.l is \"s\", which isn't a list",
+                "name": "x.w contains all of $input.l"
               }
             ],
             "inputs": [
@@ -17781,43 +17862,54 @@
           {
             "cause": "value",
             "check": "f_for_least_input",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "x.n is at least $input.z",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/prs/0/xs/0/n"
                         ],
                         "name": "x.n",
+                        "outcome": "found",
                         "value": 1
-                      },
-                      {
-                        "locations": [
-                          "/z"
-                        ],
-                        "name": "$input.z",
-                        "value": 5
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "x.n is 1, and $input.z is 5",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "n": 1,
+                      "s": "ab",
+                      "w": [
+                        1
+                      ]
+                    }
                   }
                 ],
-                "item": "item 1 of xs",
-                "locations": [
-                  "/prs/0/xs/0"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/z"
+                    ],
+                    "name": "$input.z",
+                    "outcome": "found",
+                    "value": 5
+                  }
                 ],
-                "path": "item 1 of xs",
-                "value": {
-                  "n": 1,
-                  "s": "ab",
-                  "w": [
-                    1
-                  ]
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/f_for_least_input/assert"
+                ],
+                "message": "",
+                "name": "x.n is at least $input.z"
               }
             ],
             "inputs": [

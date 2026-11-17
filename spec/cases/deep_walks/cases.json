@@ -1225,54 +1225,48 @@
           {
             "cause": "value",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "count of z.k1.k2.k3.k4.k5.k6.k7.k8.k9 is 1",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/0",
                           "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/1"
                         ],
-                        "name": "count of z.k1.k2.k3.k4.k5.k6.k7.k8.k9",
-                        "value": 2
-                      },
-                      {
-                        "locations": [
-                          "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/0",
-                          "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/1"
-                        ],
                         "name": "z.k1.k2.k3.k4.k5.k6.k7.k8.k9[]",
+                        "outcome": "found",
                         "value": [
                           1,
                           2
                         ]
                       }
-                    ]
-                  }
-                ],
-                "item": "item 1 of items",
-                "locations": [
-                  "/things/1/items/0"
-                ],
-                "path": "item 1 of items",
-                "value": {
-                  "k1": {
-                    "k2": {
-                      "k3": {
-                        "k4": {
-                          "k5": {
-                            "k6": {
-                              "k7": {
-                                "k8": {
-                                  "k9": [
-                                    1,
-                                    2
-                                  ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/1/items/0"
+                    ],
+                    "message": "count of z.k1.k2.k3.k4.k5.k6.k7.k8.k9 is 2",
+                    "name": "item 1 of items",
+                    "value": {
+                      "k1": {
+                        "k2": {
+                          "k3": {
+                            "k4": {
+                              "k5": {
+                                "k6": {
+                                  "k7": {
+                                    "k8": {
+                                      "k9": [
+                                        1,
+                                        2
+                                      ]
+                                    }
+                                  }
                                 }
                               }
                             }
@@ -1281,7 +1275,23 @@
                       }
                     }
                   }
-                }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/0",
+                      "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/1"
+                    ],
+                    "name": "count of z.k1.k2.k3.k4.k5.k6.k7.k8.k9",
+                    "value": 2
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
+                "message": "",
+                "name": "count of z.k1.k2.k3.k4.k5.k6.k7.k8.k9 is 1"
               }
             ],
             "inputs": [

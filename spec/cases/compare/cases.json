@@ -5807,39 +5807,26 @@
           {
             "cause": "absent",
             "check": "o",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "it.w is at least $params.n",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/items/0/w"
-                        ],
-                        "name": "it.w",
-                        "value": 3
-                      },
-                      {
-                        "locations": [
-                          "$params:"
-                        ],
-                        "name": "$params.n",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.n",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of items",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/items/0"
+                  "$policy:/requirements/s/checks/o/assert"
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "w": 3
-                }
+                "message": "$params.n is missing",
+                "name": "it.w is at least $params.n"
               }
             ],
             "inputs": [
@@ -5848,6 +5835,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -5874,16 +5862,23 @@
           {
             "cause": "absent",
             "check": "p",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "$params.q",
-                "locations": [
-                  "$params:"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "$params.q",
-                "value": null
+                "kind": "list",
+                "message": "$params.q is missing",
+                "name": "$params.q"
               }
             ],
             "inputs": [
@@ -7001,39 +6996,26 @@
           {
             "cause": "null",
             "check": "o",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "it.w is at least $params.n",
-                    "cause": "null",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/items/0/w"
-                        ],
-                        "name": "it.w",
-                        "value": 3
-                      },
-                      {
-                        "locations": [
-                          "$params:/n"
-                        ],
-                        "name": "$params.n",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "$params:/n"
+                    ],
+                    "name": "$params.n",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of items",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/items/0"
+                  "$policy:/requirements/s/checks/o/assert"
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "w": 3
-                }
+                "message": "$params.n is null",
+                "name": "it.w is at least $params.n"
               }
             ],
             "inputs": [
@@ -7042,6 +7024,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "null",
                 "value": null
               },
               {
@@ -7068,16 +7051,23 @@
           {
             "cause": "null",
             "check": "p",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "failed_assertions": [],
-                "item": "$params.q",
-                "locations": [
-                  "$params:/q"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/q"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "$params.q",
-                "value": null
+                "kind": "list",
+                "message": "$params.q is null",
+                "name": "$params.q"
               }
             ],
             "inputs": [
@@ -8183,39 +8173,26 @@
           {
             "cause": "unusable",
             "check": "o",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "it.w is at least $params.n",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/items/0/w"
-                        ],
-                        "name": "it.w",
-                        "value": 3
-                      },
-                      {
-                        "locations": [
-                          "$params:/n"
-                        ],
-                        "name": "$params.n",
-                        "value": "a"
-                      }
-                    ]
+                    "locations": [
+                      "$params:/n"
+                    ],
+                    "name": "$params.n",
+                    "outcome": "found",
+                    "value": "a"
                   }
                 ],
-                "item": "item 1 of items",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/items/0"
+                  "$policy:/requirements/s/checks/o/assert"
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "w": 3
-                }
+                "message": "$params.n is \"a\", which isn't a number",
+                "name": "it.w is at least $params.n"
               }
             ],
             "inputs": [
@@ -8251,16 +8228,23 @@
           {
             "cause": "unusable",
             "check": "p",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "$params.q",
-                "locations": [
-                  "$params:/q"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/q"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
                 ],
-                "path": "$params.q",
-                "value": "s"
+                "kind": "list",
+                "message": "$params.q is \"s\", which isn't a list or an object",
+                "name": "$params.q"
               }
             ],
             "inputs": [
@@ -9256,39 +9240,26 @@
           {
             "cause": "absent",
             "check": "o",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "it.w is at least $params.n",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/items/0/w"
-                        ],
-                        "name": "it.w",
-                        "value": 3
-                      },
-                      {
-                        "locations": [
-                          "$params:"
-                        ],
-                        "name": "$params.n",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.n",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of items",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/items/0"
+                  "$policy:/requirements/s/checks/o/assert"
                 ],
-                "path": "item 1 of items",
-                "value": {
-                  "w": 3
-                }
+                "message": "$params.n is missing",
+                "name": "it.w is at least $params.n"
               }
             ],
             "inputs": [
@@ -9297,6 +9268,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -9323,16 +9295,23 @@
           {
             "cause": "absent",
             "check": "p",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "$params",
-                "locations": [
-                  "$params:"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "$params",
-                "value": null
+                "kind": "list",
+                "message": "$params is missing",
+                "name": "$params"
               }
             ],
             "inputs": [
@@ -9701,37 +9680,48 @@
           {
             "cause": "value",
             "check": "e",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "o equals v",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "$params:/objs/1/x"
                         ],
                         "name": "o",
+                        "outcome": "found",
                         "value": "z"
-                      },
-                      {
-                        "locations": [
-                          "/things/0/v"
-                        ],
-                        "name": "v",
-                        "value": "y"
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "$params:/objs/1/x"
+                    ],
+                    "message": "o is \"z\", and v is \"y\"",
+                    "name": "item 2 of $params.objs",
+                    "value": "z"
                   }
                 ],
-                "item": "item 2 of $params.objs",
-                "locations": [
-                  "$params:/objs/1/x"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/v"
+                    ],
+                    "name": "v",
+                    "outcome": "found",
+                    "value": "y"
+                  }
                 ],
-                "path": "item 2 of $params.objs",
-                "value": "z"
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/e/assert"
+                ],
+                "message": "",
+                "name": "o equals v"
               }
             ],
             "inputs": [
@@ -9944,37 +9934,48 @@
             "check": "e",
             "description": "",
             "expression": "for every $params.objs.x as o: o equals v",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "o equals v",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "$params:/objs/1/x"
                         ],
                         "name": "o",
+                        "outcome": "found",
                         "value": "z"
-                      },
-                      {
-                        "locations": [
-                          "/things/0/v"
-                        ],
-                        "name": "v",
-                        "value": "y"
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "$params:/objs/1/x"
+                    ],
+                    "message": "o is \"z\", and v is \"y\"",
+                    "name": "item 2 of $params.objs",
+                    "value": "z"
                   }
                 ],
-                "item": "item 2 of $params.objs",
-                "locations": [
-                  "$params:/objs/1/x"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/v"
+                    ],
+                    "name": "v",
+                    "outcome": "found",
+                    "value": "y"
+                  }
                 ],
-                "path": "item 2 of $params.objs",
-                "value": "z"
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/e/assert"
+                ],
+                "message": "",
+                "name": "o equals v"
               }
             ],
             "inputs": [
@@ -10164,37 +10165,48 @@
           {
             "cause": "value",
             "check": "e",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "o equals v",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "$params:/objs/1/x"
                         ],
                         "name": "o",
+                        "outcome": "found",
                         "value": "z"
-                      },
-                      {
-                        "locations": [
-                          "/things/0/v"
-                        ],
-                        "name": "v",
-                        "value": "y"
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "$params:/objs/1/x"
+                    ],
+                    "message": "o is \"z\", and v is \"y\"",
+                    "name": "item 2 of $params.objs",
+                    "value": "z"
                   }
                 ],
-                "item": "item 2 of $params.objs",
-                "locations": [
-                  "$params:/objs/1/x"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/v"
+                    ],
+                    "name": "v",
+                    "outcome": "found",
+                    "value": "y"
+                  }
                 ],
-                "path": "item 2 of $params.objs",
-                "value": "z"
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/e/assert"
+                ],
+                "message": "",
+                "name": "o equals v"
               }
             ],
             "inputs": [
@@ -10623,15 +10635,17 @@
           {
             "cause": "not_an_object",
             "check": "e",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 2 of $params.objs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "$params:/objs/1"
                 ],
-                "path": "item 2 of $params.objs",
+                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "name": "item 2 of $params.objs",
                 "value": null
               }
             ],
@@ -11249,15 +11263,17 @@
             "check": "e",
             "description": "",
             "expression": "for every $params.objs.x as o: o equals v",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 2 of $params.objs",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "$params:/objs/1"
                 ],
-                "path": "item 2 of $params.objs",
+                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "name": "item 2 of $params.objs",
                 "value": null
               }
             ],
@@ -12553,46 +12569,34 @@
         {
           "cause": "absent",
           "check": "d",
-          "failed_items": [
+          "failures": [
             {
               "cause": "absent",
-              "failed_assertions": [
+              "failures": [],
+              "inputs": [
                 {
-                  "assertion": "it.w equals $params.m named by k",
-                  "cause": "absent",
-                  "inputs": [
-                    {
-                      "locations": [
-                        "/things/0/items/0/w"
-                      ],
-                      "name": "it.w",
-                      "value": "a"
-                    },
-                    {
-                      "locations": [
-                        "$params:"
-                      ],
-                      "name": "$params.m named by k",
-                      "value": null
-                    },
-                    {
-                      "locations": [
-                        "/things/0/k"
-                      ],
-                      "name": "k",
-                      "value": "x"
-                    }
-                  ]
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.m named by k",
+                  "outcome": "absent",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/k"
+                  ],
+                  "name": "k",
+                  "outcome": "found",
+                  "value": "x"
                 }
               ],
-              "item": "item 1 of items",
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/0"
+                "$policy:/requirements/s/checks/d/assert"
               ],
-              "path": "item 1 of items",
-              "value": {
-                "w": "a"
-              }
+              "message": "$params.m named by k is missing",
+              "name": "it.w equals $params.m named by k"
             }
           ],
           "inputs": [
@@ -12601,6 +12605,7 @@
                 "$params:"
               ],
               "name": "$params.m named by k",
+              "outcome": "absent",
               "value": null
             },
             {
@@ -13278,46 +13283,34 @@
         {
           "cause": "null",
           "check": "d",
-          "failed_items": [
+          "failures": [
             {
               "cause": "null",
-              "failed_assertions": [
+              "failures": [],
+              "inputs": [
                 {
-                  "assertion": "it.w equals $params.m named by k",
-                  "cause": "null",
-                  "inputs": [
-                    {
-                      "locations": [
-                        "/things/0/items/0/w"
-                      ],
-                      "name": "it.w",
-                      "value": "a"
-                    },
-                    {
-                      "locations": [
-                        "$params:/m"
-                      ],
-                      "name": "$params.m named by k",
-                      "value": null
-                    },
-                    {
-                      "locations": [
-                        "/things/0/k"
-                      ],
-                      "name": "k",
-                      "value": "x"
-                    }
-                  ]
+                  "locations": [
+                    "$params:/m"
+                  ],
+                  "name": "$params.m named by k",
+                  "outcome": "null",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/k"
+                  ],
+                  "name": "k",
+                  "outcome": "found",
+                  "value": "x"
                 }
               ],
-              "item": "item 1 of items",
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/0"
+                "$policy:/requirements/s/checks/d/assert"
               ],
-              "path": "item 1 of items",
-              "value": {
-                "w": "a"
-              }
+              "message": "$params.m is null",
+              "name": "it.w equals $params.m named by k"
             }
           ],
           "inputs": [
@@ -13326,6 +13319,7 @@
                 "$params:/m"
               ],
               "name": "$params.m named by k",
+              "outcome": "null",
               "value": null
             },
             {
@@ -14003,46 +13997,34 @@
         {
           "cause": "unusable",
           "check": "d",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [],
+              "inputs": [
                 {
-                  "assertion": "it.w equals $params.m named by k",
-                  "cause": "unusable",
-                  "inputs": [
-                    {
-                      "locations": [
-                        "/things/0/items/0/w"
-                      ],
-                      "name": "it.w",
-                      "value": "a"
-                    },
-                    {
-                      "locations": [
-                        "$params:/m"
-                      ],
-                      "name": "$params.m named by k",
-                      "value": null
-                    },
-                    {
-                      "locations": [
-                        "/things/0/k"
-                      ],
-                      "name": "k",
-                      "value": "x"
-                    }
-                  ]
+                  "locations": [
+                    "$params:/m"
+                  ],
+                  "name": "$params.m named by k",
+                  "outcome": "unusable",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/k"
+                  ],
+                  "name": "k",
+                  "outcome": "found",
+                  "value": "x"
                 }
               ],
-              "item": "item 1 of items",
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/0"
+                "$policy:/requirements/s/checks/d/assert"
               ],
-              "path": "item 1 of items",
-              "value": {
-                "w": "a"
-              }
+              "message": "$params.m is 3, which isn't an object",
+              "name": "it.w equals $params.m named by k"
             }
           ],
           "inputs": [
@@ -14051,6 +14033,7 @@
                 "$params:/m"
               ],
               "name": "$params.m named by k",
+              "outcome": "unusable",
               "value": null
             },
             {
@@ -16151,72 +16134,26 @@
           {
             "cause": "absent",
             "check": "item_side",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.zz equals m named by $input.k",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rs/0"
-                        ],
-                        "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/rs/0"
+                  "$policy:/requirements/s/checks/item_side/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
-              },
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "r.zz equals m named by $input.k",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rs/1"
-                        ],
-                        "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 2 of rs",
-                "locations": [
-                  "/things/0/rs/1"
-                ],
-                "path": "item 2 of rs",
-                "value": {
-                  "v": 4
-                }
+                "message": "$input.k is missing",
+                "name": "r.zz equals m named by $input.k"
               }
             ],
             "inputs": [
@@ -16225,6 +16162,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -16255,72 +16193,26 @@
           {
             "cause": "absent",
             "check": "params",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.zz equals m named by $params.k",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rs/0"
-                        ],
-                        "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $params.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m named by $params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/rs/0"
+                  "$policy:/requirements/s/checks/params/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
-              },
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "r.zz equals m named by $params.k",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rs/1"
-                        ],
-                        "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $params.k",
-                        "value": null
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 2 of rs",
-                "locations": [
-                  "/things/0/rs/1"
-                ],
-                "path": "item 2 of rs",
-                "value": {
-                  "v": 4
-                }
+                "message": "$params.k is missing",
+                "name": "r.zz equals m named by $params.k"
               }
             ],
             "inputs": [
@@ -16329,6 +16221,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -16359,72 +16252,34 @@
           {
             "cause": "absent",
             "check": "root_side",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "k equals m named by $input.k",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0"
-                        ],
-                        "name": "k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "k",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/rs/0"
+                  "$policy:/requirements/s/checks/root_side/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
-              },
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "k equals m named by $input.k",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0"
-                        ],
-                        "name": "k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 2 of rs",
-                "locations": [
-                  "/things/0/rs/1"
-                ],
-                "path": "item 2 of rs",
-                "value": {
-                  "v": 4
-                }
+                "message": "$input.k is missing; k is missing",
+                "name": "k equals m named by $input.k"
               }
             ],
             "inputs": [
@@ -16433,6 +16288,7 @@
                   "/things/0"
                 ],
                 "name": "k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -16440,6 +16296,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -16484,72 +16341,73 @@
           {
             "cause": "absent",
             "check": "item_side",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "r.zz equals m named by $input.k",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/things/0/rs/0"
                         ],
                         "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
+                        "outcome": "absent",
                         "value": null
                       }
-                    ]
-                  }
-                ],
-                "item": "item 1 of rs",
-                "locations": [
-                  "/things/0/rs/0"
-                ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
-              },
-              {
-                "cause": "absent",
-                "failed_assertions": [
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/0"
+                    ],
+                    "message": "r.zz is missing",
+                    "name": "item 1 of rs",
+                    "value": {
+                      "v": "a"
+                    }
+                  },
                   {
-                    "assertion": "r.zz equals m named by $input.k",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/things/0/rs/1"
                         ],
                         "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
+                        "outcome": "absent",
                         "value": null
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/1"
+                    ],
+                    "message": "r.zz is missing",
+                    "name": "item 2 of rs",
+                    "value": {
+                      "v": 4
+                    }
                   }
                 ],
-                "item": "item 2 of rs",
-                "locations": [
-                  "/things/0/rs/1"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "item 2 of rs",
-                "value": {
-                  "v": 4
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/item_side/assert"
+                ],
+                "message": "$input.k is null",
+                "name": "r.zz equals m named by $input.k"
               }
             ],
             "inputs": [
@@ -16558,6 +16416,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -16588,72 +16447,73 @@
           {
             "cause": "absent",
             "check": "params",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "r.zz equals m named by $params.k",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/things/0/rs/0"
                         ],
                         "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $params.k",
+                        "outcome": "absent",
                         "value": null
                       }
-                    ]
-                  }
-                ],
-                "item": "item 1 of rs",
-                "locations": [
-                  "/things/0/rs/0"
-                ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
-              },
-              {
-                "cause": "absent",
-                "failed_assertions": [
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/0"
+                    ],
+                    "message": "r.zz is missing",
+                    "name": "item 1 of rs",
+                    "value": {
+                      "v": "a"
+                    }
+                  },
                   {
-                    "assertion": "r.zz equals m named by $params.k",
                     "cause": "absent",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/things/0/rs/1"
                         ],
                         "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $params.k",
+                        "outcome": "absent",
                         "value": null
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/1"
+                    ],
+                    "message": "r.zz is missing",
+                    "name": "item 2 of rs",
+                    "value": {
+                      "v": 4
+                    }
                   }
                 ],
-                "item": "item 2 of rs",
-                "locations": [
-                  "/things/0/rs/1"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m named by $params.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "item 2 of rs",
-                "value": {
-                  "v": 4
-                }
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/params/assert"
+                ],
+                "message": "$params.k is null",
+                "name": "r.zz equals m named by $params.k"
               }
             ],
             "inputs": [
@@ -16662,6 +16522,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -16692,72 +16553,34 @@
           {
             "cause": "absent",
             "check": "root_side",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "k equals m named by $input.k",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0"
-                        ],
-                        "name": "k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "k",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/rs/0"
+                  "$policy:/requirements/s/checks/root_side/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
-              },
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "k equals m named by $input.k",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0"
-                        ],
-                        "name": "k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 2 of rs",
-                "locations": [
-                  "/things/0/rs/1"
-                ],
-                "path": "item 2 of rs",
-                "value": {
-                  "v": 4
-                }
+                "message": "k is missing; $input.k is null",
+                "name": "k equals m named by $input.k"
               }
             ],
             "inputs": [
@@ -16766,6 +16589,7 @@
                   "/things/0"
                 ],
                 "name": "k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -16773,6 +16597,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -16817,72 +16642,26 @@
           {
             "cause": "unusable",
             "check": "item_side",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.zz equals m named by $input.k",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rs/0"
-                        ],
-                        "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/rs/0"
+                  "$policy:/requirements/s/checks/item_side/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
-              },
-              {
-                "cause": "unusable",
-                "failed_assertions": [
-                  {
-                    "assertion": "r.zz equals m named by $input.k",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rs/1"
-                        ],
-                        "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 2 of rs",
-                "locations": [
-                  "/things/0/rs/1"
-                ],
-                "path": "item 2 of rs",
-                "value": {
-                  "v": 4
-                }
+                "message": "$input.k is 3, which isn't text",
+                "name": "r.zz equals m named by $input.k"
               }
             ],
             "inputs": [
@@ -16891,6 +16670,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -16921,72 +16701,26 @@
           {
             "cause": "unusable",
             "check": "params",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "r.zz equals m named by $params.k",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rs/0"
-                        ],
-                        "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $params.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m named by $params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/rs/0"
+                  "$policy:/requirements/s/checks/params/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
-              },
-              {
-                "cause": "unusable",
-                "failed_assertions": [
-                  {
-                    "assertion": "r.zz equals m named by $params.k",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rs/1"
-                        ],
-                        "name": "r.zz",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $params.k",
-                        "value": null
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 2 of rs",
-                "locations": [
-                  "/things/0/rs/1"
-                ],
-                "path": "item 2 of rs",
-                "value": {
-                  "v": 4
-                }
+                "message": "$params.k is 3, which isn't text",
+                "name": "r.zz equals m named by $params.k"
               }
             ],
             "inputs": [
@@ -16995,6 +16729,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -17025,72 +16760,34 @@
           {
             "cause": "unusable",
             "check": "root_side",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [
+                "failures": [],
+                "inputs": [
                   {
-                    "assertion": "k equals m named by $input.k",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0"
-                        ],
-                        "name": "k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "k",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "item": "item 1 of rs",
+                "kind": "assertion",
                 "locations": [
-                  "/things/0/rs/0"
+                  "$policy:/requirements/s/checks/root_side/assert"
                 ],
-                "path": "item 1 of rs",
-                "value": {
-                  "v": "a"
-                }
-              },
-              {
-                "cause": "unusable",
-                "failed_assertions": [
-                  {
-                    "assertion": "k equals m named by $input.k",
-                    "cause": "unusable",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0"
-                        ],
-                        "name": "k",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/m"
-                        ],
-                        "name": "m named by $input.k",
-                        "value": null
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 2 of rs",
-                "locations": [
-                  "/things/0/rs/1"
-                ],
-                "path": "item 2 of rs",
-                "value": {
-                  "v": 4
-                }
+                "message": "$input.k is 3, which isn't text; k is missing",
+                "name": "k equals m named by $input.k"
               }
             ],
             "inputs": [
@@ -17099,6 +16796,7 @@
                   "/things/0"
                 ],
                 "name": "k",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -17106,6 +16804,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
+                "outcome": "absent",
                 "value": null
               },
               {

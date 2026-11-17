@@ -2942,30 +2942,39 @@
           {
             "cause": "value",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "e is 1",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/xs/1/l/1"
                         ],
                         "name": "e",
+                        "outcome": "found",
                         "value": 2
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/1/l/1"
+                    ],
+                    "message": "item 2 of l is 2",
+                    "name": "item 2 of l",
+                    "value": 2
                   }
                 ],
-                "item": "item 2 of l",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/xs/1/l/1"
+                  "$policy:/requirements/allowed/checks/c/assert/1"
                 ],
-                "path": "item 2 of l",
-                "value": 2
+                "message": "",
+                "name": "e is 1"
               }
             ],
             "inputs": [
@@ -8060,30 +8069,39 @@
           {
             "cause": "value",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "value",
-                "failed_assertions": [
+                "failures": [
                   {
-                    "assertion": "it is 1",
                     "cause": "value",
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "/xs/0/l/1"
                         ],
                         "name": "it",
+                        "outcome": "found",
                         "value": 2
                       }
-                    ]
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/0/l/1"
+                    ],
+                    "message": "item 2 of l is 2",
+                    "name": "item 2 of l",
+                    "value": 2
                   }
                 ],
-                "item": "item 2 of l",
+                "inputs": [],
+                "kind": "assertion",
                 "locations": [
-                  "/xs/0/l/1"
+                  "$policy:/requirements/r/checks/c/assert/0"
                 ],
-                "path": "item 2 of l",
-                "value": 2
+                "message": "",
+                "name": "it is 1"
               }
             ],
             "inputs": [
@@ -11475,15 +11493,17 @@
           {
             "cause": "absent",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
-                "item": "item 1 of ys",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ps/0/items/0/ys/0"
                 ],
-                "path": "item 1 of ys",
+                "message": ".s is missing",
+                "name": "item 1 of ys",
                 "value": null
               }
             ],
@@ -11639,15 +11659,17 @@
           {
             "cause": "unusable",
             "check": "c",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "failed_assertions": [],
-                "item": "item 1 of ys",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
                 "locations": [
                   "/ps/0/mids/0/items/0/ys/0/s"
                 ],
-                "path": "item 1 of ys",
+                "message": ".s is [1], which isn't a number, a time or a date",
+                "name": "item 1 of ys",
                 "value": [
                   1
                 ]
