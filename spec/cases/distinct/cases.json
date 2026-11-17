@@ -936,7 +936,17 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/sbom/components/0/licenses/0/notes/0",
+                          "/sbom/components/1/licenses/0/notes/0"
+                        ],
+                        "name": "notes[0]",
+                        "outcome": "usable",
+                        "value": "bad"
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/sbom/components/0/licenses/0/notes/0",
@@ -5587,7 +5597,21 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/0/vs/0",
+                          "/xs/1/vs/0"
+                        ],
+                        "name": "vs[0]",
+                        "outcome": "unusable",
+                        "value": {
+                          "locations": [
+                            "/xs/0"
+                          ]
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/xs/0/vs/0",

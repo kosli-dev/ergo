@@ -517,12 +517,18 @@ _walk_entry(row, texts, name, at) := object.union(
 		_walk_kind(name),
 		name,
 		_worst_or_value({f.cause | some f in row.failed_items; f.item == name}),
-		[_item_read(f) | some f in row.failed_items; f.item == name; _reads_inside(f, name)],
+		[r | some f in row.failed_items; f.item == name; some r in _walk_reads(f, name)],
 		[],
 		concat("; ", _once([_entry_text(texts[k], name) | some k, f in row.failed_items; f.item == name; texts[k] != ""])),
 	),
 	_item_seen(row, name, at),
 )
+
+_walk_reads(f, name) := [_item_read(f)] if _reads_inside(f, name)
+
+else := [object.union(_item_read(f), {"name": n})] if n := f["ergo/read"]
+
+else := []
 
 _reads_inside(f, name) if f.path != name
 
@@ -558,6 +564,7 @@ else := text
 _where(req_name, name, check) := object.union(w, {
 	"ats": object.union({"": a | a := _assertion_ats(w, null)}, {nm: a | some nm in _option_names(check); a := _assertion_ats(w, nm)}),
 	"option_ats": {nm: _option_at(w, nm) | some nm in _option_names(check)},
+	"unfit": _unfit_refs(check),
 }) if w := {"check": check, "req": req_name, "name": name}
 
 _option_names(check) := {n | some n in check.option_of}
@@ -571,7 +578,7 @@ _assertion_at(where, null, k) := where.ats[""][k]
 
 _assertion_at(where, option, k) := where.ats[option][k] if option != null
 
-_condition_of(req, name, c) := object.union({"expression": e | e := _expression_of(c)}, {"at": a | a := _condition_at(req, name)})
+_condition_of(req, name, c) := object.union({"expression": e | e := _expression_of(c)}, object.union({"at": a | a := _condition_at(req, name)}, {"unfit": _unfit_refs(c)}))
 
 _option_at(where, nm) := _joined("$policy:", ["requirements", where.req, "checks", where.name, "any_of", nm])
 
@@ -710,15 +717,16 @@ _whose_reads(whose, f) := [r |
 else := []
 
 _parted_in(raw, at, where) := p if {
-	_m_marked_cause(raw.cause)
-	unfit := {_ref_label(r) | some r in _listed_refs(where.check); _ref_use(where.check, r) == "unusable"}
-	count(unfit) > 0
-	p := _parted(raw, at, where) with data.ergo_unfit as unfit
+	raw.passed == false
+	count(where.unfit) > 0
+	p := _parted(raw, at, where) with data.ergo_unfit as where.unfit
 } else := _parted(raw, at, where)
 
+_unfit_refs(check) := {_ref_label(r) | some r in _listed_refs(check); _ref_use(check, r) == "unusable"}
+
 _parted_applies_in(raw, at, evals, req, conds) := p if {
-	_m_marked_cause(raw.cause)
-	unfit := {_ref_label(r) | some n, _ in evals; c := _applies_to_of(req)[n]; some r in _listed_refs(c); _ref_use(c, r) == "unusable"}
+	raw.passed == false
+	unfit := {u | some n, _ in evals; some u in conds[n].unfit}
 	count(unfit) > 0
 	p := _parted_applies(_applies_deduped(raw), at, evals, req, conds) with data.ergo_unfit as unfit
 } else := _parted_applies(_applies_deduped(raw), at, evals, req, conds) if {

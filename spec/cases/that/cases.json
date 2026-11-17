@@ -1102,7 +1102,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/deployments/0/ws/1"
+                        ],
+                        "name": "ws[1]",
+                        "outcome": "usable",
+                        "value": "bee"
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/deployments/0/ws/1"
@@ -1214,7 +1223,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/deployments/1/ws/1"
+                        ],
+                        "name": "ws[1]",
+                        "outcome": "usable",
+                        "value": "bez"
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/deployments/1/ws/1"

@@ -395,7 +395,7 @@ test_a_walk_that_reads_no_list_fails_with_what_its_path_ends_at if {
 test_a_walk_starts_where_its_path_starts_and_steps_past_a_position_without_walking_it if {
 	doc := {"things": [{"id": "a", "m": [[1, 2], [3]]}]}
 	rows := _walk_rows({"i": "every $input.things[0].m[0] is at least 1", "p": "every first of m is 1"}, doc, {})
-	rows == [["a", "i", "satisfied", []], ["a", "p", "value", [_assertion("every first of m is 1", "value", ["$policy:/requirements/s/checks/p"], [_seen("m[0][]", [1, 2], ["/things/0/m/0/0", "/things/0/m/0/1"], "usable")], "", [_item("item 1 of m", "value", [1, 2], ["/things/0/m/0"], [], "", [_item("item 2 of it", "value", 2, ["/things/0/m/0/1"], [], "item 2 of it is 2", [])])])]]]
+	rows == [["a", "i", "satisfied", []], ["a", "p", "value", [_assertion("every first of m is 1", "value", ["$policy:/requirements/s/checks/p"], [_seen("m[0][]", [1, 2], ["/things/0/m/0/0", "/things/0/m/0/1"], "usable")], "", [_item("item 1 of m", "value", [1, 2], ["/things/0/m/0"], [], "", [_item("item 2 of it", "value", 2, ["/things/0/m/0/1"], [_seen("m[0][1]", 2, ["/things/0/m/0/1"], "usable")], "item 2 of it is 2", [])])])]]]
 }
 
 test_a_walk_whose_key_comes_from_a_param_that_cant_be_read_fails_with_its_cause if {
@@ -407,7 +407,7 @@ test_a_walk_whose_key_comes_from_a_param_that_cant_be_read_fails_with_its_cause 
 test_a_walk_that_reads_no_list_stops_at_the_end_when_every_value_along_the_path_is_an_object if {
 	doc := {"things": [{"id": "a", "x": {"y": {"z": 1}}}, {"id": "b", "xs": [1, 2]}]}
 	_walk_rows({"e": "every x.y is 1"}, doc, {})[0] == ["a", "e", "unusable", [_assertion("every x.y is 1", "unusable", ["$policy:/requirements/s/checks/e"], [_seen("x.y", [], [], "unusable")], "", [_list("x.y", "unusable", [_seen("x.y", {"z": 1}, ["/things/0/x/y"], "unusable")], "x.y is {\"z\": 1}, which isn't a list")])]]
-	_walk_rows({"e": "every xs[5].y is 1"}, doc, {})[1] == ["b", "e", "absent", [_assertion("every xs[5].y is 1", "absent", ["$policy:/requirements/s/checks/e"], [_seen("xs[5].y", [], [], "absent")], "", [_item("item 6 of xs", "absent", null, ["/things/1/xs"], [], "item 6 of xs is missing", [])])]]
+	_walk_rows({"e": "every xs[5].y is 1"}, doc, {})[1] == ["b", "e", "absent", [_assertion("every xs[5].y is 1", "absent", ["$policy:/requirements/s/checks/e"], [_seen("xs[5].y", [], [], "absent")], "", [_item("item 6 of xs", "absent", null, ["/things/1/xs"], [_seen("xs[5]", null, ["/things/1/xs"], "absent")], "item 6 of xs is missing", [])])]]
 	_walk_rows({"e": "every x.y.z.w is 1"}, doc, {})[1] == ["b", "e", "absent", [_assertion("every x.y.z.w is 1", "absent", ["$policy:/requirements/s/checks/e"], [_seen("x.y.z.w", [], [], "absent")], "", [_list("x", "absent", [_seen("x", null, ["/things/1"], "absent")], "x is missing")])]]
 }
 
@@ -879,8 +879,8 @@ test_an_own_field_named_like_a_part_keeps_its_dot_and_the_part_does_not if {
 test_a_failed_item_of_an_own_field_named_like_a_part_or_a_for_alias_keeps_the_dot if {
 	policy := _parts_policy({"cov": "dd.b"}, {"c": "every .cov.xs is at least 2", "d": "every cov.xs is at least 2"})
 	rep := ergo.report({"trail": {"name": "t1", "cov": {"xs": [1, 2]}, "dd": {"b": {"xs": [1]}}}}, policy, {})
-	_parts_row(rep, "c").failures == [_assertion("every .cov.xs is at least 2", "value", ["$policy:/requirements/r/checks/c"], [], "", [_item("item 1 of .cov.xs", "value", 1, ["/trail/cov/xs/0"], [], "item 1 of .cov.xs is 1", [])])]
-	_parts_row(rep, "d").failures == [_assertion("every cov.xs is at least 2", "value", ["$policy:/requirements/r/checks/d"], [], "", [_item("item 1 of cov.xs", "value", 1, ["/trail/dd/b/xs/0"], [], "item 1 of cov.xs is 1", [])])]
+	_parts_row(rep, "c").failures == [_assertion("every .cov.xs is at least 2", "value", ["$policy:/requirements/r/checks/c"], [], "", [_item("item 1 of .cov.xs", "value", 1, ["/trail/cov/xs/0"], [_seen(".cov.xs[0]", 1, ["/trail/cov/xs/0"], "usable")], "item 1 of .cov.xs is 1", [])])]
+	_parts_row(rep, "d").failures == [_assertion("every cov.xs is at least 2", "value", ["$policy:/requirements/r/checks/d"], [], "", [_item("item 1 of cov.xs", "value", 1, ["/trail/dd/b/xs/0"], [_seen("cov.xs[0]", 1, ["/trail/dd/b/xs/0"], "usable")], "item 1 of cov.xs is 1", [])])]
 	for_policy := {
 		"ergo_spec": ergo._spec,
 		"subjects": {"round": {"from": "rounds", "identified_by": "id"}},
@@ -1547,7 +1547,7 @@ test_subject_reads_the_location_of_the_subject_itself_and_of_each_item_of_a_list
 	kept := _subject_report({"sets": [{"s": [3]}]}, "every sets whose some s is 1", {"c": ".s is not empty"}, {})
 	[[r.inputs, r.failures] | some r in kept.results; r.check == "$applies"] == [[
 		[_seen(".s[]", [3], ["/sets/0/s/0"], "usable")],
-		[_assertion("some s is 1", "value", ["$policy:/subjects/s/from"], [], "", [_item("item 1 of .s", "value", 3, ["/sets/0/s/0"], [], "item 1 of .s is 3", [])])],
+		[_assertion("some s is 1", "value", ["$policy:/subjects/s/from"], [], "", [_item("item 1 of .s", "value", 3, ["/sets/0/s/0"], [_seen(".s[0]", 3, ["/sets/0/s/0"], "usable")], "item 1 of .s is 3", [])])],
 	]]
 }
 
@@ -1556,7 +1556,7 @@ test_an_applies_row_with_some_subject_names_its_failed_items_as_the_check_row_do
 	applies := [[r.subject.id, r.cause, object.get(r, "failures", [])] | some r in _subject_report(doc, "every xs whose some s is 1", {"c": ".s is not empty"}, {}).results; r.check == "$applies"]
 	check := [[r.subject.id, r.cause, object.get(r, "failures", [])] | some r in _subject_report(doc, "every xs", {"c": "some .s is 1"}, {}).results; r.check == "c"]
 	[[x[0], x[1], [a.failures | some a in x[2]]] | some x in applies] == [[x[0], x[1], [a.failures | some a in x[2]]] | some x in check]
-	applies[1] == [{"s": [3]}, "value", [_assertion("some s is 1", "value", ["$policy:/subjects/s/from"], [], "", [_item("item 1 of .s", "value", 3, ["/xs/1/s/0"], [], "item 1 of .s is 3", [])])]]
+	applies[1] == [{"s": [3]}, "value", [_assertion("some s is 1", "value", ["$policy:/subjects/s/from"], [], "", [_item("item 1 of .s", "value", 3, ["/xs/1/s/0"], [_seen(".s[0]", 3, ["/xs/1/s/0"], "usable")], "item 1 of .s is 3", [])])]]
 	applies[2] == [{"s": []}, "value", [_assertion("some s is 1", "value", ["$policy:/subjects/s/from"], [], "", [_list(".s", "value", [_seen(".s", [], ["/xs/2/s"], "usable")], ".s is []")])]]
 	applies[3] == [{"s": "s"}, "unusable", [_assertion("some s is 1", "unusable", ["$policy:/subjects/s/from"], [_seen(".s", [], [], "unusable")], "", [_list(".s", "unusable", [_seen(".s", "s", ["/xs/3/s"], "unusable")], ".s is \"s\", which isn't a list or an object")])]]
 }

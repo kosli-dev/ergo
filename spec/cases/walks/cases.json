@@ -1650,7 +1650,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/branches/1"
+                        ],
+                        "name": "branches[1]",
+                        "outcome": "usable",
+                        "value": "main"
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/branches/1"
@@ -1708,7 +1717,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/branches/1"
+                        ],
+                        "name": "branches[1]",
+                        "outcome": "unusable",
+                        "value": 5
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/branches/1"
@@ -1766,7 +1784,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/branches/0"
+                        ],
+                        "name": "branches[0]",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/branches/0"
@@ -1920,7 +1947,16 @@
                       {
                         "cause": "value",
                         "failures": [],
-                        "inputs": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/labels/1"
+                            ],
+                            "name": "pull_requests[1].labels[1]",
+                            "outcome": "usable",
+                            "value": ""
+                          }
+                        ],
                         "kind": "item",
                         "locations": [
                           "/releases/0/pull_requests/1/labels/1"
@@ -2074,7 +2110,16 @@
                       {
                         "cause": "unusable",
                         "failures": [],
-                        "inputs": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/0/labels/0"
+                            ],
+                            "name": "pull_requests[0].labels[0]",
+                            "outcome": "unusable",
+                            "value": 5
+                          }
+                        ],
                         "kind": "item",
                         "locations": [
                           "/releases/0/pull_requests/0/labels/0"
@@ -3573,7 +3618,19 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/approvers/0"
+                        ],
+                        "name": "approvers[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "state": "APPROVED",
+                          "username": "zed"
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/approvers/0"
@@ -3793,7 +3850,19 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/approvers/1"
+                        ],
+                        "name": "approvers[1]",
+                        "outcome": "usable",
+                        "value": {
+                          "state": "APPROVED",
+                          "username": "zed"
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/approvers/1"
@@ -4084,7 +4153,19 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/approvers/1"
+                        ],
+                        "name": "approvers[1]",
+                        "outcome": "usable",
+                        "value": {
+                          "state": "APPROVED",
+                          "username": "zed"
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/approvers/1"
@@ -4656,7 +4737,19 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/approvers/0"
+                        ],
+                        "name": "approvers[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "state": "APPROVED",
+                          "username": "zed"
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/approvers/0"
@@ -4939,7 +5032,18 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/approvers/1"
+                        ],
+                        "name": "approvers[1]",
+                        "outcome": "usable",
+                        "value": {
+                          "username": "zed"
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/approvers/1"
@@ -5021,7 +5125,19 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/approvers/0"
+                        ],
+                        "name": "approvers[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "comment": "ok",
+                          "username": "zed"
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/approvers/0"
@@ -8458,7 +8574,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/scores/1"
+                        ],
+                        "name": "scores[1]",
+                        "outcome": "usable",
+                        "value": 2
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/scores/1"
@@ -11407,7 +11532,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0"
+                        ],
+                        "name": "xs[0]",
+                        "outcome": "usable",
+                        "value": 1234567890.120956799
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/0"
@@ -11505,7 +11639,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/xs/1"
+                        ],
+                        "name": "xs[1]",
+                        "outcome": "usable",
+                        "value": 1234567890.120956799
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/1/xs/1"
@@ -11610,7 +11753,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/1"
+                        ],
+                        "name": "xs[1]",
+                        "outcome": "usable",
+                        "value": 1234567890.120956799
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/1"
@@ -11708,7 +11860,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/xs/0"
+                        ],
+                        "name": "xs[0]",
+                        "outcome": "usable",
+                        "value": 1234567890.120956799
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/1/xs/0"
@@ -20035,6 +20196,415 @@
             "requirement": "s",
             "subject": {
               "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every and some over plain values",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "every": "every xs is at least 2",
+            "some": "some xs is at least 5",
+            "nested": "every ys.xs is at least 2"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "each failed item reads itself, named with its position, with its value, where it sits and how the read ended",
+        "rules": [
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "xs": [
+                1,
+                "a",
+                3,
+                null
+              ],
+              "ys": [
+                {
+                  "xs": [
+                    1,
+                    5
+                  ]
+                },
+                {
+                  "xs": [
+                    "b"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0"
+                        ],
+                        "name": "xs[0]",
+                        "outcome": "usable",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is 1",
+                    "name": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/1"
+                        ],
+                        "name": "xs[1]",
+                        "outcome": "unusable",
+                        "value": "a"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/1"
+                    ],
+                    "message": "item 2 of xs is \"a\", which isn't a number",
+                    "name": "item 2 of xs",
+                    "value": "a"
+                  },
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/3"
+                        ],
+                        "name": "xs[3]",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/3"
+                    ],
+                    "message": "item 4 of xs is null",
+                    "name": "item 4 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "",
+                "name": "every xs is at least 2"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1",
+                  "/things/0/xs/2",
+                  "/things/0/xs/3"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  1,
+                  "a",
+                  3,
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of xs is 1; item 2 of xs is \"a\", which isn't a number; item 4 of xs is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "nested",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ys/0/xs/0"
+                            ],
+                            "name": "ys[0].xs[0]",
+                            "outcome": "usable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ys/0/xs/0"
+                        ],
+                        "message": "item 1 of xs is 1",
+                        "name": "item 1 of xs",
+                        "value": 1
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of ys",
+                    "value": {
+                      "xs": [
+                        1,
+                        5
+                      ]
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ys/1/xs/0"
+                            ],
+                            "name": "ys[1].xs[0]",
+                            "outcome": "unusable",
+                            "value": "b"
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ys/1/xs/0"
+                        ],
+                        "message": "item 1 of xs is \"b\", which isn't a number",
+                        "name": "item 1 of xs",
+                        "value": "b"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of ys",
+                    "value": {
+                      "xs": [
+                        "b"
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/nested"
+                ],
+                "message": "",
+                "name": "every ys.xs is at least 2"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/0/xs/0",
+                  "/things/0/ys/0/xs/1",
+                  "/things/0/ys/1/xs/0"
+                ],
+                "name": "ys[].xs[]",
+                "outcome": "usable",
+                "value": [
+                  1,
+                  5,
+                  "b"
+                ]
+              }
+            ],
+            "message": "item 1 of ys: item 1 of xs is 1; item 2 of ys: item 1 of xs is \"b\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0"
+                        ],
+                        "name": "xs[0]",
+                        "outcome": "usable",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is 1",
+                    "name": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/1"
+                        ],
+                        "name": "xs[1]",
+                        "outcome": "unusable",
+                        "value": "a"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/1"
+                    ],
+                    "message": "item 2 of xs is \"a\", which isn't a number",
+                    "name": "item 2 of xs",
+                    "value": "a"
+                  },
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/2"
+                        ],
+                        "name": "xs[2]",
+                        "outcome": "usable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/2"
+                    ],
+                    "message": "item 3 of xs is 3",
+                    "name": "item 3 of xs",
+                    "value": 3
+                  },
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/3"
+                        ],
+                        "name": "xs[3]",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/3"
+                    ],
+                    "message": "item 4 of xs is null",
+                    "name": "item 4 of xs",
+                    "value": null
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "",
+                "name": "some xs is at least 5"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1",
+                  "/things/0/xs/2",
+                  "/things/0/xs/3"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  1,
+                  "a",
+                  3,
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of xs is 1; item 2 of xs is \"a\", which isn't a number; item 3 of xs is 3; and 1 more",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
               "type": "thing"
             }
           }

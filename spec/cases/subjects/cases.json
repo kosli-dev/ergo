@@ -15925,7 +15925,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/arts/0/items/0/art/xs/1"
+                        ],
+                        "name": ".art.xs[1]",
+                        "outcome": "usable",
+                        "value": 6
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/arts/0/items/0/art/xs/1"

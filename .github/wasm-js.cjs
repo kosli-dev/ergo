@@ -33,8 +33,8 @@ const load = (dir, memory) => loadPolicy(fs.readFileSync(path.join(dir, "policy.
 
 const builtinsOf = (policy) => {
   const { builtins, opa_json_dump } = policy.wasmInstance.exports;
-  const memory = new Uint8Array(policy.mem.buffer);
   const start = opa_json_dump(builtins());
+  const memory = new Uint8Array(policy.mem.buffer);
   return Object.keys(JSON.parse(Buffer.from(memory.slice(start, memory.indexOf(0, start))).toString()));
 };
 
@@ -134,10 +134,10 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row, or a large regular expression compiled for every report, or for every parent of a subject read from another subject.`);
     return sound && usedMB <= budgetMB;
   };
-  const withEvery = await measure("deployments with a check on every test", budgetPolicy, 338, 66, 26);
-  const withSentences = await measure("deployments with three checks on each deployment", sentencePolicy, 301, 66, 19);
-  const withChain = await measure("deployments with the tests of each prod deployment as subjects", chainPolicy, 266, 132, 43);
-  const withFor = await measure("deployments with two for checks on each deployment", forPolicy, 235, 66, 118, { ok: true });
-  const withNumbers = await measure("rows with four checks that compare numbers", numbersPolicy, 403, 100, 52, {}, numbers);
+  const withEvery = await measure("deployments with a check on every test", budgetPolicy, 338, 66, 28);
+  const withSentences = await measure("deployments with three checks on each deployment", sentencePolicy, 301, 66, 20);
+  const withChain = await measure("deployments with the tests of each prod deployment as subjects", chainPolicy, 266, 132, 45);
+  const withFor = await measure("deployments with two for checks on each deployment", forPolicy, 235, 66, 110, { ok: true });
+  const withNumbers = await measure("rows with four checks that compare numbers", numbersPolicy, 403, 100, 51, {}, numbers);
   process.exit(failed.length > 0 || !withEvery || !withSentences || !withChain || !withFor || !withNumbers ? 1 : 0);
 });

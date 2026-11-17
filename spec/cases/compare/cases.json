@@ -18222,5 +18222,456 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a param of the wrong kind beside a side that is missing or null",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kept": {
+          "from": "things whose x is at least $params.min",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is at least $params.min",
+            "d": {
+              "assert": [
+                "x is at least $params.min",
+                "id is \"t1\""
+              ]
+            }
+          }
+        },
+        "k": {
+          "subject": "kept",
+          "min_subjects": 0,
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "min": "a"
+    },
+    "cases": [
+      {
+        "description": "the param is unusable in the inputs of the row and of its parts, as in the check's $refs, whatever the row's cause",
+        "rules": [
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1"
+            },
+            {
+              "id": "t2",
+              "x": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/min"
+                    ],
+                    "name": "$params.min",
+                    "outcome": "unusable",
+                    "value": "a"
+                  },
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/kept/from"
+                ],
+                "message": "x is missing",
+                "name": "x is at least $params.min"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/min"
+                ],
+                "name": "$params.min",
+                "outcome": "unusable",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x is missing",
+            "passed": false,
+            "requirement": "k",
+            "subject": {
+              "id": "t1",
+              "type": "kept"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/min"
+                    ],
+                    "name": "$params.min",
+                    "outcome": "unusable",
+                    "value": "a"
+                  },
+                  {
+                    "locations": [
+                      "/things/1/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/kept/from"
+                ],
+                "message": "x is null",
+                "name": "x is at least $params.min"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/min"
+                ],
+                "name": "$params.min",
+                "outcome": "unusable",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "/things/1/x"
+                ],
+                "name": "x",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "x is null",
+            "passed": false,
+            "requirement": "k",
+            "subject": {
+              "id": "t2",
+              "type": "kept"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/min"
+                    ],
+                    "name": "$params.min",
+                    "outcome": "unusable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ],
+                "message": "x is missing",
+                "name": "x is at least $params.min"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x",
+                "outcome": "absent",
+                "value": null
+              },
+              {
+                "locations": [
+                  "$params:/min"
+                ],
+                "name": "$params.min",
+                "outcome": "unusable",
+                "value": "a"
+              }
+            ],
+            "message": "x is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "d",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/min"
+                    ],
+                    "name": "$params.min",
+                    "outcome": "unusable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/d/assert/0"
+                ],
+                "message": "x is missing",
+                "name": "x is at least $params.min"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/min"
+                ],
+                "name": "$params.min",
+                "outcome": "unusable",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "/things/0/id"
+                ],
+                "name": "id",
+                "outcome": "usable",
+                "value": "t1"
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/1/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/min"
+                    ],
+                    "name": "$params.min",
+                    "outcome": "unusable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c"
+                ],
+                "message": "x is null",
+                "name": "x is at least $params.min"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/1/x"
+                ],
+                "name": "x",
+                "outcome": "null",
+                "value": null
+              },
+              {
+                "locations": [
+                  "$params:/min"
+                ],
+                "name": "$params.min",
+                "outcome": "unusable",
+                "value": "a"
+              }
+            ],
+            "message": "x is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "d",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/1/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/min"
+                    ],
+                    "name": "$params.min",
+                    "outcome": "unusable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/d/assert/0"
+                ],
+                "message": "x is null",
+                "name": "x is at least $params.min"
+              },
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/1/id"
+                    ],
+                    "name": "id",
+                    "outcome": "usable",
+                    "value": "t2"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/d/assert/1"
+                ],
+                "message": "id is \"t2\"",
+                "name": "id is \"t1\""
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/min"
+                ],
+                "name": "$params.min",
+                "outcome": "unusable",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "/things/1/id"
+                ],
+                "name": "id",
+                "outcome": "usable",
+                "value": "t2"
+              },
+              {
+                "locations": [
+                  "/things/1/x"
+                ],
+                "name": "x",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "x is null; id is \"t2\"",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

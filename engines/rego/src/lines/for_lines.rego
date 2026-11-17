@@ -894,6 +894,14 @@ _failed_name(path, roots) := _input_name(path) if not _dotted_root(path, roots)
 
 _failed_name(path, roots) := _with_dot(_input_name(path), true) if _dotted_root(path, roots)
 
+_failed_read_name(path, roots) := _item_read_name(path) if not _dotted_root(path, roots)
+
+_failed_read_name(path, roots) := _with_dot(_item_read_name(path), true) if _dotted_root(path, roots)
+
+_item_read_name(path) := _steps_name(path) if not _has_parents
+
+_item_read_name(path) := _with_dot(_steps_name(path), _dot_kept(path)) if _has_parents
+
 _for_failed(_, "satisfied", _) := []
 
 _for_failed(check, cause, fails) := [_for_failed_row(check, f) |

@@ -758,8 +758,8 @@ test_subject_walks_and_counts_a_subject_that_is_a_list if {
 	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "value"], [false, "value"], [false, "value"], [false, "null"], [false, "unusable"]]
 	rows[1][3] == [_seen("s[]", [1, 2], ["/xs/1/0", "/xs/1/1"], "usable")]
 	_subject_report(doc, "every xs", {"c": "every s is a string"}, {}).results[4].failures == [_assertion("every s is a string", "value", ["$policy:/requirements/r/checks/c"], [], "", [
-		_item("item 1 of s", "value", 1, ["/xs/1/0"], [], "item 1 of s is 1", []),
-		_item("item 2 of s", "value", 2, ["/xs/1/1"], [], "item 2 of s is 2", []),
+		_item("item 1 of s", "value", 1, ["/xs/1/0"], [_seen("s[0]", 1, ["/xs/1/0"], "usable")], "item 1 of s is 1", []),
+		_item("item 2 of s", "value", 2, ["/xs/1/1"], [_seen("s[1]", 2, ["/xs/1/1"], "usable")], "item 2 of s is 2", []),
 	])]
 	[[r[1], r[2]] | some r in _subject_rows(doc, "every xs", "some s is a string", {})] == [[true, "satisfied"], [false, "value"], [true, "satisfied"], [false, "value"], [false, "null"], [false, "unusable"]]
 	counts := _subject_rows(doc, "every xs", "count of s is 2", {})

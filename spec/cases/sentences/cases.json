@@ -37074,7 +37074,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/0"
+                        ],
+                        "name": "items[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/0"
@@ -37097,7 +37117,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/1"
+                        ],
+                        "name": "items[1]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/1"
@@ -37218,7 +37258,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/0"
+                        ],
+                        "name": "items[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/0"
@@ -37241,7 +37301,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/1"
+                        ],
+                        "name": "items[1]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/1"
@@ -37432,7 +37512,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/0"
+                        ],
+                        "name": "items[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/0"
@@ -37455,7 +37555,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/1"
+                        ],
+                        "name": "items[1]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/1"
@@ -37572,7 +37692,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/0"
+                        ],
+                        "name": "items[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/0"
@@ -37595,7 +37735,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/1"
+                        ],
+                        "name": "items[1]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/1"
