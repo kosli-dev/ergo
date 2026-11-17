@@ -853,25 +853,47 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/0/commits/1/signed"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/0/commits/1/signed"
+                            ],
+                            "name": "pull_requests[0].commits[1].signed",
+                            "outcome": "found",
+                            "value": false
+                          }
                         ],
-                        "name": "pull_requests[0].commits[1].signed",
-                        "outcome": "found",
-                        "value": false
+                        "kind": "item",
+                        "locations": [
+                          "/releases/0/pull_requests/0/commits/1"
+                        ],
+                        "message": "signed is false",
+                        "name": "item 2 of commits",
+                        "value": {
+                          "signed": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/releases/0/pull_requests/0/commits/1"
+                      "/releases/0/pull_requests/0"
                     ],
-                    "message": "item 1 of pull_requests: item 2 of commits: signed is false",
-                    "name": "item 2 of pull_requests[0].commits",
+                    "message": "",
+                    "name": "item 1 of pull_requests",
                     "value": {
-                      "signed": false
+                      "commits": [
+                        {
+                          "signed": true
+                        },
+                        {
+                          "signed": false
+                        }
+                      ]
                     }
                   },
                   {
@@ -893,25 +915,44 @@
                   },
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/2/commits/0"
+                            ],
+                            "name": "pull_requests[2].commits[0].signed",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
                           "/releases/0/pull_requests/2/commits/0"
                         ],
-                        "name": "pull_requests[2].commits[0].signed",
-                        "outcome": "absent",
-                        "value": null
+                        "message": "signed is missing",
+                        "name": "item 1 of commits",
+                        "value": {
+                          "sha": "c1"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/releases/0/pull_requests/2/commits/0"
+                      "/releases/0/pull_requests/2"
                     ],
-                    "message": "item 3 of pull_requests: item 1 of commits: signed is missing",
-                    "name": "item 1 of pull_requests[2].commits",
+                    "message": "",
+                    "name": "item 3 of pull_requests",
                     "value": {
-                      "sha": "c1"
+                      "commits": [
+                        {
+                          "sha": "c1"
+                        }
+                      ]
                     }
                   }
                 ],
@@ -1147,25 +1188,44 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/0/commits/0/signed"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/0/commits/0/signed"
+                            ],
+                            "name": "pull_requests[0].commits[0].signed",
+                            "outcome": "found",
+                            "value": false
+                          }
                         ],
-                        "name": "pull_requests[0].commits[0].signed",
-                        "outcome": "found",
-                        "value": false
+                        "kind": "item",
+                        "locations": [
+                          "/releases/0/pull_requests/0/commits/0"
+                        ],
+                        "message": "signed is false",
+                        "name": "item 1 of commits",
+                        "value": {
+                          "signed": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/releases/0/pull_requests/0/commits/0"
+                      "/releases/0/pull_requests/0"
                     ],
-                    "message": "item 1 of pull_requests: item 1 of commits: signed is false",
-                    "name": "item 1 of pull_requests[0].commits",
+                    "message": "",
+                    "name": "item 1 of pull_requests",
                     "value": {
-                      "signed": false
+                      "commits": [
+                        {
+                          "signed": false
+                        }
+                      ]
                     }
                   },
                   {
@@ -1755,15 +1815,33 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/releases/0/pull_requests/1/labels/1"
+                        ],
+                        "message": "item 2 of pull_requests: item 2 of labels is \"\"",
+                        "name": "item 2 of labels",
+                        "value": ""
+                      }
+                    ],
                     "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/releases/0/pull_requests/1/labels/1"
+                      "/releases/0/pull_requests/1"
                     ],
-                    "message": "item 2 of pull_requests: item 2 of labels is \"\"",
-                    "name": "item 2 of pull_requests[1].labels",
-                    "value": ""
+                    "message": "",
+                    "name": "item 2 of pull_requests",
+                    "value": {
+                      "labels": [
+                        "a",
+                        ""
+                      ]
+                    }
                   }
                 ],
                 "inputs": [],
@@ -1876,15 +1954,32 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/releases/0/pull_requests/0/labels/0"
+                        ],
+                        "message": "item 1 of pull_requests: item 1 of labels is 5, which isn't text or a list",
+                        "name": "item 1 of labels",
+                        "value": 5
+                      }
+                    ],
                     "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/releases/0/pull_requests/0/labels/0"
+                      "/releases/0/pull_requests/0"
                     ],
-                    "message": "item 1 of pull_requests: item 1 of labels is 5, which isn't text or a list",
-                    "name": "item 1 of pull_requests[0].labels",
-                    "value": 5
+                    "message": "",
+                    "name": "item 1 of pull_requests",
+                    "value": {
+                      "labels": [
+                        5
+                      ]
+                    }
                   }
                 ],
                 "inputs": [],
@@ -2015,25 +2110,44 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/1/commits/0/signed"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/commits/0/signed"
+                            ],
+                            "name": "pull_requests[1].commits[0].signed",
+                            "outcome": "found",
+                            "value": false
+                          }
                         ],
-                        "name": "pull_requests[1].commits[0].signed",
-                        "outcome": "found",
-                        "value": false
+                        "kind": "item",
+                        "locations": [
+                          "/releases/0/pull_requests/1/commits/0"
+                        ],
+                        "message": "signed is false",
+                        "name": "item 1 of commits",
+                        "value": {
+                          "signed": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/releases/0/pull_requests/1/commits/0"
+                      "/releases/0/pull_requests/1"
                     ],
-                    "message": "item 2 of pull_requests: item 1 of commits: signed is false",
-                    "name": "item 1 of pull_requests[1].commits",
+                    "message": "",
+                    "name": "item 2 of pull_requests",
                     "value": {
-                      "signed": false
+                      "commits": [
+                        {
+                          "signed": false
+                        }
+                      ]
                     }
                   }
                 ],
@@ -2396,24 +2510,41 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/0/commits/0"
+                            ],
+                            "name": "pull_requests[0].commits[0].signed",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
                           "/releases/0/pull_requests/0/commits/0"
                         ],
-                        "name": "pull_requests[0].commits[0].signed",
-                        "outcome": "absent",
-                        "value": null
+                        "message": "signed is missing",
+                        "name": "item 1 of commits",
+                        "value": {}
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/releases/0/pull_requests/0/commits/0"
+                      "/releases/0/pull_requests/0"
                     ],
-                    "message": "item 1 of pull_requests: item 1 of commits: signed is missing",
-                    "name": "item 1 of pull_requests[0].commits",
-                    "value": {}
+                    "message": "",
+                    "name": "item 1 of pull_requests",
+                    "value": {
+                      "commits": [
+                        {}
+                      ]
+                    }
                   }
                 ],
                 "inputs": [],
@@ -3085,25 +3216,44 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/releases/0/pull_requests/0/approvers/0/state"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/0/approvers/0/state"
+                            ],
+                            "name": "pull_requests[0].approvers[0].state",
+                            "outcome": "found",
+                            "value": "CHANGES"
+                          }
                         ],
-                        "name": "pull_requests[0].approvers[0].state",
-                        "outcome": "found",
-                        "value": "CHANGES"
+                        "kind": "item",
+                        "locations": [
+                          "/releases/0/pull_requests/0/approvers/0"
+                        ],
+                        "message": "state is \"CHANGES\"",
+                        "name": "item 1 of approvers",
+                        "value": {
+                          "state": "CHANGES"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/releases/0/pull_requests/0/approvers/0"
+                      "/releases/0/pull_requests/0"
                     ],
-                    "message": "item 1 of pull_requests: item 1 of approvers: state is \"CHANGES\"",
-                    "name": "item 1 of pull_requests[0].approvers",
+                    "message": "",
+                    "name": "item 1 of pull_requests",
                     "value": {
-                      "state": "CHANGES"
+                      "approvers": [
+                        {
+                          "state": "CHANGES"
+                        }
+                      ]
                     }
                   },
                   {
@@ -7577,25 +7727,47 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/0/commits/1"
+                            ],
+                            "name": "pull_requests[0].commits[1].signed",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
                           "/releases/0/pull_requests/0/commits/1"
                         ],
-                        "name": "pull_requests[0].commits[1].signed",
-                        "outcome": "absent",
-                        "value": null
+                        "message": "signed is missing",
+                        "name": "item 2 of commits",
+                        "value": {
+                          "sha": "x"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/releases/0/pull_requests/0/commits/1"
+                      "/releases/0/pull_requests/0"
                     ],
-                    "message": "item 1 of pull_requests: item 2 of commits: signed is missing",
-                    "name": "item 2 of pull_requests[0].commits",
+                    "message": "",
+                    "name": "item 1 of pull_requests",
                     "value": {
-                      "sha": "x"
+                      "commits": [
+                        {
+                          "signed": true
+                        },
+                        {
+                          "sha": "x"
+                        }
+                      ]
                     }
                   },
                   {

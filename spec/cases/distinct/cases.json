@@ -10379,29 +10379,63 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/0/k",
+                              "/s/ts/0/fs/1/k"
+                            ],
+                            "name": "ts[0].fs[0].k",
+                            "outcome": "unusable",
+                            "value": 5
+                          }
                         ],
-                        "name": "ts[0].fs[0].k",
-                        "outcome": "unusable",
-                        "value": 5
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/0",
+                          "/s/ts/0/fs/1"
+                        ],
+                        "message": "lim is [5], which isn't a list of patterns",
+                        "name": "item 1 of fs",
+                        "value": {
+                          "k": 5,
+                          "lo": 9,
+                          "ok": []
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/s/ts/0/fs/0",
-                      "/s/ts/0/fs/1"
+                      "/s/ts/0"
                     ],
-                    "message": "lim is [5], which isn't a list of patterns",
-                    "name": "item 1 of ts[0].fs",
+                    "message": "",
+                    "name": "item 1 of ts",
                     "value": {
-                      "k": 5,
-                      "lo": 9,
-                      "ok": []
+                      "fs": [
+                        {
+                          "k": 5,
+                          "lo": 9,
+                          "ok": []
+                        },
+                        {
+                          "k": 5,
+                          "lo": 1,
+                          "ok": [
+                            5
+                          ]
+                        }
+                      ],
+                      "ok": [
+                        5
+                      ],
+                      "pats": [
+                        "5"
+                      ]
                     }
                   }
                 ],

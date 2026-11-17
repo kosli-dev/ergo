@@ -224,11 +224,79 @@ _unitemed(name) := concat(" of ", array.slice(ps, 1, count(ps))) if {
 
 _walk_entries(_, [], _) := []
 
-_walk_entries(row, texts, at) := [_walk_entry(row, texts, name, at) |
+_walk_entries(row, texts, at) := _nested_items([_leveled(_walk_entry(row, texts, name, at), row, name, at) |
 	some k, f in row.failed_items
 	name := f.item
 	not name in [g.item | some g in array.slice(row.failed_items, 0, k)]
-] if texts != []
+]) if texts != []
+
+_leveled(e, row, name, at) := object.union(e, {
+	"name": names[count(levels)],
+	"message": _entry_text(e.message, concat(": ", names)),
+	"ergo/levels": [object.union(_anchored_all([lv], at)[0], {"name": names[j]}) | some j, lv in levels],
+}) if {
+	_walk_kind(name) == "item"
+	levels := _item_levels_of(row, name)
+	count(levels) > 0
+	count(levels) < 4
+	names := _level_names(name, count(levels))
+	count(names) == count(levels) + 1
+} else := e
+
+_item_levels_of(row, name) := [ls | some f in row.failed_items; f.item == name; ls := f["ergo/item"].levels][0]
+
+_level_names(name, m) := array.concat(
+	[concat("", ["item ", format_int(to_number(idx[j + 1]) + 1, 10), " of ", fields[j]]) | some j in numbers.range(0, m - 1)],
+	[concat("", ["item ", substring(name, 5, at - 5), " of ", fields[m]])],
+) if {
+	at := indexof(name, " of ")
+	pieces := split(substring(name, at + 4, -1), "[")
+	count(pieces) == m + 1
+	idx := array.concat([""], [substring(p, 0, indexof(p, "]")) | some p in array.slice(pieces, 1, count(pieces))])
+	every j in numbers.range(1, m) {
+		regex.match(`^[0-9]+$`, idx[j])
+	}
+	fields := array.concat([pieces[0]], [trim_prefix(substring(p, indexof(p, "]") + 1, -1), ".") | some p in array.slice(pieces, 1, count(pieces))])
+}
+
+_nested_items(es) := es if {
+	every e in es {
+		not _has_levels(e)
+	}
+} else := _nest_at0(es)
+
+_has_levels(e) if _ = e["ergo/levels"]
+
+_level_key(e, j) := e["ergo/levels"][j].name if count(object.get(e, "ergo/levels", [])) > j
+
+else := concat("", ["\u0000", e.name])
+
+_first_of_key(es, k, j) if {
+	key := _level_key(es[k], j)
+	not key in [_level_key(x, j) | some x in array.slice(es, 0, k)]
+}
+
+_level_group(lv, kids) := {"kind": "item", "name": lv.name, "cause": _worst_or_value({c.cause | some c in kids}), "inputs": [], "failures": kids, "message": "", "value": lv.value, "locations": lv.locations}
+
+_level_leaf(e) := object.remove(e, ["ergo/levels"])
+
+_nest_at0(es) := [_nest_node0(es, k) | some k, _ in es; _first_of_key(es, k, 0)]
+
+_nest_node0(es, k) := _level_group(es[k]["ergo/levels"][0], _nest_at1([x | some x in es; _level_key(x, 0) == _level_key(es[k], 0)])) if count(object.get(es[k], "ergo/levels", [])) > 0
+
+else := _level_leaf(es[k])
+
+_nest_at1(es) := [_nest_node1(es, k) | some k, _ in es; _first_of_key(es, k, 1)]
+
+_nest_node1(es, k) := _level_group(es[k]["ergo/levels"][1], _nest_at2([x | some x in es; _level_key(x, 1) == _level_key(es[k], 1)])) if count(object.get(es[k], "ergo/levels", [])) > 1
+
+else := _level_leaf(es[k])
+
+_nest_at2(es) := [_nest_node2(es, k) | some k, _ in es; _first_of_key(es, k, 2)]
+
+_nest_node2(es, k) := _level_group(es[k]["ergo/levels"][2], [_level_leaf(x) | some x in es; _level_key(x, 2) == _level_key(es[k], 2)]) if count(object.get(es[k], "ergo/levels", [])) > 2
+
+else := _level_leaf(es[k])
 
 _walk_entry(row, texts, name, at) := object.union(
 	_entry(

@@ -15225,25 +15225,47 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/pull_requests/2/reviews/0/state"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/2/reviews/0/state"
+                            ],
+                            "name": "pull_requests[2].reviews[0].state",
+                            "outcome": "found",
+                            "value": "bad"
+                          }
                         ],
-                        "name": "pull_requests[2].reviews[0].state",
-                        "outcome": "found",
-                        "value": "bad"
+                        "kind": "item",
+                        "locations": [
+                          "/pull_requests/2/reviews/0"
+                        ],
+                        "message": "state is \"bad\"",
+                        "name": "item 1 of reviews",
+                        "value": {
+                          "state": "bad"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/pull_requests/2/reviews/0"
+                      "/pull_requests/2"
                     ],
-                    "message": "item 3 of pull_requests: item 1 of reviews: state is \"bad\"",
-                    "name": "item 1 of pull_requests[2].reviews",
+                    "message": "",
+                    "name": "item 3 of pull_requests",
                     "value": {
-                      "state": "bad"
+                      "reviews": [
+                        {
+                          "state": "bad"
+                        },
+                        {
+                          "state": "ok"
+                        }
+                      ]
                     }
                   }
                 ],

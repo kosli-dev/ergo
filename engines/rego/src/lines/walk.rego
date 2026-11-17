@@ -431,14 +431,14 @@ default _walk_passed(_, _, _, _) := false
 
 _walk_passed([], true, leaf, v) if _op_passed(leaf, v)
 
-_walk_failure(path, w, e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": cause, "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "iv": e.iv, "iat": _item_at(w, e), "msg": _m_leaf_message(e, leaf, cause, path)} if cause := _row_cause(leaf, e.iv, "")
+_walk_failure(path, w, e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": cause, "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": _m_leaf_message(e, leaf, cause, path)} if cause := _row_cause(leaf, e.iv, "")
 
-_walk_failure(path, w, e, undecided, _, _, _) := {"path": e.c, "item": e.i, "cause": undecided[0][1], "value": null, "at": _walk_at(w, e), "iv": e.iv, "iat": _item_at(w, e), "msg": _m_walk_leaf(e, {"op": "present", "path": e.r}, undecided[0][1], _dotted_roots([path]))} if {
+_walk_failure(path, w, e, undecided, _, _, _) := {"path": e.c, "item": e.i, "cause": undecided[0][1], "value": null, "at": _walk_at(w, e), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": _m_walk_leaf(e, {"op": "present", "path": e.r}, undecided[0][1], _dotted_roots([path]))} if {
 	undecided != []
 	_focus_lost(e, undecided[0][0])
 }
 
-_walk_failure(path, w, e, undecided, _, _, _) := {"path": _walk_named_path(fe, p), "item": e.i, "cause": undecided[0][1], "value": _value_at(fe.iv, p), "at": _walk_named_at(w, fe, p), "iv": e.iv, "iat": _item_at(w, e), "msg": _m_walk_leaf(fe, undecided[0][0], _m_undecided(undecided[0][1]), _dotted_roots([path]))} if {
+_walk_failure(path, w, e, undecided, _, _, _) := {"path": _walk_named_path(fe, p), "item": e.i, "cause": undecided[0][1], "value": _value_at(fe.iv, p), "at": _walk_named_at(w, fe, p), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": _m_walk_leaf(fe, undecided[0][0], _m_undecided(undecided[0][1]), _dotted_roots([path]))} if {
 	undecided != []
 	not _focus_lost(e, undecided[0][0])
 	fe := _focus_of(e, undecided[0][0])
@@ -551,7 +551,7 @@ _walk_failed(cause, fails, path) := [{"path": _failed_name(f.path, _dotted_roots
 	f.path == p
 ] if cause != "satisfied"
 
-_fail_item(f) := {"value": f.iv, "locations": _item_locations(f)} if "iv" in object.keys(f)
+_fail_item(f) := {"value": f.iv, "locations": _item_locations(f), "levels": object.get(f, "lv", [])} if "iv" in object.keys(f)
 
 else := null
 
@@ -639,3 +639,14 @@ _s_check_for(lines, ftext, wording, problems, parts) := object.union(wording, {
 	count(_s_self_problems(marked) | _s_whose_self_problems(items)) == 0
 	texts := [_s_assertion_text(a) | some a in marked]
 } else := object.union(wording, {"expression": _s_for_written_text(lines, ftext), "$sentence": sort(_s_or_unrunnable(((problems | _s_for_problems(lines, ftext)) | _s_for_self(lines, ftext, parts))))})
+
+_item_levels(w, e) := [{"value": object.get(w.trail[0].v, s, null), "locations": [_pointer(w.trail[0].a, w.trail[0].v, s)]} |
+	some k, step in rel
+	is_number(step)
+	k < count(rel) - 1
+	s := array.slice(rel, 0, k + 1)
+] if {
+	is_array(e.i)
+	count(e.i) - count(w.trail[0].c) > 2
+	rel := array.slice(e.i, count(w.trail[0].c), count(e.i))
+} else := []

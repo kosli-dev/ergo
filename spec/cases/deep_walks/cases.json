@@ -52,25 +52,83 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/repos/1/groups/1/teams/1/units/1/ok"
+                        "cause": "value",
+                        "failures": [
+                          {
+                            "cause": "value",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/repos/1/groups/1/teams/1/units/1/ok"
+                                ],
+                                "name": "groups[1].teams[1].units[1].ok",
+                                "outcome": "found",
+                                "value": false
+                              }
+                            ],
+                            "kind": "item",
+                            "locations": [
+                              "/repos/1/groups/1/teams/1/units/1"
+                            ],
+                            "message": "ok is false",
+                            "name": "item 2 of units",
+                            "value": {
+                              "ok": false
+                            }
+                          }
                         ],
-                        "name": "groups[1].teams[1].units[1].ok",
-                        "outcome": "found",
-                        "value": false
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/repos/1/groups/1/teams/1"
+                        ],
+                        "message": "",
+                        "name": "item 2 of teams",
+                        "value": {
+                          "units": [
+                            {
+                              "ok": true
+                            },
+                            {
+                              "ok": false
+                            }
+                          ]
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/repos/1/groups/1/teams/1/units/1"
+                      "/repos/1/groups/1"
                     ],
-                    "message": "item 2 of groups: item 2 of teams: item 2 of units: ok is false",
-                    "name": "item 2 of groups[1].teams[1].units",
+                    "message": "",
+                    "name": "item 2 of groups",
                     "value": {
-                      "ok": false
+                      "teams": [
+                        {
+                          "units": [
+                            {
+                              "ok": true
+                            },
+                            {
+                              "ok": true
+                            }
+                          ]
+                        },
+                        {
+                          "units": [
+                            {
+                              "ok": true
+                            },
+                            {
+                              "ok": false
+                            }
+                          ]
+                        }
+                      ]
                     }
                   }
                 ],
@@ -126,24 +184,78 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/repos/2/groups/0/teams/1/units/0"
+                        "cause": "absent",
+                        "failures": [
+                          {
+                            "cause": "absent",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/repos/2/groups/0/teams/1/units/0"
+                                ],
+                                "name": "groups[0].teams[1].units[0].ok",
+                                "outcome": "absent",
+                                "value": null
+                              }
+                            ],
+                            "kind": "item",
+                            "locations": [
+                              "/repos/2/groups/0/teams/1/units/0"
+                            ],
+                            "message": "ok is missing",
+                            "name": "item 1 of units",
+                            "value": {}
+                          }
                         ],
-                        "name": "groups[0].teams[1].units[0].ok",
-                        "outcome": "absent",
-                        "value": null
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/repos/2/groups/0/teams/1"
+                        ],
+                        "message": "",
+                        "name": "item 2 of teams",
+                        "value": {
+                          "units": [
+                            {},
+                            {
+                              "ok": true
+                            }
+                          ]
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/repos/2/groups/0/teams/1/units/0"
+                      "/repos/2/groups/0"
                     ],
-                    "message": "item 1 of groups: item 2 of teams: item 1 of units: ok is missing",
-                    "name": "item 1 of groups[0].teams[1].units",
-                    "value": {}
+                    "message": "",
+                    "name": "item 1 of groups",
+                    "value": {
+                      "teams": [
+                        {
+                          "units": [
+                            {
+                              "ok": true
+                            },
+                            {
+                              "ok": true
+                            }
+                          ]
+                        },
+                        {
+                          "units": [
+                            {},
+                            {
+                              "ok": true
+                            }
+                          ]
+                        }
+                      ]
+                    }
                   }
                 ],
                 "inputs": [],
@@ -263,25 +375,147 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/orgs/0/repos/1/groups/1/teams/0/units/1/cells/1/ok"
+                        "cause": "value",
+                        "failures": [
+                          {
+                            "cause": "value",
+                            "failures": [
+                              {
+                                "cause": "value",
+                                "failures": [],
+                                "inputs": [
+                                  {
+                                    "locations": [
+                                      "/orgs/0/repos/1/groups/1/teams/0/units/1/cells/1/ok"
+                                    ],
+                                    "name": "groups[1].teams[0].units[1].cells[1].ok",
+                                    "outcome": "found",
+                                    "value": false
+                                  }
+                                ],
+                                "kind": "item",
+                                "locations": [
+                                  "/orgs/0/repos/1/groups/1/teams/0/units/1/cells/1"
+                                ],
+                                "message": "ok is false",
+                                "name": "item 2 of cells",
+                                "value": {
+                                  "ok": false
+                                }
+                              }
+                            ],
+                            "inputs": [],
+                            "kind": "item",
+                            "locations": [
+                              "/orgs/0/repos/1/groups/1/teams/0/units/1"
+                            ],
+                            "message": "",
+                            "name": "item 2 of units",
+                            "value": {
+                              "cells": [
+                                {
+                                  "ok": true
+                                },
+                                {
+                                  "ok": false
+                                }
+                              ]
+                            }
+                          }
                         ],
-                        "name": "groups[1].teams[0].units[1].cells[1].ok",
-                        "outcome": "found",
-                        "value": false
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/orgs/0/repos/1/groups/1/teams/0"
+                        ],
+                        "message": "",
+                        "name": "item 1 of teams",
+                        "value": {
+                          "units": [
+                            {
+                              "cells": [
+                                {
+                                  "ok": true
+                                },
+                                {
+                                  "ok": true
+                                }
+                              ]
+                            },
+                            {
+                              "cells": [
+                                {
+                                  "ok": true
+                                },
+                                {
+                                  "ok": false
+                                }
+                              ]
+                            }
+                          ]
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/orgs/0/repos/1/groups/1/teams/0/units/1/cells/1"
+                      "/orgs/0/repos/1/groups/1"
                     ],
-                    "message": "item 2 of groups: item 1 of teams: item 2 of units: item 2 of cells: ok is false",
-                    "name": "item 2 of groups[1].teams[0].units[1].cells",
+                    "message": "",
+                    "name": "item 2 of groups",
                     "value": {
-                      "ok": false
+                      "teams": [
+                        {
+                          "units": [
+                            {
+                              "cells": [
+                                {
+                                  "ok": true
+                                },
+                                {
+                                  "ok": true
+                                }
+                              ]
+                            },
+                            {
+                              "cells": [
+                                {
+                                  "ok": true
+                                },
+                                {
+                                  "ok": false
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "units": [
+                            {
+                              "cells": [
+                                {
+                                  "ok": true
+                                },
+                                {
+                                  "ok": true
+                                }
+                              ]
+                            },
+                            {
+                              "cells": [
+                                {
+                                  "ok": true
+                                },
+                                {
+                                  "ok": true
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     }
                   }
                 ],
@@ -404,25 +638,147 @@
                 "failures": [
                   {
                     "cause": "null",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/orgs/1/repos/1/groups/0/teams/1/units/1/cells/0/ok"
+                        "cause": "null",
+                        "failures": [
+                          {
+                            "cause": "null",
+                            "failures": [
+                              {
+                                "cause": "null",
+                                "failures": [],
+                                "inputs": [
+                                  {
+                                    "locations": [
+                                      "/orgs/1/repos/1/groups/0/teams/1/units/1/cells/0/ok"
+                                    ],
+                                    "name": "groups[0].teams[1].units[1].cells[0].ok",
+                                    "outcome": "null",
+                                    "value": null
+                                  }
+                                ],
+                                "kind": "item",
+                                "locations": [
+                                  "/orgs/1/repos/1/groups/0/teams/1/units/1/cells/0"
+                                ],
+                                "message": "ok is null",
+                                "name": "item 1 of cells",
+                                "value": {
+                                  "ok": null
+                                }
+                              }
+                            ],
+                            "inputs": [],
+                            "kind": "item",
+                            "locations": [
+                              "/orgs/1/repos/1/groups/0/teams/1/units/1"
+                            ],
+                            "message": "",
+                            "name": "item 2 of units",
+                            "value": {
+                              "cells": [
+                                {
+                                  "ok": null
+                                },
+                                {
+                                  "ok": true
+                                }
+                              ]
+                            }
+                          }
                         ],
-                        "name": "groups[0].teams[1].units[1].cells[0].ok",
-                        "outcome": "null",
-                        "value": null
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/orgs/1/repos/1/groups/0/teams/1"
+                        ],
+                        "message": "",
+                        "name": "item 2 of teams",
+                        "value": {
+                          "units": [
+                            {
+                              "cells": [
+                                {
+                                  "ok": true
+                                },
+                                {
+                                  "ok": true
+                                }
+                              ]
+                            },
+                            {
+                              "cells": [
+                                {
+                                  "ok": null
+                                },
+                                {
+                                  "ok": true
+                                }
+                              ]
+                            }
+                          ]
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/orgs/1/repos/1/groups/0/teams/1/units/1/cells/0"
+                      "/orgs/1/repos/1/groups/0"
                     ],
-                    "message": "item 1 of groups: item 2 of teams: item 2 of units: item 1 of cells: ok is null",
-                    "name": "item 1 of groups[0].teams[1].units[1].cells",
+                    "message": "",
+                    "name": "item 1 of groups",
                     "value": {
-                      "ok": null
+                      "teams": [
+                        {
+                          "units": [
+                            {
+                              "cells": [
+                                {
+                                  "ok": true
+                                },
+                                {
+                                  "ok": true
+                                }
+                              ]
+                            },
+                            {
+                              "cells": [
+                                {
+                                  "ok": true
+                                },
+                                {
+                                  "ok": true
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "units": [
+                            {
+                              "cells": [
+                                {
+                                  "ok": true
+                                },
+                                {
+                                  "ok": true
+                                }
+                              ]
+                            },
+                            {
+                              "cells": [
+                                {
+                                  "ok": null
+                                },
+                                {
+                                  "ok": true
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     }
                   }
                 ],
