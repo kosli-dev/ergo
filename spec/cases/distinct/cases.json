@@ -3727,34 +3727,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -3769,7 +3742,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/bare"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k is at least lo"
               }
             ],
@@ -3820,34 +3793,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -3862,7 +3808,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/dot"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k is at least lo"
               }
             ],
@@ -3913,34 +3859,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "allowed is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -3955,7 +3874,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/in"
                 ],
-                "message": "",
+                "message": "allowed is missing",
                 "name": "some distinct xs.k is in allowed"
               }
             ],
@@ -4101,56 +4020,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0"
-                        ],
-                        "name": "xs[0].ys.k",
-                        "outcome": "absent",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  },
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/1"
-                        ],
-                        "name": "xs[1].ys.k",
-                        "outcome": "absent",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 9
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -4165,7 +4035,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/two"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.ys.k equals lo"
               }
             ],
@@ -4267,34 +4137,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -4309,7 +4152,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/bare"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k is at least lo"
               }
             ],
@@ -4359,34 +4202,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -4401,7 +4217,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/dot"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k is at least lo"
               }
             ],
@@ -4451,34 +4267,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "allowed is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -4493,7 +4282,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/in"
                 ],
-                "message": "",
+                "message": "allowed is missing",
                 "name": "some distinct xs.k is in allowed"
               }
             ],
@@ -4636,55 +4425,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0"
-                        ],
-                        "name": "xs[0].ys.k",
-                        "outcome": "absent",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  },
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/1"
-                        ],
-                        "name": "xs[1].ys.k",
-                        "outcome": "absent",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "k": 5
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -4699,7 +4440,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/two"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.ys.k equals lo"
               }
             ],
@@ -4800,34 +4541,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -4842,7 +4556,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/bare"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k is at least lo"
               }
             ],
@@ -4893,34 +4607,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -4935,7 +4622,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/dot"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k is at least lo"
               }
             ],
@@ -4986,34 +4673,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "allowed is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -5028,7 +4688,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/in"
                 ],
-                "message": "",
+                "message": "allowed is missing",
                 "name": "some distinct xs.k is in allowed"
               }
             ],
@@ -5174,56 +4834,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0"
-                        ],
-                        "name": "xs[0].ys.k",
-                        "outcome": "absent",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  },
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/1"
-                        ],
-                        "name": "xs[1].ys.k",
-                        "outcome": "absent",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": null
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -5238,7 +4849,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/two"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.ys.k equals lo"
               }
             ],
@@ -5340,34 +4951,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -5382,7 +4966,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/bare"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k is at least lo"
               }
             ],
@@ -5433,34 +5017,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -5475,7 +5032,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/dot"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.k is at least lo"
               }
             ],
@@ -5526,34 +5083,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0/k",
-                          "/s/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "absent",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0",
-                      "/s/xs/1"
-                    ],
-                    "message": "allowed is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -5568,7 +5098,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/in"
                 ],
-                "message": "",
+                "message": "allowed is missing",
                 "name": "some distinct xs.k is in allowed"
               }
             ],
@@ -5714,56 +5244,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/0"
-                        ],
-                        "name": "xs[0].ys.k",
-                        "outcome": "absent",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/0"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": 1
-                    }
-                  },
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/s/xs/1"
-                        ],
-                        "name": "xs[1].ys.k",
-                        "outcome": "absent",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/s/xs/1"
-                    ],
-                    "message": "lo is missing",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": "x"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -5778,7 +5259,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/two"
                 ],
-                "message": "",
+                "message": "lo is missing",
                 "name": "every distinct xs.ys.k equals lo"
               }
             ],
@@ -10376,69 +9857,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [
-                      {
-                        "cause": "unusable",
-                        "failures": [],
-                        "inputs": [
-                          {
-                            "locations": [
-                              "/s/ts/0/fs/0/k",
-                              "/s/ts/0/fs/1/k"
-                            ],
-                            "name": "ts[0].fs[0].k",
-                            "outcome": "unusable",
-                            "value": 5
-                          }
-                        ],
-                        "kind": "item",
-                        "locations": [
-                          "/s/ts/0/fs/0",
-                          "/s/ts/0/fs/1"
-                        ],
-                        "message": "lim is [5], which isn't a list of patterns",
-                        "name": "item 1 of fs",
-                        "value": {
-                          "k": 5,
-                          "lo": 9,
-                          "ok": []
-                        }
-                      }
-                    ],
-                    "inputs": [],
-                    "kind": "item",
-                    "locations": [
-                      "/s/ts/0"
-                    ],
-                    "message": "",
-                    "name": "item 1 of ts",
-                    "value": {
-                      "fs": [
-                        {
-                          "k": 5,
-                          "lo": 9,
-                          "ok": []
-                        },
-                        {
-                          "k": 5,
-                          "lo": 1,
-                          "ok": [
-                            5
-                          ]
-                        }
-                      ],
-                      "ok": [
-                        5
-                      ],
-                      "pats": [
-                        "5"
-                      ]
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -10459,7 +9878,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/partmatch"
                 ],
-                "message": "",
+                "message": "lim is [5], which isn't a list of patterns",
                 "name": "every distinct ts.fs.k matches lim"
               }
             ],
@@ -11107,36 +10526,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/los/0/xs/0/k",
-                          "/los/0/xs/1/k"
-                        ],
-                        "name": "xs[0].k",
-                        "outcome": "unusable",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/los/0/xs/0",
-                      "/los/0/xs/1"
-                    ],
-                    "message": "lo is {\"xs\": [{\"k\": 5, \"lo\": [1]}, {\"k\": 5, \"lo\": [5]}]}, which isn't a list",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "k": 5,
-                      "lo": [
-                        1
-                      ]
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -11166,7 +10556,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "",
+                "message": "lo is {\"xs\": [{\"k\": 5, \"lo\": [1]}, {\"k\": 5, \"lo\": [5]}]}, which isn't a list",
                 "name": "some distinct xs.k is in lo"
               }
             ],

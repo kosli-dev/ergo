@@ -26252,33 +26252,6 @@
                 "cause": "not_an_object",
                 "failures": [
                   {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/arts/0/m"
-                        ],
-                        "name": "art.m named by key",
-                        "outcome": "null",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/arts/0/xs/1"
-                    ],
-                    "message": "",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "key": "a",
-                      "tags": [
-                        "x"
-                      ],
-                      "v": "x"
-                    }
-                  },
-                  {
                     "cause": "not_an_object",
                     "failures": [],
                     "inputs": [
@@ -26361,33 +26334,6 @@
               {
                 "cause": "not_an_object",
                 "failures": [
-                  {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/arts/0/m"
-                        ],
-                        "name": "art.m named by key",
-                        "outcome": "null",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/arts/0/xs/1"
-                    ],
-                    "message": "",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "key": "a",
-                      "tags": [
-                        "x"
-                      ],
-                      "v": "x"
-                    }
-                  },
                   {
                     "cause": "not_an_object",
                     "failures": [],
@@ -30541,32 +30487,6 @@
                     ],
                     "kind": "item",
                     "locations": [
-                      "/things/0/xs/1"
-                    ],
-                    "message": "",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "key": "a",
-                      "tags": [
-                        "x"
-                      ]
-                    }
-                  },
-                  {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/c"
-                        ],
-                        "name": "cov.m named by key",
-                        "outcome": "null",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
                       "/things/0/xs/2"
                     ],
                     "message": "key is missing",
@@ -30673,32 +30593,6 @@
               {
                 "cause": "not_an_object",
                 "failures": [
-                  {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/c"
-                        ],
-                        "name": "cov.m named by key",
-                        "outcome": "null",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/xs/1"
-                    ],
-                    "message": "",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "key": "a",
-                      "tags": [
-                        "x"
-                      ]
-                    }
-                  },
                   {
                     "cause": "null",
                     "failures": [],

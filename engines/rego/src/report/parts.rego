@@ -196,8 +196,8 @@ _row_failures(row, at, where, ins) := [_policy_entry(
 	where.check.expression,
 	row.cause,
 	[ins[j] | some j, i in row.inputs; not _item_input(i, lists)],
-	_walk_entries(row, texts, at),
-	concat("; ", _once(object.get(row, "ergo/own", [row.message]))),
+	_walk_entries(row, _item_owned(row, texts), at),
+	concat("; ", _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts)))),
 	[_assertion_at(where, null, 0)],
 )] if {
 	_walks(where.check)
@@ -224,11 +224,36 @@ _unitemed(name) := concat(" of ", array.slice(ps, 1, count(ps))) if {
 
 _walk_entries(_, [], _) := []
 
+_item_owned(row, texts) := texts if {
+	every k, t in texts {
+		not _root_text(row.failed_items[k].item, t)
+	}
+} else := [_owned_text(row.failed_items[k].item, t) | some k, t in texts]
+
+_owned_text(name, t) := "" if _root_text(name, t)
+
+else := t
+
+_root_texts(row, texts) := [t | some k, t in texts; _root_text(row.failed_items[k].item, t)]
+
+_root_text(name, t) if {
+	t != ""
+	startswith(name, "item ")
+	not startswith(t, "item ")
+}
+
 _walk_entries(row, texts, at) := _nested_items([_leveled(_walk_entry(row, texts, name, at), row, name, at) |
 	some k, f in row.failed_items
 	name := f.item
 	not name in [g.item | some g in array.slice(row.failed_items, 0, k)]
+	_said_for(row, texts, name)
 ]) if texts != []
+
+_said_for(row, texts, name) if {
+	some k, f in row.failed_items
+	f.item == name
+	texts[k] != ""
+}
 
 _leveled(e, row, name, at) := object.union(e, {
 	"name": names[count(levels)],
@@ -425,8 +450,8 @@ _applies_entries(row, at, evals, _, conds, ins) := [_policy_entry(
 	conds[name].expression,
 	e.assertion_cause,
 	[ins[j] | some j, i in row.inputs; not _item_input(i, lists)],
-	_walk_entries(row, texts, at),
-	concat("; ", _once(object.get(e, "ergo/own", [row.message]))),
+	_walk_entries(row, _item_owned(row, texts), at),
+	concat("; ", _once(array.concat(object.get(e, "ergo/own", [row.message]), _root_texts(row, texts)))),
 	[conds[name].at],
 )] if {
 	count(evals) == 1

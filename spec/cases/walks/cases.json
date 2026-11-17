@@ -6402,33 +6402,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/releases/0/approvers/0/timestamp"
-                        ],
-                        "name": "approvers[0].timestamp",
-                        "outcome": "absent",
-                        "value": "2026-10-02T00:00:00Z"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/releases/0/approvers/0"
-                    ],
-                    "message": "last_commit_timestamp is missing",
-                    "name": "item 1 of approvers",
-                    "value": {
-                      "last_commit_timestamp": "2026-10-01T00:00:00Z",
-                      "state": "APPROVED",
-                      "timestamp": "2026-10-02T00:00:00Z"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -6443,7 +6417,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "",
+                "message": "last_commit_timestamp is missing",
                 "name": "some approvers.timestamp is after last_commit_timestamp"
               }
             ],
@@ -8337,31 +8311,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/releases/0/files/0/owner"
-                        ],
-                        "name": "files[0].owner",
-                        "outcome": "absent",
-                        "value": "bob"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/trail/artifacts/0/releases/0/files/0"
-                    ],
-                    "message": "artifact.owner is missing",
-                    "name": "item 1 of files",
-                    "value": {
-                      "owner": "bob"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -8376,7 +8326,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "",
+                "message": "artifact.owner is missing",
                 "name": "some files.owner equals artifact.owner"
               }
             ],
@@ -8934,56 +8884,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/releases/0/files/0/owner"
-                        ],
-                        "name": "files[0].owner",
-                        "outcome": "absent",
-                        "value": "bob"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/trail/artifacts/0/releases/0/files/0"
-                    ],
-                    "message": "k is missing",
-                    "name": "item 1 of files",
-                    "value": {
-                      "k": "y",
-                      "owner": "bob"
-                    }
-                  },
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/releases/0/files/1/owner"
-                        ],
-                        "name": "files[1].owner",
-                        "outcome": "absent",
-                        "value": "ann"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/trail/artifacts/0/releases/0/files/1"
-                    ],
-                    "message": "k is missing",
-                    "name": "item 2 of files",
-                    "value": {
-                      "k": "x",
-                      "owner": "ann"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -9006,7 +8907,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "",
+                "message": "k is missing",
                 "name": "some files.owner equals artifact.atts named by k.owner"
               }
             ],
@@ -10564,56 +10465,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/prs/0/rows/0/n"
-                        ],
-                        "name": "rows[0].n",
-                        "outcome": "absent",
-                        "value": 1
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/trail/artifacts/0/prs/0/rows/0"
-                    ],
-                    "message": "key is missing",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "key": "a",
-                      "n": 1
-                    }
-                  },
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/prs/0/rows/1/n"
-                        ],
-                        "name": "rows[1].n",
-                        "outcome": "absent",
-                        "value": 2
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/trail/artifacts/0/prs/0/rows/1"
-                    ],
-                    "message": "key is missing",
-                    "name": "item 2 of rows",
-                    "value": {
-                      "key": "b",
-                      "n": 2
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -10636,7 +10488,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/plain"
                 ],
-                "message": "",
+                "message": "key is missing",
                 "name": "some rows.n is at least artifact.nums named by key"
               }
             ],
@@ -10830,56 +10682,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/prs/0/rows/0/n"
-                        ],
-                        "name": "rows[0].n",
-                        "outcome": "absent",
-                        "value": 1
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/trail/artifacts/0/prs/0/rows/0"
-                    ],
-                    "message": "key is missing",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "key": "a",
-                      "n": 1
-                    }
-                  },
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/trail/artifacts/0/prs/0/rows/1/n"
-                        ],
-                        "name": "rows[1].n",
-                        "outcome": "absent",
-                        "value": 2
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/trail/artifacts/0/prs/0/rows/1"
-                    ],
-                    "message": "key is missing",
-                    "name": "item 2 of rows",
-                    "value": {
-                      "key": "b",
-                      "n": 2
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -10902,7 +10705,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/plain"
                 ],
-                "message": "",
+                "message": "key is missing",
                 "name": "some rows.n is at least artifact.nums named by key"
               }
             ],

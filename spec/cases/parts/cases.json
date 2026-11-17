@@ -5931,101 +5931,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/2/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": "abc"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/2/xs/0"
-                    ],
-                    "message": "x.z is \"abc\", which isn't a list",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "n": 1,
-                      "v": 1,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/2/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": "abc"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/2/xs/1"
-                    ],
-                    "message": "x.z is \"abc\", which isn't a list",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "n": 1,
-                      "v": 1,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/2/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": "abc"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/2/xs/2"
-                    ],
-                    "message": "x.z is \"abc\", which isn't a list",
-                    "name": "item 3 of xs",
-                    "value": {
-                      "n": 3,
-                      "v": 5,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -6044,7 +5950,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every_sum"
                 ],
-                "message": "",
+                "message": "x.z is \"abc\", which isn't a list",
                 "name": "every xs whose n is at most sum of x.z exists"
               }
             ],
@@ -6120,101 +6026,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/2/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": "abc"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/2/xs/0"
-                    ],
-                    "message": "x.z is \"abc\", which isn't a list",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "n": 1,
-                      "v": 1,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/2/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": "abc"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/2/xs/1"
-                    ],
-                    "message": "x.z is \"abc\", which isn't a list",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "n": 1,
-                      "v": 1,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/2/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": "abc"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/2/xs/2"
-                    ],
-                    "message": "x.z is \"abc\", which isn't a list",
-                    "name": "item 3 of xs",
-                    "value": {
-                      "n": 3,
-                      "v": 5,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -6233,7 +6045,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every_whose"
                 ],
-                "message": "",
+                "message": "x.z is \"abc\", which isn't a list",
                 "name": "every xs whose n equals count of x.z exists"
               }
             ],
@@ -6470,107 +6282,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/3/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": {
-                          "k": 1
-                        }
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/3/xs/0"
-                    ],
-                    "message": "x.z is {\"k\": 1}, which isn't a list",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "n": 1,
-                      "v": 1,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/3/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": {
-                          "k": 1
-                        }
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/3/xs/1"
-                    ],
-                    "message": "x.z is {\"k\": 1}, which isn't a list",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "n": 1,
-                      "v": 1,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/3/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": {
-                          "k": 1
-                        }
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/3/xs/2"
-                    ],
-                    "message": "x.z is {\"k\": 1}, which isn't a list",
-                    "name": "item 3 of xs",
-                    "value": {
-                      "n": 3,
-                      "v": 5,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -6591,7 +6303,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every_sum"
                 ],
-                "message": "",
+                "message": "x.z is {\"k\": 1}, which isn't a list",
                 "name": "every xs whose n is at most sum of x.z exists"
               }
             ],
@@ -6669,107 +6381,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/3/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": {
-                          "k": 1
-                        }
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/3/xs/0"
-                    ],
-                    "message": "x.z is {\"k\": 1}, which isn't a list",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "n": 1,
-                      "v": 1,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/3/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": {
-                          "k": 1
-                        }
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/3/xs/1"
-                    ],
-                    "message": "x.z is {\"k\": 1}, which isn't a list",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "n": 1,
-                      "v": 1,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/3/p/z"
-                        ],
-                        "name": "x.z",
-                        "outcome": "unusable",
-                        "value": {
-                          "k": 1
-                        }
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/3/xs/2"
-                    ],
-                    "message": "x.z is {\"k\": 1}, which isn't a list",
-                    "name": "item 3 of xs",
-                    "value": {
-                      "n": 3,
-                      "v": 5,
-                      "x": {
-                        "z": [
-                          1,
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -6790,7 +6402,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every_whose"
                 ],
-                "message": "",
+                "message": "x.z is {\"k\": 1}, which isn't a list",
                 "name": "every xs whose n equals count of x.z exists"
               }
             ],
@@ -12060,50 +11672,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/prs/0/coverage/z"
-                        ],
-                        "name": "cov.z",
-                        "outcome": "unusable",
-                        "value": "12"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "message": "cov.z is \"12\", which isn't a list",
-                    "name": "item 1 of xs",
-                    "value": 2
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/prs/0/coverage/z"
-                        ],
-                        "name": "cov.z",
-                        "outcome": "unusable",
-                        "value": "12"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/prs/0/xs/1"
-                    ],
-                    "message": "cov.z is \"12\", which isn't a list",
-                    "name": "item 2 of xs",
-                    "value": 5
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -12122,7 +11691,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/e"
                 ],
-                "message": "",
+                "message": "cov.z is \"12\", which isn't a list",
                 "name": "every xs that equals count of cov.z is 2"
               }
             ],
@@ -12340,50 +11909,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/prs/0/coverage/z"
-                        ],
-                        "name": "cov.z",
-                        "outcome": "unusable",
-                        "value": "12"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "message": "cov.z is \"12\", which isn't a list",
-                    "name": "item 1 of xs",
-                    "value": 2
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/prs/0/coverage/z"
-                        ],
-                        "name": "cov.z",
-                        "outcome": "unusable",
-                        "value": "12"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/prs/0/xs/1"
-                    ],
-                    "message": "cov.z is \"12\", which isn't a list",
-                    "name": "item 2 of xs",
-                    "value": 5
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -12402,7 +11928,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/s"
                 ],
-                "message": "",
+                "message": "cov.z is \"12\", which isn't a list",
                 "name": "some xs that equals count of cov.z is 2"
               }
             ],

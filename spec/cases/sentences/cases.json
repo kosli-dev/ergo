@@ -31429,32 +31429,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/items/0/n"
-                        ],
-                        "name": "items[0].n",
-                        "outcome": "absent",
-                        "value": 3
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/items/0"
-                    ],
-                    "message": "kind is missing",
-                    "name": "item 1 of items",
-                    "value": {
-                      "kind": "a",
-                      "n": 3
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -31477,7 +31452,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/item"
                 ],
-                "message": "",
+                "message": "kind is missing",
                 "name": "every items.n is at least $params.min named by kind"
               }
             ],
@@ -31612,32 +31587,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/1/items/0/n"
-                        ],
-                        "name": "items[0].n",
-                        "outcome": "absent",
-                        "value": 1
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/1/items/0"
-                    ],
-                    "message": "kind is missing",
-                    "name": "item 1 of items",
-                    "value": {
-                      "kind": "b",
-                      "n": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -31660,7 +31610,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/item"
                 ],
-                "message": "",
+                "message": "kind is missing",
                 "name": "every items.n is at least $params.min named by kind"
               }
             ],
@@ -31910,32 +31860,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/2/items/0/n"
-                        ],
-                        "name": "items[0].n",
-                        "outcome": "absent",
-                        "value": 3
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/2/items/0"
-                    ],
-                    "message": "kind is missing",
-                    "name": "item 1 of items",
-                    "value": {
-                      "kind": 5,
-                      "n": 3
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -31958,7 +31883,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/item"
                 ],
-                "message": "",
+                "message": "kind is missing",
                 "name": "every items.n is at least $params.min named by kind"
               }
             ],
@@ -32168,31 +32093,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/3/items/0/n"
-                        ],
-                        "name": "items[0].n",
-                        "outcome": "absent",
-                        "value": 3
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/3/items/0"
-                    ],
-                    "message": "kind is missing",
-                    "name": "item 1 of items",
-                    "value": {
-                      "n": 3
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -32215,7 +32116,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/item"
                 ],
-                "message": "",
+                "message": "kind is missing",
                 "name": "every items.n is at least $params.min named by kind"
               }
             ],
@@ -66830,32 +66731,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "rows[0].v",
-                        "outcome": "absent",
-                        "value": "x"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "message": "mm named by k is missing",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "k": "k",
-                      "v": "x"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -66878,7 +66754,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "",
+                "message": "mm named by k is missing",
                 "name": "every rows.v equals mm named by k"
               }
             ],
@@ -67204,31 +67080,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/1/rows/0/v"
-                        ],
-                        "name": "rows[0].v",
-                        "outcome": "absent",
-                        "value": "x"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/1/rows/0"
-                    ],
-                    "message": "mm named by k is missing",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "v": "x"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -67251,7 +67103,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "",
+                "message": "mm named by k is missing",
                 "name": "every rows.v equals mm named by k"
               }
             ],
@@ -67577,32 +67429,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/2/rows/0/v"
-                        ],
-                        "name": "rows[0].v",
-                        "outcome": "absent",
-                        "value": "x"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/2/rows/0"
-                    ],
-                    "message": "mm named by k is missing",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "k": null,
-                      "v": "x"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -67625,7 +67452,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "",
+                "message": "mm named by k is missing",
                 "name": "every rows.v equals mm named by k"
               }
             ],
@@ -67951,32 +67778,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/3/rows/0/v"
-                        ],
-                        "name": "rows[0].v",
-                        "outcome": "absent",
-                        "value": "x"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/3/rows/0"
-                    ],
-                    "message": "mm named by k is missing",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "k": 3,
-                      "v": "x"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -67999,7 +67801,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "",
+                "message": "mm named by k is missing",
                 "name": "every rows.v equals mm named by k"
               }
             ],
@@ -68350,32 +68152,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rows/0/v"
-                        ],
-                        "name": "rows[0].v",
-                        "outcome": "absent",
-                        "value": "x"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "message": "mm named by k is missing",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "k": "k",
-                      "v": "x"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -68398,7 +68175,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "",
+                "message": "mm named by k is missing",
                 "name": "every rows.v equals mm named by k"
               }
             ],
@@ -68724,31 +68501,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/1/rows/0/v"
-                        ],
-                        "name": "rows[0].v",
-                        "outcome": "absent",
-                        "value": "x"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/1/rows/0"
-                    ],
-                    "message": "mm named by k is missing",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "v": "x"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -68771,7 +68524,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "",
+                "message": "mm named by k is missing",
                 "name": "every rows.v equals mm named by k"
               }
             ],
@@ -69097,32 +68850,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/2/rows/0/v"
-                        ],
-                        "name": "rows[0].v",
-                        "outcome": "absent",
-                        "value": "x"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/2/rows/0"
-                    ],
-                    "message": "mm named by k is missing",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "k": null,
-                      "v": "x"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -69145,7 +68873,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "",
+                "message": "mm named by k is missing",
                 "name": "every rows.v equals mm named by k"
               }
             ],
@@ -69471,32 +69199,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/3/rows/0/v"
-                        ],
-                        "name": "rows[0].v",
-                        "outcome": "absent",
-                        "value": "x"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/3/rows/0"
-                    ],
-                    "message": "mm named by k is missing",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "k": 3,
-                      "v": "x"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -69519,7 +69222,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "",
+                "message": "mm named by k is missing",
                 "name": "every rows.v equals mm named by k"
               }
             ],
@@ -87481,60 +87184,7 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/approvers/0/approved_at"
-                  ],
-                  "name": "approvers[0].approved_at",
-                  "outcome": "absent",
-                  "value": "2026-01-03T00:00:00Z"
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/approvers/0"
-              ],
-              "message": "assigned_at is missing",
-              "name": "item 1 of approvers",
-              "value": {
-                "approved_at": "2026-01-03T00:00:00Z",
-                "assigned_at": "2026-01-02T00:00:00Z",
-                "state": "APPROVED",
-                "username": "bob"
-              }
-            },
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/approvers/1/approved_at"
-                  ],
-                  "name": "approvers[1].approved_at",
-                  "outcome": "absent",
-                  "value": "2026-01-03T00:00:00Z"
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/approvers/1"
-              ],
-              "message": "assigned_at is missing",
-              "name": "item 2 of approvers",
-              "value": {
-                "approved_at": "2026-01-03T00:00:00Z",
-                "assigned_at": "2026-01-04T00:00:00Z",
-                "state": "APPROVED",
-                "username": "ann"
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -87549,7 +87199,7 @@
           "locations": [
             "$policy:/requirements/r/checks/two_fields_of_an_item_after_every"
           ],
-          "message": "",
+          "message": "assigned_at is missing",
           "name": "every approvers.approved_at is after assigned_at"
         }
       ],
@@ -88235,55 +87885,7 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/approvers/0"
-                  ],
-                  "name": "approvers[0].approved_at",
-                  "outcome": "absent",
-                  "value": null
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/approvers/0"
-              ],
-              "message": "assigned_at is missing",
-              "name": "item 1 of approvers",
-              "value": {
-                "state": "APPROVED"
-              }
-            },
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/approvers/1"
-                  ],
-                  "name": "approvers[1].approved_at",
-                  "outcome": "absent",
-                  "value": null
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/approvers/1"
-              ],
-              "message": "assigned_at is missing",
-              "name": "item 2 of approvers",
-              "value": {
-                "state": "APPROVED",
-                "username": null
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -88298,7 +87900,7 @@
           "locations": [
             "$policy:/requirements/r/checks/two_fields_of_an_item_after_every"
           ],
-          "message": "",
+          "message": "assigned_at is missing",
           "name": "every approvers.approved_at is after assigned_at"
         }
       ],
@@ -91111,20 +90713,7 @@
       "failures": [
         {
           "cause": "null",
-          "failures": [
-            {
-              "cause": "null",
-              "failures": [],
-              "inputs": [],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "m is null; k is null",
-              "name": "item 1 of xs",
-              "value": 1
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -91147,7 +90736,7 @@
           "locations": [
             "$policy:/requirements/r/checks/every"
           ],
-          "message": "",
+          "message": "m is null; k is null",
           "name": "every xs equals m named by k"
         }
       ],
@@ -91193,20 +90782,7 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "m is null; k2 is missing",
-              "name": "item 1 of xs",
-              "value": 1
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -91229,7 +90805,7 @@
           "locations": [
             "$policy:/requirements/r/checks/other"
           ],
-          "message": "",
+          "message": "m is null; k2 is missing",
           "name": "every xs equals m named by k2"
         }
       ],
@@ -91351,20 +90927,7 @@
       "failures": [
         {
           "cause": "null",
-          "failures": [
-            {
-              "cause": "null",
-              "failures": [],
-              "inputs": [],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k is null",
-              "name": "item 1 of xs",
-              "value": 1
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -91387,7 +90950,7 @@
           "locations": [
             "$policy:/requirements/r/checks/every"
           ],
-          "message": "",
+          "message": "k is null",
           "name": "every xs equals m named by k"
         }
       ],
@@ -91433,20 +90996,7 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k2 is missing",
-              "name": "item 1 of xs",
-              "value": 1
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -91469,7 +91019,7 @@
           "locations": [
             "$policy:/requirements/r/checks/other"
           ],
-          "message": "",
+          "message": "k2 is missing",
           "name": "every xs equals m named by k2"
         }
       ],
@@ -91626,20 +91176,7 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k2 is missing",
-              "name": "item 1 of xs",
-              "value": 1
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -91662,7 +91199,7 @@
           "locations": [
             "$policy:/requirements/r/checks/other"
           ],
-          "message": "",
+          "message": "k2 is missing",
           "name": "every xs equals m named by k2"
         }
       ],
@@ -91743,54 +91280,7 @@
       "failures": [
         {
           "cause": "unusable",
-          "failures": [
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/n"
-                  ],
-                  "name": "xs[0].n",
-                  "outcome": "unusable",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "m is \"zz\", which isn't a list",
-              "name": "item 1 of xs",
-              "value": {
-                "n": 1
-              }
-            },
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/1/n"
-                  ],
-                  "name": "xs[1].n",
-                  "outcome": "unusable",
-                  "value": "ab"
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/1"
-              ],
-              "message": "m is \"zz\", which isn't a list",
-              "name": "item 2 of xs",
-              "value": {
-                "n": "ab"
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -91805,7 +91295,7 @@
           "locations": [
             "$policy:/requirements/r/checks/list"
           ],
-          "message": "",
+          "message": "m is \"zz\", which isn't a list",
           "name": "every xs.n is in m"
         }
       ],
@@ -91845,54 +91335,7 @@
       "failures": [
         {
           "cause": "unusable",
-          "failures": [
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/n"
-                  ],
-                  "name": "xs[0].n",
-                  "outcome": "unusable",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "m is \"zz\", which isn't a number",
-              "name": "item 1 of xs",
-              "value": {
-                "n": 1
-              }
-            },
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/1/n"
-                  ],
-                  "name": "xs[1].n",
-                  "outcome": "unusable",
-                  "value": "ab"
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/1"
-              ],
-              "message": "m is \"zz\", which isn't a number",
-              "name": "item 2 of xs",
-              "value": {
-                "n": "ab"
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -91907,7 +91350,7 @@
           "locations": [
             "$policy:/requirements/r/checks/number"
           ],
-          "message": "",
+          "message": "m is \"zz\", which isn't a number",
           "name": "every xs.n is at least m"
         }
       ],
@@ -92026,60 +91469,13 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/n"
-                  ],
-                  "name": "xs[0].n",
-                  "outcome": "absent",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "$params.q is missing",
-              "name": "item 1 of xs",
-              "value": {
-                "n": 1
-              }
-            },
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/1/n"
-                  ],
-                  "name": "xs[1].n",
-                  "outcome": "absent",
-                  "value": "ab"
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/1"
-              ],
-              "message": "$params.q is missing",
-              "name": "item 2 of xs",
-              "value": {
-                "n": "ab"
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/params"
           ],
-          "message": "",
+          "message": "$params.q is missing",
           "name": "every xs.n does not equal $params.q"
         }
       ],
@@ -92111,60 +91507,13 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/n"
-                  ],
-                  "name": "xs[0].n",
-                  "outcome": "absent",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "$params.q is missing",
-              "name": "item 1 of xs",
-              "value": {
-                "n": 1
-              }
-            },
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/1/n"
-                  ],
-                  "name": "xs[1].n",
-                  "outcome": "absent",
-                  "value": "ab"
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/1"
-              ],
-              "message": "$params.q is missing",
-              "name": "item 2 of xs",
-              "value": {
-                "n": "ab"
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/params_list"
           ],
-          "message": "",
+          "message": "$params.q is missing",
           "name": "every xs.n is in $params.q"
         }
       ],
@@ -92196,54 +91545,7 @@
       "failures": [
         {
           "cause": "unusable",
-          "failures": [
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/n"
-                  ],
-                  "name": "xs[0].n",
-                  "outcome": "unusable",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "q is 5, which isn't text",
-              "name": "item 1 of xs",
-              "value": {
-                "n": 1
-              }
-            },
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/1/n"
-                  ],
-                  "name": "xs[1].n",
-                  "outcome": "unusable",
-                  "value": "ab"
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/1"
-              ],
-              "message": "q is 5, which isn't text",
-              "name": "item 2 of xs",
-              "value": {
-                "n": "ab"
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -92258,7 +91560,7 @@
           "locations": [
             "$policy:/requirements/r/checks/text"
           ],
-          "message": "",
+          "message": "q is 5, which isn't text",
           "name": "every xs.n starts with q"
         }
       ],
@@ -92298,54 +91600,7 @@
       "failures": [
         {
           "cause": "unusable",
-          "failures": [
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/n"
-                  ],
-                  "name": "xs[0].n",
-                  "outcome": "unusable",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "m is \"zz\", which isn't a time",
-              "name": "item 1 of xs",
-              "value": {
-                "n": 1
-              }
-            },
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/1/n"
-                  ],
-                  "name": "xs[1].n",
-                  "outcome": "unusable",
-                  "value": "ab"
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/1"
-              ],
-              "message": "m is \"zz\", which isn't a time",
-              "name": "item 2 of xs",
-              "value": {
-                "n": "ab"
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -92360,7 +91615,7 @@
           "locations": [
             "$policy:/requirements/r/checks/time"
           ],
-          "message": "",
+          "message": "m is \"zz\", which isn't a time",
           "name": "every xs.n is after m"
         }
       ],
@@ -93040,56 +92295,7 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "absent",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k is missing",
-              "name": "item 1 of xs",
-              "value": {
-                "k": "w",
-                "v": 1
-              }
-            },
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/1/v"
-                  ],
-                  "name": "xs[1].v",
-                  "outcome": "absent",
-                  "value": 2
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/1"
-              ],
-              "message": "k is missing",
-              "name": "item 2 of xs",
-              "value": {
-                "k": "z",
-                "v": 2
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -93112,7 +92318,7 @@
           "locations": [
             "$policy:/requirements/r/checks/input"
           ],
-          "message": "",
+          "message": "k is missing",
           "name": "every xs.v equals $input.m named by k"
         }
       ],
@@ -93160,56 +92366,7 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "absent",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k is missing",
-              "name": "item 1 of xs",
-              "value": {
-                "k": "w",
-                "v": 1
-              }
-            },
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/1/v"
-                  ],
-                  "name": "xs[1].v",
-                  "outcome": "absent",
-                  "value": 2
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/1"
-              ],
-              "message": "k is missing",
-              "name": "item 2 of xs",
-              "value": {
-                "k": "z",
-                "v": 2
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -93232,7 +92389,7 @@
           "locations": [
             "$policy:/requirements/r/checks/params"
           ],
-          "message": "",
+          "message": "k is missing",
           "name": "every xs.v equals $params.m named by k"
         }
       ],
@@ -93280,56 +92437,7 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "absent",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k is missing",
-              "name": "item 1 of xs",
-              "value": {
-                "k": "w",
-                "v": 1
-              }
-            },
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/1/v"
-                  ],
-                  "name": "xs[1].v",
-                  "outcome": "absent",
-                  "value": 2
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/1"
-              ],
-              "message": "k is missing",
-              "name": "item 2 of xs",
-              "value": {
-                "k": "z",
-                "v": 2
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -93356,7 +92464,7 @@
           "locations": [
             "$policy:/requirements/r/checks/part"
           ],
-          "message": "",
+          "message": "k is missing",
           "name": "every xs.v equals pl named by k"
         }
       ],
@@ -93499,32 +92607,7 @@
       "failures": [
         {
           "cause": "null",
-          "failures": [
-            {
-              "cause": "null",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "null",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k is null",
-              "name": "item 1 of xs",
-              "value": {
-                "k": "z",
-                "v": 1
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -93547,7 +92630,7 @@
           "locations": [
             "$policy:/requirements/r/checks/input"
           ],
-          "message": "",
+          "message": "k is null",
           "name": "every xs.v equals $input.m named by k"
         }
       ],
@@ -93593,32 +92676,7 @@
       "failures": [
         {
           "cause": "null",
-          "failures": [
-            {
-              "cause": "null",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "null",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k is null",
-              "name": "item 1 of xs",
-              "value": {
-                "k": "z",
-                "v": 1
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -93641,7 +92699,7 @@
           "locations": [
             "$policy:/requirements/r/checks/params"
           ],
-          "message": "",
+          "message": "k is null",
           "name": "every xs.v equals $params.m named by k"
         }
       ],
@@ -93687,32 +92745,7 @@
       "failures": [
         {
           "cause": "null",
-          "failures": [
-            {
-              "cause": "null",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "null",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k is null",
-              "name": "item 1 of xs",
-              "value": {
-                "k": "z",
-                "v": 1
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -93739,7 +92772,7 @@
           "locations": [
             "$policy:/requirements/r/checks/part"
           ],
-          "message": "",
+          "message": "k is null",
           "name": "every xs.v equals pl named by k"
         }
       ],
@@ -93880,32 +92913,7 @@
       "failures": [
         {
           "cause": "unusable",
-          "failures": [
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "unusable",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k is 3, which isn't text",
-              "name": "item 1 of xs",
-              "value": {
-                "k": "z",
-                "v": 1
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -93928,7 +92936,7 @@
           "locations": [
             "$policy:/requirements/r/checks/input"
           ],
-          "message": "",
+          "message": "k is 3, which isn't text",
           "name": "every xs.v equals $input.m named by k"
         }
       ],
@@ -93974,32 +92982,7 @@
       "failures": [
         {
           "cause": "unusable",
-          "failures": [
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "unusable",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k is 3, which isn't text",
-              "name": "item 1 of xs",
-              "value": {
-                "k": "z",
-                "v": 1
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -94022,7 +93005,7 @@
           "locations": [
             "$policy:/requirements/r/checks/params"
           ],
-          "message": "",
+          "message": "k is 3, which isn't text",
           "name": "every xs.v equals $params.m named by k"
         }
       ],
@@ -94068,32 +93051,7 @@
       "failures": [
         {
           "cause": "unusable",
-          "failures": [
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "unusable",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "k is 3, which isn't text",
-              "name": "item 1 of xs",
-              "value": {
-                "k": "z",
-                "v": 1
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -94120,7 +93078,7 @@
           "locations": [
             "$policy:/requirements/r/checks/part"
           ],
-          "message": "",
+          "message": "k is 3, which isn't text",
           "name": "every xs.v equals pl named by k"
         }
       ],
@@ -94211,32 +93169,7 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/arts/0/kids/0/xs/0/n"
-                  ],
-                  "name": "xs[0].n",
-                  "outcome": "absent",
-                  "value": 4
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/arts/0/kids/0/xs/0"
-              ],
-              "message": "k is missing",
-              "name": "item 1 of xs",
-              "value": {
-                "k": "lo",
-                "n": 4
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -94259,7 +93192,7 @@
           "locations": [
             "$policy:/requirements/r/checks/c"
           ],
-          "message": "",
+          "message": "k is missing",
           "name": "every xs.n is at least art.p named by k"
         }
       ],
@@ -96784,32 +95717,7 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/2/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "absent",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/2/xs/0"
-              ],
-              "message": "k is missing",
-              "name": "item 1 of xs",
-              "value": {
-                "k": "a",
-                "v": 1
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -96832,7 +95740,7 @@
           "locations": [
             "$policy:/subjects/pr/from"
           ],
-          "message": "",
+          "message": "k is missing",
           "name": "some xs.v equals m named by k"
         }
       ],
@@ -101916,60 +100824,13 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "absent",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "$params.q is missing",
-              "name": "item 1 of xs",
-              "value": {
-                "v": 1
-              }
-            },
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/1/v"
-                  ],
-                  "name": "xs[1].v",
-                  "outcome": "absent",
-                  "value": 2
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/1"
-              ],
-              "message": "$params.q is missing",
-              "name": "item 2 of xs",
-              "value": {
-                "v": 2
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/right"
           ],
-          "message": "",
+          "message": "$params.q is missing",
           "name": "every xs.v, if any, equals $params.q"
         }
       ],
@@ -103294,31 +102155,7 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/0/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "absent",
-                  "value": 5
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "message": "pl named by k is missing",
-              "name": "item 1 of xs",
-              "value": {
-                "v": 5
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -103345,7 +102182,7 @@
           "locations": [
             "$policy:/requirements/r/checks/c"
           ],
-          "message": "",
+          "message": "pl named by k is missing",
           "name": "every xs.v equals pl named by k"
         }
       ],
@@ -103696,37 +102533,13 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [
-            {
-              "cause": "absent",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/prs/1/xs/0/v"
-                  ],
-                  "name": "xs[0].v",
-                  "outcome": "absent",
-                  "value": 1
-                }
-              ],
-              "kind": "item",
-              "locations": [
-                "/prs/1/xs/0"
-              ],
-              "message": "$params.q is missing",
-              "name": "item 1 of xs",
-              "value": {
-                "v": 1
-              }
-            }
-          ],
+          "failures": [],
           "inputs": [],
           "kind": "assertion",
           "locations": [
             "$policy:/subjects/pr/from"
           ],
-          "message": "",
+          "message": "$params.q is missing",
           "name": "some xs.v equals $params.q"
         }
       ],

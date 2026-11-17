@@ -5534,26 +5534,13 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/tags/0"
-                    ],
-                    "message": "$params.n is missing",
-                    "name": "item 1 of tags",
-                    "value": 1
-                  }
-                ],
+                "failures": [],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/k"
                 ],
-                "message": "",
+                "message": "$params.n is missing",
                 "name": "every tags is at most $params.n"
               }
             ],
@@ -6723,26 +6710,13 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [
-                  {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/tags/0"
-                    ],
-                    "message": "$params.n is null",
-                    "name": "item 1 of tags",
-                    "value": 1
-                  }
-                ],
+                "failures": [],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/k"
                 ],
-                "message": "",
+                "message": "$params.n is null",
                 "name": "every tags is at most $params.n"
               }
             ],
@@ -7918,26 +7892,13 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/tags/0"
-                    ],
-                    "message": "$params.n is \"a\", which isn't a number",
-                    "name": "item 1 of tags",
-                    "value": 1
-                  }
-                ],
+                "failures": [],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/k"
                 ],
-                "message": "",
+                "message": "$params.n is \"a\", which isn't a number",
                 "name": "every tags is at most $params.n"
               }
             ],
@@ -9053,26 +9014,13 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/tags/0"
-                    ],
-                    "message": "$params.n is missing",
-                    "name": "item 1 of tags",
-                    "value": 1
-                  }
-                ],
+                "failures": [],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/k"
                 ],
-                "message": "",
+                "message": "$params.n is missing",
                 "name": "every tags is at most $params.n"
               }
             ],
@@ -17193,54 +17141,7 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rs/0"
-                        ],
-                        "name": "rs[0].zz",
-                        "outcome": "absent",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/rs/0"
-                    ],
-                    "message": "$input.k is missing",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "v": 1
-                    }
-                  },
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/rs/1"
-                        ],
-                        "name": "rs[1].zz",
-                        "outcome": "absent",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/rs/1"
-                    ],
-                    "message": "$input.k is missing",
-                    "name": "item 2 of rs",
-                    "value": {
-                      "v": 2
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -17255,7 +17156,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "",
+                "message": "$input.k is missing",
                 "name": "every rs.zz equals m named by $input.k"
               }
             ],

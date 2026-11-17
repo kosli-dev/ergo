@@ -6225,56 +6225,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/rows/0/v"
-                        ],
-                        "name": "rows[0].v",
-                        "outcome": "unusable",
-                        "value": "bob"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "n": 2,
-                      "v": "bob"
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/rows/1/v"
-                        ],
-                        "name": "rows[1].v",
-                        "outcome": "unusable",
-                        "value": "ann"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/cs/0/rows/1"
-                    ],
-                    "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
-                    "name": "item 2 of rows",
-                    "value": {
-                      "n": 2,
-                      "v": "ann"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -6297,7 +6248,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
                 "name": "every rows.v is in pos.name"
               }
             ],
@@ -7610,56 +7561,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/rows/0/v"
-                        ],
-                        "name": "rows[0].v",
-                        "outcome": "unusable",
-                        "value": "bob"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "message": "pos is \"s\", which isn't an object",
-                    "name": "item 1 of rows",
-                    "value": {
-                      "n": 2,
-                      "v": "bob"
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/rows/1/v"
-                        ],
-                        "name": "rows[1].v",
-                        "outcome": "unusable",
-                        "value": "ann"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/cs/0/rows/1"
-                    ],
-                    "message": "pos is \"s\", which isn't an object",
-                    "name": "item 2 of rows",
-                    "value": {
-                      "n": 2,
-                      "v": "ann"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -7678,7 +7580,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "pos is \"s\", which isn't an object",
                 "name": "every rows.v is in pos.name"
               }
             ],
@@ -7796,29 +7698,6 @@
                 "cause": "unusable",
                 "failures": [
                   {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
-                        ],
-                        "name": "t[0].rows[0].v",
-                        "outcome": "unusable",
-                        "value": "bob"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/teams/0/0/rows/0"
-                    ],
-                    "message": "t[].name is [\"bob\", 3], which isn't a list of one kind of value",
-                    "name": "item 1 of t[0].rows",
-                    "value": {
-                      "v": "bob"
-                    }
-                  },
-                  {
                     "cause": "absent",
                     "failures": [],
                     "inputs": [
@@ -7841,7 +7720,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "t[].name is [\"bob\", 3], which isn't a list of one kind of value",
                 "name": "every rows.v is in name"
               }
             ],
@@ -8358,54 +8237,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/prs/0/xs/0/v"
-                        ],
-                        "name": "xs[0].v",
-                        "outcome": "unusable",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "message": "pl[].z is [1], which isn't a list of patterns",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "v": "a"
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/prs/0/xs/1/v"
-                        ],
-                        "name": "xs[1].v",
-                        "outcome": "unusable",
-                        "value": "b"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/prs/0/xs/1"
-                    ],
-                    "message": "pl[].z is [1], which isn't a list of patterns",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "v": "b"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -8426,7 +8258,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "pl[].z is [1], which isn't a list of patterns",
                 "name": "every xs.v matches pl.z"
               }
             ],
@@ -9274,54 +9106,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/prs/0/xs/0/v"
-                        ],
-                        "name": "xs[0].v",
-                        "outcome": "unusable",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "message": "pl is \"s\", which isn't an object",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "v": "a"
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/prs/0/xs/1/v"
-                        ],
-                        "name": "xs[1].v",
-                        "outcome": "unusable",
-                        "value": "b"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/prs/0/xs/1"
-                    ],
-                    "message": "pl is \"s\", which isn't an object",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "v": "b"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -9340,7 +9125,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "pl is \"s\", which isn't an object",
                 "name": "every xs.v matches pl.z"
               }
             ],
@@ -23302,34 +23087,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/xs/0/v"
-                        ],
-                        "name": "xs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/xs/0"
-                    ],
-                    "message": "$input is [an object with 5 keys], which isn't an object",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "m": {
-                        "a": "a"
-                      },
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -23344,7 +23102,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "$input is [an object with 5 keys], which isn't an object",
                 "name": "every xs.v equals m named by $input.k"
               }
             ],
@@ -23421,34 +23179,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/xs/0/v"
-                        ],
-                        "name": "xs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/xs/0"
-                    ],
-                    "message": "$input is [an object with 5 keys], which isn't an object",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "m": {
-                        "a": "a"
-                      },
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -23463,7 +23194,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/some"
                 ],
-                "message": "",
+                "message": "$input is [an object with 5 keys], which isn't an object",
                 "name": "some xs.v equals m named by $input.k"
               }
             ],
@@ -23613,34 +23344,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/xs/0/v"
-                        ],
-                        "name": "xs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/xs/0"
-                    ],
-                    "message": "$input is [an object with 5 keys], which isn't an object",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "m": {
-                        "a": "a"
-                      },
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -23655,7 +23359,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "$input is [an object with 5 keys], which isn't an object",
                 "name": "every xs.v equals m named by $input.k"
               }
             ],
@@ -23732,34 +23436,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/xs/0/v"
-                        ],
-                        "name": "xs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/xs/0"
-                    ],
-                    "message": "$input is [an object with 5 keys], which isn't an object",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "m": {
-                        "a": "a"
-                      },
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -23774,7 +23451,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/some"
                 ],
-                "message": "",
+                "message": "$input is [an object with 5 keys], which isn't an object",
                 "name": "some xs.v equals m named by $input.k"
               }
             ],
@@ -23924,34 +23601,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/xs/0/v"
-                        ],
-                        "name": "xs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/xs/0"
-                    ],
-                    "message": "$input is [an object with 5 keys], which isn't an object",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "m": {
-                        "a": "a"
-                      },
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -23966,7 +23616,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "$input is [an object with 5 keys], which isn't an object",
                 "name": "every xs.v equals m named by $input.k"
               }
             ],
@@ -24043,34 +23693,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/xs/0/v"
-                        ],
-                        "name": "xs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/xs/0"
-                    ],
-                    "message": "$input is [an object with 5 keys], which isn't an object",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "m": {
-                        "a": "a"
-                      },
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -24085,7 +23708,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/some"
                 ],
-                "message": "",
+                "message": "$input is [an object with 5 keys], which isn't an object",
                 "name": "some xs.v equals m named by $input.k"
               }
             ],
@@ -26324,36 +25947,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "rs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "message": "$input is [an object with 7 keys], which isn't an object",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "id": "r1",
-                      "n": 1,
-                      "tags": [
-                        "a"
-                      ],
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -26368,7 +25962,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "$input is [an object with 7 keys], which isn't an object",
                 "name": "every rs.v equals m named by $input.k"
               }
             ],
@@ -26560,36 +26154,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "rs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "message": "$input is [an object with 7 keys], which isn't an object",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "id": "r1",
-                      "n": 1,
-                      "tags": [
-                        "a"
-                      ],
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -26604,7 +26169,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/some"
                 ],
-                "message": "",
+                "message": "$input is [an object with 7 keys], which isn't an object",
                 "name": "some rs.v equals m named by $input.k"
               }
             ],
@@ -27899,36 +27464,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "rs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "message": "$input is [an object with 6 keys], which isn't an object",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "id": "r1",
-                      "n": 1,
-                      "tags": [
-                        "a"
-                      ],
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -27943,7 +27479,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "$input is [an object with 6 keys], which isn't an object",
                 "name": "every rs.v equals m named by $input.k"
               }
             ],
@@ -28135,36 +27671,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "rs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "message": "$input is [an object with 6 keys], which isn't an object",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "id": "r1",
-                      "n": 1,
-                      "tags": [
-                        "a"
-                      ],
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -28179,7 +27686,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/some"
                 ],
-                "message": "",
+                "message": "$input is [an object with 6 keys], which isn't an object",
                 "name": "some rs.v equals m named by $input.k"
               }
             ],
@@ -29474,36 +28981,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "rs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "message": "$input is [an object with 7 keys], which isn't an object",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "id": "r1",
-                      "n": 1,
-                      "tags": [
-                        "a"
-                      ],
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -29518,7 +28996,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "$input is [an object with 7 keys], which isn't an object",
                 "name": "every rs.v equals m named by $input.k"
               }
             ],
@@ -29710,36 +29188,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "rs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "message": "$input is [an object with 7 keys], which isn't an object",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "id": "r1",
-                      "n": 1,
-                      "tags": [
-                        "a"
-                      ],
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -29754,7 +29203,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/some"
                 ],
-                "message": "",
+                "message": "$input is [an object with 7 keys], which isn't an object",
                 "name": "some rs.v equals m named by $input.k"
               }
             ],
@@ -31049,36 +30498,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "rs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "message": "$input is [an object with 7 keys], which isn't an object",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "id": "r1",
-                      "n": 1,
-                      "tags": [
-                        "a"
-                      ],
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -31093,7 +30513,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "$input is [an object with 7 keys], which isn't an object",
                 "name": "every rs.v equals m named by $input.k"
               }
             ],
@@ -31285,36 +30705,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "rs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "message": "$input is [an object with 7 keys], which isn't an object",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "id": "r1",
-                      "n": 1,
-                      "tags": [
-                        "a"
-                      ],
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -31329,7 +30720,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/some"
                 ],
-                "message": "",
+                "message": "$input is [an object with 7 keys], which isn't an object",
                 "name": "some rs.v equals m named by $input.k"
               }
             ],
@@ -35216,31 +34607,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "rs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "message": "$input is [an object with 7 keys], which isn't an object",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -35255,7 +34622,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "$input is [an object with 7 keys], which isn't an object",
                 "name": "every rs.v equals m named by $input.k"
               }
             ],
@@ -35504,31 +34871,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "rs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "message": "$input is [an object with 7 keys], which isn't an object",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -35543,7 +34886,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "$input is [an object with 7 keys], which isn't an object",
                 "name": "every rs.v equals m named by $input.k"
               }
             ],
@@ -35792,31 +35135,7 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/0/rs/0/v"
-                        ],
-                        "name": "rs[0].v",
-                        "outcome": "not_an_object",
-                        "value": "a"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "message": "$input is [an object with 7 keys], which isn't an object",
-                    "name": "item 1 of rs",
-                    "value": {
-                      "v": "a"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -35831,7 +35150,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "",
+                "message": "$input is [an object with 7 keys], which isn't an object",
                 "name": "every rs.v equals m named by $input.k"
               }
             ],
