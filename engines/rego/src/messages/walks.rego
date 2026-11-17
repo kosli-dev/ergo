@@ -671,7 +671,23 @@ _m_other_name(x, a) if {
 	x.named_by != a
 }
 
-_m_unalias(a, one, x) := _m_lead_alias(a, one, strings.replace_n({concat("", ["\u0002", a, "."]): ""}, x))
+_m_unalias(a, one, x) := _m_lead_alias(a, one, strings.replace_n({concat("", ["\u0002", a, "."]): ""}, x)) if not contains(x, " is ")
+
+else := _m_lead_alias(a, one, concat("; ", [concat(", and ", [_m_unalias_clause(a, c) | some c in split(p, ", and ")]) | some p in split(x, "; ")]))
+
+_m_unalias_clause(a, c) := c if _m_alias_kept(c)
+
+else := strings.replace_n({concat("", ["\u0002", a, "."]): ""}, c)
+
+_m_alias_kept(c) if {
+	not contains(c, "item ")
+	endswith(c, " is missing")
+}
+
+_m_alias_kept(c) if {
+	not contains(c, "item ")
+	endswith(c, " is null")
+}
 
 _m_lead_alias(a, one, y) := concat("", ["\u0001", a, "\u0001", substring(y, count(a) + 1, -1)]) if {
 	one == true

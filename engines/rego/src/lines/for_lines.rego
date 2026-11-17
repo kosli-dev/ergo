@@ -879,6 +879,12 @@ _m_for_item_name(check, p) := _for_item_name(check, p) if {
 
 _m_for_item_name(check, p) := _m_item_name(p, _for_dotted(check)) if not p[0] in {concat("", ["$", item.as]) | some item in check.items}
 
+_m_for_list_said(check, p, cause) := _for_item_name(check, p) if {
+	cause in _no_value_states
+	p[0] in {concat("", ["$", item.as]) | some item in check.items}
+	not is_number(p[count(p) - 1])
+} else := _m_for_item_name(check, p)
+
 _m_unaliased(p) if {
 	count(p) > 2
 	not is_number(p[1])
@@ -944,7 +950,7 @@ _for_unchecked(check, inner) := {"failed_items": [_for_unchecked_item(check, f) 
 	f.path == p
 ]} if inner != []
 
-_for_unchecked_item(check, f) := object.union({"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_inner_text(check, f), "free": _m_inner_free(f)}, {"ergo/sorted": f.sorted | "sorted" in object.keys(f)})
+_for_unchecked_item(check, f) := object.union({"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_list_said(check, f.path, f.cause), f), "text": _m_inner_text(check, f), "free": _m_inner_free(f)}, {"ergo/sorted": f.sorted | "sorted" in object.keys(f)})
 
 _for_inputs(check, subj, names, item, w) := _merged_inputs([_for_input_of(t) | some t in ((_for_input_pairs(check, subj, names, item, w) | _for_listed_pairs(check, subj)) | _for_whose_pairs(check, subj))])
 
