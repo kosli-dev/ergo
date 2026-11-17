@@ -16712,7 +16712,18 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "found",
+                    "value": [
+                      2
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/b_every_in_params"
@@ -17642,7 +17653,18 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "found",
+                    "value": [
+                      2
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/b_every_in_params"

@@ -515,7 +515,7 @@
                   {
                     "locations": [],
                     "name": "name",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -536,7 +536,7 @@
               {
                 "locations": [],
                 "name": "name",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -657,7 +657,7 @@
                   {
                     "locations": [],
                     "name": "n",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -678,7 +678,7 @@
               {
                 "locations": [],
                 "name": "n",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],

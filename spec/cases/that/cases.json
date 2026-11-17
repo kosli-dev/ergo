@@ -2363,7 +2363,19 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/t/items/0"
+                    ],
+                    "name": "items[0]",
+                    "outcome": "unusable",
+                    "value": {
+                      "kind": "a",
+                      "qty": 1
+                    }
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/t/items/0"
@@ -2441,7 +2453,19 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/t/items/0"
+                    ],
+                    "name": "items[0]",
+                    "outcome": "unusable",
+                    "value": {
+                      "kind": "a",
+                      "qty": 1
+                    }
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/t/items/0"
@@ -3717,7 +3741,27 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "xs[0]",
+                    "outcome": "unusable",
+                    "value": {
+                      "c": "s",
+                      "n": 1
+                    }
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/xs/0/c"
+                    ],
+                    "name": "xs[0].c",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
@@ -3732,7 +3776,27 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/1"
+                    ],
+                    "name": "xs[1]",
+                    "outcome": "unusable",
+                    "value": {
+                      "c": "s",
+                      "n": 2
+                    }
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/xs/1/c"
+                    ],
+                    "name": "xs[1].c",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
@@ -3780,7 +3844,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0/n"
+                    ],
+                    "name": "xs[0].n",
+                    "outcome": "unusable",
+                    "value": 1
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/xs/0/c"
+                    ],
+                    "name": "xs[0].c",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
@@ -3795,7 +3876,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/1/n"
+                    ],
+                    "name": "xs[1].n",
+                    "outcome": "unusable",
+                    "value": 2
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/xs/1/c"
+                    ],
+                    "name": "xs[1].c",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
@@ -3862,7 +3960,27 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/1"
+                    ],
+                    "name": "xs[1]",
+                    "outcome": "unusable",
+                    "value": {
+                      "c": 0,
+                      "n": 1
+                    }
+                  },
+                  {
+                    "locations": [
+                      "/ts/0/xs/1/c"
+                    ],
+                    "name": "xs[1].c",
+                    "outcome": "unusable",
+                    "value": 0
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"

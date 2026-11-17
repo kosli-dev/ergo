@@ -14528,7 +14528,7 @@
                       "/things/0/obj"
                     ],
                     "name": "obj named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -14546,7 +14546,7 @@
                   "/things/0/obj"
                 ],
                 "name": "obj named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -34914,6 +34914,17 @@
                         "value": [
                           "WTFPL"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "$params:/allowed_licenses"
+                        ],
+                        "name": "$params.allowed_licenses",
+                        "outcome": "found",
+                        "value": [
+                          "BSD-3-Clause",
+                          "Apache-2.0"
+                        ]
                       }
                     ],
                     "kind": "assertion",
@@ -35140,6 +35151,14 @@
                         "name": "licenses.license.id",
                         "outcome": "absent",
                         "value": []
+                      },
+                      {
+                        "locations": [
+                          "$params:/allowed_licenses"
+                        ],
+                        "name": "$params.allowed_licenses",
+                        "outcome": "found",
+                        "value": "BSD-3-Clause"
                       }
                     ],
                     "kind": "assertion",
@@ -63245,7 +63264,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -63274,7 +63293,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -63318,7 +63337,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -63355,7 +63374,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -63391,7 +63410,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -63428,7 +63447,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -63480,7 +63499,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -63517,7 +63536,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -63735,7 +63754,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -63764,7 +63783,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -63808,7 +63827,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -63845,7 +63864,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -63881,7 +63900,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -63918,7 +63937,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -63970,7 +63989,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -64007,7 +64026,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -64225,7 +64244,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -64254,7 +64273,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -64298,7 +64317,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -64335,7 +64354,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -64371,7 +64390,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -64408,7 +64427,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -64460,7 +64479,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -64497,7 +64516,7 @@
               {
                 "locations": [],
                 "name": "m named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -66367,7 +66386,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -66634,7 +66653,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -66901,7 +66920,7 @@
                   {
                     "locations": [],
                     "name": "m named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -70177,7 +70196,7 @@
                   {
                     "locations": [],
                     "name": "rows.w named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -70206,7 +70225,7 @@
               {
                 "locations": [],
                 "name": "rows.w named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -70242,7 +70261,7 @@
                   {
                     "locations": [],
                     "name": "rows.n named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -70271,7 +70290,7 @@
               {
                 "locations": [],
                 "name": "rows.n named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -70536,7 +70555,7 @@
                   {
                     "locations": [],
                     "name": "rows.w named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -70565,7 +70584,7 @@
               {
                 "locations": [],
                 "name": "rows.w named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -70601,7 +70620,7 @@
                   {
                     "locations": [],
                     "name": "rows.n named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -70630,7 +70649,7 @@
               {
                 "locations": [],
                 "name": "rows.n named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -70895,7 +70914,7 @@
                   {
                     "locations": [],
                     "name": "rows.w named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -70924,7 +70943,7 @@
               {
                 "locations": [],
                 "name": "rows.w named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -70960,7 +70979,7 @@
                   {
                     "locations": [],
                     "name": "rows.n named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -70989,7 +71008,7 @@
               {
                 "locations": [],
                 "name": "rows.n named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -71678,7 +71697,7 @@
                   {
                     "locations": [],
                     "name": "rows.w named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -71707,7 +71726,7 @@
               {
                 "locations": [],
                 "name": "rows.w named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -71743,7 +71762,7 @@
                   {
                     "locations": [],
                     "name": "rows.n named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -71772,7 +71791,7 @@
               {
                 "locations": [],
                 "name": "rows.n named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -72070,7 +72089,7 @@
                   {
                     "locations": [],
                     "name": "rows.w named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -72099,7 +72118,7 @@
               {
                 "locations": [],
                 "name": "rows.w named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -72135,7 +72154,7 @@
                   {
                     "locations": [],
                     "name": "rows.n named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -72164,7 +72183,7 @@
               {
                 "locations": [],
                 "name": "rows.n named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -72462,7 +72481,7 @@
                   {
                     "locations": [],
                     "name": "rows.w named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -72491,7 +72510,7 @@
               {
                 "locations": [],
                 "name": "rows.w named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -72527,7 +72546,7 @@
                   {
                     "locations": [],
                     "name": "rows.n named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -72556,7 +72575,7 @@
               {
                 "locations": [],
                 "name": "rows.n named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -72862,7 +72881,7 @@
                   {
                     "locations": [],
                     "name": "rows.w named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -72893,7 +72912,7 @@
               {
                 "locations": [],
                 "name": "rows.w named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -72931,7 +72950,7 @@
                   {
                     "locations": [],
                     "name": "rows.n named by p",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -72962,7 +72981,7 @@
               {
                 "locations": [],
                 "name": "rows.n named by p",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -73591,7 +73610,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -73620,7 +73639,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -73656,7 +73675,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -73685,7 +73704,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -74029,7 +74048,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -74058,7 +74077,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -74094,7 +74113,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -74123,7 +74142,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -74467,7 +74486,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -74496,7 +74515,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -74532,7 +74551,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -74561,7 +74580,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -75368,7 +75387,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -75397,7 +75416,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -75433,7 +75452,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -75462,7 +75481,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -75806,7 +75825,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -75835,7 +75854,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -75871,7 +75890,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -75900,7 +75919,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -76244,7 +76263,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -76273,7 +76292,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -76309,7 +76328,7 @@
                   {
                     "locations": [],
                     "name": "zz.x named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -76338,7 +76357,7 @@
               {
                 "locations": [],
                 "name": "zz.x named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -79412,7 +79431,7 @@
                       {
                         "locations": [],
                         "name": "n named by k",
-                        "outcome": "found",
+                        "outcome": "unusable",
                         "value": []
                       }
                     ],
@@ -80030,7 +80049,7 @@
                       {
                         "locations": [],
                         "name": "n named by k",
-                        "outcome": "found",
+                        "outcome": "unusable",
                         "value": []
                       }
                     ],
@@ -80620,7 +80639,7 @@
                       {
                         "locations": [],
                         "name": "n named by k",
-                        "outcome": "found",
+                        "outcome": "unusable",
                         "value": []
                       }
                     ],
@@ -81206,7 +81225,7 @@
                       {
                         "locations": [],
                         "name": "n named by k",
-                        "outcome": "found",
+                        "outcome": "null",
                         "value": []
                       }
                     ],
@@ -81804,7 +81823,7 @@
                       {
                         "locations": [],
                         "name": "n named by k",
-                        "outcome": "found",
+                        "outcome": "unusable",
                         "value": []
                       }
                     ],
@@ -82242,7 +82261,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k1",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82260,7 +82279,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k1",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -82285,7 +82304,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k0",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82303,7 +82322,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k0",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -82328,7 +82347,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.kf",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82346,7 +82365,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.kf",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -82371,7 +82390,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.kt",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82389,7 +82408,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.kt",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -82414,7 +82433,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.ko",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82432,7 +82451,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.ko",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -82457,7 +82476,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.kl",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82475,7 +82494,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.kl",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -82671,7 +82690,7 @@
                   {
                     "locations": [],
                     "name": "n named by $params.k1",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -82692,7 +82711,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k1",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -82725,7 +82744,7 @@
                       "/things/0/t"
                     ],
                     "name": "t named by $params.k1",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82751,7 +82770,7 @@
                   "/things/0/t"
                 ],
                 "name": "t named by $params.k1",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -82776,7 +82795,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k1",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82794,7 +82813,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k1",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -82823,7 +82842,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k1",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -82848,7 +82867,7 @@
                       "/things/1/m"
                     ],
                     "name": "m named by $params.k1",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82866,7 +82885,7 @@
                   "/things/1/m"
                 ],
                 "name": "m named by $params.k1",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -82891,7 +82910,7 @@
                       "/things/1/m"
                     ],
                     "name": "m named by $params.k0",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82909,7 +82928,7 @@
                   "/things/1/m"
                 ],
                 "name": "m named by $params.k0",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -82934,7 +82953,7 @@
                       "/things/1/m"
                     ],
                     "name": "m named by $params.kf",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82952,7 +82971,7 @@
                   "/things/1/m"
                 ],
                 "name": "m named by $params.kf",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -82977,7 +82996,7 @@
                       "/things/1/m"
                     ],
                     "name": "m named by $params.kt",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -82995,7 +83014,7 @@
                   "/things/1/m"
                 ],
                 "name": "m named by $params.kt",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -83020,7 +83039,7 @@
                       "/things/1/m"
                     ],
                     "name": "m named by $params.ko",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -83038,7 +83057,7 @@
                   "/things/1/m"
                 ],
                 "name": "m named by $params.ko",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -83063,7 +83082,7 @@
                       "/things/1/m"
                     ],
                     "name": "m named by $params.kl",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -83081,7 +83100,7 @@
                   "/things/1/m"
                 ],
                 "name": "m named by $params.kl",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -83253,7 +83272,7 @@
                   {
                     "locations": [],
                     "name": "n named by $params.k1",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -83274,7 +83293,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k1",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -83307,7 +83326,7 @@
                       "/things/1/t"
                     ],
                     "name": "t named by $params.k1",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -83333,7 +83352,7 @@
                   "/things/1/t"
                 ],
                 "name": "t named by $params.k1",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -83358,7 +83377,7 @@
                       "/things/1/m"
                     ],
                     "name": "m named by $params.k1",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -83376,7 +83395,7 @@
                   "/things/1/m"
                 ],
                 "name": "m named by $params.k1",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -83405,7 +83424,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k1",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -83443,7 +83462,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -83461,7 +83480,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -83528,7 +83547,7 @@
                   {
                     "locations": [],
                     "name": "n named by $input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -83549,7 +83568,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -83582,7 +83601,7 @@
                       "/things/0/t"
                     ],
                     "name": "t named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -83608,7 +83627,7 @@
                   "/things/0/t"
                 ],
                 "name": "t named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -83633,7 +83652,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -83651,7 +83670,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -83680,7 +83699,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -83712,7 +83731,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -83730,7 +83749,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -83797,7 +83816,7 @@
                   {
                     "locations": [],
                     "name": "n named by $input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -83818,7 +83837,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -83851,7 +83870,7 @@
                       "/things/0/t"
                     ],
                     "name": "t named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -83877,7 +83896,7 @@
                   "/things/0/t"
                 ],
                 "name": "t named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -83902,7 +83921,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -83920,7 +83939,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -83949,7 +83968,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -83981,7 +84000,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -83999,7 +84018,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -84066,7 +84085,7 @@
                   {
                     "locations": [],
                     "name": "n named by $input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -84087,7 +84106,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -84120,7 +84139,7 @@
                       "/things/0/t"
                     ],
                     "name": "t named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -84146,7 +84165,7 @@
                   "/things/0/t"
                 ],
                 "name": "t named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -84171,7 +84190,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -84189,7 +84208,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -84218,7 +84237,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -84250,7 +84269,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -84268,7 +84287,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -84335,7 +84354,7 @@
                   {
                     "locations": [],
                     "name": "n named by $input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -84356,7 +84375,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -84389,7 +84408,7 @@
                       "/things/0/t"
                     ],
                     "name": "t named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -84415,7 +84434,7 @@
                   "/things/0/t"
                 ],
                 "name": "t named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -84440,7 +84459,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -84458,7 +84477,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -84487,7 +84506,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -84519,7 +84538,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -84537,7 +84556,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -84604,7 +84623,7 @@
                   {
                     "locations": [],
                     "name": "n named by $input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -84625,7 +84644,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -84658,7 +84677,7 @@
                       "/things/0/t"
                     ],
                     "name": "t named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -84684,7 +84703,7 @@
                   "/things/0/t"
                 ],
                 "name": "t named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -84709,7 +84728,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -84727,7 +84746,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -84756,7 +84775,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -84788,7 +84807,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -84806,7 +84825,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -84873,7 +84892,7 @@
                   {
                     "locations": [],
                     "name": "n named by $input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -84894,7 +84913,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -84927,7 +84946,7 @@
                       "/things/0/t"
                     ],
                     "name": "t named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -84953,7 +84972,7 @@
                   "/things/0/t"
                 ],
                 "name": "t named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -84978,7 +84997,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -84996,7 +85015,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -85025,7 +85044,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -85150,8 +85169,16 @@
                   {
                     "locations": [],
                     "name": "n named by $input.k",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -85171,7 +85198,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -85439,8 +85466,16 @@
                   {
                     "locations": [],
                     "name": "n named by $input.k",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -85460,7 +85495,7 @@
               {
                 "locations": [],
                 "name": "n named by $input.k",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -85825,7 +85860,7 @@
                   {
                     "locations": [],
                     "name": "n named by $params.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -85846,7 +85881,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -85879,7 +85914,7 @@
                       "/things/0/t"
                     ],
                     "name": "t named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -85905,7 +85940,7 @@
                   "/things/0/t"
                 ],
                 "name": "t named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -85930,7 +85965,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -85948,7 +85983,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -85977,7 +86012,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -86058,7 +86093,7 @@
                   {
                     "locations": [],
                     "name": "n named by $params.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -86079,7 +86114,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -86112,7 +86147,7 @@
                       "/things/0/t"
                     ],
                     "name": "t named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -86138,7 +86173,7 @@
                   "/things/0/t"
                 ],
                 "name": "t named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -86163,7 +86198,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -86181,7 +86216,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -86210,7 +86245,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -86291,7 +86326,7 @@
                   {
                     "locations": [],
                     "name": "n named by $params.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -86312,7 +86347,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -86345,7 +86380,7 @@
                       "/things/0/t"
                     ],
                     "name": "t named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -86371,7 +86406,7 @@
                   "/things/0/t"
                 ],
                 "name": "t named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -86396,7 +86431,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -86414,7 +86449,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -86443,7 +86478,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -86532,8 +86567,16 @@
                   {
                     "locations": [],
                     "name": "n named by $params.k",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -86553,7 +86596,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -86785,8 +86828,16 @@
                   {
                     "locations": [],
                     "name": "n named by $params.k",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -86806,7 +86857,7 @@
               {
                 "locations": [],
                 "name": "n named by $params.k",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -92198,7 +92249,16 @@
         {
           "cause": "absent",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.q",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/params_list"
@@ -95659,7 +95719,20 @@
               }
             }
           ],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "$params:/envs/0/name",
+                "$params:/envs/1"
+              ],
+              "name": "$params.envs[].name",
+              "outcome": "found",
+              "value": [
+                "a",
+                null
+              ]
+            }
+          ],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/c"
@@ -95746,7 +95819,20 @@
               }
             }
           ],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "$params:/envs/0/name",
+                "$params:/envs/1"
+              ],
+              "name": "$params.envs[].name",
+              "outcome": "found",
+              "value": [
+                "a",
+                null
+              ]
+            }
+          ],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/c"
@@ -103147,7 +103233,28 @@
               }
             }
           ],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "$params:/envs/0/name",
+                "$params:/envs/1",
+                "$params:/envs/2",
+                "$params:/envs/3",
+                "$params:/envs/4",
+                "$params:/envs/5"
+              ],
+              "name": "$params.envs[].name",
+              "outcome": "found",
+              "value": [
+                "a",
+                null,
+                null,
+                null,
+                null,
+                null
+              ]
+            }
+          ],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/c"

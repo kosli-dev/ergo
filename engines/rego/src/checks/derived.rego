@@ -263,7 +263,9 @@ _tally_inputs(subj, side, t) := array.concat(
 	)),
 )
 
-_tally_list_input(t) := {"name": t.list, "value": t.values, "locations": t.locations}
+_tally_list_input(t) := {"name": t.list, "value": t.values, "locations": t.locations, "ergo/outcome": t["ergo/outcome"]} if _ = t["ergo/outcome"]
+
+else := {"name": t.list, "value": t.values, "locations": t.locations}
 
 _basic_inputs(subj, side) := [_number_input(side.text, _first_or_null([x | x := _basic_value(subj, side)]), [from, to]), from, to] if {
 	_basic_form(side) == "elapsed"
@@ -280,16 +282,17 @@ _side_inputs(subj, side) := array.concat([_derived_input(subj, side, _side_text(
 	operands := [i | some operand in side.add; some i in _basic_inputs(subj, operand)]
 }
 
-_tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "values": [], "locations": []} if {
+_tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "values": [], "locations": [], "ergo/outcome": "not_an_object"} if {
 	path := side[_basic_form(side)]
 	not _off_subject(path)
 	not _old_subject_part(path)
 	not _reads_subject(path)
 	not _list_start(path, subj)
 	not is_object(subj)
-} else := {"states": {_walk_read_state(subj, path)}, "list": _path_name(path), "values": [], "locations": []} if {
+} else := {"states": {st}, "list": _path_name(path), "values": [], "locations": [], "ergo/outcome": _outcome_word(st)} if {
 	path := side[_basic_form(side)]
 	not _walk_keys({"path": path}, subj)
+	st := _walk_read_state(subj, path)
 } else := r if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)

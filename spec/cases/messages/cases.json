@@ -8412,7 +8412,7 @@
                   {
                     "locations": [],
                     "name": "x named by zz",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -8441,7 +8441,7 @@
               {
                 "locations": [],
                 "name": "x named by zz",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -8484,7 +8484,7 @@
                   {
                     "locations": [],
                     "name": "x named by zz",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -8513,7 +8513,7 @@
               {
                 "locations": [],
                 "name": "x named by zz",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -8556,7 +8556,7 @@
                   {
                     "locations": [],
                     "name": "x named by zz",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -8585,7 +8585,7 @@
               {
                 "locations": [],
                 "name": "x named by zz",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -8718,7 +8718,7 @@
                   {
                     "locations": [],
                     "name": "x[0] named by zz",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -8747,7 +8747,7 @@
               {
                 "locations": [],
                 "name": "x[0] named by zz",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -15405,6 +15405,14 @@
                       1,
                       2
                     ]
+                  },
+                  {
+                    "locations": [
+                      "$params:/q"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "found",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -15464,6 +15472,14 @@
                     "name": "xs[].v",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/q"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "found",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -18095,6 +18111,14 @@
                       },
                       {}
                     ]
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "found",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -18235,6 +18259,14 @@
                       },
                       {}
                     ]
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "found",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -18371,6 +18403,14 @@
                     "name": "xs[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "found",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -18472,6 +18512,14 @@
                     "name": "xs[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "found",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -18606,6 +18654,14 @@
                     "name": "xs[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -18707,6 +18763,14 @@
                     "name": "xs[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -18844,6 +18908,14 @@
                     "name": "pr.l",
                     "outcome": "found",
                     "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -18957,6 +19029,14 @@
                     "name": "pr.l",
                     "outcome": "found",
                     "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -25670,6 +25750,14 @@
                     "name": "xs[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -25782,6 +25870,22 @@
                     "name": "xs[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.a",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.b",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -25894,6 +25998,14 @@
                     "name": "xs[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -26006,6 +26118,22 @@
                     "name": "xs[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.a",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.b",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -26132,6 +26260,14 @@
                     "name": "xs[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -26317,6 +26453,14 @@
                     "name": "xs[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -35963,6 +36107,14 @@
                     "name": "es",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "found",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -36004,6 +36156,14 @@
                     "name": "es",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "found",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -36155,6 +36315,14 @@
                     "name": "es",
                     "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "found",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -36197,6 +36365,14 @@
                     "name": "es",
                     "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "found",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -36305,6 +36481,22 @@
                     "name": "es",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/y"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "found",
+                    "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -36346,6 +36538,22 @@
                     "name": "es.v",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/y"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "found",
+                    "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -36387,6 +36595,22 @@
                     "name": "es",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/y"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "found",
+                    "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -36435,6 +36659,22 @@
                     "name": "es",
                     "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/y"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "found",
+                    "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -36477,6 +36717,22 @@
                     "name": "es.v",
                     "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/y"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "found",
+                    "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -36519,6 +36775,22 @@
                     "name": "es",
                     "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/y"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "found",
+                    "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -36568,6 +36840,22 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/y"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "found",
+                    "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -36610,6 +36898,22 @@
                     "name": "es[].v",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/y"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "found",
+                    "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -36652,6 +36956,22 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/y"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "found",
+                    "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -36845,6 +37165,14 @@
                     ],
                     "name": "$input.y",
                     "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "null",
                     "value": null
                   }
                 ],

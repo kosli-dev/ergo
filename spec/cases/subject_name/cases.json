@@ -7670,7 +7670,7 @@
                   {
                     "locations": [],
                     "name": "ws",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   },
                   {
@@ -7699,7 +7699,7 @@
               {
                 "locations": [],
                 "name": "ws",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               },
               {
@@ -9981,7 +9981,7 @@
                   {
                     "locations": [],
                     "name": "ys",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   },
                   {
@@ -10014,7 +10014,7 @@
               {
                 "locations": [],
                 "name": "ys",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               },
               {
@@ -13096,7 +13096,7 @@
                   {
                     "locations": [],
                     "name": ".item",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   },
                   {
@@ -13117,7 +13117,7 @@
               {
                 "locations": [],
                 "name": ".item",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               },
               {

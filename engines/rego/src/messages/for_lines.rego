@@ -169,6 +169,9 @@ _for_own_texts(item, e, names) := [t |
 _m_whose_why(first, f) := _for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
 	wo := f.whose_of
 	_for_root_fails(wo[0], wo[1], wo[2])
+} else := _for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
+	wo := f.whose_of
+	_for_own_texts(wo[0], wo[1], wo[2]) != []
 } else := f
 
 _m_inner_text(check, f) := _m_inner_text_of(check, _m_whose_why(false, f))

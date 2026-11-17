@@ -3586,7 +3586,25 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -3648,6 +3666,23 @@
                       {
                         "state": "CHANGES",
                         "username": "ann"
+                      }
+                    ]
+                  },
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
                       }
                     ]
                   }
@@ -3771,7 +3806,25 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -3846,7 +3899,25 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -3910,7 +3981,25 @@
                     "name": "approvers"
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -4008,7 +4097,25 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -4088,7 +4195,25 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -4163,7 +4288,25 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -4225,6 +4368,23 @@
                       {
                         "state": "CHANGES",
                         "username": "ann"
+                      }
+                    ]
+                  },
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
                       }
                     ]
                   }
@@ -4292,7 +4452,25 @@
                     "name": "approvers"
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -4355,6 +4533,23 @@
                     "name": "approvers",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -4474,7 +4669,25 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -4544,7 +4757,25 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -4613,6 +4844,23 @@
                     "name": "approvers",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "APPROVED",
+                        "username": "ann"
+                      },
+                      {
+                        "state": "APPROVED",
+                        "username": "bob"
+                      }
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -4703,7 +4951,24 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "comment": "ok",
+                        "username": "ann"
+                      },
+                      {
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/s2"
@@ -4769,7 +5034,24 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/staff"
+                    ],
+                    "name": "$params.staff",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "comment": "ok",
+                        "username": "ann"
+                      },
+                      {
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/e"
@@ -7422,6 +7704,14 @@
                     "value": [
                       2
                     ]
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "found",
+                    "value": "text"
                   }
                 ],
                 "kind": "assertion",
@@ -15118,6 +15408,18 @@
                     "name": "rows[].v",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/os/0/name",
+                      "$params:/os/1"
+                    ],
+                    "name": "$params.os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "bob",
+                      null
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -15157,6 +15459,18 @@
                     "name": "rows[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/os/0/name",
+                      "$params:/os/1"
+                    ],
+                    "name": "$params.os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "bob",
+                      null
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -15254,6 +15568,18 @@
                     "name": "rows[].v",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/os/0/name",
+                      "$params:/os/1"
+                    ],
+                    "name": "$params.os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "bob",
+                      null
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -15293,6 +15619,18 @@
                     "name": "rows[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/os/0/name",
+                      "$params:/os/1"
+                    ],
+                    "name": "$params.os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "bob",
+                      null
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -15389,6 +15727,18 @@
                     "name": "rows[].v",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/os/0/name",
+                      "$params:/os/1/name"
+                    ],
+                    "name": "$params.os[].name",
+                    "outcome": "found",
+                    "value": [
+                      "bob",
+                      3
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -15735,6 +16085,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -15857,6 +16215,14 @@
                     "name": "m named by $input.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -15904,6 +16270,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -15950,6 +16324,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -16072,6 +16454,14 @@
                     "name": "m named by $input.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -16119,6 +16509,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -16165,6 +16563,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -16291,8 +16697,16 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -16315,7 +16729,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -16340,6 +16754,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -16386,6 +16808,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -16512,8 +16942,16 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -16536,7 +16974,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -16561,6 +16999,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -16605,6 +17051,14 @@
                   {
                     "locations": [],
                     "name": "es[]",
+                    "outcome": "found",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
                     "outcome": "found",
                     "value": []
                   }
@@ -16733,8 +17187,16 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -16757,7 +17219,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -16780,6 +17242,14 @@
                   {
                     "locations": [],
                     "name": "es[]",
+                    "outcome": "found",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
                     "outcome": "found",
                     "value": []
                   }
@@ -16828,6 +17298,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": {}
                   }
                 ],
                 "kind": "assertion",
@@ -16954,8 +17432,16 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": {}
                   }
                 ],
                 "kind": "assertion",
@@ -16978,7 +17464,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -17003,6 +17489,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": {}
                   }
                 ],
                 "kind": "assertion",
@@ -17056,6 +17550,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -17149,6 +17651,14 @@
                     "name": "m named by $params.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -17196,6 +17706,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -17249,6 +17767,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -17342,6 +17868,14 @@
                     "name": "m named by $params.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -17389,6 +17923,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -17442,6 +17984,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -17536,8 +18086,16 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -17560,7 +18118,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -17585,6 +18143,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -17631,6 +18197,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -17724,6 +18298,14 @@
                     "name": "m named by $input.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -17771,6 +18353,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -17817,6 +18407,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -17910,6 +18508,14 @@
                     "name": "m named by $input.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -17957,6 +18563,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -18015,7 +18629,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -18039,7 +18653,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -18200,7 +18814,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -18224,7 +18838,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -18373,6 +18987,22 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/j"
+                    ],
+                    "name": "$input.j",
+                    "outcome": "found",
+                    "value": 3
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -18467,6 +19097,22 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.j",
+                    "outcome": "unusable",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/j"
+                    ],
+                    "name": "$input.j",
+                    "outcome": "found",
+                    "value": 3
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "absent",
                     "value": null
                   }
@@ -18491,7 +19137,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.j",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -18516,6 +19162,22 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/j"
+                    ],
+                    "name": "$input.j",
+                    "outcome": "found",
+                    "value": 3
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -18611,6 +19273,22 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/j"
+                    ],
+                    "name": "$input.j",
+                    "outcome": "found",
+                    "value": 3
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -18705,7 +19383,23 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.j",
-                    "outcome": "absent",
+                    "outcome": "unusable",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/j"
+                    ],
+                    "name": "$input.j",
+                    "outcome": "found",
+                    "value": 3
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
                     "value": null
                   }
                 ],
@@ -18729,7 +19423,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.j",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -18754,6 +19448,22 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/j"
+                    ],
+                    "name": "$input.j",
+                    "outcome": "found",
+                    "value": 3
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -18849,6 +19559,22 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/j"
+                    ],
+                    "name": "$input.j",
+                    "outcome": "found",
+                    "value": 3
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -18943,8 +19669,24 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.j",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/j"
+                    ],
+                    "name": "$input.j",
+                    "outcome": "found",
+                    "value": 3
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -18967,7 +19709,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.j",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -18992,6 +19734,22 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/j"
+                    ],
+                    "name": "$input.j",
+                    "outcome": "found",
+                    "value": 3
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "found",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",

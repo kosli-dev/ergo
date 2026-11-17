@@ -23001,7 +23001,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -23022,7 +23022,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -23050,8 +23050,16 @@
                   {
                     "locations": [],
                     "name": "$input.m named by $params.k",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -23071,7 +23079,7 @@
               {
                 "locations": [],
                 "name": "$input.m named by $params.k",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -23096,6 +23104,14 @@
                       "/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "not_an_object",
                     "value": null
                   }
@@ -23188,6 +23204,14 @@
                       "/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "not_an_object",
                     "value": null
                   }
@@ -23258,7 +23282,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -23279,7 +23303,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -23307,8 +23331,16 @@
                   {
                     "locations": [],
                     "name": "$input.m named by $params.k",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -23328,7 +23360,7 @@
               {
                 "locations": [],
                 "name": "$input.m named by $params.k",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -23353,6 +23385,14 @@
                       "/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "not_an_object",
                     "value": null
                   }
@@ -23445,6 +23485,14 @@
                       "/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "not_an_object",
                     "value": null
                   }
@@ -23515,7 +23563,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -23536,7 +23584,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -23564,7 +23612,7 @@
                   {
                     "locations": [],
                     "name": "$input.m named by $params.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -23585,7 +23633,7 @@
               {
                 "locations": [],
                 "name": "$input.m named by $params.k",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -23610,6 +23658,14 @@
                       "/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "not_an_object",
                     "value": null
                   }
@@ -23702,6 +23758,14 @@
                       "/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "not_an_object",
                     "value": null
                   }
@@ -23775,7 +23839,7 @@
                       {
                         "locations": [],
                         "name": "xs.m named by $input.k",
-                        "outcome": "found",
+                        "outcome": "not_an_object",
                         "value": []
                       }
                     ],
@@ -23845,7 +23909,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -23881,7 +23945,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -23910,7 +23974,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -24165,7 +24229,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -24186,7 +24250,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -24214,7 +24278,7 @@
                   {
                     "locations": [],
                     "name": "m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -24235,7 +24299,7 @@
               {
                 "locations": [],
                 "name": "m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -24270,7 +24334,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   },
                   {
@@ -24306,7 +24370,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               },
               {
@@ -24352,7 +24416,7 @@
                       {
                         "locations": [],
                         "name": "xs.m named by $input.k",
-                        "outcome": "found",
+                        "outcome": "not_an_object",
                         "value": []
                       }
                     ],
@@ -24422,7 +24486,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -24458,7 +24522,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -24487,7 +24551,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -24726,7 +24790,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -24747,7 +24811,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -24775,7 +24839,7 @@
                   {
                     "locations": [],
                     "name": "m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -24796,7 +24860,7 @@
               {
                 "locations": [],
                 "name": "m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -24831,7 +24895,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   },
                   {
@@ -24867,7 +24931,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               },
               {
@@ -25512,7 +25576,7 @@
                       {
                         "locations": [],
                         "name": "xs.m named by $input.k",
-                        "outcome": "found",
+                        "outcome": "not_an_object",
                         "value": []
                       }
                     ],
@@ -25582,7 +25646,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -25645,7 +25709,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -25666,7 +25730,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -25952,6 +26016,14 @@
                     "name": "m named by $input.k",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -25997,7 +26069,16 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every_whose"
@@ -26151,6 +26232,14 @@
                     "name": "m named by $input.k",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -26196,7 +26285,16 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_whose"
@@ -26248,7 +26346,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -26269,7 +26367,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -27021,7 +27119,7 @@
                       {
                         "locations": [],
                         "name": "xs.m named by $input.k",
-                        "outcome": "found",
+                        "outcome": "not_an_object",
                         "value": []
                       }
                     ],
@@ -27091,7 +27189,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -27154,7 +27252,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -27175,7 +27273,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -27461,6 +27559,14 @@
                     "name": "m named by $input.k",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -27506,7 +27612,16 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every_whose"
@@ -27660,6 +27775,14 @@
                     "name": "m named by $input.k",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -27705,7 +27828,16 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_whose"
@@ -27757,7 +27889,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -27778,7 +27910,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -28530,7 +28662,7 @@
                       {
                         "locations": [],
                         "name": "xs.m named by $input.k",
-                        "outcome": "found",
+                        "outcome": "not_an_object",
                         "value": []
                       }
                     ],
@@ -28600,7 +28732,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -28663,7 +28795,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -28684,7 +28816,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -28970,6 +29102,14 @@
                     "name": "m named by $input.k",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -29015,7 +29155,16 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every_whose"
@@ -29169,6 +29318,14 @@
                     "name": "m named by $input.k",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -29214,7 +29371,16 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_whose"
@@ -29266,7 +29432,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -29287,7 +29453,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -30039,7 +30205,7 @@
                       {
                         "locations": [],
                         "name": "xs.m named by $input.k",
-                        "outcome": "found",
+                        "outcome": "not_an_object",
                         "value": []
                       }
                     ],
@@ -30109,7 +30275,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -30172,7 +30338,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -30193,7 +30359,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -30479,6 +30645,14 @@
                     "name": "m named by $input.k",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -30524,7 +30698,16 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every_whose"
@@ -30678,6 +30861,14 @@
                     "name": "m named by $input.k",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -30723,7 +30914,16 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_whose"
@@ -30775,7 +30975,7 @@
                   {
                     "locations": [],
                     "name": "xs.m named by $input.k",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -30796,7 +30996,7 @@
               {
                 "locations": [],
                 "name": "xs.m named by $input.k",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -31988,6 +32188,14 @@
                       "a",
                       "b"
                     ]
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -32211,7 +32419,7 @@
                       {
                         "locations": [],
                         "name": "x.m named by $params.k",
-                        "outcome": "found",
+                        "outcome": "unusable",
                         "value": []
                       }
                     ],
@@ -32272,7 +32480,7 @@
                       {
                         "locations": [],
                         "name": "x.m named by $params.k",
-                        "outcome": "found",
+                        "outcome": "unusable",
                         "value": []
                       }
                     ],
@@ -34581,6 +34789,14 @@
                     "name": "m named by $input.k",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -34839,6 +35055,14 @@
                     "name": "m named by $input.k",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -35095,6 +35319,14 @@
                       "/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "not_an_object",
                     "value": null
                   }
@@ -37205,7 +37437,7 @@
                   {
                     "locations": [],
                     "name": "rows.w named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -37234,7 +37466,7 @@
               {
                 "locations": [],
                 "name": "rows.w named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -37325,7 +37557,7 @@
                   {
                     "locations": [],
                     "name": "rows.w named by p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -37354,7 +37586,7 @@
               {
                 "locations": [],
                 "name": "rows.w named by p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {

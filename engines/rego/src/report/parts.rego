@@ -152,9 +152,15 @@ _for_item_entry(f, l, x, aliases, at) := _leveled_by(
 	at,
 )
 
-_for_walk_entry(f, rec, at, where) := _leveled_by(_for_walk_entry_of(f, rec, at, object.get(where.check.items[count(where.check.items) - 1], "whose", [])), object.get(f, "ergo/levels", []), at)
+_for_walk_entry(f, rec, at, where) := _leveled_by(_for_walk_entry_of(f, rec, at, _for_item_whose(where.check.items, f), object.get(where.check.items[count(where.check.items) - 1], "whose", [])), object.get(f, "ergo/levels", []), at)
 
-_for_walk_entry_of(f, rec, at, whose) := object.union(
+_for_item_whose(items, f) := object.get(items[1], "whose", []) if {
+	count(items) == 2
+	_list_base(f.item) == _path_name(items[1].path)
+	_list_base(f.item) != _path_name(items[0].path)
+} else := object.get(items[0], "whose", [])
+
+_for_walk_entry_of(f, rec, at, first_whose, whose) := object.union(
 	_entry("item", f.item, f.cause, [], [_for_sorted_entry(x, x["ergo/sorted"], concat("; ", [_entry_text(m, f.item) | some m in rec.walk]), at) | some x in f.failed_items; x.cause == "ambiguous"], ""),
 	{"value": f.value, "locations": f.locations},
 ) if {
@@ -175,12 +181,25 @@ _for_walk_entry_of(f, rec, at, whose) := object.union(
 }
 
 else := object.union(
-	_entry(_walk_kind(f.item), f.item, f.cause, array.concat([_item_read(f) | _walk_kind(f.item) == "list"], _whose_reads(whose, f)), [], concat("; ", [_entry_text(m, f.item) | some m in rec.walk])),
+	_entry(_walk_kind(f.item), f.item, f.cause, array.concat([_item_read(f) | _walk_kind(f.item) == "list"], _whose_reads(first_whose, f)), [], concat("; ", [_entry_text(m, f.item) | some m in rec.walk])),
 	{"value": f.value, "locations": f.locations},
 ) if {
 	rec.walk != []
 	_walk_kind(f.item) == "item"
 } else := _entry("list", f.item, f.cause, [_item_read(f)], [], concat("; ", rec.walk)) if rec.walk != []
+
+_whose_read_name(p, f) := concat("", [_whose_item_name(f), ".", _path_name(p)]) if p != []
+
+else := _whose_item_name(f)
+
+_whose_item_name(f) := concat("", [_list_base(f.item), "[", format_int(to_number(substring(f.item, 5, indexof(f.item, " of ") - 5)) - 1, 10), "]"])
+
+_whose_read(_, p, f, st) := {"name": _whose_read_name(p, f), "value": null, "locations": f.locations, "outcome": st} if st in _no_value_states
+
+_whose_read(c, p, f, "value") := {"name": _whose_read_name(p, f), "value": object.get(f.value, _plain_keys(p), null), "locations": [_joined(f.locations[0], _plain_keys(p))], "outcome": "unusable"} if {
+	_plain_path(p)
+	_row_cause(c, f.value, "") == "unusable"
+}
 
 _for_sorted_entry(x, s, text, at) := object.union(
 	_entry("item", x.item, x.cause, [{"name": s.name, "value": x.value, "locations": x.locations, "outcome": s.outcome}], [], _entry_text(text, x.item)),
@@ -233,7 +252,7 @@ _entry(kind, name, cause, inputs, failures, message) := {
 
 _policy_entry(kind, name, cause, inputs, failures, message, locations) := object.union(_entry(kind, name, cause, inputs, failures, message), {"locations": locations})
 
-_row_failures(row, _, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, ins, [], row.message, [_assertion_at(where, null, 0)])] if {
+_row_failures(row, _, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, array.concat(ins, _tally_key_ref_entries(where.check, ins, row.cause)), [], row.message, [_assertion_at(where, null, 0)])] if {
 	not _walks(where.check)
 	not _all_of_run(where.check)
 	not _any_of_run(where.check)
@@ -246,7 +265,7 @@ _row_failures(row, at, where, _) := [_policy_entry(
 	"assertion",
 	fa.assertion,
 	fa.cause,
-	_with_outcomes(_anchored_inputs(fa.inputs, at)),
+	array.concat(_with_outcomes(_anchored_inputs(fa.inputs, at)), _sentence_ref_entries(where.check.checks[fa.at], fa.inputs)),
 	[],
 	row["ergo/texts"][k],
 	[_assertion_at(where, null, fa.at)],
@@ -270,7 +289,7 @@ _option_assertion(row, at, where, nm, i) := _policy_entry(
 	"assertion",
 	where.check.assertions[i],
 	row["ergo/outs"][i].cause,
-	_with_outcomes(_anchored_inputs(row["ergo/outs"][i].inputs, at)),
+	array.concat(_with_outcomes(_anchored_inputs(row["ergo/outs"][i].inputs, at)), _sentence_ref_entries(where.check.checks[i], row["ergo/outs"][i].inputs)),
 	[],
 	row["ergo/texts"][i],
 	[_assertion_at(where, nm, count([j | some j, n in array.slice(where.check.option_of, 0, i); n == nm]))],
@@ -280,7 +299,7 @@ _row_failures(row, at, where, ins) := [_policy_entry(
 	"assertion",
 	where.check.expression,
 	row.cause,
-	array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists)], _with_outcomes(_walk_key_ref_entries(where.check.path))),
+	array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists)], _with_outcomes(_walk_key_ref_entries(where.check.path))), _walk_cond_ref_entries(_walk_cond_refs(where.check), row.inputs)),
 	_walk_entries(row, _item_owned(row, texts), at),
 	concat("; ", _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts)))),
 	[_assertion_at(where, null, 0)],
@@ -290,6 +309,56 @@ _row_failures(row, at, where, ins) := [_policy_entry(
 	texts := object.get(row, "ergo/texts", [])
 	lists := {_list_base(f.item) | some f in row.failed_items}
 }
+
+_tally_key_ref_entries(check, inputs, cause) := [x |
+	some x in _with_outcomes(_walk_key_ref_entries([seg |
+		walk(check, [_, y])
+		is_object(y)
+		some f in _tally_forms
+		p := object.get(y, f, null)
+		is_array(p)
+		some seg in p
+	]))
+	not x.name in {i.name | some i in inputs}
+] if {
+	cause in _no_value_states
+	some i in inputs
+	_tally_input_name(i.name)
+} else := []
+
+_tally_input_name(name) if startswith(name, "count of ")
+
+_tally_input_name(name) if startswith(name, "sum of ")
+
+_sentence_ref_entries(c, inputs) := _walk_cond_ref_entries(_walk_cond_refs(c), inputs) if {
+	_walks(c)
+	c.op != "for"
+} else := []
+
+_walk_cond_refs(c) := _check_refs(conds) if {
+	conds := array.concat([c.check], c.whose)
+	some d in conds
+	_cond_may_ref(d)
+} else := set()
+
+_cond_may_ref(d) if {
+	some k, v in d
+	k != "path"
+	is_object(v)
+}
+
+_cond_may_ref(d) if {
+	some k, v in d
+	k != "path"
+	is_array(v)
+}
+
+_walk_cond_ref_entries(refs, inputs) := [] if count(refs) == 0
+
+else := [x |
+	some x in _with_outcomes(_ref_read_entries(refs))
+	not x.name in {i.name | some i in inputs}
+]
 
 _item_input(i, lists) if {
 	contains(i.name, "[]")
@@ -620,15 +689,14 @@ _condition_at(req, name) := _joined("$policy:", ["subjects", owner, "from"]) if 
 	n == name
 }
 
-_whose_reads(whose, f) := [{"name": concat("", [_list_base(f.item), "[", format_int(to_number(substring(f.item, 5, indexof(f.item, " of ") - 5)) - 1, 10), "].", _path_name(p)]), "value": null, "locations": f.locations, "outcome": st} |
+_whose_reads(whose, f) := [r |
 	is_object(f.value)
 	some c in whose
 	some x in _walk_sides_paths(c)
 	p := x[0]
 	is_array(p)
 	not _walk_outside(p)
-	st := _read_state(f.value, p)
-	st in _no_value_states
+	r := _whose_read(c, p, f, _read_state(f.value, p))
 ] if _walk_kind(f.item) == "item"
 
 else := []

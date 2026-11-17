@@ -346,7 +346,7 @@
                       "/things/0/x"
                     ],
                     "name": "x named by $params.i",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -364,7 +364,7 @@
                   "/things/0/x"
                 ],
                 "name": "x named by $params.i",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -1025,7 +1025,7 @@
                       "/things/0"
                     ],
                     "name": "x.y named by $params.i",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -1043,7 +1043,7 @@
                   "/things/0"
                 ],
                 "name": "x.y named by $params.i",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -1075,7 +1075,7 @@
                       "/things/0/x"
                     ],
                     "name": "x.y named by $params.i",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -1093,7 +1093,7 @@
                   "/things/0/x"
                 ],
                 "name": "x.y named by $params.i",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],

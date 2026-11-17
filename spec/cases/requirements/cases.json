@@ -5979,7 +5979,19 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/ok"
+                    ],
+                    "name": "$params.ok",
+                    "outcome": "found",
+                    "value": [
+                      "a",
+                      "b"
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -6045,7 +6057,19 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/ok"
+                    ],
+                    "name": "$params.ok",
+                    "outcome": "found",
+                    "value": [
+                      "a",
+                      "b"
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"

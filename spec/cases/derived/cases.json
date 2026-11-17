@@ -12538,7 +12538,7 @@
                   {
                     "locations": [],
                     "name": "xs.n",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -12559,7 +12559,7 @@
               {
                 "locations": [],
                 "name": "xs.n",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -12587,7 +12587,7 @@
                   {
                     "locations": [],
                     "name": "xs.n",
-                    "outcome": "found",
+                    "outcome": "not_an_object",
                     "value": []
                   }
                 ],
@@ -12608,7 +12608,7 @@
               {
                 "locations": [],
                 "name": "xs.n",
-                "outcome": "found",
+                "outcome": "not_an_object",
                 "value": []
               }
             ],
@@ -22024,7 +22024,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -22053,7 +22053,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -22093,7 +22093,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -22126,7 +22126,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -22158,7 +22158,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -22191,7 +22191,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -22239,7 +22239,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -22272,7 +22272,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -22308,7 +22308,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -22337,7 +22337,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -24693,6 +24693,14 @@
                     "name": "es[]",
                     "outcome": "found",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "found",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",

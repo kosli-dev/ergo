@@ -268,7 +268,7 @@ else := s if {
 	data.ergo_params != null
 } else := state
 
-_ref_step_state(path) := _worst_of({_ref_state(x.ref) | some x in path; _is_ref(x)} - {"value"})
+_ref_step_state(path) := _worst_of({_ref_step_flaw(x) | some x in path; _is_ref(x)})
 
 _outcome_word("value") := "found"
 

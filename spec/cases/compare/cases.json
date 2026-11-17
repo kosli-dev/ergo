@@ -15165,7 +15165,7 @@
                     "/m"
                   ],
                   "name": "$input.m named by $params.a",
-                  "outcome": "absent",
+                  "outcome": "unusable",
                   "value": null
                 }
               ],
@@ -15191,7 +15191,7 @@
                 "/m"
               ],
               "name": "$input.m named by $params.a",
-              "outcome": "absent",
+              "outcome": "unusable",
               "value": null
             }
           ],
@@ -15913,7 +15913,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -15939,7 +15939,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -15964,7 +15964,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -15993,7 +15993,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -16029,7 +16029,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -16055,7 +16055,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -16096,7 +16096,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -16122,7 +16122,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -16749,7 +16749,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -16775,7 +16775,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -16800,7 +16800,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -16829,7 +16829,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -16865,7 +16865,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -16891,7 +16891,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -16932,7 +16932,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -16958,7 +16958,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -17504,7 +17504,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -17522,7 +17522,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -17563,7 +17563,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -17581,7 +17581,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -17630,7 +17630,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -17656,7 +17656,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -17850,7 +17850,7 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -17876,7 +17876,7 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $input.k",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -18054,6 +18054,14 @@
                     "name": "m named by $input.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -18161,6 +18169,14 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
                     "outcome": "null",
                     "value": null
                   }
