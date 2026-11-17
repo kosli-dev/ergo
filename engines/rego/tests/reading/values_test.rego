@@ -20,7 +20,7 @@ test_a_pointer_reads_into_a_list_a_name_holds_and_stops_where_the_read_stopped i
 }
 
 test_a_read_that_starts_at_a_name_nothing_holds_has_no_location_and_never_leaves_the_report if {
-	ergo._path_input({}, ["$nope", "a"]) == {"name": "$nope.a", "value": null, "locations": []}
+	ergo._path_input({}, ["$nope", "a"]) == {"name": "$nope.a", "value": null, "locations": [], "ergo/outcome": "absent"}
 	ergo._locations_of({}, ["$nope", "a"]) == []
 	ergo._unread_at({}, {"path": ["$nope", "a"]}, {}) == {}
 	ergo._fail_locations({"path": ["$nope", "a"]}) == []

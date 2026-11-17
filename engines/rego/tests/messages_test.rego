@@ -633,9 +633,9 @@ test_each_input_of_a_subject_in_a_list_says_where_in_the_input_it_was_read if {
 
 test_a_walk_on_a_missing_list_has_no_values_and_its_failed_item_says_where_it_stopped if {
 	rows := _walk_rows({"c": "every prs.title is \"x\""}, {"things": [{"id": 1, "x": {}}]}, {})
-	rows[0][3] == [{"path": "prs", "item": "prs", "cause": "absent", "value": null, "locations": ["/things/0"]}]
+	rows[0][3] == [_assertion("every prs.title is \"x\"", "absent", ["$policy:/requirements/s/checks/c"], [_seen("prs.title", [], [], "absent")], "", [_list("prs", "absent", [_seen("prs", null, ["/things/0"], "absent")], "prs is missing")])]
 	inputs := _sentence_rows({"c": "every prs.title is \"x\""}, {"things": [{"id": 1, "x": {}}]}, {})
-	inputs[0][3] == [{"name": "prs.title", "value": [], "locations": []}]
+	inputs[0][3] == [_seen("prs.title", [], [], "absent")]
 }
 
 test_nothing_can_follow_a_subjects_name_and_the_problem_says_to_write_a_dot_for_a_field if {
@@ -652,7 +652,7 @@ test_the_subjects_name_on_the_right_of_a_phrase_reads_the_subject if {
 	_subject_rows({"xs": [1, 2]}, "every xs", "s is s", {}) == []
 	rows := _subject_rows({"xs": [{"id": "a", "x": 1}, {"id": "b", "x": {"id": "b", "x": 2}}]}, "every xs", "x is s", {})
 	[r[1] | some r in rows] == [false, false]
-	rows[0][3] == [{"name": "x", "value": 1, "locations": ["/xs/0/x"]}, {"name": "s", "value": {"id": "a", "x": 1}, "locations": ["/xs/0"]}]
+	rows[0][3] == [_seen("x", 1, ["/xs/0/x"], "found"), _seen("s", {"id": "a", "x": 1}, ["/xs/0"], "found")]
 	_subject_rows({"xs": [[1, 2]]}, "every xs", "count of x is count of s", {})[0][1] == false
 }
 
@@ -914,14 +914,14 @@ test_a_walk_whose_ref_step_cant_be_read_names_its_path_and_every_root_its_phrase
 
 test_a_for_check_that_reads_params_says_only_that_params_is_not_an_object if {
 	rows := _params_not_object_rows(_params_not_object_doc, 3)
-	rows.least_q == ["unusable", "$params is 3, which isn't an object", [_list("xs", "unusable", [], "$params is 3, which isn't an object")]]
-	rows.in_q == ["unusable", "$params is 3, which isn't an object", [_list("xs", "unusable", [], "$params is 3, which isn't an object")]]
+	rows.least_q == ["unusable", "$params is 3, which isn't an object", [_assertion("m.v is at least $params.q", "unusable", ["$policy:/requirements/r/checks/least_q/assert"], [_seen("$params.q", null, ["$params:"], "unusable")], "$params is 3, which isn't an object", [])]]
+	rows.in_q == ["unusable", "$params is 3, which isn't an object", [_assertion("m.v is in $params.q", "unusable", ["$policy:/requirements/r/checks/in_q/assert"], [_seen("$params.q", null, ["$params:"], "unusable")], "$params is 3, which isn't an object", [])]]
 	rows_s := _params_not_object_rows(_params_not_object_doc, "s")
-	rows_s.least_q == ["unusable", "$params is \"s\", which isn't an object", [_list("xs", "unusable", [], "$params is \"s\", which isn't an object")]]
-	rows_s.in_q == ["unusable", "$params is \"s\", which isn't an object", [_list("xs", "unusable", [], "$params is \"s\", which isn't an object")]]
+	rows_s.least_q == ["unusable", "$params is \"s\", which isn't an object", [_assertion("m.v is at least $params.q", "unusable", ["$policy:/requirements/r/checks/least_q/assert"], [_seen("$params.q", null, ["$params:"], "unusable")], "$params is \"s\", which isn't an object", [])]]
+	rows_s.in_q == ["unusable", "$params is \"s\", which isn't an object", [_assertion("m.v is in $params.q", "unusable", ["$policy:/requirements/r/checks/in_q/assert"], [_seen("$params.q", null, ["$params:"], "unusable")], "$params is \"s\", which isn't an object", [])]]
 	rows_l := _params_not_object_rows(_params_not_object_doc, [])
-	rows_l.least_q == ["unusable", "$params is [], which isn't an object", [_list("xs", "unusable", [], "$params is [], which isn't an object")]]
-	rows_l.in_q == ["unusable", "$params is [], which isn't an object", [_list("xs", "unusable", [], "$params is [], which isn't an object")]]
+	rows_l.least_q == ["unusable", "$params is [], which isn't an object", [_assertion("m.v is at least $params.q", "unusable", ["$policy:/requirements/r/checks/least_q/assert"], [_seen("$params.q", null, ["$params:"], "unusable")], "$params is [], which isn't an object", [])]]
+	rows_l.in_q == ["unusable", "$params is [], which isn't an object", [_assertion("m.v is in $params.q", "unusable", ["$policy:/requirements/r/checks/in_q/assert"], [_seen("$params.q", null, ["$params:"], "unusable")], "$params is [], which isn't an object", [])]]
 }
 
 test_an_empty_list_with_params_that_are_not_an_object_names_only_the_key_that_isnt_text_beside_a_root_that_isnt_a_number if {

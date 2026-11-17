@@ -263,7 +263,7 @@ test_a_ref_step_renders_and_is_recorded_like_any_ref if {
 	rep := report(trail_doc, trail_req(attested)) with data.params as {"artifact": "app", "att": "junit"}
 	rep.requirements.s.checks.c.expression == `attestations named by $params.att.status is "COMPLETE"`
 	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.att", "value": "junit", "locations": ["$params:/att"]}]
-	ergo.violations(rep)[0].inputs == [{"name": "attestations named by $params.att.status", "value": "FAILED", "locations": ["/trail/artifacts/app/attestations/junit/status"]}, {"name": "$params.att", "value": "junit", "locations": ["$params:/att"]}]
+	ergo.violations(rep)[0].inputs == [_seen("attestations named by $params.att.status", "FAILED", ["/trail/artifacts/app/attestations/junit/status"], "found"), _seen("$params.att", "junit", ["$params:/att"], "found")]
 }
 
 test_a_ref_step_in_from_that_cannot_be_read_shows_up_in_violations if {
@@ -333,22 +333,19 @@ test_assertions_joined_with_and_or_listed_under_assert_give_one_row_that_names_t
 test_an_applies_row_that_fails_with_a_cause_other_than_value_is_a_violation_with_the_failed_items_or_assertions if {
 	some_rep := _from_report(_releases, {"release": {"from": `releases whose some files.path does not match "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
 	some_violations := {v.subject.id: object.filter(v, ["failures"]) | some v in ergo.violations(some_rep); v.check == "$applies"}
-	some_violations.unset == {"failures": [_assertion("some files.path does not match \"^docs/\"", "absent", ["$policy:/subjects/release/from"], [_seen("files.path", [], [], "found")], "", [_list("files", "absent", [_seen("files", null, ["/releases/3"], "absent")], "files is missing")])]}
+	some_violations.unset == {"failures": [_assertion("some files.path does not match \"^docs/\"", "absent", ["$policy:/subjects/release/from"], [_seen("files.path", [], [], "absent")], "", [_list("files", "absent", [_seen("files", null, ["/releases/3"], "absent")], "files is missing")])]}
 	some_violations.null.failures[0].failures[0].cause == "null"
 	not "mixed" in object.keys(some_violations)
 	not "docs" in object.keys(some_violations)
 	many_rep := _from_report(_releases, {"release": {"from": `releases whose ticket is "ok" and whose every files.path matches "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
 	many_violations := {v.subject.id: object.filter(v, ["failures"]) | some v in ergo.violations(many_rep); v.check == "$applies"}
-	many_violations.unset == {"failures": [_assertion(`every files.path matches "^docs/"`, "absent", ["$policy:/subjects/release/from#2"], [_seen("files.path", [], [], "found")], "files is missing", [])]}
+	many_violations.unset == {"failures": [_assertion(`every files.path matches "^docs/"`, "absent", ["$policy:/subjects/release/from#2"], [_seen("files.path", [], [], "absent")], "files is missing", [])]}
 	not "mixed" in object.keys(many_violations)
 }
 
 test_a_violation_lists_a_ref_once_when_the_row_lists_it_already if {
 	rep := ergo.report({"things": [{"id": "t", "x": "z"}]}, _sentence_policy({"c": "x is in $params.k"}), {"k": ["a"]})
-	[v.inputs | some v in ergo.violations(rep)] == [[
-		{"name": "x", "value": "z", "locations": ["/things/0/x"]},
-		{"name": "$params.k", "value": ["a"], "locations": ["$params:/k"]},
-	]]
+	[v.inputs | some v in ergo.violations(rep)] == [[_seen("x", "z", ["/things/0/x"], "found"), _seen("$params.k", ["a"], ["$params:/k"], "found")]]
 }
 
 test_a_violation_carries_the_tags_of_the_row_it_copies if {

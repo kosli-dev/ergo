@@ -282,12 +282,7 @@ _deployments := {"deployments": [
 
 test_a_from_written_as_a_sentence_reads_its_path_and_keeps_the_subjects_whose_conditions_hold if {
 	rep := _from_report(_deployments, {"emergency change": {"from": `deployments whose environment is "prod" and whose change_type is "emergency"`, "identified_by": "id"}}, {"c": "id exists"}, {})
-	_from_rows(rep) == [
-		[1, "$applies", "satisfied", [{"name": "change_type", "value": "emergency", "locations": ["/deployments/0/change_type"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/0/environment"]}]],
-		[2, "$applies", "absent", [{"name": "change_type", "value": null, "locations": ["/deployments/1"]}, {"name": "environment", "value": "dev", "locations": ["/deployments/1/environment"]}]],
-		[3, "$applies", "value", [{"name": "change_type", "value": "standard", "locations": ["/deployments/2/change_type"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/2/environment"]}]],
-		[1, "c", "satisfied", [{"name": "id", "value": 1, "locations": ["/deployments/0/id"]}]],
-	]
+	_from_rows(rep) == [[1, "$applies", "satisfied", [_in("change_type", "emergency", ["/deployments/0/change_type"]), _in("environment", "prod", ["/deployments/0/environment"])]], [2, "$applies", "absent", [_seen("change_type", null, ["/deployments/1"], "absent"), _seen("environment", "dev", ["/deployments/1/environment"], "found")]], [3, "$applies", "value", [_seen("change_type", "standard", ["/deployments/2/change_type"], "found"), _seen("environment", "prod", ["/deployments/2/environment"], "found")]], [1, "c", "satisfied", [_in("id", 1, ["/deployments/0/id"])]]]
 	rep.requirements.r.checks["$applies"].expression == `environment is "prod" and change_type is "emergency"`
 }
 
@@ -621,14 +616,9 @@ test_a_failed_line_names_an_alias_that_holds_a_list_as_the_sentence_writes_it if
 
 test_a_failed_line_names_an_alias_read_by_a_key_as_the_sentence_writes_it if {
 	things := [{"id": 1, "key": "k1", "n": [{"k1": [1, 2]}]}]
-	_line_inputs({"for": "every n as c", "assert": "c named by key is 9"}, things) == [[
-		_seen("c named by key", [1, 2], ["/things/0/n/0/k1"], "found"),
-		_seen("key", "k1", ["/things/0/key"], "found"),
-	]]
-	_line_inputs({"for": "every n as c", "assert": "first of c named by key is 9"}, things) == [[
-		_seen("item 1 of c named by key", 1, ["/things/0/n/0/k1/0"], "found"),
-		_seen("key", "k1", ["/things/0/key"], "found"),
-	]]
+	_line_inputs({"for": "every n as c", "assert": "c named by key is 9"}, things) == [[_seen("c named by key", [1, 2], ["/things/0/n/0/k1"], "found")]]
+	_line_inputs({"for": "every n as c", "assert": "first of c named by key is 9"}, things) == [[_seen("item 1 of c named by key", 1, ["/things/0/n/0/k1/0"], "found")]]
+	[a.inputs | some r in ergo.report({"things": things}, _sentence_policy({"c": {"for": "every n as c", "assert": "first of c named by key is 9"}}), {}).results; r.check == "c"; some a in r.failures] == [[_seen("key", "k1", ["/things/0/key"], "found")]]
 }
 
 as_sentences_checks(checks) := ergo.as_sentences({"subjects": {"s": {"from": "items"}}, "requirements": {"r": {"subject": "s", "checks": checks}}}).requirements.r.checks

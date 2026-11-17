@@ -290,10 +290,7 @@ test_named_by_a_field_reads_the_key_the_subjects_field_holds if {
 		{"id": "v1", "severity": "high", "age": 3},
 		{"id": "v2", "severity": "low", "age": 40},
 	]}
-	_sentence_rows({"c": "age is at most $params.limits named by severity"}, doc, {"limits": {"high": 5, "low": 30}}) == [
-		["c", true, "satisfied", [{"name": "age", "value": 3, "locations": ["/things/0/age"]}, {"name": "$params.limits named by severity", "value": 5, "locations": ["$params:/limits/high"]}, {"name": "severity", "value": "high", "locations": ["/things/0/severity"]}]],
-		["c", false, "value", [{"name": "age", "value": 40, "locations": ["/things/1/age"]}, {"name": "$params.limits named by severity", "value": 30, "locations": ["$params:/limits/low"]}, {"name": "severity", "value": "low", "locations": ["/things/1/severity"]}]],
-	]
+	_sentence_rows({"c": "age is at most $params.limits named by severity"}, doc, {"limits": {"high": 5, "low": 30}}) == [["c", true, "satisfied", [_in("age", 3, ["/things/0/age"]), _in("$params.limits named by severity", 5, ["$params:/limits/high"]), _in("severity", "high", ["/things/0/severity"])]], ["c", false, "value", [_seen("age", 40, ["/things/1/age"], "found"), _seen("$params.limits named by severity", 30, ["$params:/limits/low"], "found"), _seen("severity", "low", ["/things/1/severity"], "found")]]]
 	_sentence_rows({"c": "age is at most $params.limits[severity]"}, doc, {"limits": {"high": 5, "low": 30}}) == _sentence_rows({"c": "age is at most $params.limits named by severity"}, doc, {"limits": {"high": 5, "low": 30}})
 	ergo.report(doc, _sentence_policy({"c": "age is at most $params.limits[severity]"}), {}).requirements.s.checks.c.expression == "age is at most $params.limits named by severity"
 	rep := ergo.report(doc, _sentence_policy({"c": "age is at most $params.limits named by severity"}), {})
@@ -303,10 +300,7 @@ test_named_by_a_field_reads_the_key_the_subjects_field_holds if {
 
 test_named_by_a_field_reads_a_key_of_the_subject_too if {
 	doc := {"things": [{"id": 1, "k": "a", "m": {"a": 1, "b": 2}}, {"id": 2, "k": "b", "m": {"a": 1, "b": 2}}]}
-	_sentence_rows({"c": "m named by k is 1"}, doc, {}) == [
-		["c", true, "satisfied", [{"name": "m named by k", "value": 1, "locations": ["/things/0/m/a"]}, {"name": "k", "value": "a", "locations": ["/things/0/k"]}]],
-		["c", false, "value", [{"name": "m named by k", "value": 2, "locations": ["/things/1/m/b"]}, {"name": "k", "value": "b", "locations": ["/things/1/k"]}]],
-	]
+	_sentence_rows({"c": "m named by k is 1"}, doc, {}) == [["c", true, "satisfied", [_in("m named by k", 1, ["/things/0/m/a"]), _in("k", "a", ["/things/0/k"])]], ["c", false, "value", [_seen("m named by k", 2, ["/things/1/m/b"], "found"), _seen("k", "b", ["/things/1/k"], "found")]]]
 }
 
 test_named_by_a_field_on_a_subject_that_isnt_an_object_fails_as_not_an_object if {
@@ -405,7 +399,7 @@ test_subject_is_the_subject_itself_when_the_subject_is_a_string if {
 		{"allowed_regions": ["eu-west-1"]},
 	) == [
 		["eu-west-1", true, "satisfied", [{"name": "s", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}, {"name": "$params.allowed_regions", "value": ["eu-west-1"], "locations": ["$params:/allowed_regions"]}]],
-		["us-east-1", false, "value", [{"name": "s", "value": "us-east-1", "locations": ["/deployment/regions/1"]}, {"name": "$params.allowed_regions", "value": ["eu-west-1"], "locations": ["$params:/allowed_regions"]}]],
+		["us-east-1", false, "value", [_seen("s", "us-east-1", ["/deployment/regions/1"], "found"), _seen("$params.allowed_regions", ["eu-west-1"], ["$params:/allowed_regions"], "found")]],
 	]
 	rep := _subject_report({"deployment": {"regions": ["eu-west-1"]}}, "every deployment.regions", {"c": "s is one of $params.allowed_regions"}, {"allowed_regions": ["eu-west-1"]})
 	rep.requirements.r.checks.c.expression == "s is in $params.allowed_regions"
@@ -449,7 +443,7 @@ test_subject_on_a_null_subject_fails_as_null_and_on_the_wrong_type_as_value_or_u
 }
 
 test_a_subjects_name_reads_the_subject_and_never_a_field_with_the_same_name if {
-	_subject_rows({"xs": [{"id": "a", "s": 1}]}, "every xs", "s is 1", {}) == [[{"id": "a", "s": 1}, false, "unusable", [{"name": "s", "value": {"id": "a", "s": 1}, "locations": ["/xs/0"]}]]]
+	_subject_rows({"xs": [{"id": "a", "s": 1}]}, "every xs", "s is 1", {}) == [[{"id": "a", "s": 1}, false, "unusable", [_seen("s", {"id": "a", "s": 1}, ["/xs/0"], "found")]]]
 }
 
 test_subject_works_after_and_and_in_an_any_of_option_and_names_the_subject if {
