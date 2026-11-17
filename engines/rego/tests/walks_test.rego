@@ -1159,7 +1159,7 @@ test_ids_of_subjects_read_with_every_are_unique_across_all_of_them if {
 }
 
 test_a_picked_item_that_fails_is_named_by_where_it_is_in_the_input if {
-	_picked("last of commits sorted by timestamp", [3, 1, 2]) == ["value", [_assertion("c.author is \"x\"", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 1 of commits", "value", {"author": "ada", "timestamp": 3}, ["/things/0/commits/0"], [_seen("c.author", "ada", ["/things/0/commits/0/author"], "found")], "author is \"ada\"", [])])], [_seen("item 1 of commits", {"author": "ada", "timestamp": 3}, ["/things/0/commits/0"], "found")]]
+	_picked("last of commits sorted by timestamp", [3, 1, 2]) == ["value", [_assertion("c.author is \"x\"", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 1 of commits", "value", {"author": "ada", "timestamp": 3}, ["/things/0/commits/0"], [_seen("c.author", "ada", ["/things/0/commits/0/author"], "found")], "c.author is \"ada\"", [])])], [_seen("item 1 of commits", {"author": "ada", "timestamp": 3}, ["/things/0/commits/0"], "found")]]
 }
 
 test_a_tie_at_the_picked_position_fails_as_ambiguous_and_names_the_tied_items if {

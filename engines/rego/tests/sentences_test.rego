@@ -163,7 +163,7 @@ test_a_sentence_check_reports_its_description_meta_and_printed_sentence_only if 
 		{"allowed": ["a"]},
 	)
 	r.requirements.s.checks.a == {"description": "", "meta": {}, "expression": `x is "a"`}
-	r.requirements.s.checks.b == {"description": "In the list", "meta": {"id": "B-1"}, "expression": "x is in $params.allowed", "$refs": [{"name": "$params.allowed", "value": ["a"], "locations": ["$params:/allowed"]}]}
+	r.requirements.s.checks.b == {"description": "In the list", "meta": {"id": "B-1"}, "expression": "x is in $params.allowed", "$refs": [{"name": "$params.allowed", "value": ["a"], "locations": ["$params:/allowed"], "outcome": "found"}]}
 	r.compliant
 }
 

@@ -67,7 +67,7 @@ _said_rows(check, things) := [[r.subject.id, r.cause, object.get(r, "message", n
 test_an_empty_first_list_a_for_line_tolerates_still_runs_the_sentences_that_dont_read_it if {
 	approvers := [{"u": "ada"}, {"u": "g", "state": "REJECTED"}]
 	every line in ["every commits, if any, as c, some approvers as ap", "every commits, if any, as c, every approvers as ap"] {
-		_said_rows({"for": line, "assert": ["ap.state is \"APPROVED\"", "c.author is ap.u"]}, [{"id": 1, "approvers": approvers, "commits": []}]) == [[1, "absent", "item 1 of approvers: state is missing; item 2 of approvers: state is \"REJECTED\"", [_assertion("ap.state is \"APPROVED\"", "absent", ["$policy:/requirements/s/checks/c/assert/0"], [], "", [_item("item 1 of approvers", "absent", {"u": "ada"}, ["/things/0/approvers/0"], [_seen("ap.state", null, ["/things/0/approvers/0"], "absent")], "state is missing", []), _item("item 2 of approvers", "value", {"state": "REJECTED", "u": "g"}, ["/things/0/approvers/1"], [_seen("ap.state", "REJECTED", ["/things/0/approvers/1/state"], "found")], "state is \"REJECTED\"", [])])]]]
+		_said_rows({"for": line, "assert": ["ap.state is \"APPROVED\"", "c.author is ap.u"]}, [{"id": 1, "approvers": approvers, "commits": []}]) == [[1, "absent", "item 1 of approvers: ap.state is missing; item 2 of approvers: ap.state is \"REJECTED\"", [_assertion("ap.state is \"APPROVED\"", "absent", ["$policy:/requirements/s/checks/c/assert/0"], [], "", [_item("item 1 of approvers", "absent", {"u": "ada"}, ["/things/0/approvers/0"], [_seen("ap.state", null, ["/things/0/approvers/0"], "absent")], "ap.state is missing", []), _item("item 2 of approvers", "value", {"state": "REJECTED", "u": "g"}, ["/things/0/approvers/1"], [_seen("ap.state", "REJECTED", ["/things/0/approvers/1/state"], "found")], "ap.state is \"REJECTED\"", [])])]]]
 		_said_rows({"for": line, "assert": ["c.author is ap.u", "ap.state is \"APPROVED\""]}, [{"id": 1, "approvers": approvers, "commits": []}]) == [[1, "absent", "item 1 of approvers: state is missing; item 2 of approvers: state is \"REJECTED\"", [_assertion("ap.state is \"APPROVED\"", "absent", ["$policy:/requirements/s/checks/c/assert/1"], [], "", [_item("item 1 of approvers", "absent", {"u": "ada"}, ["/things/0/approvers/0"], [_seen("ap.state", null, ["/things/0/approvers/0"], "absent")], "state is missing", []), _item("item 2 of approvers", "value", {"state": "REJECTED", "u": "g"}, ["/things/0/approvers/1"], [_seen("ap.state", "REJECTED", ["/things/0/approvers/1/state"], "found")], "state is \"REJECTED\"", [])])]]]
 	}
 	_said_rows({"for": "every commits whose n is 1, if any, as c, some approvers as ap", "assert": "ap.state is \"APPROVED\""}, [{"id": 1, "approvers": approvers, "commits": [{"n": 2}]}]) == [[1, "absent", "item 1 of approvers: state is missing; item 2 of approvers: state is \"REJECTED\"", [_assertion("ap.state is \"APPROVED\"", "absent", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 1 of approvers", "absent", {"u": "ada"}, ["/things/0/approvers/0"], [_seen("ap.state", null, ["/things/0/approvers/0"], "absent")], "state is missing", []), _item("item 2 of approvers", "value", {"state": "REJECTED", "u": "g"}, ["/things/0/approvers/1"], [_seen("ap.state", "REJECTED", ["/things/0/approvers/1/state"], "found")], "state is \"REJECTED\"", [])])]]]
@@ -105,7 +105,7 @@ test_a_for_line_on_a_subject_that_isnt_an_object_fails_like_any_path_does if {
 
 test_a_for_list_whose_named_by_cant_be_read_fails_with_its_cause_as_a_walk_does if {
 	check := {"for": "every m named by $params.k as x", "assert": "x is 1"}
-	_for_rows(check, [{"id": 1, "m": {"a": [1]}}], {}) == [[1, "absent", [_list("m named by $params.k", "absent", [], "$params.k is missing")], [_seen("m named by $params.k", [], [], "absent")]]]
+	_for_rows(check, [{"id": 1, "m": {"a": [1]}}], {}) == [[1, "absent", [_assertion("x is 1", "absent", ["$policy:/requirements/s/checks/c/assert"], [_seen("$params.k", null, ["$params:"], "absent")], "$params.k is missing", [])], [_seen("m named by $params.k", [], [], "absent")]]]
 	_for_rows(check, [{"id": 1, "m": {"a": [1]}}], {"k": "a"}) == [[1, "satisfied", [], [{"name": "m named by $params.k[]", "value": [1], "locations": ["/things/0/m/a/0"]}]]]
 	inner := {"for": "every xs as x, every m named by $params.k as y", "assert": "y is 1"}
 	_for_rows(inner, [{"id": 1, "xs": [1], "m": {"a": [1]}}], {}) == [[1, "absent", [_list("m named by $params.k", "absent", [_seen("m named by $params.k", null, ["/things/0/m"], "absent")], "m named by $params.k is missing")], [_seen("m named by $params.k", [], [], "absent"), _seen("xs[]", [1], ["/things/0/xs/0"], "found")]]]
@@ -303,7 +303,7 @@ test_a_picked_item_and_a_walk_share_a_for_line if {
 
 test_a_for_item_that_failed_shows_the_item_as_its_value if {
 	rows := _for_rows({"for": "every xs as x", "assert": "x.k is 1"}, [{"id": 1, "xs": [{"k": 1}, {"k": 2}]}], {})
-	rows[0][2] == [_assertion("x.k is 1", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 2 of xs", "value", {"k": 2}, ["/things/0/xs/1"], [_seen("x.k", 2, ["/things/0/xs/1/k"], "found")], "k is 2", [])])]
+	rows[0][2] == [_assertion("x.k is 1", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 2 of xs", "value", {"k": 2}, ["/things/0/xs/1"], [_seen("x.k", 2, ["/things/0/xs/1/k"], "found")], "x.k is 2", [])])]
 }
 
 test_a_for_item_whose_path_ends_at_a_field_shows_what_its_alias_stands_for_as_its_value if {
@@ -331,7 +331,7 @@ test_a_for_line_row_gives_the_location_of_each_item_and_of_the_item_that_failed 
 	rows := [r | some r in ergo.report({"things": [{"id": "t1", "prs": [{"a": 1}, {"a": 2}]}]}, _sentence_policy({"c": {"for": "every prs as pr", "assert": "pr.a is 1"}}), {}).results; r.check == "c"]
 	count(rows) == 1
 	rows[0].inputs == [_seen("prs[]", [{"a": 1}, {"a": 2}], ["/things/0/prs/0", "/things/0/prs/1"], "found")]
-	rows[0].failures == [_assertion("pr.a is 1", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 2 of prs", "value", {"a": 2}, ["/things/0/prs/1"], [_seen("pr.a", 2, ["/things/0/prs/1/a"], "found")], "a is 2", [])])]
+	rows[0].failures == [_assertion("pr.a is 1", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 2 of prs", "value", {"a": 2}, ["/things/0/prs/1"], [_seen("pr.a", 2, ["/things/0/prs/1/a"], "found")], "pr.a is 2", [])])]
 }
 
 test_a_failed_item_of_a_nested_for_line_points_at_the_value_it_read if {
@@ -464,7 +464,7 @@ test_a_for_check_with_params_missing_or_null_reads_it_as_missing_and_names_the_p
 test_params_that_arent_an_object_make_a_for_line_unusable_even_when_its_items_arent_objects if {
 	every params in [[], 3, "s", true] {
 		rows := _item_rows(_params_cause_policy, {"prs": [{"id": "p0", "xs": ["s", {"v": "x"}]}]}, params)
-		rows.plain == ["unusable", "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number"]
+		rows.plain == ["unusable", "item 1 of xs is \"s\", which isn't an object; item 2 of xs: m.v is \"x\", which isn't a number"]
 		rows.some[0] == "unusable"
 		rows.reads[0] == "unusable"
 		rows.whose[0] == "unusable"

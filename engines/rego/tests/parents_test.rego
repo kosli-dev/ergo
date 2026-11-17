@@ -739,7 +739,7 @@ test_a_walk_through_a_for_alias_fails_like_a_count_when_the_key_is_missing_or_th
 test_a_second_for_item_that_starts_at_a_parents_part_names_its_unchecked_items_like_its_inputs if {
 	doc := {"artifact": {"n": "a", "ps": {"w": [{"t": "k1"}, {}]}, "kids": [{"id": 1, "keys": ["k1"]}]}}
 	row := _part_for_row(doc, {"ap": "ps"}, {"for": "every keys as k, every artifact.ap.w whose t is k as x", "assert": "x.t is 1"}, {})
-	row.failures == [_assertion("x.t is 1", "unusable", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 1 of artifact.ap.w", "unusable", {"t": "k1"}, ["/artifact/ps/w/0"], [_seen("x.t", "k1", ["/artifact/ps/w/0/t"], "found")], "t is \"k1\", which isn't a number", [])])])]
+	row.failures == [_assertion("x.t is 1", "unusable", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 1 of artifact.ap.w", "unusable", {"t": "k1"}, ["/artifact/ps/w/0"], [_seen("x.t", "k1", ["/artifact/ps/w/0/t"], "found")], "x.t is \"k1\", which isn't a number", [])])]), _item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 2 of artifact.ap.w", "absent", {}, ["/artifact/ps/w/1"], [_seen("artifact.ap.w[1].t", null, ["/artifact/ps/w/1"], "absent")], "t is missing", [])])]
 	"item 2 of artifact.ap.w" in {f.name | walk(row.failures, [_, f]); f.kind == "item"}
 	[i.name | some i in row.inputs] == ["artifact.ap.w[]", "keys[]"]
 }
@@ -754,7 +754,7 @@ test_a_second_for_item_that_starts_at_a_parents_part_named_by_an_item_keeps_the_
 test_a_second_for_item_that_starts_at_a_plain_parent_input_or_params_keeps_its_name_in_unchecked_items if {
 	doc := {"artifact": {"n": "a", "w": [{"t": "k1"}, {}], "kids": [{"id": 1, "keys": ["k1"]}]}, "top": [{"t": "k1"}, {}]}
 	plain := _part_for_row(doc, {}, {"for": "every keys as k, every artifact.w whose t is k as x", "assert": "x.t is 1"}, {})
-	plain.failures == [_assertion("x.t is 1", "unusable", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 1 of artifact.w", "unusable", {"t": "k1"}, ["/artifact/w/0"], [_seen("x.t", "k1", ["/artifact/w/0/t"], "found")], "t is \"k1\", which isn't a number", [])])])]
+	plain.failures == [_assertion("x.t is 1", "unusable", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 1 of artifact.w", "unusable", {"t": "k1"}, ["/artifact/w/0"], [_seen("x.t", "k1", ["/artifact/w/0/t"], "found")], "x.t is \"k1\", which isn't a number", [])])]), _item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 2 of artifact.w", "absent", {}, ["/artifact/w/1"], [_seen("artifact.w[1].t", null, ["/artifact/w/1"], "absent")], "t is missing", [])])]
 	from_input := _part_for_row(doc, {}, {"for": "every keys as k, every $input.top whose t is k as x", "assert": "x.t is 1"}, {})
 	"item 2 of $input.top" in {f.name | walk(from_input.failures, [_, f]); f.kind == "item"}
 	from_params := _part_for_row(doc, {}, {"for": "every keys as k, every $params.l whose t is k as x", "assert": "x.t is 1"}, {"l": [{"t": "k1"}, {}]})

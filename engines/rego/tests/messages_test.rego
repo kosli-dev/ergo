@@ -1081,7 +1081,7 @@ test_a_parent_part_in_a_relative_clause_of_the_wrong_type_is_named_once_before_t
 
 test_a_parent_part_in_a_relative_clause_that_is_there_still_lets_each_item_decide if {
 	rows := _item_rows(_clause_parent_part_policy, _parent_part_doc({"z": 1}, [{"n": 1}, {"n": 2}]), {})
-	rows.whose == ["value", "item 2 of ys: n is 2"]
+	rows.whose == ["value", "item 2 of ys: x.n is 2"]
 	rows.grandparent == ["satisfied", null]
 	rows.count == ["satisfied", null]
 	bare := _item_rows(_clause_parent_part_policy, _parent_part_doc({"z": 1}, [1, 2]), {})
