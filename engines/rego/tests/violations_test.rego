@@ -104,7 +104,7 @@ test_violations_join_the_definition_onto_the_row if {
 		"inputs": [{"name": "reviewed", "value": null, "locations": ["/items/0"], "outcome": "absent"}],
 		"cause": "absent",
 		"message": "reviewed is missing",
-		"failures": [_assertion("reviewed is true", "absent", ["$policy:/requirements/s/checks/reviewed"], [], "", [])],
+		"failures": [_assertion("reviewed is true", "absent", ["$policy:/requirements/s/checks/reviewed/assert"], [_seen("reviewed", null, ["/items/0"], "absent")], "reviewed is missing", [])],
 	}]
 }
 
