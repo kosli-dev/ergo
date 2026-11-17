@@ -25,10 +25,44 @@ _parted(row, at, where) := object.union(object.remove(row, _row_stash_keys), {
 
 _for_texted(row) if _ = row["ergo/for_texts"]
 
-_for_failures(row, at, where, t) := array.concat(
+_for_failures(row, at, where, t) := _for_failures_of(row, at, where, t, _for_key_texts(where.check))
+
+_for_failures_of(row, at, where, t, []) := array.concat(
 	[e | some i, a in where.check.assertions; e := _for_assertion_entry(row, at, where, t, i, a)],
 	_nested_items([e | some kind in ["list", "item"]; some e in _for_row_breaks(row, t, at); _leveled_kind(e) == kind]),
 )
+
+_for_failures_of(row, at, where, t, ks) := array.concat(
+	[_for_keyed_entry(e, i, ks, where.check) | some i, a in where.check.assertions; e := _for_assertion_entry(row, at, where, object.union(t, {"said": [_for_keyed_said(s, j, ks) | some j, s in t.said]}), i, a)],
+	_nested_items([e | some kind in ["list", "item"]; some e in _for_row_breaks(row, t, at); _leveled_kind(e) == kind; not _for_key_break(e, ks)]),
+) if ks != []
+
+_for_key_texts(check) := _once([k | some item in check.items; some k in _walk_key_ref_texts(item.path)])
+
+_for_keyed_said(s, 0, ks) := concat("; ", _once(array.concat(ks, [x | some x in split(s, "; "); x != ""])))
+
+_for_keyed_said(s, j, _) := s if j > 0
+
+_for_keyed_entry(e, 0, _, check) := object.union(e, {"inputs": _once(array.concat(e.inputs, [x | some item in check.items; some x in _with_outcomes(_walk_key_ref_entries(item.path))]))})
+
+_for_keyed_entry(e, i, _, _) := e if i > 0
+
+_for_key_break(e, ks) if _for_key_leaf(e, ks)
+
+_for_key_break(e, ks) if {
+	e.message == ""
+	count(e.failures) > 0
+	every f in e.failures {
+		_for_key_leaf(f, ks)
+	}
+}
+
+_for_key_leaf(e, ks) if {
+	e.failures == []
+	every x in split(e.message, "; ") {
+		x in ks
+	}
+}
 
 _leveled_kind(e) := "item" if _has_levels(e)
 
@@ -246,7 +280,7 @@ _row_failures(row, at, where, ins) := [_policy_entry(
 	"assertion",
 	where.check.expression,
 	row.cause,
-	[ins[j] | some j, i in row.inputs; not _item_input(i, lists)],
+	array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists)], _with_outcomes(_walk_key_ref_entries(where.check.path))),
 	_walk_entries(row, _item_owned(row, texts), at),
 	concat("; ", _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts)))),
 	[_assertion_at(where, null, 0)],

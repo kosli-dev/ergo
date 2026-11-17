@@ -665,3 +665,16 @@ _list_levels(start, path) := [{"value": object.get(start.v, s, null), "locations
 	count(path) - count(start.c) > 1
 	rel := array.slice(path, count(start.c), count(path))
 } else := []
+
+_walk_key_ref_texts(path) := [concat("", [_ref_label(seg.ref), " is ", _key_ref_word[f]]) |
+	some seg in path
+	f := _ref_step_flaw(seg)
+	f in _no_value_states
+]
+
+_walk_key_ref_entries(path) := _ref_read_entries({seg.ref |
+	some seg in path
+	_ref_step_flaw(seg) in _no_value_states
+})
+
+_key_ref_word := {"absent": "missing", "null": "null"}

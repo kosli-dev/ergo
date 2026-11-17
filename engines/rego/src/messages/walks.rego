@@ -87,10 +87,15 @@ _walk_parts(check, subj, raw, r) := [_m_not_object(check, subj)] if {
 	raw.cause == "not_an_object"
 }
 
-_walk_parts(check, _, raw, r) := _once(array.concat([concat("", [_path_name(check.path), " is ", _m_state_word(raw.cause)])], _walk_phrase_roots(check))) if {
+_walk_parts(check, _, raw, r) := _once(array.concat(_walk_list_texts(check.path, raw.cause), _walk_phrase_roots(check))) if {
 	r.failed == []
 	raw.cause in _no_value_states
 }
+
+_walk_list_texts(path, cause) := ks if {
+	ks := _walk_key_ref_texts(path)
+	ks != []
+} else := [concat("", [_path_name(path), " is ", _m_state_word(cause)])]
 
 _walk_phrase_roots(check) := [m |
 	is_object(object.get(check, "check", null))

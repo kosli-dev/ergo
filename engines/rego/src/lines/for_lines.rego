@@ -316,7 +316,10 @@ else := [object.union(object.union({"path": check.items[1].path, "item": check.i
 
 _for_input_key_why(path) := {"why": [_m_isnt("$input", data.ergo_document, "an object")]} if _reads_input_key({"path": path})
 
-else := {}
+else := {"why": ks} if {
+	ks := _walk_key_ref_texts(path)
+	ks != []
+} else := {}
 
 _m_unread_text(f) := f.msg if is_array(object.get(f, "msg", null))
 
