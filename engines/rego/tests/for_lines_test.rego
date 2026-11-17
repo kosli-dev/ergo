@@ -19,11 +19,8 @@ test_a_part_on_a_for_line_item_counts_the_parts_path if {
 test_a_for_line_lists_each_first_item_that_failed_with_the_lines_it_failed if {
 	rows := _for_rows(_peer_approval, _peer_things, {})
 	[[row[0], row[1]] | some row in rows] == [["peer", "satisfied"], ["fails", "value"], ["nostate", "absent"]]
-	rows[1][2] == [
-		{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "value", "value": _peer_things[1].approvers[0], "failed_assertions": [{"assertion": "approver.timestamp is after commit.timestamp", "cause": "value", "items": [{"item": "item 2 of commits", "cause": "value"}]}], "locations": ["/things/1/approvers/0"]},
-		{"path": "item 2 of approvers", "item": "item 2 of approvers", "cause": "value", "value": _peer_things[1].approvers[1], "failed_assertions": [{"assertion": "approver.username does not equal author", "cause": "value"}], "locations": ["/things/1/approvers/1"]},
-	]
-	rows[2][2] == [{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "absent", "value": _peer_things[2].approvers[0], "failed_assertions": [], "locations": ["/things/2/approvers/0"]}]
+	rows[1][2] == [_assertion("approver.username does not equal author", "value", ["$policy:/requirements/s/checks/c/assert/0"], [_seen("author", "ann", ["/things/1/author"], "found")], "", [_item("item 2 of approvers", "value", {"state": "APPROVED", "timestamp": "2026-10-01T12:00:00Z", "username": "ann"}, ["/things/1/approvers/1"], [_seen("approver.username", "ann", ["/things/1/approvers/1/username"], "found")], "approver.username is \"ann\", and author is \"ann\"", [])]), _assertion("approver.timestamp is after commit.timestamp", "value", ["$policy:/requirements/s/checks/c/assert/1"], [], "", [_item("item 1 of approvers", "value", {"state": "APPROVED", "timestamp": "2026-10-01T10:00:00Z", "username": "bob"}, ["/things/1/approvers/0"], [], "", [_item("item 2 of commits", "value", {"timestamp": "2026-10-01T11:00:00Z"}, ["/things/1/commits/1"], [_seen("approver.timestamp", "2026-10-01T10:00:00Z", ["/things/1/approvers/0/timestamp"], "found"), _seen("commit.timestamp", "2026-10-01T11:00:00Z", ["/things/1/commits/1/timestamp"], "found")], "approver.timestamp is \"2026-10-01T10:00:00Z\", and commit.timestamp is \"2026-10-01T11:00:00Z\"", [])])])]
+	rows[2][2] == [_item("item 1 of approvers", "absent", {"timestamp": "2026-10-01T12:00:00Z", "username": "carl"}, ["/things/2/approvers/0"], [], "state is missing", [])]
 	rows[0][2] == []
 }
 
@@ -78,7 +75,7 @@ test_a_list_a_for_line_tolerates_still_fails_when_it_is_missing_null_or_not_a_li
 	[[row[0], row[1]] | some row in _for_rows(check, things, {})] == [[1, "absent"], [2, "null"], [3, "unusable"], [4, "satisfied"]]
 }
 
-_said_rows(check, things) := [[r.subject.id, r.cause, object.get(r, "message", null), _old_for_items(r)] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), {}).results; r.check == "c"]
+_said_rows(check, things) := [[r.subject.id, r.cause, object.get(r, "message", null), object.get(r, "failures", [])] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), {}).results; r.check == "c"]
 
 test_an_empty_first_list_a_for_line_tolerates_still_runs_the_sentences_that_dont_read_it if {
 	approvers := [{"u": "ada"}, {"u": "g", "state": "REJECTED"}]
@@ -138,7 +135,7 @@ test_a_for_list_whose_named_by_cant_be_read_fails_with_its_cause_as_a_walk_does 
 
 test_a_for_line_whose_param_cant_be_used_fails_as_unusable_and_keeps_its_inputs if {
 	rows := _for_rows({"for": "every xs as x", "assert": "x is one of $params.l"}, [{"id": 1, "xs": [1]}, "s"], {"l": "text"})
-	rows == [[1, "unusable", [{"cause": "unusable", "failed_assertions": [{"assertion": "x is in $params.l", "cause": "unusable"}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": 1}], [{"name": "$params.l", "value": "text", "locations": ["$params:/l"]}, {"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}]], ["s", "unusable", [], [{"name": "$params.l", "value": "text", "locations": ["$params:/l"]}, {"name": "xs", "value": [], "locations": []}]]]
+	rows == [[1, "unusable", [_assertion("x is in $params.l", "unusable", ["$policy:/requirements/s/checks/c/assert"], [_seen("$params.l", "text", ["$params:/l"], "found")], "$params.l is \"text\", which isn't a list", [])], [_seen("$params.l", "text", ["$params:/l"], "found"), _seen("xs[]", [1], ["/things/0/xs/0"], "found")]], ["s", "unusable", [_assertion("x is in $params.l", "unusable", ["$policy:/requirements/s/checks/c/assert"], [], "$params.l is \"text\", which isn't a list", [])], [_seen("$params.l", "text", ["$params:/l"], "found"), _seen("xs", [], [], "found")]]]
 	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [{"x": 1}]}], {"l": "text"})] == ["unusable"]
 	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [1]}], {"l": "text"})] == ["unusable"]
 }
@@ -206,16 +203,25 @@ test_a_for_line_walk_named_by_the_subject_lists_the_key_and_named_by_the_alias_l
 
 test_named_by_a_name_from_the_for_line_reads_the_key_each_item_names if {
 	check := {"for": "every dispatched as persona", "assert": `shas named by persona matches "^[0-9a-f]{40}$"`}
-	rows := [[r.subject.id, r.cause, [[f.item, f.cause, [_bare_line(l) | some l in f.failed_assertions]] | some f in r.failed_items], r.inputs] | some r in ergo.report(_persona_doc, _sentence_policy({"c": check}), {}).results; r.check == "c"]
-	rows == [
-		[1, "satisfied", [], [{"name": "dispatched[]", "value": ["security", "style"], "locations": ["/things/0/dispatched/0", "/things/0/dispatched/1"]}, {"name": "shas", "value": _persona_doc.things[0].shas, "locations": ["/things/0/shas"]}]],
-		[
-			2, "unusable", [
-				["item 1 of dispatched", "value", [{"assertion": `shas named by persona matches "^[0-9a-f]{40}$"`, "cause": "value"}]],
-				["item 2 of dispatched", "absent", [{"assertion": `shas named by persona matches "^[0-9a-f]{40}$"`, "cause": "absent"}]],
-				["item 3 of dispatched", "unusable", [{"assertion": `shas named by persona matches "^[0-9a-f]{40}$"`, "cause": "unusable"}]],
+	rows := _for_rows(check, _persona_doc.things, {})
+	sentence := `shas named by persona matches "^[0-9a-f]{40}$"`
+	rows[0] == [1, "satisfied", [], [{"name": "dispatched[]", "value": ["security", "style"], "locations": ["/things/0/dispatched/0", "/things/0/dispatched/1"]}, {"name": "shas", "value": _persona_doc.things[0].shas, "locations": ["/things/0/shas"]}]]
+	rows[1] == [
+		2, "unusable", [_assertion(
+			sentence, "unusable", ["$policy:/requirements/s/checks/c/assert"], [
+				_seen("shas named by persona", "x", ["/things/1/shas/security"], "found"),
+				_seen("shas named by persona", null, ["/things/1/shas"], "absent"),
+				_seen("shas named by persona", null, ["/things/1/shas"], "unusable"),
 			],
-			[{"name": "dispatched[]", "value": ["security", "perf", 5], "locations": ["/things/1/dispatched/0", "/things/1/dispatched/1", "/things/1/dispatched/2"]}, {"name": "shas", "value": {"security": "x"}, "locations": ["/things/1/shas"]}],
+			"", [
+				_item("item 1 of dispatched", "value", "security", ["/things/1/dispatched/0"], [], "shas named by persona is \"x\"", []),
+				_item("item 2 of dispatched", "absent", "perf", ["/things/1/dispatched/1"], [], "shas named by persona is missing", []),
+				_item("item 3 of dispatched", "unusable", 5, ["/things/1/dispatched/2"], [], "persona is 5, which isn't text", []),
+			],
+		)],
+		[
+			_seen("dispatched[]", ["security", "perf", 5], ["/things/1/dispatched/0", "/things/1/dispatched/1", "/things/1/dispatched/2"], "found"),
+			_seen("shas", {"security": "x"}, ["/things/1/shas"], "found"),
 		],
 	]
 }
@@ -260,7 +266,7 @@ test_the_nested_failed_items_of_a_second_for_line_keep_the_dot_of_an_own_field i
 		"requirements": {"r": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z", "assert": "z is at least 1"}}}},
 	}
 	rep := ergo.report({"rounds": [{"id": "r1", "y": {"zs": [5, 0]}, "items": [{"id": "i1"}]}]}, policy, {})
-	[i.item | some r in rep.results; r.check == "c"; some f in r.failed_items; some a in f.failed_assertions; some i in a.items] == ["item 2 of .y.zs"]
+	[r.failures | some r in rep.results; r.check == "c"] == [[_assertion("z is at least 1", "value", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 1 of items", "value", {"id": "i1"}, ["/rounds/0/items/0"], [], "", [_item("item 2 of .y.zs", "value", 0, ["/rounds/0/y/zs/1"], [_seen("z", 0, ["/rounds/0/y/zs/1"], "found")], "item 2 of .y.zs is 0", [])])])]]
 }
 
 test_an_alias_works_on_the_subject_in_a_for_line_and_not_on_its_items if {
@@ -352,11 +358,8 @@ test_a_for_item_whose_path_ends_at_a_field_shows_what_its_alias_stands_for_as_it
 
 test_a_plus_under_a_for_line_whose_term_is_missing_still_shows_the_sum_and_the_term_as_null if {
 	check := {"for": "every xs as x", "assert": ["x.a is 1", "n plus 2 is 3"]}
-	[[r.cause, r.inputs] | some r in ergo.report({"things": [{"id": 1, "xs": [{"a": 1}]}]}, _sentence_policy({"c": check}), {}).results; r.check == "c"] == [["absent", [
-		{"name": "n", "value": null, "locations": ["/things/0"]},
-		{"name": "n plus 2", "value": null, "locations": ["/things/0"]},
-		{"name": "xs[]", "value": [{"a": 1}], "locations": ["/things/0/xs/0"]},
-	]]]
+	rows := [r | some r in ergo.report({"things": [{"id": 1, "xs": [{"a": 1}]}]}, _sentence_policy({"c": check}), {}).results; r.check == "c"]
+	[rows[0].cause, rows[0].inputs, rows[0].failures] == ["absent", [_seen("n", null, ["/things/0"], "absent"), _in("n plus 2", null, ["/things/0"]), _seen("xs[]", [{"a": 1}], ["/things/0/xs/0"], "found")], [_assertion("n plus 2 is 3", "absent", ["$policy:/requirements/s/checks/c/assert/1"], [_in("n plus 2", null, ["/things/0"]), _seen("n", null, ["/things/0"], "absent")], "n is missing", [])]]
 }
 
 test_a_plus_under_a_for_line_shows_the_sum_and_each_term if {
@@ -371,15 +374,8 @@ test_a_plus_under_a_for_line_shows_the_sum_and_each_term if {
 test_a_for_line_row_gives_the_location_of_each_item_and_of_the_item_that_failed if {
 	rows := [r | some r in ergo.report({"things": [{"id": "t1", "prs": [{"a": 1}, {"a": 2}]}]}, _sentence_policy({"c": {"for": "every prs as pr", "assert": "pr.a is 1"}}), {}).results; r.check == "c"]
 	count(rows) == 1
-	rows[0].inputs == [{"name": "prs[]", "value": [{"a": 1}, {"a": 2}], "locations": ["/things/0/prs/0", "/things/0/prs/1"]}]
-	rows[0].failed_items == [{
-		"path": "item 2 of prs",
-		"item": "item 2 of prs",
-		"cause": "value",
-		"value": {"a": 2},
-		"locations": ["/things/0/prs/1"],
-		"failed_assertions": [{"assertion": "pr.a is 1", "cause": "value", "inputs": [{"name": "pr.a", "value": 2, "locations": ["/things/0/prs/1/a"]}]}],
-	}]
+	rows[0].inputs == [_seen("prs[]", [{"a": 1}, {"a": 2}], ["/things/0/prs/0", "/things/0/prs/1"], "found")]
+	rows[0].failures == [_assertion("pr.a is 1", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 2 of prs", "value", {"a": 2}, ["/things/0/prs/1"], [_seen("pr.a", 2, ["/things/0/prs/1/a"], "found")], "a is 2", [])])]
 }
 
 test_a_failed_item_of_a_nested_for_line_points_at_the_value_it_read if {
@@ -498,16 +494,16 @@ test_a_for_line_reads_a_bare_input_before_any_item_and_names_the_empty_list_afte
 test_a_for_check_that_does_not_read_params_but_passes_is_unusable_with_its_expression_when_params_is_not_an_object if {
 	doc := {"prs": [{"id": "p0", "z": 1, "xs": [{"v": 1}]}]}
 	every params in [3, "s", []] {
-		_params_not_object_rows(doc, params).plain == ["unusable", "for every xs as m: z is 1 is false", 0]
+		_params_not_object_rows(doc, params).plain == ["unusable", "for every xs as m: z is 1 is false", [_list("xs", "unusable", [], "for every xs as m: z is 1 is false")]]
 	}
 }
 
-test_a_for_check_with_params_missing_or_null_reads_it_as_missing_and_lists_every_item if {
+test_a_for_check_with_params_missing_or_null_reads_it_as_missing_and_names_the_problem_once_on_the_assertion if {
 	every params in [null, {}] {
 		rows := _params_not_object_rows(_params_not_object_doc, params)
-		rows.least_z == ["unusable", "z is \"s\", which isn't a number", 2]
-		rows.least_q == ["absent", "$params.q is missing", 2]
-		rows.in_q == ["absent", "$params.q is missing", 2]
+		rows.least_z == ["unusable", "z is \"s\", which isn't a number", [_assertion("m.v is at least z", "unusable", ["$policy:/requirements/r/checks/least_z/assert"], [_seen("z", "s", ["/prs/0/z"], "found")], "z is \"s\", which isn't a number", [])]]
+		rows.least_q == ["absent", "$params.q is missing", [_assertion("m.v is at least $params.q", "absent", ["$policy:/requirements/r/checks/least_q/assert"], [_seen("$params.q", null, ["$params:"], "absent")], "$params.q is missing", [])]]
+		rows.in_q == ["absent", "$params.q is missing", [_assertion("m.v is in $params.q", "absent", ["$policy:/requirements/r/checks/in_q/assert"], [_seen("$params.q", null, ["$params:"], "absent")], "$params.q is missing", [])]]
 	}
 }
 

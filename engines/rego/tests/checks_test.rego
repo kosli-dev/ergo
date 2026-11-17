@@ -593,7 +593,7 @@ test_sections_ergo_does_not_know_leave_the_report_unchanged if {
 	ergo.report({"items": [{"id": 1}]}, object.union(policy, {"notes": "reviewed by the platform team"}), {}) == rep
 }
 
-trail_rows(check) := [[r.passed, r.cause, _plain(r.inputs)] | some r in rows_for(report(trail_doc, trail_req(check)), "s", "c")]
+trail_rows(check) := [[r.passed, r.cause, r.inputs] | some r in rows_for(report(trail_doc, trail_req(check)), "s", "c")]
 
 test_a_ref_step_in_a_path_reads_the_key_it_names if {
 	trail_rows(attested) == [[true, "satisfied", [{"name": "attestations named by $params.att.status", "value": "COMPLETE", "locations": ["/trail/artifacts/app/attestations/pull-request/status"]}]]] with data.params as {"artifact": "app", "att": "pull-request"}
@@ -656,7 +656,7 @@ test_a_key_that_is_not_a_string_in_the_input_fails_the_check_even_when_a_number_
 	rows_for(report({"items": [{"id": "a", "x": {1: "a"}}]}, req), "s", "c")[0].cause == "unusable"
 }
 
-lookalike_rows(doc, req) := [[r.check, r.subject.id, r.passed, r.cause, _plain(r.inputs)] |
+lookalike_rows(doc, req) := [[r.check, r.subject.id, r.passed, r.cause, r.inputs] |
 	some r in report(doc, req).results
 	not startswith(r.check, "$")
 ]

@@ -455,7 +455,7 @@ test_a_subjects_name_reads_the_subject_and_never_a_field_with_the_same_name if {
 test_subject_works_after_and_and_in_an_any_of_option_and_names_the_subject if {
 	rows := _subject_rows({"xs": [1, 2]}, "every xs", "s is 1 and s is a number", {})
 	[[r[0], r[1], r[2]] | some r in rows] == [[1, true, "satisfied"], [2, false, "value"]]
-	_subject_report({"xs": [1, 2]}, "every xs", {"c": "s is 1 and s is a number"}, {}).results[4].failed_assertions == [{"assertion": "s is 1", "cause": "value"}]
+	_subject_report({"xs": [1, 2]}, "every xs", {"c": "s is 1 and s is a number"}, {}).results[4].failures == [_assertion("s is 1", "value", ["$policy:/requirements/r/checks/c#1"], [_seen("s", 2, ["/xs/1"], "found")], "s is 2", [])]
 	options := _subject_rows({"xs": [1, "a", null]}, "every xs", {"any_of": {"num": "s is a number", "str": ["s is a string", "s is 'a'"]}}, {})
 	[[r[0], r[1], r[2]] | some r in options] == [[1, true, "satisfied"], ["a", true, "satisfied"], [null, false, "null"]]
 	_subject_report({"xs": [1]}, "every xs", {"c": {"any_of": {"num": "s is a number", "str": "s is a string"}}}, {}).requirements.r.checks.c.expression == "one of: num(s is a number) | str(s is a string)"

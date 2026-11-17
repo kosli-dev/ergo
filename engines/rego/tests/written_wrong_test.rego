@@ -1108,7 +1108,7 @@ test_a_pick_that_doesnt_start_from_the_first_name_fails_the_check_as_it_would_wr
 	second := _for_rows({"for": "some approvers as approver, last of commits sorted by timestamp as c", "assert": "approver.username does not equal c.author"}, [{"id": 1, "approvers": [{"username": "linus"}], "commits": commits}], {})
 	[first[0][1], first[0][2]] == [second[0][1], second[0][2]]
 	second[0][1] == "ambiguous"
-	[f.path | some f in second[0][2]] == ["item 1 of commits", "item 2 of commits"]
+	second[0][2] == [_item("item 1 of commits", "ambiguous", commits[0], ["/things/0/commits/0"], [], "item 1 and item 2 of commits tie on timestamp", []), _item("item 2 of commits", "ambiguous", commits[1], ["/things/0/commits/1"], [], "item 1 and item 2 of commits tie on timestamp", [])]
 	[row[1] | some row in _for_rows({"for": "some approvers as approver, item 3 of commits as c", "assert": "approver exists"}, [{"id": 1, "approvers": [1], "commits": commits}], {})] == ["absent"]
 }
 

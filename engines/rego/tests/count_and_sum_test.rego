@@ -104,7 +104,7 @@ test_min_subjects_lists_only_the_count_when_the_input_and_params_are_json if {
 	rows_for(ergo.report({"items": [{"id": "a", "x": 1}]}, lifted(json_only_req), {"allowed": ["MIT"]}), "s", "$min_subjects")[0].inputs == [{"name": "in-scope thing count", "value": 1, "locations": ["/items/0"]}]
 }
 
-derived_row(subj, check) := [r.passed, r.cause, _plain(r.inputs)] if {
+derived_row(subj, check) := [r.passed, r.cause, r.inputs] if {
 	r := rows_for(ergo.report({"items": [object.union({"id": 1}, subj)]}, lifted({"s": {"from": "items", "identified_by": "id", "checks": {"c": check}}}), {}), "s", "c")[0]
 }
 
@@ -765,11 +765,11 @@ test_subject_walks_and_counts_a_subject_that_is_a_list if {
 	doc := {"xs": [["a", "b"], [1, 2], [1, "a"], [], null, "s"]}
 	rows := _subject_rows(doc, "every xs", "every s is a string", {})
 	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "value"], [false, "value"], [false, "value"], [false, "null"], [false, "unusable"]]
-	rows[1][3] == [{"name": "s[]", "value": [1, 2], "locations": ["/xs/1/0", "/xs/1/1"]}]
-	_subject_report(doc, "every xs", {"c": "every s is a string"}, {}).results[4].failed_items == [
-		{"cause": "value", "item": "item 1 of s", "path": "item 1 of s", "value": 1, "locations": ["/xs/1/0"]},
-		{"cause": "value", "item": "item 2 of s", "path": "item 2 of s", "value": 2, "locations": ["/xs/1/1"]},
-	]
+	rows[1][3] == [_seen("s[]", [1, 2], ["/xs/1/0", "/xs/1/1"], "found")]
+	_subject_report(doc, "every xs", {"c": "every s is a string"}, {}).results[4].failures == [_assertion("every s is a string", "value", ["$policy:/requirements/r/checks/c"], [], "", [
+		_item("item 1 of s", "value", 1, ["/xs/1/0"], [], "item 1 of s is 1", []),
+		_item("item 2 of s", "value", 2, ["/xs/1/1"], [], "item 2 of s is 2", []),
+	])]
 	[[r[1], r[2]] | some r in _subject_rows(doc, "every xs", "some s is a string", {})] == [[true, "satisfied"], [false, "value"], [true, "satisfied"], [false, "value"], [false, "null"], [false, "unusable"]]
 	counts := _subject_rows(doc, "every xs", "count of s is 2", {})
 	[[r[1], r[2]] | some r in counts] == [[true, "satisfied"], [true, "satisfied"], [true, "satisfied"], [false, "value"], [false, "null"], [false, "unusable"]]
