@@ -17999,7 +17999,7 @@
                     "locations": [
                       "/things/0/ws/0"
                     ],
-                    "message": "k is 2",
+                    "message": "w.k is 2",
                     "name": "item 1 of lst",
                     "value": {
                       "k": 2
@@ -18031,7 +18031,7 @@
                 }
               }
             ],
-            "message": "item 1 of lst: k is 2",
+            "message": "item 1 of lst: w.k is 2",
             "passed": false,
             "requirement": "s",
             "subject": {

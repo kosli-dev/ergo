@@ -3387,7 +3387,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "xs[0].c",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
@@ -3401,7 +3410,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/1"
+                    ],
+                    "name": "xs[1].c",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
@@ -3446,7 +3464,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "xs[0].c",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
@@ -3460,7 +3487,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/1"
+                    ],
+                    "name": "xs[1].c",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
@@ -3512,7 +3548,16 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "xs[0].c",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
@@ -3527,7 +3572,16 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/1"
+                    ],
+                    "name": "xs[1].c",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"
@@ -3575,7 +3629,16 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/0"
+                    ],
+                    "name": "xs[0].c",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/0"
@@ -3590,7 +3653,16 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/xs/1"
+                    ],
+                    "name": "xs[1].c",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ts/0/xs/1"

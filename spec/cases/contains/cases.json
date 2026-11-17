@@ -5964,6 +5964,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
+                "outcome": "found",
                 "value": "b"
               }
             ],
@@ -5973,6 +5974,7 @@
                   "$params:"
                 ],
                 "name": "$params.z",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -5982,6 +5984,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -5991,6 +5994,7 @@
                   "$params:/w"
                 ],
                 "name": "$params.w",
+                "outcome": "found",
                 "value": 3
               }
             ],
@@ -6000,6 +6004,7 @@
                   "$params:/x"
                 ],
                 "name": "$params.x",
+                "outcome": "found",
                 "value": {
                   "y": "b"
                 }
@@ -6011,6 +6016,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
+                "outcome": "found",
                 "value": "b"
               }
             ],
@@ -6020,6 +6026,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
+                "outcome": "found",
                 "value": "b"
               }
             ]

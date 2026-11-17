@@ -21220,7 +21220,20 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:"], "name": "$params.i", "value": null}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.i",
+                "outcome": "absent",
+                "value": null
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the parent field is null",
@@ -21271,7 +21284,20 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:"], "name": "$params.i", "value": null}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.i",
+                "outcome": "absent",
+                "value": null
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the subject is a list",
@@ -21324,7 +21350,20 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:"], "name": "$params.i", "value": null}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.i",
+                "outcome": "absent",
+                "value": null
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the subject is a string",
@@ -21375,7 +21414,20 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:"], "name": "$params.i", "value": null}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.i",
+                "outcome": "absent",
+                "value": null
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the subject is null",
@@ -21426,7 +21478,20 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:"], "name": "$params.i", "value": null}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.i",
+                "outcome": "absent",
+                "value": null
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -21484,7 +21549,20 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": null}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/i"
+                ],
+                "name": "$params.i",
+                "outcome": "null",
+                "value": null
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the parent field is null",
@@ -21535,7 +21613,20 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": null}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/i"
+                ],
+                "name": "$params.i",
+                "outcome": "null",
+                "value": null
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the subject is a list",
@@ -21588,7 +21679,20 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": null}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/i"
+                ],
+                "name": "$params.i",
+                "outcome": "null",
+                "value": null
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the subject is a string",
@@ -21639,7 +21743,20 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": null}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/i"
+                ],
+                "name": "$params.i",
+                "outcome": "null",
+                "value": null
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the subject is null",
@@ -21690,7 +21807,20 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": null}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/i"
+                ],
+                "name": "$params.i",
+                "outcome": "null",
+                "value": null
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -21748,7 +21878,22 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": [1]}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/i"
+                ],
+                "name": "$params.i",
+                "outcome": "found",
+                "value": [
+                  1
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the parent field is null",
@@ -21799,7 +21944,22 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": [1]}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/i"
+                ],
+                "name": "$params.i",
+                "outcome": "found",
+                "value": [
+                  1
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the subject is a list",
@@ -21852,7 +22012,22 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": [1]}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/i"
+                ],
+                "name": "$params.i",
+                "outcome": "found",
+                "value": [
+                  1
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the subject is a string",
@@ -21903,7 +22078,22 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": [1]}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/i"
+                ],
+                "name": "$params.i",
+                "outcome": "found",
+                "value": [
+                  1
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails with the ref's cause when the subject is null",
@@ -21954,7 +22144,22 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": [1]}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "$params:/i"
+                ],
+                "name": "$params.i",
+                "outcome": "found",
+                "value": [
+                  1
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -22011,7 +22216,22 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["/i"], "name": "$input.i", "value": [1]}]}}
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "/i"
+                ],
+                "name": "$input.i",
+                "outcome": "found",
+                "value": [
+                  1
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -41288,6 +41508,7 @@
                   "$params:/0"
                 ],
                 "name": "$params[0].v",
+                "outcome": "unusable",
                 "value": null
               }
             ]
@@ -41370,6 +41591,7 @@
                   "$params:/0"
                 ],
                 "name": "$params[0].v",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -41379,6 +41601,7 @@
                   "$params:/0"
                 ],
                 "name": "$params[0].v",
+                "outcome": "unusable",
                 "value": null
               }
             ]
@@ -41461,6 +41684,7 @@
                   "$params:/0"
                 ],
                 "name": "$params[0].v",
+                "outcome": "unusable",
                 "value": null
               }
             ]
@@ -41598,6 +41822,7 @@
                   "$params:/l"
                 ],
                 "name": "$params.l",
+                "outcome": "found",
                 "value": [
                   3
                 ]
@@ -41609,6 +41834,7 @@
                   "$params:/p"
                 ],
                 "name": "$params.p",
+                "outcome": "found",
                 "value": 2
               }
             ]

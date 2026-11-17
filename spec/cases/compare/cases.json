@@ -4729,6 +4729,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
+                "outcome": "found",
                 "value": 1
               }
             ],
@@ -4738,6 +4739,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "found",
                 "value": 2
               }
             ],
@@ -4747,6 +4749,7 @@
                   "/z"
                 ],
                 "name": "$input.z",
+                "outcome": "found",
                 "value": 1
               }
             ],
@@ -4756,6 +4759,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
+                "outcome": "found",
                 "value": 1
               }
             ],
@@ -4765,6 +4769,7 @@
                   "$params:/p"
                 ],
                 "name": "$params.p",
+                "outcome": "found",
                 "value": "ab"
               }
             ],
@@ -4774,6 +4779,7 @@
                   "$params:/deadline"
                 ],
                 "name": "$params.deadline",
+                "outcome": "found",
                 "value": "2026-02-01T00:00:00Z"
               }
             ],
@@ -4783,6 +4789,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "found",
                 "value": [
                   1
                 ]
@@ -4794,6 +4801,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "found",
                 "value": [
                   1
                 ]
@@ -4805,6 +4813,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "found",
                 "value": [
                   1
                 ]
@@ -4816,6 +4825,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "found",
                 "value": [
                   1
                 ]
@@ -4827,6 +4837,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "found",
                 "value": 2
               }
             ],
@@ -4836,6 +4847,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "found",
                 "value": 2
               }
             ],
@@ -4845,6 +4857,7 @@
                   "$params:/flag"
                 ],
                 "name": "$params.flag",
+                "outcome": "found",
                 "value": true
               }
             ],
@@ -4854,6 +4867,7 @@
                   "/z"
                 ],
                 "name": "$input.z",
+                "outcome": "found",
                 "value": 1
               },
               {
@@ -4861,6 +4875,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
+                "outcome": "found",
                 "value": 1
               }
             ],
@@ -4870,6 +4885,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "found",
                 "value": 2
               }
             ],
@@ -4879,6 +4895,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "found",
                 "value": [
                   1
                 ]
@@ -5905,6 +5922,7 @@
                   "$params:"
                 ],
                 "name": "$params.x.y",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -5914,6 +5932,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -5923,6 +5942,7 @@
                   ""
                 ],
                 "name": "$input.z",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -5932,6 +5952,7 @@
                   "$params:"
                 ],
                 "name": "$params.x.y",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -5941,6 +5962,7 @@
                   "$params:"
                 ],
                 "name": "$params.p",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -5950,6 +5972,7 @@
                   "$params:"
                 ],
                 "name": "$params.deadline",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -5959,6 +5982,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -5968,6 +5992,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -5977,6 +6002,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -5986,6 +6012,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -5995,6 +6022,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -6004,6 +6032,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -6013,6 +6042,7 @@
                   "$params:"
                 ],
                 "name": "$params.flag",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -6022,6 +6052,7 @@
                   ""
                 ],
                 "name": "$input.z",
+                "outcome": "absent",
                 "value": null
               },
               {
@@ -6029,6 +6060,7 @@
                   "$params:"
                 ],
                 "name": "$params.x.y",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -6038,6 +6070,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -6047,6 +6080,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
+                "outcome": "absent",
                 "value": null
               }
             ]
@@ -7081,6 +7115,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7090,6 +7125,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7099,6 +7135,7 @@
                   "/z"
                 ],
                 "name": "$input.z",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7108,6 +7145,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7117,6 +7155,7 @@
                   "$params:/p"
                 ],
                 "name": "$params.p",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7126,6 +7165,7 @@
                   "$params:/deadline"
                 ],
                 "name": "$params.deadline",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7135,6 +7175,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7144,6 +7185,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7153,6 +7195,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7162,6 +7205,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7171,6 +7215,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7180,6 +7225,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7189,6 +7235,7 @@
                   "$params:/flag"
                 ],
                 "name": "$params.flag",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7198,6 +7245,7 @@
                   "/z"
                 ],
                 "name": "$input.z",
+                "outcome": "null",
                 "value": null
               },
               {
@@ -7205,6 +7253,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7214,6 +7263,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -7223,6 +7273,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "null",
                 "value": null
               }
             ]
@@ -8245,6 +8296,7 @@
                   "$params:/x"
                 ],
                 "name": "$params.x.y",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -8254,6 +8306,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "found",
                 "value": "a"
               }
             ],
@@ -8263,6 +8316,7 @@
                   "/z"
                 ],
                 "name": "$input.z",
+                "outcome": "found",
                 "value": [
                   1
                 ]
@@ -8274,6 +8328,7 @@
                   "$params:/x"
                 ],
                 "name": "$params.x.y",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -8283,6 +8338,7 @@
                   "$params:/p"
                 ],
                 "name": "$params.p",
+                "outcome": "found",
                 "value": 1
               }
             ],
@@ -8292,6 +8348,7 @@
                   "$params:/deadline"
                 ],
                 "name": "$params.deadline",
+                "outcome": "found",
                 "value": 3
               }
             ],
@@ -8301,6 +8358,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "found",
                 "value": "s"
               }
             ],
@@ -8310,6 +8368,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "found",
                 "value": "s"
               }
             ],
@@ -8319,6 +8378,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "found",
                 "value": "s"
               }
             ],
@@ -8328,6 +8388,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "found",
                 "value": "s"
               }
             ],
@@ -8337,6 +8398,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "found",
                 "value": "a"
               }
             ],
@@ -8346,6 +8408,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "found",
                 "value": "a"
               }
             ],
@@ -8355,6 +8418,7 @@
                   "$params:/flag"
                 ],
                 "name": "$params.flag",
+                "outcome": "found",
                 "value": [
                   1
                 ]
@@ -8366,6 +8430,7 @@
                   "/z"
                 ],
                 "name": "$input.z",
+                "outcome": "found",
                 "value": [
                   1
                 ]
@@ -8375,6 +8440,7 @@
                   "$params:/x"
                 ],
                 "name": "$params.x.y",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -8384,6 +8450,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "found",
                 "value": "a"
               }
             ],
@@ -8393,6 +8460,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "found",
                 "value": "s"
               }
             ]
@@ -9299,6 +9367,7 @@
                   "$params:"
                 ],
                 "name": "$params.x.y",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9308,6 +9377,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9317,6 +9387,7 @@
                   "/z"
                 ],
                 "name": "$input.z",
+                "outcome": "found",
                 "value": 1
               }
             ],
@@ -9326,6 +9397,7 @@
                   "$params:"
                 ],
                 "name": "$params.x.y",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9335,6 +9407,7 @@
                   "$params:"
                 ],
                 "name": "$params.p",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9344,6 +9417,7 @@
                   "$params:"
                 ],
                 "name": "$params.deadline",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9353,6 +9427,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9362,6 +9437,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9371,6 +9447,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9380,6 +9457,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9389,6 +9467,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9398,6 +9477,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9407,6 +9487,7 @@
                   "$params:"
                 ],
                 "name": "$params.flag",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9416,6 +9497,7 @@
                   "/z"
                 ],
                 "name": "$input.z",
+                "outcome": "found",
                 "value": 1
               },
               {
@@ -9423,6 +9505,7 @@
                   "$params:"
                 ],
                 "name": "$params.x.y",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9432,6 +9515,7 @@
                   "$params:"
                 ],
                 "name": "$params.n",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -9441,6 +9525,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
+                "outcome": "absent",
                 "value": null
               }
             ]
@@ -9802,14 +9887,126 @@
         ],
         "refs": {
           "s": {
-            "a": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
-            "b": [{"locations": ["/objs/0/x", "/objs/1/x"], "name": "$input.objs[].x", "value": ["y", "y"]}],
-            "c": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
-            "d": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
-            "e": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
-            "f": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
-            "g": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
-            "h": [{"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null}, {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}]
+            "a": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1/x"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "found",
+                "value": [
+                  "y",
+                  "z"
+                ]
+              }
+            ],
+            "b": [
+              {
+                "locations": [
+                  "/objs/0/x",
+                  "/objs/1/x"
+                ],
+                "name": "$input.objs[].x",
+                "outcome": "found",
+                "value": [
+                  "y",
+                  "y"
+                ]
+              }
+            ],
+            "c": [
+              {
+                "locations": [
+                  "$params:/objs/0/n",
+                  "$params:/objs/1/n"
+                ],
+                "name": "$params.objs[].n",
+                "outcome": "found",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "d": [
+              {
+                "locations": [
+                  "$params:/objs/0/n",
+                  "$params:/objs/1/n"
+                ],
+                "name": "$params.objs[].n",
+                "outcome": "found",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "e": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1/x"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "found",
+                "value": [
+                  "y",
+                  "z"
+                ]
+              }
+            ],
+            "f": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1/x"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "found",
+                "value": [
+                  "y",
+                  "z"
+                ]
+              }
+            ],
+            "g": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1/x"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "found",
+                "value": [
+                  "y",
+                  "z"
+                ]
+              }
+            ],
+            "h": [
+              {
+                "locations": [
+                  "$params:/objs"
+                ],
+                "name": "$params.objs.x",
+                "outcome": "unusable",
+                "value": null
+              },
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1/x"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "found",
+                "value": [
+                  "y",
+                  "z"
+                ]
+              }
+            ]
           }
         },
         "violations": [
@@ -10287,14 +10484,126 @@
         ],
         "refs": {
           "s": {
-            "a": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
-            "b": [{"locations": ["/objs/0/x", "/objs/1"], "name": "$input.objs[].x", "value": ["y", null]}],
-            "c": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
-            "d": [{"locations": ["$params:/objs/0/n", "$params:/objs/1/n"], "name": "$params.objs[].n", "value": [1, 2]}],
-            "e": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
-            "f": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
-            "g": [{"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}],
-            "h": [{"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null}, {"locations": ["$params:/objs/0/x", "$params:/objs/1/x"], "name": "$params.objs[].x", "value": ["y", "z"]}]
+            "a": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1/x"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "found",
+                "value": [
+                  "y",
+                  "z"
+                ]
+              }
+            ],
+            "b": [
+              {
+                "locations": [
+                  "/objs/0/x",
+                  "/objs/1"
+                ],
+                "name": "$input.objs[].x",
+                "outcome": "absent",
+                "value": [
+                  "y",
+                  null
+                ]
+              }
+            ],
+            "c": [
+              {
+                "locations": [
+                  "$params:/objs/0/n",
+                  "$params:/objs/1/n"
+                ],
+                "name": "$params.objs[].n",
+                "outcome": "found",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "d": [
+              {
+                "locations": [
+                  "$params:/objs/0/n",
+                  "$params:/objs/1/n"
+                ],
+                "name": "$params.objs[].n",
+                "outcome": "found",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "e": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1/x"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "found",
+                "value": [
+                  "y",
+                  "z"
+                ]
+              }
+            ],
+            "f": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1/x"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "found",
+                "value": [
+                  "y",
+                  "z"
+                ]
+              }
+            ],
+            "g": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1/x"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "found",
+                "value": [
+                  "y",
+                  "z"
+                ]
+              }
+            ],
+            "h": [
+              {
+                "locations": [
+                  "$params:/objs"
+                ],
+                "name": "$params.objs.x",
+                "outcome": "unusable",
+                "value": null
+              },
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1/x"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "found",
+                "value": [
+                  "y",
+                  "z"
+                ]
+              }
+            ]
           }
         }
       }
@@ -10939,14 +11248,124 @@
         ],
         "refs": {
           "s": {
-            "a": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
-            "b": [{"locations": ["/objs/0"], "name": "$input.objs[].x", "value": [null]}],
-            "c": [{"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}],
-            "d": [{"locations": ["$params:/objs/0/n", "$params:/objs/1"], "name": "$params.objs[].n", "value": [1, null]}],
-            "e": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
-            "f": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
-            "g": [{"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}],
-            "h": [{"locations": ["$params:/objs"], "name": "$params.objs.x", "value": null}, {"locations": ["$params:/objs/0/x", "$params:/objs/1"], "name": "$params.objs[].x", "value": ["y", null]}]
+            "a": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "unusable",
+                "value": [
+                  "y",
+                  null
+                ]
+              }
+            ],
+            "b": [
+              {
+                "locations": [
+                  "/objs/0"
+                ],
+                "name": "$input.objs[].x",
+                "outcome": "unusable",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "c": [
+              {
+                "locations": [
+                  "$params:/objs/0/n",
+                  "$params:/objs/1"
+                ],
+                "name": "$params.objs[].n",
+                "outcome": "unusable",
+                "value": [
+                  1,
+                  null
+                ]
+              }
+            ],
+            "d": [
+              {
+                "locations": [
+                  "$params:/objs/0/n",
+                  "$params:/objs/1"
+                ],
+                "name": "$params.objs[].n",
+                "outcome": "unusable",
+                "value": [
+                  1,
+                  null
+                ]
+              }
+            ],
+            "e": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "unusable",
+                "value": [
+                  "y",
+                  null
+                ]
+              }
+            ],
+            "f": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "unusable",
+                "value": [
+                  "y",
+                  null
+                ]
+              }
+            ],
+            "g": [
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "unusable",
+                "value": [
+                  "y",
+                  null
+                ]
+              }
+            ],
+            "h": [
+              {
+                "locations": [
+                  "$params:/objs"
+                ],
+                "name": "$params.objs.x",
+                "outcome": "unusable",
+                "value": null
+              },
+              {
+                "locations": [
+                  "$params:/objs/0/x",
+                  "$params:/objs/1"
+                ],
+                "name": "$params.objs[].x",
+                "outcome": "unusable",
+                "value": [
+                  "y",
+                  null
+                ]
+              }
+            ]
           }
         },
         "violations": [
@@ -11635,7 +12054,21 @@
             }
           }
         ],
-        "refs": {"s": {"a": [], "b": [{"locations": ["$params:/a"], "name": "$params.a", "value": "y"}]}},
+        "refs": {
+          "s": {
+            "a": [],
+            "b": [
+              {
+                "locations": [
+                  "$params:/a"
+                ],
+                "name": "$params.a",
+                "outcome": "found",
+                "value": "y"
+              }
+            ]
+          }
+        },
         "violations": []
       }
     ]
@@ -11684,7 +12117,11 @@
             }
           }
         ],
-        "refs": {"s": {"c": []}}
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
       }
     ]
   },
@@ -12105,7 +12542,139 @@
             "type": "picked"
           }
         }
-      ], "refs": {"s": {"a": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "b": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}], "c": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "d": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "e": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "f": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "g": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "h": [{"locations": ["$params:/m"], "name": "$params.m", "value": {"x": "a", "y": "b"}}], "i": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}, {"locations": ["$params:/a"], "name": "$params.a", "value": "x"}]}, "t": {"$applies": [], "c": []}}, "violations": [
+      ], "refs": {
+        "s": {
+          "a": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            }
+          ],
+          "b": [
+            {
+              "locations": [
+                "/m"
+              ],
+              "name": "$input.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            }
+          ],
+          "c": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            }
+          ],
+          "d": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            }
+          ],
+          "e": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            }
+          ],
+          "f": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            }
+          ],
+          "g": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            }
+          ],
+          "h": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            }
+          ],
+          "i": [
+            {
+              "locations": [
+                "/m"
+              ],
+              "name": "$input.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            },
+            {
+              "locations": [
+                "$params:/a"
+              ],
+              "name": "$params.a",
+              "outcome": "found",
+              "value": "x"
+            }
+          ]
+        },
+        "t": {
+          "$applies": [],
+          "c": []
+        }
+      }, "violations": [
         {
           "cause": "unusable",
           "check": "f",
@@ -12169,6 +12738,7 @@
                 "$params:/m"
               ],
               "name": "$params.m",
+              "outcome": "found",
               "value": {
                 "x": "a",
                 "y": "b"
@@ -12255,6 +12825,7 @@
                 "$params:/m"
               ],
               "name": "$params.m",
+              "outcome": "found",
               "value": {
                 "x": "a",
                 "y": "b"
@@ -12982,7 +13553,118 @@
             "type": "thing"
           }
         }
-      ], "refs": {"s": {"a": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "b": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}], "c": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "d": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "e": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "f": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "g": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "h": [{"locations": ["$params:"], "name": "$params.m", "value": null}], "i": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}, {"locations": ["$params:"], "name": "$params.a", "value": null}]}, "t": {"$applies": [], "c": []}}}
+      ], "refs": {
+        "s": {
+          "a": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.m",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
+          "b": [
+            {
+              "locations": [
+                "/m"
+              ],
+              "name": "$input.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            }
+          ],
+          "c": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.m",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
+          "d": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.m",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
+          "e": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.m",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
+          "f": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.m",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
+          "g": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.m",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
+          "h": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.m",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
+          "i": [
+            {
+              "locations": [
+                "/m"
+              ],
+              "name": "$input.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.a",
+              "outcome": "absent",
+              "value": null
+            }
+          ]
+        },
+        "t": {
+          "$applies": [],
+          "c": []
+        }
+      }}
   ]},
   {"description": "$refs list the path before named by, when it is null", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}, "picked": {"from": "things whose v is $params.m named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is $params.m named by k", "b": "v is $input.m named by k", "c": "$params.m named by k exists", "d": {"for": "every items as it", "assert": "it.w is $params.m named by k"}, "e": {"any_of": {"o1": "v is $params.m named by k", "o2": "v is 1"}}, "f": "count of $params.m named by k is 1", "g": "tags contains $params.m named by k", "h": "v is in $params.m named by k", "i": "v is $input.m named by $params.a"}}, "t": {"subject": "picked", "checks": {"c": "v exists"}}}}, "params": {"m": null, "a": null}, "cases": [
       {"description": "lists the path before named by with null, and the rows don't change", "rules": ["value.refs", "location.refs"], "input": {"things": [{"id": "t1", "v": "a", "k": "x", "tags": ["a"], "items": [{"w": "a"}]}], "m": {"x": "a", "y": "b"}}, "results": [
@@ -13696,7 +14378,118 @@
             "type": "thing"
           }
         }
-      ], "refs": {"s": {"a": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "b": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}], "c": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "d": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "e": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "f": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "g": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "h": [{"locations": ["$params:/m"], "name": "$params.m", "value": null}], "i": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}, {"locations": ["$params:/a"], "name": "$params.a", "value": null}]}, "t": {"$applies": [], "c": []}}}
+      ], "refs": {
+        "s": {
+          "a": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "null",
+              "value": null
+            }
+          ],
+          "b": [
+            {
+              "locations": [
+                "/m"
+              ],
+              "name": "$input.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            }
+          ],
+          "c": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "null",
+              "value": null
+            }
+          ],
+          "d": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "null",
+              "value": null
+            }
+          ],
+          "e": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "null",
+              "value": null
+            }
+          ],
+          "f": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "null",
+              "value": null
+            }
+          ],
+          "g": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "null",
+              "value": null
+            }
+          ],
+          "h": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "null",
+              "value": null
+            }
+          ],
+          "i": [
+            {
+              "locations": [
+                "/m"
+              ],
+              "name": "$input.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            },
+            {
+              "locations": [
+                "$params:/a"
+              ],
+              "name": "$params.a",
+              "outcome": "null",
+              "value": null
+            }
+          ]
+        },
+        "t": {
+          "$applies": [],
+          "c": []
+        }
+      }}
   ]},
   {"description": "$refs list the path before named by, when it is of the wrong type", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}, "picked": {"from": "things whose v is $params.m named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is $params.m named by k", "b": "v is $input.m named by k", "c": "$params.m named by k exists", "d": {"for": "every items as it", "assert": "it.w is $params.m named by k"}, "e": {"any_of": {"o1": "v is $params.m named by k", "o2": "v is 1"}}, "f": "count of $params.m named by k is 1", "g": "tags contains $params.m named by k", "h": "v is in $params.m named by k", "i": "v is $input.m named by $params.a"}}, "t": {"subject": "picked", "checks": {"c": "v exists"}}}}, "params": {"m": 3, "a": 3}, "cases": [
       {"description": "lists the path before named by with what it read, and the rows don't change", "rules": ["value.refs", "location.refs"], "input": {"things": [{"id": "t1", "v": "a", "k": "x", "tags": ["a"], "items": [{"w": "a"}]}], "m": {"x": "a", "y": "b"}}, "results": [
@@ -14410,7 +15203,118 @@
             "type": "thing"
           }
         }
-      ], "refs": {"s": {"a": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "b": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}], "c": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "d": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "e": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "f": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "g": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "h": [{"locations": ["$params:/m"], "name": "$params.m", "value": 3}], "i": [{"locations": ["/m"], "name": "$input.m", "value": {"x": "a", "y": "b"}}, {"locations": ["$params:/a"], "name": "$params.a", "value": 3}]}, "t": {"$applies": [], "c": []}}}
+      ], "refs": {
+        "s": {
+          "a": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": 3
+            }
+          ],
+          "b": [
+            {
+              "locations": [
+                "/m"
+              ],
+              "name": "$input.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            }
+          ],
+          "c": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": 3
+            }
+          ],
+          "d": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": 3
+            }
+          ],
+          "e": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": 3
+            }
+          ],
+          "f": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": 3
+            }
+          ],
+          "g": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": 3
+            }
+          ],
+          "h": [
+            {
+              "locations": [
+                "$params:/m"
+              ],
+              "name": "$params.m",
+              "outcome": "found",
+              "value": 3
+            }
+          ],
+          "i": [
+            {
+              "locations": [
+                "/m"
+              ],
+              "name": "$input.m",
+              "outcome": "found",
+              "value": {
+                "x": "a",
+                "y": "b"
+              }
+            },
+            {
+              "locations": [
+                "$params:/a"
+              ],
+              "name": "$params.a",
+              "outcome": "found",
+              "value": 3
+            }
+          ]
+        },
+        "t": {
+          "$applies": [],
+          "c": []
+        }
+      }}
   ]},
   {
     "description": "a check whose sides can't be read in different ways, with a named by key from $input.k",

@@ -132,7 +132,7 @@
                     "locations": [
                       "/releases/0/commits/1"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 2 of commits",
                     "value": {
                       "signed": false
@@ -166,7 +166,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: signed is false",
+            "message": "item 2 of commits: c.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -229,7 +229,7 @@
                     "locations": [
                       "/releases/0/commits/0"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 1 of commits",
                     "value": {
                       "signed": false
@@ -252,7 +252,7 @@
                     "locations": [
                       "/releases/0/commits/2"
                     ],
-                    "message": "signed is 1, which isn't true or false",
+                    "message": "c.signed is 1, which isn't true or false",
                     "name": "item 3 of commits",
                     "value": {
                       "signed": 1
@@ -290,7 +290,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: signed is false; item 3 of commits: signed is 1, which isn't true or false",
+            "message": "item 1 of commits: c.signed is false; item 3 of commits: c.signed is 1, which isn't true or false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -348,7 +348,7 @@
                     "locations": [
                       "/releases/0/commits/1"
                     ],
-                    "message": "signed is missing",
+                    "message": "c.signed is missing",
                     "name": "item 2 of commits",
                     "value": {}
                   }
@@ -378,7 +378,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: signed is missing",
+            "message": "item 2 of commits: c.signed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -912,7 +912,7 @@
                     "locations": [
                       "/releases/0/commits/0"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 1 of commits",
                     "value": {
                       "signed": false
@@ -942,7 +942,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: signed is false",
+            "message": "item 1 of commits: c.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1083,7 +1083,7 @@
                     "locations": [
                       "/releases/0/commits/0"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 1 of commits",
                     "value": {
                       "signed": false
@@ -1106,7 +1106,7 @@
                     "locations": [
                       "/releases/0/commits/1"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 2 of commits",
                     "value": {
                       "signed": false
@@ -1140,7 +1140,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: signed is false; item 2 of commits: signed is false",
+            "message": "item 1 of commits: c.signed is false; item 2 of commits: c.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1315,7 +1315,7 @@
                     "locations": [
                       "/releases/0/commits/0"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 1 of commits",
                     "value": {
                       "signed": false
@@ -1338,7 +1338,7 @@
                     "locations": [
                       "/releases/0/commits/1"
                     ],
-                    "message": "signed is missing",
+                    "message": "c.signed is missing",
                     "name": "item 2 of commits",
                     "value": {}
                   }
@@ -1368,7 +1368,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: signed is false; item 2 of commits: signed is missing",
+            "message": "item 1 of commits: c.signed is false; item 2 of commits: c.signed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1632,7 +1632,7 @@
                     "locations": [
                       "/releases/0/commits/1"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 2 of commits",
                     "value": {
                       "kind": "code",
@@ -1669,7 +1669,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: signed is false",
+            "message": "item 2 of commits: c.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1701,7 +1701,7 @@
                     "locations": [
                       "/releases/0/commits/1"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 2 of commits",
                     "value": {
                       "kind": "code",
@@ -1738,7 +1738,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: signed is false",
+            "message": "item 2 of commits: c.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1770,7 +1770,7 @@
                     "locations": [
                       "/releases/0/commits/1"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 2 of commits",
                     "value": {
                       "kind": "code",
@@ -1807,7 +1807,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: signed is false",
+            "message": "item 2 of commits: c.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1975,7 +1975,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/commits/0"
+                    ],
+                    "name": "commits[0].kind",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/releases/0/commits/0"
@@ -2021,7 +2030,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/commits/0"
+                    ],
+                    "name": "commits[0].kind",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/releases/0/commits/0"
@@ -2141,7 +2159,7 @@
                     "locations": [
                       "/releases/0/commits/1"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 2 of commits",
                     "value": {
                       "kind": "code",
@@ -2160,7 +2178,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/commits/0"
+                    ],
+                    "name": "commits[0].kind",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/releases/0/commits/0"
@@ -2191,7 +2218,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: kind is missing; item 2 of commits: signed is false",
+            "message": "item 1 of commits: kind is missing; item 2 of commits: c.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2223,7 +2250,7 @@
                     "locations": [
                       "/releases/0/commits/1"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 2 of commits",
                     "value": {
                       "kind": "code",
@@ -2242,7 +2269,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/commits/0"
+                    ],
+                    "name": "commits[0].kind",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/releases/0/commits/0"
@@ -2273,7 +2309,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: kind is missing; item 2 of commits: signed is false",
+            "message": "item 1 of commits: kind is missing; item 2 of commits: c.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2305,7 +2341,7 @@
                     "locations": [
                       "/releases/0/commits/1"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 2 of commits",
                     "value": {
                       "kind": "code",
@@ -2324,7 +2360,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/commits/0"
+                    ],
+                    "name": "commits[0].kind",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/releases/0/commits/0"
@@ -2355,7 +2400,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: kind is missing; item 2 of commits: signed is false",
+            "message": "item 1 of commits: kind is missing; item 2 of commits: c.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2396,7 +2441,16 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/commits/0"
+                    ],
+                    "name": "commits[0].kind",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/releases/0/commits/0"
@@ -2439,7 +2493,16 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/commits/0"
+                    ],
+                    "name": "commits[0].kind",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/releases/0/commits/0"
@@ -2482,7 +2545,16 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/commits/0"
+                    ],
+                    "name": "commits[0].kind",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/releases/0/commits/0"
@@ -2743,7 +2815,16 @@
               {
                 "cause": "value",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "name": "xs[0].k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/things/0/xs/0"
@@ -2913,7 +2994,7 @@
                     "locations": [
                       "/releases/0/commits/0"
                     ],
-                    "message": "signed is missing",
+                    "message": "author.signed is missing",
                     "name": "item 1 of commits",
                     "value": {
                       "x": 1
@@ -2943,7 +3024,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: signed is missing",
+            "message": "item 1 of commits: author.signed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3731,7 +3812,7 @@
                 ]
               }
             ],
-            "message": "item 2 of pull_requests: item 1 of approvers: approver.username is \"eve\", and pr.author is \"eve\"",
+            "message": "item 2 of pull_requests: item 1 of pr.approvers: approver.username is \"eve\", and pr.author is \"eve\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3788,7 +3869,16 @@
               {
                 "cause": "value",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ],
+                    "name": "pull_requests[1].state",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/releases/0/pull_requests/1"
@@ -4206,7 +4296,7 @@
                 ]
               }
             ],
-            "message": "item 1 of pull_requests: item 1 of approvers: approver.username is missing",
+            "message": "item 1 of pull_requests: item 1 of pr.approvers: approver.username is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4256,12 +4346,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/pull_requests/0/approvers/0"
+                        ],
+                        "name": "pr.approvers[0].state",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/pull_requests/0/approvers/0"
                     ],
-                    "message": "item 1 of approvers is missing",
+                    "message": "state is missing",
                     "name": "item 1 of pr.approvers",
                     "value": {
                       "username": "lee"
@@ -4316,7 +4415,7 @@
                 ]
               }
             ],
-            "message": "item 1 of pull_requests: item 1 of approvers is missing",
+            "message": "item 1 of pull_requests: item 1 of pr.approvers: state is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4546,7 +4645,7 @@
                         "locations": [
                           "/releases/0/pull_requests/0/commits/0"
                         ],
-                        "message": "signed is false",
+                        "message": "commit.signed is false",
                         "name": "item 1 of pr.commits",
                         "value": {
                           "signed": false
@@ -4608,7 +4707,7 @@
                 ]
               }
             ],
-            "message": "item 1 of pull_requests: item 1 of commits: signed is false",
+            "message": "item 1 of pull_requests: item 1 of pr.commits: commit.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5990,7 +6089,7 @@
                     "locations": [
                       "/releases/0/commits/1"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 2 of commits",
                     "value": {
                       "kind": "test",
@@ -6027,7 +6126,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: signed is false",
+            "message": "item 2 of commits: c.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -6324,10 +6423,22 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
-                "kind": "list",
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
                 "message": "$params.k is missing",
-                "name": "shas named by $params.k"
+                "name": "sha.ok is true"
               }
             ],
             "inputs": [
@@ -6407,41 +6518,23 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
+                "failures": [],
+                "inputs": [
                   {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/releases/0/groups/0/shas"
-                        ],
-                        "name": "g.shas named by $params.k",
-                        "outcome": "absent",
-                        "value": null
-                      }
+                    "locations": [
+                      "$params:"
                     ],
-                    "kind": "list",
-                    "message": "shas named by $params.k is missing",
-                    "name": "g.shas named by $params.k"
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
-                "inputs": [],
-                "kind": "item",
+                "kind": "assertion",
                 "locations": [
-                  "/releases/0/groups/0"
+                  "$policy:/requirements/s/checks/c/assert"
                 ],
-                "message": "",
-                "name": "item 1 of groups",
-                "value": {
-                  "shas": {
-                    "a": [
-                      {
-                        "ok": true
-                      }
-                    ]
-                  }
-                }
+                "message": "$params.k is missing",
+                "name": "sha.ok is true"
               }
             ],
             "inputs": [
@@ -6470,7 +6563,7 @@
                 ]
               }
             ],
-            "message": "item 1 of groups: shas named by $params.k is missing",
+            "message": "$params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8462,7 +8555,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/pull_requests/0/approvals/1"
+                    ],
+                    "name": "approvals[1].state",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/pull_requests/0/approvals/1"
@@ -9385,7 +9487,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/pull_requests/0/commits/1"
+                    ],
+                    "name": "commits[1].kind",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/pull_requests/0/commits/1"
@@ -9511,12 +9622,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/commits/1"
+                        ],
+                        "name": "commits[1].author",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/pull_requests/0/commits/1"
                     ],
-                    "message": "item 2 of commits is missing",
+                    "message": "author is missing",
                     "name": "item 2 of commits",
                     "value": {
                       "t": 2
@@ -9541,12 +9661,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/commits/1"
+                        ],
+                        "name": "commits[1].author",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/pull_requests/0/commits/1"
                     ],
-                    "message": "item 2 of commits is missing",
+                    "message": "author is missing",
                     "name": "item 2 of commits",
                     "value": {
                       "t": 2
@@ -9603,7 +9732,7 @@
                 ]
               }
             ],
-            "message": "item 1 of approvers: item 2 of commits is missing; item 2 of approvers: item 2 of commits is missing",
+            "message": "item 1 of approvers: item 2 of commits: author is missing; item 2 of approvers: item 2 of commits: author is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -10676,12 +10805,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/commits/1"
+                        ],
+                        "name": "commits[1].author",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/pull_requests/0/commits/1"
                     ],
-                    "message": "item 2 of commits is missing",
+                    "message": "author is missing",
                     "name": "item 2 of commits",
                     "value": {
                       "t": 2
@@ -10733,7 +10871,7 @@
                 ]
               }
             ],
-            "message": "item 1 of approvers: item 2 of commits is missing",
+            "message": "item 1 of approvers: item 2 of commits: author is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -14257,7 +14395,7 @@
                         "locations": [
                           "/pull_requests/0/approvers/0"
                         ],
-                        "message": "state is missing",
+                        "message": "approver.state is missing",
                         "name": "item 1 of approvers",
                         "value": {
                           "username": "ada"
@@ -14280,7 +14418,7 @@
                         "locations": [
                           "/pull_requests/0/approvers/1"
                         ],
-                        "message": "state is missing",
+                        "message": "approver.state is missing",
                         "name": "item 2 of approvers",
                         "value": {
                           "username": "linus"
@@ -14342,7 +14480,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: item 1 of approvers: state is missing; item 1 of commits: item 2 of approvers: state is missing",
+            "message": "item 1 of commits: item 1 of approvers: approver.state is missing; item 1 of commits: item 2 of approvers: approver.state is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15084,7 +15222,7 @@
                         "locations": [
                           "/pull_requests/0/approvers/0"
                         ],
-                        "message": "state is missing",
+                        "message": "approver.state is missing",
                         "name": "item 1 of approvers",
                         "value": {
                           "username": "ada"
@@ -15107,7 +15245,7 @@
                         "locations": [
                           "/pull_requests/0/approvers/1"
                         ],
-                        "message": "state is null",
+                        "message": "approver.state is null",
                         "name": "item 2 of approvers",
                         "value": {
                           "state": null,
@@ -15132,7 +15270,7 @@
                         "locations": [
                           "/pull_requests/0/approvers/2"
                         ],
-                        "message": "state is 1, which isn't text",
+                        "message": "approver.state is 1, which isn't text",
                         "name": "item 3 of approvers",
                         "value": {
                           "state": 1,
@@ -15204,7 +15342,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: item 1 of approvers: state is missing; item 1 of commits: item 2 of approvers: state is null; item 1 of commits: item 3 of approvers: state is 1, which isn't text",
+            "message": "item 1 of commits: item 1 of approvers: approver.state is missing; item 1 of commits: item 2 of approvers: approver.state is null; item 1 of commits: item 3 of approvers: approver.state is 1, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17798,7 +17936,7 @@
                         "locations": [
                           "/things/0/items/0/subs/0"
                         ],
-                        "message": "item 1 of subs is 1",
+                        "message": "item 1 of z.subs is 1",
                         "name": "item 1 of z.subs",
                         "value": 1
                       }
@@ -17862,7 +18000,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: item 1 of subs is 1",
+            "message": "item 1 of items: item 1 of z.subs is 1",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17971,7 +18109,7 @@
                         "locations": [
                           "/things/0/deep/0/subs/1"
                         ],
-                        "message": "item 1 of leaves is 9",
+                        "message": "item 1 of y.leaves is 9",
                         "name": "item 2 of z.subs",
                         "value": {
                           "leaves": [
@@ -18078,7 +18216,7 @@
                 ]
               }
             ],
-            "message": "item 1 of deep: item 2 of subs: item 1 of leaves is 9",
+            "message": "item 1 of deep: item 2 of z.subs: item 1 of y.leaves is 9",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19413,7 +19551,7 @@
                     "locations": [
                       "/items/0/m/0"
                     ],
-                    "message": "item 3 of q is missing",
+                    "message": "item 3 of x.q is missing",
                     "name": "item 1 of m",
                     "value": {
                       "q": [
@@ -19451,7 +19589,7 @@
                 ]
               }
             ],
-            "message": "item 1 of m: item 3 of q is missing",
+            "message": "item 1 of m: item 3 of x.q is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -20663,12 +20801,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/ps/w/2"
+                        ],
+                        "name": "artifact.ap.w[2].t",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/trail/artifacts/0/ps/w/2"
                     ],
-                    "message": "item 3 of artifact.ap.w is missing",
+                    "message": "t is missing",
                     "name": "item 3 of artifact.ap.w",
                     "value": {}
                   }
@@ -20717,7 +20864,7 @@
                 ]
               }
             ],
-            "message": "item 1 of keys: item 3 of artifact.ap.w is missing",
+            "message": "item 1 of keys: item 3 of artifact.ap.w: t is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -20830,7 +20977,7 @@
                         "locations": [
                           "/trail/artifacts/0/ps/w/1"
                         ],
-                        "message": "ok is false",
+                        "message": "x.ok is false",
                         "name": "item 2 of artifact.ap.w",
                         "value": {
                           "ok": false,
@@ -20891,7 +21038,7 @@
                 ]
               }
             ],
-            "message": "item 1 of keys: item 2 of artifact.ap.w: ok is false",
+            "message": "item 1 of keys: item 2 of artifact.ap.w: x.ok is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21581,7 +21728,7 @@
                     "locations": [
                       "/things/0/commits/0"
                     ],
-                    "message": "signed is false",
+                    "message": "c.signed is false",
                     "name": "item 1 of commits",
                     "value": {
                       "signed": false
@@ -21611,7 +21758,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: signed is false",
+            "message": "item 1 of commits: c.signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -23267,7 +23414,7 @@
                         "locations": [
                           "/rounds/0/items/0/zs/0"
                         ],
-                        "message": "item 1 of zs is 1",
+                        "message": "item 1 of y.zs is 1",
                         "name": "item 1 of y.zs",
                         "value": 1
                       }
@@ -23356,7 +23503,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: item 1 of zs is 1",
+            "message": "item 1 of items: item 1 of y.zs is 1",
             "passed": false,
             "requirement": "r01",
             "subject": {
@@ -23733,7 +23880,7 @@
                         "locations": [
                           "/rounds/0/rs/0"
                         ],
-                        "message": "y is 3",
+                        "message": "z.y is 3",
                         "name": "item 1 of rs",
                         "value": {
                           "cov": 1,
@@ -23783,7 +23930,7 @@
                         "locations": [
                           "/rounds/0/rs/0"
                         ],
-                        "message": "y is 3",
+                        "message": "z.y is 3",
                         "name": "item 1 of rs",
                         "value": {
                           "cov": 1,
@@ -23876,7 +24023,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: item 1 of rs: y is 3; item 2 of items: item 1 of rs: y is 3",
+            "message": "item 1 of items: item 1 of rs: z.y is 3; item 2 of items: item 1 of rs: z.y is 3",
             "passed": false,
             "requirement": "r04",
             "subject": {
@@ -23908,7 +24055,7 @@
                     "locations": [
                       "/rounds/0/items/0"
                     ],
-                    "message": "n is 1",
+                    "message": "i.n is 1",
                     "name": "item 1 of items",
                     "value": {
                       "cov": 1,
@@ -23975,7 +24122,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: n is 1",
+            "message": "item 1 of items: i.n is 1",
             "passed": false,
             "requirement": "r09",
             "subject": {
@@ -24690,7 +24837,7 @@
                         "locations": [
                           "/rounds/0/items/0"
                         ],
-                        "message": "n is 1",
+                        "message": "q.n is 1",
                         "name": "item 1 of items",
                         "value": {
                           "cov": 1,
@@ -24791,7 +24938,7 @@
                 ]
               }
             ],
-            "message": "item 1 of .cov.xs: item 1 of items: n is 1; item 2 of .cov.xs is 2",
+            "message": "item 1 of .cov.xs: item 1 of items: q.n is 1; item 2 of .cov.xs is 2",
             "passed": false,
             "requirement": "r02",
             "subject": {
@@ -25235,7 +25382,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "item 1 of tags is \"t\", and nums is [\"u\"]",
+                    "message": "item 1 of x.tags is \"t\", and x.nums is [\"u\"]",
                     "name": "item 1 of xs",
                     "value": {
                       "nums": [
@@ -25277,7 +25424,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 of tags is \"t\", and nums is [\"u\"]",
+            "message": "item 1 of xs: item 1 of x.tags is \"t\", and x.nums is [\"u\"]",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -27271,7 +27418,7 @@
                         "locations": [
                           "/things/0/xs/0/ys/0"
                         ],
-                        "message": "w is 1, which isn't a list or an object",
+                        "message": "y.w is 1, which isn't a list or an object",
                         "name": "item 1 of x.ys",
                         "value": {
                           "w": 1,
@@ -27347,7 +27494,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 of ys: w is 1, which isn't a list or an object",
+            "message": "item 1 of xs: item 1 of x.ys: y.w is 1, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -27833,7 +27980,7 @@
                         "locations": [
                           "/things/0/ys/0"
                         ],
-                        "message": "n is 2",
+                        "message": "q.n is 2",
                         "name": "item 1 of ys",
                         "value": {
                           "k": 1,
@@ -27887,7 +28034,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 of ys: n is 2",
+            "message": "item 1 of xs: item 1 of ys: q.n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -28055,7 +28202,7 @@
                         "locations": [
                           "/things/0/ys/0"
                         ],
-                        "message": "n is 5",
+                        "message": "q.n is 5",
                         "name": "item 1 of ys",
                         "value": {
                           "k": 2,
@@ -28124,7 +28271,7 @@
                 ]
               }
             ],
-            "message": "item 2 of xs: item 1 of ys: n is 5",
+            "message": "item 2 of xs: item 1 of ys: q.n is 5",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -28296,7 +28443,7 @@
                         "locations": [
                           "/things/0/ys/1"
                         ],
-                        "message": "n is 2",
+                        "message": "q.n is 2",
                         "name": "item 2 of ys",
                         "value": {
                           "k": 1,
@@ -28352,7 +28499,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 2 of ys: n is 2",
+            "message": "item 1 of xs: item 2 of ys: q.n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -28530,7 +28677,7 @@
                         "locations": [
                           "/things/0/ys/1"
                         ],
-                        "message": "n is 2",
+                        "message": "q.n is 2",
                         "name": "item 2 of ys",
                         "value": {
                           "k": 2,
@@ -28602,7 +28749,7 @@
                 ]
               }
             ],
-            "message": "item 2 of xs: item 2 of ys: n is 2",
+            "message": "item 2 of xs: item 2 of ys: q.n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -28767,7 +28914,7 @@
                         "locations": [
                           "/things/0/ys/1"
                         ],
-                        "message": "n is 2",
+                        "message": "q.n is 2",
                         "name": "item 2 of ys",
                         "value": {
                           "k": 1,
@@ -28821,7 +28968,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 2 of ys: n is 2",
+            "message": "item 1 of xs: item 2 of ys: q.n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -28989,7 +29136,7 @@
                         "locations": [
                           "/things/0/ys/2"
                         ],
-                        "message": "n is 3",
+                        "message": "q.n is 3",
                         "name": "item 3 of ys",
                         "value": {
                           "k": 2,
@@ -29058,7 +29205,7 @@
                 ]
               }
             ],
-            "message": "item 2 of xs: item 3 of ys: n is 3",
+            "message": "item 2 of xs: item 3 of ys: q.n is 3",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -29284,7 +29431,7 @@
                         "locations": [
                           "/things/0/ys/0"
                         ],
-                        "message": "n is 2",
+                        "message": "q.n is 2",
                         "name": "item 1 of ys",
                         "value": {
                           "k": 1,
@@ -29355,7 +29502,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 of ys: n is 2",
+            "message": "item 1 of xs: item 1 of ys: q.n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -29756,7 +29903,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "name": "xs[0].k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/things/0/xs/0"
@@ -41765,7 +41921,7 @@
                     "locations": [
                       "/decisions/1"
                     ],
-                    "message": "decision is \"deny\"",
+                    "message": "d.decision is \"deny\"",
                     "name": "item 2 of $input.decisions",
                     "value": {
                       "correlation_id": "c2",
@@ -41810,7 +41966,7 @@
                 "value": "c2"
               }
             ],
-            "message": "item 1 of $input.decisions: d.correlation_id is \"c1\", and correlation_id is \"c2\"; item 2 of $input.decisions: decision is \"deny\"",
+            "message": "item 1 of $input.decisions: d.correlation_id is \"c1\", and correlation_id is \"c2\"; item 2 of $input.decisions: d.decision is \"deny\"",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -58858,7 +59014,7 @@
                     "locations": [
                       "/prs/0/xs/1"
                     ],
-                    "message": "v is \"x\", which isn't a number",
+                    "message": "m.v is \"x\", which isn't a number",
                     "name": "item 2 of xs",
                     "value": {
                       "v": "x"
@@ -58902,7 +59058,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
+            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: m.v is \"x\", which isn't a number",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -58981,7 +59137,7 @@
                     "locations": [
                       "/prs/0/xs/1"
                     ],
-                    "message": "v is \"x\", which isn't a number",
+                    "message": "m.v is \"x\", which isn't a number",
                     "name": "item 2 of xs",
                     "value": {
                       "v": "x"
@@ -59025,7 +59181,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
+            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: m.v is \"x\", which isn't a number",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -59104,7 +59260,7 @@
                     "locations": [
                       "/prs/0/xs/1"
                     ],
-                    "message": "v is \"x\", which isn't a number",
+                    "message": "m.v is \"x\", which isn't a number",
                     "name": "item 2 of xs",
                     "value": {
                       "v": "x"
@@ -59148,7 +59304,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
+            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: m.v is \"x\", which isn't a number",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -66373,7 +66529,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/rows/1"
@@ -66954,7 +67119,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/rows/1"
@@ -66966,7 +67140,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/2"
+                    ],
+                    "name": "rows[2].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/rows/2"
@@ -68444,7 +68627,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[1].n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/rows/1"
@@ -68456,7 +68648,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/2"
+                    ],
+                    "name": "rows[2].n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/rows/2"
@@ -68703,7 +68904,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[1].k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/rows/1"
@@ -68715,7 +68925,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/2"
+                    ],
+                    "name": "rows[2].k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/rows/2"
@@ -69056,7 +69275,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/ws/1"
@@ -69263,12 +69491,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ms/0/ws/1"
+                        ],
+                        "name": "m.ws[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/cs/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws: v is missing",
+                    "message": "v is missing",
                     "name": "item 2 of m.ws",
                     "value": {
                       "n": 2
@@ -69350,7 +69587,7 @@
                 ]
               }
             ],
-            "message": "item 2 of pos: name is missing; item 1 of ms: item 2 of ws: v is missing",
+            "message": "item 2 of pos: name is missing; item 1 of ms: item 2 of m.ws: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -69419,7 +69656,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/ws/1"
@@ -69578,12 +69824,21 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ms/0/ws/1"
+                        ],
+                        "name": "m.ws[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/cs/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws: v is missing",
+                    "message": "v is missing",
                     "name": "item 2 of m.ws",
                     "value": {
                       "n": 2
@@ -69665,7 +69920,7 @@
                 ]
               }
             ],
-            "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value; item 1 of ms: item 2 of ws: v is missing",
+            "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value; item 1 of ms: item 2 of m.ws: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -69727,7 +69982,16 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/ws/1"
@@ -69862,12 +70126,21 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ms/0/ws/1"
+                        ],
+                        "name": "m.ws[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/cs/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws: v is missing",
+                    "message": "v is missing",
                     "name": "item 2 of m.ws",
                     "value": {
                       "n": 2
@@ -69933,7 +70206,7 @@
                 ]
               }
             ],
-            "message": "pos is null; item 1 of ms: item 2 of ws: v is missing",
+            "message": "pos is null; item 1 of ms: item 2 of m.ws: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -70202,7 +70475,7 @@
                     "locations": [
                       "/cs/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws is null, which isn't an object",
+                    "message": "item 2 of m.ws is null, which isn't an object",
                     "name": "item 2 of m.ws",
                     "value": null
                   }
@@ -70276,7 +70549,7 @@
                 ]
               }
             ],
-            "message": "item 2 of pos: name is missing; item 1 of ms: item 2 of ws is null, which isn't an object",
+            "message": "item 2 of pos: name is missing; item 1 of ms: item 2 of m.ws is null, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -70391,7 +70664,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/ws/1"
@@ -70457,7 +70739,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/ws/1"
@@ -70529,12 +70820,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ms/0/ws/1"
+                        ],
+                        "name": "m.ws[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/cs/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws: v is missing",
+                    "message": "v is missing",
                     "name": "item 2 of m.ws",
                     "value": {
                       "n": 2
@@ -70612,7 +70912,7 @@
                 ]
               }
             ],
-            "message": "item 2 of $input.os: name is missing; item 1 of ms: item 2 of ws: v is missing",
+            "message": "item 2 of $input.os: name is missing; item 1 of ms: item 2 of m.ws: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -70653,12 +70953,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ms/0/ws/1"
+                        ],
+                        "name": "m.ws[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/cs/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws: v is missing",
+                    "message": "v is missing",
                     "name": "item 2 of m.ws",
                     "value": {
                       "n": 2
@@ -70724,7 +71033,7 @@
                 ]
               }
             ],
-            "message": "item 2 of $params.os: name is missing; item 1 of ms: item 2 of ws: v is missing",
+            "message": "item 2 of $params.os: name is missing; item 1 of ms: item 2 of m.ws: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -70786,7 +71095,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/ws/1"
@@ -70848,7 +71166,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/ws/1"
@@ -70920,12 +71247,21 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ms/0/ws/1"
+                        ],
+                        "name": "m.ws[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/cs/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws: v is missing",
+                    "message": "v is missing",
                     "name": "item 2 of m.ws",
                     "value": {
                       "n": 2
@@ -70999,7 +71335,7 @@
                 ]
               }
             ],
-            "message": "$input.os is \"s\", which isn't an object; item 1 of ms: item 2 of ws: v is missing",
+            "message": "$input.os is \"s\", which isn't an object; item 1 of ms: item 2 of m.ws: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -71040,12 +71376,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ms/0/ws/1"
+                        ],
+                        "name": "m.ws[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/cs/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws: v is missing",
+                    "message": "v is missing",
                     "name": "item 2 of m.ws",
                     "value": {
                       "n": 2
@@ -71111,7 +71456,7 @@
                 ]
               }
             ],
-            "message": "item 2 of $params.os: name is missing; item 1 of ms: item 2 of ws: v is missing",
+            "message": "item 2 of $params.os: name is missing; item 1 of ms: item 2 of m.ws: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -71227,7 +71572,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ws/1"
+                    ],
+                    "name": "ws[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/kids/0/ws/1"
@@ -71296,7 +71650,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ws/1"
+                    ],
+                    "name": "ws[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/kids/0/ws/1"
@@ -71387,12 +71750,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/kids/0/ms/0/ws/1"
+                        ],
+                        "name": "m.ws[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/cs/0/kids/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws: v is missing",
+                    "message": "v is missing",
                     "name": "item 2 of m.ws",
                     "value": {
                       "n": 2
@@ -71470,7 +71842,7 @@
                 ]
               }
             ],
-            "message": "item 2 of c.os: name is missing; item 1 of ms: item 2 of ws: v is missing",
+            "message": "item 2 of c.os: name is missing; item 1 of ms: item 2 of m.ws: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -71514,12 +71886,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/kids/0/ms/0/ws/1"
+                        ],
+                        "name": "m.ws[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/cs/0/kids/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws: v is missing",
+                    "message": "v is missing",
                     "name": "item 2 of m.ws",
                     "value": {
                       "n": 2
@@ -71601,7 +71982,7 @@
                 ]
               }
             ],
-            "message": "item 2 of c.pos: name is missing; item 1 of ms: item 2 of ws: v is missing",
+            "message": "item 2 of c.pos: name is missing; item 1 of ms: item 2 of m.ws: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -71671,7 +72052,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ws/1"
+                    ],
+                    "name": "ws[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/kids/0/ws/1"
@@ -71728,7 +72118,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ws/1"
+                    ],
+                    "name": "ws[1].v",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/cs/0/kids/0/ws/1"
@@ -71803,12 +72202,21 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/kids/0/ms/0/ws/1"
+                        ],
+                        "name": "m.ws[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/cs/0/kids/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws: v is missing",
+                    "message": "v is missing",
                     "name": "item 2 of m.ws",
                     "value": {
                       "n": 2
@@ -71874,7 +72282,7 @@
                 ]
               }
             ],
-            "message": "c.os is \"s\", which isn't an object; item 1 of ms: item 2 of ws: v is missing",
+            "message": "c.os is \"s\", which isn't an object; item 1 of ms: item 2 of m.ws: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -71918,12 +72326,21 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/kids/0/ms/0/ws/1"
+                        ],
+                        "name": "m.ws[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/cs/0/kids/0/ms/0/ws/1"
                     ],
-                    "message": "item 2 of ws: v is missing",
+                    "message": "v is missing",
                     "name": "item 2 of m.ws",
                     "value": {
                       "n": 2
@@ -71989,7 +72406,7 @@
                 ]
               }
             ],
-            "message": "c.pos is \"s\", which isn't an object; item 1 of ms: item 2 of ws: v is missing",
+            "message": "c.pos is \"s\", which isn't an object; item 1 of ms: item 2 of m.ws: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -78180,7 +78597,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/l/0"
+                        ],
+                        "name": "$params.l[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "$params:/l/0"
@@ -78268,12 +78694,21 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/l/0"
+                        ],
+                        "name": "$params.l[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "$params:/l/0"
                     ],
-                    "message": "item 1 of $params.l is missing",
+                    "message": "v is missing",
                     "name": "item 1 of $params.l",
                     "value": {
                       "w": 1
@@ -78318,7 +78753,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: item 1 of $params.l is missing",
+            "message": "item 1 of items: item 1 of $params.l: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -78399,7 +78834,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/l/0"
+                        ],
+                        "name": "$params.l[0].v",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "$params:/l/0"
@@ -78487,12 +78931,21 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/l/0"
+                        ],
+                        "name": "$params.l[0].v",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "$params:/l/0"
                     ],
-                    "message": "item 1 of $params.l is null",
+                    "message": "v is null",
                     "name": "item 1 of $params.l",
                     "value": {
                       "v": null
@@ -78537,7 +78990,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: item 1 of $params.l is null",
+            "message": "item 1 of items: item 1 of $params.l: v is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -85593,7 +86046,7 @@
                     "locations": [
                       "/pull_requests/0/approvers/0"
                     ],
-                    "message": "state is \"REJECTED\"",
+                    "message": "approver.state is \"REJECTED\"",
                     "name": "item 1 of approvers",
                     "value": {
                       "state": "REJECTED",
@@ -85617,7 +86070,7 @@
                     "locations": [
                       "/pull_requests/0/approvers/1"
                     ],
-                    "message": "state is missing",
+                    "message": "approver.state is missing",
                     "name": "item 2 of approvers",
                     "value": {
                       "u": "grace"
@@ -85658,7 +86111,7 @@
                 "value": []
               }
             ],
-            "message": "item 1 of approvers: state is \"REJECTED\"; item 2 of approvers: state is missing",
+            "message": "item 1 of approvers: approver.state is \"REJECTED\"; item 2 of approvers: approver.state is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -85756,7 +86209,7 @@
                     "locations": [
                       "/pull_requests/0/approvers/0"
                     ],
-                    "message": "state is \"REJECTED\"",
+                    "message": "approver.state is \"REJECTED\"",
                     "name": "item 1 of approvers",
                     "value": {
                       "state": "REJECTED",
@@ -85780,7 +86233,7 @@
                     "locations": [
                       "/pull_requests/0/approvers/1"
                     ],
-                    "message": "state is missing",
+                    "message": "approver.state is missing",
                     "name": "item 2 of approvers",
                     "value": {
                       "u": "grace"
@@ -85821,7 +86274,7 @@
                 "value": []
               }
             ],
-            "message": "item 1 of approvers: state is \"REJECTED\"; item 2 of approvers: state is missing",
+            "message": "item 1 of approvers: approver.state is \"REJECTED\"; item 2 of approvers: approver.state is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -85908,7 +86361,7 @@
                     "locations": [
                       "/pull_requests/0/approvers/0"
                     ],
-                    "message": "state is \"REJECTED\"",
+                    "message": "approver.state is \"REJECTED\"",
                     "name": "item 1 of approvers",
                     "value": {
                       "state": "REJECTED",
@@ -85932,7 +86385,7 @@
                     "locations": [
                       "/pull_requests/0/approvers/1"
                     ],
-                    "message": "state is missing",
+                    "message": "approver.state is missing",
                     "name": "item 2 of approvers",
                     "value": {
                       "u": "grace"
@@ -85973,7 +86426,7 @@
                 "value": []
               }
             ],
-            "message": "item 1 of approvers: state is \"REJECTED\"; item 2 of approvers: state is missing",
+            "message": "item 1 of approvers: approver.state is \"REJECTED\"; item 2 of approvers: approver.state is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -86005,7 +86458,7 @@
                     "locations": [
                       "/pull_requests/0/approvers/0"
                     ],
-                    "message": "state is \"REJECTED\"",
+                    "message": "approver.state is \"REJECTED\"",
                     "name": "item 1 of approvers",
                     "value": {
                       "state": "REJECTED",
@@ -86029,7 +86482,7 @@
                     "locations": [
                       "/pull_requests/0/approvers/1"
                     ],
-                    "message": "state is missing",
+                    "message": "approver.state is missing",
                     "name": "item 2 of approvers",
                     "value": {
                       "u": "grace"
@@ -86070,7 +86523,7 @@
                 "value": []
               }
             ],
-            "message": "item 1 of approvers: state is \"REJECTED\"; item 2 of approvers: state is missing",
+            "message": "item 1 of approvers: approver.state is \"REJECTED\"; item 2 of approvers: approver.state is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -86517,7 +86970,7 @@
                         "locations": [
                           "/pull_requests/0/approvers/0"
                         ],
-                        "message": "state is \"REJECTED\"",
+                        "message": "approver.state is \"REJECTED\"",
                         "name": "item 1 of approvers",
                         "value": {
                           "state": "REJECTED",
@@ -86541,7 +86994,7 @@
                         "locations": [
                           "/pull_requests/0/approvers/1"
                         ],
-                        "message": "state is missing",
+                        "message": "approver.state is missing",
                         "name": "item 2 of approvers",
                         "value": {
                           "u": "grace"
@@ -86602,7 +87055,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: item 1 of approvers: state is \"REJECTED\"; item 1 of commits: item 2 of approvers: state is missing",
+            "message": "item 1 of commits: item 1 of approvers: approver.state is \"REJECTED\"; item 1 of commits: item 2 of approvers: approver.state is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -86684,7 +87137,7 @@
                         "locations": [
                           "/pull_requests/0/approvers/0"
                         ],
-                        "message": "state is \"REJECTED\"",
+                        "message": "approver.state is \"REJECTED\"",
                         "name": "item 1 of approvers",
                         "value": {
                           "state": "REJECTED",
@@ -86708,7 +87161,7 @@
                         "locations": [
                           "/pull_requests/0/approvers/1"
                         ],
-                        "message": "state is missing",
+                        "message": "approver.state is missing",
                         "name": "item 2 of approvers",
                         "value": {
                           "u": "grace"
@@ -86769,7 +87222,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: item 1 of approvers: state is \"REJECTED\"; item 1 of commits: item 2 of approvers: state is missing",
+            "message": "item 1 of commits: item 1 of approvers: approver.state is \"REJECTED\"; item 1 of commits: item 2 of approvers: approver.state is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -86938,7 +87391,7 @@
                         "locations": [
                           "/pull_requests/0/approvers/0"
                         ],
-                        "message": "state is \"REJECTED\"",
+                        "message": "approver.state is \"REJECTED\"",
                         "name": "item 1 of approvers",
                         "value": {
                           "state": "REJECTED",
@@ -87023,7 +87476,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: item 1 of approvers: state is \"REJECTED\"; item 1 of commits: item 2 of approvers: commit.author is \"ada\", and approver.u is \"grace\", and approver.state is missing",
+            "message": "item 1 of commits: item 1 of approvers: approver.state is \"REJECTED\"; item 1 of commits: item 2 of approvers: commit.author is \"ada\", and approver.u is \"grace\", and approver.state is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -87055,7 +87508,7 @@
                     "locations": [
                       "/pull_requests/0/approvers/0"
                     ],
-                    "message": "state is \"REJECTED\"",
+                    "message": "approver.state is \"REJECTED\"",
                     "name": "item 1 of approvers",
                     "value": {
                       "state": "REJECTED",
@@ -87079,7 +87532,7 @@
                     "locations": [
                       "/pull_requests/0/approvers/1"
                     ],
-                    "message": "state is missing",
+                    "message": "approver.state is missing",
                     "name": "item 2 of approvers",
                     "value": {
                       "u": "grace"
@@ -87127,7 +87580,7 @@
                 ]
               }
             ],
-            "message": "item 1 of approvers: state is \"REJECTED\"; item 2 of approvers: state is missing",
+            "message": "item 1 of approvers: approver.state is \"REJECTED\"; item 2 of approvers: approver.state is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -87162,7 +87615,7 @@
                         "locations": [
                           "/pull_requests/0/approvers/0"
                         ],
-                        "message": "state is \"REJECTED\"",
+                        "message": "approver.state is \"REJECTED\"",
                         "name": "item 1 of approvers",
                         "value": {
                           "state": "REJECTED",
@@ -87232,7 +87685,7 @@
                 "value": "fix"
               }
             ],
-            "message": "item 1 of commits: item 1 of approvers: state is \"REJECTED\"",
+            "message": "item 1 of commits: item 1 of approvers: approver.state is \"REJECTED\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -89817,7 +90270,7 @@
                     "locations": [
                       "/pull_requests/0/commits/0"
                     ],
-                    "message": "signed is missing",
+                    "message": "commit.signed is missing",
                     "name": "item 1 of commits",
                     "value": {
                       "kind": "docs"
@@ -89847,7 +90300,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: signed is missing",
+            "message": "item 1 of commits: commit.signed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -91545,7 +91998,7 @@
                   "locations": [
                     "/things/0/ys/1"
                   ],
-                  "message": "k is \"q\"",
+                  "message": "y.k is \"q\"",
                   "name": "item 2 of ys",
                   "value": {
                     "k": "q",
@@ -91575,7 +92028,7 @@
               }
             }
           ],
-          "message": "item 2 of ys: k is \"q\"",
+          "message": "item 2 of ys: y.k is \"q\"",
           "passed": false,
           "requirement": "s",
           "subject": {
@@ -95177,6 +95630,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
+                "outcome": "found",
                 "value": [
                   1,
                   2
@@ -95460,6 +95914,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
+                "outcome": "found",
                 "value": "b"
               }
             ],
@@ -95469,6 +95924,7 @@
                   "/y"
                 ],
                 "name": "$input.y",
+                "outcome": "found",
                 "value": "c"
               }
             ]
@@ -95756,6 +96212,7 @@
                   "$params:"
                 ],
                 "name": "$params.z",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -95765,6 +96222,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -95774,6 +96232,7 @@
                   "$params:/w"
                 ],
                 "name": "$params.w",
+                "outcome": "found",
                 "value": 3
               }
             ]
@@ -96128,6 +96587,7 @@
                   "$params:"
                 ],
                 "name": "$params.z",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -96137,6 +96597,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -96146,6 +96607,7 @@
                   "$params:/w"
                 ],
                 "name": "$params.w",
+                "outcome": "found",
                 "value": 3
               }
             ],
@@ -96155,6 +96617,7 @@
                   "$params:/l"
                 ],
                 "name": "$params.l",
+                "outcome": "found",
                 "value": "s"
               }
             ],
@@ -96164,6 +96627,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
+                "outcome": "null",
                 "value": null
               }
             ]
@@ -96619,7 +97083,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ys/0"
+                    ],
+                    "name": "ys[0].n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/arts/0/ys/0"
@@ -98306,7 +98779,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ys/0"
+                    ],
+                    "name": "ys[0].n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/arts/0/ys/0"
@@ -98573,7 +99055,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ys/0"
+                    ],
+                    "name": "ys[0].n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/arts/0/ys/0"
@@ -98847,7 +99338,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ys/0"
+                    ],
+                    "name": "ys[0].n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/arts/0/ys/0"
@@ -99131,7 +99631,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ys/0"
+                    ],
+                    "name": "ys[0].n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/arts/0/ys/0"
@@ -99389,7 +99898,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ys/0"
+                    ],
+                    "name": "ys[0].n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/arts/0/ys/0"
@@ -99632,7 +100150,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ys/0"
+                    ],
+                    "name": "ys[0].n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/arts/0/ys/0"
@@ -99779,7 +100306,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/0"
@@ -99793,7 +100329,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/1"
@@ -99876,7 +100421,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/0"
@@ -99890,7 +100444,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/1"
@@ -100007,7 +100570,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/0"
@@ -100021,7 +100593,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/1"
@@ -100104,7 +100685,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/0"
@@ -100118,7 +100708,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/1"
@@ -100262,7 +100861,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/0"
@@ -100276,7 +100884,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/1"
@@ -100355,7 +100972,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/0"
@@ -100369,7 +100995,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].u",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ys/1"
@@ -100511,7 +101146,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "name": "ys[0].z",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/things/0/ys/0"
@@ -100525,7 +101169,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "name": "ys[1].z",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/things/0/ys/1"
@@ -100588,7 +101241,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "name": "ys[0].u",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/things/0/ys/0"
@@ -100602,7 +101264,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "name": "ys[1].u",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/things/0/ys/1"
@@ -100665,7 +101336,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "name": "ys[0].u",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/things/0/ys/0"
@@ -100679,7 +101359,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "name": "ys[1].u",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/things/0/ys/1"

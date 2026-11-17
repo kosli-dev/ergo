@@ -33,7 +33,7 @@ _for_failures_of(row, at, where, t, []) := array.concat(
 )
 
 _for_failures_of(row, at, where, t, ks) := array.concat(
-	[_for_keyed_entry(e, i, ks, where.check) | some i, a in where.check.assertions; e := _for_assertion_entry(row, at, where, object.union(t, {"said": [_for_keyed_said(s, j, ks) | some j, s in t.said]}), i, a)],
+	[_for_keyed_entry(e, i, where.check) | some i, a in where.check.assertions; e := _for_assertion_entry(row, at, where, object.union(t, {"said": [_for_keyed_said(s, j, ks) | some j, s in t.said]}), i, a)],
 	_nested_items([e | some kind in ["list", "item"]; some e in _for_row_breaks(row, t, at, where); _leveled_kind(e) == kind; not _for_key_break(e, ks)]),
 ) if ks != []
 
@@ -43,9 +43,9 @@ _for_keyed_said(s, 0, ks) := concat("; ", _once(array.concat(ks, [x | some x in 
 
 _for_keyed_said(s, j, _) := s if j > 0
 
-_for_keyed_entry(e, 0, _, check) := object.union(e, {"inputs": _once(array.concat(e.inputs, [x | some item in check.items; some x in _with_outcomes(_walk_key_ref_entries(item.path))]))})
+_for_keyed_entry(e, 0, check) := object.union(e, {"inputs": _once(array.concat(e.inputs, [x | some item in check.items; some x in _with_outcomes(_walk_key_ref_entries(item.path))]))})
 
-_for_keyed_entry(e, i, _, _) := e if i > 0
+_for_keyed_entry(e, i, _) := e if i > 0
 
 _for_key_break(e, ks) if _for_key_leaf(e, ks)
 

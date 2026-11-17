@@ -941,7 +941,23 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"locations": ["$params:/allowed"], "name": "$params.allowed", "value": ["p", "q"]}]}},
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/allowed"
+                ],
+                "name": "$params.allowed",
+                "outcome": "found",
+                "value": [
+                  "p",
+                  "q"
+                ]
+              }
+            ]
+          }
+        },
         "violations": [
           {
             "cause": "value",
@@ -1217,7 +1233,38 @@
             }
           }
         ],
-        "refs": {"s": {"in": [{"locations": ["/sbom/components/0/name", "/sbom/components/1/name"], "name": "$input.sbom.components[].name", "value": ["click", "jinja2"]}], "not_in": [{"locations": ["/sbom/components/0/name", "/sbom/components/1/name"], "name": "$input.sbom.components[].name", "value": ["click", "jinja2"]}]}},
+        "refs": {
+          "s": {
+            "in": [
+              {
+                "locations": [
+                  "/sbom/components/0/name",
+                  "/sbom/components/1/name"
+                ],
+                "name": "$input.sbom.components[].name",
+                "outcome": "found",
+                "value": [
+                  "click",
+                  "jinja2"
+                ]
+              }
+            ],
+            "not_in": [
+              {
+                "locations": [
+                  "/sbom/components/0/name",
+                  "/sbom/components/1/name"
+                ],
+                "name": "$input.sbom.components[].name",
+                "outcome": "found",
+                "value": [
+                  "click",
+                  "jinja2"
+                ]
+              }
+            ]
+          }
+        },
         "violations": [
           {
             "cause": "value",
@@ -3178,7 +3225,24 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"locations": ["/0/id", "/1/id"], "name": "$input[].id", "value": ["a", "b"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "/0/id",
+                  "/1/id"
+                ],
+                "name": "$input[].id",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails every row as absent when an item of the input has no value",
@@ -3320,7 +3384,24 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"locations": ["/0/id", "/1"], "name": "$input[].id", "value": ["a", null]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "/0/id",
+                  "/1"
+                ],
+                "name": "$input[].id",
+                "outcome": "absent",
+                "value": [
+                  "a",
+                  null
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails every row as unusable when an item of the input is not an object",
@@ -4690,7 +4771,142 @@
             }
           }
         ],
-        "refs": {"s": {"all_of": [{"locations": ["/0/k", "/1/k"], "name": "$input[].k", "value": ["x", "y"]}], "contains": [{"locations": [""], "name": "$input.k", "value": null}], "matches": [{"locations": ["/0/p", "/1/p"], "name": "$input[].p", "value": ["^a", "^b"]}], "none_of": [{"locations": ["/0/k", "/1/k"], "name": "$input[].k", "value": ["x", "y"]}], "not_all_of": [{"locations": ["/0/k", "/1/k"], "name": "$input[].k", "value": ["x", "y"]}], "not_contains": [{"locations": [""], "name": "$input.k", "value": null}], "not_matches": [{"locations": ["/0/p", "/1/p"], "name": "$input[].p", "value": ["^a", "^b"]}], "not_one_of": [{"locations": ["/0/id", "/1/id"], "name": "$input[].id", "value": ["a", "b"]}], "one_of": [{"locations": ["/0/id", "/1/id"], "name": "$input[].id", "value": ["a", "b"]}], "some_of": [{"locations": ["/0/k", "/1/k"], "name": "$input[].k", "value": ["x", "y"]}]}}
+        "refs": {
+          "s": {
+            "all_of": [
+              {
+                "locations": [
+                  "/0/k",
+                  "/1/k"
+                ],
+                "name": "$input[].k",
+                "outcome": "found",
+                "value": [
+                  "x",
+                  "y"
+                ]
+              }
+            ],
+            "contains": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.k",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "matches": [
+              {
+                "locations": [
+                  "/0/p",
+                  "/1/p"
+                ],
+                "name": "$input[].p",
+                "outcome": "found",
+                "value": [
+                  "^a",
+                  "^b"
+                ]
+              }
+            ],
+            "none_of": [
+              {
+                "locations": [
+                  "/0/k",
+                  "/1/k"
+                ],
+                "name": "$input[].k",
+                "outcome": "found",
+                "value": [
+                  "x",
+                  "y"
+                ]
+              }
+            ],
+            "not_all_of": [
+              {
+                "locations": [
+                  "/0/k",
+                  "/1/k"
+                ],
+                "name": "$input[].k",
+                "outcome": "found",
+                "value": [
+                  "x",
+                  "y"
+                ]
+              }
+            ],
+            "not_contains": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.k",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "not_matches": [
+              {
+                "locations": [
+                  "/0/p",
+                  "/1/p"
+                ],
+                "name": "$input[].p",
+                "outcome": "found",
+                "value": [
+                  "^a",
+                  "^b"
+                ]
+              }
+            ],
+            "not_one_of": [
+              {
+                "locations": [
+                  "/0/id",
+                  "/1/id"
+                ],
+                "name": "$input[].id",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ],
+            "one_of": [
+              {
+                "locations": [
+                  "/0/id",
+                  "/1/id"
+                ],
+                "name": "$input[].id",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ],
+            "some_of": [
+              {
+                "locations": [
+                  "/0/k",
+                  "/1/k"
+                ],
+                "name": "$input[].k",
+                "outcome": "found",
+                "value": [
+                  "x",
+                  "y"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails every phrase that reads a missing value as absent, and is one of passes when every item has its value",
@@ -5996,7 +6212,142 @@
             }
           }
         ],
-        "refs": {"s": {"all_of": [{"locations": ["/0/k", "/1"], "name": "$input[].k", "value": ["x", null]}], "contains": [{"locations": [""], "name": "$input.k", "value": null}], "matches": [{"locations": ["/0/p", "/1"], "name": "$input[].p", "value": ["^a", null]}], "none_of": [{"locations": ["/0/k", "/1"], "name": "$input[].k", "value": ["x", null]}], "not_all_of": [{"locations": ["/0/k", "/1"], "name": "$input[].k", "value": ["x", null]}], "not_contains": [{"locations": [""], "name": "$input.k", "value": null}], "not_matches": [{"locations": ["/0/p", "/1"], "name": "$input[].p", "value": ["^a", null]}], "not_one_of": [{"locations": ["/0/id", "/1/id"], "name": "$input[].id", "value": ["a", "b"]}], "one_of": [{"locations": ["/0/id", "/1/id"], "name": "$input[].id", "value": ["a", "b"]}], "some_of": [{"locations": ["/0/k", "/1"], "name": "$input[].k", "value": ["x", null]}]}}
+        "refs": {
+          "s": {
+            "all_of": [
+              {
+                "locations": [
+                  "/0/k",
+                  "/1"
+                ],
+                "name": "$input[].k",
+                "outcome": "absent",
+                "value": [
+                  "x",
+                  null
+                ]
+              }
+            ],
+            "contains": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.k",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "matches": [
+              {
+                "locations": [
+                  "/0/p",
+                  "/1"
+                ],
+                "name": "$input[].p",
+                "outcome": "absent",
+                "value": [
+                  "^a",
+                  null
+                ]
+              }
+            ],
+            "none_of": [
+              {
+                "locations": [
+                  "/0/k",
+                  "/1"
+                ],
+                "name": "$input[].k",
+                "outcome": "absent",
+                "value": [
+                  "x",
+                  null
+                ]
+              }
+            ],
+            "not_all_of": [
+              {
+                "locations": [
+                  "/0/k",
+                  "/1"
+                ],
+                "name": "$input[].k",
+                "outcome": "absent",
+                "value": [
+                  "x",
+                  null
+                ]
+              }
+            ],
+            "not_contains": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.k",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "not_matches": [
+              {
+                "locations": [
+                  "/0/p",
+                  "/1"
+                ],
+                "name": "$input[].p",
+                "outcome": "absent",
+                "value": [
+                  "^a",
+                  null
+                ]
+              }
+            ],
+            "not_one_of": [
+              {
+                "locations": [
+                  "/0/id",
+                  "/1/id"
+                ],
+                "name": "$input[].id",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ],
+            "one_of": [
+              {
+                "locations": [
+                  "/0/id",
+                  "/1/id"
+                ],
+                "name": "$input[].id",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ],
+            "some_of": [
+              {
+                "locations": [
+                  "/0/k",
+                  "/1"
+                ],
+                "name": "$input[].k",
+                "outcome": "absent",
+                "value": [
+                  "x",
+                  null
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -6145,7 +6496,24 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["/0/ok/id", "/1/ok/id"], "name": "$input[].ok.id", "value": ["a", "c"]}]}},
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "/0/ok/id",
+                  "/1/ok/id"
+                ],
+                "name": "$input[].ok.id",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "c"
+                ]
+              }
+            ]
+          }
+        },
         "requirements": {"s": {"subjects": {"matching": 1, "total": 2}}}
       },
       {
@@ -6306,7 +6674,24 @@
             }
           }
         ],
-        "refs": {"s": {"$applies": [{"locations": ["/0/ok/id", "/1/ok"], "name": "$input[].ok.id", "value": ["a", null]}]}},
+        "refs": {
+          "s": {
+            "$applies": [
+              {
+                "locations": [
+                  "/0/ok/id",
+                  "/1/ok"
+                ],
+                "name": "$input[].ok.id",
+                "outcome": "absent",
+                "value": [
+                  "a",
+                  null
+                ]
+              }
+            ]
+          }
+        },
         "requirements": {"s": {"subjects": {"matching": 0, "total": 2}}}
       }
     ]
@@ -13499,6 +13884,7 @@
                   "$params:/0"
                 ],
                 "name": "$params[0].v",
+                "outcome": "unusable",
                 "value": null
               }
             ]
@@ -13642,6 +14028,7 @@
                   "$params:/0"
                 ],
                 "name": "item 1 of $params",
+                "outcome": "found",
                 "value": [
                   1
                 ]

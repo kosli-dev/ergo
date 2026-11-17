@@ -6072,6 +6072,7 @@
                   "$params:/ok"
                 ],
                 "name": "$params.ok",
+                "outcome": "found",
                 "value": [
                   "a",
                   "b"

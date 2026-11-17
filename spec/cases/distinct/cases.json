@@ -3032,7 +3032,7 @@
                         "locations": [
                           "/s/commits/1/reviews/0"
                         ],
-                        "message": "item 1 of reviews is \"no\"",
+                        "message": "item 1 of commit.reviews is \"no\"",
                         "name": "item 1 of commit.reviews",
                         "value": "no"
                       }
@@ -3105,7 +3105,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: item 1 of reviews is \"no\"",
+            "message": "item 2 of commits: item 1 of commit.reviews is \"no\"",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3171,7 +3171,7 @@
                         "locations": [
                           "/s/reviewers/1"
                         ],
-                        "message": "ok is false",
+                        "message": "r.ok is false",
                         "name": "item 2 of reviewers",
                         "value": {
                           "by": "bob",
@@ -3257,7 +3257,7 @@
                 }
               }
             ],
-            "message": "item 2 of commits: item 2 of reviewers: ok is false",
+            "message": "item 2 of commits: item 2 of reviewers: r.ok is false",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -5349,7 +5349,7 @@
                     "locations": [
                       "/s/xs/2"
                     ],
-                    "message": "k is 5, and lo is 9",
+                    "message": "x.k is 5, and x.lo is 9",
                     "name": "item 3 of xs",
                     "value": {
                       "k": 5,
@@ -5391,7 +5391,7 @@
                 ]
               }
             ],
-            "message": "item 3 of xs: k is 5, and lo is 9",
+            "message": "item 3 of xs: x.k is 5, and x.lo is 9",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8247,7 +8247,7 @@
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of fs: k is 5, which isn't an object; item 2 of fs: k is 5, which isn't an object",
+                    "message": "item 1 of t.fs: k is 5, which isn't an object; item 2 of t.fs: k is 5, which isn't an object",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -8324,7 +8324,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ts: item 1 of fs: k is 5, which isn't an object; item 1 of ts: item 2 of fs: k is 5, which isn't an object",
+            "message": "item 1 of ts: item 1 of t.fs: k is 5, which isn't an object; item 1 of ts: item 2 of t.fs: k is 5, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8498,7 +8498,7 @@
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of fs: k is 5, which isn't an object; item 2 of fs: k is 5, which isn't an object",
+                    "message": "item 1 of t.fs: k is 5, which isn't an object; item 2 of t.fs: k is 5, which isn't an object",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -8573,7 +8573,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ts: item 1 of fs: k is 5, which isn't an object; item 1 of ts: item 2 of fs: k is 5, which isn't an object",
+            "message": "item 1 of ts: item 1 of t.fs: k is 5, which isn't an object; item 1 of ts: item 2 of t.fs: k is 5, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8749,7 +8749,7 @@
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of fs: k is 5, which isn't an object; item 2 of fs: k is 5, which isn't an object",
+                    "message": "item 1 of t.fs: k is 5, which isn't an object; item 2 of t.fs: k is 5, which isn't an object",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -8826,7 +8826,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ts: item 1 of fs: k is 5, which isn't an object; item 1 of ts: item 2 of fs: k is 5, which isn't an object",
+            "message": "item 1 of ts: item 1 of t.fs: k is 5, which isn't an object; item 1 of ts: item 2 of t.fs: k is 5, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -9003,7 +9003,7 @@
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of fs: k is 5, which isn't an object; item 2 of fs: k is 5, which isn't an object",
+                    "message": "item 1 of t.fs: k is 5, which isn't an object; item 2 of t.fs: k is 5, which isn't an object",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -9080,7 +9080,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ts: item 1 of fs: k is 5, which isn't an object; item 1 of ts: item 2 of fs: k is 5, which isn't an object",
+            "message": "item 1 of ts: item 1 of t.fs: k is 5, which isn't an object; item 1 of ts: item 2 of t.fs: k is 5, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -9471,7 +9471,7 @@
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of fs: k is 5, which isn't text",
+                    "message": "item 1 of t.fs: k is 5, which isn't text",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -9539,7 +9539,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ts: item 1 of fs: k is 5, which isn't text",
+            "message": "item 1 of ts: item 1 of t.fs: k is 5, which isn't text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -9613,7 +9613,7 @@
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of fs: k is 5, and ok is [5]",
+                    "message": "item 1 of t.fs: k is 5, and t.ok is [5]",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -9681,7 +9681,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ts: item 1 of fs: k is 5, and ok is [5]",
+            "message": "item 1 of ts: item 1 of t.fs: k is 5, and t.ok is [5]",
             "passed": false,
             "requirement": "r",
             "subject": {

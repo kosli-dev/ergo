@@ -3631,7 +3631,23 @@
           }
         ],
         "expressions": {"s": {"c": "x is in $params.k"}},
-        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as value when it isn't",
@@ -3704,7 +3720,23 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as unusable on a number",
@@ -3777,7 +3809,23 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as absent when the field is missing",
@@ -3850,7 +3898,23 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as null when the field is null",
@@ -3923,7 +3987,23 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -3997,7 +4077,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": [], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": []
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -4071,7 +4164,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "a"
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -4145,7 +4251,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": null, "locations": ["$params:"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.k",
+                "outcome": "absent",
+                "value": null
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -4219,7 +4338,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": null, "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "null",
+                "value": null
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -4263,7 +4395,23 @@
           }
         ],
         "expressions": {"s": {"c": "x is in $input.allowed"}},
-        "refs": {"s": {"c": [{"name": "$input.allowed", "value": ["a", "b"], "locations": ["/allowed"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "/allowed"
+                ],
+                "name": "$input.allowed",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as value when it isn't",
@@ -4336,7 +4484,23 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$input.allowed", "value": ["a", "b"], "locations": ["/allowed"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "/allowed"
+                ],
+                "name": "$input.allowed",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -5607,7 +5771,20 @@
           }
         ],
         "expressions": {"s": {"c": "x contains $params.k"}},
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "a"
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as value when it doesn't",
@@ -5678,7 +5855,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "a"
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as unusable when the field is a string",
@@ -5745,7 +5935,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "a"
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -5823,7 +6026,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": null, "locations": ["$params:"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.k",
+                "outcome": "absent",
+                "value": null
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -6132,7 +6348,20 @@
           }
         ],
         "expressions": {"s": {"c": "x does not contain $params.k"}},
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "a"
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as value when the list has it",
@@ -6203,7 +6432,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "a"
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -6543,7 +6785,23 @@
           }
         ],
         "expressions": {"s": {"c": "x contains all of $params.k"}},
-        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as value when one is missing",
@@ -6620,7 +6878,23 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -6698,7 +6972,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": [], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": []
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -6776,7 +7063,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "a", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "a"
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -7090,7 +7390,23 @@
           }
         ],
         "expressions": {"s": {"c": "x contains none of $params.k"}},
-        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as value when the list has one",
@@ -7167,7 +7483,23 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -8069,7 +8401,23 @@
           }
         ],
         "expressions": {"s": {"c": "x matches $params.p"}},
-        "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a", "^b"], "locations": ["$params:/p"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "outcome": "found",
+                "value": [
+                  "^a",
+                  "^b"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as value when none does",
@@ -8142,7 +8490,23 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a", "^b"], "locations": ["$params:/p"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "outcome": "found",
+                "value": [
+                  "^a",
+                  "^b"
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -8220,7 +8584,22 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.p", "value": ["("], "locations": ["$params:/p"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "outcome": "found",
+                "value": [
+                  "("
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -8264,7 +8643,22 @@
           }
         ],
         "expressions": {"s": {"c": "x does not match $params.p"}},
-        "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a"], "locations": ["$params:/p"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "outcome": "found",
+                "value": [
+                  "^a"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as value when one matches",
@@ -8335,7 +8729,22 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a"], "locations": ["$params:/p"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/p"
+                ],
+                "name": "$params.p",
+                "outcome": "found",
+                "value": [
+                  "^a"
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -13832,7 +14241,20 @@
           }
         ],
         "expressions": {"s": {"c": "obj named by $params.k is 1"}},
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "b", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "b"
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as value when the other key holds another value",
@@ -13883,7 +14305,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "b", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "b"
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as absent when the key isn't there",
@@ -13934,7 +14369,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "b", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "b"
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -13969,7 +14417,20 @@
           }
         ],
         "expressions": {"s": {"c": "obj named by $params.k.v is 1"}},
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "b", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "b"
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -14027,7 +14488,20 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": null, "locations": ["$params:"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.k",
+                "outcome": "absent",
+                "value": null
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -14085,7 +14559,22 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.k", "value": ["b"], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": [
+                  "b"
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -14120,7 +14609,20 @@
           }
         ],
         "expressions": {"s": {"c": "obj named by $params.k is 1"}},
-        "refs": {"s": {"c": [{"name": "$params.k", "value": "b", "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": "b"
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -15314,7 +15816,22 @@
           }
         ],
         "expressions": {"s": {"c": "x is in $params.k"}},
-        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a"], "locations": ["$params:/k"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "found",
+                "value": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -20586,7 +21103,22 @@
             }
           }
         ],
-        "refs": {"s": {"c": [{"name": "$params.blocked", "value": ["prod"], "locations": ["$params:/blocked"]}]}}
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/blocked"
+                ],
+                "name": "$params.blocked",
+                "outcome": "found",
+                "value": [
+                  "prod"
+                ]
+              }
+            ]
+          }
+        }
       },
       {
         "description": "fails as value on a value the list holds",
@@ -24841,7 +25373,21 @@
           }
         ],
         "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}},
-        "refs": {"s": {"$min_subjects": [], "$unique_ids": [], "$well_formed": [], "all": [], "has": [], "in": [], "lacks": [], "match": [], "no_match": [], "none": [], "not_in": []}}
+        "refs": {
+          "s": {
+            "$min_subjects": [],
+            "$unique_ids": [],
+            "$well_formed": [],
+            "all": [],
+            "has": [],
+            "in": [],
+            "lacks": [],
+            "match": [],
+            "no_match": [],
+            "none": [],
+            "not_in": []
+          }
+        }
       },
       {
         "description": "fails as value when the field holds no match",
@@ -84554,13 +85100,21 @@
                     "name": "n named by $input.k",
                     "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/b"
                 ],
-                "message": "n named by $input.k is null",
+                "message": "$input.k is null",
                 "name": "every n named by $input.k is 1"
               }
             ],
@@ -84572,7 +85126,7 @@
                 "value": []
               }
             ],
-            "message": "n named by $input.k is null",
+            "message": "$input.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -84738,10 +85292,22 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
-                "kind": "list",
+                "inputs": [
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/f/assert"
+                ],
                 "message": "$input.k is null",
-                "name": "n named by $input.k"
+                "name": "x is 1"
               }
             ],
             "inputs": [
@@ -84823,13 +85389,21 @@
                     "name": "n named by $input.k",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/b"
                 ],
-                "message": "n named by $input.k is missing",
+                "message": "$input.k is missing",
                 "name": "every n named by $input.k is 1"
               }
             ],
@@ -84841,7 +85415,7 @@
                 "value": []
               }
             ],
-            "message": "n named by $input.k is missing",
+            "message": "$input.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -85007,10 +85581,22 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
-                "kind": "list",
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/f/assert"
+                ],
                 "message": "$input.k is missing",
-                "name": "n named by $input.k"
+                "name": "x is 1"
               }
             ],
             "inputs": [
@@ -85896,13 +86482,21 @@
                     "name": "n named by $params.k",
                     "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "n named by $params.k is null",
+                "message": "$params.k is null",
                 "name": "every n named by $params.k is 1"
               }
             ],
@@ -85914,7 +86508,7 @@
                 "value": []
               }
             ],
-            "message": "n named by $params.k is null",
+            "message": "$params.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -86080,10 +86674,22 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
-                "kind": "list",
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/e/assert"
+                ],
                 "message": "$params.k is null",
-                "name": "n named by $params.k"
+                "name": "x is 1"
               }
             ],
             "inputs": [
@@ -86129,13 +86735,21 @@
                     "name": "n named by $params.k",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "n named by $params.k is missing",
+                "message": "$params.k is missing",
                 "name": "every n named by $params.k is 1"
               }
             ],
@@ -86147,7 +86761,7 @@
                 "value": []
               }
             ],
-            "message": "n named by $params.k is missing",
+            "message": "$params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -86313,10 +86927,22 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
-                "kind": "list",
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/e/assert"
+                ],
                 "message": "$params.k is missing",
-                "name": "n named by $params.k"
+                "name": "x is 1"
               }
             ],
             "inputs": [
@@ -89367,7 +89993,16 @@
         {
           "cause": "absent",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/xs/1/meta"
+              ],
+              "name": "xs[1].k",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
           "kind": "item",
           "locations": [
             "/prs/0/xs/1/meta"
@@ -90291,7 +90926,7 @@
               "locations": [
                 "/prs/0/xs/0/ys/1/z"
               ],
-              "message": "item 2 of ys: z is \"s\", which isn't an object",
+              "message": "z is \"s\", which isn't an object",
               "name": "item 2 of x.ys",
               "value": "s"
             }
@@ -90329,7 +90964,7 @@
               "locations": [
                 "/prs/0/xs/1/ys/0/z"
               ],
-              "message": "item 1 of ys: z is null, which isn't an object",
+              "message": "z is null, which isn't an object",
               "name": "item 1 of x.ys",
               "value": null
             },
@@ -90341,7 +90976,7 @@
               "locations": [
                 "/prs/0/xs/1/ys/1"
               ],
-              "message": "item 2 of ys: z is missing",
+              "message": "z is missing",
               "name": "item 2 of x.ys",
               "value": null
             }
@@ -90421,7 +91056,7 @@
           ]
         }
       ],
-      "message": "item 1 of xs: item 2 of ys: z is \"s\", which isn't an object; item 2 of xs: item 1 of ys: z is null, which isn't an object; item 2 of xs: item 2 of ys: z is missing",
+      "message": "item 1 of xs: item 2 of x.ys: z is \"s\", which isn't an object; item 2 of xs: item 1 of x.ys: z is null, which isn't an object; item 2 of xs: item 2 of x.ys: z is missing",
       "passed": false,
       "requirement": "r",
       "subject": {

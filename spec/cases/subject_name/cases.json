@@ -102,7 +102,22 @@
           }
         ],
         "expressions": {"allowed": {"allowed": "region is in $params.allowed_regions"}},
-        "refs": {"allowed": {"allowed": [{"locations": ["$params:/allowed_regions"], "name": "$params.allowed_regions", "value": ["eu-west-1"]}]}}
+        "refs": {
+          "allowed": {
+            "allowed": [
+              {
+                "locations": [
+                  "$params:/allowed_regions"
+                ],
+                "name": "$params.allowed_regions",
+                "outcome": "found",
+                "value": [
+                  "eu-west-1"
+                ]
+              }
+            ]
+          }
+        }
       }
     ]
   },

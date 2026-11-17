@@ -7465,13 +7465,21 @@
                     "name": "xs named by $params.k",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/n"
                 ],
-                "message": "xs named by $params.k is missing",
+                "message": "$params.k is missing",
                 "name": "every xs named by $params.k is 1"
               }
             ],
@@ -7483,7 +7491,7 @@
                 "value": []
               }
             ],
-            "message": "xs named by $params.k is missing",
+            "message": "$params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8933,7 +8941,7 @@
                     "locations": [
                       "/trail/artifacts/0/releases/0/files/1"
                     ],
-                    "message": "item 1 of tags is \"bob\", and artifact.owner is \"ann\"",
+                    "message": "item 1 of f.tags is \"bob\", and artifact.owner is \"ann\"",
                     "name": "item 2 of files",
                     "value": {
                       "tags": [
@@ -8990,7 +8998,7 @@
                 ]
               }
             ],
-            "message": "item 2 of files: item 1 of tags is \"bob\", and artifact.owner is \"ann\"",
+            "message": "item 2 of files: item 1 of f.tags is \"bob\", and artifact.owner is \"ann\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9455,6 +9463,7 @@
                   "$params:/owners"
                 ],
                 "name": "$params.owners",
+                "outcome": "found",
                 "value": [
                   "ann",
                   "cid"
