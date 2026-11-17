@@ -132,3 +132,21 @@ test_a_walk_that_reads_no_list_has_a_list_entry_under_its_assertion if {
 	[_shape(f) | some f in rows[0].failures] == [{"kind": "assertion", "name": "every x.y is 1", "cause": "absent", "message": "", "failures": [{"kind": "list", "name": "x", "cause": "absent", "message": "x is missing", "failures": []}]}]
 	rows[0].failures[0].failures[0].inputs == [{"name": "x", "value": null, "locations": ["/things/0"], "outcome": "absent"}]
 }
+
+test_a_list_failing_deep_down_sits_under_the_items_it_belongs_to if {
+	doc := {"things": [{"id": 1, "groups": [{"teams": [{"units": [{"n": 1}, {"n": 2}]}, {"units": null}]}]}]}
+	rows := _walk_rows({"c": "every groups.teams.units.n is 1"}, doc, {})
+	rows[0][3] == [_assertion("every groups.teams.units.n is 1", "null", ["$policy:/requirements/s/checks/c"], [], "", [_item("item 1 of groups", "null", {"teams": [{"units": [{"n": 1}, {"n": 2}]}, {"units": null}]}, ["/things/0/groups/0"], [], "", [_item("item 1 of teams", "value", {"units": [{"n": 1}, {"n": 2}]}, ["/things/0/groups/0/teams/0"], [], "", [_item("item 2 of units", "value", {"n": 2}, ["/things/0/groups/0/teams/0/units/1"], [_seen("groups[0].teams[0].units[1].n", 2, ["/things/0/groups/0/teams/0/units/1/n"], "found")], "n is 2", [])]), _item("item 2 of teams", "null", {"units": null}, ["/things/0/groups/0/teams/1"], [], "", [_list("units", "null", [_seen("groups[0].teams[1].units", null, ["/things/0/groups/0/teams/1/units"], "null")], "units is null")])])])]
+}
+
+test_a_for_lines_second_list_through_a_deep_path_sits_under_the_items_it_belongs_to if {
+	rows := _for_rows({"for": "every prs as pr, every pr.meta.commits as c", "assert": "c.signed is true"}, [{"id": 1, "prs": [{"meta": {"commits": [{"signed": true}, {"signed": false}]}}, {"meta": {"commits": null}}]}], {})
+	rows[0][2] == [_assertion("c.signed is true", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 1 of prs", "value", {"meta": {"commits": [{"signed": true}, {"signed": false}]}}, ["/things/0/prs/0"], [], "", [_item("item 2 of pr.meta.commits", "value", {"signed": false}, ["/things/0/prs/0/meta/commits/1"], [_seen("c.signed", false, ["/things/0/prs/0/meta/commits/1/signed"], "found")], "signed is false", [])])]), _item("item 2 of prs", "null", {"meta": {"commits": null}}, ["/things/0/prs/1"], [], "", [_list("pr.meta.commits", "null", [_seen("pr.meta.commits", null, ["/things/0/prs/1/meta/commits"], "null")], "pr.meta.commits is null")])]
+}
+
+test_two_sentences_that_say_the_same_text_each_keep_it_and_the_row_says_it_once if {
+	policy := _sentence_policy({"c": {"description": "d", "assert": ["x is 1", "x is 2"]}})
+	rows := [r | some r in ergo.report({"things": [{"id": 1, "x": 5}]}, policy, {}).results; r.check == "c"]
+	rows[0].message == "x is 5"
+	[f.message | some f in rows[0].failures] == ["x is 5", "x is 5"]
+}
