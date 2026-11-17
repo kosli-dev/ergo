@@ -909,7 +909,7 @@ else := raw
 _for_texts(check, subj, r, once, line) := {
 	"items": items,
 	"said": [concat("; ", array.concat(_for_flaw_said(check, i, flaw), _for_grouped(check, _uncovered(array.concat([m | some m in roots; i in owners[m]], object.get(frees, a, [])))))) | some i, a in check.assertions],
-	"walk": array.concat(array.concat([["list", _for_list_label(check), m] | flaw == []; some m in line], [["list", _for_list_label(check), concat("; ", _for_grouped(check, unowned))] | unowned != []]), seconds),
+	"walk": array.concat(array.concat([["list", _for_list_label(check, m), m] | flaw == []; some m in line], [["list", _for_list_label(check, ""), concat("; ", _for_grouped(check, unowned))] | unowned != []]), seconds),
 	"free": [object.remove(l, ["msg", "own_msg"]) | some l in object.get(r, "free_lines", [])],
 	"flawed": flaw != [],
 } if {
@@ -966,7 +966,11 @@ _for_once_skip(_, []) := []
 
 _for_once_skip(check, once) := array.concat(once, [m | some x in _for_second_roots(check, _for_names); some m in x.raw]) if once != []
 
-_for_list_label(check) := _input_name(check.items[0].path)
+_for_list_label(check, m) := name if {
+	count(check.items) == 2
+	name := _input_name(check.items[1].path)
+	startswith(m, concat("", [name, " "]))
+} else := _input_name(check.items[0].path)
 
 _for_root_owner(check, subj, m, frees) := free | {i | some i, _ in check.assertions; not i in free; _for_root_of(check, subj, i, m)} if {
 	free := {i | some i, a in check.assertions; _for_free_root(m, frees[a])}

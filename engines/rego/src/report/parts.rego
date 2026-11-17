@@ -69,9 +69,13 @@ _leveled_kind(e) := "item" if _has_levels(e)
 else := e.kind
 
 _for_row_breaks(row, t, at, where) := array.concat(
-	[_entry(w[0], w[1], row.cause, [], [], w[2]) | some w in t.walk],
+	[_entry(w[0], w[1], row.cause, [i | some i in _with_outcomes(row.inputs); _list_read_of(i.name, w[1])], [], w[2]) | some w in t.walk],
 	[e | some k, f in row.failed_items; rec := t.items[k]; "walk" in object.keys(rec); e := _for_walk_entry(f, _tie_texts(row, t, f, rec), at, where)],
 )
+
+_list_read_of(name, list) if name == list
+
+_list_read_of(name, list) if name == concat("", [list, "[]"])
 
 _tie_texts(row, t, f, rec) := t.items[j] if {
 	f.cause == "ambiguous"

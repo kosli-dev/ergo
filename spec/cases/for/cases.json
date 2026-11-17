@@ -1849,7 +1849,21 @@
               {
                 "cause": "value",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/commits/0"
+                    ],
+                    "name": "commits[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "kind": "doc",
+                        "signed": true
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "commits is [{\"kind\": \"doc\", \"signed\": true}]",
                 "name": "commits"
@@ -1909,7 +1923,21 @@
               {
                 "cause": "value",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/commits/0"
+                    ],
+                    "name": "commits[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "kind": "doc",
+                        "signed": true
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "commits is [{\"kind\": \"doc\", \"signed\": true}]",
                 "name": "commits"
@@ -5323,7 +5351,22 @@
               {
                 "cause": "value",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/approvers/0"
+                    ],
+                    "name": "approvers[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "PENDING",
+                        "timestamp": "2026-10-05T00:00:00Z",
+                        "username": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "approvers is [{\"state\": \"PENDING\", \"timestamp\": \"2026-10-05T00:00:00Z\", \"username\": \"bob\"}]",
                 "name": "approvers"
@@ -6206,7 +6249,21 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/0/commits/0"
+                    ],
+                    "name": "commits[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "kind": "code",
+                        "signed": false
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.kinds is \"code\", which isn't a list",
                 "name": "commits"
@@ -8411,10 +8468,17 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "commits[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "commits is []",
-                "name": "approvers"
+                "name": "commits"
               }
             ],
             "inputs": [
@@ -8665,7 +8729,28 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/pull_requests/0/approvals/0",
+                      "/pull_requests/0/approvals/1"
+                    ],
+                    "name": "approvals[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "approved_at": 1,
+                        "by": "ada",
+                        "state": "APPROVED"
+                      },
+                      {
+                        "approved_at": 3,
+                        "by": "grace",
+                        "state": "CHANGES_REQUESTED"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "approvals is [{\"approved_at\": 1, \"by\": \"ada\", \"state\": \"APPROVED\"}, {\"approved_at\": 3, \"by\": \"grace\", \"state\": \"CHANGES_REQUESTED\"}]",
                 "name": "approvals"
@@ -11185,10 +11270,17 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "ys is []",
-                "name": "xs"
+                "name": "ys"
               }
             ],
             "inputs": [
@@ -29291,10 +29383,17 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "ys is []",
-                "name": "xs"
+                "name": "ys"
               }
             ],
             "inputs": [
@@ -29360,10 +29459,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1,
+                        "n": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "ys is [{\"k\": 1, \"n\": 1}]",
-                "name": "xs"
+                "name": "ys"
               }
             ],
             "inputs": [
@@ -39654,7 +39767,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$params",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params is 3, which isn't an object",
                 "name": "$params"
@@ -39697,7 +39817,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "$params.v",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params is 3, which isn't an object",
                 "name": "$params.v"
@@ -57133,7 +57260,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      },
+                      {
+                        "v": "x"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.top.q is \"s\", which isn't a number",
                 "name": "xs"
@@ -57195,7 +57339,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      },
+                      {
+                        "v": "x"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl.z is \"s\", which isn't a number",
                 "name": "xs"
@@ -57248,7 +57409,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      },
+                      {
+                        "v": "x"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.q is \"s\", which isn't a number",
                 "name": "xs"
@@ -57310,7 +57488,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      },
+                      {
+                        "v": "x"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pr.z is \"s\", which isn't a number",
                 "name": "xs"
@@ -57434,7 +57629,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": "a",
+                        "v": 1
+                      },
+                      {
+                        "k": "b",
+                        "v": "x"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl.z is \"s\", which isn't a list",
                 "name": "xs"
@@ -57499,7 +57713,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": "a",
+                        "v": 1
+                      },
+                      {
+                        "k": "b",
+                        "v": "x"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl.z is \"s\", which isn't a list",
                 "name": "xs"
@@ -57564,7 +57797,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": "a",
+                        "v": 1
+                      },
+                      {
+                        "k": "b",
+                        "v": "x"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.q is \"s\", which isn't a list",
                 "name": "xs"
@@ -57629,7 +57881,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": "a",
+                        "v": 1
+                      },
+                      {
+                        "k": "b",
+                        "v": "x"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.q is \"s\", which isn't a list",
                 "name": "xs"
@@ -63898,7 +64169,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob",
+                        "ws": [
+                          {
+                            "x": "bob"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing",
                 "name": "rows"
@@ -64096,7 +64385,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob",
+                        "ws": [
+                          {
+                            "x": "bob"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos.name is missing",
                 "name": "rows"
@@ -64278,7 +64585,25 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob",
+                        "ws": [
+                          {
+                            "x": "bob"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos is null",
                 "name": "rows"
@@ -64460,7 +64785,25 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob",
+                        "ws": [
+                          {
+                            "x": "bob"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos is \"s\", which isn't an object",
                 "name": "rows"
@@ -64593,7 +64936,29 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2,
+                            "v": "ann"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
                 "name": "ms"
@@ -64802,7 +65167,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
                 "name": "rows"
@@ -64946,7 +65330,29 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2,
+                            "v": "ann"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing",
                 "name": "ms"
@@ -65155,7 +65561,26 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing",
                 "name": "rows"
@@ -65299,7 +65724,29 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2,
+                            "v": "ann"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is null",
                 "name": "ms"
@@ -65508,7 +65955,26 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is null",
                 "name": "rows"
@@ -65652,7 +66118,29 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2,
+                            "v": "ann"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 1 of pos is 1, which isn't an object; item 2 of pos is 2, which isn't an object",
                 "name": "ms"
@@ -65861,7 +66349,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 1 of pos is 1, which isn't an object; item 2 of pos is 2, which isn't an object",
                 "name": "rows"
@@ -65997,7 +66504,29 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2,
+                            "v": "ann"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos is \"s\", which isn't an object",
                 "name": "ms"
@@ -66182,7 +66711,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos is \"s\", which isn't an object",
                 "name": "rows"
@@ -66599,7 +67147,22 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob"
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing",
                 "name": "rows"
@@ -67189,7 +67752,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1",
+                      "/cs/0/rows/2"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob"
+                      },
+                      {},
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more",
                 "name": "rows"
@@ -67689,7 +68269,21 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1,
+                        "n": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more",
                 "name": "rows"
@@ -67916,7 +68510,21 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1,
+                        "n": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: k is missing; item 3 of pos: k is missing; item 4 of pos: k is missing; and 2 more",
                 "name": "rows"
@@ -68014,7 +68622,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 1
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more",
                 "name": "ms"
@@ -68171,7 +68796,21 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1,
+                        "n": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 4 more",
                 "name": "rows"
@@ -68422,7 +69061,21 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1,
+                        "n": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: k is missing; item 3 of pos: k is missing; item 4 of pos: k is missing; and 4 more",
                 "name": "rows"
@@ -68530,7 +69183,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 1
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 4 more",
                 "name": "ms"
@@ -68697,7 +69367,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1",
+                      "/cs/0/rows/2"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1,
+                        "n": 1
+                      },
+                      {},
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more",
                 "name": "rows"
@@ -68974,7 +69662,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1",
+                      "/cs/0/rows/2"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1,
+                        "n": 1
+                      },
+                      {},
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: k is missing; item 3 of pos: k is missing; item 4 of pos: k is missing; and 2 more",
                 "name": "rows"
@@ -69120,7 +69826,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 1
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing; item 3 of pos: name is missing; item 4 of pos: name is missing; and 2 more",
                 "name": "ms"
@@ -69345,7 +70068,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/0",
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing",
                 "name": "ws"
@@ -69543,7 +70284,28 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing",
                 "name": "ms"
@@ -69726,7 +70488,25 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/0",
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
                 "name": "ws"
@@ -69876,7 +70656,28 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
                 "name": "ms"
@@ -70052,7 +70853,25 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/0",
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos is null",
                 "name": "ws"
@@ -70178,7 +70997,28 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos is null",
                 "name": "ms"
@@ -70339,7 +71179,23 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/0",
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      null
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing",
                 "name": "ws"
@@ -70522,7 +71378,26 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          null
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing",
                 "name": "ms"
@@ -70734,7 +71609,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/0",
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $input.os: name is missing",
                 "name": "ws"
@@ -70809,7 +71702,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/0",
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $params.os: name is missing",
                 "name": "ws"
@@ -70872,7 +71783,28 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $input.os: name is missing",
                 "name": "ms"
@@ -71005,7 +71937,28 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $params.os: name is missing",
                 "name": "ms"
@@ -71165,7 +72118,25 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/0",
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.os is \"s\", which isn't an object",
                 "name": "ws"
@@ -71236,7 +72207,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ws/0",
+                      "/cs/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $params.os: name is missing",
                 "name": "ws"
@@ -71299,7 +72288,28 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.os is \"s\", which isn't an object",
                 "name": "ms"
@@ -71437,7 +72447,28 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $params.os: name is missing",
                 "name": "ms"
@@ -71651,7 +72682,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ws/0",
+                      "/cs/0/kids/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of c.os: name is missing",
                 "name": "ws"
@@ -71729,7 +72778,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ws/0",
+                      "/cs/0/kids/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of c.pos: name is missing",
                 "name": "ws"
@@ -71811,7 +72878,28 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of c.os: name is missing",
                 "name": "ms"
@@ -71947,7 +73035,28 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of c.pos: name is missing",
                 "name": "ms"
@@ -72131,7 +73240,25 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ws/0",
+                      "/cs/0/kids/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "c.os is \"s\", which isn't an object",
                 "name": "ws"
@@ -72197,7 +73324,25 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ws/0",
+                      "/cs/0/kids/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "c.pos is \"s\", which isn't an object",
                 "name": "ws"
@@ -72263,7 +73408,28 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "c.os is \"s\", which isn't an object",
                 "name": "ms"
@@ -72387,7 +73553,28 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/ms/0"
+                    ],
+                    "name": "ms[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "ws": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          },
+                          {
+                            "n": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "c.pos is \"s\", which isn't an object",
                 "name": "ms"
@@ -72675,7 +73862,20 @@
               {
                 "cause": "value",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "xs is [{\"v\": 1}]",
                 "name": "xs"
@@ -72752,7 +73952,20 @@
               {
                 "cause": "value",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "xs is [{\"v\": 1}]",
                 "name": "xs"
@@ -72875,7 +74088,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl.z is missing",
                 "name": "xs"
@@ -72910,7 +74136,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl.z is missing",
                 "name": "xs"
@@ -72945,7 +74184,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl.z is missing",
                 "name": "xs"
@@ -73062,7 +74314,20 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl is null",
                 "name": "xs"
@@ -73097,7 +74362,20 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl is null",
                 "name": "xs"
@@ -73132,7 +74410,20 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl is null",
                 "name": "xs"
@@ -73249,7 +74540,20 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl is \"s\", which isn't an object",
                 "name": "xs"
@@ -73284,7 +74588,20 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl is \"s\", which isn't an object",
                 "name": "xs"
@@ -73319,7 +74636,20 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl is \"s\", which isn't an object",
                 "name": "xs"
@@ -75927,7 +77257,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/xs/0/ys/0",
+                      "/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov.z is missing",
                 "name": "ys"
@@ -75985,7 +77332,24 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/xs/0/ys/0",
+                      "/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov is null",
                 "name": "ys"
@@ -76043,7 +77407,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/xs/0/ys/0",
+                      "/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov is \"s\", which isn't an object",
                 "name": "ys"
@@ -76107,7 +77488,14 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pl: k is missing",
                 "name": "rows"
@@ -76152,7 +77540,14 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pl: k is missing",
                 "name": "rows"
@@ -76414,7 +77809,14 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pl: k is null",
                 "name": "rows"
@@ -76558,7 +77960,14 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pl is null, which isn't an object",
                 "name": "rows"
@@ -76603,7 +78012,14 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pl is null, which isn't an object",
                 "name": "rows"
@@ -76865,7 +78281,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pl: k is \"s\", which isn't a number",
                 "name": "rows"
@@ -77009,7 +78432,14 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "item 1 of pl is 1, which isn't an object; item 2 of pl is 2, which isn't an object",
                 "name": "rows"
@@ -77054,7 +78484,14 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "item 1 of pl is 1, which isn't an object; item 2 of pl is 2, which isn't an object",
                 "name": "rows"
@@ -77284,7 +78721,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/objs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pl: k is missing",
                 "name": "rows"
@@ -77335,7 +78785,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/objs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pl: k is missing",
                 "name": "rows"
@@ -77776,7 +79239,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of c.os: name is missing",
                 "name": "rows"
@@ -77826,7 +79302,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/kids/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of c.pos: name is missing",
                 "name": "rows"
@@ -77880,7 +79369,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob",
+                        "ws": [
+                          {
+                            "x": "bob"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $input.lst: name is missing",
                 "name": "rows"
@@ -77932,7 +79439,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob",
+                        "ws": [
+                          {
+                            "x": "bob"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing",
                 "name": "rows"
@@ -78001,7 +79526,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $input.os: k is \"a\", which isn't a number",
                 "name": "rows"
@@ -78054,7 +79598,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: k is \"a\", which isn't a number",
                 "name": "rows"
@@ -78118,7 +79681,26 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $input.os: k is missing",
                 "name": "rows"
@@ -78171,7 +79753,26 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: k is missing",
                 "name": "rows"
@@ -78235,7 +79836,26 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $input.os: k is null",
                 "name": "rows"
@@ -78288,7 +79908,26 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: k is null",
                 "name": "rows"
@@ -78352,7 +79991,26 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 1 of $input.os is 1, which isn't an object; item 2 of $input.os is 2, which isn't an object",
                 "name": "rows"
@@ -78405,7 +80063,26 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 1 of pos is 1, which isn't an object; item 2 of pos is 2, which isn't an object",
                 "name": "rows"
@@ -78469,7 +80146,26 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.os.k is missing",
                 "name": "rows"
@@ -78510,7 +80206,26 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0",
+                      "/cs/0/rows/1"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 2,
+                        "v": "bob"
+                      },
+                      {
+                        "n": 2,
+                        "v": "ann"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos.k is missing",
                 "name": "rows"
@@ -79663,7 +81378,31 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/pull_requests/0/approvers/0",
+                      "/pull_requests/0/approvers/1"
+                    ],
+                    "name": "approvers[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "REJECTED",
+                        "subs": [
+                          1
+                        ],
+                        "u": "ada"
+                      },
+                      {
+                        "subs": [
+                          1
+                        ],
+                        "u": "grace"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of approvers: approver.state is missing",
                 "name": "approvers"
@@ -79895,7 +81634,31 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/pull_requests/0/approvers/0",
+                      "/pull_requests/0/approvers/1"
+                    ],
+                    "name": "approvers[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "state": "REJECTED",
+                        "subs": [
+                          1
+                        ],
+                        "u": "ada"
+                      },
+                      {
+                        "subs": [
+                          1
+                        ],
+                        "u": "grace"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of approvers: approver.state is missing",
                 "name": "approvers"
@@ -92141,7 +93904,14 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "approvers[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "approver.lists named by k is missing",
                 "name": "approvers"
@@ -92184,7 +93954,14 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "approvers[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "approver.lists.subs is missing",
                 "name": "approvers"
@@ -92429,7 +94206,14 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos: name is missing",
                 "name": "rows"
@@ -92549,7 +94333,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of pos is null, which isn't an object",
                 "name": "rows"
@@ -92671,7 +94462,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
                 "name": "rows"
@@ -96788,7 +98586,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1
+                      },
+                      {
+                        "k": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.z is missing",
                 "name": "ws"
@@ -96913,7 +98728,24 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1
+                      },
+                      {
+                        "k": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.z is null",
                 "name": "ws"
@@ -97038,7 +98870,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1
+                      },
+                      {
+                        "k": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.z is \"s\", which isn't a number",
                 "name": "ws"
@@ -97162,7 +99011,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1
+                      },
+                      {
+                        "k": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.z is null",
                 "name": "ws"
@@ -97318,7 +99184,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1
+                      },
+                      {
+                        "k": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.z is missing",
                 "name": "ws"
@@ -97470,7 +99353,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": 1
+                      },
+                      {
+                        "k": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is missing",
                 "name": "ws"
@@ -98097,7 +99997,26 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/xs/0",
+                      "/things/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "k": "a",
+                        "v": 1
+                      },
+                      {
+                        "k": "b",
+                        "v": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.k is missing",
                 "name": "xs"
@@ -98343,7 +100262,22 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.z is missing",
                 "name": "ws"
@@ -98533,7 +100467,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.z is \"s\", which isn't a number",
                 "name": "ws"
@@ -98739,7 +100688,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is \"s\", which isn't a list",
                 "name": "ws"
@@ -98858,7 +100822,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is \"s\", which isn't a list",
                 "name": "ws"
@@ -99015,7 +100994,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is {\"a\": 1}, which isn't a list",
                 "name": "ws"
@@ -99134,7 +101128,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is {\"a\": 1}, which isn't a list",
                 "name": "ws"
@@ -99287,7 +101296,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.z is \"s\", which isn't a list",
                 "name": "ws"
@@ -99417,7 +101441,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.z is {\"a\": 1}, which isn't a list",
                 "name": "ws"
@@ -99580,7 +101619,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.z is \"s\", which isn't a list",
                 "name": "ws"
@@ -99710,7 +101764,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.z is {\"a\": 1}, which isn't a list",
                 "name": "ws"
@@ -99875,7 +101944,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.z is \"s\", which isn't a list",
                 "name": "ws"
@@ -99977,7 +102061,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.z is {\"a\": 1}, which isn't a list",
                 "name": "ws"
@@ -100127,7 +102226,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.z is \"s\", which isn't a list",
                 "name": "ws"
@@ -100229,7 +102343,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/ws/0",
+                      "/arts/0/ws/1"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "z": 9
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.z is {\"a\": 1}, which isn't a list",
                 "name": "ws"
@@ -101225,7 +103354,18 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ws/0"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.u is \"s\", which isn't a number",
                 "name": "ws"
@@ -101336,7 +103476,18 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ws/0"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is \"s\", which isn't a number",
                 "name": "ws"
@@ -101447,7 +103598,18 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ws/0"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is \"s\", which isn't a number",
                 "name": "ws"
@@ -101616,15 +103778,33 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "ys is []",
-                "name": "ws"
+                "name": "ys"
               },
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ws/0"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is \"s\", which isn't a list",
                 "name": "ws"
@@ -101663,15 +103843,33 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "ys is []",
-                "name": "ws"
+                "name": "ys"
               },
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ws/0"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is \"s\", which isn't a list",
                 "name": "ws"
@@ -101710,7 +103908,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "ys is []",
                 "name": "ys"
@@ -101718,7 +103923,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is \"s\", which isn't a list",
                 "name": "ys"
@@ -101807,15 +104019,33 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "ys is []",
-                "name": "ws"
+                "name": "ys"
               },
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ws/0"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is {\"a\": 1}, which isn't a list",
                 "name": "ws"
@@ -101854,15 +104084,33 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "ys is []",
-                "name": "ws"
+                "name": "ys"
               },
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ws/0"
+                    ],
+                    "name": "ws[]",
+                    "outcome": "found",
+                    "value": [
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is {\"a\": 1}, which isn't a list",
                 "name": "ws"
@@ -101901,7 +104149,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "ys is []",
                 "name": "ys"
@@ -101909,7 +104164,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.z is {\"a\": 1}, which isn't a list",
                 "name": "ys"

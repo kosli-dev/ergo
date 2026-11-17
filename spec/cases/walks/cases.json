@@ -16126,7 +16126,14 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is missing",
                 "name": "es"
@@ -16172,7 +16179,14 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is missing",
                 "name": "es"
@@ -16365,7 +16379,14 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is null",
                 "name": "es"
@@ -16411,7 +16432,14 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is null",
                 "name": "es"
@@ -17591,7 +17619,14 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.k is missing",
                 "name": "es"
@@ -17808,7 +17843,14 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.k is null",
                 "name": "es"
@@ -18238,7 +18280,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is missing",
                 "name": "es"
@@ -18448,7 +18497,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is null",
                 "name": "es"

@@ -10895,7 +10895,20 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value; pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
                 "name": "rows"
@@ -11219,7 +11232,20 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value; item 2 of pos: name is missing",
                 "name": "rows"
@@ -11582,7 +11608,20 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $params.os: name is missing; pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
                 "name": "rows"
@@ -11906,7 +11945,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "item 2 of $params.os: name is missing; item 2 of pos: name is missing",
                 "name": "rows"
@@ -12262,7 +12314,20 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.os.name is missing; pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
                 "name": "rows"
@@ -12586,7 +12651,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.os.name is missing; item 2 of pos: name is missing",
                 "name": "rows"
@@ -14907,7 +14985,21 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/cs/0/rows/0"
+                    ],
+                    "name": "rows[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": "a",
+                        "w": "a"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pos is [{\"name\": \"a\"}], which isn't an object",
                 "name": "rows"
@@ -31414,7 +31506,27 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/rs/0",
+                      "/0/rs/1"
+                    ],
+                    "name": "rs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "m": {
+                          "a": "a"
+                        },
+                        "v": "a"
+                      },
+                      {
+                        "v": "b"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input is [an object with 6 keys], which isn't an object",
                 "name": "rs"
@@ -31471,7 +31583,27 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/rs/0",
+                      "/0/rs/1"
+                    ],
+                    "name": "rs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "m": {
+                          "a": "a"
+                        },
+                        "v": "a"
+                      },
+                      {
+                        "v": "b"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$input is [an object with 6 keys], which isn't an object",
                 "name": "rs"
@@ -32299,7 +32431,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/rs/0",
+                      "/0/rs/1"
+                    ],
+                    "name": "rs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 1,
+                        "v": "a"
+                      },
+                      {
+                        "n": 2,
+                        "v": "b"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params is 3, which isn't an object",
                 "name": "rs"
@@ -32352,7 +32503,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/rs/0",
+                      "/0/rs/1"
+                    ],
+                    "name": "rs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 1,
+                        "v": "a"
+                      },
+                      {
+                        "n": 2,
+                        "v": "b"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params is 3, which isn't an object",
                 "name": "rs"

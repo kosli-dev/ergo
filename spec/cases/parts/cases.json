@@ -7153,7 +7153,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/kids/0/items/0"
+                    ],
+                    "name": "items[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "hi": 1,
+                        "lo": 5,
+                        "pa": {
+                          "w": 1
+                        },
+                        "status": "ok"
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pa.w is missing",
                 "name": "items"

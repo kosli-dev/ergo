@@ -77005,7 +77005,14 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows.w named by p",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "p is null",
                 "name": "rows.w named by p"
@@ -77129,7 +77136,14 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows.w named by p",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "p is missing",
                 "name": "rows.w named by p"
@@ -77253,7 +77267,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "rows.w named by p",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "p is 3, which isn't text",
                 "name": "rows.w named by p"
@@ -82832,7 +82853,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "n named by $params.k1",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.k1 is 1, which isn't text",
                 "name": "n named by $params.k1"
@@ -83414,7 +83442,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "n named by $params.k1",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.k1 is 1, which isn't text",
                 "name": "n named by $params.k1"
@@ -83689,7 +83724,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "n named by $input.k",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is 1, which isn't text",
                 "name": "n named by $input.k"
@@ -83958,7 +84000,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "n named by $input.k",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is 0, which isn't text",
                 "name": "n named by $input.k"
@@ -84227,7 +84276,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "n named by $input.k",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is 1, which isn't text",
                 "name": "n named by $input.k"
@@ -84496,7 +84552,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "n named by $input.k",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is true, which isn't text",
                 "name": "n named by $input.k"
@@ -84765,7 +84828,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "n named by $input.k",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is {\"a\": 1}, which isn't text",
                 "name": "n named by $input.k"
@@ -85034,7 +85104,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "n named by $input.k",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$input.k is [\"q\"], which isn't text",
                 "name": "n named by $input.k"
@@ -86002,7 +86079,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "n named by $params.k",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.k is true, which isn't text",
                 "name": "n named by $params.k"
@@ -86235,7 +86319,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "n named by $params.k",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.k is {\"a\": 1}, which isn't text",
                 "name": "n named by $params.k"
@@ -86468,7 +86559,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "n named by $params.k",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.k is [\"q\"], which isn't text",
                 "name": "n named by $params.k"
@@ -100928,7 +101026,14 @@
         {
           "cause": "absent",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [],
+              "name": "xs[]",
+              "outcome": "found",
+              "value": []
+            }
+          ],
           "kind": "list",
           "message": "pr.z is missing",
           "name": "xs"
@@ -101323,7 +101428,24 @@
         {
           "cause": "absent",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/xs/0",
+                "/prs/0/xs/1"
+              ],
+              "name": "xs[]",
+              "outcome": "found",
+              "value": [
+                {
+                  "v": 1
+                },
+                {
+                  "v": 2
+                }
+              ]
+            }
+          ],
           "kind": "list",
           "message": "pr.z is missing",
           "name": "xs"
@@ -101841,7 +101963,24 @@
         {
           "cause": "unusable",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "/arts/0/prs/0/xs/0",
+                "/arts/0/prs/0/xs/1"
+              ],
+              "name": "xs[]",
+              "outcome": "found",
+              "value": [
+                {
+                  "v": 5
+                },
+                {
+                  "v": 6
+                }
+              ]
+            }
+          ],
           "kind": "list",
           "message": "pr.a is 3, which isn't an object",
           "name": "xs"
@@ -102403,7 +102542,14 @@
         {
           "cause": "unusable",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [],
+              "name": "xs[]",
+              "outcome": "found",
+              "value": []
+            }
+          ],
           "kind": "list",
           "message": "$params.q is \"s\", which isn't a number",
           "name": "xs"
@@ -102601,7 +102747,20 @@
         {
           "cause": "unusable",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/1/xs/0"
+              ],
+              "name": "xs[]",
+              "outcome": "found",
+              "value": [
+                {
+                  "v": 1
+                }
+              ]
+            }
+          ],
           "kind": "list",
           "message": "$params.q is \"s\", which isn't a number",
           "name": "xs"
@@ -102818,7 +102977,24 @@
         {
           "cause": "unusable",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/2/xs/0",
+                "/prs/2/xs/1"
+              ],
+              "name": "xs[]",
+              "outcome": "found",
+              "value": [
+                {
+                  "v": 1
+                },
+                {
+                  "v": 2
+                }
+              ]
+            }
+          ],
           "kind": "list",
           "message": "$params.q is \"s\", which isn't a number",
           "name": "xs"
@@ -103013,7 +103189,24 @@
         {
           "cause": "absent",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/xs/0"
+              ],
+              "name": "xs[]",
+              "outcome": "found",
+              "value": [
+                {
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
           "kind": "list",
           "message": "pr.k is missing",
           "name": "xs"
@@ -103371,7 +103564,28 @@
         {
           "cause": "unusable",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/xs/0",
+                "/prs/0/xs/1"
+              ],
+              "name": "xs[]",
+              "outcome": "found",
+              "value": [
+                {
+                  "ys": "s"
+                },
+                {
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
           "kind": "list",
           "message": "pr.k is missing",
           "name": "xs"

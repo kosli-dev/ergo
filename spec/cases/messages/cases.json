@@ -1547,7 +1547,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/commits/0"
+                    ],
+                    "name": "commits[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "signed": false
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "commits is [{\"signed\": false}]",
                 "name": "commits"
@@ -1589,7 +1602,14 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "commits[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "commits is []",
                 "name": "commits"
@@ -11419,7 +11439,24 @@
               {
                 "cause": "value",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/d/items/0"
+                    ],
+                    "name": "lst[]",
+                    "outcome": "found",
+                    "part": {
+                      "id": null,
+                      "name": "lst"
+                    },
+                    "value": [
+                      {
+                        "x": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "lst is [{\"x\": 1}]",
                 "name": "lst"
@@ -15527,7 +15564,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "pr.z is \"s\", which isn't a list",
                 "name": "xs"
@@ -16103,7 +16147,23 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "aa": 1,
+                        "b": "s"
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.q is missing; pr.z is missing",
                 "name": "xs"
@@ -17796,7 +17856,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      },
+                      {
+                        "v": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pr.z is \"s\", which isn't a list",
                 "name": "xs"
@@ -18169,7 +18246,23 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1,
+                        "w": 1
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list",
                 "name": "xs"
@@ -18452,7 +18545,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.l is \"s\", which isn't a list; pr.l is {}, which isn't a list",
                 "name": "xs"
@@ -18703,7 +18803,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.l is null; pr.l is \"s\", which isn't a list",
                 "name": "xs"
@@ -18963,7 +19070,20 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.l is null; pr.l is \"s\", which isn't a list",
                 "name": "xs"
@@ -24936,7 +25056,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "pr.z is \"s\", which isn't a list",
                 "name": "xs"
@@ -25085,7 +25212,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/1/xs/0",
+                      "/prs/1/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      },
+                      {
+                        "v": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pr.z is \"s\", which isn't a list",
                 "name": "xs"
@@ -25561,7 +25705,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/ys/0",
+                      "/prs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "q": 1
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.l is missing",
                 "name": "ys"
@@ -25615,7 +25774,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/1/ys/0",
+                      "/prs/1/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "q": 1
+                      },
+                      {}
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "$params.l is missing",
                 "name": "ys"
@@ -26810,7 +26984,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "xs[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "pr.z is \"s\", which isn't a list",
                 "name": "xs"
@@ -26964,7 +27145,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/gs/0/arts/0/xs/0/ys/0",
+                      "/gs/0/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov.z is missing",
                 "name": "ys"
@@ -27016,7 +27214,24 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/gs/0/arts/0/xs/0/ys/0",
+                      "/gs/0/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "g.gc.z is missing",
                 "name": "ys"
@@ -27187,7 +27402,24 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/gs/0/arts/0/xs/0/ys/0",
+                      "/gs/0/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov.z is null",
                 "name": "ys"
@@ -27239,7 +27471,24 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/gs/0/arts/0/xs/0/ys/0",
+                      "/gs/0/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "g.gc.z is null",
                 "name": "ys"
@@ -27410,7 +27659,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/gs/0/arts/0/xs/0/ys/0",
+                      "/gs/0/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov.z is \"s\", which isn't a number",
                 "name": "ys"
@@ -27462,7 +27728,24 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/gs/0/arts/0/xs/0/ys/0",
+                      "/gs/0/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "g.gc.z is \"s\", which isn't a number",
                 "name": "ys"
@@ -30783,7 +31066,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/xs/0/ys/0",
+                      "/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      1,
+                      2
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov.z is missing",
                 "name": "ys"
@@ -30932,7 +31228,20 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/xs/0/ys/0",
+                      "/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      1,
+                      2
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov.z is null",
                 "name": "ys"
@@ -31081,7 +31390,20 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/arts/0/xs/0/ys/0",
+                      "/arts/0/xs/0/ys/1"
+                    ],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": [
+                      1,
+                      "b"
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov.z is \"s\", which isn't a number",
                 "name": "ys"
@@ -31420,7 +31742,14 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov.z is missing",
                 "name": "ys"
@@ -31607,7 +31936,14 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov.z is null",
                 "name": "ys"
@@ -31794,7 +32130,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov.z is \"s\", which isn't a number",
                 "name": "ys"
@@ -31981,7 +32324,14 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "ys[]",
+                    "outcome": "found",
+                    "value": []
+                  }
+                ],
                 "kind": "list",
                 "message": "art.cov is [{\"z\": 1}], which isn't an object",
                 "name": "ys"
@@ -37022,7 +37372,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/es/0"
+                    ],
+                    "name": "es[]",
+                    "outcome": "found",
+                    "value": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ],
                 "kind": "list",
                 "message": "pl.z is null; $input.y is missing",
                 "name": "es"
