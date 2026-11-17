@@ -1751,26 +1751,50 @@
               {
                 "cause": "ambiguous",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/commits/0/ts"
+                    ],
+                    "name": "commits[0].ts",
+                    "outcome": "found",
+                    "value": 1
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/commits/0/ts"
+                  "/things/0/commits/0"
                 ],
                 "message": "item 1 and item 2 of commits tie on ts",
                 "name": "item 1 of commits",
-                "value": 1
+                "value": {
+                  "ok": true,
+                  "ts": 1
+                }
               },
               {
                 "cause": "ambiguous",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/commits/1/ts"
+                    ],
+                    "name": "commits[1].ts",
+                    "outcome": "found",
+                    "value": 1
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/commits/1/ts"
+                  "/things/0/commits/1"
                 ],
                 "message": "item 1 and item 2 of commits tie on ts",
                 "name": "item 2 of commits",
-                "value": 1
+                "value": {
+                  "ok": true,
+                  "ts": 1
+                }
               }
             ],
             "inputs": [
@@ -2452,7 +2476,16 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/cs/2"
+                    ],
+                    "name": "cs[2].ts",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/things/0/cs/2"
@@ -2464,26 +2497,46 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/cs/3"
+                    ],
+                    "name": "cs[3].ts",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/things/0/cs/3"
                 ],
                 "message": "item 4 of cs is \"str\", which isn't an object",
                 "name": "item 4 of cs",
-                "value": null
+                "value": "str"
               },
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/cs/4/ts"
+                    ],
+                    "name": "cs[4].ts",
+                    "outcome": "unusable",
+                    "value": "a"
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/cs/4/ts"
+                  "/things/0/cs/4"
                 ],
                 "message": "ts is \"a\", which isn't a number, a time or a date",
                 "name": "item 5 of cs",
-                "value": "a"
+                "value": {
+                  "ts": "a"
+                }
               }
             ],
             "inputs": [

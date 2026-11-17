@@ -11497,14 +11497,25 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ps/0/items/0/ys/0"
+                    ],
+                    "name": "ys[0].s",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/ps/0/items/0/ys/0"
                 ],
                 "message": ".s is missing",
                 "name": "item 1 of ys",
-                "value": null
+                "value": {
+                  "v": 3
+                }
               }
             ],
             "inputs": [
@@ -11663,16 +11674,30 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ps/0/mids/0/items/0/ys/0/s"
+                    ],
+                    "name": "ys[0].s",
+                    "outcome": "unusable",
+                    "value": [
+                      1
+                    ]
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/ps/0/mids/0/items/0/ys/0/s"
+                  "/ps/0/mids/0/items/0/ys/0"
                 ],
                 "message": ".s is [1], which isn't a number, a time or a date",
                 "name": "item 1 of ys",
-                "value": [
-                  1
-                ]
+                "value": {
+                  "s": [
+                    1
+                  ],
+                  "v": 3
+                }
               }
             ],
             "inputs": [

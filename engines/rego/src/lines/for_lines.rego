@@ -497,9 +497,9 @@ _for_unsortable(item, _, _) := [] if not "by" in object.keys(item.pick)
 _for_unsortable(item, w, names) := array.concat(unread, mixed) if {
 	"by" in object.keys(item.pick)
 	items := w.items
-	unread := [object.union({"path": e.i, "item": e.i, "cause": _for_sort_state(item, e, names), "value": _for_sort_shown(item, e, names), "raw": _focus_entry(e).iv, "at": _for_sort_at(item, w, e, names)}, _m_sort_why(item, _focus_entry(e), names)) | some e in items; not _for_sort_key(item, e, names)]
+	unread := [object.union({"path": e.i, "item": e.i, "cause": _for_sort_state(item, e, names), "value": _for_sort_shown(item, e, names), "raw": _focus_entry(e).iv, "at": _for_sort_at(item, w, e, names), "sorted": _for_sorted(item, w, e, _for_sort_state(item, e, names))}, _m_sort_why(item, _focus_entry(e), names)) | some e in items; not _for_sort_key(item, e, names)]
 	kinds := {_for_sort_key(item, e, names)[0] | some e in items}
-	mixed := [{"path": e.i, "item": e.i, "cause": "unusable", "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names), "why": [_m_leaf(_focus_entry(e).i, _m_isnt(_input_name(item.pick.by), _for_sort_shown(item, e, names), _m_kind_word[_for_kept_kind(kinds)]))]} |
+	mixed := [{"path": e.i, "item": e.i, "cause": "unusable", "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names), "sorted": _for_sorted(item, w, e, "found"), "why": [_m_leaf(_focus_entry(e).i, _m_isnt(_input_name(item.pick.by), _for_sort_shown(item, e, names), _m_kind_word[_for_kept_kind(kinds)]))]} |
 		count(kinds) > 1
 		some e in items
 		_for_sort_key(item, e, names)[0] != _for_kept_kind(kinds)
@@ -583,9 +583,17 @@ _for_pick_slot(pick, n) := n - pick.at if {
 	pick.at <= n
 }
 
+_for_sorted(item, w, e, outcome) := {"name": _for_sorted_name(_input_name(array.concat(e.i, item.pick.by)), e.i[0]), "value": _walk_value(e.v, e, w), "at": _walk_at(w, e), "outcome": outcome}
+
+_for_sorted_name(name, start) := substring(name, 1, -1) if {
+	is_string(start)
+	startswith(start, "$")
+	not startswith(start, "$$")
+} else := name
+
 _for_tied(item, _, _) := [] if not "by" in object.keys(item.pick)
 
-_for_tied(item, w, names) := [{"path": e.i, "item": e.i, "cause": "ambiguous", "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names)} |
+_for_tied(item, w, names) := [{"path": e.i, "item": e.i, "cause": "ambiguous", "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names), "sorted": _for_sorted(item, w, e, "found")} |
 	some e in w.items
 	k := _for_sort_key(item, e, names)[1]
 	k == key
@@ -916,7 +924,7 @@ _for_failed_base(check, f) := {
 	"bare": _m_rest_named(_m_for_item_name(check, f.item), f),
 }
 
-_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), _fail_levels(f))
+_for_failed_flags(f) := object.union(object.union(object.union(object.union({"msg": f.why | "why" in object.keys(f)}, {"raw": f.raw | "raw" in object.keys(f)}), {"hoisted": true | object.get(f, "hoisted", false) == true}), {"whose_of": f.whose_of | "whose_of" in object.keys(f)}), object.union(_fail_levels(f), {"ergo/sorted": f.sorted | "sorted" in object.keys(f)}))
 
 _fail_levels(f) := {"ergo/levels": f.lv} if {
 	"lv" in object.keys(f)
@@ -931,7 +939,7 @@ _for_unchecked(check, inner) := {"failed_items": [_for_unchecked_item(check, f) 
 	f.path == p
 ]} if inner != []
 
-_for_unchecked_item(check, f) := {"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_inner_text(check, f), "free": _m_inner_free(f)}
+_for_unchecked_item(check, f) := object.union({"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_inner_text(check, f), "free": _m_inner_free(f)}, {"ergo/sorted": f.sorted | "sorted" in object.keys(f)})
 
 _for_inputs(check, subj, names, item, w) := _merged_inputs([_for_input_of(t) | some t in ((_for_input_pairs(check, subj, names, item, w) | _for_listed_pairs(check, subj)) | _for_whose_pairs(check, subj))])
 

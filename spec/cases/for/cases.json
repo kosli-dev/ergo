@@ -7756,26 +7756,52 @@
               {
                 "cause": "ambiguous",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/pull_requests/0/commits/0/timestamp"
+                    ],
+                    "name": "commits[0].timestamp",
+                    "outcome": "found",
+                    "value": 2
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/pull_requests/0/commits/0/timestamp"
+                  "/pull_requests/0/commits/0"
                 ],
                 "message": "item 1 and item 2 of commits tie on timestamp",
                 "name": "item 1 of commits",
-                "value": 2
+                "value": {
+                  "author_username": "ada",
+                  "sha": "c1",
+                  "timestamp": 2
+                }
               },
               {
                 "cause": "ambiguous",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/pull_requests/0/commits/1/timestamp"
+                    ],
+                    "name": "commits[1].timestamp",
+                    "outcome": "found",
+                    "value": 2
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/pull_requests/0/commits/1/timestamp"
+                  "/pull_requests/0/commits/1"
                 ],
                 "message": "item 1 and item 2 of commits tie on timestamp",
                 "name": "item 2 of commits",
-                "value": 2
+                "value": {
+                  "author_username": "grace",
+                  "sha": "c2",
+                  "timestamp": 2
+                }
               }
             ],
             "inputs": [
@@ -8007,14 +8033,26 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/pull_requests/0/commits/1"
+                    ],
+                    "name": "commits[1].timestamp",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
                   "/pull_requests/0/commits/1"
                 ],
                 "message": "timestamp is missing",
                 "name": "item 2 of commits",
-                "value": null
+                "value": {
+                  "author_username": "grace",
+                  "sha": "c2"
+                }
               }
             ],
             "inputs": [
@@ -8100,14 +8138,27 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/pull_requests/0/commits/1/timestamp"
+                    ],
+                    "name": "commits[1].timestamp",
+                    "outcome": "unusable",
+                    "value": "yesterday"
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/pull_requests/0/commits/1/timestamp"
+                  "/pull_requests/0/commits/1"
                 ],
                 "message": "timestamp is \"yesterday\", which isn't a number, a time or a date",
                 "name": "item 2 of commits",
-                "value": "yesterday"
+                "value": {
+                  "author_username": "grace",
+                  "sha": "c2",
+                  "timestamp": "yesterday"
+                }
               }
             ],
             "inputs": [
@@ -8785,14 +8836,25 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/teams/0/owners/1/name"
+                    ],
+                    "name": "owners[1].name",
+                    "outcome": "unusable",
+                    "value": 7
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/teams/0/owners/1/name"
+                  "/teams/0/owners/1"
                 ],
                 "message": "name is 7, which isn't text",
                 "name": "item 2 of owners",
-                "value": 7
+                "value": {
+                  "name": 7
+                }
               }
             ],
             "inputs": [
@@ -8857,26 +8919,48 @@
               {
                 "cause": "ambiguous",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/teams/0/owners/0/name"
+                    ],
+                    "name": "owners[0].name",
+                    "outcome": "found",
+                    "value": "Zoe"
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/teams/0/owners/0/name"
+                  "/teams/0/owners/0"
                 ],
                 "message": "item 1 and item 2 of owners tie on name",
                 "name": "item 1 of owners",
-                "value": "Zoe"
+                "value": {
+                  "name": "Zoe"
+                }
               },
               {
                 "cause": "ambiguous",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/teams/0/owners/1/name"
+                    ],
+                    "name": "owners[1].name",
+                    "outcome": "found",
+                    "value": "Zoe"
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/teams/0/owners/1/name"
+                  "/teams/0/owners/1"
                 ],
                 "message": "item 1 and item 2 of owners tie on name",
                 "name": "item 2 of owners",
-                "value": "Zoe"
+                "value": {
+                  "name": "Zoe"
+                }
               }
             ],
             "inputs": [
@@ -9099,14 +9183,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/sites/0/audits/0/held_on"
+                    ],
+                    "name": "audits[0].held_on",
+                    "outcome": "found",
+                    "value": "2026-10-02"
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/sites/0/audits/0/held_on"
+                  "/sites/0/audits/0"
                 ],
                 "message": "held_on is \"2026-10-02\", which isn't a time",
                 "name": "item 1 of audits",
-                "value": "2026-10-02"
+                "value": {
+                  "held_on": "2026-10-02",
+                  "passed": true
+                }
               }
             ],
             "inputs": [
@@ -9173,14 +9269,26 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/sites/0/audits/0/held_on"
+                    ],
+                    "name": "audits[0].held_on",
+                    "outcome": "unusable",
+                    "value": "2026-02-29"
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/sites/0/audits/0/held_on"
+                  "/sites/0/audits/0"
                 ],
                 "message": "held_on is \"2026-02-29\", which isn't a number, a time or a date",
                 "name": "item 1 of audits",
-                "value": "2026-02-29"
+                "value": {
+                  "held_on": "2026-02-29",
+                  "passed": true
+                }
               }
             ],
             "inputs": [
@@ -29852,13 +29960,60 @@
             "failures": [
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0/ys/0/n"
+                        ],
+                        "name": "p.ys[0].n",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0/ys/0"
+                    ],
+                    "message": "item 1 and item 2 of p.ys tie on n",
+                    "name": "item 1 of p.ys",
+                    "value": {
+                      "n": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0/ys/1/n"
+                        ],
+                        "name": "p.ys[1].n",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0/ys/1"
+                    ],
+                    "message": "item 1 and item 2 of p.ys tie on n",
+                    "name": "item 2 of p.ys",
+                    "value": {
+                      "n": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/things/0/xs/0"
                 ],
-                "message": "item 1 and item 2 of p.ys tie on n",
+                "message": "",
                 "name": "item 1 of xs",
                 "value": {
                   "k": 1,
@@ -30451,26 +30606,54 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/rows/0/m"
+                    ],
+                    "name": "rows[0].m named by $params.km",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/rows/0/m"
+                  "/things/0/rows/0"
                 ],
                 "message": "$params.km is missing",
                 "name": "item 1 of rows",
-                "value": null
+                "value": {
+                  "m": {
+                    "q": 2
+                  },
+                  "v": 2
+                }
               },
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/rows/1/m"
+                    ],
+                    "name": "rows[1].m named by $params.km",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/rows/1/m"
+                  "/things/0/rows/1"
                 ],
                 "message": "$params.km is missing",
                 "name": "item 2 of rows",
-                "value": null
+                "value": {
+                  "m": {
+                    "q": 1
+                  },
+                  "v": 1
+                }
               }
             ],
             "inputs": [
@@ -30512,14 +30695,29 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/1/rows/0/m"
+                    ],
+                    "name": "rows[0].m named by $params.km",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/1/rows/0/m"
+                  "/things/1/rows/0"
                 ],
                 "message": "$params.km is missing",
                 "name": "item 1 of rows",
-                "value": null
+                "value": {
+                  "m": [
+                    5,
+                    1
+                  ],
+                  "v": 1
+                }
               }
             ],
             "inputs": [
@@ -30555,26 +30753,54 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/rows/0/m"
+                    ],
+                    "name": "rows[0].m named by $params.kz",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/rows/0/m"
+                  "/things/0/rows/0"
                 ],
                 "message": "$params.kz is null",
                 "name": "item 1 of rows",
-                "value": null
+                "value": {
+                  "m": {
+                    "q": 2
+                  },
+                  "v": 2
+                }
               },
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/rows/1/m"
+                    ],
+                    "name": "rows[1].m named by $params.kz",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/rows/1/m"
+                  "/things/0/rows/1"
                 ],
                 "message": "$params.kz is null",
                 "name": "item 2 of rows",
-                "value": null
+                "value": {
+                  "m": {
+                    "q": 1
+                  },
+                  "v": 1
+                }
               }
             ],
             "inputs": [
@@ -30616,14 +30842,29 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/1/rows/0/m"
+                    ],
+                    "name": "rows[0].m named by $params.kz",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/1/rows/0/m"
+                  "/things/1/rows/0"
                 ],
                 "message": "$params.kz is null",
                 "name": "item 1 of rows",
-                "value": null
+                "value": {
+                  "m": [
+                    5,
+                    1
+                  ],
+                  "v": 1
+                }
               }
             ],
             "inputs": [
@@ -30659,26 +30900,54 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/rows/0/m"
+                    ],
+                    "name": "rows[0].m named by $params.kn",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/rows/0/m"
+                  "/things/0/rows/0"
                 ],
                 "message": "$params.kn is 1, which isn't text",
                 "name": "item 1 of rows",
-                "value": null
+                "value": {
+                  "m": {
+                    "q": 2
+                  },
+                  "v": 2
+                }
               },
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/rows/1/m"
+                    ],
+                    "name": "rows[1].m named by $params.kn",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/rows/1/m"
+                  "/things/0/rows/1"
                 ],
                 "message": "$params.kn is 1, which isn't text",
                 "name": "item 2 of rows",
-                "value": null
+                "value": {
+                  "m": {
+                    "q": 1
+                  },
+                  "v": 1
+                }
               }
             ],
             "inputs": [
@@ -30720,14 +30989,29 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/1/rows/0/m"
+                    ],
+                    "name": "rows[0].m named by $params.kn",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/1/rows/0/m"
+                  "/things/1/rows/0"
                 ],
                 "message": "$params.kn is 1, which isn't text",
                 "name": "item 1 of rows",
-                "value": null
+                "value": {
+                  "m": [
+                    5,
+                    1
+                  ],
+                  "v": 1
+                }
               }
             ],
             "inputs": [
@@ -30787,14 +31071,29 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/1/rows/0/m"
+                    ],
+                    "name": "rows[0].m named by $params.ks",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/1/rows/0/m"
+                  "/things/1/rows/0"
                 ],
                 "message": "m is [5, 1], which isn't an object",
                 "name": "item 1 of rows",
-                "value": null
+                "value": {
+                  "m": [
+                    5,
+                    1
+                  ],
+                  "v": 1
+                }
               }
             ],
             "inputs": [
@@ -30830,26 +31129,54 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/rows/0/m"
+                    ],
+                    "name": "rows[0].m named by $params.ko",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/rows/0/m"
+                  "/things/0/rows/0"
                 ],
                 "message": "$params.ko is {\"a\": 1}, which isn't text",
                 "name": "item 1 of rows",
-                "value": null
+                "value": {
+                  "m": {
+                    "q": 2
+                  },
+                  "v": 2
+                }
               },
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/rows/1/m"
+                    ],
+                    "name": "rows[1].m named by $params.ko",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/rows/1/m"
+                  "/things/0/rows/1"
                 ],
                 "message": "$params.ko is {\"a\": 1}, which isn't text",
                 "name": "item 2 of rows",
-                "value": null
+                "value": {
+                  "m": {
+                    "q": 1
+                  },
+                  "v": 1
+                }
               }
             ],
             "inputs": [
@@ -30891,14 +31218,29 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/1/rows/0/m"
+                    ],
+                    "name": "rows[0].m named by $params.ko",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/1/rows/0/m"
+                  "/things/1/rows/0"
                 ],
                 "message": "$params.ko is {\"a\": 1}, which isn't text",
                 "name": "item 1 of rows",
-                "value": null
+                "value": {
+                  "m": [
+                    5,
+                    1
+                  ],
+                  "v": 1
+                }
               }
             ],
             "inputs": [
@@ -31731,13 +32073,62 @@
             "failures": [
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/items/0/hi"
+                        ],
+                        "name": "p.items[0].hi",
+                        "outcome": "found",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ws/0/items/0"
+                    ],
+                    "message": "item 1 and item 2 of p.items tie on hi",
+                    "name": "item 1 of p.items",
+                    "value": {
+                      "hi": 5,
+                      "lo": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/items/1/hi"
+                        ],
+                        "name": "p.items[1].hi",
+                        "outcome": "found",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ws/0/items/1"
+                    ],
+                    "message": "item 1 and item 2 of p.items tie on hi",
+                    "name": "item 2 of p.items",
+                    "value": {
+                      "hi": 5,
+                      "lo": 2
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/things/0/ws/0"
                 ],
-                "message": "item 1 and item 2 of p.items tie on hi",
+                "message": "",
                 "name": "item 1 of ws",
                 "value": {
                   "items": [
@@ -31835,26 +32226,60 @@
               {
                 "cause": "ambiguous",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ws/0/w"
+                    ],
+                    "name": "ws[0].w",
+                    "outcome": "found",
+                    "value": 1
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/ws/0/w"
+                  "/things/0/ws/0"
                 ],
                 "message": "item 1 and item 2 of ws tie on w",
                 "name": "item 1 of ws",
-                "value": 1
+                "value": {
+                  "items": [
+                    {
+                      "hi": 1,
+                      "lo": 1
+                    }
+                  ],
+                  "w": 1
+                }
               },
               {
                 "cause": "ambiguous",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/ws/1/w"
+                    ],
+                    "name": "ws[1].w",
+                    "outcome": "found",
+                    "value": 1
+                  }
+                ],
                 "kind": "item",
                 "locations": [
-                  "/things/0/ws/1/w"
+                  "/things/0/ws/1"
                 ],
                 "message": "item 1 and item 2 of ws tie on w",
                 "name": "item 2 of ws",
-                "value": 1
+                "value": {
+                  "items": [
+                    {
+                      "hi": 2,
+                      "lo": 1
+                    }
+                  ],
+                  "w": 1
+                }
               }
             ],
             "inputs": [
@@ -58893,13 +59318,62 @@
             "failures": [
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/0"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 1 of xs",
                 "value": {
                   "k": "a",
@@ -58908,13 +59382,62 @@
               },
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/1"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 2 of xs",
                 "value": {
                   "k": "a",
@@ -59008,13 +59531,62 @@
             "failures": [
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/0"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 1 of xs",
                 "value": {
                   "k": "a",
@@ -59023,13 +59595,62 @@
               },
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/1"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 2 of xs",
                 "value": {
                   "k": "a",
@@ -59123,13 +59744,62 @@
             "failures": [
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/0"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 1 of xs",
                 "value": {
                   "k": "a",
@@ -59138,13 +59808,62 @@
               },
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/1"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 2 of xs",
                 "value": {
                   "k": "a",
@@ -59238,13 +59957,62 @@
             "failures": [
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/0"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 1 of xs",
                 "value": {
                   "k": "a",
@@ -59253,13 +60021,62 @@
               },
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/1"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 2 of xs",
                 "value": {
                   "k": "a",
@@ -59364,13 +60181,62 @@
               },
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/0"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 1 of xs",
                 "value": {
                   "k": "a",
@@ -59379,13 +60245,62 @@
               },
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/1"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 2 of xs",
                 "value": {
                   "k": "a",
@@ -59498,13 +60413,62 @@
               },
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/0"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 1 of xs",
                 "value": {
                   "k": "a",
@@ -59513,13 +60477,62 @@
               },
               {
                 "cause": "ambiguous",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "found",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "item 1 and item 2 of xs tie on v",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "k": "a",
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
                   "/prs/0/xs/1"
                 ],
-                "message": "item 1 and item 2 of xs tie on v",
+                "message": "",
                 "name": "item 2 of xs",
                 "value": {
                   "k": "a",

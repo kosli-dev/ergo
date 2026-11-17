@@ -118,12 +118,27 @@ _for_item_entry(f, l, x, aliases, at) := _leveled_by(
 	at,
 )
 
-_for_walk_entry(f, rec, at) := _leveled_by(_for_walk_entry_of(f, rec), object.get(f, "ergo/levels", []), at)
+_for_walk_entry(f, rec, at) := _leveled_by(_for_walk_entry_of(f, rec, at), object.get(f, "ergo/levels", []), at)
 
-_for_walk_entry_of(f, rec) := object.union(
+_for_walk_entry_of(f, rec, at) := object.union(
+	_entry("item", f.item, f.cause, [], [_for_sorted_entry(x, x["ergo/sorted"], concat("; ", [_entry_text(m, f.item) | some m in rec.walk]), at) | some x in f.failed_items; x.cause == "ambiguous"], ""),
+	{"value": f.value, "locations": f.locations},
+) if {
+	rec.walk != []
+	some x in object.get(f, "failed_items", [])
+	_ = x["ergo/sorted"]
+} else := object.union(
+	_entry("item", f.item, f.cause, [{"name": x.name, "value": f.value, "locations": f.locations, "outcome": x.outcome}], [], concat("; ", [_entry_text(m, f.item) | some m in rec.walk])),
+	{"value": x.value, "locations": _anchored_all([{"locations": [x.at]}], at)[0].locations},
+) if {
+	x := f["ergo/sorted"]
+	rec.walk != []
+} else := object.union(
 	_entry(_walk_kind(f.item), f.item, f.cause, [], [_for_inner_entry(x, rec.inner[n]) | some n, x in f.failed_items; rec.inner[n] != []], ""),
 	{"value": f.value, "locations": f.locations},
-) if rec.inner != []
+) if {
+	rec.inner != []
+}
 
 else := object.union(
 	_entry(_walk_kind(f.item), f.item, f.cause, [_item_read(f) | _walk_kind(f.item) == "list"], [], concat("; ", [_entry_text(m, f.item) | some m in rec.walk])),
@@ -132,6 +147,11 @@ else := object.union(
 	rec.walk != []
 	_walk_kind(f.item) == "item"
 } else := _entry("list", f.item, f.cause, [_item_read(f)], [], concat("; ", rec.walk)) if rec.walk != []
+
+_for_sorted_entry(x, s, text, at) := object.union(
+	_entry("item", x.item, x.cause, [{"name": s.name, "value": x.value, "locations": x.locations, "outcome": s.outcome}], [], _entry_text(text, x.item)),
+	{"value": s.value, "locations": _anchored_all([{"locations": [s.at]}], at)[0].locations},
+)
 
 _for_inner_entry(x, ts) := object.union(_entry("item", x.item, x.cause, [], [], concat("; ", ts)), {"value": x.value, "locations": x.locations}) if _walk_kind(x.item) == "item"
 
