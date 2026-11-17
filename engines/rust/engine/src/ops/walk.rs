@@ -82,6 +82,7 @@ pub struct Failure {
     pub location: Option<Location>,
     pub copies: Vec<String>,
     pub msg: String,
+    pub seen: Option<(Value, Location)>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -130,6 +131,19 @@ impl Failure {
             "value": self.value,
             "locations": locations,
         })
+    }
+
+    /// The failed item as `to_json` gives it, with what the row's `failures`
+    /// also need: its text, and the item it sits in.
+    pub fn to_rich_json(&self) -> Value {
+        let mut entry = self.to_json();
+        entry["ergo/text"] = json!(self.msg);
+        if let Some((value, location)) = &self.seen {
+            let mut places = vec![location.render()];
+            places.extend(self.copies.iter().cloned());
+            entry["ergo/item"] = json!({"value": value, "locations": places});
+        }
+        entry
     }
 }
 
@@ -606,6 +620,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
             value: raw.value,
             location: Some(raw.location),
             copies: Vec::new(),
+            seen: None,
         })
         .collect();
     failures.sort_by(|a, b| a.order.cmp(&b.order));
@@ -617,6 +632,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
 pub struct Run {
     pub verdict: Verdict,
     pub failed_items: Vec<Value>,
+    pub rich: Vec<Value>,
     pub message: Option<String>,
     pub parts: Vec<String>,
 }
@@ -1108,6 +1124,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     value: Value::Null,
                     location: Some(item.end_location.clone()),
                     copies: Vec::new(),
+                    seen: Some((item.item.value.clone(), item.item.location.clone())),
                 })
             } else if let Some((check, verdict, _)) = undecided {
                 let at = &focus;
@@ -1171,6 +1188,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                         .unwrap_or(Value::Null),
                     location: read.and_then(|r| r.location),
                     copies: Vec::new(),
+                    seen: Some((item.item.value.clone(), item.item.location.clone())),
                 })
             } else if kept && !passed {
                 let off = message::off_item(&leaf_check, ctx, leaf.cause);
@@ -1200,6 +1218,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     value: item.shown(),
                     location: Some(item.end_location.clone()),
                     copies: Vec::new(),
+                    seen: Some((item.item.value.clone(), item.item.location.clone())),
                 })
             } else {
                 None
@@ -1261,8 +1280,9 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             value: json!([]),
             locations: Vec::new(),
             part: None,
-            state: crate::path::Outcome::Found,
+            state: outcome,
             null_at: None,
+            worked: false,
         }];
         inputs.extend(outside);
         inputs.sort_by(|a, b| a.name.cmp(&b.name));
@@ -1295,6 +1315,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         return Run {
             verdict: Verdict { cause, inputs },
             failed_items: walked.failures.iter().map(Failure::to_json).collect(),
+            rich: walked.failures.iter().map(Failure::to_rich_json).collect(),
             message: Some(message::joined(parts.clone())),
             parts,
         };
@@ -1309,6 +1330,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     fails.extend(judged.iter().filter_map(|j| j.failure.as_ref()));
     let cause = cause_of(walk, &walked, &judged, &fails);
     let mut sorted_msgs: Vec<String> = Vec::new();
+    let rich: Vec<Value> = fails.iter().map(|f| f.to_rich_json()).collect();
     let failed_items = if cause == Cause::Satisfied {
         Vec::new()
     } else {
@@ -1329,6 +1351,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         part: tag,
         state: crate::path::Outcome::Found,
         null_at: None,
+        worked: false,
     }];
     inputs.extend(outside);
     inputs.sort_by(|a, b| a.name.cmp(&b.name));
@@ -1344,6 +1367,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     Run {
         verdict: Verdict { cause, inputs },
         failed_items,
+        rich,
         message: (!parts.is_empty()).then(|| message::joined(parts.clone())),
         parts,
     }
@@ -1388,6 +1412,7 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
                 inputs: Vec::new(),
             },
             failed_items: Vec::new(),
+            rich: Vec::new(),
             message: Some(message::isnt(
                 ctx.subject_label(),
                 ctx.subject.value,

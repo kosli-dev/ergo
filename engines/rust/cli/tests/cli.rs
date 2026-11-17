@@ -116,7 +116,16 @@ fn violations_gives_the_one_violation_the_readme_shows() {
             "check": "approved",
             "description": "Someone approved the deployment",
             "expression": "approved_by is a non-empty string",
-            "inputs": [{"name": "approved_by", "value": null, "locations": ["/deployments/1"]}],
+            "failures": [{
+                "kind": "assertion",
+                "name": "approved_by is a non-empty string",
+                "cause": "absent",
+                "inputs": [{"name": "approved_by", "value": null, "locations": ["/deployments/1"], "outcome": "absent"}],
+                "failures": [],
+                "message": "approved_by is missing",
+                "locations": ["$policy:/requirements/prod_deploy/checks/approved/assert"]
+            }],
+            "inputs": [{"name": "approved_by", "value": null, "locations": ["/deployments/1"], "outcome": "absent"}],
             "message": "approved_by is missing",
             "requirement": "prod_deploy",
             "subject": {"id": "d-2", "type": "deployment"}
@@ -345,12 +354,35 @@ fn output_is_pretty_with_two_spaces_sorted_keys_and_a_trailing_newline() {
     "check": "approved",
     "description": "Someone approved the deployment",
     "expression": "approved_by is a non-empty string",
+    "failures": [
+      {
+        "cause": "absent",
+        "failures": [],
+        "inputs": [
+          {
+            "locations": [
+              "/deployments/1"
+            ],
+            "name": "approved_by",
+            "outcome": "absent",
+            "value": null
+          }
+        ],
+        "kind": "assertion",
+        "locations": [
+          "$policy:/requirements/prod_deploy/checks/approved/assert"
+        ],
+        "message": "approved_by is missing",
+        "name": "approved_by is a non-empty string"
+      }
+    ],
     "inputs": [
       {
         "locations": [
           "/deployments/1"
         ],
         "name": "approved_by",
+        "outcome": "absent",
         "value": null
       }
     ],
@@ -645,7 +677,16 @@ fn yes_and_on_in_a_yaml_input_are_strings_as_opa_1_21_reads_them() {
             "check": "approved",
             "description": "",
             "expression": "approved is true",
-            "inputs": [{"name": "approved", "value": "yes", "locations": ["/deployments/0/approved"]}],
+            "failures": [{
+                "kind": "assertion",
+                "name": "approved is true",
+                "cause": "unusable",
+                "inputs": [{"name": "approved", "value": "yes", "locations": ["/deployments/0/approved"], "outcome": "unusable"}],
+                "failures": [],
+                "message": "approved is \"yes\", which isn't true or false",
+                "locations": ["$policy:/requirements/approved/checks/approved"]
+            }],
+            "inputs": [{"name": "approved", "value": "yes", "locations": ["/deployments/0/approved"], "outcome": "unusable"}],
             "message": "approved is \"yes\", which isn't true or false",
             "requirement": "approved",
             "subject": {"id": "d-1", "type": "deployment"}

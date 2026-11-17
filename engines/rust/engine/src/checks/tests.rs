@@ -114,9 +114,9 @@ fn refs_are_read_once_from_the_params_and_the_input_and_sorted_by_name() {
     assert_eq!(
         found,
         [
-            json!({"name": "$input.i", "value": "z", "locations": ["/i"]}),
-            json!({"name": "$params.a", "value": 1, "locations": ["$params:/a"]}),
-            json!({"name": "$params.b", "value": [2], "locations": ["$params:/b"]}),
+            json!({"name": "$input.i", "value": "z", "locations": ["/i"], "outcome": "usable"}),
+            json!({"name": "$params.a", "value": 1, "locations": ["$params:/a"], "outcome": "usable"}),
+            json!({"name": "$params.b", "value": [2], "locations": ["$params:/b"], "outcome": "usable"}),
         ]
     );
 }
@@ -133,7 +133,9 @@ fn a_ref_that_cannot_be_read_shows_null_where_the_read_stopped() {
     };
     assert_eq!(
         refs_of(&plan, &json!({}), None),
-        [json!({"name": "$params.k", "value": null, "locations": ["$params:"]})]
+        [
+            json!({"name": "$params.k", "value": null, "locations": ["$params:"], "outcome": "absent"})
+        ]
     );
     let params = json!({});
     assert_eq!(

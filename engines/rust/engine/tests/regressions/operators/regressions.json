@@ -1349,6 +1349,7 @@
                     "/top/n"
                   ],
                   "name": "$input.top.n",
+                  "outcome": "usable",
                   "value": 2
                 }
               ],
@@ -1430,7 +1431,6 @@
         {
           "cause": "satisfied",
           "check": "c",
-          "failed_items": [],
           "inputs": [
             {
               "locations": [
@@ -1958,6 +1958,7 @@
                     "/top/n"
                   ],
                   "name": "$input.top.n",
+                  "outcome": "usable",
                   "value": 2
                 }
               ],
@@ -2039,7 +2040,6 @@
         {
           "cause": "satisfied",
           "check": "c",
-          "failed_items": [],
           "inputs": [
             {
               "locations": [
@@ -2835,6 +2835,7 @@
                     "$params:/q"
                   ],
                   "name": "$params.q",
+                  "outcome": "usable",
                   "value": 3
                 }
               ],
@@ -2916,7 +2917,6 @@
         {
           "cause": "satisfied",
           "check": "c",
-          "failed_items": [],
           "inputs": [
             {
               "locations": [

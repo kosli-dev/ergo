@@ -22,6 +22,20 @@ impl Cause {
         }
     }
 
+    pub fn from_name(name: &str) -> Option<Cause> {
+        [
+            Cause::Satisfied,
+            Cause::NotAnObject,
+            Cause::Ambiguous,
+            Cause::Unusable,
+            Cause::Absent,
+            Cause::Null,
+            Cause::Value,
+        ]
+        .into_iter()
+        .find(|cause| cause.name() == name)
+    }
+
     /// Whether this cause is a failure: anything but `Satisfied` and `Value`.
     pub fn is_failure(self) -> bool {
         !matches!(self, Cause::Satisfied | Cause::Value)

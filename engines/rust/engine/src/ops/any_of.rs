@@ -6,7 +6,81 @@ use serde_json::Value;
 #[derive(Debug, Clone, PartialEq)]
 pub struct AnyOf {
     pub names: Vec<String>,
+    pub texts: Vec<Vec<String>>,
     pub options: Vec<Vec<Check>>,
+}
+
+/// One line of an option that didn't pass, as its `failures` entry needs it.
+pub struct LineRun {
+    pub check: Check,
+    pub at: usize,
+    pub text: String,
+    pub cause: Cause,
+    pub inputs: Vec<Input>,
+    pub said: String,
+}
+
+/// What one option of an `any_of` gives, with its lines that didn't pass.
+pub struct OptionRun {
+    pub name: String,
+    pub cause: Cause,
+    pub count: usize,
+    pub lines: Vec<LineRun>,
+}
+
+/// Runs each option of `check` line by line, for the row's `failures`.
+pub fn option_runs(check: &AnyOf, ctx: &Ctx) -> Vec<OptionRun> {
+    let in_option = Ctx {
+        in_option: true,
+        ..ctx.clone()
+    };
+    check
+        .options
+        .iter()
+        .enumerate()
+        .map(|(at, option)| {
+            let mut causes = Vec::new();
+            let mut field_missing = false;
+            let mut lines = Vec::new();
+            for (k, line) in option.iter().enumerate() {
+                let ran = run_full(line, &in_option);
+                field_missing |= answers_presence(line, &ran.verdict);
+                causes.push(ran.verdict.cause);
+                if ran.verdict.passed() {
+                    continue;
+                }
+                let said = super::message::option_line_text(
+                    line,
+                    &in_option,
+                    ran.message.clone(),
+                    &ran.verdict,
+                );
+                lines.push(LineRun {
+                    check: line.clone(),
+                    at: k,
+                    text: check
+                        .texts
+                        .get(at)
+                        .and_then(|t| t.get(k))
+                        .cloned()
+                        .unwrap_or_default(),
+                    cause: ran.verdict.cause,
+                    inputs: ran.verdict.inputs,
+                    said,
+                });
+            }
+            OptionRun {
+                name: check.names.get(at).cloned().unwrap_or_default(),
+                cause: if field_missing {
+                    Cause::Value
+                } else {
+                    Cause::worst(causes).unwrap_or(Cause::Satisfied)
+                },
+                count: option.len(),
+                lines,
+            }
+        })
+        .collect()
 }
 
 impl AnyOf {

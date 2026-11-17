@@ -118,6 +118,7 @@ pub struct Check {
     pub meta: Value,
     pub form: Form,
     pub problems: BTreeSet<String>,
+    pub written: Value,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -477,6 +478,7 @@ fn read_check(value: &Value) -> Check {
                 meta: empty_meta(),
                 form: Form::Line(text.clone()),
                 problems,
+                written: value.clone(),
             };
         }
         Value::Object(map) => map,
@@ -487,6 +489,7 @@ fn read_check(value: &Value) -> Check {
                 meta: empty_meta(),
                 form: Form::Invalid,
                 problems,
+                written: value.clone(),
             };
         }
     };
@@ -545,6 +548,7 @@ fn read_check(value: &Value) -> Check {
         meta: reported_meta(map),
         form,
         problems,
+        written: value.clone(),
     }
 }
 

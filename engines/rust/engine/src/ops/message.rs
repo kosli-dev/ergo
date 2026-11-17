@@ -191,6 +191,12 @@ fn key_steps(path: &Path) -> impl Iterator<Item = &Path> {
     })
 }
 
+/// The names of the values `check` compares or tests, not the keys it reads
+/// on the way.
+pub fn side_names(check: &Check) -> Vec<String> {
+    side_paths(check).into_iter().map(name::name).collect()
+}
+
 fn side_paths(check: &Check) -> Vec<&Path> {
     match check {
         Check::Compare(c) => c.left.paths().into_iter().chain(c.right.paths()).collect(),
@@ -592,6 +598,23 @@ fn unflawed_cause(line: &Check, ctx: &Ctx) -> Cause {
     }
 }
 
+/// What an `any_of` line that didn't pass says, run in its option's `ctx`.
+pub fn option_line_text(
+    line: &Check,
+    ctx: &Ctx,
+    said: Option<String>,
+    verdict: &Verdict,
+) -> String {
+    if let Some(said) = said {
+        return said;
+    }
+    let mut verdict = verdict.clone();
+    if verdict.cause == Cause::Unusable && line.flawed(ctx) {
+        verdict.cause = unflawed_cause(line, ctx);
+    }
+    message(line, ctx, &verdict)
+}
+
 fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
     let in_option = Ctx {
         in_option: true,
@@ -607,14 +630,7 @@ fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
                 if ran.verdict.passed() {
                     return None;
                 }
-                if let Some(said) = ran.message {
-                    return Some(said);
-                }
-                let mut verdict = ran.verdict;
-                if verdict.cause == Cause::Unusable && line.flawed(ctx) {
-                    verdict.cause = unflawed_cause(line, ctx);
-                }
-                Some(message(line, ctx, &verdict))
+                Some(option_line_text(line, ctx, ran.message, &ran.verdict))
             })
             .collect();
         if lines.is_empty() {
@@ -1052,6 +1068,7 @@ fn plain_side_inputs(side: &Side, ctx: &Ctx) -> Vec<Input> {
                     part: None,
                     state: Outcome::Found,
                     null_at: None,
+                    worked: true,
                 }],
                 _ => pieces
                     .iter()
@@ -1075,6 +1092,7 @@ fn tally_inputs(side: &TallySide, ctx: &Ctx, cause: Cause) -> Vec<Input> {
                     part: None,
                     state: Outcome::Found,
                     null_at: None,
+                    worked: true,
                 }],
                 (Cause::Value, Err(_)) | (_, _) => {
                     let _ = counted;

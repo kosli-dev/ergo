@@ -1,6 +1,9 @@
 use crate::SPEC;
-use crate::report;
 use serde_json::{Value, json};
+
+fn report(input: &Value, policy: &Value, params: &Value) -> Value {
+    crate::report::keeping_stash(|| crate::report(input, policy, params))
+}
 
 fn policy(subjects: Value, min: Value) -> Value {
     json!({
@@ -1025,7 +1028,7 @@ fn a_check_row_reads_the_subject_and_a_requirement_with_a_failing_check_is_not_m
     assert_eq!(a[0]["passed"], json!(true));
     assert_eq!(
         a[1]["inputs"],
-        json!([{"name": "x", "value": null, "locations": ["/ds/1"]}])
+        json!([{"name": "x", "value": null, "locations": ["/ds/1"], "outcome": "absent"}])
     );
     assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
     assert_eq!(
@@ -1422,8 +1425,8 @@ fn an_any_of_tags_an_input_with_the_part_that_reads_the_same_path() {
     assert_eq!(
         inputs,
         json!([
-            {"name": "cv", "value": 1, "locations": ["/things/0/name"], "part": {"name": "cv", "id": null}},
-            {"name": "name", "value": 1, "locations": ["/things/0/name"], "part": {"name": "cv", "id": null}}
+            {"name": "cv", "value": 1, "locations": ["/things/0/name"], "part": {"name": "cv", "id": null}, "outcome": "usable"},
+            {"name": "name", "value": 1, "locations": ["/things/0/name"], "part": {"name": "cv", "id": null}, "outcome": "usable"}
         ])
     );
 }
@@ -1796,6 +1799,7 @@ fn merge_runs_keeps_the_rows_of_the_first_run_whatever_the_length_of_the_others(
         message: None,
         failed_items: None,
         failed_assertions: None,
+        failures: None,
     };
     let short = vec![row(3)];
     let long = vec![row(4), row(5), row(6)];

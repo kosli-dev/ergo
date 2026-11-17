@@ -210,6 +210,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "k1",
                     "k1"
@@ -227,6 +228,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "k1",
                     "k1"
@@ -400,6 +402,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -414,6 +417,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -476,6 +480,7 @@
               "value": 0
             }
           ],
+          "message": "m is {\"k1\": {\"x\": 1}, \"k2\": {\"x\": 2}}, which isn't a list",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -560,6 +565,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "k1"
                   ]
@@ -576,6 +582,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "k1"
                   ]
@@ -751,6 +758,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "k1",
                     "zz"
@@ -768,6 +776,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "k1",
                     "zz"
@@ -882,15 +891,39 @@
         {
           "cause": "absent",
           "check": "c",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/m"
+                  ],
+                  "name": "x",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "x is missing",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/m"
               ],
               "name": "x",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "x is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -959,6 +992,7 @@
                     "$params:"
                   ],
                   "name": "$params.keys",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -973,6 +1007,7 @@
                     "$params:"
                   ],
                   "name": "$params.keys",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -1035,6 +1070,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -1122,6 +1158,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -1136,6 +1173,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -1198,6 +1236,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -1283,6 +1322,7 @@
                     "$params:"
                   ],
                   "name": "$params.keys",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -1297,6 +1337,7 @@
                     "$params:"
                   ],
                   "name": "$params.keys",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -1359,6 +1400,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -1448,6 +1490,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": {
                     "a": 1
                   }
@@ -1464,6 +1507,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": {
                     "a": 1
                   }
@@ -1528,6 +1572,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is {\"a\": 1}, which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -1615,6 +1660,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -1629,6 +1675,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -1691,6 +1738,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is \"k1\", which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -2452,6 +2500,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -2466,6 +2515,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -2528,6 +2578,7 @@
               "value": 0
             }
           ],
+          "message": "$params.key is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -2615,6 +2666,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -2629,6 +2681,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -2691,6 +2744,7 @@
               "value": 0
             }
           ],
+          "message": "$params.key is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -2776,6 +2830,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -2790,6 +2845,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -2852,6 +2908,7 @@
               "value": 0
             }
           ],
+          "message": "$params.key is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -3103,6 +3160,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -3117,6 +3175,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -3305,6 +3364,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -3319,6 +3379,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -3541,6 +3602,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "k1"
                   ]
@@ -3557,6 +3619,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "k1"
                   ]
@@ -3887,6 +3950,7 @@
                     "/sel"
                   ],
                   "name": "$input.sel",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -3901,6 +3965,7 @@
                     "/sel"
                   ],
                   "name": "$input.sel",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -4088,6 +4153,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": true
                 }
               ],
@@ -4102,6 +4168,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": true
                 }
               ],
@@ -4164,6 +4231,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is true, which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -4264,6 +4332,7 @@
                     "$params:"
                   ],
                   "name": "$params.keys",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -4278,6 +4347,7 @@
                     "$params:"
                   ],
                   "name": "$params.keys",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -4340,6 +4410,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -4442,6 +4513,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -4456,6 +4528,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -4518,6 +4591,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -4618,6 +4692,7 @@
                     "$params:"
                   ],
                   "name": "$params.keys",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -4632,6 +4707,7 @@
                     "$params:"
                   ],
                   "name": "$params.keys",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -4694,6 +4770,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -4796,6 +4873,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": 3
                 }
               ],
@@ -4810,6 +4888,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": 3
                 }
               ],
@@ -4872,6 +4951,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is 3, which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -4976,6 +5056,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": {
                     "a": 1
                   }
@@ -4992,6 +5073,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": {
                     "a": 1
                   }
@@ -5056,6 +5138,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is {\"a\": 1}, which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -5158,6 +5241,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -5172,6 +5256,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -5234,6 +5319,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is \"k1\", which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -5880,6 +5966,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -5894,6 +5981,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -5956,6 +6044,7 @@
               "value": 0
             }
           ],
+          "message": "$params.key is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -6058,6 +6147,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -6072,6 +6162,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -6134,6 +6225,7 @@
               "value": 0
             }
           ],
+          "message": "$params.key is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -6234,6 +6326,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -6248,6 +6341,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -6310,6 +6404,7 @@
               "value": 0
             }
           ],
+          "message": "$params.key is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -6774,6 +6869,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -6788,6 +6884,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -6850,6 +6947,7 @@
               "value": 0
             }
           ],
+          "message": "m.k1.k is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -7496,6 +7594,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -7510,6 +7609,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -7572,6 +7672,7 @@
               "value": 0
             }
           ],
+          "message": "$params.key is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -7674,6 +7775,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -7688,6 +7790,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -7750,6 +7853,7 @@
               "value": 0
             }
           ],
+          "message": "$params.key is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -7850,6 +7954,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -7864,6 +7969,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -7926,6 +8032,7 @@
               "value": 0
             }
           ],
+          "message": "$params.key is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -8390,6 +8497,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -8404,6 +8512,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -8466,6 +8575,7 @@
               "value": 0
             }
           ],
+          "message": "zz is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -8982,6 +9092,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -8996,6 +9107,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "k1"
                 }
               ],
@@ -9398,6 +9510,7 @@
                     "$params:"
                   ],
                   "name": "$params.key",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -9465,6 +9578,7 @@
               "value": 0
             }
           ],
+          "message": "in-scope d count is 0",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -9593,6 +9707,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -9653,6 +9768,7 @@
         {
           "cause": "satisfied",
           "check": "$min_subjects",
+          "failed_items": [],
           "inputs": [
             {
               "locations": [
@@ -9676,8 +9792,7 @@
               }
             },
             "type": "d"
-          },
-          "failed_items": []
+          }
         },
         {
           "cause": "satisfied",
@@ -16173,6 +16288,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -16243,6 +16359,7 @@
               "value": 0
             }
           ],
+          "message": "in-scope finding count is 0",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -16362,6 +16479,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -16432,6 +16550,7 @@
               "value": 0
             }
           ],
+          "message": "in-scope finding count is 0",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -17808,6 +17927,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -17818,6 +17938,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -17832,6 +17953,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -17842,6 +17964,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -17904,6 +18027,7 @@
               "value": 0
             }
           ],
+          "message": "$params.nope is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -17998,6 +18122,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -18015,6 +18140,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -18082,6 +18208,7 @@
               "value": 1
             }
           ],
+          "message": "scans is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -18188,6 +18315,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -18205,6 +18333,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -18272,6 +18401,7 @@
               "value": 1
             }
           ],
+          "message": "scans is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -18382,6 +18512,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -18389,6 +18520,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -18406,6 +18538,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -18413,6 +18546,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -18480,6 +18614,7 @@
               "value": 1
             }
           ],
+          "message": "scans.prod is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -18589,6 +18724,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -18596,6 +18732,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -18613,6 +18750,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -18620,6 +18758,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -18687,6 +18826,7 @@
               "value": 1
             }
           ],
+          "message": "scans.prod is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -19163,6 +19303,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -19173,6 +19314,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -19187,6 +19329,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -19197,6 +19340,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -19259,6 +19403,7 @@
               "value": 0
             }
           ],
+          "message": "$params.nope is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -19352,6 +19497,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -19366,6 +19512,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -19428,6 +19575,7 @@
               "value": 0
             }
           ],
+          "message": "scans is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -19526,6 +19674,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -19540,6 +19689,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -19602,6 +19752,7 @@
               "value": 0
             }
           ],
+          "message": "scans is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -19704,6 +19855,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -19711,6 +19863,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -19725,6 +19878,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -19732,6 +19886,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -19794,6 +19949,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -19895,6 +20051,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -19902,6 +20059,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -19916,6 +20074,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -19923,6 +20082,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -19985,6 +20145,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -20274,6 +20435,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 },
                 {
@@ -20281,6 +20443,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -20295,6 +20458,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 },
                 {
@@ -20302,6 +20466,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -20364,6 +20529,7 @@
               "value": 0
             }
           ],
+          "message": "$params.nope is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -20455,6 +20621,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -20469,6 +20636,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -20531,6 +20699,7 @@
               "value": 0
             }
           ],
+          "message": "scans is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -20615,6 +20784,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -20629,6 +20799,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -20691,6 +20862,7 @@
               "value": 0
             }
           ],
+          "message": "scans is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -20779,6 +20951,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -20786,6 +20959,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -20800,6 +20974,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -20807,6 +20982,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -20869,6 +21045,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -20956,6 +21133,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -20963,6 +21141,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -20977,6 +21156,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -20984,6 +21164,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -21046,6 +21227,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -21307,6 +21489,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 },
                 {
@@ -21314,6 +21497,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -21328,6 +21512,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 },
                 {
@@ -21335,6 +21520,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -21397,6 +21583,7 @@
               "value": 0
             }
           ],
+          "message": "$params.nope is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -21488,6 +21675,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -21502,6 +21690,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -21564,6 +21753,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -21665,6 +21855,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -21672,6 +21863,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -21686,6 +21878,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -21693,6 +21886,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -21755,6 +21949,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -22033,6 +22228,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -22047,6 +22243,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -22109,6 +22306,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -22196,6 +22394,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -22203,6 +22402,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -22217,6 +22417,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -22224,6 +22425,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -22286,6 +22488,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -22557,6 +22760,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -22574,6 +22778,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -22639,6 +22844,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [\"a\", 1], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -22744,6 +22950,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -22751,6 +22958,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -22768,6 +22976,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -22775,6 +22984,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -22840,6 +23050,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [\"a\", 1], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -23339,6 +23550,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -23349,6 +23561,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -23363,6 +23576,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -23373,6 +23587,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -23435,6 +23650,7 @@
               "value": 0
             }
           ],
+          "message": "$params.nope is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -23529,6 +23745,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -23546,6 +23763,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -23611,6 +23829,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [\"a\", 1], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -23702,6 +23921,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -23709,6 +23929,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -23726,6 +23947,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -23733,6 +23955,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -23798,6 +24021,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [\"a\", 1], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -24255,6 +24479,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -24265,6 +24490,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -24279,6 +24505,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -24289,6 +24516,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -24351,6 +24579,7 @@
               "value": 0
             }
           ],
+          "message": "$params.nope is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -24444,6 +24673,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -24458,6 +24688,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -24520,6 +24751,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -24622,6 +24854,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -24629,6 +24862,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -24643,6 +24877,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -24650,6 +24885,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -24712,6 +24948,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -24993,6 +25230,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -25007,6 +25245,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -25069,6 +25308,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -25157,6 +25397,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -25164,6 +25405,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -25178,6 +25420,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -25185,6 +25428,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -25247,6 +25491,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -25518,6 +25763,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -25534,6 +25780,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -25598,6 +25845,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [null], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -25702,6 +25950,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -25709,6 +25958,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -25725,6 +25975,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -25732,6 +25983,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -25796,6 +26048,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [null], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -26288,6 +26541,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -26297,6 +26551,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -26311,6 +26566,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -26320,6 +26576,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -26382,6 +26639,7 @@
               "value": 0
             }
           ],
+          "message": "$params.nope is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -26475,6 +26733,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -26491,6 +26750,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -26555,6 +26815,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [null], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -26645,6 +26906,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -26652,6 +26914,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -26668,6 +26931,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -26675,6 +26939,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -26739,6 +27004,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [null], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -27189,6 +27455,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -27198,6 +27465,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -27212,6 +27480,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -27221,6 +27490,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -27283,6 +27553,7 @@
               "value": 0
             }
           ],
+          "message": "$params.nope is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -27377,6 +27648,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 },
                 {
@@ -27384,6 +27656,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -27451,6 +27724,7 @@
               "value": 0
             }
           ],
+          "message": "in-scope finding count is 0",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -27567,6 +27841,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 },
                 {
@@ -27574,6 +27849,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -27641,6 +27917,7 @@
               "value": 0
             }
           ],
+          "message": "in-scope finding count is 0",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -27757,6 +28034,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -27771,6 +28049,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -27833,6 +28112,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is \"a\", which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -28121,6 +28401,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 },
                 {
@@ -28128,6 +28409,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -28142,6 +28424,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 },
                 {
@@ -28149,6 +28432,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -28211,6 +28495,7 @@
               "value": 0
             }
           ],
+          "message": "$params.nope is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -28302,6 +28587,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -28316,6 +28602,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -28378,6 +28665,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is \"a\", which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -28638,6 +28926,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 },
                 {
@@ -28645,6 +28934,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -28659,6 +28949,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 },
                 {
@@ -28666,6 +28957,7 @@
                     "$params:"
                   ],
                   "name": "$params.nope",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -28728,6 +29020,7 @@
               "value": 0
             }
           ],
+          "message": "$params.nope is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -29630,6 +29923,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29647,6 +29941,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29714,6 +30009,7 @@
               "value": 1
             }
           ],
+          "message": "scans is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -29814,6 +30110,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29831,6 +30128,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29898,6 +30196,7 @@
               "value": 1
             }
           ],
+          "message": "scans is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -30002,6 +30301,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -30009,6 +30309,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -30026,6 +30327,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -30033,6 +30335,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -30100,6 +30403,7 @@
               "value": 1
             }
           ],
+          "message": "scans.prod is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -30203,6 +30507,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -30210,6 +30515,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -30227,6 +30533,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -30234,6 +30541,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -30301,6 +30609,7 @@
               "value": 1
             }
           ],
+          "message": "scans.prod is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -30407,6 +30716,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -30421,6 +30731,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -30483,6 +30794,7 @@
               "value": 0
             }
           ],
+          "message": "scans is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -30579,6 +30891,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -30586,6 +30899,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -30600,6 +30914,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -30607,6 +30922,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -30669,6 +30985,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -30754,6 +31071,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -30768,6 +31086,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -30830,6 +31149,7 @@
               "value": 0
             }
           ],
+          "message": "scans is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -30912,6 +31232,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -30919,6 +31240,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -30933,6 +31255,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -30940,6 +31263,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -31002,6 +31326,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -31091,6 +31416,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -31108,6 +31434,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -31173,6 +31500,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [\"a\", 1], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -31271,6 +31599,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -31278,6 +31607,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -31295,6 +31625,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -31302,6 +31633,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -31367,6 +31699,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [\"a\", 1], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -31454,6 +31787,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -31471,6 +31805,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -31536,6 +31871,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [\"a\", 1], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -31620,6 +31956,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -31627,6 +31964,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -31644,6 +31982,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -31651,6 +31990,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -31716,6 +32056,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [\"a\", 1], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -31804,6 +32145,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -31820,6 +32162,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -31884,6 +32227,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [null], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -31981,6 +32325,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -31988,6 +32333,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -32004,6 +32350,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -32011,6 +32358,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -32075,6 +32423,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [null], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -32161,6 +32510,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -32177,6 +32527,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -32241,6 +32592,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [null], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -32324,6 +32676,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -32331,6 +32684,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -32347,6 +32701,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -32354,6 +32709,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -32418,6 +32774,7 @@
               "value": 0
             }
           ],
+          "message": "$params.k is [null], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -33346,6 +33703,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33363,6 +33721,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33430,6 +33789,7 @@
               "value": 1
             }
           ],
+          "message": "scans is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -33532,6 +33892,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33549,6 +33910,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33616,6 +33978,7 @@
               "value": 1
             }
           ],
+          "message": "scans is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -33722,6 +34085,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -33729,6 +34093,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33746,6 +34111,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -33753,6 +34119,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33820,6 +34187,7 @@
               "value": 1
             }
           ],
+          "message": "scans.prod is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -33925,6 +34293,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -33932,6 +34301,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33949,6 +34319,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -33956,6 +34327,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -34023,6 +34395,7 @@
               "value": 1
             }
           ],
+          "message": "scans.prod is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -34131,6 +34504,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -34145,6 +34519,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -34207,6 +34582,7 @@
               "value": 0
             }
           ],
+          "message": "scans is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -34305,6 +34681,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -34312,6 +34689,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -34326,6 +34704,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -34333,6 +34712,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -34395,6 +34775,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -34482,6 +34863,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -34496,6 +34878,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -34558,6 +34941,7 @@
               "value": 0
             }
           ],
+          "message": "scans is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -34642,6 +35026,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -34649,6 +35034,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -34663,6 +35049,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -34670,6 +35057,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -34732,6 +35120,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -35936,6 +36325,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -35953,6 +36343,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -36163,6 +36554,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -36170,6 +36562,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -36187,6 +36580,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -36194,6 +36588,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -36393,6 +36788,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -36410,6 +36806,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -36587,6 +36984,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -36594,6 +36992,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -36611,6 +37010,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -36618,6 +37018,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -36797,6 +37198,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -36811,6 +37213,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -36975,6 +37378,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -36982,6 +37386,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -36996,6 +37401,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -37003,6 +37409,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -37156,6 +37563,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -37170,6 +37578,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -37320,6 +37729,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -37327,6 +37737,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -37341,6 +37752,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -37348,6 +37760,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -38003,6 +38416,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "a"
                   ]
@@ -38019,6 +38433,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "a"
                   ]
@@ -38085,6 +38500,7 @@
               "value": 1
             }
           ],
+          "message": "m is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -38187,6 +38603,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "k1",
                     "k2"
@@ -38204,6 +38621,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     "k1",
                     "k2"
@@ -38272,6 +38690,7 @@
               "value": 2
             }
           ],
+          "message": "m is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -38396,6 +38815,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -38412,6 +38832,7 @@
                     "$params:/keys"
                   ],
                   "name": "$params.keys",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -38476,6 +38897,7 @@
               "value": 0
             }
           ],
+          "message": "$params.keys is [null], which isn't a list of text",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -38815,6 +39237,31 @@
         {
           "cause": "absent",
           "check": "a",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "count of l",
+                  "value": null
+                },
+                {
+                  "locations": [],
+                  "name": "l",
+                  "outcome": "absent",
+                  "value": []
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "l is missing",
+              "name": "count of l is 2"
+            }
+          ],
           "inputs": [
             {
               "locations": [],
@@ -38824,9 +39271,11 @@
             {
               "locations": [],
               "name": "l",
+              "outcome": "absent",
               "value": []
             }
           ],
+          "message": "l is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -38840,6 +39289,31 @@
         {
           "cause": "absent",
           "check": "b",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "sum of l",
+                  "value": null
+                },
+                {
+                  "locations": [],
+                  "name": "l",
+                  "outcome": "absent",
+                  "value": []
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/b"
+              ],
+              "message": "l is missing",
+              "name": "sum of l is at least 3.5"
+            }
+          ],
           "inputs": [
             {
               "locations": [],
@@ -38849,9 +39323,11 @@
             {
               "locations": [],
               "name": "l",
+              "outcome": "absent",
               "value": []
             }
           ],
+          "message": "l is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -39136,6 +39612,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     1.5,
                     2
@@ -39186,6 +39663,7 @@
               ]
             }
           ],
+          "message": "checks.f: doesn't parse",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -39352,6 +39830,7 @@
               ]
             }
           ],
+          "message": "repeated d ids is [1]",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -39381,15 +39860,39 @@
         {
           "cause": "value",
           "check": "a",
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 100
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 100",
+              "name": "x is 1.5"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 100
             }
           ],
+          "message": "x is 100",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -39561,6 +40064,7 @@
               ]
             }
           ],
+          "message": "repeated d ids is [1]",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -39590,15 +40094,39 @@
         {
           "cause": "value",
           "check": "a",
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 100
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 100",
+              "name": "x is 1.5"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 100
             }
           ],
+          "message": "x is 100",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -39767,6 +40295,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -39794,15 +40323,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0"
+                  ],
+                  "name": "zz",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "zz exists is false",
+              "name": "zz exists"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0"
               ],
               "name": "zz",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "zz exists is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -39826,15 +40379,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1"
+                  ],
+                  "name": "zz",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "zz exists is false",
+              "name": "zz exists"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1"
               ],
               "name": "zz",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "zz exists is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -39960,6 +40537,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "unusable",
                   "value": null
                 }
               ],
@@ -40022,6 +40600,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -40049,12 +40628,43 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 1
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.k",
+                  "outcome": "unusable",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "$params is [], which isn't an object",
+              "name": "x is in $params.k"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 1
             },
             {
@@ -40062,9 +40672,11 @@
                 "$params:"
               ],
               "name": "$params.k",
+              "outcome": "unusable",
               "value": null
             }
           ],
+          "message": "$params is [], which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -40088,12 +40700,43 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.k",
+                  "outcome": "unusable",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "$params is [], which isn't an object",
+              "name": "x is in $params.k"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             },
             {
@@ -40101,9 +40744,11 @@
                 "$params:"
               ],
               "name": "$params.k",
+              "outcome": "unusable",
               "value": null
             }
           ],
+          "message": "$params is [], which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -41148,6 +41793,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -41175,15 +41821,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 1
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -41194,15 +41864,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -41783,6 +42477,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -41810,15 +42505,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/0/items/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/g/0/items/0/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 1
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -41831,15 +42550,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/0/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/g/0/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -42476,6 +43219,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -42503,15 +43247,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 1
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -42535,15 +43303,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -42906,6 +43698,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -42933,15 +43726,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 1
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -42965,15 +43782,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -43495,15 +44336,39 @@
         {
           "cause": "value",
           "check": "a",
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 2",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
+          "message": "x is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -43683,6 +44548,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -43710,15 +44576,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 1
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -43729,15 +44619,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -43908,6 +44822,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -43935,15 +44850,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 1
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -43954,15 +44893,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -44131,6 +45094,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -44158,15 +45122,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 1
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -44190,15 +45178,39 @@
         {
           "cause": "unusable",
           "check": "a",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "x is 1 is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -45117,12 +46129,35 @@
         {
           "cause": "not_an_object",
           "check": "c",
+          "failures": [
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/0"
+                  ],
+                  "name": "x",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "d is \"s\", which isn't an object",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/g/0"
               ],
               "name": "x",
+              "outcome": "not_an_object",
               "value": null
             }
           ],
@@ -45137,12 +46172,35 @@
         {
           "cause": "not_an_object",
           "check": "c",
+          "failures": [
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/1"
+                  ],
+                  "name": "x",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "d is 1, which isn't an object",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/g/1"
               ],
               "name": "x",
+              "outcome": "not_an_object",
               "value": null
             }
           ],
@@ -45157,12 +46215,35 @@
         {
           "cause": "not_an_object",
           "check": "c",
+          "failures": [
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/2"
+                  ],
+                  "name": "x",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "d is null, which isn't an object",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/g/2"
               ],
               "name": "x",
+              "outcome": "not_an_object",
               "value": null
             }
           ],
@@ -45177,12 +46258,35 @@
         {
           "cause": "not_an_object",
           "check": "c",
+          "failures": [
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/3"
+                  ],
+                  "name": "x",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "d is [1], which isn't an object",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/g/3"
               ],
               "name": "x",
+              "outcome": "not_an_object",
               "value": null
             }
           ],
@@ -45372,15 +46476,39 @@
         {
           "cause": "not_an_object",
           "check": "c",
+          "failures": [
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/0"
+                  ],
+                  "name": "x",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "d is \"s\", which isn't an object",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/g/0"
               ],
               "name": "x",
+              "outcome": "not_an_object",
               "value": null
             }
           ],
+          "message": "d is \"s\", which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -46144,15 +47272,39 @@
         {
           "cause": "not_an_object",
           "check": "c",
+          "failures": [
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/0/i/0"
+                  ],
+                  "name": "x",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "d is 1, which isn't an object",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/g/0/i/0"
               ],
               "name": "x",
+              "outcome": "not_an_object",
               "value": null
             }
           ],
+          "message": "d is 1, which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -46671,13 +47823,13 @@
               "value": 1
             }
           ],
+          "message": "item 2 of items: y is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
             "type": "d"
-          },
-          "message": "item 2 of items: y is missing"
+          }
         },
         {
           "cause": "satisfied",
@@ -46699,22 +47851,45 @@
         {
           "cause": "not_an_object",
           "check": "c",
+          "failures": [
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/y"
+                  ],
+                  "name": "x",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "d is 2, which isn't an object",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0/y"
               ],
               "name": "x",
+              "outcome": "not_an_object",
               "value": null
             }
           ],
+          "message": "d is 2, which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": 2,
             "type": "d"
-          },
-          "message": "d is 2, which isn't an object"
+          }
         }
       ],
       "subjects": {
@@ -46894,22 +48069,45 @@
         {
           "cause": "not_an_object",
           "check": "c",
+          "failures": [
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/w/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "d is 1, which isn't an object",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/w/0/x"
               ],
               "name": "x",
+              "outcome": "not_an_object",
               "value": null
             }
           ],
+          "message": "d is 1, which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": 1,
             "type": "d"
-          },
-          "message": "d is 1, which isn't an object"
+          }
         }
       ],
       "subjects": {
@@ -50193,6 +51391,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a"
                   ]
@@ -50209,6 +51408,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a"
                   ]
@@ -51112,6 +52312,44 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/fb"
+                  ],
+                  "name": "fa plus fb",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 100000000000000000000
+                },
+                {
+                  "locations": [
+                    "/things/0/fb"
+                  ],
+                  "name": "fb",
+                  "outcome": "usable",
+                  "value": 1000000000000000
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus fb needs more than 15 digits",
+              "name": "fa plus fb is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -51126,6 +52364,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 100000000000000000000
             },
             {
@@ -51133,9 +52372,11 @@
                 "/things/0/fb"
               ],
               "name": "fb",
+              "outcome": "usable",
               "value": 1000000000000000
             }
           ],
+          "message": "fa plus fb needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -51309,6 +52550,44 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/fb"
+                  ],
+                  "name": "fa plus fb",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": -1e-06
+                },
+                {
+                  "locations": [
+                    "/things/0/fb"
+                  ],
+                  "name": "fb",
+                  "outcome": "usable",
+                  "value": 0.1234567890123456
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus fb needs more than 15 digits",
+              "name": "fa plus fb is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -51323,16 +52602,19 @@
                 "/things/0/fa"
               ],
               "name": "fa",
-              "value": -0.000001
+              "outcome": "usable",
+              "value": -1e-06
             },
             {
               "locations": [
                 "/things/0/fb"
               ],
               "name": "fb",
+              "outcome": "usable",
               "value": 0.1234567890123456
             }
           ],
+          "message": "fa plus fb needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -52941,6 +54223,70 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "fa plus count of items",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 1e-16
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "count of items",
+                  "value": 2
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "items[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "vals": [
+                        1e-16,
+                        -999999999999999
+                      ],
+                      "x": 1e-16,
+                      "y": -999999999999999
+                    },
+                    {
+                      "vals": [
+                        1e-16
+                      ],
+                      "x": -999999999999999,
+                      "y": 1e-16
+                    }
+                  ]
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus count of items needs more than 15 digits",
+              "name": "fa plus count of items is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -52956,7 +54302,8 @@
                 "/things/0/fa"
               ],
               "name": "fa",
-              "value": 0.0000000000000001
+              "outcome": "usable",
+              "value": 1e-16
             },
             {
               "locations": [
@@ -52972,25 +54319,27 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
-                    0.0000000000000001,
+                    1e-16,
                     -999999999999999
                   ],
-                  "x": 0.0000000000000001,
+                  "x": 1e-16,
                   "y": -999999999999999
                 },
                 {
                   "vals": [
-                    0.0000000000000001
+                    1e-16
                   ],
                   "x": -999999999999999,
-                  "y": 0.0000000000000001
+                  "y": 1e-16
                 }
               ]
             }
           ],
+          "message": "fa plus count of items needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -53164,6 +54513,70 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "fa plus count of items",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 0.1234567890123456
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "count of items",
+                  "value": 2
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "items[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "vals": [
+                        0.1234567890123456,
+                        -1e-06
+                      ],
+                      "x": 0.1234567890123456,
+                      "y": -1e-06
+                    },
+                    {
+                      "vals": [
+                        0.1234567890123456
+                      ],
+                      "x": -1e-06,
+                      "y": 0.1234567890123456
+                    }
+                  ]
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus count of items needs more than 15 digits",
+              "name": "fa plus count of items is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -53179,6 +54592,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 0.1234567890123456
             },
             {
@@ -53195,25 +54609,27 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
                     0.1234567890123456,
-                    -0.000001
+                    -1e-06
                   ],
                   "x": 0.1234567890123456,
-                  "y": -0.000001
+                  "y": -1e-06
                 },
                 {
                   "vals": [
                     0.1234567890123456
                   ],
-                  "x": -0.000001,
+                  "x": -1e-06,
                   "y": 0.1234567890123456
                 }
               ]
             }
           ],
+          "message": "fa plus count of items needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -53600,6 +55016,61 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "fa plus seconds elapsed from s1 to s2",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 10000000000
+                },
+                {
+                  "locations": [
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "seconds elapsed from s1 to s2",
+                  "value": 0.123456
+                },
+                {
+                  "locations": [
+                    "/things/0/s1"
+                  ],
+                  "name": "s1",
+                  "outcome": "usable",
+                  "value": 0
+                },
+                {
+                  "locations": [
+                    "/things/0/s2"
+                  ],
+                  "name": "s2",
+                  "outcome": "usable",
+                  "value": 0.123456
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus seconds elapsed from s1 to s2 needs more than 15 digits",
+              "name": "fa plus seconds elapsed from s1 to s2 is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -53615,6 +55086,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 10000000000
             },
             {
@@ -53630,6 +55102,7 @@
                 "/things/0/s1"
               ],
               "name": "s1",
+              "outcome": "usable",
               "value": 0
             },
             {
@@ -53637,9 +55110,11 @@
                 "/things/0/s2"
               ],
               "name": "s2",
+              "outcome": "usable",
               "value": 0.123456
             }
           ],
+          "message": "fa plus seconds elapsed from s1 to s2 needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -53813,6 +55288,61 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "fa plus seconds elapsed from s1 to s2",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 0.1234567890123456
+                },
+                {
+                  "locations": [
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "seconds elapsed from s1 to s2",
+                  "value": 0.123456
+                },
+                {
+                  "locations": [
+                    "/things/0/s1"
+                  ],
+                  "name": "s1",
+                  "outcome": "usable",
+                  "value": 0
+                },
+                {
+                  "locations": [
+                    "/things/0/s2"
+                  ],
+                  "name": "s2",
+                  "outcome": "usable",
+                  "value": 0.123456
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus seconds elapsed from s1 to s2 needs more than 15 digits",
+              "name": "fa plus seconds elapsed from s1 to s2 is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -53828,6 +55358,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 0.1234567890123456
             },
             {
@@ -53843,6 +55374,7 @@
                 "/things/0/s1"
               ],
               "name": "s1",
+              "outcome": "usable",
               "value": 0
             },
             {
@@ -53850,9 +55382,11 @@
                 "/things/0/s2"
               ],
               "name": "s2",
+              "outcome": "usable",
               "value": 0.123456
             }
           ],
+          "message": "fa plus seconds elapsed from s1 to s2 needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -54901,6 +56435,44 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/fb"
+                  ],
+                  "name": "fa plus fb plus 1",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 100000000000000000000
+                },
+                {
+                  "locations": [
+                    "/things/0/fb"
+                  ],
+                  "name": "fb",
+                  "outcome": "usable",
+                  "value": 1e-16
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus fb plus 1 needs more than 15 digits",
+              "name": "fa plus fb plus 1 is at least 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -54915,6 +56487,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 100000000000000000000
             },
             {
@@ -54922,9 +56495,11 @@
                 "/things/0/fb"
               ],
               "name": "fb",
-              "value": 0.0000000000000001
+              "outcome": "usable",
+              "value": 1e-16
             }
           ],
+          "message": "fa plus fb plus 1 needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -55098,6 +56673,44 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/fb"
+                  ],
+                  "name": "fa plus fb plus 1",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": -1e-06
+                },
+                {
+                  "locations": [
+                    "/things/0/fb"
+                  ],
+                  "name": "fb",
+                  "outcome": "usable",
+                  "value": 0.1234567890123456
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus fb plus 1 needs more than 15 digits",
+              "name": "fa plus fb plus 1 is at least 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -55112,16 +56725,19 @@
                 "/things/0/fa"
               ],
               "name": "fa",
-              "value": -0.000001
+              "outcome": "usable",
+              "value": -1e-06
             },
             {
               "locations": [
                 "/things/0/fb"
               ],
               "name": "fb",
+              "outcome": "usable",
               "value": 0.1234567890123456
             }
           ],
+          "message": "fa plus fb plus 1 needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -55526,6 +57142,79 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1",
+                    "/things/0/fa",
+                    "/things/0/fb"
+                  ],
+                  "name": "count of items plus fa plus fb",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "count of items",
+                  "value": 2
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "items[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "vals": [
+                        100000000000000000000,
+                        1e-16
+                      ],
+                      "x": 100000000000000000000,
+                      "y": 1e-16
+                    },
+                    {
+                      "vals": [
+                        100000000000000000000
+                      ],
+                      "x": 1e-16,
+                      "y": 100000000000000000000
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 100000000000000000000
+                },
+                {
+                  "locations": [
+                    "/things/0/fb"
+                  ],
+                  "name": "fb",
+                  "outcome": "usable",
+                  "value": 1e-16
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "count of items plus fa plus fb needs more than 15 digits",
+              "name": "count of items plus fa plus fb is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -55551,20 +57240,21 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
                     100000000000000000000,
-                    0.0000000000000001
+                    1e-16
                   ],
                   "x": 100000000000000000000,
-                  "y": 0.0000000000000001
+                  "y": 1e-16
                 },
                 {
                   "vals": [
                     100000000000000000000
                   ],
-                  "x": 0.0000000000000001,
+                  "x": 1e-16,
                   "y": 100000000000000000000
                 }
               ]
@@ -55574,6 +57264,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 100000000000000000000
             },
             {
@@ -55581,9 +57272,11 @@
                 "/things/0/fb"
               ],
               "name": "fb",
-              "value": 0.0000000000000001
+              "outcome": "usable",
+              "value": 1e-16
             }
           ],
+          "message": "count of items plus fa plus fb needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -55757,6 +57450,79 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1",
+                    "/things/0/fa",
+                    "/things/0/fb"
+                  ],
+                  "name": "count of items plus fa plus fb",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "count of items",
+                  "value": 2
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "items[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "vals": [
+                        -1e-06,
+                        0.1234567890123456
+                      ],
+                      "x": -1e-06,
+                      "y": 0.1234567890123456
+                    },
+                    {
+                      "vals": [
+                        -1e-06
+                      ],
+                      "x": 0.1234567890123456,
+                      "y": -1e-06
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": -1e-06
+                },
+                {
+                  "locations": [
+                    "/things/0/fb"
+                  ],
+                  "name": "fb",
+                  "outcome": "usable",
+                  "value": 0.1234567890123456
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "count of items plus fa plus fb needs more than 15 digits",
+              "name": "count of items plus fa plus fb is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -55782,21 +57548,22 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
-                    -0.000001,
+                    -1e-06,
                     0.1234567890123456
                   ],
-                  "x": -0.000001,
+                  "x": -1e-06,
                   "y": 0.1234567890123456
                 },
                 {
                   "vals": [
-                    -0.000001
+                    -1e-06
                   ],
                   "x": 0.1234567890123456,
-                  "y": -0.000001
+                  "y": -1e-06
                 }
               ]
             },
@@ -55805,16 +57572,19 @@
                 "/things/0/fa"
               ],
               "name": "fa",
-              "value": -0.000001
+              "outcome": "usable",
+              "value": -1e-06
             },
             {
               "locations": [
                 "/things/0/fb"
               ],
               "name": "fb",
+              "outcome": "usable",
               "value": 0.1234567890123456
             }
           ],
+          "message": "count of items plus fa plus fb needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {

@@ -10,11 +10,13 @@ fn row(for_line: &str, assertions: Value, subject: Value) -> Value {
     let mut subject = subject;
     subject["id"] = json!(1);
     let input = json!({"things": [subject]});
-    let report = crate::report(
-        &input,
-        &policy,
-        &json!({"k": "a", "list": ["x"], "kinds": "code", "need": {"b": 1}}),
-    );
+    let report = crate::report::keeping_stash(|| {
+        crate::report(
+            &input,
+            &policy,
+            &json!({"k": "a", "list": ["x"], "kinds": "code", "need": {"b": 1}}),
+        )
+    });
     report["results"]
         .as_array()
         .unwrap()
@@ -38,7 +40,7 @@ fn problems(for_line: &str) -> Value {
         "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": "x exists"}}}}
     });
     let input = json!({"things": [{"id": 1, "xs": {"a": 1}, "x": "a", "ys": ["a"]}]});
-    let report = crate::report(&input, &policy, &json!({}));
+    let report = crate::report::keeping_stash(|| crate::report(&input, &policy, &json!({})));
     let rows = report["results"].as_array().unwrap();
     assert!(rows.iter().all(|row| row["check"] != "c"));
     let well_formed = rows
@@ -344,7 +346,9 @@ fn a_subject_that_is_not_an_object_fails_as_not_an_object_with_nothing_listed() 
         "subjects": {"thing": {"from": "things", "identified_by": "id"}},
         "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as x", "assert": "x is 1"}}}}
     });
-    let report = crate::report(&json!({"things": ["text"]}), &policy, &json!({}));
+    let report = crate::report::keeping_stash(|| {
+        crate::report(&json!({"things": ["text"]}), &policy, &json!({}))
+    });
     let found = report["results"]
         .as_array()
         .unwrap()
@@ -365,7 +369,9 @@ fn a_for_line_over_the_subject_by_its_name_fails_as_not_an_object_on_a_subject_t
             "subjects": {"thing": {"from": "every xs"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every thing as k", "assert": "k is 1"}}}}
         });
-        let report = crate::report(&json!({"xs": [subject]}), &policy, &json!({}));
+        let report = crate::report::keeping_stash(|| {
+            crate::report(&json!({"xs": [subject]}), &policy, &json!({}))
+        });
         let found = report["results"]
             .as_array()
             .unwrap()
@@ -386,7 +392,7 @@ fn a_failed_assertion_keeps_the_dot_of_a_field_named_like_the_subject() {
         "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every ys as k", "assert": ".thing is 1"}}}}
     });
     let input = json!({"xs": [{"thing": 2, "ys": [1]}]});
-    let report = crate::report(&input, &policy, &json!({}));
+    let report = crate::report::keeping_stash(|| crate::report(&input, &policy, &json!({})));
     let found = report["results"]
         .as_array()
         .unwrap()
@@ -518,7 +524,7 @@ fn a_failed_count_whose_whose_reads_a_part_lists_the_parts_value_with_its_locati
         }}}}
     });
     let input = json!({"things": [{"id": "t", "groups": [1], "items": [{"w": 1}, {"w": 2}], "meta": {"w": 2}}]});
-    let report = crate::report(&input, &policy, &json!({}));
+    let report = crate::report::keeping_stash(|| crate::report(&input, &policy, &json!({})));
     let found = report["results"]
         .as_array()
         .unwrap()
@@ -1431,7 +1437,8 @@ fn pr_row(
     });
     let mut pr = fields;
     pr["id"] = json!("p0");
-    let report = crate::report(&json!({"prs": [pr]}), &policy, &params);
+    let report =
+        crate::report::keeping_stash(|| crate::report(&json!({"prs": [pr]}), &policy, &params));
     let found = report["results"]
         .as_array()
         .unwrap()
@@ -1490,7 +1497,8 @@ fn two_roots_rows(pos: Value, os: Value) -> Vec<(String, Value)> {
         }}}
     });
     let input = json!({"prs": [{"id": "p0", "os": pos, "rows": [{"v": "bob"}], "ms": [{"ws": [{"v": "bob"}]}]}]});
-    let report = crate::report(&input, &policy, &json!({"os": os}));
+    let report =
+        crate::report::keeping_stash(|| crate::report(&input, &policy, &json!({"os": os})));
     ["every", "every_rev", "for_count"]
         .iter()
         .map(|check| {

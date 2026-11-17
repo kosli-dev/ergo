@@ -283,6 +283,7 @@ fn read_form(
             let mut parts = Vec::new();
             let mut lowered_options = Vec::new();
             let mut lowered_names: Vec<String> = Vec::new();
+            let mut lowered_texts: Vec<Vec<String>> = Vec::new();
             let mut ok = !options.is_empty();
             for (option, read) in options {
                 match read {
@@ -307,6 +308,7 @@ fn read_form(
                             &mut problems,
                         );
                         lowered_names.push(option.to_string());
+                        lowered_texts.push(plan.items.iter().map(|i| i.text.clone()).collect());
                         lowered_options.push(plan.items.into_iter().map(|i| i.check).collect());
                         parts.push(format!(
                             "{option}({})",
@@ -325,6 +327,7 @@ fn read_form(
                     text: expression.clone(),
                     check: Check::AnyOf(AnyOf {
                         names: lowered_names,
+                        texts: lowered_texts,
                         options: lowered_options,
                     }),
                 }],
@@ -429,25 +432,38 @@ fn refs_walked(paths: &[(Path, bool)], input: &Value, params: Option<&Value>) ->
     };
     let mut entries: Vec<Value> = Vec::new();
     for (reference, walks) in paths {
+        let read = path::read(reference, &ctx);
+        let outcome = ref_outcome(read.outcome);
         if let Some(walk) = crate::ops::lists::walked(reference, &ctx).filter(|_| *walks) {
             entries.push(serde_json::json!({
                 "name": walk.name,
                 "value": walk.value,
                 "locations": walk.locations,
+                "outcome": outcome,
             }));
             continue;
         }
-        let read = path::read(reference, &ctx);
         let locations: Vec<String> = read.location.iter().map(Location::render).collect();
         entries.push(serde_json::json!({
             "name": name::name(reference),
             "value": read.value.cloned().unwrap_or(Value::Null),
             "locations": locations,
+            "outcome": outcome,
         }));
     }
     entries.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
     entries.dedup();
     entries
+}
+
+fn ref_outcome(outcome: path::Outcome) -> &'static str {
+    match outcome {
+        path::Outcome::Found => "usable",
+        path::Outcome::Null => "null",
+        path::Outcome::Absent => "absent",
+        path::Outcome::Unusable => "unusable",
+        path::Outcome::NotAnObject => "not_an_object",
+    }
 }
 
 #[cfg(test)]

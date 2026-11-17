@@ -35,6 +35,7 @@ fn row(requirement: &str, check: &str, cause: Cause) -> Row {
         message: None,
         failed_items: None,
         failed_assertions: None,
+        failures: None,
     }
 }
 
@@ -54,6 +55,7 @@ fn a_row_prints_as_the_schema_wants() {
     r.subject_in = Some(Map::from_iter([("artifact".to_string(), json!("sha-1"))]));
     r.failed_items = Some(json!([]));
     r.failed_assertions = Some(json!([{"assertion": "a", "cause": "value"}]));
+    r.failures = Some(json!([{"kind": "assertion"}]));
     assert_eq!(
         r.to_json(),
         json!({
@@ -63,10 +65,23 @@ fn a_row_prints_as_the_schema_wants() {
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}],
-            "failed_items": [],
-            "failed_assertions": [{"assertion": "a", "cause": "value"}],
+            "failures": [{"kind": "assertion"}],
         })
     );
+}
+
+#[test]
+fn only_a_min_subjects_row_keeps_its_failed_items() {
+    let mut r = row("s", "$min_subjects", Cause::Value);
+    r.failed_items = Some(json!([]));
+    assert_eq!(r.to_json()["failed_items"], json!([]));
+}
+
+#[test]
+fn a_passed_row_has_no_failures() {
+    let mut r = row("s", "c", Cause::Satisfied);
+    r.failures = Some(json!([]));
+    assert!(r.to_json().get("failures").is_none());
 }
 
 #[test]
@@ -1142,8 +1157,8 @@ fn a_violation_lists_a_ref_once_when_its_row_lists_it_already() {
     assert_eq!(
         violations(&report)[0]["inputs"],
         json!([
-            {"name": "x", "value": "z", "locations": ["/things/0/x"]},
-            {"name": "$params.k", "value": ["a"], "locations": ["$params:/k"]}
+            {"name": "x", "value": "z", "locations": ["/things/0/x"], "outcome": "usable"},
+            {"name": "$params.k", "value": ["a"], "locations": ["$params:/k"], "outcome": "usable"}
         ])
     );
 }
@@ -1241,15 +1256,29 @@ fn violations_fail_closed_on_a_report_that_lacks_a_requirement_entry() {
 }
 
 #[test]
-fn a_violation_keeps_failed_assertions() {
+fn a_violation_keeps_failures() {
     let report = json!({
         "requirements": {"s": {"status": "not_met", "checks": {"c": {"description": "d", "expression": "e"}}}},
         "results": [{"requirement": "s", "subject": {"type": "t", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [],
-                     "failed_assertions": [{"assertion": "a", "cause": "value"}]}],
+                     "failures": [{"kind": "assertion", "name": "a", "cause": "value"}]}],
     });
     assert_eq!(
-        violations(&report)[0]["failed_assertions"],
-        json!([{"assertion": "a", "cause": "value"}])
+        violations(&report)[0]["failures"],
+        json!([{"kind": "assertion", "name": "a", "cause": "value"}])
+    );
+}
+
+#[test]
+fn a_violation_lists_a_ref_its_row_lists_with_an_outcome_once() {
+    let report = json!({
+        "requirements": {"s": {"status": "not_met", "checks": {"c": {"description": "d", "expression": "e",
+            "$refs": [{"name": "$params.k", "value": null, "locations": ["$params:"], "outcome": "absent"}]}}}},
+        "results": [{"requirement": "s", "subject": {"type": "t", "id": 1}, "check": "c", "passed": false, "cause": "absent",
+                     "inputs": [{"name": "$params.k", "value": null, "locations": ["$params:"], "outcome": "absent"}]}],
+    });
+    assert_eq!(
+        violations(&report)[0]["inputs"].as_array().unwrap().len(),
+        1
     );
 }
 
@@ -1362,10 +1391,10 @@ fn a_ref_through_a_list_of_params_points_at_where_the_read_stopped() {
     let checks = &report["requirements"]["s"]["checks"];
     assert_eq!(
         checks["c"]["$refs"],
-        json!([{"name": "$params[0].v", "value": null, "locations": ["$params:/0"]}])
+        json!([{"name": "$params[0].v", "value": null, "locations": ["$params:/0"], "outcome": "unusable"}])
     );
     assert_eq!(
         checks["d"]["$refs"],
-        json!([{"name": "item 1 of $params", "value": [1], "locations": ["$params:/0"]}])
+        json!([{"name": "item 1 of $params", "value": [1], "locations": ["$params:/0"], "outcome": "usable"}])
     );
 }

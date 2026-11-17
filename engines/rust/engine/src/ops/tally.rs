@@ -396,6 +396,7 @@ fn number_entry(text: &str, result: &Result<Number, Cause>, locations: Vec<Strin
         part: None,
         state: crate::path::Outcome::Found,
         null_at: None,
+        worked: true,
     }
 }
 
@@ -522,6 +523,7 @@ fn counted_entries(
         part: list.part.clone(),
         state: crate::path::Outcome::Found,
         null_at: None,
+        worked: true,
     }];
     entries.push(list);
     entries.extend(super::field_inputs(&counted.path, ctx));
@@ -538,8 +540,9 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             value: Value::Array(Vec::new()),
             locations: Vec::new(),
             part: None,
-            state: crate::path::Outcome::Found,
+            state: crate::path::Outcome::NotAnObject,
             null_at: None,
+            worked: false,
         };
         let whose: Vec<&Check> = counted.whose.iter().collect();
         let mut outside = walk::outside_inputs_of(&whose, &outer);
@@ -569,8 +572,12 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             value: Value::Array(Vec::new()),
             locations: Vec::new(),
             part: None,
-            state: crate::path::Outcome::Found,
+            state: match outcome {
+                crate::path::Outcome::Unusable => crate::path::Outcome::Found,
+                other => other,
+            },
             null_at: None,
+            worked: false,
         };
         let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
         return Worked {
@@ -637,8 +644,21 @@ fn walked_list(walked: &walk::Walked, path: &Path, outer: &Ctx) -> Input {
             .map(|item| item.end_location.render())
             .collect(),
         part: path::part_tag(path, outer).map(|(name, id)| Part { name, id }),
-        state: crate::path::Outcome::Found,
+        state: walked.unreadable.unwrap_or_else(|| {
+            walked
+                .failures
+                .iter()
+                .find(|f| !f.path.contains('['))
+                .map(|f| match f.cause {
+                    Cause::Absent => crate::path::Outcome::Absent,
+                    Cause::Null => crate::path::Outcome::Null,
+                    Cause::NotAnObject => crate::path::Outcome::NotAnObject,
+                    _ => crate::path::Outcome::Found,
+                })
+                .unwrap_or(crate::path::Outcome::Found)
+        }),
         null_at: None,
+        worked: false,
     }
 }
 
