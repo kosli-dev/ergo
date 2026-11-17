@@ -566,9 +566,15 @@ _releases := {"releases": [
 	{"id": "number", "files": [{"path": "docs/upgrade.md"}, {"path": 5}], "ticket": "ok"},
 ]}
 
-_applies_failures_of(rep) := {r.subject.id: object.filter(r, ["failed_items", "failed_assertions"]) | some r in rep.results; r.check == "$applies"}
+_applies_failures_of(rep) := {r.subject.id: _unlocated(object.get(r, "failures", [])) | some r in rep.results; r.check == "$applies"}
 
-_check_failures_of(rep) := {r.subject.id: object.filter(r, ["failed_items", "failed_assertions"]) | some r in rep.results; r.check == "c"}
+_check_failures_of(rep) := {r.subject.id: _unlocated(object.get(r, "failures", [])) | some r in rep.results; r.check == "c"}
+
+_unlocated_entry(e) := object.remove(e, ["locations"]) if e.kind in {"assertion", "option"}
+
+_unlocated_entry(e) := e if not e.kind in {"assertion", "option"}
+
+_unlocated(entries) := [object.union(_unlocated_entry(e), {"failures": [object.union(_unlocated_entry(f), {"failures": [_unlocated_entry(g) | some g in f.failures]}) | some f in e.failures]}) | some e in entries]
 
 _as_condition_and_as_check(sentences) := [
 	_from_report(_releases, {"release": {"from": concat(" whose ", ["releases", concat(" and whose ", sentences)]), "identified_by": "id"}}, {"c": "ticket exists"}, {}),
