@@ -38,7 +38,7 @@ _walk_flawed(check) if _param_broken(check, set())
 
 _walk_flawed(_) if _unreadable_input
 
-_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": []}], _walk_side_inputs(subj, check))), "failed": _walk_failed(state, _null_prefix_fails(check, subj), check.path)} if {
+_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": [], "ergo/outcome": _outcome_word(state)}], _walk_side_inputs(subj, check))), "failed": _walk_failed(state, _null_prefix_fails(check, subj), check.path)} if {
 	state := _walk_read_state(subj, check.path)
 	not _walk_keys(check, subj)
 }
@@ -562,7 +562,9 @@ _item_locations(f) := [f.iat] if not "ats" in object.keys(f)
 
 else := [trim_suffix(a, trim_prefix(f.at, f.iat)) | some a in f.ats]
 
-_walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}]
+_walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": [], "locations": [], "ergo/outcome": _walk_stop_state(_walk_stopped_at(w.trail).v)}] if w.walked == set()
+
+else := [{"name": _walk_name(check.path, w.walked), "value": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}]
 
 _walk_name(path, walked) := _walk_shown_name(_walk_unaliased(path, _walk_crossed(path, walked)), walked)
 

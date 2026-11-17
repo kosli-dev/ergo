@@ -9905,6 +9905,13 @@
                         "locations": [
                           "/releases/0/pull_requests/1/reviews/0"
                         ],
+                        "name": "count of pr.reviews",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/releases/0/pull_requests/1/reviews/0"
+                        ],
                         "name": "pr.reviews[]",
                         "outcome": "found",
                         "value": [
@@ -9929,15 +9936,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/releases/0/pull_requests/1/reviews/0"
-                    ],
-                    "name": "count of pr.reviews",
-                    "value": 1
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -10027,6 +10026,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of pr.reviews",
+                        "value": 0
+                      },
+                      {
+                        "locations": [],
                         "name": "pr.reviews[]",
                         "outcome": "found",
                         "value": []
@@ -10043,13 +10047,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "count of pr.reviews",
-                    "value": 0
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -10135,6 +10133,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of pr.reviews",
+                        "value": null
+                      },
+                      {
+                        "locations": [],
                         "name": "pr.reviews",
                         "outcome": "found",
                         "value": []
@@ -10149,13 +10152,7 @@
                     "value": {}
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "count of pr.reviews",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -10242,6 +10239,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of pr.reviews",
+                        "value": null
+                      },
+                      {
+                        "locations": [],
                         "name": "pr.reviews",
                         "outcome": "found",
                         "value": []
@@ -10258,13 +10260,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "count of pr.reviews",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -10342,6 +10338,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of pr.reviews",
+                        "value": null
+                      },
+                      {
+                        "locations": [],
                         "name": "pr.reviews",
                         "outcome": "found",
                         "value": []
@@ -10358,13 +10359,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "count of pr.reviews",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -16669,6 +16664,14 @@
                     "inputs": [
                       {
                         "locations": [
+                          "/vulns/0/pull_requests/1/opened",
+                          "/vulns/0/pull_requests/1/closed"
+                        ],
+                        "name": "days elapsed from pr.opened to pr.closed",
+                        "value": 3
+                      },
+                      {
+                        "locations": [
                           "/vulns/0/pull_requests/1/opened"
                         ],
                         "name": "pr.opened",
@@ -16696,16 +16699,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/vulns/0/pull_requests/1/opened",
-                      "/vulns/0/pull_requests/1/closed"
-                    ],
-                    "name": "days elapsed from pr.opened to pr.closed",
-                    "value": 3
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -16791,6 +16785,14 @@
                     "inputs": [
                       {
                         "locations": [
+                          "/vulns/0/pull_requests/0/opened",
+                          "/vulns/0/pull_requests/0"
+                        ],
+                        "name": "days elapsed from pr.opened to pr.closed",
+                        "value": null
+                      },
+                      {
+                        "locations": [
                           "/vulns/0/pull_requests/0/opened"
                         ],
                         "name": "pr.opened",
@@ -16817,16 +16819,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/vulns/0/pull_requests/0/opened",
-                      "/vulns/0/pull_requests/0"
-                    ],
-                    "name": "days elapsed from pr.opened to pr.closed",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -26557,7 +26550,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -26581,7 +26574,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -26630,7 +26623,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -26654,7 +26647,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -26790,7 +26783,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -26814,7 +26807,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -26863,7 +26856,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -26887,7 +26880,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -27023,7 +27016,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -27047,7 +27040,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -27096,7 +27089,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -27120,7 +27113,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -27256,7 +27249,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -27280,7 +27273,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -27329,7 +27322,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -27353,7 +27346,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -27505,7 +27498,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -27529,7 +27522,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -27586,7 +27579,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -27610,7 +27603,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],

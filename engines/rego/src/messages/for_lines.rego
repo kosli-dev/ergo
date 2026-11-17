@@ -898,10 +898,12 @@ else := raw
 
 _for_texts(check, subj, r, once, line) := {
 	"items": items,
-	"said": [concat("; ", _for_grouped(check, _uncovered(array.concat([m | some m in roots; i in owners[m]], object.get(frees, a, []))))) | some i, a in check.assertions],
-	"walk": array.concat(array.concat([["list", _for_list_label(check), m] | some m in line], [["list", _for_list_label(check), concat("; ", _for_grouped(check, unowned))] | unowned != []]), seconds),
+	"said": [concat("; ", array.concat(_for_flaw_said(check, i, flaw), _for_grouped(check, _uncovered(array.concat([m | some m in roots; i in owners[m]], object.get(frees, a, [])))))) | some i, a in check.assertions],
+	"walk": array.concat(array.concat([["list", _for_list_label(check), m] | flaw == []; some m in line], [["list", _for_list_label(check), concat("; ", _for_grouped(check, unowned))] | unowned != []]), seconds),
 	"free": [object.remove(l, ["msg", "own_msg"]) | some l in object.get(r, "free_lines", [])],
+	"flawed": flaw != [],
 } if {
+	flaw := _for_flaw_line(check, line)
 	said := _m_for_said(check) | _m_for_tally_said(check)
 	rs := object.get(r, "root_msgs", object.get(r, "other_roots", []))
 	second := {m | once != []; some x in _for_second_roots(check, _for_names); some m in x.ms}
@@ -914,6 +916,22 @@ _for_texts(check, subj, r, once, line) := {
 	unowned := _uncovered([m | some m in roots; -1 in owners[m]])
 	seconds := [["item", _m_lead_of(m), _m_after_lead(_m_lead_of(m), m)] | once != []; some m in rs; m in second]
 }
+
+_for_flaw_line(check, line) := line if {
+	line != []
+	_unreadable_input
+	not _m_reads_params(check.items)
+} else := []
+
+_for_flaw_said(_, _, []) := []
+
+_for_flaw_said(check, i, flaw) := flaw if {
+	flaw != []
+	_m_reads_params(check.checks[i])
+} else := flaw if {
+	flaw != []
+	not _m_reads_params(check.checks)
+} else := []
 
 _for_grouped(check, ts) := _m_tally_grouped(check, ts) if count(ts) > 3
 

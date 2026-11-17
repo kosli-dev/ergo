@@ -36,16 +36,26 @@ else := e.kind
 
 _for_row_breaks(row, t, at) := array.concat(
 	[_entry(w[0], w[1], row.cause, [], [], w[2]) | some w in t.walk],
-	[e | some k, f in row.failed_items; rec := t.items[k]; "walk" in object.keys(rec); e := _for_walk_entry(f, rec, at)],
+	[e | some k, f in row.failed_items; rec := t.items[k]; "walk" in object.keys(rec); e := _for_walk_entry(f, _tie_texts(row, t, f, rec), at)],
 )
+
+_tie_texts(row, t, f, rec) := t.items[j] if {
+	f.cause == "ambiguous"
+	rec.walk == []
+	rec.inner == []
+	j := min({j | some j, g in row.failed_items; g.cause == "ambiguous"; t.items[j].walk != []})
+} else := rec
 
 _for_assertion_entry(row, at, where, t, i, a) := _policy_entry(
 	"assertion",
 	a,
 	_worst_or_value(causes),
 	_once(array.concat(
-		[x | some [_, _, l] in lines; some x in _with_outcomes(object.get(l, "inputs", [])); not _alias_named(x.name, aliases)],
-		[x | some l in t.free; l.assertion == a; some x in _with_outcomes(_anchored_inputs(l.inputs, at))],
+		array.concat(
+			[x | some [_, _, l] in lines; some x in _with_outcomes(object.get(l, "inputs", [])); not _alias_named(x.name, aliases)],
+			[x | some l in t.free; l.assertion == a; some x in _with_outcomes(_anchored_inputs(l.inputs, at))],
+		),
+		[x | t.flawed; lines == []; some x in _with_outcomes(row.inputs); _for_sentence_read(x.name, where.check.checks[i])],
 	)),
 	items,
 	t.said[i],
@@ -70,9 +80,20 @@ _for_item_said(x) if {
 	m != ""
 }
 
+_for_sentence_read(name, c) if {
+	some p in _for_read_paths(c)
+	name == _input_name(p)
+}
+
+_for_sentence_read(name, c) if {
+	some r in _check_refs(c)
+	name == _ref_label(r)
+}
+
 _alias_named(name, aliases) if {
 	some a in aliases
-	_alias_name_start(name, a)
+	some w in split(name, " ")
+	_alias_name_start(w, a)
 }
 
 _alias_name_start(name, a) if name == a

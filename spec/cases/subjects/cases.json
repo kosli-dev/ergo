@@ -2184,7 +2184,7 @@
                   {
                     "locations": [],
                     "name": "files.path",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -2200,7 +2200,7 @@
               {
                 "locations": [],
                 "name": "files.path",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -2241,7 +2241,7 @@
                   {
                     "locations": [],
                     "name": "files.path",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -2257,7 +2257,7 @@
               {
                 "locations": [],
                 "name": "files.path",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -2298,7 +2298,7 @@
                   {
                     "locations": [],
                     "name": "files.path",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -2314,7 +2314,7 @@
               {
                 "locations": [],
                 "name": "files.path",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -2913,7 +2913,7 @@
                   {
                     "locations": [],
                     "name": "files.path",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -2929,7 +2929,7 @@
               {
                 "locations": [],
                 "name": "files.path",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -2970,7 +2970,7 @@
                   {
                     "locations": [],
                     "name": "files.path",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -2986,7 +2986,7 @@
               {
                 "locations": [],
                 "name": "files.path",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -3027,7 +3027,7 @@
                   {
                     "locations": [],
                     "name": "files.path",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -3043,7 +3043,7 @@
               {
                 "locations": [],
                 "name": "files.path",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -3523,7 +3523,7 @@
                   {
                     "locations": [],
                     "name": "files.path",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -3539,7 +3539,7 @@
               {
                 "locations": [],
                 "name": "files.path",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -3580,7 +3580,7 @@
                   {
                     "locations": [],
                     "name": "files.path",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -3596,7 +3596,7 @@
               {
                 "locations": [],
                 "name": "files.path",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -3637,7 +3637,7 @@
                   {
                     "locations": [],
                     "name": "files.path",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -3653,7 +3653,7 @@
               {
                 "locations": [],
                 "name": "files.path",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -41233,6 +41233,7 @@
                       "$params:/0"
                     ],
                     "name": "$params[0].v",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -41258,6 +41259,7 @@
                   "$params:/0"
                 ],
                 "name": "$params[0].v",
+                "outcome": "unusable",
                 "value": null
               },
               {

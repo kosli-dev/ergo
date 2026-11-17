@@ -288,7 +288,7 @@
                   {
                     "locations": [],
                     "name": "commits.signed",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -304,7 +304,7 @@
               {
                 "locations": [],
                 "name": "commits.signed",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -352,7 +352,7 @@
                   {
                     "locations": [],
                     "name": "commits.signed",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -368,7 +368,7 @@
               {
                 "locations": [],
                 "name": "commits.signed",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -416,7 +416,7 @@
                   {
                     "locations": [],
                     "name": "commits.signed",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -432,7 +432,7 @@
               {
                 "locations": [],
                 "name": "commits.signed",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -480,7 +480,7 @@
                   {
                     "locations": [],
                     "name": "commits.signed",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -496,7 +496,7 @@
               {
                 "locations": [],
                 "name": "commits.signed",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -1503,7 +1503,7 @@
                   {
                     "locations": [],
                     "name": "pull_requests.commits.signed",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -1519,7 +1519,7 @@
               {
                 "locations": [],
                 "name": "pull_requests.commits.signed",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -2625,7 +2625,7 @@
                   {
                     "locations": [],
                     "name": "pull_requests.commits.signed",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -2641,7 +2641,7 @@
               {
                 "locations": [],
                 "name": "pull_requests.commits.signed",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -2957,7 +2957,7 @@
                   {
                     "locations": [],
                     "name": "approvers.state",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -2973,7 +2973,7 @@
               {
                 "locations": [],
                 "name": "approvers.state",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -3021,7 +3021,7 @@
                   {
                     "locations": [],
                     "name": "approvers.state",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -3037,7 +3037,7 @@
               {
                 "locations": [],
                 "name": "approvers.state",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -3085,7 +3085,7 @@
                   {
                     "locations": [],
                     "name": "approvers.state",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -3101,7 +3101,7 @@
               {
                 "locations": [],
                 "name": "approvers.state",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -4353,7 +4353,7 @@
                   {
                     "locations": [],
                     "name": "approvers",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -4369,7 +4369,7 @@
               {
                 "locations": [],
                 "name": "approvers",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -4611,7 +4611,7 @@
                   {
                     "locations": [],
                     "name": "approvers",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -4627,7 +4627,7 @@
               {
                 "locations": [],
                 "name": "approvers",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -7185,7 +7185,7 @@
                   {
                     "locations": [],
                     "name": "commits.signed",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -7221,7 +7221,7 @@
               {
                 "locations": [],
                 "name": "commits.signed",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -7463,7 +7463,7 @@
                   {
                     "locations": [],
                     "name": "xs named by $params.k",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -7479,7 +7479,7 @@
               {
                 "locations": [],
                 "name": "xs named by $params.k",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -7702,7 +7702,7 @@
                   {
                     "locations": [],
                     "name": "pull_requests.commits.signed",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -7718,7 +7718,7 @@
               {
                 "locations": [],
                 "name": "pull_requests.commits.signed",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -7766,7 +7766,7 @@
                   {
                     "locations": [],
                     "name": "pull_requests.commits.signed",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -7782,7 +7782,7 @@
               {
                 "locations": [],
                 "name": "pull_requests.commits.signed",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -7838,7 +7838,7 @@
                   {
                     "locations": [],
                     "name": "x.y",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -7854,7 +7854,7 @@
               {
                 "locations": [],
                 "name": "x.y",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -8243,7 +8243,7 @@
                   {
                     "locations": [],
                     "name": "pull_requests.title",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -8259,7 +8259,7 @@
               {
                 "locations": [],
                 "name": "pull_requests.title",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -10120,7 +10120,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums"
+                        ],
+                        "name": "artifact.nums named by k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/trail/artifacts/0/prs/0/keys/1"
@@ -10131,14 +10140,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/trail/artifacts/0/nums"
-                    ],
-                    "name": "artifact.nums named by k",
-                    "outcome": "absent",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/trail/artifacts/0/prs/0/rows/0/n",
@@ -10262,7 +10263,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums"
+                        ],
+                        "name": "artifact.nums named by k",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/trail/artifacts/0/prs/0/keys/1"
@@ -10273,14 +10283,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/trail/artifacts/0/nums"
-                    ],
-                    "name": "artifact.nums named by k",
-                    "outcome": "null",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/trail/artifacts/0/prs/0/rows/0/n",
@@ -10403,7 +10405,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums/k1"
+                        ],
+                        "name": "artifact.nums named by k",
+                        "outcome": "found",
+                        "value": "a"
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/trail/artifacts/0/prs/0/keys/0"
@@ -10414,14 +10425,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/trail/artifacts/0/nums/k1"
-                    ],
-                    "name": "artifact.nums named by k",
-                    "outcome": "found",
-                    "value": "a"
-                  },
                   {
                     "locations": [
                       "/trail/artifacts/0/prs/0/rows/0/n",

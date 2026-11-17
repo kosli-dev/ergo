@@ -2288,6 +2288,7 @@
                       "/sbom/components"
                     ],
                     "name": "$input.sbom.components.name",
+                    "outcome": "null",
                     "value": null
                   }
                 ],
@@ -2313,6 +2314,7 @@
                   "/sbom/components"
                 ],
                 "name": "$input.sbom.components.name",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -2345,6 +2347,7 @@
                       "/sbom/components"
                     ],
                     "name": "$input.sbom.components.name",
+                    "outcome": "null",
                     "value": null
                   }
                 ],
@@ -2370,6 +2373,7 @@
                   "/sbom/components"
                 ],
                 "name": "$input.sbom.components.name",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -2409,6 +2413,7 @@
                       "/sbom/components"
                     ],
                     "name": "$input.sbom.components.name",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -2434,6 +2439,7 @@
                   "/sbom/components"
                 ],
                 "name": "$input.sbom.components.name",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -2466,6 +2472,7 @@
                       "/sbom/components"
                     ],
                     "name": "$input.sbom.components.name",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -2491,6 +2498,7 @@
                   "/sbom/components"
                 ],
                 "name": "$input.sbom.components.name",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -3709,6 +3717,7 @@
                       ""
                     ],
                     "name": "$input.k",
+                    "outcome": "not_an_object",
                     "value": null
                   }
                 ],
@@ -3738,6 +3747,7 @@
                   ""
                 ],
                 "name": "$input.k",
+                "outcome": "not_an_object",
                 "value": null
               }
             ],
@@ -3907,6 +3917,7 @@
                       ""
                     ],
                     "name": "$input.k",
+                    "outcome": "not_an_object",
                     "value": null
                   }
                 ],
@@ -3936,6 +3947,7 @@
                   ""
                 ],
                 "name": "$input.k",
+                "outcome": "not_an_object",
                 "value": null
               }
             ],
@@ -4239,6 +4251,7 @@
                       ""
                     ],
                     "name": "$input.k",
+                    "outcome": "not_an_object",
                     "value": null
                   }
                 ],
@@ -4268,6 +4281,7 @@
                   ""
                 ],
                 "name": "$input.k",
+                "outcome": "not_an_object",
                 "value": null
               }
             ],
@@ -4398,6 +4412,7 @@
                       ""
                     ],
                     "name": "$input.k",
+                    "outcome": "not_an_object",
                     "value": null
                   }
                 ],
@@ -4427,6 +4442,7 @@
                   ""
                 ],
                 "name": "$input.k",
+                "outcome": "not_an_object",
                 "value": null
               }
             ],
@@ -4777,6 +4793,7 @@
                       ""
                     ],
                     "name": "$input.k",
+                    "outcome": "not_an_object",
                     "value": null
                   }
                 ],
@@ -4806,6 +4823,7 @@
                   ""
                 ],
                 "name": "$input.k",
+                "outcome": "not_an_object",
                 "value": null
               }
             ],
@@ -5051,6 +5069,7 @@
                       ""
                     ],
                     "name": "$input.k",
+                    "outcome": "not_an_object",
                     "value": null
                   }
                 ],
@@ -5080,6 +5099,7 @@
                   ""
                 ],
                 "name": "$input.k",
+                "outcome": "not_an_object",
                 "value": null
               }
             ],
@@ -5422,6 +5442,7 @@
                       ""
                     ],
                     "name": "$input.k",
+                    "outcome": "not_an_object",
                     "value": null
                   }
                 ],
@@ -5451,6 +5472,7 @@
                   ""
                 ],
                 "name": "$input.k",
+                "outcome": "not_an_object",
                 "value": null
               }
             ],
@@ -5696,6 +5718,7 @@
                       ""
                     ],
                     "name": "$input.k",
+                    "outcome": "not_an_object",
                     "value": null
                   }
                 ],
@@ -5725,6 +5748,7 @@
                   ""
                 ],
                 "name": "$input.k",
+                "outcome": "not_an_object",
                 "value": null
               }
             ],
@@ -7019,6 +7043,7 @@
                       "/names"
                     ],
                     "name": "$input.names.n",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -7046,6 +7071,7 @@
                   "/names"
                 ],
                 "name": "$input.names.n",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -7110,6 +7136,7 @@
                       "/names"
                     ],
                     "name": "$input.names.n",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -7137,6 +7164,7 @@
                   "/names"
                 ],
                 "name": "$input.names.n",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -7474,6 +7502,7 @@
                       "/names"
                     ],
                     "name": "$input.names.n",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -7501,6 +7530,7 @@
                   "/names"
                 ],
                 "name": "$input.names.n",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -7602,6 +7632,7 @@
                       "/names"
                     ],
                     "name": "$input.names.n",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -7629,6 +7660,7 @@
                   "/names"
                 ],
                 "name": "$input.names.n",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -7936,6 +7968,7 @@
                       "/names"
                     ],
                     "name": "$input.names.n",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -7963,6 +7996,7 @@
                   "/names"
                 ],
                 "name": "$input.names.n",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -8064,6 +8098,7 @@
                       "/names"
                     ],
                     "name": "$input.names.n",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -8091,6 +8126,7 @@
                   "/names"
                 ],
                 "name": "$input.names.n",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -13416,6 +13452,7 @@
                       "$params:/0"
                     ],
                     "name": "$params[0].v",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -13441,6 +13478,7 @@
                   "$params:/0"
                 ],
                 "name": "$params[0].v",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -14102,6 +14140,7 @@
                       "$params:"
                     ],
                     "name": "$params.l",
+                    "outcome": "absent",
                     "value": null
                   }
                 ],
@@ -14127,6 +14166,7 @@
                   "$params:"
                 ],
                 "name": "$params.l",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -14159,6 +14199,7 @@
                       "$params:"
                     ],
                     "name": "$params.l",
+                    "outcome": "absent",
                     "value": null
                   }
                 ],
@@ -14184,6 +14225,7 @@
                   "$params:"
                 ],
                 "name": "$params.l",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -14230,6 +14272,7 @@
                       "$params:/l"
                     ],
                     "name": "$params.l",
+                    "outcome": "null",
                     "value": null
                   }
                 ],
@@ -14255,6 +14298,7 @@
                   "$params:/l"
                 ],
                 "name": "$params.l",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -14287,6 +14331,7 @@
                       "$params:/l"
                     ],
                     "name": "$params.l",
+                    "outcome": "null",
                     "value": null
                   }
                 ],
@@ -14312,6 +14357,7 @@
                   "$params:/l"
                 ],
                 "name": "$params.l",
+                "outcome": "null",
                 "value": null
               }
             ],
@@ -14591,6 +14637,7 @@
                       ""
                     ],
                     "name": "$input.l",
+                    "outcome": "absent",
                     "value": null
                   }
                 ],
@@ -14616,6 +14663,7 @@
                   ""
                 ],
                 "name": "$input.l",
+                "outcome": "absent",
                 "value": null
               }
             ],

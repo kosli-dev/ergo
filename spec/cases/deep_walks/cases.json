@@ -1594,6 +1594,14 @@
                           "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/0",
                           "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/1"
                         ],
+                        "name": "count of z.k1.k2.k3.k4.k5.k6.k7.k8.k9",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/0",
+                          "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/1"
+                        ],
                         "name": "z.k1.k2.k3.k4.k5.k6.k7.k8.k9[]",
                         "outcome": "found",
                         "value": [
@@ -1632,16 +1640,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/0",
-                      "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/1"
-                    ],
-                    "name": "count of z.k1.k2.k3.k4.k5.k6.k7.k8.k9",
-                    "value": 2
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"

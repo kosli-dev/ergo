@@ -12165,6 +12165,14 @@
                           "/fams/0/kids/0/gs/0/xs/0",
                           "/fams/0/kids/0/gs/0/xs/1"
                         ],
+                        "name": "count of g.xs that equals count of g.z",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/fams/0/kids/0/gs/0/xs/0",
+                          "/fams/0/kids/0/gs/0/xs/1"
+                        ],
                         "name": "g.xs[]",
                         "outcome": "found",
                         "value": [
@@ -12195,16 +12203,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/fams/0/kids/0/gs/0/xs/0",
-                      "/fams/0/kids/0/gs/0/xs/1"
-                    ],
-                    "name": "count of g.xs that equals count of g.z",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/f/assert"

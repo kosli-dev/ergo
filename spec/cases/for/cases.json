@@ -491,7 +491,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -550,7 +550,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -609,7 +609,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -730,7 +730,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -788,7 +788,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -850,7 +850,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -1253,7 +1253,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -7371,7 +7371,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/shas/security"
+                        ],
+                        "name": "shas named by persona",
+                        "outcome": "found",
+                        "value": "x"
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/1/dispatched/0"
@@ -7383,7 +7392,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/shas"
+                        ],
+                        "name": "shas named by persona",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/1/dispatched/1"
@@ -7395,7 +7413,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/shas"
+                        ],
+                        "name": "shas named by persona",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/1/dispatched/2"
@@ -7405,32 +7432,7 @@
                     "value": 5
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/1/shas/security"
-                    ],
-                    "name": "shas named by persona",
-                    "outcome": "found",
-                    "value": "x"
-                  },
-                  {
-                    "locations": [
-                      "/things/1/shas"
-                    ],
-                    "name": "shas named by persona",
-                    "outcome": "absent",
-                    "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/1/shas"
-                    ],
-                    "name": "shas named by persona",
-                    "outcome": "unusable",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -7761,6 +7763,18 @@
                 ],
                 "message": "item 1 and item 2 of commits tie on timestamp",
                 "name": "item 1 of commits",
+                "value": 2
+              },
+              {
+                "cause": "ambiguous",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
+                "locations": [
+                  "/pull_requests/0/commits/1/timestamp"
+                ],
+                "message": "item 1 and item 2 of commits tie on timestamp",
+                "name": "item 2 of commits",
                 "value": 2
               }
             ],
@@ -8850,6 +8864,18 @@
                 ],
                 "message": "item 1 and item 2 of owners tie on name",
                 "name": "item 1 of owners",
+                "value": "Zoe"
+              },
+              {
+                "cause": "ambiguous",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
+                "locations": [
+                  "/teams/0/owners/1/name"
+                ],
+                "message": "item 1 and item 2 of owners tie on name",
+                "name": "item 2 of owners",
                 "value": "Zoe"
               }
             ],
@@ -10102,7 +10128,7 @@
                       {
                         "locations": [],
                         "name": "c.files",
-                        "outcome": "found",
+                        "outcome": "null",
                         "value": []
                       }
                     ],
@@ -10277,7 +10303,19 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/batches/1/k1"
+                        ],
+                        "name": "b named by key",
+                        "outcome": "found",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/batches/1"
@@ -10293,17 +10331,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/releases/0/batches/1/k1"
-                    ],
-                    "name": "b named by key",
-                    "outcome": "found",
-                    "value": [
-                      1,
-                      2
-                    ]
-                  },
                   {
                     "locations": [
                       "/releases/0/key"
@@ -10418,7 +10445,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/batches/1"
+                        ],
+                        "name": "item 1 of b",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/releases/0/batches/1"
@@ -10428,16 +10464,7 @@
                     "value": []
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/releases/0/batches/1"
-                    ],
-                    "name": "item 1 of b",
-                    "outcome": "absent",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -18377,6 +18404,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of commit.files",
+                        "value": 0
+                      },
+                      {
+                        "locations": [],
                         "name": "commit.files[]",
                         "outcome": "found",
                         "value": []
@@ -18394,13 +18426,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "count of commit.files",
-                    "value": 0
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/files/assert"
@@ -19156,6 +19182,14 @@
                           "/items/0/batches/0/0",
                           "/items/0/batches/0/1"
                         ],
+                        "name": "count of b",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/items/0/batches/0/0",
+                          "/items/0/batches/0/1"
+                        ],
                         "name": "b[]",
                         "outcome": "found",
                         "value": [
@@ -19181,6 +19215,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of b",
+                        "value": 0
+                      },
+                      {
+                        "locations": [],
                         "name": "b[]",
                         "outcome": "found",
                         "value": []
@@ -19195,21 +19234,7 @@
                     "value": []
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/items/0/batches/0/0",
-                      "/items/0/batches/0/1"
-                    ],
-                    "name": "count of b",
-                    "value": 2
-                  },
-                  {
-                    "locations": [],
-                    "name": "count of b",
-                    "value": 0
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -19266,7 +19291,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/items/0/m/0/q"
+                        ],
+                        "name": "item 3 of x.q",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/items/0/m/0"
@@ -19282,16 +19316,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/items/0/m/0/q"
-                    ],
-                    "name": "item 3 of x.q",
-                    "outcome": "absent",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -19399,11 +19424,25 @@
                         "locations": [
                           "/items/0/commits/0/files/0"
                         ],
+                        "name": "count of c.files",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/items/0/commits/0/files/0"
+                        ],
                         "name": "c.files[]",
                         "outcome": "found",
                         "value": [
                           "a"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/items/0/commits/0/files/0"
+                        ],
+                        "name": "count of c.files plus 1",
+                        "value": 2
                       }
                     ],
                     "kind": "item",
@@ -19420,22 +19459,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/items/0/commits/0/files/0"
-                    ],
-                    "name": "count of c.files",
-                    "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/items/0/commits/0/files/0"
-                    ],
-                    "name": "count of c.files plus 1",
-                    "value": 2
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert/1"
@@ -27123,7 +27147,7 @@
                           {
                             "locations": [],
                             "name": "y.w",
-                            "outcome": "found",
+                            "outcome": "unusable",
                             "value": []
                           },
                           {
@@ -31363,14 +31387,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/things/0/ws/0"
-                    ],
-                    "name": "w named by zz",
-                    "outcome": "absent",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/things/0"
                     ],
                     "name": "zz",
@@ -31443,14 +31459,6 @@
                 "cause": "null",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/ws/0"
-                    ],
-                    "name": "w named by zz",
-                    "outcome": "null",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/things/0/zz"
@@ -31527,14 +31535,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/things/0/ws/0"
-                    ],
-                    "name": "w named by zz",
-                    "outcome": "unusable",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/things/0/zz"
                     ],
                     "name": "zz",
@@ -31609,14 +31609,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/ws/0"
-                    ],
-                    "name": "w named by zz",
-                    "outcome": "unusable",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/things/0/zz"
@@ -31850,6 +31842,18 @@
                 ],
                 "message": "item 1 and item 2 of ws tie on w",
                 "name": "item 1 of ws",
+                "value": 1
+              },
+              {
+                "cause": "ambiguous",
+                "failures": [],
+                "inputs": [],
+                "kind": "item",
+                "locations": [
+                  "/things/0/ws/1/w"
+                ],
+                "message": "item 1 and item 2 of ws tie on w",
+                "name": "item 2 of ws",
                 "value": 1
               }
             ],
@@ -36665,6 +36669,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -36690,6 +36695,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -36736,6 +36742,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -36761,6 +36768,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -36807,6 +36815,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -36832,6 +36841,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -36878,6 +36888,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -36903,6 +36914,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -36949,6 +36961,7 @@
                       "$params:"
                     ],
                     "name": "$params.a",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -36974,6 +36987,7 @@
                   "$params:"
                 ],
                 "name": "$params.a",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -37020,6 +37034,7 @@
                       "$params:"
                     ],
                     "name": "$params[0].a",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -37045,6 +37060,7 @@
                   "$params:"
                 ],
                 "name": "$params[0].a",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -37091,6 +37107,7 @@
                       "$params:"
                     ],
                     "name": "$params[0].a",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -37116,6 +37133,7 @@
                   "$params:"
                 ],
                 "name": "$params[0].a",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -37162,6 +37180,7 @@
                       "$params:"
                     ],
                     "name": "$params[0].a",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -37187,6 +37206,7 @@
                   "$params:"
                 ],
                 "name": "$params[0].a",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -37233,6 +37253,7 @@
                       "$params:"
                     ],
                     "name": "$params[0].a",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -37258,6 +37279,7 @@
                   "$params:"
                 ],
                 "name": "$params[0].a",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -37304,6 +37326,7 @@
                       "$params:"
                     ],
                     "name": "$params[0].a",
+                    "outcome": "absent",
                     "value": null
                   }
                 ],
@@ -37329,6 +37352,7 @@
                   "$params:"
                 ],
                 "name": "$params[0].a",
+                "outcome": "absent",
                 "value": null
               }
             ],
@@ -37680,7 +37704,7 @@
                   {
                     "locations": [],
                     "name": "$params.a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -37696,7 +37720,7 @@
               {
                 "locations": [],
                 "name": "$params.a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -37733,7 +37757,7 @@
                   {
                     "locations": [],
                     "name": "$params.a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -37749,7 +37773,7 @@
               {
                 "locations": [],
                 "name": "$params.a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -37786,7 +37810,7 @@
                   {
                     "locations": [],
                     "name": "$params.a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -37802,7 +37826,7 @@
               {
                 "locations": [],
                 "name": "$params.a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -37839,7 +37863,7 @@
                   {
                     "locations": [],
                     "name": "$params.a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -37855,7 +37879,7 @@
               {
                 "locations": [],
                 "name": "$params.a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -38166,7 +38190,7 @@
                   {
                     "locations": [],
                     "name": "$params.a",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -38182,7 +38206,7 @@
               {
                 "locations": [],
                 "name": "$params.a",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -38237,7 +38261,7 @@
                   {
                     "locations": [],
                     "name": "$params[0].a",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -38253,7 +38277,7 @@
               {
                 "locations": [],
                 "name": "$params[0].a",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -38416,7 +38440,7 @@
                   {
                     "locations": [],
                     "name": "$params[0].a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -38432,7 +38456,7 @@
               {
                 "locations": [],
                 "name": "$params[0].a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -38469,7 +38493,7 @@
                   {
                     "locations": [],
                     "name": "$params[0].a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -38485,7 +38509,7 @@
               {
                 "locations": [],
                 "name": "$params[0].a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -38522,7 +38546,7 @@
                   {
                     "locations": [],
                     "name": "$params[0].a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -38538,7 +38562,7 @@
               {
                 "locations": [],
                 "name": "$params[0].a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -38575,7 +38599,7 @@
                   {
                     "locations": [],
                     "name": "$params[0].a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -38591,7 +38615,7 @@
               {
                 "locations": [],
                 "name": "$params[0].a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -38628,7 +38652,7 @@
                   {
                     "locations": [],
                     "name": "$params[0].a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -38644,7 +38668,7 @@
               {
                 "locations": [],
                 "name": "$params[0].a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -38681,7 +38705,7 @@
                   {
                     "locations": [],
                     "name": "$params[0]",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -38697,7 +38721,7 @@
               {
                 "locations": [],
                 "name": "$params[0]",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -39035,7 +39059,7 @@
               {
                 "locations": [],
                 "name": "$params",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -39078,7 +39102,7 @@
               {
                 "locations": [],
                 "name": "$params.v",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -39111,10 +39135,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
-                "kind": "list",
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.v",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c/assert"
+                ],
                 "message": "$params is 3, which isn't an object",
-                "name": "ws"
+                "name": "w is in $params.v"
               }
             ],
             "inputs": [
@@ -39123,6 +39159,7 @@
                   "$params:"
                 ],
                 "name": "$params.v",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -39301,6 +39338,7 @@
                       "$params:"
                     ],
                     "name": "$params.v",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -39326,6 +39364,7 @@
                   "$params:"
                 ],
                 "name": "$params.v",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -39372,6 +39411,7 @@
                       "$params:/0"
                     ],
                     "name": "$params[0].v",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -39397,6 +39437,7 @@
                   "$params:/0"
                 ],
                 "name": "$params[0].v",
+                "outcome": "unusable",
                 "value": null
               }
             ],
@@ -53289,6 +53330,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of k",
+                        "value": null
+                      },
+                      {
+                        "locations": [],
                         "name": "k",
                         "outcome": "found",
                         "value": []
@@ -53305,13 +53351,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "count of k",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_k/assert"
@@ -53478,6 +53518,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of k",
+                        "value": null
+                      },
+                      {
+                        "locations": [],
                         "name": "k",
                         "outcome": "found",
                         "value": []
@@ -53494,13 +53539,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "count of k",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_k/assert"
@@ -54799,7 +54838,24 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/artifacts/0/prs/0/rows/0",
+                          "/artifacts/0/prs/0/rows/1"
+                        ],
+                        "name": "count of rows whose n equals artifact.nums named by k",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/artifacts/0/nums"
+                        ],
+                        "name": "artifact.nums named by k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/artifacts/0/prs/0/ks/1"
@@ -54815,14 +54871,6 @@
                       "/artifacts/0/prs/0/rows/0",
                       "/artifacts/0/prs/0/rows/1"
                     ],
-                    "name": "count of rows whose n equals artifact.nums named by k",
-                    "value": null
-                  },
-                  {
-                    "locations": [
-                      "/artifacts/0/prs/0/rows/0",
-                      "/artifacts/0/prs/0/rows/1"
-                    ],
                     "name": "rows[]",
                     "outcome": "found",
                     "value": [
@@ -54833,14 +54881,6 @@
                         "n": 2
                       }
                     ]
-                  },
-                  {
-                    "locations": [
-                      "/artifacts/0/nums"
-                    ],
-                    "name": "artifact.nums named by k",
-                    "outcome": "absent",
-                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -55523,10 +55563,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
-                "kind": "list",
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/in_q/assert"
+                ],
                 "message": "$params is 3, which isn't an object",
-                "name": "xs"
+                "name": "m.v is in $params.q"
               }
             ],
             "inputs": [
@@ -55535,6 +55587,7 @@
                   "$params:"
                 ],
                 "name": "$params.q",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -55569,10 +55622,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
-                "kind": "list",
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/least_q/assert"
+                ],
                 "message": "$params is 3, which isn't an object",
-                "name": "xs"
+                "name": "m.v is at least $params.q"
               }
             ],
             "inputs": [
@@ -56051,7 +56116,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -56108,7 +56173,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -57150,7 +57215,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params.q named by m.k",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/prs/0/xs/0"
@@ -57162,16 +57236,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "$params:"
-                    ],
-                    "name": "$params.q named by m.k",
-                    "outcome": "unusable",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/field/assert"
@@ -57279,7 +57344,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params named by m.k",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/prs/0/xs/0"
@@ -57291,16 +57365,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "$params:"
-                    ],
-                    "name": "$params named by m.k",
-                    "outcome": "unusable",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/whole/assert"
@@ -58720,10 +58785,22 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
-                "kind": "list",
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/c/assert"
+                ],
                 "message": "$params is 3, which isn't an object",
-                "name": "xs"
+                "name": "m.v is at least $params.n"
               }
             ],
             "inputs": [
@@ -60720,6 +60797,13 @@
                         "locations": [
                           "/prs/0/xs/0/ys/0"
                         ],
+                        "name": "count of m.ys whose v is in pl.z",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
                         "name": "m.ys[]",
                         "outcome": "found",
                         "value": [
@@ -60746,13 +60830,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/prs/0/xs/0/ys/0"
-                    ],
-                    "name": "count of m.ys whose v is in pl.z",
-                    "value": 1
-                  },
                   {
                     "locations": [
                       "/prs/0/c/0/z"
@@ -61062,13 +61139,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/prs/0/xs/0/ys/0"
-                    ],
-                    "name": "count of m.ys whose v is in pl.z",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/prs/0/c"
                     ],
                     "name": "pl.z",
@@ -61243,13 +61313,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/prs/0/xs/0/ys/0"
-                    ],
-                    "name": "count of m.ys whose v is in pl.z",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/prs/0/c"
@@ -61437,6 +61500,13 @@
                         "locations": [
                           "/prs/0/xs/0/ys/0"
                         ],
+                        "name": "count of m.ys whose v is in pl.z",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
                         "name": "m.ys[]",
                         "outcome": "found",
                         "value": [
@@ -61463,13 +61533,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/prs/0/xs/0/ys/0"
-                    ],
-                    "name": "count of m.ys whose v is in pl.z",
-                    "value": 1
-                  },
                   {
                     "locations": [
                       "/prs/0/c/z"
@@ -61644,13 +61707,6 @@
                 "cause": "absent",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/prs/0/xs/0/ys/0"
-                    ],
-                    "name": "count of m.ys whose v is in pl.z",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/prs/0"
@@ -63213,14 +63269,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/cs/0/ms/0/ws/0",
-                      "/cs/0/ms/0/ws/1"
-                    ],
-                    "name": "count of m.ws whose v is in pos.name",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1/name"
                     ],
@@ -63572,14 +63620,6 @@
                 "cause": "absent",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/cs/0/ms/0/ws/0",
-                      "/cs/0/ms/0/ws/1"
-                    ],
-                    "name": "count of m.ws whose v is in pos.name",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/cs/0/os/0/name",
@@ -63935,14 +63975,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/cs/0/ms/0/ws/0",
-                      "/cs/0/ms/0/ws/1"
-                    ],
-                    "name": "count of m.ws whose v is in pos.name",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1/name"
                     ],
@@ -64296,14 +64328,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/cs/0/ms/0/ws/0",
-                      "/cs/0/ms/0/ws/1"
-                    ],
-                    "name": "count of m.ws whose v is in pos.name",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0",
                       "/cs/0/os/1"
                     ],
@@ -64655,14 +64679,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/cs/0/ms/0/ws/0",
-                      "/cs/0/ms/0/ws/1"
-                    ],
-                    "name": "count of m.ws whose v is in pos.name",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/cs/0/os"
@@ -66500,13 +66516,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/cs/0/ms/0/ws/0"
-                    ],
-                    "name": "count of m.ws whose n equals count of pos.name",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1",
                       "/cs/0/os/2",
@@ -66997,13 +67006,6 @@
                 "cause": "absent",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/cs/0/ms/0/ws/0"
-                    ],
-                    "name": "count of m.ws whose n equals count of pos.name",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/cs/0/os/0/name",
@@ -67550,13 +67552,6 @@
                 "cause": "absent",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/cs/0/ms/0/ws/0"
-                    ],
-                    "name": "count of m.ws whose n equals count of pos.name",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/cs/0/os/0/name",
@@ -69796,6 +69791,7 @@
                   "/os"
                 ],
                 "name": "$input.os.name",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -69949,6 +69945,7 @@
                   "/os"
                 ],
                 "name": "$input.os.name",
+                "outcome": "unusable",
                 "value": null
               },
               {
@@ -72017,13 +72014,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/teams/0/0/rows/0/ws/0"
-                    ],
-                    "name": "count of r.ws whose x is in pl.z",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/teams/0/0/c/z",
                       "/teams/0/1"
                     ],
@@ -72033,13 +72023,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [
-                      "/teams/0/1/rows/0/ws/0"
-                    ],
-                    "name": "count of r.ws whose x is in pl.z",
-                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -72143,13 +72126,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/teams/0/0/rows/0/ws/0"
-                    ],
-                    "name": "count of r.ws whose x is in pl.z",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/teams/0/0/c/z",
                       "/teams/0/1/c/z"
                     ],
@@ -72159,13 +72135,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [
-                      "/teams/0/1/rows/0/ws/0"
-                    ],
-                    "name": "count of r.ws whose x is in pl.z",
-                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -72272,13 +72241,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/teams/0/0/rows/0/ws/0"
-                    ],
-                    "name": "count of r.ws whose x is in pl.z",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/teams/0/0/c/z",
                       "/teams/0/1/c"
                     ],
@@ -72288,13 +72250,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [
-                      "/teams/0/1/rows/0/ws/0"
-                    ],
-                    "name": "count of r.ws whose x is in pl.z",
-                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -73865,14 +73820,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/teams/0/0/ms/0/ws/0",
-                      "/teams/0/0/ms/0/ws/1"
-                    ],
-                    "name": "count of m.ws whose n equals count of pl.k",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/teams/0/0/c/0",
                       "/teams/0/0/c/1",
                       "/teams/0/1/c/0",
@@ -73886,14 +73833,6 @@
                       null,
                       null
                     ]
-                  },
-                  {
-                    "locations": [
-                      "/teams/0/1/ms/0/ws/0",
-                      "/teams/0/1/ms/0/ws/1"
-                    ],
-                    "name": "count of m.ws whose n equals count of pl.k",
-                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -74119,13 +74058,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/rels/0/kids/0/rows/0/ws/0"
-                    ],
-                    "name": "count of r.ws whose x is in rel.os.name",
-                    "value": null
-                  },
-                  {
-                    "locations": [
                       "/rels/0"
                     ],
                     "name": "rel.os.name",
@@ -74220,13 +74152,6 @@
                 "cause": "null",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/rels/0/kids/0/rows/0/ws/0"
-                    ],
-                    "name": "count of r.ws whose x is in rel.os.name",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/rels/0/os"
@@ -74324,13 +74249,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/rels/0/kids/0/rows/0/ws/0"
-                    ],
-                    "name": "count of r.ws whose x is in rel.os.name",
-                    "value": null
-                  },
                   {
                     "locations": [
                       "/rels/0/os"
@@ -80229,6 +80147,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of approver.subs",
+                        "value": null
+                      },
+                      {
+                        "locations": [],
                         "name": "approver.subs",
                         "outcome": "found",
                         "value": []
@@ -80248,6 +80171,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of approver.subs",
+                        "value": null
+                      },
+                      {
+                        "locations": [],
                         "name": "approver.subs",
                         "outcome": "found",
                         "value": []
@@ -80262,13 +80190,7 @@
                     "value": 3
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "count of approver.subs",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/count_subs/assert"
@@ -80704,6 +80626,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of approver.subs",
+                        "value": null
+                      },
+                      {
+                        "locations": [],
                         "name": "approver.subs",
                         "outcome": "found",
                         "value": []
@@ -80727,6 +80654,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of approver.subs",
+                        "value": null
+                      },
+                      {
+                        "locations": [],
                         "name": "approver.subs",
                         "outcome": "found",
                         "value": []
@@ -80744,13 +80676,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "count of approver.subs",
-                    "value": null
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/count_subs/assert"
@@ -83440,7 +83366,7 @@
               {
                 "locations": [],
                 "name": "approvers",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -83484,7 +83410,7 @@
               {
                 "locations": [],
                 "name": "approvers",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -83528,7 +83454,7 @@
               {
                 "locations": [],
                 "name": "approvers",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -83572,7 +83498,7 @@
               {
                 "locations": [],
                 "name": "approvers",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -83630,7 +83556,7 @@
               {
                 "locations": [],
                 "name": "approvers",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -83668,7 +83594,7 @@
               {
                 "locations": [],
                 "name": "approvers",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -83712,7 +83638,7 @@
               {
                 "locations": [],
                 "name": "approvers",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -83756,7 +83682,7 @@
               {
                 "locations": [],
                 "name": "approvers",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -83869,6 +83795,11 @@
                     "inputs": [
                       {
                         "locations": [],
+                        "name": "count of approver.subs",
+                        "value": 0
+                      },
+                      {
+                        "locations": [],
                         "name": "approver.subs[]",
                         "outcome": "found",
                         "value": []
@@ -83887,13 +83818,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "count of approver.subs",
-                    "value": 0
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/count_subs/assert"
@@ -86367,7 +86292,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -86418,7 +86343,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -86469,7 +86394,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -86528,7 +86453,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -86572,7 +86497,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -86631,7 +86556,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -86682,7 +86607,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -86733,7 +86658,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -86819,7 +86744,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -86870,7 +86795,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -86921,7 +86846,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -86980,7 +86905,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -87024,7 +86949,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -87083,7 +87008,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -87134,7 +87059,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -87185,7 +87110,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -87271,7 +87196,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -87322,7 +87247,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -87373,7 +87298,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -87432,7 +87357,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -87476,7 +87401,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -87535,7 +87460,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -87586,7 +87511,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -87637,7 +87562,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -89527,7 +89452,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -89565,7 +89490,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -89611,7 +89536,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -89667,7 +89592,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -89713,7 +89638,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -89759,7 +89684,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -89830,7 +89755,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -89868,7 +89793,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -89914,7 +89839,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -89970,7 +89895,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -90016,7 +89941,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -90062,7 +89987,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {
@@ -90133,7 +90058,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -90171,7 +90096,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -90217,7 +90142,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -90273,7 +90198,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -90319,7 +90244,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -90365,7 +90290,7 @@
               {
                 "locations": [],
                 "name": "commits",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -94922,7 +94847,7 @@
                   {
                     "locations": [],
                     "name": "$params.z",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -94976,7 +94901,7 @@
                   {
                     "locations": [],
                     "name": "$params.n",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -95030,7 +94955,7 @@
                   {
                     "locations": [],
                     "name": "$params.w",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -95084,7 +95009,7 @@
                   {
                     "locations": [],
                     "name": "$params.n",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -95138,7 +95063,7 @@
                   {
                     "locations": [],
                     "name": "$params.l",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],

@@ -467,7 +467,9 @@ else := _walk_worst(fails) if {
 	fails != []
 }
 
-_for_list_input(item, w) := [_walk_name(item.path, w.walked), [_walk_value(e.v, e, w) | some e in w.items], _walk_locations(w)]
+_for_list_input(item, w) := [_walk_name(item.path, w.walked), [], [], _walk_stop_state(_walk_stopped_at(w.trail).v)] if w.walked == set()
+
+else := [_walk_name(item.path, w.walked), [_walk_value(e.v, e, w) | some e in w.items], _walk_locations(w)]
 
 _for_sort_key(item, x, names) := _for_sortable_exact(_for_sortable(v, object.get(item.pick, "alphabetically", false)), [json.marshal(v) | is_number(v)]) if {
 	"by" in object.keys(item.pick)
