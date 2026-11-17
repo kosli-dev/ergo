@@ -1289,9 +1289,9 @@ test_a_failed_line_lists_a_value_it_reads_twice_once_for_each_pair_of_items if {
 	things := [{"id": 1, "commits": [{"ts": 5}], "ap": [{"ts": 9}, {"ts": 1}]}]
 	check := {"for": "every commits as c, every ap as ap", "assert": "c.ts is at least c.ts plus ap.ts"}
 	rows := _for_rows_full(check, things, {})
-	[x.inputs | some x in rows[0][2][0].failed_assertions[0].items] == [
-		[{"name": "c.ts", "value": 5, "locations": ["/things/0/commits/0/ts"]}, {"name": "c.ts plus ap.ts", "value": 14, "locations": ["/things/0/commits/0/ts", "/things/0/ap/0/ts"]}, {"name": "ap.ts", "value": 9, "locations": ["/things/0/ap/0/ts"]}],
-		[{"name": "c.ts", "value": 5, "locations": ["/things/0/commits/0/ts"]}, {"name": "c.ts plus ap.ts", "value": 6, "locations": ["/things/0/commits/0/ts", "/things/0/ap/1/ts"]}, {"name": "ap.ts", "value": 1, "locations": ["/things/0/ap/1/ts"]}],
+	[x.inputs | some x in rows[0][2][0].failures[0].failures] == [
+		[_seen("c.ts", 5, ["/things/0/commits/0/ts"], "found"), _in("c.ts plus ap.ts", 14, ["/things/0/commits/0/ts", "/things/0/ap/0/ts"]), _seen("ap.ts", 9, ["/things/0/ap/0/ts"], "found")],
+		[_seen("c.ts", 5, ["/things/0/commits/0/ts"], "found"), _in("c.ts plus ap.ts", 6, ["/things/0/commits/0/ts", "/things/0/ap/1/ts"]), _seen("ap.ts", 1, ["/things/0/ap/1/ts"], "found")],
 	]
 }
 

@@ -108,7 +108,7 @@ test_a_for_list_whose_named_by_cant_be_read_fails_with_its_cause_as_a_walk_does 
 	_for_rows(check, [{"id": 1, "m": {"a": [1]}}], {}) == [[1, "absent", [_assertion("x is 1", "absent", ["$policy:/requirements/s/checks/c/assert"], [_seen("$params.k", null, ["$params:"], "absent")], "$params.k is missing", [])], [_seen("m named by $params.k", [], [], "absent")]]]
 	_for_rows(check, [{"id": 1, "m": {"a": [1]}}], {"k": "a"}) == [[1, "satisfied", [], [{"name": "m named by $params.k[]", "value": [1], "locations": ["/things/0/m/a/0"]}]]]
 	inner := {"for": "every xs as x, every m named by $params.k as y", "assert": "y is 1"}
-	_for_rows(inner, [{"id": 1, "xs": [1], "m": {"a": [1]}}], {}) == [[1, "absent", [_list("m named by $params.k", "absent", [_seen("m named by $params.k", null, ["/things/0/m"], "absent")], "m named by $params.k is missing")], [_seen("m named by $params.k", [], [], "absent"), _seen("xs[]", [1], ["/things/0/xs/0"], "found")]]]
+	_for_rows(inner, [{"id": 1, "xs": [1], "m": {"a": [1]}}], {}) == [[1, "absent", [_assertion("y is 1", "absent", ["$policy:/requirements/s/checks/c/assert"], [_seen("$params.k", null, ["$params:"], "absent")], "$params.k is missing", [])], [_seen("m named by $params.k", [], [], "absent"), _seen("xs[]", [1], ["/things/0/xs/0"], "found")]]]
 }
 
 test_a_for_line_whose_param_cant_be_used_fails_as_unusable_and_keeps_its_inputs if {
