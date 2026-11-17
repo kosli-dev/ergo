@@ -472,13 +472,15 @@ _subject_position_sentences := [
 
 _subject_position_values := [[1, "x"], [], "s", null, [["a"], "b"], {"k": 1}, {}, 3, true]
 
-_subject_shape(rows) := json.marshal([[r.passed, r.cause, _unlocated(r.inputs), _unlocated(object.get(r, "failed_items", null))] | some r in rows])
+_subject_shape(rows) := json.marshal([[r.passed, r.cause, _without_locations(r.inputs), [_without_locations_entry(e) | some e in object.get(r, "failures", [])]] | some r in rows])
 
-_unlocated(entries) := [{k: v | some k, v in e; k != "locations"} | some e in entries] if entries != null
+_without_locations(entries) := [{k: v | some k, v in e; k != "locations"} | some e in entries]
 
-_unlocated(null) := null
+_without_locations_entry(e) := object.union({k: v | some k, v in e; not k in {"locations", "inputs", "failures"}}, {"inputs": _without_locations(e.inputs), "failures": [_without_locations_deeper(f) | some f in e.failures]})
 
-_subject_field_shape(rows) := replace(replace(replace(replace(_subject_shape(rows), `"v[`, `"s[`), `"v"`, `"s"`), ` of v"`, ` of s"`), ` of v[`, ` of s[`)
+_without_locations_deeper(e) := object.union({k: v | some k, v in e; not k in {"locations", "inputs", "failures"}}, {"inputs": _without_locations(e.inputs), "failures": [object.union({k: v | some k, v in f; not k in {"locations", "inputs"}}, {"inputs": _without_locations(f.inputs)}) | some f in e.failures]})
+
+_subject_field_shape(rows) := replace(replace(replace(replace(replace(replace(replace(_subject_shape(rows), `"v[`, `"s[`), `"v"`, `"s"`), ` of v"`, ` of s"`), ` of v[`, ` of s[`), ` of v `, ` of s `), `"v is `, `"s is `), ` v is `, ` s is `)
 
 _subject_rows_of(doc, from, text) := [r | some r in _subject_report(doc, from, {"c": text}, {}).results; r.check == "c"]
 
