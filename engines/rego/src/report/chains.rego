@@ -13,7 +13,7 @@ _evaluated(doc, req, name, parts) := object.union(_chain_evaluation(req, name, p
 	pick := _parent_pick(doc, req)
 }
 
-_evaluated(doc, req, name, parts) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand, _fixed(req), parts) if {
+_evaluated(doc, req, name, parts) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand, _fixed(req, name), parts) if {
 	_grand_chained(req)
 	parent := data.ergo_subject_sentences.chains[req.subject]
 	grand := data.ergo_subject_sentences.chains[parent]
@@ -78,7 +78,7 @@ _grandchild_evaluation(req, name, parent, grand, g, p, _) := {
 }
 
 _chain_evaluation(req, name, pick, parts) := _parents_evaluation(req, name, [_parent_evaluation(req, name, pick.parent, p, fixed) | some p in pick.parents], parts) if {
-	fixed := _fixed(req)
+	fixed := _fixed(req, name)
 	"parents" in object.keys(pick)
 	count(pick.parents) > 0
 }

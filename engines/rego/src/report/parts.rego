@@ -20,11 +20,12 @@ _for_line_clean(l) := object.union(l, object.union({"inputs": _unstashed_inputs(
 _unstashed_inputs(inputs) := [object.remove(i, _input_stash_keys) | some i in inputs]
 
 _parted(row, at, where) := object.union(object.remove(row, _row_stash_keys), {
-	"inputs": _with_outcomes(row.inputs),
-	"failures": _row_failures(row, at, where),
+	"inputs": ins,
+	"failures": _row_failures(row, at, where, ins),
 }) if {
 	row.passed == false
 	where.check.op != "for"
+	ins := _with_outcomes(row.inputs)
 }
 
 _passed_row(row) := row if {
@@ -69,14 +70,14 @@ _entry(kind, name, cause, inputs, failures, message) := {
 
 _policy_entry(kind, name, cause, inputs, failures, message, locations) := object.union(_entry(kind, name, cause, inputs, failures, message), {"locations": locations})
 
-_row_failures(row, _, where) := [_policy_entry("assertion", where.check.expression, row.cause, _with_outcomes(row.inputs), [], row.message, [_assertion_at(where, null, 0)])] if {
+_row_failures(row, _, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, ins, [], row.message, [_assertion_at(where, null, 0)])] if {
 	not _walks(where.check)
 	not _all_of_run(where.check)
 	not _any_of_run(where.check)
 	not where.check.op == "for"
 }
 
-_row_failures(row, at, where) := [_policy_entry(
+_row_failures(row, at, where, _) := [_policy_entry(
 	"assertion",
 	fa.assertion,
 	fa.cause,
@@ -88,14 +89,14 @@ _row_failures(row, at, where) := [_policy_entry(
 	some k, fa in row.failed_assertions
 ] if _all_of_run(where.check)
 
-_row_failures(row, at, where) := [_policy_entry(
+_row_failures(row, at, where, _) := [_policy_entry(
 	"option",
 	nm,
 	_group_cause({row["ergo/outs"][i].line | some i, n in where.check.option_of; n == nm}),
 	[],
 	[_option_assertion(row, at, where, nm, i) | some i, n in where.check.option_of; n == nm; row["ergo/outs"][i].line != "satisfied"],
 	concat(", and ", [t | some i, n in where.check.option_of; n == nm; t := row["ergo/texts"][i]; t != ""]),
-	[_option_at(where, nm)],
+	[where.option_ats[nm]],
 ) |
 	some nm in sort({n | some n in where.check.option_of})
 ] if _any_of_run(where.check)
@@ -110,11 +111,11 @@ _option_assertion(row, at, where, nm, i) := _policy_entry(
 	[_assertion_at(where, nm, count([j | some j, n in array.slice(where.check.option_of, 0, i); n == nm]))],
 )
 
-_row_failures(row, at, where) := [_policy_entry(
+_row_failures(row, at, where, ins) := [_policy_entry(
 	"assertion",
 	where.check.expression,
 	row.cause,
-	_with_outcomes([i | some i in row.inputs; not _item_input(i, lists)]),
+	[ins[j] | some j, i in row.inputs; not _item_input(i, lists)],
 	_walk_entries(row, texts, at),
 	concat("; ", _once(object.get(row, "ergo/own", [row.message]))),
 	[_assertion_at(where, null, 0)],
@@ -189,10 +190,23 @@ _entry_text(text, name) := substring(text, count(name) + 2, -1) if startswith(te
 
 else := text
 
-_assertion_at(where, option, k) := concat("", [_lines_at(where, option, lines, n)[k]]) if {
+_where(req_name, name, check) := object.union(w, {
+	"ats": object.union({"": a | a := _assertion_ats(w, null)}, {nm: a | some nm in _option_names(check); a := _assertion_ats(w, nm)}),
+	"option_ats": {nm: _option_at(w, nm) | some nm in _option_names(check)},
+}) if w := {"check": check, "req": req_name, "name": name}
+
+_option_names(check) := {n | some n in check.option_of}
+
+_assertion_ats(where, option) := [concat("", [x]) | some x in _lines_at(lines, n)] if {
 	lines := _written_lines(where, option)
 	n := _assertion_count(where, option)
 }
+
+_assertion_at(where, null, k) := where.ats[""][k]
+
+_assertion_at(where, option, k) := where.ats[option][k] if option != null
+
+_condition_of(req, name, c) := object.union({"expression": e | e := _expression_of(c)}, {"at": a | a := _condition_at(req, name)})
 
 _option_at(where, nm) := _joined("$policy:", ["requirements", where.req, "checks", where.name, "any_of", nm])
 
@@ -223,22 +237,22 @@ else := 1
 
 _assertion_count(where, nm) := count([n | some n in where.check.option_of; n == nm]) if nm != null
 
-_lines_at(_, _, lines, n) := [lines.at | some _ in numbers.range(1, n)] if {
+_lines_at(lines, n) := [lines.at | some _ in numbers.range(1, n)] if {
 	not lines.list
 	n == 1
 }
 
-_lines_at(_, _, lines, n) := [concat("", [lines.at, "#", format_int(k, 10)]) | some k in numbers.range(1, n)] if {
+_lines_at(lines, n) := [concat("", [lines.at, "#", format_int(k, 10)]) | some k in numbers.range(1, n)] if {
 	not lines.list
 	n > 1
 }
 
-_lines_at(_, _, lines, n) := [_joined(lines.at, [j]) | some j, _ in lines.lines] if {
+_lines_at(lines, n) := [_joined(lines.at, [j]) | some j, _ in lines.lines] if {
 	lines.list
 	count(lines.lines) == n
 }
 
-_lines_at(_, _, lines, n) := [_line_mark(lines.at, j, counts[j], k) | some j, _ in lines.lines; some k in numbers.range(1, counts[j])] if {
+_lines_at(lines, n) := [_line_mark(lines.at, j, counts[j], k) | some j, _ in lines.lines; some k in numbers.range(1, counts[j])] if {
 	lines.list
 	count(lines.lines) != n
 	counts := [count(object.get(_sentence(line), "assertions", [line])) | some line in lines.lines]
@@ -248,21 +262,24 @@ _line_mark(at, j, 1, _) := _joined(at, [j])
 
 _line_mark(at, j, c, k) := concat("", [_joined(at, [j]), "#", format_int(k, 10)]) if c > 1
 
-_parted_applies(row, _, _, _) := _passed_row(row) if row.passed == true
+_parted_applies(row, _, _, _, _) := _passed_row(row) if row.passed == true
 
-_parted_applies(row, at, evals, req) := object.union(object.remove(row, _row_stash_keys), {
-	"inputs": _with_outcomes(row.inputs),
-	"failures": _applies_entries(row, at, evals, req),
-}) if row.passed == false
+_parted_applies(row, at, evals, req, conds) := object.union(object.remove(row, _row_stash_keys), {
+	"inputs": ins,
+	"failures": _applies_entries(row, at, evals, req, conds, ins),
+}) if {
+	row.passed == false
+	ins := _with_outcomes(row.inputs)
+}
 
-_applies_entries(row, at, evals, req) := [_policy_entry(
+_applies_entries(row, at, evals, _, conds, ins) := [_policy_entry(
 	"assertion",
-	_expression_of(_applies_to_of(req)[name]),
+	conds[name].expression,
 	e.assertion_cause,
-	_with_outcomes([i | some i in row.inputs; not _item_input(i, lists)]),
+	[ins[j] | some j, i in row.inputs; not _item_input(i, lists)],
 	_walk_entries(row, texts, at),
 	concat("; ", _once(object.get(e, "ergo/own", [row.message]))),
-	[_condition_at(req, name)],
+	[conds[name].at],
 )] if {
 	count(evals) == 1
 	some name, e in evals
@@ -271,28 +288,28 @@ _applies_entries(row, at, evals, req) := [_policy_entry(
 	lists := {_list_base(f.item) | some f in row.failed_items}
 }
 
-_applies_entries(row, _, evals, req) := [_policy_entry(
+_applies_entries(row, _, evals, _, conds, ins) := [_policy_entry(
 	"assertion",
-	_expression_of(_applies_to_of(req)[name]),
+	conds[name].expression,
 	e.assertion_cause,
-	_with_outcomes(row.inputs),
+	ins,
 	[],
 	row.message,
-	[_condition_at(req, name)],
+	[conds[name].at],
 )] if {
 	count(evals) == 1
 	some name, e in evals
 	not "failed_items" in object.keys(row)
 }
 
-_applies_entries(_, at, evals, req) := [_policy_entry(
+_applies_entries(_, at, evals, req, conds, _) := [_policy_entry(
 	"assertion",
-	_expression_of(_applies_to_of(req)[name]),
+	conds[name].expression,
 	evals[name].assertion_cause,
 	_with_outcomes(_anchored_inputs(evals[name].inputs, at)),
 	[],
 	_first_text(texts, k),
-	[_condition_at(req, name)],
+	[conds[name].at],
 ) |
 	some k, name in failed
 ] if {

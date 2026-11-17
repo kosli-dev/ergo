@@ -315,16 +315,16 @@ _entry_anchor(entry) := entry.at if object.get(entry, "ats", null) == null
 
 else := entry.ats
 
-_subject_rows(entry, ref, req, req_name, flaws, prepared) := [row |
+_subject_rows(entry, ref, req, req_name, fixed) := [row |
 	anchor := _entry_anchor(entry)
-	some check_name in _names(prepared)
+	some check_name in _names(fixed.prepared)
 	row := object.union(
 		{
 			"requirement": req_name,
 			"subject": ref,
 			"check": check_name,
 		},
-		_parted(_anchored(_outcome(req, prepared[check_name], flaws[check_name], entry.subject), anchor), anchor, {"check": prepared[check_name], "req": req_name, "name": check_name}),
+		_parted(_anchored(_outcome(req, fixed.prepared[check_name], fixed.check_flaws[check_name], entry.subject), anchor), anchor, fixed.wheres[check_name]),
 	)
 ]
 
@@ -431,18 +431,18 @@ _repeats(sorted) := {x |
 	x[0] == sorted[i - 1][0]
 }
 
-_applies_rows(raw, refs, evals, req, req_name) := [row |
+_applies_rows(raw, refs, evals, req, req_name, conds) := [row |
 	some i, entry in raw
-	row := _applies_row(refs[i], entry, evals[i], req, req_name)
+	row := _applies_row(refs[i], entry, evals[i], req, req_name, conds)
 ] if {
 	_size(_applies_to_of(req)) > 0
 }
 
-_applies_rows(_, _, _, req, _) := [] if {
+_applies_rows(_, _, _, req, _, _) := [] if {
 	_size(_applies_to_of(req)) == 0
 }
 
-_applies_row(ref, entry, evals, req, req_name) := _parted_applies(_applies_raw_row(ref, entry, evals, req, req_name), _entry_anchor(entry), evals, req)
+_applies_row(ref, entry, evals, req, req_name, conds) := _parted_applies(_applies_raw_row(ref, entry, evals, req, req_name), _entry_anchor(entry), evals, req, conds)
 
 _applies_raw_row(ref, entry, evals, req, req_name) := object.union(
 	{

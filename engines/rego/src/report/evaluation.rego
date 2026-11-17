@@ -139,9 +139,14 @@ _with_listed(def, checked, refs) := object.union(def, {"$refs_of": checked}) if 
 
 _with_listed(def, _, refs) := def if count(refs) == 0
 
-_evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _evaluation_with(doc, req, name, _fixed(req)))
+_evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _evaluation_with(doc, req, name, _fixed(req, name)))
 
-_fixed(req) := {
+_fixed(req, name) := object.union(f, {
+	"wheres": {n: _where(name, n, c) | some n, c in f.prepared},
+	"conditions": {n: _condition_of(req, n, c) | some n, c in _applies_to_of(req)},
+}) if f := _fixed_of(req)
+
+_fixed_of(req) := {
 	"filter_flaws": {n: _flaw(check, _from_names(req, here)) |
 		some n, check in _applies_to_of(req)
 		here := _s_written_here(req, "applies_to", n)
@@ -198,7 +203,7 @@ _evaluation_with(doc, written, name, fixed) := {
 	refs := {i: _entry_ref_alone(entry, req, i in longs) | some i, entry in raw}
 	evals := {i: _applies_evals_alone(req, entry, fixed.filter_flaws, i in longs) | some i, entry in raw}
 	matches := {i: _subject_matches(evals[i], req) | some i, _ in raw}
-	applies := _applies_rows(raw, refs, evals, req, name)
+	applies := _applies_rows(raw, refs, evals, req, name, fixed.conditions)
 	matching := [raw[i] | some i, _ in raw; matches[i]]
 	groups := [rows |
 		some i, entry in raw
@@ -221,9 +226,9 @@ _applies_evals_alone(req, entry, flaws, false) := _applies_evals(req, entry.subj
 
 _applies_evals_alone(req, entry, flaws, true) := r if r := _applies_evals(req, entry.subject, flaws) with data.ergo_item as entry
 
-_subject_rows_alone(entry, ref, req, name, fixed, false) := _subject_rows(entry, ref, req, name, fixed.check_flaws, fixed.prepared)
+_subject_rows_alone(entry, ref, req, name, fixed, false) := _subject_rows(entry, ref, req, name, fixed)
 
-_subject_rows_alone(entry, ref, req, name, fixed, true) := r if r := _subject_rows(entry, ref, req, name, fixed.check_flaws, fixed.prepared) with data.ergo_item as entry
+_subject_rows_alone(entry, ref, req, name, fixed, true) := r if r := _subject_rows(entry, ref, req, name, fixed) with data.ergo_item as entry
 
 _with_ref_answer(check) := _ref_answered_compare(check) if {
 	is_object(check)
