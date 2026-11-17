@@ -1488,7 +1488,7 @@
                   {
                     "locations": [],
                     "name": "commits.author",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -1509,7 +1509,7 @@
               {
                 "locations": [],
                 "name": "commits.author",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -1544,7 +1544,7 @@
                   {
                     "locations": [],
                     "name": "commits.author",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -1565,7 +1565,7 @@
               {
                 "locations": [],
                 "name": "commits.author",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],

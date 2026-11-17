@@ -7701,20 +7701,35 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/teams/0/1"
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/teams/0/1"
+                            ],
+                            "name": "t[1].rows",
+                            "outcome": "absent",
+                            "value": null
+                          }
                         ],
-                        "name": "t[1].rows",
-                        "outcome": "absent",
-                        "value": null
+                        "kind": "list",
+                        "message": "rows is missing",
+                        "name": "rows"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of t: rows is missing",
-                    "name": "t[1].rows"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/teams/0/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of t",
+                    "value": {
+                      "name": 3
+                    }
                   }
                 ],
                 "inputs": [],
@@ -7786,48 +7801,87 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/teams/0/0/rows/0/v"
+                            ],
+                            "name": "t[0].rows[0].v",
+                            "outcome": "absent",
+                            "value": "bob"
+                          }
                         ],
-                        "name": "t[0].rows[0].v",
-                        "outcome": "absent",
-                        "value": "bob"
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/0/rows/0"
+                        ],
+                        "message": "item 2 of t: name is missing",
+                        "name": "item 1 of rows",
+                        "value": {
+                          "v": "bob"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/0/rows/0"
+                      "/teams/0/0"
                     ],
-                    "message": "item 2 of t: name is missing",
-                    "name": "item 1 of t[0].rows",
+                    "message": "",
+                    "name": "item 1 of t",
                     "value": {
-                      "v": "bob"
+                      "name": "bob",
+                      "rows": [
+                        {
+                          "v": "bob"
+                        }
+                      ]
                     }
                   },
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/teams/0/1/rows/0/v"
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/teams/0/1/rows/0/v"
+                            ],
+                            "name": "t[1].rows[0].v",
+                            "outcome": "absent",
+                            "value": "bob"
+                          }
                         ],
-                        "name": "t[1].rows[0].v",
-                        "outcome": "absent",
-                        "value": "bob"
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/1/rows/0"
+                        ],
+                        "message": "name is missing",
+                        "name": "item 1 of rows",
+                        "value": {
+                          "v": "bob"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/1/rows/0"
+                      "/teams/0/1"
                     ],
-                    "message": "item 2 of t: name is missing",
-                    "name": "item 1 of t[1].rows",
+                    "message": "",
+                    "name": "item 2 of t",
                     "value": {
-                      "v": "bob"
+                      "rows": [
+                        {
+                          "v": "bob"
+                        }
+                      ]
                     }
                   }
                 ],
@@ -7906,48 +7960,88 @@
                 "failures": [
                   {
                     "cause": "null",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
+                        "cause": "null",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/teams/0/0/rows/0/v"
+                            ],
+                            "name": "t[0].rows[0].v",
+                            "outcome": "null",
+                            "value": "bob"
+                          }
                         ],
-                        "name": "t[0].rows[0].v",
-                        "outcome": "null",
-                        "value": "bob"
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/0/rows/0"
+                        ],
+                        "message": "item 2 of t: name is null",
+                        "name": "item 1 of rows",
+                        "value": {
+                          "v": "bob"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/0/rows/0"
+                      "/teams/0/0"
                     ],
-                    "message": "item 2 of t: name is null",
-                    "name": "item 1 of t[0].rows",
+                    "message": "",
+                    "name": "item 1 of t",
                     "value": {
-                      "v": "bob"
+                      "name": "bob",
+                      "rows": [
+                        {
+                          "v": "bob"
+                        }
+                      ]
                     }
                   },
                   {
                     "cause": "null",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/teams/0/1/rows/0/v"
+                        "cause": "null",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/teams/0/1/rows/0/v"
+                            ],
+                            "name": "t[1].rows[0].v",
+                            "outcome": "null",
+                            "value": "bob"
+                          }
                         ],
-                        "name": "t[1].rows[0].v",
-                        "outcome": "null",
-                        "value": "bob"
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/1/rows/0"
+                        ],
+                        "message": "name is null",
+                        "name": "item 1 of rows",
+                        "value": {
+                          "v": "bob"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/1/rows/0"
+                      "/teams/0/1"
                     ],
-                    "message": "item 2 of t: name is null",
-                    "name": "item 1 of t[1].rows",
+                    "message": "",
+                    "name": "item 2 of t",
                     "value": {
-                      "v": "bob"
+                      "name": null,
+                      "rows": [
+                        {
+                          "v": "bob"
+                        }
+                      ]
                     }
                   }
                 ],
@@ -8027,43 +8121,76 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/teams/0/0/rows/0/v"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/teams/0/0/rows/0/v"
+                            ],
+                            "name": "t[0].rows[0].v",
+                            "outcome": "unusable",
+                            "value": "bob"
+                          }
                         ],
-                        "name": "t[0].rows[0].v",
-                        "outcome": "unusable",
-                        "value": "bob"
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/0/rows/0"
+                        ],
+                        "message": "item 2 of t is \"s\", which isn't an object",
+                        "name": "item 1 of rows",
+                        "value": {
+                          "v": "bob"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/0/rows/0"
+                      "/teams/0/0"
                     ],
-                    "message": "item 2 of t is \"s\", which isn't an object",
-                    "name": "item 1 of t[0].rows",
+                    "message": "",
+                    "name": "item 1 of t",
                     "value": {
-                      "v": "bob"
+                      "name": "bob",
+                      "rows": [
+                        {
+                          "v": "bob"
+                        }
+                      ]
                     }
                   },
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/teams/0/1"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/teams/0/1"
+                            ],
+                            "name": "t[1].rows",
+                            "outcome": "unusable",
+                            "value": null
+                          }
                         ],
-                        "name": "t[1].rows",
-                        "outcome": "unusable",
-                        "value": null
+                        "kind": "list",
+                        "message": "rows is null, which isn't a list",
+                        "name": "rows"
                       }
                     ],
-                    "kind": "list",
-                    "message": "item 2 of t: rows is null, which isn't a list",
-                    "name": "t[1].rows"
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/teams/0/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of t",
+                    "value": "s"
                   }
                 ],
                 "inputs": [],

@@ -645,18 +645,18 @@ _s_check_for(lines, ftext, wording, problems, parts) := object.union(wording, {
 	texts := [_s_assertion_text(a) | some a in marked]
 } else := object.union(wording, {"expression": _s_for_written_text(lines, ftext), "$sentence": sort(_s_or_unrunnable(((problems | _s_for_problems(lines, ftext)) | _s_for_self(lines, ftext, parts))))})
 
-_item_levels(w, e) := [{"value": object.get(w.trail[0].v, s, null), "locations": [_pointer(w.trail[0].a, w.trail[0].v, s)]} |
+_item_levels(w, e) := [{"value": object.get({"v": w.trail[0].v}, array.concat(["v"], s), null), "locations": [_pointer(w.trail[0].a, w.trail[0].v, s)]} |
 	some k, step in rel
 	is_number(step)
 	k < count(rel) - 1
 	s := array.slice(rel, 0, k + 1)
 ] if {
 	is_array(e.i)
-	count(e.i) - count(w.trail[0].c) > 2
+	count(e.i) - count(w.trail[0].c) > 1
 	rel := array.slice(e.i, count(w.trail[0].c), count(e.i))
 } else := []
 
-_list_levels(start, path) := [{"value": object.get(start.v, s, null), "locations": [_pointer(start.a, start.v, s)]} |
+_list_levels(start, path) := [{"value": object.get({"v": start.v}, array.concat(["v"], s), null), "locations": [_pointer(start.a, start.v, s)]} |
 	some k, step in rel
 	is_number(step)
 	s := array.slice(rel, 0, k + 1)

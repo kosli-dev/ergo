@@ -306,7 +306,7 @@
                   {
                     "locations": [],
                     "name": "findings",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -327,7 +327,7 @@
               {
                 "locations": [],
                 "name": "findings",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -378,7 +378,7 @@
                   {
                     "locations": [],
                     "name": "findings",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -399,7 +399,7 @@
               {
                 "locations": [],
                 "name": "findings",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -659,7 +659,7 @@
                   {
                     "locations": [],
                     "name": "findings",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -680,7 +680,7 @@
               {
                 "locations": [],
                 "name": "findings",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -1282,7 +1282,7 @@
                   {
                     "locations": [],
                     "name": "findings",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -1303,7 +1303,7 @@
               {
                 "locations": [],
                 "name": "findings",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -2060,7 +2060,7 @@
                   {
                     "locations": [],
                     "name": "pull_requests.commits",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -2081,7 +2081,7 @@
               {
                 "locations": [],
                 "name": "pull_requests.commits",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -2765,7 +2765,7 @@
                   {
                     "locations": [],
                     "name": "items.usd",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -2786,7 +2786,7 @@
               {
                 "locations": [],
                 "name": "items.usd",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -2837,7 +2837,7 @@
                   {
                     "locations": [],
                     "name": "items.usd",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -2858,7 +2858,7 @@
               {
                 "locations": [],
                 "name": "items.usd",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -6294,7 +6294,7 @@
                   {
                     "locations": [],
                     "name": "findings",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -6330,7 +6330,7 @@
               {
                 "locations": [],
                 "name": "findings",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -6396,7 +6396,7 @@
                   {
                     "locations": [],
                     "name": "findings",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -6432,7 +6432,7 @@
               {
                 "locations": [],
                 "name": "findings",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -7707,7 +7707,7 @@
                   {
                     "locations": [],
                     "name": "findings",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -7736,7 +7736,7 @@
               {
                 "locations": [],
                 "name": "findings",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -10139,7 +10139,7 @@
                       {
                         "locations": [],
                         "name": "pr.reviews",
-                        "outcome": "found",
+                        "outcome": "absent",
                         "value": []
                       }
                     ],
@@ -10245,7 +10245,7 @@
                       {
                         "locations": [],
                         "name": "pr.reviews",
-                        "outcome": "found",
+                        "outcome": "null",
                         "value": []
                       }
                     ],
@@ -10741,7 +10741,7 @@
                   {
                     "locations": [],
                     "name": "$params.approvers",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -10762,7 +10762,7 @@
               {
                 "locations": [],
                 "name": "$params.approvers",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -10838,7 +10838,7 @@
                   {
                     "locations": [],
                     "name": "$params.approvers",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -10859,7 +10859,7 @@
               {
                 "locations": [],
                 "name": "$params.approvers",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -11625,7 +11625,7 @@
                   {
                     "locations": [],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -11646,7 +11646,7 @@
               {
                 "locations": [],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -11697,7 +11697,7 @@
                   {
                     "locations": [],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -11718,7 +11718,7 @@
               {
                 "locations": [],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -21154,7 +21154,7 @@
                   {
                     "locations": [],
                     "name": "zzs",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -21183,7 +21183,7 @@
               {
                 "locations": [],
                 "name": "zzs",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -21438,7 +21438,7 @@
                   {
                     "locations": [],
                     "name": "zzs.n",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -21467,7 +21467,7 @@
               {
                 "locations": [],
                 "name": "zzs.n",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -21585,7 +21585,7 @@
                   {
                     "locations": [],
                     "name": "zzs",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -21614,7 +21614,7 @@
               {
                 "locations": [],
                 "name": "zzs",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -21869,7 +21869,7 @@
                   {
                     "locations": [],
                     "name": "zzs.n",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -21898,7 +21898,7 @@
               {
                 "locations": [],
                 "name": "zzs.n",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -22016,7 +22016,7 @@
                   {
                     "locations": [],
                     "name": "zzs",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -22045,7 +22045,7 @@
               {
                 "locations": [],
                 "name": "zzs",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -22300,7 +22300,7 @@
                   {
                     "locations": [],
                     "name": "zzs.n",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -22329,7 +22329,7 @@
               {
                 "locations": [],
                 "name": "zzs.n",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -25016,7 +25016,7 @@
                   {
                     "locations": [],
                     "name": "es.v",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -25037,7 +25037,7 @@
               {
                 "locations": [],
                 "name": "es.v",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -25065,7 +25065,7 @@
                   {
                     "locations": [],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -25086,7 +25086,7 @@
               {
                 "locations": [],
                 "name": "es",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -25121,7 +25121,7 @@
                   {
                     "locations": [],
                     "name": "es.v",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -25142,7 +25142,7 @@
               {
                 "locations": [],
                 "name": "es.v",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -25170,7 +25170,7 @@
                   {
                     "locations": [],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -25191,7 +25191,7 @@
               {
                 "locations": [],
                 "name": "es",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               }
             ],
@@ -26472,7 +26472,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   },
                   {
@@ -26501,7 +26501,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               },
               {
@@ -26705,7 +26705,7 @@
                   {
                     "locations": [],
                     "name": "xs",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   },
                   {
@@ -26734,7 +26734,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "null",
                 "value": []
               },
               {

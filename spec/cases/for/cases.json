@@ -39037,7 +39037,7 @@
                   {
                     "locations": [],
                     "name": "$params.a",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -39058,7 +39058,7 @@
               {
                 "locations": [],
                 "name": "$params.a",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -39100,7 +39100,7 @@
                   {
                     "locations": [],
                     "name": "$params",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -39121,7 +39121,7 @@
               {
                 "locations": [],
                 "name": "$params",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -39481,7 +39481,7 @@
                   {
                     "locations": [],
                     "name": "$params[0]",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -39502,7 +39502,7 @@
               {
                 "locations": [],
                 "name": "$params[0]",
-                "outcome": "found",
+                "outcome": "absent",
                 "value": []
               }
             ],
@@ -42657,7 +42657,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -42801,7 +42801,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -42863,7 +42863,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -43007,7 +43007,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -43683,7 +43683,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -43884,7 +43884,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -45341,7 +45341,7 @@
                   {
                     "locations": [],
                     "name": "$input.top.q",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -45396,7 +45396,7 @@
                   {
                     "locations": [],
                     "name": "pl.z",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],
@@ -53661,7 +53661,7 @@
                   {
                     "locations": [],
                     "name": "w.z",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -53716,7 +53716,7 @@
                   {
                     "locations": [],
                     "name": "w.z",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -63741,7 +63741,7 @@
                   {
                     "locations": [],
                     "name": "$input.lst.z",
-                    "outcome": "found",
+                    "outcome": "absent",
                     "value": []
                   }
                 ],
@@ -63806,7 +63806,7 @@
                   {
                     "locations": [],
                     "name": "pl.z",
-                    "outcome": "found",
+                    "outcome": "null",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -75388,28 +75388,61 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/0/ms/0/ws/0"
+                        ],
+                        "message": "item 2 of t: c.z is missing",
+                        "name": "item 1 of m.ws",
+                        "value": {
+                          "n": 2
+                        }
+                      }
+                    ],
                     "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/0/ms/0/ws/0"
+                      "/teams/0/0/ms/0"
                     ],
-                    "message": "item 2 of t: c.z is missing",
-                    "name": "item 1 of m.ws",
+                    "message": "",
+                    "name": "item 1 of ms",
                     "value": {
-                      "n": 2
+                      "ws": [
+                        {
+                          "n": 2
+                        }
+                      ]
                     }
                   }
                 ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
-                  "/teams/0/0/ms/0"
+                  "/teams/0/0"
                 ],
                 "message": "",
-                "name": "item 1 of t[0].ms",
+                "name": "item 1 of t",
                 "value": {
-                  "ws": [
+                  "c": {
+                    "z": [
+                      "a"
+                    ]
+                  },
+                  "ms": [
+                    {
+                      "ws": [
+                        {
+                          "n": 2
+                        }
+                      ]
+                    }
+                  ],
+                  "rows": [
                     {
                       "n": 2
                     }
@@ -75421,28 +75454,56 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/1/ms/0/ws/0"
+                        ],
+                        "message": "item 2 of t: c.z is missing",
+                        "name": "item 1 of m.ws",
+                        "value": {
+                          "n": 1
+                        }
+                      }
+                    ],
                     "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/1/ms/0/ws/0"
+                      "/teams/0/1/ms/0"
                     ],
-                    "message": "item 2 of t: c.z is missing",
-                    "name": "item 1 of m.ws",
+                    "message": "",
+                    "name": "item 1 of ms",
                     "value": {
-                      "n": 1
+                      "ws": [
+                        {
+                          "n": 1
+                        }
+                      ]
                     }
                   }
                 ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
-                  "/teams/0/1/ms/0"
+                  "/teams/0/1"
                 ],
                 "message": "",
-                "name": "item 1 of t[1].ms",
+                "name": "item 2 of t",
                 "value": {
-                  "ws": [
+                  "ms": [
+                    {
+                      "ws": [
+                        {
+                          "n": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "rows": [
                     {
                       "n": 1
                     }
@@ -75752,28 +75813,61 @@
                 "failures": [
                   {
                     "cause": "null",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "null",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/0/ms/0/ws/0"
+                        ],
+                        "message": "item 2 of t: c.z is null",
+                        "name": "item 1 of m.ws",
+                        "value": {
+                          "n": 2
+                        }
+                      }
+                    ],
                     "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/0/ms/0/ws/0"
+                      "/teams/0/0/ms/0"
                     ],
-                    "message": "item 2 of t: c.z is null",
-                    "name": "item 1 of m.ws",
+                    "message": "",
+                    "name": "item 1 of ms",
                     "value": {
-                      "n": 2
+                      "ws": [
+                        {
+                          "n": 2
+                        }
+                      ]
                     }
                   }
                 ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
-                  "/teams/0/0/ms/0"
+                  "/teams/0/0"
                 ],
                 "message": "",
-                "name": "item 1 of t[0].ms",
+                "name": "item 1 of t",
                 "value": {
-                  "ws": [
+                  "c": {
+                    "z": [
+                      "a"
+                    ]
+                  },
+                  "ms": [
+                    {
+                      "ws": [
+                        {
+                          "n": 2
+                        }
+                      ]
+                    }
+                  ],
+                  "rows": [
                     {
                       "n": 2
                     }
@@ -75785,28 +75879,59 @@
                 "failures": [
                   {
                     "cause": "null",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "null",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/1/ms/0/ws/0"
+                        ],
+                        "message": "item 2 of t: c.z is null",
+                        "name": "item 1 of m.ws",
+                        "value": {
+                          "n": 1
+                        }
+                      }
+                    ],
                     "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/1/ms/0/ws/0"
+                      "/teams/0/1/ms/0"
                     ],
-                    "message": "item 2 of t: c.z is null",
-                    "name": "item 1 of m.ws",
+                    "message": "",
+                    "name": "item 1 of ms",
                     "value": {
-                      "n": 1
+                      "ws": [
+                        {
+                          "n": 1
+                        }
+                      ]
                     }
                   }
                 ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
-                  "/teams/0/1/ms/0"
+                  "/teams/0/1"
                 ],
                 "message": "",
-                "name": "item 1 of t[1].ms",
+                "name": "item 2 of t",
                 "value": {
-                  "ws": [
+                  "c": {
+                    "z": null
+                  },
+                  "ms": [
+                    {
+                      "ws": [
+                        {
+                          "n": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "rows": [
                     {
                       "n": 1
                     }
@@ -76119,28 +76244,61 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/0/ms/0/ws/0"
+                        ],
+                        "message": "item 2 of t: c.z is \"s\", which isn't a list",
+                        "name": "item 1 of m.ws",
+                        "value": {
+                          "n": 2
+                        }
+                      }
+                    ],
                     "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/0/ms/0/ws/0"
+                      "/teams/0/0/ms/0"
                     ],
-                    "message": "item 2 of t: c.z is \"s\", which isn't a list",
-                    "name": "item 1 of m.ws",
+                    "message": "",
+                    "name": "item 1 of ms",
                     "value": {
-                      "n": 2
+                      "ws": [
+                        {
+                          "n": 2
+                        }
+                      ]
                     }
                   }
                 ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
-                  "/teams/0/0/ms/0"
+                  "/teams/0/0"
                 ],
                 "message": "",
-                "name": "item 1 of t[0].ms",
+                "name": "item 1 of t",
                 "value": {
-                  "ws": [
+                  "c": {
+                    "z": [
+                      "a"
+                    ]
+                  },
+                  "ms": [
+                    {
+                      "ws": [
+                        {
+                          "n": 2
+                        }
+                      ]
+                    }
+                  ],
+                  "rows": [
                     {
                       "n": 2
                     }
@@ -76152,28 +76310,59 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/1/ms/0/ws/0"
+                        ],
+                        "message": "item 2 of t: c.z is \"s\", which isn't a list",
+                        "name": "item 1 of m.ws",
+                        "value": {
+                          "n": 1
+                        }
+                      }
+                    ],
                     "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/1/ms/0/ws/0"
+                      "/teams/0/1/ms/0"
                     ],
-                    "message": "item 2 of t: c.z is \"s\", which isn't a list",
-                    "name": "item 1 of m.ws",
+                    "message": "",
+                    "name": "item 1 of ms",
                     "value": {
-                      "n": 1
+                      "ws": [
+                        {
+                          "n": 1
+                        }
+                      ]
                     }
                   }
                 ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
-                  "/teams/0/1/ms/0"
+                  "/teams/0/1"
                 ],
                 "message": "",
-                "name": "item 1 of t[1].ms",
+                "name": "item 2 of t",
                 "value": {
-                  "ws": [
+                  "c": {
+                    "z": "s"
+                  },
+                  "ms": [
+                    {
+                      "ws": [
+                        {
+                          "n": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "rows": [
                     {
                       "n": 1
                     }
@@ -76428,42 +76617,80 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/0/ms/0/ws/0"
+                        ],
+                        "message": "item 1 of t: item 1 of c is 1, which isn't an object",
+                        "name": "item 1 of m.ws",
+                        "value": {
+                          "n": 2
+                        }
+                      },
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/0/ms/0/ws/1"
+                        ],
+                        "message": "item 1 of t: item 1 of c is 1, which isn't an object",
+                        "name": "item 2 of m.ws",
+                        "value": {
+                          "n": 3
+                        }
+                      }
+                    ],
                     "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/0/ms/0/ws/0"
+                      "/teams/0/0/ms/0"
                     ],
-                    "message": "item 1 of t: item 1 of c is 1, which isn't an object",
-                    "name": "item 1 of m.ws",
+                    "message": "",
+                    "name": "item 1 of ms",
                     "value": {
-                      "n": 2
-                    }
-                  },
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [],
-                    "kind": "item",
-                    "locations": [
-                      "/teams/0/0/ms/0/ws/1"
-                    ],
-                    "message": "item 1 of t: item 1 of c is 1, which isn't an object",
-                    "name": "item 2 of m.ws",
-                    "value": {
-                      "n": 3
+                      "ws": [
+                        {
+                          "n": 2
+                        },
+                        {
+                          "n": 3
+                        }
+                      ]
                     }
                   }
                 ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
-                  "/teams/0/0/ms/0"
+                  "/teams/0/0"
                 ],
                 "message": "",
-                "name": "item 1 of t[0].ms",
+                "name": "item 1 of t",
                 "value": {
-                  "ws": [
+                  "c": [
+                    1,
+                    2
+                  ],
+                  "ms": [
+                    {
+                      "ws": [
+                        {
+                          "n": 2
+                        },
+                        {
+                          "n": 3
+                        }
+                      ]
+                    }
+                  ],
+                  "rows": [
                     {
                       "n": 2
                     },
@@ -76478,42 +76705,80 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/1/ms/0/ws/0"
+                        ],
+                        "message": "item 1 of t: item 1 of c is 1, which isn't an object",
+                        "name": "item 1 of m.ws",
+                        "value": {
+                          "n": 2
+                        }
+                      },
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/teams/0/1/ms/0/ws/1"
+                        ],
+                        "message": "item 1 of t: item 1 of c is 1, which isn't an object",
+                        "name": "item 2 of m.ws",
+                        "value": {
+                          "n": 3
+                        }
+                      }
+                    ],
                     "inputs": [],
                     "kind": "item",
                     "locations": [
-                      "/teams/0/1/ms/0/ws/0"
+                      "/teams/0/1/ms/0"
                     ],
-                    "message": "item 1 of t: item 1 of c is 1, which isn't an object",
-                    "name": "item 1 of m.ws",
+                    "message": "",
+                    "name": "item 1 of ms",
                     "value": {
-                      "n": 2
-                    }
-                  },
-                  {
-                    "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [],
-                    "kind": "item",
-                    "locations": [
-                      "/teams/0/1/ms/0/ws/1"
-                    ],
-                    "message": "item 1 of t: item 1 of c is 1, which isn't an object",
-                    "name": "item 2 of m.ws",
-                    "value": {
-                      "n": 3
+                      "ws": [
+                        {
+                          "n": 2
+                        },
+                        {
+                          "n": 3
+                        }
+                      ]
                     }
                   }
                 ],
                 "inputs": [],
                 "kind": "item",
                 "locations": [
-                  "/teams/0/1/ms/0"
+                  "/teams/0/1"
                 ],
                 "message": "",
-                "name": "item 1 of t[1].ms",
+                "name": "item 2 of t",
                 "value": {
-                  "ws": [
+                  "c": [
+                    1,
+                    2
+                  ],
+                  "ms": [
+                    {
+                      "ws": [
+                        {
+                          "n": 2
+                        },
+                        {
+                          "n": 3
+                        }
+                      ]
+                    }
+                  ],
+                  "rows": [
                     {
                       "n": 2
                     },
@@ -83469,7 +83734,7 @@
                       {
                         "locations": [],
                         "name": "approver.subs",
-                        "outcome": "found",
+                        "outcome": "null",
                         "value": []
                       }
                     ],
@@ -83976,7 +84241,7 @@
                       {
                         "locations": [],
                         "name": "approver.subs",
-                        "outcome": "found",
+                        "outcome": "absent",
                         "value": []
                       }
                     ],
@@ -92532,7 +92797,7 @@
                   {
                     "locations": [],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "null",
                     "value": []
                   }
                 ],

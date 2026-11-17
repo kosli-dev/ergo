@@ -970,3 +970,9 @@ test_a_count_sum_or_plus_with_a_key_from_a_list_input_fails_as_not_an_object_not
 		[[r.cause, r.message] | some r in ergo.report(doc, policy, {}).results; r.check == "c"] == [["not_an_object", message]]
 	}
 }
+
+test_a_count_or_sum_of_a_missing_or_null_list_says_the_list_is_absent_or_null if {
+	r := _subject_report({"xs": [{"id": 0, "n": null, "o": {}}]}, "every xs", {"a": "count of zz is 1", "b": "sum of zz is 1", "c": "count of n is 1", "d": "count of o.zz plus 1 is 1"}, {})
+	outcomes := {[x.check, i.name, i.outcome] | some x in r.results; x.check in {"a", "b", "c", "d"}; some i in x.inputs; i.value == []}
+	outcomes == {["a", "zz", "absent"], ["b", "zz", "absent"], ["c", "n", "null"], ["d", "o.zz", "absent"]}
+}
