@@ -262,13 +262,13 @@ test_a_present_filter_rules_out_a_subject_whose_field_is_missing if {
 test_a_ref_step_renders_and_is_recorded_like_any_ref if {
 	rep := report(trail_doc, trail_req(attested)) with data.params as {"artifact": "app", "att": "junit"}
 	rep.requirements.s.checks.c.expression == `attestations named by $params.att.status is "COMPLETE"`
-	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.att", "value": "junit", "locations": ["$params:/att"]}]
+	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.att", "value": "junit", "locations": ["$params:/att"], "outcome": "found"}]
 	ergo.violations(rep)[0].inputs == [_seen("attestations named by $params.att.status", "FAILED", ["/trail/artifacts/app/attestations/junit/status"], "found"), _seen("$params.att", "junit", ["$params:/att"], "found")]
 }
 
 test_a_ref_step_in_from_that_cannot_be_read_shows_up_in_violations if {
 	vs := ergo.violations(report(trail_doc, trail_req("fingerprint exists"))) with data.params as {}
-	[[v.check, v.cause, v.inputs] | some v in vs] == [["$min_subjects", "absent", [{"name": "in-scope subject count", "value": 0, "locations": []}, {"name": "$params.artifact", "value": null, "locations": ["$params:"]}]]]
+	[[v.check, v.cause, v.inputs] | some v in vs] == [["$min_subjects", "absent", [{"name": "in-scope subject count", "value": 0, "locations": []}, _seen("$params.artifact", null, ["$params:"], "absent")]]]
 }
 
 test_a_badly_written_filter_stops_the_requirement_even_when_another_condition_rules_the_subject_out if {
@@ -387,7 +387,7 @@ test_a_failed_line_lists_its_values_in_the_violations_too if {
 
 test_a_ref_in_refs_has_its_location_and_a_violation_copies_it if {
 	rep := ergo.report({"things": [{"id": "t1", "x": "z"}]}, _sentence_policy({"c": "x is in $params.allowed"}), {"allowed": ["p", "q"]})
-	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.allowed", "value": ["p", "q"], "locations": ["$params:/allowed"]}]
+	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.allowed", "value": ["p", "q"], "locations": ["$params:/allowed"], "outcome": "found"}]
 	[r.inputs | some r in rep.results; r.check == "c"] == [[_seen("x", "z", ["/things/0/x"], "found"), _seen("$params.allowed", ["p", "q"], ["$params:/allowed"], "found")]]
 	[v.inputs | some v in ergo.violations(rep)] == [[_seen("x", "z", ["/things/0/x"], "found"), _seen("$params.allowed", ["p", "q"], ["$params:/allowed"], "found")]]
 }

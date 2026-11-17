@@ -1718,7 +1718,7 @@ test_a_ref_that_walks_a_list_of_objects_compares_with_what_it_reads_from_each_it
 
 test_a_ref_that_walks_a_list_of_objects_is_listed_in_refs_with_the_location_of_each_item if {
 	report := ergo.report(_walk_right_doc([{"name": "click"}, {"name": "jinja2"}]), _sentence_policy({"c": "x is in $input.sbom.components.name"}), {})
-	report.requirements.s.checks.c["$refs"] == [{"name": "$input.sbom.components[].name", "value": ["click", "jinja2"], "locations": ["/sbom/components/0/name", "/sbom/components/1/name"]}]
+	report.requirements.s.checks.c["$refs"] == [{"name": "$input.sbom.components[].name", "value": ["click", "jinja2"], "locations": ["/sbom/components/0/name", "/sbom/components/1/name"], "outcome": "found"}]
 }
 
 test_a_param_that_walks_a_list_of_objects_compares_with_what_it_reads_from_each_item if {
@@ -1732,7 +1732,7 @@ test_a_ref_that_starts_at_a_list_input_walks_its_items if {
 	policy := {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"description": "d", "subject": "t", "checks": {"c": {"description": "d", "assert": "id is in $input.id"}}}}}
 	report := ergo.report([{"id": "a"}, {"id": "b"}], policy, {})
 	[[r.passed, r.cause] | some r in report.results; r.check == "c"] == [[true, "satisfied"], [true, "satisfied"]]
-	report.requirements.r.checks.c["$refs"] == [{"name": "$input[].id", "value": ["a", "b"], "locations": ["/0/id", "/1/id"]}]
+	report.requirements.r.checks.c["$refs"] == [{"name": "$input[].id", "value": ["a", "b"], "locations": ["/0/id", "/1/id"], "outcome": "found"}]
 }
 
 test_a_ref_that_starts_at_a_list_input_fails_when_an_item_cant_be_read if {
@@ -1764,8 +1764,8 @@ test_a_right_side_walks_a_list_input_whatever_another_check_reads_as_a_key if {
 	doc := [{"id": "x", "k": "x", "m": {"x": 1}}]
 	rep := ergo.report(doc, policy, {})
 	[[r.check, r.passed, r.cause] | some r in rep.results; r.check in {"c", "d"}] == [["c", true, "satisfied"], ["d", false, "not_an_object"]]
-	rep.requirements.r.checks.c["$refs"] == [{"name": "$input[].k", "value": ["x"], "locations": ["/0/k"]}]
-	rep.requirements.r.checks.d["$refs"] == [{"name": "$input.k", "value": null, "locations": [""]}]
+	rep.requirements.r.checks.c["$refs"] == [{"name": "$input[].k", "value": ["x"], "locations": ["/0/k"], "outcome": "found"}]
+	rep.requirements.r.checks.d["$refs"] == [{"name": "$input.k", "value": null, "locations": [""], "outcome": "not_an_object"}]
 }
 
 test_a_check_decides_a_named_by_key_on_a_list_input_by_its_own_form_not_by_the_checks_beside_it if {
@@ -1844,7 +1844,7 @@ test_a_ref_that_starts_at_params_that_are_a_list_is_not_walked if {
 	policy := {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"description": "d", "subject": "t", "checks": {"c": {"description": "d", "assert": "id is in $params.id"}}}}}
 	report := ergo.report([{"id": "a"}], policy, [{"id": "a"}])
 	[[r.passed, r.cause, r.message] | some r in report.results; r.check == "c"] == [[false, "unusable", "$params is [{\"id\": \"a\"}], which isn't an object"]]
-	report.requirements.r.checks.c["$refs"] == [{"name": "$params.id", "value": null, "locations": ["$params:"]}]
+	report.requirements.r.checks.c["$refs"] == [{"name": "$params.id", "value": null, "locations": ["$params:"], "outcome": "unusable"}]
 }
 
 test_a_right_side_that_starts_at_an_alias_that_is_a_list_walks_it_once if {

@@ -180,7 +180,7 @@ test_a_ref_step_in_from_finds_the_subjects if {
 	rep := report(trail_doc, trail_req("fingerprint exists")) with data.params as {"artifact": "app"}
 	rep.requirements.s.subjects == {"total": 1, "matching": 1}
 	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(trail.artifacts named by $params.artifact)) >= 1"
-	rep.requirements.s.checks["$min_subjects"]["$refs"] == [{"name": "$params.artifact", "value": "app", "locations": ["$params:/artifact"]}]
+	rep.requirements.s.checks["$min_subjects"]["$refs"] == [{"name": "$params.artifact", "value": "app", "locations": ["$params:/artifact"], "outcome": "found"}]
 	rep.requirements.s.status == "met"
 }
 
@@ -295,7 +295,7 @@ test_named_by_a_field_reads_the_key_the_subjects_field_holds if {
 	ergo.report(doc, _sentence_policy({"c": "age is at most $params.limits[severity]"}), {}).requirements.s.checks.c.expression == "age is at most $params.limits named by severity"
 	rep := ergo.report(doc, _sentence_policy({"c": "age is at most $params.limits named by severity"}), {})
 	rep.requirements.s.checks.c.expression == "age is at most $params.limits named by severity"
-	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.limits", "value": null, "locations": ["$params:"]}]
+	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.limits", "value": null, "locations": ["$params:"], "outcome": "absent"}]
 }
 
 test_named_by_a_field_reads_a_key_of_the_subject_too if {

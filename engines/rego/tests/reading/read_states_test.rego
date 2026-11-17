@@ -11,7 +11,7 @@ test_a_path_with_a_ref_step_that_cant_be_read_is_flawed if {
 }
 
 test_a_ref_that_is_not_a_path_in_the_input_or_the_params_has_no_location if {
-	ergo._ref_entries({["x"]}) == [{"name": "<invalid ref>", "value": null, "locations": []}]
+	ergo._ref_entries({["x"]}) == [{"name": "<invalid ref>", "value": null, "locations": [], "outcome": "absent"}]
 }
 
 test_listed_refs_skip_meta_and_description_but_not_an_option_named_meta if {

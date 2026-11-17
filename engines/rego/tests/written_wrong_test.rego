@@ -1371,10 +1371,10 @@ test_a_contains_ref_that_meets_a_list_is_in_refs_as_written if {
 	doc := {"r": [{"n": "a"}], "things": [{"id": "s", "items": [{"tags": ["a"]}]}]}
 	every check in ["tags contains $input.r.n", "count of items whose tags contains $input.r.n is 1", "every items whose tags contains $input.r.n exists"] {
 		rep := ergo.report(doc, _list_key_policy({"from": "things", "identified_by": "id"}, check), {})
-		rep.requirements.r.checks.c["$refs"] == [{"name": "$input.r.n", "value": null, "locations": ["/r"]}]
+		rep.requirements.r.checks.c["$refs"] == [{"name": "$input.r.n", "value": null, "locations": ["/r"], "outcome": "unusable"}]
 	}
 	keyed := ergo.report({"m": {"x": {"v": 1}}, "a": [{"k": "x"}]}, _list_key_policy({"from": "$input.m named by each of $input.a.k"}, "v is 1"), {})
-	keyed.requirements.r.checks["$min_subjects"]["$refs"] == [{"name": "$input.a.k", "value": null, "locations": ["/a"]}]
+	keyed.requirements.r.checks["$min_subjects"]["$refs"] == [{"name": "$input.a.k", "value": null, "locations": ["/a"], "outcome": "unusable"}]
 }
 
 test_named_by_each_of_a_field_or_a_subject_is_written_wrong_whatever_the_parent_holds if {

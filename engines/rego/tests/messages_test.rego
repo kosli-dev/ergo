@@ -904,12 +904,12 @@ test_message_of_an_empty_list_read_on_the_right_names_the_root_that_is_missing_n
 
 test_a_walk_whose_ref_step_cant_be_read_names_its_path_and_every_root_its_phrase_cant_read if {
 	whose := {"c": "every xs named by $params.k whose v is 1, if any, exists"}
-	_root_rows(whose, {"id": "p", "xs": []}, {}).c == ["absent", "xs named by $params.k is missing"]
-	_root_rows(whose, {"id": "p", "xs": []}, {"k": null}).c == ["null", "xs named by $params.k is null"]
+	_root_rows(whose, {"id": "p", "xs": []}, {}).c == ["absent", "$params.k is missing"]
+	_root_rows(whose, {"id": "p", "xs": []}, {"k": null}).c == ["null", "$params.k is null"]
 	phrase := {"c": "every xs named by $params.k, if any, equals q"}
-	_root_rows(phrase, {"id": "p", "xs": []}, {}).c == ["absent", "xs named by $params.k is missing; q is missing"]
-	_root_rows(phrase, {"id": "p", "xs": [], "q": null}, {"k": null}).c == ["null", "xs named by $params.k is null; q is null"]
-	_root_rows(phrase, {"id": "p", "xs": [], "q": 1}, {}).c == ["absent", "xs named by $params.k is missing"]
+	_root_rows(phrase, {"id": "p", "xs": []}, {}).c == ["absent", "$params.k is missing; q is missing"]
+	_root_rows(phrase, {"id": "p", "xs": [], "q": null}, {"k": null}).c == ["null", "$params.k is null; q is null"]
+	_root_rows(phrase, {"id": "p", "xs": [], "q": 1}, {}).c == ["absent", "$params.k is missing"]
 }
 
 test_a_for_check_that_reads_params_says_only_that_params_is_not_an_object if {
