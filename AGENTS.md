@@ -146,7 +146,7 @@ The report must stay byte-identical for the same policy and input, whatever orde
 ## Code rules
 
 - Names that JavaScript sees, like Wasm exports and npm APIs, are camelCase (`#[wasm_bindgen(js_name = parseCheck)]`). JSON keys the spec defines, like `failed_items`, stay as they are.
-- A `$` name in a report must be something a policy can read. Ergo's own labels in reports are plain words.
+- `$` marks Ergo's own names. Only `$input` and `$params` can also be read, and a label inside `inputs` or a message is plain words.
 - A line that coverage lists isn't dead code. Check every caller and try a real policy before deleting it. If it can be reached, add a test.
 - In Rego, `not f(x.y)` is undefined when `x.y` is missing. Put the test in a small rule and negate that.
 
