@@ -175,7 +175,14 @@ _m_inner_text(check, f) := _m_inner_text_of(check, _m_whose_why(false, f))
 
 _m_inner_text_of(check, f) := [_m_why_text(_m_for_item_name(check, f.path), f.own[0])] if count(object.get(f, "own", [])) > 0
 
-else := _m_root_why(f)
+else := ts if {
+	ts := _m_root_why(f)
+	ts != []
+} else := [concat("", [_m_for_item_name(check, f.path), ": ", substring(w, indexof(w, ": ") + 2, -1)]) |
+	count(object.get(f, "rest", [])) == 0
+	some w in object.get(f, "why", [])
+	contains(w, ": ")
+]
 
 _m_inner_free(f) := _m_inner_free_of(_m_whose_why(false, f))
 
@@ -411,7 +418,7 @@ _m_for_fail(f) := [_m_isnt(object.get(f, "bare", object.get(f, "said", f.item)),
 	not is_object(object.get(f, "raw", f.value))
 }
 
-_m_for_fail(f) := [_m_under(object.get(f, "said", f.item), _m_group_text(g)) | some g in _m_for_groups(f)] if {
+_m_for_fail(f) := array.concat([_m_under(object.get(f, "said", f.item), _m_group_text(g)) | some g in _m_for_groups(f)], [_m_free_text(f, x, t) | some x in object.get(f, "failed_items", []); some t in _m_inner_fail(x)]) if {
 	not "msg" in object.keys(f)
 	not _m_bare_item(f)
 	f.failed_assertions != []
@@ -1018,7 +1025,7 @@ _for_free_said(r, rs, once, free_as) := {a: _once(ts) |
 	ts != []
 } if once != []
 
-_for_item_texts(check, failed, k, skip, said, once, free_as) := {"lines": lines, "roots": [t | some l in lines; some t in l.roots]} if {
+_for_item_texts(check, failed, k, skip, said, once, free_as) := {"lines": lines, "roots": [t | some l in lines; some t in l.roots], "walk": [], "inner": _for_line_inner_texts(failed[k])} if {
 	f := failed[k]
 	f.cause != "ambiguous"
 	not _for_hoisted(f)
@@ -1058,6 +1065,11 @@ _for_inner_texts(f) := [[_m_unled(name, _m_free_text(f, x, t)) | some t in _m_in
 	not _for_said_why(f)
 	not _m_bare_item(f)
 	f.failed_assertions == []
+	count(object.get(f, "failed_items", [])) > 0
+	name := object.get(f, "said", f.item)
+} else := []
+
+_for_line_inner_texts(f) := [[_m_unled(name, _m_free_text(f, x, t)) | some t in _m_inner_fail(x)] | some x in f.failed_items] if {
 	count(object.get(f, "failed_items", [])) > 0
 	name := object.get(f, "said", f.item)
 } else := []
