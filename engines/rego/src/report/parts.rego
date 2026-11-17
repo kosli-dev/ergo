@@ -336,7 +336,7 @@ _item_levels_of(row, name) := ls[0] if {
 	count(ls) > 0
 } else := []
 
-_level_names(name, m) := array.concat(_outer_level_names(b, m), [concat("", ["item ", substring(name, 5, at - 5), " of ", b.fields[m]])]) if {
+_level_names(name, m) := array.concat(_outer_level_names(b, m), [concat("", ["item ", substring(name, 5, at - 5), " of ", _level_field(b.fields[m])])]) if {
 	startswith(name, "item ")
 	at := indexof(name, " of ")
 	b := _level_bits(substring(name, at + 4, -1), m)
@@ -347,7 +347,11 @@ _level_names(name, m) := array.concat(_outer_level_names(b, m), [b.fields[m]]) i
 	b := _level_bits(name, m)
 }
 
-_outer_level_names(b, m) := [concat("", ["item ", format_int(to_number(b.idx[j + 1]) + 1, 10), " of ", b.fields[j]]) | some j in numbers.range(0, m - 1)]
+_outer_level_names(b, m) := [concat("", ["item ", format_int(to_number(b.idx[j + 1]) + 1, 10), " of ", _level_field(b.fields[j])]) | some j in numbers.range(0, m - 1)]
+
+_level_field(field) := "it" if field == ""
+
+else := field
 
 _level_bits(path, m) := {"idx": idx, "fields": fields} if {
 	pieces := split(path, "[")
