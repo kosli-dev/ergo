@@ -909,8 +909,8 @@ _for_texts(check, subj, r, once, line) := {
 	free_as := {a | some i, a in check.assertions; not _for_reads_an_alias(check, check.checks[i])}
 	items := [_for_item_texts(check, r.failed, k, skip, said, once, free_as) | some k, _ in r.failed]
 	roots := _once(array.concat([m | once != []; some m in rs; not m in second], [t | some x in items; some t in x.roots]))
-	frees := _for_free_said(check, r, rs, once, free_as)
-	owners := {m: _for_root_owner(check, subj, m, _for_free_said(check, r, [], once, free_as)) | some m in roots}
+	frees := _for_free_said(r, rs, once, free_as)
+	owners := {m: _for_root_owner(check, subj, m, _for_free_said(r, [], once, free_as)) | some m in roots}
 	unowned := _uncovered([m | some m in roots; owners[m] == -1])
 	seconds := [["item", _m_lead_of(m), _m_after_lead(_m_lead_of(m), m)] | once != []; some m in rs; m in second]
 }
@@ -978,9 +978,9 @@ _for_root_of(check, subj, i, m) if {
 	}
 }
 
-_for_free_said(_, _, _, [], _) := {}
+_for_free_said(_, _, [], _) := {}
 
-_for_free_said(_, r, rs, once, free_as) := {a: _once(ts) |
+_for_free_said(r, rs, once, free_as) := {a: _once(ts) |
 	some a in free_as
 	ts := array.concat(
 		[t |
