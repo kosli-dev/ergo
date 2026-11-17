@@ -48,7 +48,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "b"
                   }
                 ],
@@ -66,7 +66,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "b"
               }
             ],
@@ -231,7 +231,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "1"
                   }
                 ],
@@ -249,7 +249,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "1"
               }
             ],

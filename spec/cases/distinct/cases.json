@@ -591,7 +591,7 @@
                       "/sbom/components/1/licenses/0/terms/0/ok"
                     ],
                     "name": "ok",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -610,7 +610,7 @@
                   "/sbom/components/1/licenses/0/terms/0/ok"
                 ],
                 "name": "ok",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -787,7 +787,7 @@
                       "/sbom/components/1/type"
                     ],
                     "name": "type",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "app"
                   }
                 ],
@@ -805,7 +805,7 @@
                   "/sbom/components/1/type"
                 ],
                 "name": "type",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "app"
               }
             ],
@@ -963,7 +963,7 @@
                   "/sbom/components/1/licenses/0/notes/0"
                 ],
                 "name": "notes[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bad"
                 ]
@@ -994,7 +994,7 @@
                       "/sbom/components/1/licenses/0/ok"
                     ],
                     "name": "ok",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -1013,7 +1013,7 @@
                   "/sbom/components/1/licenses/0/ok"
                 ],
                 "name": "ok",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -1208,7 +1208,7 @@
                       "/s/commits/1/author"
                     ],
                     "name": "commits[].author",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "ann",
                       "ann"
@@ -1238,7 +1238,7 @@
                   "/s/commits/1/author"
                 ],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ann",
                   "ann"
@@ -1293,7 +1293,7 @@
                       "/s/commits/2/author"
                     ],
                     "name": "commits[].author",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "ann",
                       null,
@@ -1326,7 +1326,7 @@
                   "/s/commits/2/author"
                 ],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ann",
                   null,
@@ -1430,7 +1430,7 @@
                   {
                     "locations": [],
                     "name": "commits.author",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -1451,7 +1451,7 @@
               {
                 "locations": [],
                 "name": "commits.author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -1602,7 +1602,7 @@
                   {
                     "locations": [],
                     "name": "commits[].author",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -1623,7 +1623,7 @@
               {
                 "locations": [],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -1737,7 +1737,7 @@
                       "/s/commits/1/author"
                     ],
                     "name": "commits[].author",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       null,
                       "bob"
@@ -1767,7 +1767,7 @@
                   "/s/commits/1/author"
                 ],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null,
                   "bob"
@@ -1899,7 +1899,7 @@
                       "/s/commits/1"
                     ],
                     "name": "commits[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "author": "ann",
@@ -1934,7 +1934,7 @@
                   "/s/commits/1"
                 ],
                 "name": "commits[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "author": "ann",
@@ -2052,7 +2052,7 @@
                       "/s/stages/1/usd"
                     ],
                     "name": "stages[].usd",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1.5,
                       null
@@ -2082,7 +2082,7 @@
                   "/s/stages/1/usd"
                 ],
                 "name": "stages[].usd",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1.5,
                   null
@@ -2135,7 +2135,7 @@
                       "/s/stages/1/usd"
                     ],
                     "name": "stages[].usd",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       600000000000000,
                       600000000000000
@@ -2165,7 +2165,7 @@
                   "/s/stages/1/usd"
                 ],
                 "name": "stages[].usd",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   600000000000000,
                   600000000000000
@@ -2219,7 +2219,7 @@
                           "/s/commits/2/author"
                         ],
                         "name": "commits[1].author",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "bob"
                       }
                     ],
@@ -2252,7 +2252,7 @@
                   "/s/commits/2/author"
                 ],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ann",
                   "bob",
@@ -2296,7 +2296,7 @@
                           "/s/commits/0/author"
                         ],
                         "name": "commits[0].author",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "ann"
                       }
                     ],
@@ -2320,7 +2320,7 @@
                           "/s/commits/2/author"
                         ],
                         "name": "commits[1].author",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "bob"
                       }
                     ],
@@ -2353,7 +2353,7 @@
                   "/s/commits/2/author"
                 ],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ann",
                   "bob",
@@ -2437,7 +2437,7 @@
                           "/s/commits/1/author"
                         ],
                         "name": "commits[0].author",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "ann"
                       }
                     ],
@@ -2469,7 +2469,7 @@
                   "/s/commits/1/author"
                 ],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ann",
                   "ann"
@@ -2570,7 +2570,7 @@
                   "/s/commits/1"
                 ],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null,
                   null
@@ -2664,7 +2664,7 @@
                   "/s/commits/1"
                 ],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null,
                   null
@@ -2711,7 +2711,7 @@
                           "/s/commits"
                         ],
                         "name": "commits",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -2733,7 +2733,7 @@
               {
                 "locations": [],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -2763,7 +2763,7 @@
                           "/s/commits"
                         ],
                         "name": "commits",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -2785,7 +2785,7 @@
               {
                 "locations": [],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -2860,7 +2860,7 @@
                   "/s/commits/2"
                 ],
                 "name": "commits[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "author": "bob",
@@ -2927,7 +2927,7 @@
                           "/s/commits/1/author"
                         ],
                         "name": "who",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "bob"
                       }
                     ],
@@ -2958,7 +2958,7 @@
                   "/s/commits/2/author"
                 ],
                 "name": "commits[].author",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ann",
                   "bob",
@@ -3024,7 +3024,7 @@
                               "/s/commits/1/reviews/0"
                             ],
                             "name": "review",
-                            "outcome": "found",
+                            "outcome": "usable",
                             "value": "no"
                           }
                         ],
@@ -3069,7 +3069,7 @@
                   "/s/commits/1/reviews/0"
                 ],
                 "name": "commit.reviews[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ok",
                   "no"
@@ -3082,7 +3082,7 @@
                   "/s/commits/2"
                 ],
                 "name": "commits[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "author": "ann",
@@ -3163,7 +3163,7 @@
                               "/s/reviewers/1/ok"
                             ],
                             "name": "r.ok",
-                            "outcome": "found",
+                            "outcome": "usable",
                             "value": false
                           }
                         ],
@@ -3212,7 +3212,7 @@
                   "/s/commits/2"
                 ],
                 "name": "commits[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "author": "ann",
@@ -3239,7 +3239,7 @@
                   "/s/reviewers/0"
                 ],
                 "name": "item 1 of reviewers",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": {
                   "by": "ann",
                   "ok": true
@@ -3250,7 +3250,7 @@
                   "/s/reviewers/1"
                 ],
                 "name": "item 2 of reviewers",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": {
                   "by": "bob",
                   "ok": false
@@ -3761,7 +3761,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -3827,7 +3827,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -3893,7 +3893,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -3941,7 +3941,7 @@
                       "/s/xs/1/k"
                     ],
                     "name": "xs[].k",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       5,
                       5
@@ -3970,7 +3970,7 @@
                   "/s/xs"
                 ],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "k": 5,
@@ -3988,7 +3988,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -4054,7 +4054,7 @@
                   "/s/xs/1"
                 ],
                 "name": "xs[].ys.k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null,
                   null
@@ -4171,7 +4171,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -4236,7 +4236,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -4301,7 +4301,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -4348,7 +4348,7 @@
                       "/s/xs/1/k"
                     ],
                     "name": "xs[].k",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       5,
                       5
@@ -4377,7 +4377,7 @@
                   "/s/xs"
                 ],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "k": 5,
@@ -4394,7 +4394,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -4459,7 +4459,7 @@
                   "/s/xs/1"
                 ],
                 "name": "xs[].ys.k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null,
                   null
@@ -4575,7 +4575,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -4641,7 +4641,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -4707,7 +4707,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -4755,7 +4755,7 @@
                       "/s/xs/1/k"
                     ],
                     "name": "xs[].k",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       5,
                       5
@@ -4784,7 +4784,7 @@
                   "/s/xs"
                 ],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "k": 5,
@@ -4802,7 +4802,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -4868,7 +4868,7 @@
                   "/s/xs/1"
                 ],
                 "name": "xs[].ys.k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null,
                   null
@@ -4985,7 +4985,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -5051,7 +5051,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -5117,7 +5117,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -5165,7 +5165,7 @@
                       "/s/xs/1/k"
                     ],
                     "name": "xs[].k",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       5,
                       5
@@ -5194,7 +5194,7 @@
                   "/s/xs"
                 ],
                 "name": "xs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "k": 5,
@@ -5212,7 +5212,7 @@
                   "/s/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -5278,7 +5278,7 @@
                   "/s/xs/1"
                 ],
                 "name": "xs[].ys.k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null,
                   null
@@ -5333,7 +5333,7 @@
                           "/s/xs/2/k"
                         ],
                         "name": "x.k",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": 5
                       },
                       {
@@ -5341,7 +5341,7 @@
                           "/s/xs/2/lo"
                         ],
                         "name": "x.lo",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": 9
                       }
                     ],
@@ -5374,7 +5374,7 @@
                   "/s/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "k": 5,
@@ -5618,7 +5618,7 @@
                   "/xs/1/vs/0"
                 ],
                 "name": "vs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "locations": [
@@ -5650,7 +5650,7 @@
                       "/xs/1/v"
                     ],
                     "name": "v",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "locations": [
                         "/xs/0"
@@ -5673,7 +5673,7 @@
                   "/xs/1/v"
                 ],
                 "name": "v",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "locations": [
                     "/xs/0"
@@ -5746,7 +5746,7 @@
                       "/sbom/components/2/licenses/0/ok"
                     ],
                     "name": "ok",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -5765,7 +5765,7 @@
                   "/sbom/components/2/licenses/0/ok"
                 ],
                 "name": "ok",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -5797,7 +5797,7 @@
                           "/sbom/components/2/licenses/0/notes/0"
                         ],
                         "name": "note",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "bad"
                       }
                     ],
@@ -5827,7 +5827,7 @@
                   "/sbom/components/2/licenses/0/notes/0"
                 ],
                 "name": "notes[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bad"
                 ]
@@ -6783,7 +6783,7 @@
                   "/s/ts/0"
                 ],
                 "name": "ts[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fs": [
@@ -6969,7 +6969,7 @@
                   "/s/ts/0"
                 ],
                 "name": "ts[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fs": [
@@ -7155,7 +7155,7 @@
                   "/s/ts/0"
                 ],
                 "name": "ts[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fs": [
@@ -7343,7 +7343,7 @@
                   "/s/ts/0"
                 ],
                 "name": "ts[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fs": [
@@ -8236,7 +8236,7 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           5,
                           5
@@ -8275,7 +8275,7 @@
                       "/s/lo"
                     ],
                     "name": "lo",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -8293,7 +8293,7 @@
                   "/s/lo"
                 ],
                 "name": "lo",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               },
               {
@@ -8301,7 +8301,7 @@
                   "/s/ts/0"
                 ],
                 "name": "ts[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fs": [
@@ -8487,7 +8487,7 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           5,
                           5
@@ -8525,7 +8525,7 @@
                       "/s/lo"
                     ],
                     "name": "lo",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -8543,7 +8543,7 @@
                   "/s/lo"
                 ],
                 "name": "lo",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               },
               {
@@ -8551,7 +8551,7 @@
                   "/s/ts/0"
                 ],
                 "name": "ts[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fs": [
@@ -8738,7 +8738,7 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           5,
                           5
@@ -8777,7 +8777,7 @@
                       "/s/lo"
                     ],
                     "name": "lo",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -8795,7 +8795,7 @@
                   "/s/lo"
                 ],
                 "name": "lo",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               },
               {
@@ -8803,7 +8803,7 @@
                   "/s/ts/0"
                 ],
                 "name": "ts[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fs": [
@@ -8992,7 +8992,7 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           5,
                           5
@@ -9031,7 +9031,7 @@
                       "/s/lo"
                     ],
                     "name": "lo",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -9049,7 +9049,7 @@
                   "/s/lo"
                 ],
                 "name": "lo",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               },
               {
@@ -9057,7 +9057,7 @@
                   "/s/ts/0"
                 ],
                 "name": "ts[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fs": [
@@ -9450,7 +9450,7 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           5,
                           5
@@ -9461,7 +9461,7 @@
                           "/s/ts/0/pats"
                         ],
                         "name": "t.pats",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           "5"
                         ]
@@ -9512,7 +9512,7 @@
                   "/s/ts/0"
                 ],
                 "name": "ts[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fs": [
@@ -9592,7 +9592,7 @@
                           "/s/ts/0/fs/1/k"
                         ],
                         "name": "t.fs[].k",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           5,
                           5
@@ -9603,7 +9603,7 @@
                           "/s/ts/0/ok"
                         ],
                         "name": "t.ok",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           5
                         ]
@@ -9654,7 +9654,7 @@
                   "/s/ts/0"
                 ],
                 "name": "ts[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fs": [
@@ -9864,7 +9864,7 @@
                       "/s/ok"
                     ],
                     "name": "lim",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "lim"
@@ -9888,7 +9888,7 @@
                   "/s/ok"
                 ],
                 "name": "lim",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "lim"
@@ -9903,7 +9903,7 @@
                   "/s/ts/0/fs/1/k"
                 ],
                 "name": "ts[].fs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -10114,7 +10114,7 @@
                           "/rs/0/gs/0/hs/1/k"
                         ],
                         "name": "hs[0].k",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": 5
                       }
                     ],
@@ -10136,7 +10136,7 @@
                       "/rs/0/ok"
                     ],
                     "name": "p.ok",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       5
                     ]
@@ -10157,7 +10157,7 @@
                   "/rs/0/gs/0/hs/1/k"
                 ],
                 "name": "hs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -10168,7 +10168,7 @@
                   "/rs/0/ok"
                 ],
                 "name": "p.ok",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5
                 ]
@@ -10533,7 +10533,7 @@
                       "/los/0"
                     ],
                     "name": "lo",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": {
                       "xs": [
                         {
@@ -10566,7 +10566,7 @@
                   "/los/0"
                 ],
                 "name": "lo",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": {
                   "xs": [
                     {
@@ -10590,7 +10590,7 @@
                   "/los/0/xs/1/k"
                 ],
                 "name": "xs[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   5
@@ -10814,7 +10814,7 @@
                       "/things/0/xs/2"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1234567890.120956789,
                       1234567890.120956789,
@@ -10847,7 +10847,7 @@
                   "/things/0/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1234567890.120956789,
                   1234567890.120956789,
@@ -10962,7 +10962,7 @@
                       "/things/1/xs/2"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1234567890.120956789,
                       1234567890.120956789,
@@ -10995,7 +10995,7 @@
                   "/things/1/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1234567890.120956789,
                   1234567890.120956789,

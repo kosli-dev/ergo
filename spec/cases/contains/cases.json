@@ -51,7 +51,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "b"
                     ]
@@ -71,7 +71,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "b"
                 ]
@@ -105,7 +105,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -123,7 +123,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -155,7 +155,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "abc"
                   }
                 ],
@@ -173,7 +173,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "abc"
               }
             ],
@@ -205,7 +205,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "a": "a"
                     }
@@ -225,7 +225,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "a": "a"
                 }
@@ -394,7 +394,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "1",
                       1
@@ -415,7 +415,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "1",
                   1
@@ -472,7 +472,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "1"
                     ]
@@ -492,7 +492,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "1"
                 ]
@@ -563,7 +563,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -583,7 +583,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -678,7 +678,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       1,
                       2
@@ -699,7 +699,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   1,
                   2
@@ -734,7 +734,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -754,7 +754,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -788,7 +788,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "b"
                   }
                 ],
@@ -806,7 +806,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "b"
               }
             ],
@@ -923,7 +923,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "garlic"
                     ]
@@ -943,7 +943,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "garlic"
                 ]
@@ -984,7 +984,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -1012,7 +1012,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -1062,7 +1062,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -1072,7 +1072,7 @@
                       "$params:/banned"
                     ],
                     "name": "$params.banned",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -1090,7 +1090,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -1100,7 +1100,7 @@
                   "$params:/banned"
                 ],
                 "name": "$params.banned",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -1140,7 +1140,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -1150,7 +1150,7 @@
                       "$params:/banned"
                     ],
                     "name": "$params.banned",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "a"
                   }
                 ],
@@ -1168,7 +1168,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -1178,7 +1178,7 @@
                   "$params:/banned"
                 ],
                 "name": "$params.banned",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "a"
               }
             ],
@@ -1217,7 +1217,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "b"
                     ]
@@ -1227,7 +1227,7 @@
                       "$params:/banned"
                     ],
                     "name": "$params.banned",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "a",
                       1
@@ -1248,7 +1248,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "b"
                 ]
@@ -1258,7 +1258,7 @@
                   "$params:/banned"
                 ],
                 "name": "$params.banned",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "a",
                   1
@@ -1294,7 +1294,7 @@
                       "$params:/banned"
                     ],
                     "name": "$params.banned",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "a",
                       1
@@ -1323,7 +1323,7 @@
                   "$params:/banned"
                 ],
                 "name": "$params.banned",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "a",
                   1
@@ -1364,7 +1364,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a",
@@ -1381,7 +1381,7 @@
                       "/things/0/pair"
                     ],
                     "name": "pair",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a",
                       "b"
@@ -1402,7 +1402,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a",
@@ -1419,7 +1419,7 @@
                   "/things/0/pair"
                 ],
                 "name": "pair",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a",
                   "b"
@@ -1564,7 +1564,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "c",
@@ -1577,7 +1577,7 @@
                       "/things/0/pair"
                     ],
                     "name": "pair",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "e",
                       "f"
@@ -1598,7 +1598,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "c",
@@ -1611,7 +1611,7 @@
                   "/things/0/pair"
                 ],
                 "name": "pair",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "e",
                   "f"
@@ -1639,7 +1639,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "c",
@@ -1652,7 +1652,7 @@
                       "/pair"
                     ],
                     "name": "$input.pair",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "e",
                       "f"
@@ -1673,7 +1673,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "c",
@@ -1686,7 +1686,7 @@
                   "/pair"
                 ],
                 "name": "$input.pair",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "e",
                   "f"
@@ -1721,7 +1721,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a",
@@ -1752,7 +1752,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a",
@@ -1790,7 +1790,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a",
@@ -1821,7 +1821,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a",
@@ -1859,7 +1859,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a",
@@ -1890,7 +1890,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a",
@@ -1935,7 +1935,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a",
@@ -1966,7 +1966,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a",
@@ -2004,7 +2004,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a",
@@ -2035,7 +2035,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a",
@@ -2073,7 +2073,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a",
@@ -2104,7 +2104,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a",
@@ -2149,7 +2149,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       [
                         "a",
@@ -2162,7 +2162,7 @@
                       "/things/0/pair"
                     ],
                     "name": "pair",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "a"
                   }
                 ],
@@ -2180,7 +2180,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   [
                     "a",
@@ -2193,7 +2193,7 @@
                   "/things/0/pair"
                 ],
                 "name": "pair",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               }
             ],
@@ -2218,7 +2218,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       [
                         "a",
@@ -2231,7 +2231,7 @@
                       "/things/0/pair"
                     ],
                     "name": "pair",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "a"
                   }
                 ],
@@ -2249,7 +2249,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   [
                     "a",
@@ -2262,7 +2262,7 @@
                   "/things/0/pair"
                 ],
                 "name": "pair",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               }
             ],
@@ -2287,7 +2287,7 @@
                       "/things/0/pairs"
                     ],
                     "name": "pairs",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       [
                         "a",
@@ -2300,7 +2300,7 @@
                       "/pair"
                     ],
                     "name": "$input.pair",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "a"
                   }
                 ],
@@ -2318,7 +2318,7 @@
                   "/things/0/pairs"
                 ],
                 "name": "pairs",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   [
                     "a",
@@ -2331,7 +2331,7 @@
                   "/pair"
                 ],
                 "name": "$input.pair",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               }
             ],
@@ -2369,7 +2369,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a"
@@ -2399,7 +2399,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a"
@@ -2436,7 +2436,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a"
@@ -2466,7 +2466,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a"
@@ -2503,7 +2503,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a"
@@ -2533,7 +2533,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a"
@@ -2577,7 +2577,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -2605,7 +2605,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -2640,7 +2640,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -2668,7 +2668,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -2703,7 +2703,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -2731,7 +2731,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -2773,7 +2773,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -2801,7 +2801,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -2836,7 +2836,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -2864,7 +2864,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -2899,7 +2899,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -2927,7 +2927,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -3025,7 +3025,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -3035,7 +3035,7 @@
                       "/things/0/x/name"
                     ],
                     "name": "x.name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "a"
                   }
                 ],
@@ -3053,7 +3053,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -3063,7 +3063,7 @@
                   "/things/0/x/name"
                 ],
                 "name": "x.name",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               }
             ],
@@ -3095,7 +3095,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -3123,7 +3123,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -3158,7 +3158,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -3186,7 +3186,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -3221,7 +3221,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -3249,7 +3249,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -3291,7 +3291,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -3319,7 +3319,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -3354,7 +3354,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -3382,7 +3382,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -3417,7 +3417,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -3445,7 +3445,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -3487,7 +3487,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -3515,7 +3515,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -3550,7 +3550,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -3578,7 +3578,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -3613,7 +3613,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -3641,7 +3641,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -3690,7 +3690,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a"
@@ -3720,7 +3720,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a"
@@ -3757,7 +3757,7 @@
                       "/things/0/labels"
                     ],
                     "name": "labels",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         "a"
@@ -3787,7 +3787,7 @@
                   "/things/0/labels"
                 ],
                 "name": "labels",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     "a"
@@ -3871,7 +3871,7 @@
                       "/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "x"
                     ]
@@ -3882,7 +3882,7 @@
                       "/1/k"
                     ],
                     "name": "$input[].k",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "x",
                       "y"
@@ -3903,7 +3903,7 @@
                   "/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "x"
                 ]
@@ -3914,7 +3914,7 @@
                   "/1/k"
                 ],
                 "name": "$input[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "x",
                   "y"
@@ -3942,7 +3942,7 @@
                       "/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "x"
                     ]
@@ -3970,7 +3970,7 @@
                   "/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "x"
                 ]
@@ -4005,7 +4005,7 @@
                       "/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "x"
                     ]
@@ -4033,7 +4033,7 @@
                   "/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "x"
                 ]
@@ -4068,7 +4068,7 @@
                       "/1/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "z"
                     ]
@@ -4079,7 +4079,7 @@
                       "/1/k"
                     ],
                     "name": "$input[].k",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "x",
                       "y"
@@ -4100,7 +4100,7 @@
                   "/1/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "z"
                 ]
@@ -4111,7 +4111,7 @@
                   "/1/k"
                 ],
                 "name": "$input[].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "x",
                   "y"
@@ -4139,7 +4139,7 @@
                       "/1/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "z"
                     ]
@@ -4167,7 +4167,7 @@
                   "/1/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "z"
                 ]
@@ -4202,7 +4202,7 @@
                       "/1/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "z"
                     ]
@@ -4230,7 +4230,7 @@
                   "/1/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "z"
                 ]
@@ -4278,7 +4278,7 @@
                       "/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -4288,7 +4288,7 @@
                       "/0/k"
                     ],
                     "name": "$input[0].k",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "z"
                   }
                 ],
@@ -4306,7 +4306,7 @@
                   "/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -4316,7 +4316,7 @@
                   "/0/k"
                 ],
                 "name": "$input[0].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "z"
               }
             ],
@@ -4369,7 +4369,7 @@
                       "/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "a"
                     ]
@@ -4379,7 +4379,7 @@
                       ""
                     ],
                     "name": "$input",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "id": "t",
@@ -4405,7 +4405,7 @@
                   "/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "a"
                 ]
@@ -4415,7 +4415,7 @@
                   ""
                 ],
                 "name": "$input",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "id": "t",
@@ -4448,7 +4448,7 @@
                       "/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "a"
                     ]
@@ -4458,7 +4458,7 @@
                       ""
                     ],
                     "name": "$input",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "id": "t",
@@ -4484,7 +4484,7 @@
                   "/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "a"
                 ]
@@ -4494,7 +4494,7 @@
                   ""
                 ],
                 "name": "$input",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "id": "t",
@@ -4534,7 +4534,7 @@
                       "/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       [
                         {
@@ -4549,7 +4549,7 @@
                       "/0/k"
                     ],
                     "name": "$input[0].k",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "a"
                   }
                 ],
@@ -4567,7 +4567,7 @@
                   "/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   [
                     {
@@ -4582,7 +4582,7 @@
                   "/0/k"
                 ],
                 "name": "$input[0].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               }
             ],
@@ -4607,7 +4607,7 @@
                       "/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       [
                         {
@@ -4622,7 +4622,7 @@
                       "/0/k"
                     ],
                     "name": "$input[0].k",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "a"
                   }
                 ],
@@ -4640,7 +4640,7 @@
                   "/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   [
                     {
@@ -4655,7 +4655,7 @@
                   "/0/k"
                 ],
                 "name": "$input[0].k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               }
             ],
@@ -4726,7 +4726,7 @@
                       "/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       [
                         {
@@ -4741,7 +4741,7 @@
                       ""
                     ],
                     "name": "$input",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "id": "x",
@@ -4772,7 +4772,7 @@
                   "/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   [
                     {
@@ -4787,7 +4787,7 @@
                   ""
                 ],
                 "name": "$input",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "id": "x",
@@ -4847,7 +4847,7 @@
                       "/0/items/1"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "tags": [
@@ -4893,7 +4893,7 @@
                   "/0/items/1"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "tags": [
@@ -4964,7 +4964,7 @@
                   "/0/items/1"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "tags": [
@@ -5009,7 +5009,7 @@
                       "/0/items/1"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "tags": [
@@ -5055,7 +5055,7 @@
                   "/0/items/1"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "tags": [
@@ -5119,7 +5119,7 @@
                       "/things/0/items/0"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "tags": [
@@ -5158,7 +5158,7 @@
                   "/things/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "tags": [
@@ -5223,7 +5223,7 @@
                   "/things/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "tags": [
@@ -5280,7 +5280,7 @@
                   "/things/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "tags": [
@@ -5324,7 +5324,7 @@
                       "/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -5342,7 +5342,7 @@
                       "/0/key"
                     ],
                     "name": "key",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "x"
                   }
                 ],
@@ -5360,7 +5360,7 @@
                   "/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -5378,7 +5378,7 @@
                   "/0/key"
                 ],
                 "name": "key",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "x"
               }
             ],
@@ -5403,7 +5403,7 @@
                       "/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a"
                     ]
@@ -5421,7 +5421,7 @@
                       "/0/key"
                     ],
                     "name": "key",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "x"
                   }
                 ],
@@ -5439,7 +5439,7 @@
                   "/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a"
                 ]
@@ -5457,7 +5457,7 @@
                   "/0/key"
                 ],
                 "name": "key",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "x"
               }
             ],
@@ -5613,7 +5613,7 @@
                       "/things/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "ab"
                     ]
@@ -5623,7 +5623,7 @@
                       "/things/0/v"
                     ],
                     "name": "v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "a"
                   },
                   {
@@ -5649,7 +5649,7 @@
                   "/things/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ab"
                 ]
@@ -5659,7 +5659,7 @@
                   "/things/0/v"
                 ],
                 "name": "v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               },
               {
@@ -5692,7 +5692,7 @@
                       "/things/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "ab"
                     ]
@@ -5702,7 +5702,7 @@
                       "/things/0/v"
                     ],
                     "name": "v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "a"
                   },
                   {
@@ -5728,7 +5728,7 @@
                   "/things/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ab"
                 ]
@@ -5738,7 +5738,7 @@
                   "/things/0/v"
                 ],
                 "name": "v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               },
               {
@@ -5771,7 +5771,7 @@
                       "/things/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "ab"
                     ]
@@ -5781,7 +5781,7 @@
                       "/things/0/v"
                     ],
                     "name": "v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "a"
                   },
                   {
@@ -5789,7 +5789,7 @@
                       "$params:/w"
                     ],
                     "name": "$params.w",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -5807,7 +5807,7 @@
                   "/things/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ab"
                 ]
@@ -5817,7 +5817,7 @@
                   "/things/0/v"
                 ],
                 "name": "v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               },
               {
@@ -5825,7 +5825,7 @@
                   "$params:/w"
                 ],
                 "name": "$params.w",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -5850,7 +5850,7 @@
                       "/things/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "ab"
                     ]
@@ -5860,7 +5860,7 @@
                       "/things/0/v"
                     ],
                     "name": "v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "a"
                   },
                   {
@@ -5868,7 +5868,7 @@
                       "$params:/x"
                     ],
                     "name": "$params.x",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "y": "b"
                     }
@@ -5888,7 +5888,7 @@
                   "/things/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ab"
                 ]
@@ -5898,7 +5898,7 @@
                   "/things/0/v"
                 ],
                 "name": "v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               },
               {
@@ -5906,7 +5906,7 @@
                   "$params:/x"
                 ],
                 "name": "$params.x",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "y": "b"
                 }
@@ -5964,7 +5964,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "b"
               }
             ],
@@ -5994,7 +5994,7 @@
                   "$params:/w"
                 ],
                 "name": "$params.w",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -6004,7 +6004,7 @@
                   "$params:/x"
                 ],
                 "name": "$params.x",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "y": "b"
                 }
@@ -6016,7 +6016,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "b"
               }
             ],
@@ -6026,7 +6026,7 @@
                   "$params:/x/y"
                 ],
                 "name": "$params.x.y",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "b"
               }
             ]

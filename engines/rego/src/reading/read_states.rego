@@ -626,8 +626,6 @@ _ref_label(r) := _ref_name(r) if not _ref_walks(r)
 
 _ref_inputs(check) := _ref_read_entries(_check_refs(check))
 
-_ref_entries(refs) := [{"name": t[0], "value": t[1], "locations": t[2], "outcome": t[3]} | some t in sort({[_ref_label(r), _ref_shown(r), _ref_locations(r), _outcome_word(_ref_state(r))] | some r in refs})]
-
 _ref_read_entries(refs) := [_ref_entry(t) | some t in sort({[_ref_label(r), _ref_shown(r), _ref_locations(r), _ref_outcome(r)] | some r in refs})]
 
 _ref_entry(t) := {"name": t[0], "value": t[1], "locations": t[2]} if t[3] == ""

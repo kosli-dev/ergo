@@ -28,7 +28,7 @@ test_applies_row_echoes_the_field_the_filter_read if {
 	some r in rep.results
 	r.check == "$applies"
 	r.subject.id == "b"
-	r.inputs == [_seen("state", "CLOSED", ["/items/1/state"], "found")]
+	r.inputs == [_seen("state", "CLOSED", ["/items/1/state"], "usable")]
 }
 
 test_applies_definition_renders_the_filter_expression if {
@@ -732,7 +732,7 @@ test_an_applies_row_lists_an_input_read_by_two_conditions_once_with_its_location
 	rep := ergo.report({"things": [{"id": "t1", "state": "live", "x": 1}, {"id": "t2", "state": "old"}]}, policy, {})
 	[[r.subject.id, r.inputs] | some r in rep.results; r.check == "$applies"] == [
 		["t1", [{"name": "state", "value": "live", "locations": ["/things/0/state"]}]],
-		["t2", [_seen("state", "old", ["/things/1/state"], "found")]],
+		["t2", [_seen("state", "old", ["/things/1/state"], "usable")]],
 	]
 }
 

@@ -50,7 +50,7 @@
                       "/deployment/regions/1"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "us-east-1"
                   },
                   {
@@ -58,7 +58,7 @@
                       "$params:/allowed_regions"
                     ],
                     "name": "$params.allowed_regions",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "eu-west-1"
                     ]
@@ -78,7 +78,7 @@
                   "/deployment/regions/1"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "us-east-1"
               },
               {
@@ -86,7 +86,7 @@
                   "$params:/allowed_regions"
                 ],
                 "name": "$params.allowed_regions",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "eu-west-1"
                 ]
@@ -110,7 +110,7 @@
                   "$params:/allowed_regions"
                 ],
                 "name": "$params.allowed_regions",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "eu-west-1"
                 ]
@@ -205,7 +205,7 @@
                       "/xs/2"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 3
                   }
                 ],
@@ -223,7 +223,7 @@
                   "/xs/2"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 3
               }
             ],
@@ -280,7 +280,7 @@
                       "/xs/1"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": ""
                   }
                 ],
@@ -298,7 +298,7 @@
                   "/xs/1"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": ""
               }
             ],
@@ -496,7 +496,7 @@
                       "/xs/2"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": ""
                   }
                 ],
@@ -514,7 +514,7 @@
                   "/xs/2"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": ""
               }
             ],
@@ -539,7 +539,7 @@
                       "/xs/3"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -557,7 +557,7 @@
                   "/xs/3"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -638,7 +638,7 @@
                       "/xs/0"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -656,7 +656,7 @@
                   "/xs/0"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               }
             ],
@@ -700,7 +700,7 @@
                       "/xs/2"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "a"
                   }
                 ],
@@ -718,7 +718,7 @@
                   "/xs/2"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "a"
               }
             ],
@@ -818,7 +818,7 @@
                       "/xs/1"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "b"
                   }
                 ],
@@ -836,7 +836,7 @@
                   "/xs/1"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "b"
               }
             ],
@@ -861,7 +861,7 @@
                       "/xs/2"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -879,7 +879,7 @@
                   "/xs/2"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -983,7 +983,7 @@
                       "/xs/1"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "s"
                   }
                 ],
@@ -1001,7 +1001,7 @@
                   "/xs/1"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "s"
               }
             ],
@@ -1026,7 +1026,7 @@
                       "/xs/2"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 3
                   }
                 ],
@@ -1044,7 +1044,7 @@
                   "/xs/2"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 3
               }
             ],
@@ -1069,7 +1069,7 @@
                       "/xs/3"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1
                     ]
@@ -1089,7 +1089,7 @@
                   "/xs/3"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1
                 ]
@@ -1216,7 +1216,7 @@
                       "/xs/2"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "s"
                   }
                 ],
@@ -1234,7 +1234,7 @@
                   "/xs/2"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "s"
               }
             ],
@@ -1347,7 +1347,7 @@
                   "/xs/1/1"
                 ],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   "a"
@@ -1439,7 +1439,7 @@
                   "/xs/2/1"
                 ],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -1505,7 +1505,7 @@
                   "/xs/2/1"
                 ],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -1539,7 +1539,7 @@
                           "/xs/3"
                         ],
                         "name": "region",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -1561,7 +1561,7 @@
               {
                 "locations": [],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -1589,7 +1589,7 @@
                           "/xs/3"
                         ],
                         "name": "region",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -1611,7 +1611,7 @@
               {
                 "locations": [],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -1988,7 +1988,7 @@
                       "/xs/1/1"
                     ],
                     "name": "region[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a",
                       "b"
@@ -2018,7 +2018,7 @@
                   "/xs/1/1"
                 ],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a",
                   "b"
@@ -2056,7 +2056,7 @@
                       "/xs/2/0"
                     ],
                     "name": "region[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1
                     ]
@@ -2083,7 +2083,7 @@
                   "/xs/2/0"
                 ],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1
                 ]
@@ -2119,7 +2119,7 @@
                       "/xs/2/0"
                     ],
                     "name": "region[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1
                     ]
@@ -2146,7 +2146,7 @@
                   "/xs/2/0"
                 ],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1
                 ]
@@ -2276,7 +2276,7 @@
                   {
                     "locations": [],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -2297,7 +2297,7 @@
               {
                 "locations": [],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -2325,7 +2325,7 @@
                   {
                     "locations": [],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -2346,7 +2346,7 @@
               {
                 "locations": [],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -2403,7 +2403,7 @@
                       "/xs/1/region"
                     ],
                     "name": ".region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -2421,7 +2421,7 @@
                   "/xs/1/region"
                 ],
                 "name": ".region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -2532,7 +2532,7 @@
                       "/xs/1/region"
                     ],
                     "name": ".region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -2550,7 +2550,7 @@
                   "/xs/1/region"
                 ],
                 "name": ".region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               },
               {
@@ -2558,7 +2558,7 @@
                   "/xs/1"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": {
                   "id": "b",
                   "region": 2
@@ -2600,7 +2600,7 @@
                       "/xs/0"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "id": "a",
                       "region": 1
@@ -2621,7 +2621,7 @@
                   "/xs/0"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "id": "a",
                   "region": 1
@@ -2717,7 +2717,7 @@
                       "/xs/1"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -2735,7 +2735,7 @@
                   "/xs/1"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -2970,7 +2970,7 @@
                           "/xs/1/l/1"
                         ],
                         "name": "e",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": 2
                       }
                     ],
@@ -2999,7 +2999,7 @@
                   "/xs/1/l/1"
                 ],
                 "name": "l[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -3010,7 +3010,7 @@
                   "/xs/1"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": {
                   "id": "b",
                   "l": [
@@ -4205,7 +4205,7 @@
                       "/sets/1"
                     ],
                     "name": "kept",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       3
                     ]
@@ -4225,7 +4225,7 @@
                   "/sets/1"
                 ],
                 "name": "kept",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   3
                 ]
@@ -4353,7 +4353,7 @@
                   "/lists/0/1"
                 ],
                 "name": "list[].plain",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null,
                   null
@@ -4393,7 +4393,7 @@
                       "/lists/0/1"
                     ],
                     "name": "list[].plain",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       null,
                       null
@@ -4423,7 +4423,7 @@
                   "/lists/0/1"
                 ],
                 "name": "list[].plain",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null,
                   null
@@ -4473,7 +4473,7 @@
                       "/values/1"
                     ],
                     "name": "plain",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -4491,7 +4491,7 @@
                   "/values/1"
                 ],
                 "name": "plain",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -4611,7 +4611,7 @@
                       "$params:/wanted"
                     ],
                     "name": "$params.wanted",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "eu"
                   },
                   {
@@ -4619,7 +4619,7 @@
                       "/xs/1"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "us"
                   }
                 ],
@@ -4637,7 +4637,7 @@
                   "$params:/wanted"
                 ],
                 "name": "$params.wanted",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "eu"
               },
               {
@@ -4645,7 +4645,7 @@
                   "/xs/1"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "us"
               }
             ],
@@ -4670,7 +4670,7 @@
                       "/xs/1"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "us"
                   },
                   {
@@ -4678,7 +4678,7 @@
                       "$params:/wanted"
                     ],
                     "name": "$params.wanted",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "eu"
                   }
                 ],
@@ -4696,7 +4696,7 @@
                   "/xs/1"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "us"
               },
               {
@@ -4704,7 +4704,7 @@
                   "$params:/wanted"
                 ],
                 "name": "$params.wanted",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "eu"
               }
             ],
@@ -4758,7 +4758,7 @@
                       "$params:/wanted"
                     ],
                     "name": "$params.wanted",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "eu"
                   },
                   {
@@ -4784,7 +4784,7 @@
                   "$params:/wanted"
                 ],
                 "name": "$params.wanted",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "eu"
               },
               {
@@ -4825,7 +4825,7 @@
                       "$params:/wanted"
                     ],
                     "name": "$params.wanted",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "eu"
                   }
                 ],
@@ -4851,7 +4851,7 @@
                   "$params:/wanted"
                 ],
                 "name": "$params.wanted",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "eu"
               }
             ],
@@ -4884,7 +4884,7 @@
                       "$params:/allowed"
                     ],
                     "name": "$params.allowed",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "eu",
                       "us"
@@ -4913,7 +4913,7 @@
                   "$params:/allowed"
                 ],
                 "name": "$params.allowed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "eu",
                   "us"
@@ -4941,7 +4941,7 @@
                       "$params:/wanted"
                     ],
                     "name": "$params.wanted",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "eu"
                   },
                   {
@@ -4949,7 +4949,7 @@
                       "/xs/3"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 3
                   }
                 ],
@@ -4967,7 +4967,7 @@
                   "$params:/wanted"
                 ],
                 "name": "$params.wanted",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "eu"
               },
               {
@@ -4975,7 +4975,7 @@
                   "/xs/3"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 3
               }
             ],
@@ -5000,7 +5000,7 @@
                       "/xs/3"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -5008,7 +5008,7 @@
                       "$params:/wanted"
                     ],
                     "name": "$params.wanted",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "eu"
                   }
                 ],
@@ -5026,7 +5026,7 @@
                   "/xs/3"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": 3
               },
               {
@@ -5034,7 +5034,7 @@
                   "$params:/wanted"
                 ],
                 "name": "$params.wanted",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "eu"
               }
             ],
@@ -5059,7 +5059,7 @@
                       "/xs/3"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -5067,7 +5067,7 @@
                       "$params:/allowed"
                     ],
                     "name": "$params.allowed",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "eu",
                       "us"
@@ -5088,7 +5088,7 @@
                   "/xs/3"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": 3
               },
               {
@@ -5096,7 +5096,7 @@
                   "$params:/allowed"
                 ],
                 "name": "$params.allowed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "eu",
                   "us"
@@ -5236,7 +5236,7 @@
                       "/xs/1/0"
                     ],
                     "name": "region[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1
                     ]
@@ -5246,7 +5246,7 @@
                       "$params:/n"
                     ],
                     "name": "$params.n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -5271,7 +5271,7 @@
                   "/xs/1/0"
                 ],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1
                 ]
@@ -5281,7 +5281,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -5315,7 +5315,7 @@
                       "/xs/1/0"
                     ],
                     "name": "region[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1
                     ]
@@ -5325,7 +5325,7 @@
                       "/xs/1/0"
                     ],
                     "name": "region[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1
                     ]
@@ -5366,7 +5366,7 @@
                   "/xs/1/0"
                 ],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1
                 ]
@@ -5412,7 +5412,7 @@
                   {
                     "locations": [],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -5420,7 +5420,7 @@
                       "$params:/n"
                     ],
                     "name": "$params.n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -5441,7 +5441,7 @@
               {
                 "locations": [],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -5449,7 +5449,7 @@
                   "$params:/n"
                 ],
                 "name": "$params.n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -5477,13 +5477,13 @@
                   {
                     "locations": [],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
                     "locations": [],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -5514,7 +5514,7 @@
               {
                 "locations": [],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -5573,7 +5573,7 @@
                       "/ws/2"
                     ],
                     "name": "$input.ws[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "ref": "p"
@@ -5591,7 +5591,7 @@
                       "/xs/0"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "p"
                   }
                 ],
@@ -5620,7 +5620,7 @@
                   "/ws/2"
                 ],
                 "name": "$input.ws[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "ref": "p"
@@ -5638,7 +5638,7 @@
                   "/xs/0"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "p"
               }
             ],
@@ -5870,7 +5870,7 @@
                       "/ys/2"
                     ],
                     "name": "$input.ys[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "k": "a",
@@ -5891,7 +5891,7 @@
                       "/xs/1"
                     ],
                     "name": "s",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "q"
                   }
                 ],
@@ -5920,7 +5920,7 @@
                   "/ys/2"
                 ],
                 "name": "$input.ys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "k": "a",
@@ -5941,7 +5941,7 @@
                   "/xs/1"
                 ],
                 "name": "s",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "q"
               }
             ],
@@ -6199,7 +6199,7 @@
                   "/xs/1/1"
                 ],
                 "name": "tag list[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "v2",
                   3
@@ -6230,7 +6230,7 @@
                       "/xs/2"
                     ],
                     "name": "tag list",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -6248,7 +6248,7 @@
                   "/xs/2"
                 ],
                 "name": "tag list",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -6276,7 +6276,7 @@
                           "/xs/2"
                         ],
                         "name": "tag list",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -6298,7 +6298,7 @@
               {
                 "locations": [],
                 "name": "tag list[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -6355,7 +6355,7 @@
                       "/xs/1"
                     ],
                     "name": "item",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 3
                   }
                 ],
@@ -6373,7 +6373,7 @@
                   "/xs/1"
                 ],
                 "name": "item",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 3
               }
             ],
@@ -6502,7 +6502,7 @@
                       "/xs/1/region"
                     ],
                     "name": ".region",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "name": "n"
                     }
@@ -6522,7 +6522,7 @@
                   "/xs/1/region"
                 ],
                 "name": ".region",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "name": "n"
                 }
@@ -6549,7 +6549,7 @@
                       "/xs/1/region"
                     ],
                     "name": ".region",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "name": "n"
                     }
@@ -6569,7 +6569,7 @@
                   "/xs/1/region"
                 ],
                 "name": ".region",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "name": "n"
                 }
@@ -6579,7 +6579,7 @@
                   "/xs/1"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": {
                   "id": "b",
                   "region": {
@@ -6697,7 +6697,7 @@
                   "/xs/2"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": {
                   "id": "c"
                 }
@@ -6780,7 +6780,7 @@
                       "/xs/0"
                     ],
                     "name": "region",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "id": "a",
                       "region": 1
@@ -6801,7 +6801,7 @@
                   "/xs/0"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "id": "a",
                   "region": 1
@@ -7575,7 +7575,7 @@
                       "/xs/0/ws/1"
                     ],
                     "name": "ws[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "x": 1
@@ -7617,7 +7617,7 @@
                   "/xs/0/ws/1"
                 ],
                 "name": "ws[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "x": 1
@@ -7743,7 +7743,7 @@
                       "/xs/1/0"
                     ],
                     "name": "region[].ws",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       null
                     ]
@@ -7753,7 +7753,7 @@
                       "/xs/1/0/y"
                     ],
                     "name": "region[0].y",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -7778,7 +7778,7 @@
                   "/xs/1/0"
                 ],
                 "name": "region[].ws",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null
                 ]
@@ -7788,7 +7788,7 @@
                   "/xs/1/0/y"
                 ],
                 "name": "region[0].y",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -7824,7 +7824,7 @@
                       "/xs/2/ws/0"
                     ],
                     "name": "ws[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "x": 2
@@ -7836,7 +7836,7 @@
                       "/xs/2/name"
                     ],
                     "name": "region.name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -7861,7 +7861,7 @@
                   "/xs/2/ws/0"
                 ],
                 "name": "ws[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "x": 2
@@ -7873,7 +7873,7 @@
                   "/xs/2/name"
                 ],
                 "name": "region.name",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               }
             ],
@@ -7912,7 +7912,7 @@
                       "/xs/2/ws/0"
                     ],
                     "name": "ws[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "x": 2
@@ -7949,7 +7949,7 @@
                   "/xs/2/ws/0"
                 ],
                 "name": "ws[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "x": 2
@@ -8109,7 +8109,7 @@
                           "/xs/0/l/1"
                         ],
                         "name": "it",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": 2
                       }
                     ],
@@ -8138,7 +8138,7 @@
                   "/xs/0/l/1"
                 ],
                 "name": "l[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -8149,7 +8149,7 @@
                   "/xs/0"
                 ],
                 "name": "region",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": {
                   "id": "a",
                   "l": [
@@ -8301,7 +8301,7 @@
                       "/xs/1"
                     ],
                     "name": "it",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 3
                   }
                 ],
@@ -8319,7 +8319,7 @@
                   "/xs/1"
                 ],
                 "name": "it",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 3
               }
             ],
@@ -8344,7 +8344,7 @@
                       "/xs/1"
                     ],
                     "name": "it",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -8362,7 +8362,7 @@
                   "/xs/1"
                 ],
                 "name": "it",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -8387,7 +8387,7 @@
                       "$params:/p"
                     ],
                     "name": "$params.p",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "a"
                   },
                   {
@@ -8395,7 +8395,7 @@
                       "/xs/1"
                     ],
                     "name": "it",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 3
                   }
                 ],
@@ -8413,7 +8413,7 @@
                   "$params:/p"
                 ],
                 "name": "$params.p",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "a"
               },
               {
@@ -8421,7 +8421,7 @@
                   "/xs/1"
                 ],
                 "name": "it",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 3
               }
             ],
@@ -8583,7 +8583,7 @@
                       "/xs/1/it"
                     ],
                     "name": "it",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -8601,7 +8601,7 @@
                   "/xs/1/it"
                 ],
                 "name": "it",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -8626,7 +8626,7 @@
                       "/xs/1/it"
                     ],
                     "name": "it",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -8644,7 +8644,7 @@
                   "/xs/1/it"
                 ],
                 "name": "it",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -8791,7 +8791,7 @@
                       "/xs/1/v"
                     ],
                     "name": "it",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "it"
@@ -8813,7 +8813,7 @@
                   "/xs/1/v"
                 ],
                 "name": "it",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "it"
@@ -8878,7 +8878,7 @@
                   "/xs/0/1"
                 ],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -9153,7 +9153,7 @@
                       "/xs/1/1"
                     ],
                     "name": "region[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1,
                       1
@@ -9183,7 +9183,7 @@
                   "/xs/1/1"
                 ],
                 "name": "region[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   1
@@ -9282,7 +9282,7 @@
                       "/xs/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 0
                   },
                   {
@@ -9290,7 +9290,7 @@
                       "/xs/0"
                     ],
                     "name": "thing",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "thing": [
                         0
@@ -9313,7 +9313,7 @@
                   "/xs/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 0
               },
               {
@@ -9321,7 +9321,7 @@
                   "/xs/0"
                 ],
                 "name": "thing",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "thing": [
                     0
@@ -9356,7 +9356,7 @@
                       "/xs/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 0
                   },
                   {
@@ -9364,7 +9364,7 @@
                       "/xs/0"
                     ],
                     "name": "thing",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "thing": [
                         0
@@ -9387,7 +9387,7 @@
                   "/xs/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 0
               },
               {
@@ -9395,7 +9395,7 @@
                   "/xs/0"
                 ],
                 "name": "thing",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "thing": [
                     0
@@ -9430,7 +9430,7 @@
                       "/xs/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 0
                   },
                   {
@@ -9438,7 +9438,7 @@
                       "/xs/0"
                     ],
                     "name": "thing",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "thing": [
                         0
@@ -9461,7 +9461,7 @@
                   "/xs/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 0
               },
               {
@@ -9469,7 +9469,7 @@
                   "/xs/0"
                 ],
                 "name": "thing",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "thing": [
                     0
@@ -9504,7 +9504,7 @@
                       "/xs/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 0
                   },
                   {
@@ -9512,7 +9512,7 @@
                       "/o"
                     ],
                     "name": "$input.o",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "a": 0,
                       "b": [
@@ -9535,7 +9535,7 @@
                   "/xs/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 0
               },
               {
@@ -9543,7 +9543,7 @@
                   "/o"
                 ],
                 "name": "$input.o",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "a": 0,
                   "b": [
@@ -9613,7 +9613,7 @@
                       "/kids/1/kid"
                     ],
                     "name": ".kid",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -9631,7 +9631,7 @@
                   "/kids/1/kid"
                 ],
                 "name": ".kid",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -9749,7 +9749,7 @@
                   {
                     "locations": [],
                     "name": ".kid",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -9770,7 +9770,7 @@
               {
                 "locations": [],
                 "name": ".kid",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -9875,7 +9875,7 @@
                       "/xs/0/ys/0"
                     ],
                     "name": "ys[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "thing": 1
@@ -9887,7 +9887,7 @@
                       "/xs/0/thing"
                     ],
                     "name": "p",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "p"
@@ -9918,7 +9918,7 @@
                   "/xs/0/ys/0"
                 ],
                 "name": "ys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "thing": 1
@@ -9930,7 +9930,7 @@
                   "/xs/0/thing"
                 ],
                 "name": "p",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "p"
@@ -10119,7 +10119,7 @@
                       "/things/0/ys/2"
                     ],
                     "name": "ys[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "k": 1,
@@ -10165,7 +10165,7 @@
                   "/things/0/ys/2"
                 ],
                 "name": "ys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "k": 1,
@@ -10218,7 +10218,7 @@
                       "/things/0/ys/2"
                     ],
                     "name": "ys[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "k": 1,
@@ -10264,7 +10264,7 @@
                   "/things/0/ys/2"
                 ],
                 "name": "ys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "k": 1,
@@ -10408,7 +10408,7 @@
                       "/rels/0/kids/0/kid/x"
                     ],
                     "name": ".kid.x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -10426,7 +10426,7 @@
                   "/rels/0/kids/0/kid/x"
                 ],
                 "name": ".kid.x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -10611,7 +10611,7 @@
                       "/rels/0/rel/w"
                     ],
                     "name": ".rel.w",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -10629,7 +10629,7 @@
                   "/rels/0/rel/w"
                 ],
                 "name": ".rel.w",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -10890,7 +10890,7 @@
                       "/releases/0"
                     ],
                     "name": "item",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "id": "a",
                       "item": 1,
@@ -10908,7 +10908,7 @@
                       "/releases/0/item"
                     ],
                     "name": ".item",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -10926,7 +10926,7 @@
                   "/releases/0"
                 ],
                 "name": "item",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "id": "a",
                   "item": 1,
@@ -10944,7 +10944,7 @@
                   "/releases/0/item"
                 ],
                 "name": ".item",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               }
             ],
@@ -11258,7 +11258,7 @@
                       "/releases/0/xs/0"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "item": 3,
@@ -11288,7 +11288,7 @@
                   "/releases/0/xs/0"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "item": 3,
@@ -11348,7 +11348,7 @@
                       "/releases/0/xs/0"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "item": 3,
@@ -11378,7 +11378,7 @@
                   "/releases/0/xs/0"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "item": 3,
@@ -11560,7 +11560,7 @@
                   "/ps/0/items/0/ys/1"
                 ],
                 "name": "ys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "v": 3
@@ -11742,7 +11742,7 @@
                   "/ps/0/mids/0/items/0/ys/1"
                 ],
                 "name": "ys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "s": [
@@ -11938,7 +11938,7 @@
                       "/xs/1/item"
                     ],
                     "name": ".item",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -11956,7 +11956,7 @@
                   "/xs/1/item"
                 ],
                 "name": ".item",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -12201,7 +12201,7 @@
                       "/xs/1/first"
                     ],
                     "name": ".first",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       1,
                       2
@@ -12222,7 +12222,7 @@
                   "/xs/1/first"
                 ],
                 "name": ".first",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   1,
                   2
@@ -12425,7 +12425,7 @@
                       "/ps/0/items/1/my t"
                     ],
                     "name": ".\"my t\"",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -12443,7 +12443,7 @@
                   "/ps/0/items/1/my t"
                 ],
                 "name": ".\"my t\"",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -12535,7 +12535,7 @@
                       "/ps/0/items/1/t"
                     ],
                     "name": ".t",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -12555,7 +12555,7 @@
                       "/ps/0/items/1/t"
                     ],
                     "name": ".t",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -12573,7 +12573,7 @@
                   "/ps/0/items/1/t"
                 ],
                 "name": ".t",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -12665,7 +12665,7 @@
                       "/ps/0/items/1/item"
                     ],
                     "name": ".item",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -12683,7 +12683,7 @@
                   "/ps/0/items/1/item"
                 ],
                 "name": ".item",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -12975,7 +12975,7 @@
                       "/xs/1/item/1"
                     ],
                     "name": ".item[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1,
                       2
@@ -13005,7 +13005,7 @@
                   "/xs/1/item/1"
                 ],
                 "name": ".item[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -13352,7 +13352,7 @@
                   "/xs/2/0"
                 ],
                 "name": "item[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2
                 ]
@@ -13606,7 +13606,7 @@
                   "/xs/1/rel/0"
                 ],
                 "name": ".rel[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2
                 ]
@@ -13696,7 +13696,7 @@
                       "/xs/0"
                     ],
                     "name": "rel",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "rel": [
                         1
@@ -13718,7 +13718,7 @@
                   "/xs/0"
                 ],
                 "name": "rel",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "rel": [
                     1
@@ -13864,7 +13864,7 @@
                       "/things/0/ys/1"
                     ],
                     "name": "ys[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "v": 1
@@ -13898,7 +13898,7 @@
                   "/things/0/ys/1"
                 ],
                 "name": "ys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "v": 1
@@ -14006,7 +14006,7 @@
                       "/things/0/ys/1"
                     ],
                     "name": "ys[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "v": 1
@@ -14040,7 +14040,7 @@
                   "/things/0/ys/1"
                 ],
                 "name": "ys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "v": 1
@@ -14148,7 +14148,7 @@
                       "/things/0/ys/1"
                     ],
                     "name": "ys[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "v": 1
@@ -14182,7 +14182,7 @@
                   "/things/0/ys/1"
                 ],
                 "name": "ys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "v": 1

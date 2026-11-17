@@ -220,7 +220,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2024-01-01T00:00:00Z"
                   },
                   {
@@ -228,7 +228,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -246,7 +246,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2024-01-01T00:00:00Z"
               },
               {
@@ -254,7 +254,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               }
             ],
@@ -286,7 +286,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2024-01-01t00:00:00z"
                   },
                   {
@@ -294,7 +294,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-01-01T00:00:01Z"
                   }
                 ],
@@ -312,7 +312,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2024-01-01t00:00:00z"
               },
               {
@@ -320,7 +320,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-01-01T00:00:01Z"
               }
             ],
@@ -352,7 +352,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2024-02-30T00:00:00Z"
                   },
                   {
@@ -360,7 +360,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-03-02T00:00:01Z"
                   }
                 ],
@@ -378,7 +378,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2024-02-30T00:00:00Z"
               },
               {
@@ -386,7 +386,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-03-02T00:00:01Z"
               }
             ],
@@ -418,7 +418,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "1900-02-29T00:00:00Z"
                   },
                   {
@@ -426,7 +426,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-03-02T00:00:01Z"
                   }
                 ],
@@ -444,7 +444,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "1900-02-29T00:00:00Z"
               },
               {
@@ -452,7 +452,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-03-02T00:00:01Z"
               }
             ],
@@ -484,7 +484,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "1677-12-31T23:59:59Z"
                   },
                   {
@@ -492,7 +492,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-03-02T00:00:01Z"
                   }
                 ],
@@ -510,7 +510,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "1677-12-31T23:59:59Z"
               },
               {
@@ -518,7 +518,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-03-02T00:00:01Z"
               }
             ],
@@ -550,7 +550,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-03-02T00:00:01Z"
                   },
                   {
@@ -558,7 +558,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2262-01-01T00:00:00Z"
                   }
                 ],
@@ -576,7 +576,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-03-02T00:00:01Z"
               },
               {
@@ -584,7 +584,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2262-01-01T00:00:00Z"
               }
             ],
@@ -649,7 +649,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-01-02"
                   },
                   {
@@ -657,7 +657,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-01-01"
                   }
                 ],
@@ -675,7 +675,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-01-02"
               },
               {
@@ -683,7 +683,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-01-01"
               }
             ],
@@ -715,7 +715,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2024-01-01"
                   },
                   {
@@ -723,7 +723,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-01-02T00:00:00Z"
                   }
                 ],
@@ -741,7 +741,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2024-01-01"
               },
               {
@@ -749,7 +749,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-01-02T00:00:00Z"
               }
             ],
@@ -781,7 +781,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2023-02-29"
                   },
                   {
@@ -789,7 +789,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-01-01"
                   }
                 ],
@@ -807,7 +807,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2023-02-29"
               },
               {
@@ -815,7 +815,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-01-01"
               }
             ],
@@ -847,7 +847,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2024-01-01T00:00:00"
                   },
                   {
@@ -855,7 +855,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2024-01-02T00:00:00"
                   }
                 ],
@@ -873,7 +873,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2024-01-01T00:00:00"
               },
               {
@@ -881,7 +881,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2024-01-02T00:00:00"
               }
             ],
@@ -913,7 +913,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2016-12-31T23:59:60Z"
                   },
                   {
@@ -921,7 +921,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2017-01-02T00:00:00Z"
                   }
                 ],
@@ -939,7 +939,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2016-12-31T23:59:60Z"
               },
               {
@@ -947,7 +947,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2017-01-02T00:00:00Z"
               }
             ],
@@ -979,7 +979,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2024-01-01T24:00:00Z"
                   },
                   {
@@ -987,7 +987,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-01-03T00:00:00Z"
                   }
                 ],
@@ -1005,7 +1005,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2024-01-01T24:00:00Z"
               },
               {
@@ -1013,7 +1013,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-01-03T00:00:00Z"
               }
             ],
@@ -1045,7 +1045,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2024-01-01 00:00:00Z"
                   },
                   {
@@ -1053,7 +1053,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-01-02T00:00:00Z"
                   }
                 ],
@@ -1071,7 +1071,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2024-01-01 00:00:00Z"
               },
               {
@@ -1079,7 +1079,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-01-02T00:00:00Z"
               }
             ],
@@ -1111,7 +1111,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2024-01-01T00:00:00+0100"
                   },
                   {
@@ -1119,7 +1119,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-01-02T00:00:00Z"
                   }
                 ],
@@ -1137,7 +1137,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2024-01-01T00:00:00+0100"
               },
               {
@@ -1145,7 +1145,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-01-02T00:00:00Z"
               }
             ],
@@ -1177,7 +1177,7 @@
                       "/things/0/a"
                     ],
                     "name": ".a",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "2024-01-01T00:00:00.Z"
                   },
                   {
@@ -1185,7 +1185,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2024-01-03T00:00:00Z"
                   }
                 ],
@@ -1203,7 +1203,7 @@
                   "/things/0/a"
                 ],
                 "name": ".a",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "2024-01-01T00:00:00.Z"
               },
               {
@@ -1211,7 +1211,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2024-01-03T00:00:00Z"
               }
             ],
@@ -1251,7 +1251,7 @@
                       "/things/0/b"
                     ],
                     "name": "b",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2017-01-02T00:00:00Z"
                   }
                 ],
@@ -1277,7 +1277,7 @@
                   "/things/0/b"
                 ],
                 "name": "b",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2017-01-02T00:00:00Z"
               }
             ],

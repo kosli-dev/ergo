@@ -79,14 +79,14 @@ test_an_applies_row_of_a_child_subject_and_of_a_subject_that_reads_its_parent_ha
 	doc := {"artifact": {"id": "sha", "owner": "ann", "releases": [{"id": 1, "files": [{"owner": "ann"}]}, {"id": 2, "files": [{"owner": "bob"}]}]}}
 	subjects := {"artifact": {"identified_by": "id"}, "release": {"from": "every artifact.releases whose some files.owner is artifact.owner and whose id exists", "identified_by": "id"}}
 	rep := ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": subjects, "requirements": {"r": {"subject": "release", "checks": {"c": "id exists"}}}}, {})
-	_applies_failures_by_subject(rep) == {1: [], 2: [_assertion("some files.owner equals artifact.owner", "value", ["$policy:/subjects/release/from#1"], [_seen("artifact.owner", "ann", ["/artifact/owner"], "found"), _seen("files[].owner", ["bob"], ["/artifact/releases/1/files/0/owner"], "found")], "item 1 of files: owner is \"bob\", and artifact.owner is \"ann\"", [])]}
+	_applies_failures_by_subject(rep) == {1: [], 2: [_assertion("some files.owner equals artifact.owner", "value", ["$policy:/subjects/release/from#1"], [_seen("artifact.owner", "ann", ["/artifact/owner"], "usable"), _seen("files[].owner", ["bob"], ["/artifact/releases/1/files/0/owner"], "usable")], "item 1 of files: owner is \"bob\", and artifact.owner is \"ann\"", [])]}
 	single := {"artifact": {"identified_by": "id"}, "release": {"from": "every artifact.releases whose some files.owner is artifact.owner", "identified_by": "id"}}
 	one := ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": single, "requirements": {"r": {"subject": "release", "checks": {"c": "id exists"}}}}, {})
-	_applies_failures_by_subject(one) == {1: [], 2: [_assertion("some files.owner equals artifact.owner", "value", ["$policy:/subjects/release/from"], [_seen("artifact.owner", "ann", ["/artifact/owner"], "found")], "", [_item("item 1 of files", "value", {"owner": "bob"}, ["/artifact/releases/1/files/0"], [_seen("files[0].owner", "bob", ["/artifact/releases/1/files/0/owner"], "found")], "owner is \"bob\", and artifact.owner is \"ann\"", [])])]}
+	_applies_failures_by_subject(one) == {1: [], 2: [_assertion("some files.owner equals artifact.owner", "value", ["$policy:/subjects/release/from"], [_seen("artifact.owner", "ann", ["/artifact/owner"], "usable")], "", [_item("item 1 of files", "value", {"owner": "bob"}, ["/artifact/releases/1/files/0"], [_seen("files[0].owner", "bob", ["/artifact/releases/1/files/0/owner"], "usable")], "owner is \"bob\", and artifact.owner is \"ann\"", [])])]}
 	chain := {"releases": {"from": "releases", "identified_by": "id"}, "source": {"from": `releases whose some files.path does not match "^docs/"`}}
 	cdoc := {"releases": [{"id": 3, "files": [{"path": "a.go"}]}, {"id": 4, "files": [{"path": "docs/a"}]}]}
 	crep := ergo.report(cdoc, {"ergo_spec": ergo._spec, "subjects": chain, "requirements": {"r": {"subject": "source", "checks": {"c": "id exists"}}}}, {})
-	_applies_failures_by_subject(crep) == {3: [], 4: [_assertion("some files.path does not match \"^docs/\"", "value", ["$policy:/subjects/source/from"], [], "", [_item("item 1 of files", "value", {"path": "docs/a"}, ["/releases/1/files/0"], [_seen("files[0].path", "docs/a", ["/releases/1/files/0/path"], "found")], "path is \"docs/a\"", [])])]}
+	_applies_failures_by_subject(crep) == {3: [], 4: [_assertion("some files.path does not match \"^docs/\"", "value", ["$policy:/subjects/source/from"], [], "", [_item("item 1 of files", "value", {"path": "docs/a"}, ["/releases/1/files/0"], [_seen("files[0].path", "docs/a", ["/releases/1/files/0/path"], "usable")], "path is \"docs/a\"", [])])]}
 }
 
 test_a_from_condition_with_some_reads_a_parent_subject_by_its_name if {
@@ -117,11 +117,11 @@ test_a_check_of_a_chain_reads_the_parent_by_its_name if {
 _owner_input := {"name": "artifact.owner", "value": "ann", "locations": ["/artifact/owner"]}
 
 test_a_one_line_some_or_every_lists_the_parent_it_reads_on_the_right_side if {
-	_owner_rows({"some": "some commits.author is artifact.owner", "every": "every commits.author, if any, is artifact.owner"}) == {"every": [_seen("artifact.owner", "ann", ["/artifact/owner"], "found"), _seen("commits[].author", ["bob", "ann"], ["/artifact/pull_requests/0/commits/0/author", "/artifact/pull_requests/0/commits/1/author"], "found")], "some": [_in("artifact.owner", "ann", ["/artifact/owner"]), _in("commits[].author", ["bob", "ann"], ["/artifact/pull_requests/0/commits/0/author", "/artifact/pull_requests/0/commits/1/author"])]}
+	_owner_rows({"some": "some commits.author is artifact.owner", "every": "every commits.author, if any, is artifact.owner"}) == {"every": [_seen("artifact.owner", "ann", ["/artifact/owner"], "usable"), _seen("commits[].author", ["bob", "ann"], ["/artifact/pull_requests/0/commits/0/author", "/artifact/pull_requests/0/commits/1/author"], "usable")], "some": [_in("artifact.owner", "ann", ["/artifact/owner"]), _in("commits[].author", ["bob", "ann"], ["/artifact/pull_requests/0/commits/0/author", "/artifact/pull_requests/0/commits/1/author"])]}
 }
 
 test_a_one_line_some_lists_the_parent_its_whose_reads if {
-	_owner_rows({"c": "some commits.n whose author is artifact.owner is 2"}) == {"c": [_seen("artifact.owner", "ann", ["/artifact/owner"], "found"), _seen("commits[].n", [1, 2], ["/artifact/pull_requests/0/commits/0/n", "/artifact/pull_requests/0/commits/1/n"], "found")]}
+	_owner_rows({"c": "some commits.n whose author is artifact.owner is 2"}) == {"c": [_seen("artifact.owner", "ann", ["/artifact/owner"], "usable"), _seen("commits[].n", [1, 2], ["/artifact/pull_requests/0/commits/0/n", "/artifact/pull_requests/0/commits/1/n"], "usable")]}
 }
 
 test_a_count_lists_the_parent_its_whose_reads if {
@@ -137,17 +137,17 @@ test_a_count_lists_the_parent_its_whose_reads if {
 }
 
 test_a_one_line_some_after_a_for_line_lists_the_parent_it_reads if {
-	commits := _seen("commits[]", [{"author": "bob", "n": 1}, {"author": "ann", "n": 2}], ["/artifact/pull_requests/0/commits/0", "/artifact/pull_requests/0/commits/1"], "found")
+	commits := _seen("commits[]", [{"author": "bob", "n": 1}, {"author": "ann", "n": 2}], ["/artifact/pull_requests/0/commits/0", "/artifact/pull_requests/0/commits/1"], "usable")
 	doc := object.union(_owner_doc, {"artifact": {"tags": ["x", "ann"]}})
 	checks := {
 		"right": {"for": "every commits as c", "assert": "some artifact.tags is c.author"},
 		"left": {"for": "every commits as c", "assert": "c.author is artifact.owner and some artifact.tags is \"x\""},
 	}
 	rep := ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
-	tags := _seen("artifact.tags[]", ["x", "ann"], ["/artifact/tags/0", "/artifact/tags/1"], "found")
+	tags := _seen("artifact.tags[]", ["x", "ann"], ["/artifact/tags/0", "/artifact/tags/1"], "usable")
 	{r.check: r.inputs | some r in rep.results; r.check in {"right", "left"}} == {
 		"right": [tags, commits],
-		"left": [_seen("artifact.owner", "ann", ["/artifact/owner"], "found"), tags, commits],
+		"left": [_seen("artifact.owner", "ann", ["/artifact/owner"], "usable"), tags, commits],
 	}
 }
 
@@ -163,8 +163,8 @@ test_a_one_line_some_lists_a_missing_or_null_parent_value_as_a_plain_assertion_d
 	checks := {"missing": "some commits.author is artifact.nope", "null": "some commits.author is artifact.nul"}
 	rep := ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
 	{r.check: [r.cause, r.inputs] | some r in rep.results; r.check in {"missing", "null"}} == {
-		"missing": ["absent", [_seen("artifact.nope", null, ["/artifact"], "absent"), object.union(_owner_authors, {"outcome": "found"})]],
-		"null": ["null", [_seen("artifact.nul", null, ["/artifact/nul"], "null"), object.union(_owner_authors, {"outcome": "found"})]],
+		"missing": ["absent", [_seen("artifact.nope", null, ["/artifact"], "absent"), object.union(_owner_authors, {"outcome": "usable"})]],
+		"null": ["null", [_seen("artifact.nul", null, ["/artifact/nul"], "null"), object.union(_owner_authors, {"outcome": "usable"})]],
 	}
 }
 
@@ -214,18 +214,18 @@ _kids_report(from) := ergo.report(_kids_doc, {"ergo_spec": ergo._spec, "subjects
 _applies_of(rep) := [[r.subject.id, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"]
 
 test_a_whose_in_a_childs_from_line_reads_the_parent_by_its_name if {
-	_applies_of(_kids_report("every b.kids whose v equals b.x")) == [["k1", "satisfied", [_in("b.x", 1, ["/bs/0/x"]), _in("v", 1, ["/bs/0/kids/0/v"])]], ["k2", "value", [_seen("b.x", 1, ["/bs/0/x"], "found"), _seen("v", 2, ["/bs/0/kids/1/v"], "found")]]]
+	_applies_of(_kids_report("every b.kids whose v equals b.x")) == [["k1", "satisfied", [_in("b.x", 1, ["/bs/0/x"]), _in("v", 1, ["/bs/0/kids/0/v"])]], ["k2", "value", [_seen("b.x", 1, ["/bs/0/x"], "usable"), _seen("v", 2, ["/bs/0/kids/1/v"], "usable")]]]
 }
 
 test_the_parents_name_on_the_left_of_a_whose_in_a_childs_from_line_is_the_childs_own_field if {
 	rep := ergo.report({"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 2}, "v": 2}, {"id": "k2", "v": 1}]}]}, {"ergo_spec": ergo._spec, "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "every b.kids whose b.x equals v", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
-	_applies_of(rep) == [["k1", "satisfied", [_in(".b.x", 2, ["/bs/0/kids/0/b/x"]), _in("v", 2, ["/bs/0/kids/0/v"])]], ["k2", "absent", [_seen(".b.x", null, ["/bs/0/kids/1"], "absent"), _seen("v", 1, ["/bs/0/kids/1/v"], "found")]]]
+	_applies_of(rep) == [["k1", "satisfied", [_in(".b.x", 2, ["/bs/0/kids/0/b/x"]), _in("v", 2, ["/bs/0/kids/0/v"])]], ["k2", "absent", [_seen(".b.x", null, ["/bs/0/kids/1"], "absent"), _seen("v", 1, ["/bs/0/kids/1/v"], "usable")]]]
 	rep.requirements.r.checks["$applies"].expression == ".b.x equals v"
 }
 
 test_a_dot_before_the_parents_name_in_a_childs_from_line_reads_the_childs_own_field if {
 	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "b": 1}, {"id": "k2", "b": 5}]}]}, {"ergo_spec": ergo._spec, "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "every b.kids whose .b equals 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "b exists"}}}}, {})
-	_applies_of(rep) == [["k1", "satisfied", [_in(".b", 1, ["/bs/0/kids/0/b"])]], ["k2", "value", [_seen(".b", 5, ["/bs/0/kids/1/b"], "found")]]]
+	_applies_of(rep) == [["k1", "satisfied", [_in(".b", 1, ["/bs/0/kids/0/b"])]], ["k2", "value", [_seen(".b", 5, ["/bs/0/kids/1/b"], "usable")]]]
 	rep.requirements.r.checks["$applies"].expression == ".b is 1"
 }
 
@@ -233,7 +233,7 @@ test_a_whose_in_a_childs_from_line_reads_a_part_of_the_parent_by_its_name if {
 	doc := {"bs": [{"id": "b1", "meta": {"tag": {"id": "t1", "x": 1}}, "kids": [{"id": "k1", "v": 1}, {"id": "k2", "v": 2}]}]}
 	subjects := {"b": {"from": "bs", "identified_by": "id", "has": {"tag": {"from": "meta.tag", "identified_by": "id"}}}, "kid": {"from": "every b.kids whose v equals b.tag.x", "identified_by": "id"}}
 	rep := ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
-	_applies_of(rep) == [["k1", "satisfied", [{"locations": ["/bs/0/meta/tag/x"], "name": "b.tag.x", "part": {"id": "t1", "name": "b.tag"}, "value": 1}, _in("v", 1, ["/bs/0/kids/0/v"])]], ["k2", "value", [{"locations": ["/bs/0/meta/tag/x"], "name": "b.tag.x", "outcome": "found", "part": {"id": "t1", "name": "b.tag"}, "value": 1}, _seen("v", 2, ["/bs/0/kids/1/v"], "found")]]]
+	_applies_of(rep) == [["k1", "satisfied", [{"locations": ["/bs/0/meta/tag/x"], "name": "b.tag.x", "part": {"id": "t1", "name": "b.tag"}, "value": 1}, _in("v", 1, ["/bs/0/kids/0/v"])]], ["k2", "value", [{"locations": ["/bs/0/meta/tag/x"], "name": "b.tag.x", "outcome": "usable", "part": {"id": "t1", "name": "b.tag"}, "value": 1}, _seen("v", 2, ["/bs/0/kids/1/v"], "usable")]]]
 }
 
 test_a_count_on_the_left_of_a_whose_in_a_check_reads_the_items_own_field_not_the_parent if {
@@ -248,7 +248,7 @@ test_a_count_on_the_left_of_a_whose_in_a_childs_from_line_reads_the_childs_own_f
 }
 
 test_a_whose_in_a_childs_from_line_that_reads_a_missing_field_of_the_parent_fails_as_absent if {
-	_applies_of(_kids_report("every b.kids whose v equals b.nope")) == [["k1", "absent", [_seen("b.nope", null, ["/bs/0"], "absent"), _seen("v", 1, ["/bs/0/kids/0/v"], "found")]], ["k2", "absent", [_seen("b.nope", null, ["/bs/0"], "absent"), _seen("v", 2, ["/bs/0/kids/1/v"], "found")]]]
+	_applies_of(_kids_report("every b.kids whose v equals b.nope")) == [["k1", "absent", [_seen("b.nope", null, ["/bs/0"], "absent"), _seen("v", 1, ["/bs/0/kids/0/v"], "usable")]], ["k2", "absent", [_seen("b.nope", null, ["/bs/0"], "absent"), _seen("v", 2, ["/bs/0/kids/1/v"], "usable")]]]
 }
 
 test_a_whose_in_the_from_lines_of_a_chain_of_three_subjects_reads_every_ancestor_by_its_name if {
@@ -261,7 +261,7 @@ test_a_whose_in_the_from_lines_of_a_chain_of_three_subjects_reads_every_ancestor
 	rep := ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
 	[[r.subject.id, r.subject.in, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"] == [
 		["k1", {"top": "t1", "b": "b1"}, "satisfied", [{"name": "b.x", "value": 1, "locations": ["/tops/0/bs/0/x"]}, {"name": "top.y", "value": 2, "locations": ["/tops/0/y"]}, {"name": "v", "value": 1, "locations": ["/tops/0/bs/0/kids/0/v"]}, {"name": "w", "value": 2, "locations": ["/tops/0/bs/0/kids/0/w"]}]],
-		["k2", {"top": "t1", "b": "b1"}, "value", [_seen("b.x", 1, ["/tops/0/bs/0/x"], "found"), _seen("top.y", 2, ["/tops/0/y"], "found"), _seen("v", 2, ["/tops/0/bs/0/kids/1/v"], "found"), _seen("w", 2, ["/tops/0/bs/0/kids/1/w"], "found")]],
+		["k2", {"top": "t1", "b": "b1"}, "value", [_seen("b.x", 1, ["/tops/0/bs/0/x"], "usable"), _seen("top.y", 2, ["/tops/0/y"], "usable"), _seen("v", 2, ["/tops/0/bs/0/kids/1/v"], "usable"), _seen("w", 2, ["/tops/0/bs/0/kids/1/w"], "usable")]],
 	]
 }
 
@@ -512,8 +512,8 @@ test_a_position_in_a_list_inside_a_parents_part_is_never_hidden_either if {
 	checks := {"c": "every artifact.rv.state is \"ok\"", "n": "count of artifact.rv is 2"}
 	rep := ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, {"art": "web"})
 	row := _parts_row(rep, "c")
-	row.failures == [_assertion("every artifact.rv.state is \"ok\"", "value", ["$policy:/requirements/r/checks/c"], [], "", [_item("item 2 of artifact.pull_requests", "value", {"reviews": [{"state": "bad"}]}, ["/trail/artifacts/web/pull_requests/1"], [], "", [_item("item 1 of reviews", "value", {"state": "bad"}, ["/trail/artifacts/web/pull_requests/1/reviews/0"], [_seen("artifact.pull_requests[1].reviews[0].state", "bad", ["/trail/artifacts/web/pull_requests/1/reviews/0/state"], "found")], "state is \"bad\"", [])])])]
-	_untagged(row.inputs) == [_seen("artifact.pull_requests[].reviews[].state", ["ok", "bad"], ["/trail/artifacts/web/pull_requests/0/reviews/0/state", "/trail/artifacts/web/pull_requests/1/reviews/0/state"], "found")]
+	row.failures == [_assertion("every artifact.rv.state is \"ok\"", "value", ["$policy:/requirements/r/checks/c"], [], "", [_item("item 2 of artifact.pull_requests", "value", {"reviews": [{"state": "bad"}]}, ["/trail/artifacts/web/pull_requests/1"], [], "", [_item("item 1 of reviews", "value", {"state": "bad"}, ["/trail/artifacts/web/pull_requests/1/reviews/0"], [_seen("artifact.pull_requests[1].reviews[0].state", "bad", ["/trail/artifacts/web/pull_requests/1/reviews/0/state"], "usable")], "state is \"bad\"", [])])])]
+	_untagged(row.inputs) == [_seen("artifact.pull_requests[].reviews[].state", ["ok", "bad"], ["/trail/artifacts/web/pull_requests/0/reviews/0/state", "/trail/artifacts/web/pull_requests/1/reviews/0/state"], "usable")]
 }
 
 test_a_chained_subject_that_starts_deeper_in_its_parents_part_keeps_the_rest_of_the_path_in_its_expressions if {
@@ -636,7 +636,7 @@ test_a_chain_of_three_subjects_with_no_grandparent_or_no_parent_in_scope_fails_m
 test_a_failed_line_lists_a_parents_field_and_the_childs_own_field_of_the_same_name_in_the_order_they_were_read if {
 	policy := {"ergo_spec": ergo._spec, "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "every b.kids", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": {"for": "every cs as c", "assert": "c.ts is at least b.x plus .b.x"}}}}}
 	rep := ergo.report({"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 1}, "cs": [{"ts": 1}]}]}]}, policy, {})
-	[r.failures | some r in rep.results; r.check == "c"] == [[_assertion("c.ts is at least b.x plus .b.x", "value", ["$policy:/requirements/r/checks/c/assert"], [_in("b.x plus .b.x", 2, ["/bs/0/x", "/bs/0/kids/0/b/x"]), _seen("b.x", 1, ["/bs/0/x"], "found"), _seen(".b.x", 1, ["/bs/0/kids/0/b/x"], "found")], "", [_item("item 1 of cs", "value", {"ts": 1}, ["/bs/0/kids/0/cs/0"], [_seen("c.ts", 1, ["/bs/0/kids/0/cs/0/ts"], "found")], "c.ts is 1, and b.x plus .b.x is 2", [])])]]
+	[r.failures | some r in rep.results; r.check == "c"] == [[_assertion("c.ts is at least b.x plus .b.x", "value", ["$policy:/requirements/r/checks/c/assert"], [_in("b.x plus .b.x", 2, ["/bs/0/x", "/bs/0/kids/0/b/x"]), _seen("b.x", 1, ["/bs/0/x"], "usable"), _seen(".b.x", 1, ["/bs/0/kids/0/b/x"], "usable")], "", [_item("item 1 of cs", "value", {"ts": 1}, ["/bs/0/kids/0/cs/0"], [_seen("c.ts", 1, ["/bs/0/kids/0/cs/0/ts"], "usable")], "c.ts is 1, and b.x plus .b.x is 2", [])])]]
 }
 
 test_child_subjects_that_read_each_other_lead_to_a_loop_not_a_chain_too_deep if {
@@ -682,7 +682,7 @@ test_a_for_row_shows_the_parent_fields_its_assertions_read if {
 	inp := {"ts": [{"id": "t1", "x": 1, "d": {"c": {"q": 3}}, "kids": [{"id": "k1", "rs": [{"v": 1}, {"v": 2}]}]}]}
 	rs := {"name": "rs[]", "value": [{"v": 1}, {"v": 2}], "locations": ["/ts/0/kids/0/rs/0", "/ts/0/kids/0/rs/1"]}
 	named_by_rows(subjects, "kid", {"for": "every rs as r", "assert": "r.v is at least t.x"}, inp) == [[true, [_in("rs[]", [{"v": 1}, {"v": 2}], ["/ts/0/kids/0/rs/0", "/ts/0/kids/0/rs/1"]), _in("t.x", 1, ["/ts/0/x"])]]]
-	named_by_rows(subjects, "kid", {"for": "every rs as r", "assert": "r.v is at least t.y"}, inp) == [[false, [_seen("rs[]", [{"v": 1}, {"v": 2}], ["/ts/0/kids/0/rs/0", "/ts/0/kids/0/rs/1"], "found"), _seen("t.y", null, ["/ts/0"], "absent")]]]
+	named_by_rows(subjects, "kid", {"for": "every rs as r", "assert": "r.v is at least t.y"}, inp) == [[false, [_seen("rs[]", [{"v": 1}, {"v": 2}], ["/ts/0/kids/0/rs/0", "/ts/0/kids/0/rs/1"], "usable"), _seen("t.y", null, ["/ts/0"], "absent")]]]
 	named_by_rows(subjects, "kid", {"for": "every rs as r", "assert": "r.v is at most t.cov.q"}, inp) == [[true, [rs, {"name": "t.cov.q", "part": {"id": null, "name": "t.cov"}, "value": 3, "locations": ["/ts/0/d/c/q"]}]]]
 }
 
@@ -739,7 +739,7 @@ test_a_walk_through_a_for_alias_fails_like_a_count_when_the_key_is_missing_or_th
 test_a_second_for_item_that_starts_at_a_parents_part_names_its_unchecked_items_like_its_inputs if {
 	doc := {"artifact": {"n": "a", "ps": {"w": [{"t": "k1"}, {}]}, "kids": [{"id": 1, "keys": ["k1"]}]}}
 	row := _part_for_row(doc, {"ap": "ps"}, {"for": "every keys as k, every artifact.ap.w whose t is k as x", "assert": "x.t is 1"}, {})
-	row.failures == [_assertion("x.t is 1", "unusable", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 1 of artifact.ap.w", "unusable", {"t": "k1"}, ["/artifact/ps/w/0"], [_seen("x.t", "k1", ["/artifact/ps/w/0/t"], "found")], "x.t is \"k1\", which isn't a number", [])])]), _item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 2 of artifact.ap.w", "absent", {}, ["/artifact/ps/w/1"], [_seen("artifact.ap.w[1].t", null, ["/artifact/ps/w/1"], "absent")], "t is missing", [])])]
+	row.failures == [_assertion("x.t is 1", "unusable", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 1 of artifact.ap.w", "unusable", {"t": "k1"}, ["/artifact/ps/w/0"], [_seen("x.t", "k1", ["/artifact/ps/w/0/t"], "unusable")], "x.t is \"k1\", which isn't a number", [])])]), _item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 2 of artifact.ap.w", "absent", {}, ["/artifact/ps/w/1"], [_seen("artifact.ap.w[1].t", null, ["/artifact/ps/w/1"], "absent")], "t is missing", [])])]
 	"item 2 of artifact.ap.w" in {f.name | walk(row.failures, [_, f]); f.kind == "item"}
 	[i.name | some i in row.inputs] == ["artifact.ap.w[]", "keys[]"]
 }
@@ -754,7 +754,7 @@ test_a_second_for_item_that_starts_at_a_parents_part_named_by_an_item_keeps_the_
 test_a_second_for_item_that_starts_at_a_plain_parent_input_or_params_keeps_its_name_in_unchecked_items if {
 	doc := {"artifact": {"n": "a", "w": [{"t": "k1"}, {}], "kids": [{"id": 1, "keys": ["k1"]}]}, "top": [{"t": "k1"}, {}]}
 	plain := _part_for_row(doc, {}, {"for": "every keys as k, every artifact.w whose t is k as x", "assert": "x.t is 1"}, {})
-	plain.failures == [_assertion("x.t is 1", "unusable", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 1 of artifact.w", "unusable", {"t": "k1"}, ["/artifact/w/0"], [_seen("x.t", "k1", ["/artifact/w/0/t"], "found")], "x.t is \"k1\", which isn't a number", [])])]), _item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 2 of artifact.w", "absent", {}, ["/artifact/w/1"], [_seen("artifact.w[1].t", null, ["/artifact/w/1"], "absent")], "t is missing", [])])]
+	plain.failures == [_assertion("x.t is 1", "unusable", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 1 of artifact.w", "unusable", {"t": "k1"}, ["/artifact/w/0"], [_seen("x.t", "k1", ["/artifact/w/0/t"], "unusable")], "x.t is \"k1\", which isn't a number", [])])]), _item("item 1 of keys", "unusable", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 2 of artifact.w", "absent", {}, ["/artifact/w/1"], [_seen("artifact.w[1].t", null, ["/artifact/w/1"], "absent")], "t is missing", [])])]
 	from_input := _part_for_row(doc, {}, {"for": "every keys as k, every $input.top whose t is k as x", "assert": "x.t is 1"}, {})
 	"item 2 of $input.top" in {f.name | walk(from_input.failures, [_, f]); f.kind == "item"}
 	from_params := _part_for_row(doc, {}, {"for": "every keys as k, every $params.l whose t is k as x", "assert": "x.t is 1"}, {"l": [{"t": "k1"}, {}]})
@@ -764,9 +764,9 @@ test_a_second_for_item_that_starts_at_a_plain_parent_input_or_params_keeps_its_n
 test_a_first_for_item_through_a_parents_part_or_named_by_names_its_failed_items_like_a_walk if {
 	doc := {"artifact": {"n": "a", "ps": {"w": [1, 0], "k1": [1, 0]}, "kids": [{"id": 1, "k": "k1"}]}}
 	part := _part_for_row(doc, {"ap": "ps"}, {"for": "every artifact.ap.w as x", "assert": "x is 1"}, {})
-	part.failures == [_assertion("x is 1", "value", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 2 of artifact.ap.w", "value", 0, ["/artifact/ps/w/1"], [_seen("x", 0, ["/artifact/ps/w/1"], "found")], "item 2 of artifact.ap.w is 0", [])])]
+	part.failures == [_assertion("x is 1", "value", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 2 of artifact.ap.w", "value", 0, ["/artifact/ps/w/1"], [_seen("x", 0, ["/artifact/ps/w/1"], "usable")], "item 2 of artifact.ap.w is 0", [])])]
 	named := _part_for_row(doc, {"ap": "ps"}, {"for": "every artifact.ap named by k as x", "assert": "x is 1"}, {})
-	named.failures == [_assertion("x is 1", "value", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 2 of artifact.ap.k1", "value", 0, ["/artifact/ps/k1/1"], [_seen("x", 0, ["/artifact/ps/k1/1"], "found")], "item 2 of artifact.ap.k1 is 0", [])])]
+	named.failures == [_assertion("x is 1", "value", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 2 of artifact.ap.k1", "value", 0, ["/artifact/ps/k1/1"], [_seen("x", 0, ["/artifact/ps/k1/1"], "usable")], "item 2 of artifact.ap.k1 is 0", [])])]
 	[i.name | some i in named.inputs] == ["artifact.ap named by k[]", "k"]
 }
 

@@ -262,8 +262,8 @@ test_a_present_filter_rules_out_a_subject_whose_field_is_missing if {
 test_a_ref_step_renders_and_is_recorded_like_any_ref if {
 	rep := report(trail_doc, trail_req(attested)) with data.params as {"artifact": "app", "att": "junit"}
 	rep.requirements.s.checks.c.expression == `attestations named by $params.att.status is "COMPLETE"`
-	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.att", "value": "junit", "locations": ["$params:/att"], "outcome": "found"}]
-	ergo.violations(rep)[0].inputs == [_seen("attestations named by $params.att.status", "FAILED", ["/trail/artifacts/app/attestations/junit/status"], "found"), _seen("$params.att", "junit", ["$params:/att"], "found")]
+	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.att", "value": "junit", "locations": ["$params:/att"], "outcome": "usable"}]
+	ergo.violations(rep)[0].inputs == [_seen("attestations named by $params.att.status", "FAILED", ["/trail/artifacts/app/attestations/junit/status"], "usable"), _seen("$params.att", "junit", ["$params:/att"], "usable")]
 }
 
 test_a_ref_step_in_from_that_cannot_be_read_shows_up_in_violations if {
@@ -319,8 +319,8 @@ test_assertions_joined_with_and_or_listed_under_assert_give_one_row_that_names_t
 	r := ergo.report(doc, policy, {})
 	r.requirements.s.checks.list.expression == "username does not equal author and ts is after last_commit"
 	rows := [[row.subject.id, row.check, row.cause, row.failures] | some row in r.results; row.check in {"line", "list"}]
-	late := [_seen("ts", 1, ["/prs/0/ts"], "found"), _seen("last_commit", 2, ["/prs/0/last_commit"], "found")]
-	gone := [_assertion("username does not equal author", "value", ["$policy:/requirements/s/checks/CHECK"], [_seen("username", "ann", ["/prs/1/username"], "found"), _seen("author", "ann", ["/prs/1/author"], "found")], "username is \"ann\", and author is \"ann\"", []), _assertion("ts is after last_commit", "absent", ["$policy:/requirements/s/checks/CHECK"], [_seen("ts", null, ["/prs/1"], "absent"), _seen("last_commit", 2, ["/prs/1/last_commit"], "found")], "ts is missing", [])]
+	late := [_seen("ts", 1, ["/prs/0/ts"], "usable"), _seen("last_commit", 2, ["/prs/0/last_commit"], "usable")]
+	gone := [_assertion("username does not equal author", "value", ["$policy:/requirements/s/checks/CHECK"], [_seen("username", "ann", ["/prs/1/username"], "usable"), _seen("author", "ann", ["/prs/1/author"], "usable")], "username is \"ann\", and author is \"ann\"", []), _assertion("ts is after last_commit", "absent", ["$policy:/requirements/s/checks/CHECK"], [_seen("ts", null, ["/prs/1"], "absent"), _seen("last_commit", 2, ["/prs/1/last_commit"], "usable")], "ts is missing", [])]
 	rows == [
 		["late", "line", "value", [_assertion("ts is after last_commit", "value", ["$policy:/requirements/s/checks/line#2"], late, "ts is 1, and last_commit is 2", [])]],
 		["late", "list", "value", [_assertion("ts is after last_commit", "value", ["$policy:/requirements/s/checks/list/assert/1"], late, "ts is 1, and last_commit is 2", [])]],
@@ -345,13 +345,13 @@ test_an_applies_row_that_fails_with_a_cause_other_than_value_is_a_violation_with
 
 test_a_violation_lists_a_ref_once_when_the_row_lists_it_already if {
 	rep := ergo.report({"things": [{"id": "t", "x": "z"}]}, _sentence_policy({"c": "x is in $params.k"}), {"k": ["a"]})
-	[v.inputs | some v in ergo.violations(rep)] == [[_seen("x", "z", ["/things/0/x"], "found"), _seen("$params.k", ["a"], ["$params:/k"], "found")]]
+	[v.inputs | some v in ergo.violations(rep)] == [[_seen("x", "z", ["/things/0/x"], "usable"), _seen("$params.k", ["a"], ["$params:/k"], "usable")]]
 }
 
 test_a_violation_carries_the_tags_of_the_row_it_copies if {
 	rep := _parts_report(_tag_has, {"c": "coverage.hunks_total is 99"}, _tag_doc)
 	violation := [v | some v in ergo.violations(rep); v.check == "c"][0]
-	violation.inputs[0] == {"name": "coverage.hunks_total", "part": {"id": "att-7", "name": "coverage"}, "value": 25, "locations": ["/trail/dd/cov/hunks_total"], "outcome": "found"}
+	violation.inputs[0] == {"name": "coverage.hunks_total", "part": {"id": "att-7", "name": "coverage"}, "value": 25, "locations": ["/trail/dd/cov/hunks_total"], "outcome": "usable"}
 }
 
 test_a_broken_branch_along_a_from_line_with_every_fails_min_subjects_with_the_worst_cause_and_lists_where if {
@@ -382,14 +382,14 @@ test_a_broken_branch_along_a_from_line_with_every_fails_min_subjects_with_the_wo
 test_a_failed_line_lists_its_values_in_the_violations_too if {
 	check := {"for": "some approvers as approver, every commits as commit", "assert": "approver.t is more than commit.t"}
 	r := ergo.report({"things": [{"id": 1, "approvers": [{"t": 5}], "commits": [{"t": 9}]}]}, _sentence_policy({"c": check}), {})
-	[v.failures | some v in ergo.violations(r); v.check == "c"] == [[_assertion("approver.t is more than commit.t", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 1 of approvers", "value", {"t": 5}, ["/things/0/approvers/0"], [], "", [_item("item 1 of commits", "value", {"t": 9}, ["/things/0/commits/0"], [_seen("approver.t", 5, ["/things/0/approvers/0/t"], "found"), _seen("commit.t", 9, ["/things/0/commits/0/t"], "found")], "approver.t is 5, and commit.t is 9", [])])])]]
+	[v.failures | some v in ergo.violations(r); v.check == "c"] == [[_assertion("approver.t is more than commit.t", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 1 of approvers", "value", {"t": 5}, ["/things/0/approvers/0"], [], "", [_item("item 1 of commits", "value", {"t": 9}, ["/things/0/commits/0"], [_seen("approver.t", 5, ["/things/0/approvers/0/t"], "usable"), _seen("commit.t", 9, ["/things/0/commits/0/t"], "usable")], "approver.t is 5, and commit.t is 9", [])])])]]
 }
 
 test_a_ref_in_refs_has_its_location_and_a_violation_copies_it if {
 	rep := ergo.report({"things": [{"id": "t1", "x": "z"}]}, _sentence_policy({"c": "x is in $params.allowed"}), {"allowed": ["p", "q"]})
-	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.allowed", "value": ["p", "q"], "locations": ["$params:/allowed"], "outcome": "found"}]
-	[r.inputs | some r in rep.results; r.check == "c"] == [[_seen("x", "z", ["/things/0/x"], "found"), _seen("$params.allowed", ["p", "q"], ["$params:/allowed"], "found")]]
-	[v.inputs | some v in ergo.violations(rep)] == [[_seen("x", "z", ["/things/0/x"], "found"), _seen("$params.allowed", ["p", "q"], ["$params:/allowed"], "found")]]
+	rep.requirements.s.checks.c["$refs"] == [{"name": "$params.allowed", "value": ["p", "q"], "locations": ["$params:/allowed"], "outcome": "usable"}]
+	[r.inputs | some r in rep.results; r.check == "c"] == [[_seen("x", "z", ["/things/0/x"], "usable"), _seen("$params.allowed", ["p", "q"], ["$params:/allowed"], "usable")]]
+	[v.inputs | some v in ergo.violations(rep)] == [[_seen("x", "z", ["/things/0/x"], "usable"), _seen("$params.allowed", ["p", "q"], ["$params:/allowed"], "usable")]]
 }
 
 test_a_policy_with_no_requirements_has_a_violation_for_the_row_that_says_so if {

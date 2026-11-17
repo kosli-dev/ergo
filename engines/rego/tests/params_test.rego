@@ -18,11 +18,11 @@ test_a_path_can_start_at_params if {
 
 test_params_that_are_missing_fail_closed if {
 	check := "licences does not contain $params.banned"
-	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [_seen("licences", ["MIT"], ["/items/0/licences"], "found"), _seen("$params.banned", null, ["$params:"], "absent")]]]
-	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [_seen("licences", ["MIT"], ["/items/0/licences"], "found"), _seen("$params.banned", null, ["$params:"], "absent")]]] with data.params as {}
-	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [_seen("licences", ["MIT"], ["/items/0/licences"], "found"), _seen("$params.banned", null, ["$params:"], "absent")]]] with data.params as null
-	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "unusable", [_seen("licences", ["MIT"], ["/items/0/licences"], "found"), _seen("$params.banned", null, ["$params:"], "unusable")]]] with data.params as "not an object"
-	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "null", [_seen("licences", ["MIT"], ["/items/0/licences"], "found"), _seen("$params.banned", null, ["$params:/banned"], "null")]]] with data.params as {"banned": null}
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [_seen("licences", ["MIT"], ["/items/0/licences"], "usable"), _seen("$params.banned", null, ["$params:"], "absent")]]]
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [_seen("licences", ["MIT"], ["/items/0/licences"], "usable"), _seen("$params.banned", null, ["$params:"], "absent")]]] with data.params as {}
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [_seen("licences", ["MIT"], ["/items/0/licences"], "usable"), _seen("$params.banned", null, ["$params:"], "absent")]]] with data.params as null
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "unusable", [_seen("licences", ["MIT"], ["/items/0/licences"], "usable"), _seen("$params.banned", null, ["$params:"], "unusable")]]] with data.params as "not an object"
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "null", [_seen("licences", ["MIT"], ["/items/0/licences"], "usable"), _seen("$params.banned", null, ["$params:/banned"], "null")]]] with data.params as {"banned": null}
 }
 
 test_a_present_check_on_a_param_fails_as_absent_with_no_params_and_as_unusable_with_params_that_are_not_an_object if {
@@ -53,7 +53,7 @@ test_the_report_never_reads_data_params if {
 
 test_params_are_not_read_from_the_input if {
 	check := "name is $params.artifact_name"
-	params_rows({"items": [{"id": 1, "name": "app"}], "params": {"artifact_name": "app"}}, check) == [[false, "absent", [_seen("name", "app", ["/items/0/name"], "found"), _seen("$params.artifact_name", null, ["$params:"], "absent")]]]
+	params_rows({"items": [{"id": 1, "name": "app"}], "params": {"artifact_name": "app"}}, check) == [[false, "absent", [_seen("name", "app", ["/items/0/name"], "usable"), _seen("$params.artifact_name", null, ["$params:"], "absent")]]]
 }
 
 test_a_key_called_dollar_dollar_params_is_read_with_literal if {
@@ -77,7 +77,7 @@ test_a_whole_params_read_with_null_params_fails_as_absent_and_with_an_object_rea
 	check := "$params exists"
 	params_rows({"items": [{"id": 1}]}, check) == [[false, "absent", [_seen("$params", null, ["$params:"], "absent")]]] with data.params as null
 	params_rows({"items": [{"id": 1}]}, check) == [[true, "satisfied", [{"name": "$params", "value": {}, "locations": ["$params:"]}]]] with data.params as {}
-	params_rows({"items": [{"id": 1}]}, check) == [[false, "unusable", [_seen("$params", "x", ["$params:"], "found")]]] with data.params as "x"
+	params_rows({"items": [{"id": 1}]}, check) == [[false, "unusable", [_seen("$params", "x", ["$params:"], "usable")]]] with data.params as "x"
 }
 
 test_a_path_reads_params_input_lookups_positions_and_quoted_keys if {
@@ -124,7 +124,7 @@ test_a_missing_param_only_fails_the_options_of_an_any_of_that_read_it if {
 }
 
 test_a_one_line_some_lists_an_input_value_it_compares_with_but_not_a_param if {
-	_owner_rows({"input": "some commits.author is $input.artifact.owner", "param": "some commits.author is $params.owner"}) == {"input": [_in("$input.artifact.owner", "ann", ["/artifact/owner"]), _in("commits[].author", ["bob", "ann"], ["/artifact/pull_requests/0/commits/0/author", "/artifact/pull_requests/0/commits/1/author"])], "param": [_seen("commits[].author", ["bob", "ann"], ["/artifact/pull_requests/0/commits/0/author", "/artifact/pull_requests/0/commits/1/author"], "found")]}
+	_owner_rows({"input": "some commits.author is $input.artifact.owner", "param": "some commits.author is $params.owner"}) == {"input": [_in("$input.artifact.owner", "ann", ["/artifact/owner"]), _in("commits[].author", ["bob", "ann"], ["/artifact/pull_requests/0/commits/0/author", "/artifact/pull_requests/0/commits/1/author"])], "param": [_seen("commits[].author", ["bob", "ann"], ["/artifact/pull_requests/0/commits/0/author", "/artifact/pull_requests/0/commits/1/author"], "usable")]}
 }
 
 _list_rights := [
@@ -178,7 +178,7 @@ test_a_field_after_does_not_match_gives_the_verdict_and_cause_of_the_same_list_r
 
 test_a_list_read_with_named_by_a_params_key_shows_the_field_and_the_list_it_read if {
 	rows := _sentence_rows({"c": "x is in $params.lists named by $params.k"}, _named_things, _named_params)
-	[[r[1], r[2], r[3]] | some r in rows] == [[true, "satisfied", [_in("x", "p", ["/things/0/x"]), _in("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"])]], [false, "value", [_seen("x", "z", ["/things/1/x"], "found"), _seen("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"], "found")]], [true, "satisfied", [_in("x", "p", ["/things/2/x"]), _in("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"])]], [true, "satisfied", [_in("x", "p", ["/things/3/x"]), _in("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"])]], [true, "satisfied", [_in("x", "p", ["/things/4/x"]), _in("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"])]], [false, "unusable", [_seen("x", 3, ["/things/5/x"], "found"), _seen("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"], "found")]]]
+	[[r[1], r[2], r[3]] | some r in rows] == [[true, "satisfied", [_in("x", "p", ["/things/0/x"]), _in("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"])]], [false, "value", [_seen("x", "z", ["/things/1/x"], "usable"), _seen("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"], "usable")]], [true, "satisfied", [_in("x", "p", ["/things/2/x"]), _in("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"])]], [true, "satisfied", [_in("x", "p", ["/things/3/x"]), _in("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"])]], [true, "satisfied", [_in("x", "p", ["/things/4/x"]), _in("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"])]], [false, "unusable", [_seen("x", 3, ["/things/5/x"], "unusable"), _seen("$params.lists named by $params.k", ["p", "q"], ["$params:/lists/a"], "usable")]]]
 }
 
 test_a_pick_sorted_by_a_field_named_by_a_param_reads_the_param if {

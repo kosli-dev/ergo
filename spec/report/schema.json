@@ -113,7 +113,7 @@
         "name": {"type": "string"},
         "value": true,
         "locations": {"$ref": "#/$defs/locations"},
-        "outcome": {"enum": ["found", "absent", "null", "unusable", "not_an_object"], "description": "Only on failed rows, on an entry that reads a path: how the read ended. A value Ergo works out, like a count of or a sum of, has none."},
+        "outcome": {"enum": ["usable", "unusable", "null", "absent", "not_an_object"], "description": "Only on failed rows, on an entry that reads a path: how the read ended, with usable for a value the check can use, and unusable for one that was read but the check can't use. A value Ergo works out, like a count of or a sum of, has none."},
         "part": {
           "type": "object",
           "description": "Present when the input was read through a part: the part's alias as the check writes it, and the id read inside the part, or null.",

@@ -65,7 +65,7 @@
                                   "/repos/1/groups/1/teams/1/units/1/ok"
                                 ],
                                 "name": "groups[1].teams[1].units[1].ok",
-                                "outcome": "found",
+                                "outcome": "usable",
                                 "value": false
                               }
                             ],
@@ -154,7 +154,7 @@
                   "/repos/1/groups/1/teams/1/units/1/ok"
                 ],
                 "name": "groups[].teams[].units[].ok",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true,
                   true,
@@ -280,7 +280,7 @@
                   "/repos/2/groups/1/teams/1/units/1/ok"
                 ],
                 "name": "groups[].teams[].units[].ok",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true,
                   true,
@@ -391,7 +391,7 @@
                                       "/orgs/0/repos/1/groups/1/teams/0/units/1/cells/1/ok"
                                     ],
                                     "name": "groups[1].teams[0].units[1].cells[1].ok",
-                                    "outcome": "found",
+                                    "outcome": "usable",
                                     "value": false
                                   }
                                 ],
@@ -549,7 +549,7 @@
                   "/orgs/0/repos/1/groups/1/teams/1/units/1/cells/1/ok"
                 ],
                 "name": "groups[].teams[].units[].cells[].ok",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true,
                   true,
@@ -812,7 +812,7 @@
                   "/orgs/1/repos/1/groups/1/teams/1/units/1/cells/1/ok"
                 ],
                 "name": "groups[].teams[].units[].cells[].ok",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true,
                   true,
@@ -1008,7 +1008,7 @@
                       "/orgs/0/repos/1/groups/1/teams/1/units/1/cells/1"
                     ],
                     "name": "groups[].teams[].units[].cells[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "ok": true
@@ -1107,7 +1107,7 @@
                   "/orgs/0/repos/1/groups/1/teams/1/units/1/cells/1"
                 ],
                 "name": "groups[].teams[].units[].cells[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "ok": true
@@ -1433,7 +1433,7 @@
                           "/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/1/ok"
                         ],
                         "name": "k1.k2.k3.k4.k5.k6.k7.k8.k9[1].ok",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": false
                       }
                     ],
@@ -1464,7 +1464,7 @@
                   "/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/1/ok"
                 ],
                 "name": "k1.k2.k3.k4.k5.k6.k7.k8.k9[].ok",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true,
                   false
@@ -1603,7 +1603,7 @@
                           "/things/1/items/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/1"
                         ],
                         "name": "z.k1.k2.k3.k4.k5.k6.k7.k8.k9[]",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           1,
                           2
@@ -1655,7 +1655,7 @@
                   "/things/1/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "k1": {
@@ -1785,7 +1785,7 @@
                           "/things/1/k1/0/k2/k3/k4/k5/k6/k7/k8/k9/0"
                         ],
                         "name": "item 1 of k1[0].k2.k3.k4.k5.k6.k7.k8.k9",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": false
                       }
                     ],
@@ -1832,7 +1832,7 @@
                   "/things/1/k1/0/k2/k3/k4/k5/k6/k7/k8/k9/0"
                 ],
                 "name": "k1[].k2.k3.k4.k5.k6.k7.k8.k9[0]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   false
                 ]
@@ -1936,7 +1936,7 @@
                       "/k1/k2/k3/k4/k5/k6/k7/k8/k9/k10/1/ok"
                     ],
                     "name": "ok",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -1954,7 +1954,7 @@
                   "/k1/k2/k3/k4/k5/k6/k7/k8/k9/k10/1/ok"
                 ],
                 "name": "ok",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -2118,7 +2118,7 @@
                       "/things/1/n"
                     ],
                     "name": "n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 3
                   },
                   {
@@ -2135,7 +2135,7 @@
                       "/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/k10/1"
                     ],
                     "name": "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1,
                       1
@@ -2156,7 +2156,7 @@
                   "/things/1/n"
                 ],
                 "name": "n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 3
               },
               {
@@ -2173,7 +2173,7 @@
                   "/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/k10/1"
                 ],
                 "name": "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   1
@@ -2353,7 +2353,7 @@
                   "/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/z/1"
                 ],
                 "name": "x.z[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -2590,7 +2590,7 @@
                       "/bs/0/kids/1/xs/0"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "b": {
@@ -2610,7 +2610,7 @@
                       "/bs/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/z"
                     ],
                     "name": "b.x.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "b.x"
@@ -2641,7 +2641,7 @@
                   "/bs/0/kids/1/xs/0"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "b": {
@@ -2661,7 +2661,7 @@
                   "/bs/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/z"
                 ],
                 "name": "b.x.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "b.x"

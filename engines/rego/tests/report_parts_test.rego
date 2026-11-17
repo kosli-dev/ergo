@@ -28,20 +28,20 @@ test_a_null_field_is_read_as_null_and_only_on_a_failed_row if {
 	not "outcome" in object.keys(rows[1].inputs[0])
 }
 
-test_a_wrong_typed_field_is_found_and_the_row_fails_as_unusable if {
+test_a_wrong_typed_field_is_unusable_and_the_row_fails_as_unusable if {
 	rows := _parts_results({"things": [{"id": "w", "x": [1]}]}, "x is \"ok\"", {})
 	rows[0].cause == "unusable"
-	rows[0].inputs == [{"name": "x", "value": [1], "locations": ["/things/0/x"], "outcome": "found"}]
+	rows[0].inputs == [{"name": "x", "value": [1], "locations": ["/things/0/x"], "outcome": "unusable"}]
 }
 
 test_a_failed_row_gives_an_outcome_to_every_path_input_of_each_entry_under_it if {
 	rows := _parts_results({"things": [{"id": "a", "x": 1, "y": 3}]}, "x is 1 and y is 2", {})
 	every i in rows[0].inputs {
-		i.outcome == "found"
+		i.outcome == "usable"
 	}
 	every f in rows[0].failures {
 		every i in f.inputs {
-			i.outcome == "found"
+			i.outcome == "usable"
 		}
 	}
 }
@@ -122,7 +122,7 @@ test_an_item_that_failed_two_sentences_of_a_for_line_sits_under_each_of_them if 
 test_a_for_line_item_names_what_it_read_through_the_alias_and_has_a_value_and_a_location if {
 	rows := _parts_results({"things": [{"id": "a", "xs": [{"v": 2}, {"v": 1}]}]}, {"for": "every xs as x", "assert": "x.v is 1"}, {})
 	item := rows[0].failures[0].failures[0]
-	item.inputs == [{"name": "x.v", "value": 2, "locations": ["/things/0/xs/0/v"], "outcome": "found"}]
+	item.inputs == [{"name": "x.v", "value": 2, "locations": ["/things/0/xs/0/v"], "outcome": "usable"}]
 	item.value == {"v": 2}
 	item.locations == ["/things/0/xs/0"]
 }
@@ -136,12 +136,12 @@ test_a_walk_that_reads_no_list_has_a_list_entry_under_its_assertion if {
 test_a_list_failing_deep_down_sits_under_the_items_it_belongs_to if {
 	doc := {"things": [{"id": 1, "groups": [{"teams": [{"units": [{"n": 1}, {"n": 2}]}, {"units": null}]}]}]}
 	rows := _walk_rows({"c": "every groups.teams.units.n is 1"}, doc, {})
-	rows[0][3] == [_assertion("every groups.teams.units.n is 1", "null", ["$policy:/requirements/s/checks/c"], [], "", [_item("item 1 of groups", "null", {"teams": [{"units": [{"n": 1}, {"n": 2}]}, {"units": null}]}, ["/things/0/groups/0"], [], "", [_item("item 1 of teams", "value", {"units": [{"n": 1}, {"n": 2}]}, ["/things/0/groups/0/teams/0"], [], "", [_item("item 2 of units", "value", {"n": 2}, ["/things/0/groups/0/teams/0/units/1"], [_seen("groups[0].teams[0].units[1].n", 2, ["/things/0/groups/0/teams/0/units/1/n"], "found")], "n is 2", [])]), _item("item 2 of teams", "null", {"units": null}, ["/things/0/groups/0/teams/1"], [], "", [_list("units", "null", [_seen("groups[0].teams[1].units", null, ["/things/0/groups/0/teams/1/units"], "null")], "units is null")])])])]
+	rows[0][3] == [_assertion("every groups.teams.units.n is 1", "null", ["$policy:/requirements/s/checks/c"], [], "", [_item("item 1 of groups", "null", {"teams": [{"units": [{"n": 1}, {"n": 2}]}, {"units": null}]}, ["/things/0/groups/0"], [], "", [_item("item 1 of teams", "value", {"units": [{"n": 1}, {"n": 2}]}, ["/things/0/groups/0/teams/0"], [], "", [_item("item 2 of units", "value", {"n": 2}, ["/things/0/groups/0/teams/0/units/1"], [_seen("groups[0].teams[0].units[1].n", 2, ["/things/0/groups/0/teams/0/units/1/n"], "usable")], "n is 2", [])]), _item("item 2 of teams", "null", {"units": null}, ["/things/0/groups/0/teams/1"], [], "", [_list("units", "null", [_seen("groups[0].teams[1].units", null, ["/things/0/groups/0/teams/1/units"], "null")], "units is null")])])])]
 }
 
 test_a_for_lines_second_list_through_a_deep_path_sits_under_the_items_it_belongs_to if {
 	rows := _for_rows({"for": "every prs as pr, every pr.meta.commits as c", "assert": "c.signed is true"}, [{"id": 1, "prs": [{"meta": {"commits": [{"signed": true}, {"signed": false}]}}, {"meta": {"commits": null}}]}], {})
-	rows[0][2] == [_assertion("c.signed is true", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 1 of prs", "value", {"meta": {"commits": [{"signed": true}, {"signed": false}]}}, ["/things/0/prs/0"], [], "", [_item("item 2 of pr.meta.commits", "value", {"signed": false}, ["/things/0/prs/0/meta/commits/1"], [_seen("c.signed", false, ["/things/0/prs/0/meta/commits/1/signed"], "found")], "c.signed is false", [])])]), _item("item 2 of prs", "null", {"meta": {"commits": null}}, ["/things/0/prs/1"], [], "", [_list("pr.meta.commits", "null", [_seen("pr.meta.commits", null, ["/things/0/prs/1/meta/commits"], "null")], "pr.meta.commits is null")])]
+	rows[0][2] == [_assertion("c.signed is true", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 1 of prs", "value", {"meta": {"commits": [{"signed": true}, {"signed": false}]}}, ["/things/0/prs/0"], [], "", [_item("item 2 of pr.meta.commits", "value", {"signed": false}, ["/things/0/prs/0/meta/commits/1"], [_seen("c.signed", false, ["/things/0/prs/0/meta/commits/1/signed"], "usable")], "c.signed is false", [])])]), _item("item 2 of prs", "null", {"meta": {"commits": null}}, ["/things/0/prs/1"], [], "", [_list("pr.meta.commits", "null", [_seen("pr.meta.commits", null, ["/things/0/prs/1/meta/commits"], "null")], "pr.meta.commits is null")])]
 }
 
 test_two_sentences_that_say_the_same_text_each_keep_it_and_the_row_says_it_once if {

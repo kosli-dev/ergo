@@ -21,7 +21,7 @@
                       "/ws/0"
                     ],
                     "name": "word",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "a"
                   }
                 ],
@@ -39,7 +39,7 @@
                   "/ws/0"
                 ],
                 "name": "word",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               }
             ],
@@ -146,7 +146,7 @@
                       "/ws/3"
                     ],
                     "name": "word",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 3
                   }
                 ],
@@ -166,7 +166,7 @@
                       "/ws/3"
                     ],
                     "name": "word",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -184,7 +184,7 @@
                   "/ws/3"
                 ],
                 "name": "word",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -209,7 +209,7 @@
                       "/ws/4"
                     ],
                     "name": "word",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "cc"
                   }
                 ],
@@ -227,7 +227,7 @@
                   "/ws/4"
                 ],
                 "name": "word",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "cc"
               }
             ],
@@ -391,7 +391,7 @@
                       "/releases/tags/1"
                     ],
                     "name": "tag list",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "v0"
                     ]
@@ -411,7 +411,7 @@
                   "/releases/tags/1"
                 ],
                 "name": "tag list",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "v0"
                 ]
@@ -440,7 +440,7 @@
                       "/releases/tags/2"
                     ],
                     "name": "tag list",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "broken"
                   }
                 ],
@@ -458,7 +458,7 @@
                   "/releases/tags/2"
                 ],
                 "name": "tag list",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "broken"
               }
             ],
@@ -541,7 +541,7 @@
                       "/ws/1"
                     ],
                     "name": "w",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "apple"
                   }
                 ],
@@ -559,7 +559,7 @@
                   "/ws/1"
                 ],
                 "name": "w",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "apple"
               }
             ],
@@ -635,7 +635,7 @@
                       "/ws/1"
                     ],
                     "name": "w",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "bee"
                   }
                 ],
@@ -653,7 +653,7 @@
                   "/ws/1"
                 ],
                 "name": "w",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "bee"
               }
             ],
@@ -678,7 +678,7 @@
                       "/ws/2"
                     ],
                     "name": "w",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "ally"
                   }
                 ],
@@ -696,7 +696,7 @@
                   "/ws/2"
                 ],
                 "name": "w",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "ally"
               }
             ],
@@ -784,7 +784,7 @@
                       "/ws/4"
                     ],
                     "name": "w",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -804,7 +804,7 @@
                       "/ws/4"
                     ],
                     "name": "w",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -822,7 +822,7 @@
                   "/ws/4"
                 ],
                 "name": "w",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -898,7 +898,7 @@
                       "/ws/1"
                     ],
                     "name": "w",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "bee"
                   }
                 ],
@@ -916,7 +916,7 @@
                   "/ws/1"
                 ],
                 "name": "w",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "bee"
               }
             ],
@@ -941,7 +941,7 @@
                       "/ws/2"
                     ],
                     "name": "w",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "ally"
                   }
                 ],
@@ -959,7 +959,7 @@
                   "/ws/2"
                 ],
                 "name": "w",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "ally"
               }
             ],
@@ -1129,7 +1129,7 @@
                   "/deployments/0/ws/2"
                 ],
                 "name": "ws[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bay",
                   "bee",
@@ -1240,7 +1240,7 @@
                   "/deployments/1/ws/1"
                 ],
                 "name": "ws[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bay",
                   "bez"
@@ -1338,7 +1338,7 @@
                           "/deployments/0/ws/1"
                         ],
                         "name": "w",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "bee"
                       }
                     ],
@@ -1368,7 +1368,7 @@
                   "/deployments/0/ws/2"
                 ],
                 "name": "ws[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bay",
                   "bee",
@@ -1431,7 +1431,7 @@
                       "/items/1/that"
                     ],
                     "name": ".that",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "y"
                   }
                 ],
@@ -1449,7 +1449,7 @@
                   "/items/1/that"
                 ],
                 "name": ".that",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "y"
               }
             ],
@@ -1476,7 +1476,7 @@
                       "/items/0"
                     ],
                     "name": "w",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "that": "x"
                     }
@@ -1496,7 +1496,7 @@
                   "/items/0"
                 ],
                 "name": "w",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "that": "x"
                 }
@@ -1557,7 +1557,7 @@
                       "/deployments/1/that"
                     ],
                     "name": ".that",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "y"
                   }
                 ],
@@ -1575,7 +1575,7 @@
                   "/deployments/1/that"
                 ],
                 "name": ".that",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "y"
               }
             ],
@@ -1968,7 +1968,7 @@
                   "/deployments/0/ws/1"
                 ],
                 "name": "ws[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "b",
                   3
@@ -2020,7 +2020,7 @@
                   "/deployments/0/ws/1"
                 ],
                 "name": "ws[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bay",
                   3
@@ -2407,7 +2407,7 @@
                   "/t/items/1"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "kind": "a",
@@ -2497,7 +2497,7 @@
                   "/t/items/1"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "kind": "a",
@@ -2654,7 +2654,7 @@
                       "/ws/1"
                     ],
                     "name": "my w",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "apple"
                   }
                 ],
@@ -2672,7 +2672,7 @@
                   "/ws/1"
                 ],
                 "name": "my w",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "apple"
               }
             ],
@@ -2729,7 +2729,7 @@
                       "/items/0"
                     ],
                     "name": "my w",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "kind": "a"
                     }
@@ -2749,7 +2749,7 @@
                   "/items/0/kind"
                 ],
                 "name": "kind",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               },
               {
@@ -2757,7 +2757,7 @@
                   "/items/0"
                 ],
                 "name": "my w",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "kind": "a"
                 }
@@ -2812,7 +2812,7 @@
                   "/items/1"
                 ],
                 "name": "my w",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "x"
               }
             ],
@@ -2869,7 +2869,7 @@
                       "/ws/1"
                     ],
                     "name": "item",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "apple"
                   }
                 ],
@@ -2887,7 +2887,7 @@
                   "/ws/1"
                 ],
                 "name": "item",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "apple"
               }
             ],
@@ -2944,7 +2944,7 @@
                       "/items/0"
                     ],
                     "name": "item",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "kind": "a"
                     }
@@ -2964,7 +2964,7 @@
                   "/items/0"
                 ],
                 "name": "item",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "kind": "a"
                 }
@@ -2974,7 +2974,7 @@
                   "/items/0/kind"
                 ],
                 "name": "kind",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               }
             ],
@@ -3019,7 +3019,7 @@
                   "/items/1"
                 ],
                 "name": "item",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "x"
               },
               {
@@ -3084,7 +3084,7 @@
                       "/ws/1"
                     ],
                     "name": "that",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "apple"
                   }
                 ],
@@ -3102,7 +3102,7 @@
                   "/ws/1"
                 ],
                 "name": "that",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "apple"
               }
             ],
@@ -3159,7 +3159,7 @@
                       "/items/0"
                     ],
                     "name": "that",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {
                       "kind": "a"
                     }
@@ -3179,7 +3179,7 @@
                   "/items/0/kind"
                 ],
                 "name": "kind",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               },
               {
@@ -3187,7 +3187,7 @@
                   "/items/0"
                 ],
                 "name": "that",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": {
                   "kind": "a"
                 }
@@ -3242,7 +3242,7 @@
                   "/items/1"
                 ],
                 "name": "that",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "x"
               }
             ],
@@ -3299,7 +3299,7 @@
                       "/ws/1"
                     ],
                     "name": "it",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "apple"
                   }
                 ],
@@ -3317,7 +3317,7 @@
                   "/ws/1"
                 ],
                 "name": "it",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "apple"
               }
             ],
@@ -3462,7 +3462,7 @@
                   "/ts/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1
@@ -3539,7 +3539,7 @@
                   "/ts/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1
@@ -3625,7 +3625,7 @@
                   "/ts/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "c": null,
@@ -3706,7 +3706,7 @@
                   "/ts/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "c": null,
@@ -3816,7 +3816,7 @@
                   "/ts/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "c": "s",
@@ -3913,7 +3913,7 @@
                   "/ts/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "c": "s",
@@ -4000,7 +4000,7 @@
                   "/ts/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   {
@@ -4042,7 +4042,7 @@
                   "/ts/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   {

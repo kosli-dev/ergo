@@ -883,6 +883,12 @@ _m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(c
 _m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(check, subj, row.cause))}) if {
 	row.passed == false
 	row.cause != "missing"
+	row.cause != "unusable"
+}
+
+_m_filter(check, subj, row) := object.union(object.union(row, {"message": _m_joined(_m_line(check, subj, row.cause))}), _m_unusable_marks(check, subj, row)) if {
+	row.passed == false
+	row.cause == "unusable"
 }
 
 _m_filter_walk(_, _, true, _, _) := {}

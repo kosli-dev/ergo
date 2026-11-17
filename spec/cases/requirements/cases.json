@@ -3251,7 +3251,7 @@
                       "/1/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -3269,7 +3269,7 @@
                   "/1/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -3387,7 +3387,7 @@
                       "/1/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -3405,7 +3405,7 @@
                   "/1/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -3895,7 +3895,7 @@
                       "/t/1/e"
                     ],
                     "name": "e",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "q"
                   }
                 ],
@@ -3913,7 +3913,7 @@
                   "/t/1/e"
                 ],
                 "name": "e",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "q"
               }
             ],
@@ -4569,7 +4569,7 @@
                       "/t/1/e"
                     ],
                     "name": "e",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "q"
                   }
                 ],
@@ -4587,7 +4587,7 @@
                   "/t/1/e"
                 ],
                 "name": "e",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "q"
               }
             ],
@@ -4746,7 +4746,7 @@
                       "/t/0/e"
                     ],
                     "name": "e",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "q"
                   }
                 ],
@@ -4764,7 +4764,7 @@
                   "/t/0/e"
                 ],
                 "name": "e",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "q"
               }
             ],
@@ -4804,7 +4804,7 @@
                       "/t/0/e"
                     ],
                     "name": "e",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "q"
                   }
                 ],
@@ -4822,7 +4822,7 @@
                   "/t/0/e"
                 ],
                 "name": "e",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "q"
               }
             ],
@@ -4929,7 +4929,7 @@
                       "/t/0/e"
                     ],
                     "name": "e",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "q"
                   }
                 ],
@@ -4967,7 +4967,7 @@
                   "/t/0/e"
                 ],
                 "name": "e",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "q"
               },
               {
@@ -5964,7 +5964,7 @@
                           "/t/0/cs/1/v"
                         ],
                         "name": "cs[1].v",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "z"
                       }
                     ],
@@ -5985,7 +5985,7 @@
                       "$params:/ok"
                     ],
                     "name": "$params.ok",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a",
                       "b"
@@ -6007,7 +6007,7 @@
                   "/t/0/cs/1/v"
                 ],
                 "name": "cs[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a",
                   "z"
@@ -6042,7 +6042,7 @@
                           "/t/0/cs/1/v"
                         ],
                         "name": "cs[1].v",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "z"
                       }
                     ],
@@ -6063,7 +6063,7 @@
                       "$params:/ok"
                     ],
                     "name": "$params.ok",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a",
                       "b"
@@ -6085,7 +6085,7 @@
                   "/t/0/cs/1/v"
                 ],
                 "name": "cs[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a",
                   "z"
@@ -6096,7 +6096,7 @@
                   "$params:/ok"
                 ],
                 "name": "$params.ok",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a",
                   "b"
@@ -6334,7 +6334,7 @@
                       "/things/1/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -6352,7 +6352,7 @@
                   "/things/1/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -12619,7 +12619,7 @@
                       "/commits/1/pull_requests/1/approved_by"
                     ],
                     "name": "approved_by",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": ""
                   }
                 ],
@@ -12637,7 +12637,7 @@
                   "/commits/1/pull_requests/1/approved_by"
                 ],
                 "name": "approved_by",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": ""
               }
             ],
@@ -12665,7 +12665,7 @@
                       "/commits/1/pull_requests/2/approved_by"
                     ],
                     "name": "approved_by",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 5
                   }
                 ],
@@ -12683,7 +12683,7 @@
                   "/commits/1/pull_requests/2/approved_by"
                 ],
                 "name": "approved_by",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 5
               }
             ],
@@ -12808,7 +12808,7 @@
                       "/commits/1/pull_requests/1/approved_by"
                     ],
                     "name": "approved_by",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": ""
                   }
                 ],
@@ -12826,7 +12826,7 @@
                   "/commits/1/pull_requests/1/approved_by"
                 ],
                 "name": "approved_by",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": ""
               }
             ],
@@ -12855,7 +12855,7 @@
                       "/commits/1/pull_requests/2/approved_by"
                     ],
                     "name": "approved_by",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 5
                   }
                 ],
@@ -12873,7 +12873,7 @@
                   "/commits/1/pull_requests/2/approved_by"
                 ],
                 "name": "approved_by",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 5
               }
             ],
@@ -14737,7 +14737,7 @@
                       "/commits/0/pull_requests/2/approved_by"
                     ],
                     "name": "approved_by",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 5
                   }
                 ],
@@ -14755,7 +14755,7 @@
                   "/commits/0/pull_requests/2/approved_by"
                 ],
                 "name": "approved_by",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 5
               }
             ],
@@ -14903,7 +14903,7 @@
                       "/commits/0/pull_requests/2/approved_by"
                     ],
                     "name": "approved_by",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 5
                   }
                 ],
@@ -14921,7 +14921,7 @@
                   "/commits/0/pull_requests/2/approved_by"
                 ],
                 "name": "approved_by",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 5
               }
             ],
@@ -15143,7 +15143,7 @@
                       "/releases/0/artifacts/1/signatures/0/valid"
                     ],
                     "name": "valid",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -15161,7 +15161,7 @@
                   "/releases/0/artifacts/1/signatures/0/valid"
                 ],
                 "name": "valid",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -15213,7 +15213,7 @@
                       "/releases/1/artifacts/0/signatures/1/valid"
                     ],
                     "name": "valid",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -15231,7 +15231,7 @@
                   "/releases/1/artifacts/0/signatures/1/valid"
                 ],
                 "name": "valid",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -15264,7 +15264,7 @@
                       "/releases/0/artifacts/1/signatures/0/valid"
                     ],
                     "name": "valid",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -15282,7 +15282,7 @@
                   "/releases/0/artifacts/1/signatures/0/valid"
                 ],
                 "name": "valid",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -15456,7 +15456,7 @@
                       "/releases/0/artifacts/1/signatures/0/valid"
                     ],
                     "name": "valid",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -15474,7 +15474,7 @@
                   "/releases/0/artifacts/1/signatures/0/valid"
                 ],
                 "name": "valid",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -15524,7 +15524,7 @@
                       "/releases/1/artifacts/0/signatures/1/valid"
                     ],
                     "name": "valid",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -15542,7 +15542,7 @@
                   "/releases/1/artifacts/0/signatures/1/valid"
                 ],
                 "name": "valid",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],

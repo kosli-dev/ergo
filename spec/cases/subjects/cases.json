@@ -769,7 +769,7 @@
                       "/deployments/1/environment"
                     ],
                     "name": "environment",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "staging"
                   }
                 ],
@@ -787,7 +787,7 @@
                   "/deployments/1/change_type"
                 ],
                 "name": "change_type",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "emergency"
               },
               {
@@ -795,7 +795,7 @@
                   "/deployments/1/environment"
                 ],
                 "name": "environment",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "staging"
               }
             ],
@@ -820,7 +820,7 @@
                       "/deployments/2/change_type"
                     ],
                     "name": "change_type",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "normal"
                   }
                 ],
@@ -838,7 +838,7 @@
                   "/deployments/2/change_type"
                 ],
                 "name": "change_type",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "normal"
               },
               {
@@ -846,7 +846,7 @@
                   "/deployments/2/environment"
                 ],
                 "name": "environment",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "prod"
               }
             ],
@@ -997,7 +997,7 @@
                   "/deployments/0/environment"
                 ],
                 "name": "environment",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "prod"
               }
             ],
@@ -1104,7 +1104,7 @@
                       "/deployments/0/change_type"
                     ],
                     "name": "change_type",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": true
                   }
                 ],
@@ -1122,7 +1122,7 @@
                   "/deployments/0/change_type"
                 ],
                 "name": "change_type",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": true
               },
               {
@@ -1130,7 +1130,7 @@
                   "/deployments/0/environment"
                 ],
                 "name": "environment",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "prod"
               }
             ],
@@ -1251,7 +1251,7 @@
                       "/deployments/0/change_type"
                     ],
                     "name": "change_type",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "normal"
                   }
                 ],
@@ -1269,7 +1269,7 @@
                   "/deployments/0/change_type"
                 ],
                 "name": "change_type",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "normal"
               },
               {
@@ -1591,7 +1591,7 @@
                   {
                     "locations": [],
                     "name": "reviews[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -1612,7 +1612,7 @@
               {
                 "locations": [],
                 "name": "reviews[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -1933,7 +1933,7 @@
                           "/releases/1/files/0/path"
                         ],
                         "name": "files[0].path",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "docs/upgrade.md"
                       }
                     ],
@@ -1963,7 +1963,7 @@
                   "/releases/1/files/0/path"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/upgrade.md"
                 ]
@@ -1993,7 +1993,7 @@
                           "/releases/2/files"
                         ],
                         "name": "files",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -2015,7 +2015,7 @@
               {
                 "locations": [],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -2342,7 +2342,7 @@
                           "/releases/3/files/0/path"
                         ],
                         "name": "files[0].path",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "docs/upgrade.md"
                       }
                     ],
@@ -2396,7 +2396,7 @@
                   "/releases/3/files/1"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/upgrade.md",
                   null
@@ -2427,7 +2427,7 @@
                           "/releases/4/files/0/path"
                         ],
                         "name": "files[0].path",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "docs/upgrade.md"
                       }
                     ],
@@ -2481,7 +2481,7 @@
                   "/releases/4/files/1/path"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/upgrade.md",
                   5
@@ -2639,7 +2639,7 @@
                           "/releases/0/files/1/path"
                         ],
                         "name": "files[1].path",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "src/api.go"
                       }
                     ],
@@ -2670,7 +2670,7 @@
                   "/releases/0/files/1/path"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/upgrade.md",
                   "src/api.go"
@@ -2722,7 +2722,7 @@
                           "/releases/2/files"
                         ],
                         "name": "files",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -2744,7 +2744,7 @@
               {
                 "locations": [],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -3102,7 +3102,7 @@
                   "/releases/3/files/1"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/upgrade.md",
                   null
@@ -3164,7 +3164,7 @@
                   "/releases/4/files/1/path"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/upgrade.md",
                   5
@@ -3323,7 +3323,7 @@
                           "/releases/0/files/1/path"
                         ],
                         "name": "files[1].path",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "src/api.go"
                       }
                     ],
@@ -3354,7 +3354,7 @@
                   "/releases/0/files/1/path"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/upgrade.md",
                   "src/api.go"
@@ -3712,7 +3712,7 @@
                   "/releases/3/files/1"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/upgrade.md",
                   null
@@ -3901,7 +3901,7 @@
                       "/releases/1/files/0/path"
                     ],
                     "name": "files[].path",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "docs/upgrade.md"
                     ]
@@ -3921,7 +3921,7 @@
                   "/releases/1/files/0/path"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/upgrade.md"
                 ]
@@ -3931,7 +3931,7 @@
                   "/releases/1/ticket"
                 ],
                 "name": "ticket",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "ok"
               }
             ],
@@ -3956,7 +3956,7 @@
                       "/releases/2/ticket"
                     ],
                     "name": "ticket",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "no"
                   }
                 ],
@@ -3974,7 +3974,7 @@
                   "/releases/2/files/0/path"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "src/api.go"
                 ]
@@ -3984,7 +3984,7 @@
                   "/releases/2/ticket"
                 ],
                 "name": "ticket",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "no"
               }
             ],
@@ -4200,7 +4200,7 @@
                           "/trail/artifacts/0/releases/1/files/0/owner"
                         ],
                         "name": "files[0].owner",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "bob"
                       }
                     ],
@@ -4221,7 +4221,7 @@
                       "/trail/artifacts/0/owner"
                     ],
                     "name": "artifact.owner",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "ann"
                   }
                 ],
@@ -4239,7 +4239,7 @@
                   "/trail/artifacts/0/owner"
                 ],
                 "name": "artifact.owner",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "ann"
               },
               {
@@ -4247,7 +4247,7 @@
                   "/trail/artifacts/0/releases/1/files/0/owner"
                 ],
                 "name": "files[].owner",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob"
                 ]
@@ -4566,7 +4566,7 @@
                           "/artifacts/1/releases/0/files/0/path"
                         ],
                         "name": "files[0].path",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "docs/upgrade.md"
                       }
                     ],
@@ -4596,7 +4596,7 @@
                   "/artifacts/1/releases/0/files/0/path"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/upgrade.md"
                 ]
@@ -4626,7 +4626,7 @@
                           "/artifacts/1/releases/1/files"
                         ],
                         "name": "files",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -4648,7 +4648,7 @@
               {
                 "locations": [],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -4843,7 +4843,7 @@
                           "/releases/1/files/0/path"
                         ],
                         "name": "files[0].path",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "docs/upgrade.md"
                       }
                     ],
@@ -4873,7 +4873,7 @@
                   "/releases/1/files/0/path"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/upgrade.md"
                 ]
@@ -9363,7 +9363,7 @@
                       "/lockfile/1/status"
                     ],
                     "name": "status",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "PENDING"
                   }
                 ],
@@ -9381,7 +9381,7 @@
                   "/lockfile/1/status"
                 ],
                 "name": "status",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "PENDING"
               }
             ],
@@ -10333,7 +10333,7 @@
                   "/artifacts/0/name"
                 ],
                 "name": "artifact.name",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "web"
               },
               {
@@ -10534,7 +10534,7 @@
                   "/artifacts/0/pulls/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               }
             ],
@@ -11447,7 +11447,7 @@
                       "/bs/0/x"
                     ],
                     "name": "b.x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   },
                   {
@@ -11455,7 +11455,7 @@
                       "/bs/0/kids/1/v"
                     ],
                     "name": "v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -11473,7 +11473,7 @@
                   "/bs/0/x"
                 ],
                 "name": "b.x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               },
               {
@@ -11481,7 +11481,7 @@
                   "/bs/0/kids/1/v"
                 ],
                 "name": "v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -11631,7 +11631,7 @@
                       "/bs/0/kids/0/v"
                     ],
                     "name": "v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -11657,7 +11657,7 @@
                   "/bs/0/kids/0/v"
                 ],
                 "name": "v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               }
             ],
@@ -11854,7 +11854,7 @@
                       "/bs/0/kids/1/v"
                     ],
                     "name": "v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -11880,7 +11880,7 @@
                   "/bs/0/kids/1/v"
                 ],
                 "name": "v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               }
             ],
@@ -12153,7 +12153,7 @@
                       "/artifacts/0/pulls/0/commits/1/verified"
                     ],
                     "name": "verified",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -12171,7 +12171,7 @@
                   "/artifacts/0/id"
                 ],
                 "name": "artifact.id",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a1"
               },
               {
@@ -12179,7 +12179,7 @@
                   "/artifacts/0/pulls/0/id"
                 ],
                 "name": "pull_request.id",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "p1"
               },
               {
@@ -12187,7 +12187,7 @@
                   "/artifacts/0/pulls/0/commits/1/verified"
                 ],
                 "name": "verified",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -12966,7 +12966,7 @@
                       "/artifacts/0/pull_requests/1/approvals"
                     ],
                     "name": "approvals",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 0
                   }
                 ],
@@ -12984,7 +12984,7 @@
                   "/artifacts/0/pull_requests/1/approvals"
                 ],
                 "name": "approvals",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 0
               }
             ],
@@ -13757,7 +13757,7 @@
                       "/artifacts/0/releases/1/n"
                     ],
                     "name": "n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -13775,7 +13775,7 @@
                   "/artifacts/0/releases/1/n"
                 ],
                 "name": "n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -13964,7 +13964,7 @@
                       "/artifacts/0/releases/0/n"
                     ],
                     "name": "n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -13982,7 +13982,7 @@
                   "/artifacts/0/releases/0/n"
                 ],
                 "name": "n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               }
             ],
@@ -14759,7 +14759,7 @@
                       "/defects/1/severity"
                     ],
                     "name": "severity",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "low"
                   }
                 ],
@@ -14777,7 +14777,7 @@
                   "/defects/1/severity"
                 ],
                 "name": "severity",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "low"
               },
               {
@@ -14785,7 +14785,7 @@
                   "/defects/1/status"
                 ],
                 "name": "status",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "open"
               }
             ],
@@ -15028,7 +15028,7 @@
                       "/defects/1/severity"
                     ],
                     "name": "severity",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "low"
                   }
                 ],
@@ -15046,7 +15046,7 @@
                   "/defects/1/severity"
                 ],
                 "name": "severity",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "low"
               },
               {
@@ -15054,7 +15054,7 @@
                   "/defects/1/team"
                 ],
                 "name": "team",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               }
             ],
@@ -15079,7 +15079,7 @@
                       "/defects/2/team"
                     ],
                     "name": "team",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "b"
                   }
                 ],
@@ -15097,7 +15097,7 @@
                   "/defects/2/severity"
                 ],
                 "name": "severity",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "critical"
               },
               {
@@ -15105,7 +15105,7 @@
                   "/defects/2/team"
                 ],
                 "name": "team",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "b"
               }
             ],
@@ -15713,7 +15713,7 @@
                       "/arts/0/k"
                     ],
                     "name": "art.k",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -15731,7 +15731,7 @@
                   "/arts/0/k"
                 ],
                 "name": "art.k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -15852,7 +15852,7 @@
                       "/arts/0/items/0/art/k"
                     ],
                     "name": ".art.k",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   },
                   {
@@ -15860,7 +15860,7 @@
                       "/arts/0/items/0/v"
                     ],
                     "name": "v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 5
                   }
                 ],
@@ -15878,7 +15878,7 @@
                   "/arts/0/items/0/art/k"
                 ],
                 "name": ".art.k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               },
               {
@@ -15886,7 +15886,7 @@
                   "/arts/0/items/0/v"
                 ],
                 "name": "v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 5
               }
             ],
@@ -15951,7 +15951,7 @@
                   "/arts/0/items/0/art/xs/1"
                 ],
                 "name": ".art.xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5,
                   6
@@ -16079,7 +16079,7 @@
                   "/arts/0/items/0/leaves/0/art/k"
                 ],
                 "name": ".art.k",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               },
               {
@@ -18340,7 +18340,7 @@
                       "/settings/security/sso/enabled"
                     ],
                     "name": "enabled",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -18358,7 +18358,7 @@
                   "/settings/security/sso/enabled"
                 ],
                 "name": "enabled",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -19758,7 +19758,7 @@
                   "/trail/artifacts/0/fingerprint"
                 ],
                 "name": "artifact.fingerprint",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "a"
               },
               {
@@ -19774,7 +19774,7 @@
                   "/trail/artifacts/0/pull_requests/1/url"
                 ],
                 "name": "url",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "u2"
               }
             ],
@@ -19921,7 +19921,7 @@
                       "/things/1/state"
                     ],
                     "name": "state",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "old"
                   }
                 ],
@@ -19941,7 +19941,7 @@
                       "/things/1/state"
                     ],
                     "name": "state",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "old"
                   }
                 ],
@@ -19959,7 +19959,7 @@
                   "/things/1/state"
                 ],
                 "name": "state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "old"
               }
             ],
@@ -20055,7 +20055,7 @@
                       "/things/1/state"
                     ],
                     "name": "state",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "old"
                   }
                 ],
@@ -20073,7 +20073,7 @@
                   "/things/1/state"
                 ],
                 "name": "state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "old"
               }
             ],
@@ -20204,7 +20204,7 @@
                       "/things/0/state"
                     ],
                     "name": "state",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "old"
                   }
                 ],
@@ -20222,7 +20222,7 @@
                   "/things/0/state"
                 ],
                 "name": "state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "old"
               }
             ],
@@ -20828,7 +20828,7 @@
                           "/modules/0/files/1/path"
                         ],
                         "name": "files[1].path",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "src/x.go"
                       }
                     ],
@@ -20859,7 +20859,7 @@
                   "/modules/0/files/1/path"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/a.md",
                   "src/x.go"
@@ -20921,7 +20921,7 @@
                   "/modules/1/files/1"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/a.md",
                   null
@@ -20996,7 +20996,7 @@
                           "/releases/1/files/0/path"
                         ],
                         "name": "files[0].path",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "docs/a.md"
                       }
                     ],
@@ -21026,7 +21026,7 @@
                   "/releases/1/files/0/path"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/a.md"
                 ]
@@ -21056,7 +21056,7 @@
                           "/releases/2/files/0/path"
                         ],
                         "name": "files[0].path",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "docs/a.md"
                       }
                     ],
@@ -21110,7 +21110,7 @@
                   "/releases/2/files/1"
                 ],
                 "name": "files[].path",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "docs/a.md",
                   null
@@ -21886,7 +21886,7 @@
                   "$params:/i"
                 ],
                 "name": "$params.i",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -21952,7 +21952,7 @@
                   "$params:/i"
                 ],
                 "name": "$params.i",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -22020,7 +22020,7 @@
                   "$params:/i"
                 ],
                 "name": "$params.i",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -22086,7 +22086,7 @@
                   "$params:/i"
                 ],
                 "name": "$params.i",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -22152,7 +22152,7 @@
                   "$params:/i"
                 ],
                 "name": "$params.i",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -22224,7 +22224,7 @@
                   "/i"
                 ],
                 "name": "$input.i",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -22265,7 +22265,7 @@
                       "/bs/0/kids/0/v"
                     ],
                     "name": "v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -22291,7 +22291,7 @@
                   "/bs/0/kids/0/v"
                 ],
                 "name": "v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               }
             ],
@@ -34881,7 +34881,7 @@
                       "/version"
                     ],
                     "name": "version",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 12
                   }
                 ],
@@ -34899,7 +34899,7 @@
                   "/version"
                 ],
                 "name": "version",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": 12
               }
             ],
@@ -34990,7 +34990,7 @@
                       "/version"
                     ],
                     "name": "version",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": false
                   }
                 ],
@@ -35008,7 +35008,7 @@
                   "/version"
                 ],
                 "name": "version",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": false
               }
             ],
@@ -37060,7 +37060,7 @@
                       "/deployments/1/env"
                     ],
                     "name": "env",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "staging"
                   }
                 ],
@@ -37078,7 +37078,7 @@
                   "/deployments/1/env"
                 ],
                 "name": "env",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "staging"
               }
             ],
@@ -38066,7 +38066,7 @@
                       "/builds/0/tags"
                     ],
                     "name": "tags",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "a",
                       "b"
@@ -38087,7 +38087,7 @@
                   "/builds/0/tags"
                 ],
                 "name": "tags",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "a",
                   "b"
@@ -38671,7 +38671,7 @@
                       "/builds/1/test_runs/integration/passed"
                     ],
                     "name": "passed",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -38689,7 +38689,7 @@
                   "/builds/1/test_runs/integration/passed"
                 ],
                 "name": "passed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -39515,7 +39515,7 @@
                       "/ds/0/m/up"
                     ],
                     "name": "up",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -39533,7 +39533,7 @@
                   "/ds/0/m/up"
                 ],
                 "name": "up",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -39750,7 +39750,7 @@
                       "/ds/0/ms/0/up"
                     ],
                     "name": "up",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": false
                   }
                 ],
@@ -39768,7 +39768,7 @@
                   "/ds/0/ms/0/up"
                 ],
                 "name": "up",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": false
               }
             ],
@@ -40818,7 +40818,7 @@
                       "/things/0/m/y/v"
                     ],
                     "name": "v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -40836,7 +40836,7 @@
                   "/things/0/m/y/v"
                 ],
                 "name": "v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -41024,7 +41024,7 @@
                     "/things/1/l"
                   ],
                   "name": "l",
-                  "outcome": "found",
+                  "outcome": "usable",
                   "value": 1234567890.120956799
                 },
                 {
@@ -41032,7 +41032,7 @@
                     "/things/1/r"
                   ],
                   "name": "r",
-                  "outcome": "found",
+                  "outcome": "usable",
                   "value": 1234567890.120956789
                 }
               ],
@@ -41050,7 +41050,7 @@
                 "/things/1/l"
               ],
               "name": "l",
-              "outcome": "found",
+              "outcome": "usable",
               "value": 1234567890.120956799
             },
             {
@@ -41058,7 +41058,7 @@
                 "/things/1/r"
               ],
               "name": "r",
-              "outcome": "found",
+              "outcome": "usable",
               "value": 1234567890.120956789
             }
           ],
@@ -41107,7 +41107,7 @@
                     "/things/0/l"
                   ],
                   "name": "l",
-                  "outcome": "found",
+                  "outcome": "usable",
                   "value": 2234567890.120956799
                 },
                 {
@@ -41115,7 +41115,7 @@
                     "/things/0/r"
                   ],
                   "name": "r",
-                  "outcome": "found",
+                  "outcome": "usable",
                   "value": 2234567890.120956789
                 }
               ],
@@ -41133,7 +41133,7 @@
                 "/things/0/l"
               ],
               "name": "l",
-              "outcome": "found",
+              "outcome": "usable",
               "value": 2234567890.120956799
             },
             {
@@ -41141,7 +41141,7 @@
                 "/things/0/r"
               ],
               "name": "r",
-              "outcome": "found",
+              "outcome": "usable",
               "value": 2234567890.120956789
             }
           ],
@@ -41245,7 +41245,7 @@
                     "/things/1/l"
                   ],
                   "name": "l",
-                  "outcome": "found",
+                  "outcome": "usable",
                   "value": 1234567890.120956799
                 },
                 {
@@ -41253,7 +41253,7 @@
                     "/things/1/r"
                   ],
                   "name": "r",
-                  "outcome": "found",
+                  "outcome": "usable",
                   "value": 1234567890.120956789
                 }
               ],
@@ -41271,7 +41271,7 @@
                 "/things/1/l"
               ],
               "name": "l",
-              "outcome": "found",
+              "outcome": "usable",
               "value": 1234567890.120956799
             },
             {
@@ -41279,7 +41279,7 @@
                 "/things/1/r"
               ],
               "name": "r",
-              "outcome": "found",
+              "outcome": "usable",
               "value": 1234567890.120956789
             }
           ],
@@ -41325,7 +41325,7 @@
                     "/things/0/l"
                   ],
                   "name": "l",
-                  "outcome": "found",
+                  "outcome": "usable",
                   "value": 2234567890.120956799
                 },
                 {
@@ -41333,7 +41333,7 @@
                     "/things/0/r"
                   ],
                   "name": "r",
-                  "outcome": "found",
+                  "outcome": "usable",
                   "value": 2234567890.120956789
                 }
               ],
@@ -41351,7 +41351,7 @@
                 "/things/0/l"
               ],
               "name": "l",
-              "outcome": "found",
+              "outcome": "usable",
               "value": 2234567890.120956799
             },
             {
@@ -41359,7 +41359,7 @@
                 "/things/0/r"
               ],
               "name": "r",
-              "outcome": "found",
+              "outcome": "usable",
               "value": 2234567890.120956789
             }
           ],
@@ -41461,7 +41461,7 @@
                       "/things/0/x"
                     ],
                     "name": "x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   }
                 ],
@@ -41487,7 +41487,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               }
             ],
@@ -41822,7 +41822,7 @@
                   "$params:/l"
                 ],
                 "name": "$params.l",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   3
                 ]
@@ -41834,7 +41834,7 @@
                   "$params:/p"
                 ],
                 "name": "$params.p",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ]

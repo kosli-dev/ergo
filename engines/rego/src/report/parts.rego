@@ -241,7 +241,10 @@ _with_outcome(i) := object.union(object.remove(i, _input_stash_keys), {"outcome"
 
 else := object.remove(i, _input_stash_keys) if i["ergo/worked"] == true
 
-else := object.union(i, {"outcome": "found"}) if i.value != null
+else := object.union(i, {"outcome": "unusable"}) if {
+	i.value != null
+	i.name in data.ergo_unfit
+} else := object.union(i, {"outcome": "usable"}) if i.value != null
 
 else := i
 
@@ -544,7 +547,7 @@ _item_read(f) := {"name": f.path, "value": f.value, "locations": f.locations, "o
 
 _item_outcome(cause, value) := cause if cause in _failed_read_states
 
-else := "found" if value != null
+else := "usable" if value != null
 
 else := "null"
 
@@ -634,11 +637,11 @@ _parted_applies(row, at, evals, req, conds) := object.union(object.remove(row, _
 	ins := _with_outcomes(row.inputs)
 }
 
-_applies_entries(row, at, evals, _, conds, ins) := [_policy_entry(
+_applies_entries(row, at, evals, req, conds, ins) := [_policy_entry(
 	"assertion",
 	conds[name].expression,
 	e.assertion_cause,
-	[ins[j] | some j, i in row.inputs; not _item_input(i, lists)],
+	array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists)], _with_outcomes(_walk_key_ref_entries(object.get(c, "path", [])))), _walk_cond_ref_entries(_walk_cond_refs(c), row.inputs)),
 	_walk_entries(row, _item_owned(row, texts), at),
 	concat("; ", _once(array.concat(object.get(e, "ergo/own", [row.message]), _root_texts(row, texts)))),
 	[conds[name].at],
@@ -646,6 +649,7 @@ _applies_entries(row, at, evals, _, conds, ins) := [_policy_entry(
 	count(evals) == 1
 	some name, e in evals
 	"failed_items" in object.keys(row)
+	c := _applies_to_of(req)[name]
 	texts := object.get(e, "ergo/texts", [])
 	lists := {_list_base(f.item) | some f in row.failed_items}
 }
@@ -704,3 +708,30 @@ _whose_reads(whose, f) := [r |
 ] if _walk_kind(f.item) == "item"
 
 else := []
+
+_parted_in(raw, at, where) := p if {
+	_m_marked_cause(raw.cause)
+	unfit := {_ref_label(r) | some r in _listed_refs(where.check); _ref_use(where.check, r) == "unusable"}
+	count(unfit) > 0
+	p := _parted(raw, at, where) with data.ergo_unfit as unfit
+} else := _parted(raw, at, where)
+
+_parted_applies_in(raw, at, evals, req, conds) := p if {
+	_m_marked_cause(raw.cause)
+	unfit := {_ref_label(r) | some n, _ in evals; c := _applies_to_of(req)[n]; some r in _listed_refs(c); _ref_use(c, r) == "unusable"}
+	count(unfit) > 0
+	p := _parted_applies(_applies_deduped(raw), at, evals, req, conds) with data.ergo_unfit as unfit
+} else := _parted_applies(_applies_deduped(raw), at, evals, req, conds) if {
+	_m_marked_cause(raw.cause)
+} else := _parted_applies(raw, at, evals, req, conds)
+
+_applies_deduped(raw) := object.union(raw, {"inputs": [i | some i in raw.inputs; not _unusable_twin(i, raw.inputs)]})
+
+_unusable_twin(i, ins) if {
+	not i["ergo/outcome"]
+	some j in ins
+	j["ergo/outcome"] == "unusable"
+	j.name == i.name
+	j.value == i.value
+	j.locations == i.locations
+}

@@ -74,8 +74,8 @@ test_a_compiled_policy_reads_the_params_and_input_of_each_run_not_the_ones_it_wa
 	[[r.passed, r.cause] | some r in ergo.report(doc, form, {"l": ["q"]}).results; r.check == "c"] == [[false, "value"]]
 	[[r.passed, r.cause] | some r in ergo.report(doc, form, {"l": "text"}).results; r.check == "c"] == [[false, "unusable"]]
 	[[r.passed, r.cause] | some r in ergo.report({"things": [{"id": "a", "x": {"p"}}]}, form, {"l": ["p"]}).results; r.check == "c"] == [[false, "unusable"]]
-	ergo.report(doc, form, {"l": ["p"]}).requirements.s.checks.c["$refs"] == [{"name": "$params.l", "value": ["p"], "locations": ["$params:/l"], "outcome": "found"}]
-	ergo.report(doc, form, {"l": ["q"]}).requirements.s.checks.c["$refs"] == [{"name": "$params.l", "value": ["q"], "locations": ["$params:/l"], "outcome": "found"}]
+	ergo.report(doc, form, {"l": ["p"]}).requirements.s.checks.c["$refs"] == [{"name": "$params.l", "value": ["p"], "locations": ["$params:/l"], "outcome": "usable"}]
+	ergo.report(doc, form, {"l": ["q"]}).requirements.s.checks.c["$refs"] == [{"name": "$params.l", "value": ["q"], "locations": ["$params:/l"], "outcome": "usable"}]
 }
 
 test_a_compiled_policy_with_a_field_missing_or_of_a_type_ergo_cant_use_fails_like_a_policy_ergo_cant_read if {

@@ -55,7 +55,7 @@
                           "/releases/0/commits/1/signed"
                         ],
                         "name": "commits[1].signed",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": false
                       }
                     ],
@@ -86,7 +86,7 @@
                   "/releases/0/commits/1/signed"
                 ],
                 "name": "commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true,
                   false
@@ -124,7 +124,7 @@
                           "/releases/0/commits/0/signed"
                         ],
                         "name": "commits[0].signed",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": false
                       }
                     ],
@@ -147,7 +147,7 @@
                           "/releases/0/commits/2/signed"
                         ],
                         "name": "commits[2].signed",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": false
                       }
                     ],
@@ -179,7 +179,7 @@
                   "/releases/0/commits/2/signed"
                 ],
                 "name": "commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   false,
                   true,
@@ -218,7 +218,7 @@
                           "/releases/0/commits"
                         ],
                         "name": "commits",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -240,7 +240,7 @@
               {
                 "locations": [],
                 "name": "commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -560,7 +560,7 @@
                   "/releases/0/commits/1"
                 ],
                 "name": "commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true,
                   null
@@ -628,7 +628,7 @@
                   "/releases/0/commits/0/signed"
                 ],
                 "name": "commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null
                 ]
@@ -695,7 +695,7 @@
                   "/releases/0/commits/0/signed"
                 ],
                 "name": "commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "yes"
                 ]
@@ -732,7 +732,7 @@
                           "/releases/0/commits/0/signed"
                         ],
                         "name": "commits[0].signed",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": false
                       }
                     ],
@@ -784,7 +784,7 @@
                   "/releases/0/commits/1"
                 ],
                 "name": "commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   false,
                   null
@@ -863,7 +863,7 @@
                               "/releases/0/pull_requests/0/commits/1/signed"
                             ],
                             "name": "pull_requests[0].commits[1].signed",
-                            "outcome": "found",
+                            "outcome": "usable",
                             "value": false
                           }
                         ],
@@ -986,7 +986,7 @@
                   "/releases/0/pull_requests/2/commits/0"
                 ],
                 "name": "pull_requests[].commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true,
                   false,
@@ -1028,7 +1028,7 @@
                               "/releases/0/pull_requests/1/commits"
                             ],
                             "name": "pull_requests[1].commits",
-                            "outcome": "found",
+                            "outcome": "usable",
                             "value": []
                           }
                         ],
@@ -1064,7 +1064,7 @@
                   "/releases/0/pull_requests/0/commits/0/signed"
                 ],
                 "name": "pull_requests[].commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true
                 ]
@@ -1140,7 +1140,7 @@
                   "/releases/0/pull_requests/0/commits/0/signed"
                 ],
                 "name": "pull_requests[].commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true
                 ]
@@ -1216,7 +1216,7 @@
                   "/releases/0/pull_requests/0/commits/0/signed"
                 ],
                 "name": "pull_requests[].commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true
                 ]
@@ -1256,7 +1256,7 @@
                               "/releases/0/pull_requests/0/commits/0/signed"
                             ],
                             "name": "pull_requests[0].commits[0].signed",
-                            "outcome": "found",
+                            "outcome": "usable",
                             "value": false
                           }
                         ],
@@ -1360,7 +1360,7 @@
                               "/releases/0/pull_requests/3/commits"
                             ],
                             "name": "pull_requests[3].commits",
-                            "outcome": "found",
+                            "outcome": "usable",
                             "value": []
                           }
                         ],
@@ -1396,7 +1396,7 @@
                   "/releases/0/pull_requests/0/commits/0/signed"
                 ],
                 "name": "pull_requests[].commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   false
                 ]
@@ -1433,7 +1433,7 @@
                           "/releases/0/pull_requests"
                         ],
                         "name": "pull_requests",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -1455,7 +1455,7 @@
               {
                 "locations": [],
                 "name": "pull_requests[].commits.signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -1582,7 +1582,7 @@
                   "/releases/0/pull_requests/0"
                 ],
                 "name": "pull_requests[].commits.signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null
                 ]
@@ -1676,7 +1676,7 @@
                   "/releases/0/branches/1"
                 ],
                 "name": "branches[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "release/1",
                   "main"
@@ -1734,7 +1734,7 @@
                   "/releases/0/branches/1"
                 ],
                 "name": "branches[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "release/1",
                   5
@@ -1791,7 +1791,7 @@
                   "/releases/0/branches/0"
                 ],
                 "name": "branches[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null
                 ]
@@ -1828,7 +1828,7 @@
                           "/releases/0/branches"
                         ],
                         "name": "branches",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -1850,7 +1850,7 @@
               {
                 "locations": [],
                 "name": "branches[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -1962,7 +1962,7 @@
                   "/releases/0/pull_requests/1/labels/1"
                 ],
                 "name": "pull_requests[].labels[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bug",
                   "a",
@@ -2004,7 +2004,7 @@
                               "/releases/0/pull_requests/1/labels"
                             ],
                             "name": "pull_requests[1].labels",
-                            "outcome": "found",
+                            "outcome": "usable",
                             "value": []
                           }
                         ],
@@ -2040,7 +2040,7 @@
                   "/releases/0/pull_requests/0/labels/0"
                 ],
                 "name": "pull_requests[].labels[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bug"
                 ]
@@ -2113,7 +2113,7 @@
                   "/releases/0/pull_requests/0/labels/0"
                 ],
                 "name": "pull_requests[].labels[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   5
                 ]
@@ -2236,7 +2236,7 @@
                               "/releases/0/pull_requests/1/commits/0/signed"
                             ],
                             "name": "pull_requests[1].commits[0].signed",
-                            "outcome": "found",
+                            "outcome": "usable",
                             "value": false
                           }
                         ],
@@ -2282,7 +2282,7 @@
                   "/releases/0/pull_requests/1/commits/0/signed"
                 ],
                 "name": "pull_requests[].commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   false
                 ]
@@ -2356,7 +2356,7 @@
                   "/releases/0/pull_requests/0/commits/0/signed"
                 ],
                 "name": "pull_requests[].commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true
                 ]
@@ -2432,7 +2432,7 @@
                   "/releases/0/pull_requests/0/commits/0/signed"
                 ],
                 "name": "pull_requests[].commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true
                 ]
@@ -2508,7 +2508,7 @@
                   "/releases/0/pull_requests/0/commits/0/signed"
                 ],
                 "name": "pull_requests[].commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true
                 ]
@@ -2575,7 +2575,7 @@
                   "/releases/0/pull_requests/0/commits"
                 ],
                 "name": "pull_requests[].commits.signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null
                 ]
@@ -2721,7 +2721,7 @@
                   "/releases/0/pull_requests/0/commits/0"
                 ],
                 "name": "pull_requests[].commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null
                 ]
@@ -2795,7 +2795,7 @@
                           "/releases/0/approvers/0/state"
                         ],
                         "name": "approvers[0].state",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "CHANGES"
                       }
                     ],
@@ -2818,7 +2818,7 @@
                           "/releases/0/approvers/1/state"
                         ],
                         "name": "approvers[1].state",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "COMMENTED"
                       }
                     ],
@@ -2849,7 +2849,7 @@
                   "/releases/0/approvers/1/state"
                 ],
                 "name": "approvers[].state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "CHANGES",
                   "COMMENTED"
@@ -2887,7 +2887,7 @@
                           "/releases/0/approvers"
                         ],
                         "name": "approvers",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -2909,7 +2909,7 @@
               {
                 "locations": [],
                 "name": "approvers[].state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -3166,7 +3166,7 @@
                           "/releases/0/approvers/0/state"
                         ],
                         "name": "approvers[0].state",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "CHANGES"
                       }
                     ],
@@ -3218,7 +3218,7 @@
                   "/releases/0/approvers/1"
                 ],
                 "name": "approvers[].state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "CHANGES",
                   null
@@ -3279,7 +3279,7 @@
                           "/releases/0/approvers/1/state"
                         ],
                         "name": "approvers[1].state",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "CHANGES"
                       }
                     ],
@@ -3310,7 +3310,7 @@
                   "/releases/0/approvers/1/state"
                 ],
                 "name": "approvers[].state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   null,
                   "CHANGES"
@@ -3385,7 +3385,7 @@
                               "/releases/0/pull_requests/0/approvers/0/state"
                             ],
                             "name": "pull_requests[0].approvers[0].state",
-                            "outcome": "found",
+                            "outcome": "usable",
                             "value": "CHANGES"
                           }
                         ],
@@ -3427,7 +3427,7 @@
                               "/releases/0/pull_requests/1/approvers"
                             ],
                             "name": "pull_requests[1].approvers",
-                            "outcome": "found",
+                            "outcome": "usable",
                             "value": []
                           }
                         ],
@@ -3493,7 +3493,7 @@
                   "/releases/0/pull_requests/0/approvers/0/state"
                 ],
                 "name": "pull_requests[].approvers[].state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "CHANGES"
                 ]
@@ -3592,7 +3592,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -3620,7 +3620,7 @@
                   "/releases/0/approvers/1"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "state": "APPROVED",
@@ -3661,7 +3661,7 @@
                       "/releases/0/approvers/0"
                     ],
                     "name": "approvers[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "CHANGES",
@@ -3674,7 +3674,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -3701,7 +3701,7 @@
                   "/releases/0/approvers/0"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "state": "CHANGES",
@@ -3812,7 +3812,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -3840,7 +3840,7 @@
                   "/releases/0/approvers/1"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "username": "ann"
@@ -3905,7 +3905,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -3932,7 +3932,7 @@
                   "/releases/0/approvers/0"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "state": null,
@@ -3972,7 +3972,7 @@
                           "/releases/0/approvers"
                         ],
                         "name": "approvers",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -3987,7 +3987,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -4012,7 +4012,7 @@
               {
                 "locations": [],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -4103,7 +4103,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -4132,7 +4132,7 @@
                   "/releases/0/approvers/2"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "state": "APPROVED",
@@ -4201,7 +4201,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -4229,7 +4229,7 @@
                   "/releases/0/approvers/1"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "state": "APPROVED",
@@ -4294,7 +4294,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -4322,7 +4322,7 @@
                   "/releases/0/approvers/1"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "state": "APPROVED",
@@ -4363,7 +4363,7 @@
                       "/releases/0/approvers/0"
                     ],
                     "name": "approvers[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "CHANGES",
@@ -4376,7 +4376,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -4403,7 +4403,7 @@
                   "/releases/0/approvers/0"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "state": "CHANGES",
@@ -4443,7 +4443,7 @@
                           "/releases/0/approvers"
                         ],
                         "name": "approvers",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": []
                       }
                     ],
@@ -4458,7 +4458,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -4483,7 +4483,7 @@
               {
                 "locations": [],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -4539,7 +4539,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -4675,7 +4675,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -4702,7 +4702,7 @@
                   "/releases/0/approvers/0"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "state": "APPROVED",
@@ -4763,7 +4763,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -4790,7 +4790,7 @@
                   "/releases/0/approvers/0"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "username": "ann"
@@ -4850,7 +4850,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "state": "APPROVED",
@@ -4957,7 +4957,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "comment": "ok",
@@ -4984,7 +4984,7 @@
                   "/releases/0/approvers/1"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "comment": "ok",
@@ -5040,7 +5040,7 @@
                       "$params:/staff"
                     ],
                     "name": "$params.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "comment": "ok",
@@ -5067,7 +5067,7 @@
                   "/releases/0/approvers/1"
                 ],
                 "name": "approvers[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "comment": "ok",
@@ -5176,7 +5176,7 @@
                   "/releases/0/reviews/1"
                 ],
                 "name": "reviews[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "name": "ann",
@@ -5300,7 +5300,7 @@
             "/things/0/items/2"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "kids": [
@@ -5379,7 +5379,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "kids": [
@@ -5448,7 +5448,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "kids": 5,
@@ -5566,7 +5566,7 @@
             "/things/0/items/2"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "kids": [
@@ -5643,7 +5643,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "kids": [
@@ -5712,7 +5712,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "kids": 5,
@@ -5779,7 +5779,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "lo": 1,
@@ -5844,7 +5844,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "hi": 1,
@@ -5908,7 +5908,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "status": "ok"
@@ -5973,7 +5973,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "hi": 1,
@@ -6040,7 +6040,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "hi": null,
@@ -6107,7 +6107,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "hi": 1,
@@ -6175,7 +6175,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "lo": 1,
@@ -6241,7 +6241,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "lo": 1,
@@ -6307,7 +6307,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "lo": 1,
@@ -6373,7 +6373,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "hi": null,
@@ -6440,7 +6440,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "min": 1,
@@ -6506,7 +6506,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "kids": 5,
@@ -6548,7 +6548,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "lo": 1,
@@ -6589,7 +6589,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "lo": 1,
@@ -6643,7 +6643,7 @@
             "/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "lo": 1,
@@ -6713,7 +6713,7 @@
             "/arts/0/things/0/items/0"
           ],
           "name": "items[]",
-          "outcome": "found",
+          "outcome": "usable",
           "value": [
             {
               "lo": 1,
@@ -6795,7 +6795,7 @@
                           "/releases/0/approvers/0/timestamp"
                         ],
                         "name": "approvers[0].timestamp",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "2026-10-02T00:00:00Z"
                       }
                     ],
@@ -6818,7 +6818,7 @@
                       "/releases/0/last_commit_timestamp"
                     ],
                     "name": "last_commit_timestamp",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "2026-12-01T00:00:00Z"
                   }
                 ],
@@ -6836,7 +6836,7 @@
                   "/releases/0/approvers/0/timestamp"
                 ],
                 "name": "approvers[].timestamp",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "2026-10-02T00:00:00Z"
                 ]
@@ -6846,7 +6846,7 @@
                   "/releases/0/last_commit_timestamp"
                 ],
                 "name": "last_commit_timestamp",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "2026-12-01T00:00:00Z"
               }
             ],
@@ -6896,7 +6896,7 @@
                   "/releases/0/approvers/0/timestamp"
                 ],
                 "name": "approvers[].timestamp",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "2026-10-02T00:00:00Z"
                 ]
@@ -6948,7 +6948,7 @@
                           "/releases/0/approvers/0/username"
                         ],
                         "name": "approvers[0].username",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "ann"
                       }
                     ],
@@ -6972,7 +6972,7 @@
                       "/staff"
                     ],
                     "name": "$input.staff",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "zed"
                     ]
@@ -6992,7 +6992,7 @@
                   "/staff"
                 ],
                 "name": "$input.staff",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "zed"
                 ]
@@ -7002,7 +7002,7 @@
                   "/releases/0/approvers/0/username"
                 ],
                 "name": "approvers[].username",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ann"
                 ]
@@ -7155,7 +7155,7 @@
                       "/releases/0/commits/1/signed"
                     ],
                     "name": "commits[].signed",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       true,
                       false
@@ -7177,7 +7177,7 @@
                   "/releases/0/commits/1/signed"
                 ],
                 "name": "commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true,
                   false
@@ -7188,7 +7188,7 @@
                   "/releases/0/state"
                 ],
                 "name": "state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "MERGED"
               }
             ],
@@ -7241,7 +7241,7 @@
                       "/releases/0/items/0/price"
                     ],
                     "name": "items[].price",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1
                     ]
@@ -7261,7 +7261,7 @@
                   "/releases/0/items/0/price"
                 ],
                 "name": "items[].price",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1
                 ]
@@ -7271,7 +7271,7 @@
                   "/releases/0/owner"
                 ],
                 "name": "owner",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "x"
               }
             ],
@@ -7303,7 +7303,7 @@
                       "/releases/0/state"
                     ],
                     "name": "state",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "OPEN"
                   }
                 ],
@@ -7321,7 +7321,7 @@
                   "/releases/0/commits/0/signed"
                 ],
                 "name": "commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true
                 ]
@@ -7331,7 +7331,7 @@
                   "/releases/0/state"
                 ],
                 "name": "state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "OPEN"
               }
             ],
@@ -7356,7 +7356,7 @@
                       "/releases/0/state"
                     ],
                     "name": "state",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "OPEN"
                   }
                 ],
@@ -7374,7 +7374,7 @@
                   "/releases/0/approvers/0/state"
                 ],
                 "name": "approvers[].state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "APPROVED"
                 ]
@@ -7384,7 +7384,7 @@
                   "/releases/0/state"
                 ],
                 "name": "state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "OPEN"
               }
             ],
@@ -7409,7 +7409,7 @@
                       "/releases/0/owner"
                     ],
                     "name": "owner",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "y"
                   }
                 ],
@@ -7427,7 +7427,7 @@
                   "/releases/0/items/0/price"
                 ],
                 "name": "items[].price",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   3
                 ]
@@ -7437,7 +7437,7 @@
                   "/releases/0/owner"
                 ],
                 "name": "owner",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "y"
               }
             ],
@@ -7487,7 +7487,7 @@
                       "/releases/0/state"
                     ],
                     "name": "state",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "OPEN"
                   }
                 ],
@@ -7511,7 +7511,7 @@
                   "/releases/0/state"
                 ],
                 "name": "state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "OPEN"
               }
             ],
@@ -7536,7 +7536,7 @@
                       "/releases/0/state"
                     ],
                     "name": "state",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "OPEN"
                   }
                 ],
@@ -7556,7 +7556,7 @@
                       "/releases/0/approvers/0/state"
                     ],
                     "name": "approvers[].state",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "CHANGES"
                     ]
@@ -7576,7 +7576,7 @@
                   "/releases/0/approvers/0/state"
                 ],
                 "name": "approvers[].state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "CHANGES"
                 ]
@@ -7586,7 +7586,7 @@
                   "/releases/0/state"
                 ],
                 "name": "state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "OPEN"
               }
             ],
@@ -7611,7 +7611,7 @@
                       "/releases/0/items/0/price"
                     ],
                     "name": "items[].price",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1
                     ]
@@ -7651,7 +7651,7 @@
                   "/releases/0/items/0/price"
                 ],
                 "name": "items[].price",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1
                 ]
@@ -7700,7 +7700,7 @@
                       "/things/0/xs/0/v"
                     ],
                     "name": "xs[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       2
                     ]
@@ -7710,7 +7710,7 @@
                       "$params:/l"
                     ],
                     "name": "$params.l",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": "text"
                   }
                 ],
@@ -7728,7 +7728,7 @@
                   "/things/0/xs/0/v"
                 ],
                 "name": "xs[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2
                 ]
@@ -8278,7 +8278,7 @@
                   "/releases/0/pull_requests/0/commits/1"
                 ],
                 "name": "pull_requests[].commits[].signed",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   true,
                   null
@@ -8322,7 +8322,7 @@
                           "/releases/0/pull_requests/1/title"
                         ],
                         "name": "pull_requests[1].title",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "y"
                       }
                     ],
@@ -8353,7 +8353,7 @@
                   "/releases/0/pull_requests/1/title"
                 ],
                 "name": "pull_requests[].title",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "x",
                   "y"
@@ -8420,7 +8420,7 @@
                   "/releases/0/pull_requests/1"
                 ],
                 "name": "pull_requests[].title",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "x",
                   null
@@ -8484,7 +8484,7 @@
                   "/releases/0/scores/1"
                 ],
                 "name": "scores[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -8702,7 +8702,7 @@
                           "/trail/artifacts/0/releases/0/files/0/owner"
                         ],
                         "name": "files[0].owner",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "bob"
                       }
                     ],
@@ -8723,7 +8723,7 @@
                       "/trail/artifacts/0/owner"
                     ],
                     "name": "artifact.owner",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "ann"
                   }
                 ],
@@ -8741,7 +8741,7 @@
                   "/trail/artifacts/0/owner"
                 ],
                 "name": "artifact.owner",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "ann"
               },
               {
@@ -8749,7 +8749,7 @@
                   "/trail/artifacts/0/releases/0/files/0/owner"
                 ],
                 "name": "files[].owner",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob"
                 ]
@@ -8844,7 +8844,7 @@
                   "/trail/artifacts/0/releases/0/files/0/owner"
                 ],
                 "name": "files[].owner",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob"
                 ]
@@ -9002,7 +9002,7 @@
                           "/trail/artifacts/0/releases/0/files/1/owner"
                         ],
                         "name": "files[1].owner",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "bob"
                       }
                     ],
@@ -9023,7 +9023,7 @@
                       "/trail/artifacts/0/owner"
                     ],
                     "name": "artifact.owner",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "ann"
                   }
                 ],
@@ -9041,7 +9041,7 @@
                   "/trail/artifacts/0/owner"
                 ],
                 "name": "artifact.owner",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "ann"
               },
               {
@@ -9050,7 +9050,7 @@
                   "/trail/artifacts/0/releases/0/files/1/owner"
                 ],
                 "name": "files[].owner",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ann",
                   "bob"
@@ -9221,7 +9221,7 @@
                           "/trail/artifacts/0/releases/0/files/1/tags/0"
                         ],
                         "name": "f.tags[]",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           "bob"
                         ]
@@ -9246,7 +9246,7 @@
                       "/trail/artifacts/0/owner"
                     ],
                     "name": "artifact.owner",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "ann"
                   }
                 ],
@@ -9264,7 +9264,7 @@
                   "/trail/artifacts/0/owner"
                 ],
                 "name": "artifact.owner",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "ann"
               },
               {
@@ -9273,7 +9273,7 @@
                   "/trail/artifacts/0/releases/0/files/1"
                 ],
                 "name": "files[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "tags": [
@@ -9426,7 +9426,7 @@
                   "/trail/artifacts/0/releases/0/files/1/owner"
                 ],
                 "name": "files[].owner",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob",
                   "ann"
@@ -9753,7 +9753,7 @@
                   "$params:/owners"
                 ],
                 "name": "$params.owners",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "ann",
                   "cid"
@@ -10445,7 +10445,7 @@
                       "/trail/artifacts/0/prs/0/rows/1/n"
                     ],
                     "name": "rows[].n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1,
                       2
@@ -10466,7 +10466,7 @@
                   "/trail/artifacts/0/nums"
                 ],
                 "name": "artifact.nums",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": {
                   "k1": 1
                 }
@@ -10477,7 +10477,7 @@
                   "/trail/artifacts/0/prs/0/keys/1"
                 ],
                 "name": "keys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "k1",
                   "k2"
@@ -10489,7 +10489,7 @@
                   "/trail/artifacts/0/prs/0/rows/1/n"
                 ],
                 "name": "rows[].n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -10588,7 +10588,7 @@
                       "/trail/artifacts/0/prs/0/rows/1/n"
                     ],
                     "name": "rows[].n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1,
                       2
@@ -10609,7 +10609,7 @@
                   "/trail/artifacts/0/nums"
                 ],
                 "name": "artifact.nums",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": {
                   "k1": 1
                 }
@@ -10620,7 +10620,7 @@
                   "/trail/artifacts/0/prs/0/keys/1"
                 ],
                 "name": "keys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "k1",
                   null
@@ -10632,7 +10632,7 @@
                   "/trail/artifacts/0/prs/0/rows/1/n"
                 ],
                 "name": "rows[].n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -10710,7 +10710,7 @@
                           "/trail/artifacts/0/nums/k1"
                         ],
                         "name": "artifact.nums named by k",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "a"
                       }
                     ],
@@ -10730,7 +10730,7 @@
                       "/trail/artifacts/0/prs/0/rows/1/n"
                     ],
                     "name": "rows[].n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1,
                       2
@@ -10751,7 +10751,7 @@
                   "/trail/artifacts/0/nums"
                 ],
                 "name": "artifact.nums",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": {
                   "k1": "a"
                 }
@@ -10761,7 +10761,7 @@
                   "/trail/artifacts/0/prs/0/keys/0"
                 ],
                 "name": "keys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "k1"
                 ]
@@ -10772,7 +10772,7 @@
                   "/trail/artifacts/0/prs/0/rows/1/n"
                 ],
                 "name": "rows[].n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -10897,7 +10897,7 @@
                       "/trail/artifacts/0/prs/0/rows/1/n"
                     ],
                     "name": "rows[].n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1,
                       2
@@ -10934,7 +10934,7 @@
                   "/trail/artifacts/0/prs/0/keys/0"
                 ],
                 "name": "keys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "k1"
                 ]
@@ -10945,7 +10945,7 @@
                   "/trail/artifacts/0/prs/0/rows/1/n"
                 ],
                 "name": "rows[].n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -11019,7 +11019,7 @@
                   "/trail/artifacts/0/prs/0/rows/1/n"
                 ],
                 "name": "rows[].n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -11114,7 +11114,7 @@
                       "/trail/artifacts/0/prs/0/rows/1/n"
                     ],
                     "name": "rows[].n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       1,
                       2
@@ -11151,7 +11151,7 @@
                   "/trail/artifacts/0/prs/0/keys/0"
                 ],
                 "name": "keys[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "k1"
                 ]
@@ -11162,7 +11162,7 @@
                   "/trail/artifacts/0/prs/0/rows/1/n"
                 ],
                 "name": "rows[].n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -11236,7 +11236,7 @@
                   "/trail/artifacts/0/prs/0/rows/1/n"
                 ],
                 "name": "rows[].n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -11423,7 +11423,7 @@
                       "/things/0/r"
                     ],
                     "name": "r",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1234567890.120956789
                   }
                 ],
@@ -11441,7 +11441,7 @@
                   "/things/0/r"
                 ],
                 "name": "r",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1234567890.120956789
               },
               {
@@ -11450,7 +11450,7 @@
                   "/things/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1234567890.120956799,
                   1234567890.120956789
@@ -11521,7 +11521,7 @@
                       "/things/1/r"
                     ],
                     "name": "r",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1234567890.120956789
                   }
                 ],
@@ -11539,7 +11539,7 @@
                   "/things/1/r"
                 ],
                 "name": "r",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1234567890.120956789
               },
               {
@@ -11548,7 +11548,7 @@
                   "/things/1/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1234567890.120956789,
                   1234567890.120956799
@@ -11626,7 +11626,7 @@
                       "/things/0/r"
                     ],
                     "name": "r",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1234567890.120956789
                   }
                 ],
@@ -11644,7 +11644,7 @@
                   "/things/0/r"
                 ],
                 "name": "r",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1234567890.120956789
               },
               {
@@ -11653,7 +11653,7 @@
                   "/things/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1234567890.120956789,
                   1234567890.120956799
@@ -11724,7 +11724,7 @@
                       "/things/1/r"
                     ],
                     "name": "r",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1234567890.120956789
                   }
                 ],
@@ -11742,7 +11742,7 @@
                   "/things/1/r"
                 ],
                 "name": "r",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1234567890.120956789
               },
               {
@@ -11751,7 +11751,7 @@
                   "/things/1/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1234567890.120956799,
                   1234567890.120956789
@@ -11919,7 +11919,7 @@
                         "/things/0/xs/1/v"
                       ],
                       "name": "xs[1].v",
-                      "outcome": "found",
+                      "outcome": "usable",
                       "value": 1234567890.120956799
                     }
                   ],
@@ -11950,7 +11950,7 @@
                 "/things/0/xs/1/v"
               ],
               "name": "xs[].v",
-              "outcome": "found",
+              "outcome": "usable",
               "value": [
                 1234567890.120956789,
                 1234567890.120956799
@@ -12109,7 +12109,7 @@
                         "/things/0/xs/0/v"
                       ],
                       "name": "xs[0].v",
-                      "outcome": "found",
+                      "outcome": "usable",
                       "value": 2234567890.120956799
                     }
                   ],
@@ -12140,7 +12140,7 @@
                 "/things/0/xs/1/v"
               ],
               "name": "xs[].v",
-              "outcome": "found",
+              "outcome": "usable",
               "value": [
                 2234567890.120956799,
                 2234567890.120956789
@@ -12251,7 +12251,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -12260,7 +12260,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -12288,7 +12288,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -12297,7 +12297,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -12330,7 +12330,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -12343,7 +12343,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -12362,7 +12362,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -12375,7 +12375,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -12401,7 +12401,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -12414,7 +12414,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -12433,7 +12433,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -12446,7 +12446,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -12474,7 +12474,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -12483,7 +12483,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -12511,7 +12511,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -12520,7 +12520,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -12582,7 +12582,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -12591,7 +12591,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -12619,7 +12619,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -12628,7 +12628,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -12661,7 +12661,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -12674,7 +12674,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -12693,7 +12693,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -12706,7 +12706,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -12732,7 +12732,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -12745,7 +12745,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -12764,7 +12764,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -12777,7 +12777,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -12805,7 +12805,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -12814,7 +12814,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -12842,7 +12842,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -12851,7 +12851,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -12915,7 +12915,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -12924,7 +12924,7 @@
                       "/cs/0/os/1/name"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -12952,7 +12952,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -12961,7 +12961,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -12994,7 +12994,7 @@
                       "/cs/0/os/1/name"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -13007,7 +13007,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -13026,7 +13026,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -13039,7 +13039,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -13065,7 +13065,7 @@
                       "/cs/0/os/1/name"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -13078,7 +13078,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -13097,7 +13097,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -13110,7 +13110,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -13138,7 +13138,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -13147,7 +13147,7 @@
                       "/cs/0/os/1/name"
                     ],
                     "name": "pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -13175,7 +13175,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -13184,7 +13184,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -13450,7 +13450,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "c.os[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "bob",
                       null
@@ -13459,7 +13459,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -13478,7 +13478,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "c.os[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob",
                   null
@@ -13487,7 +13487,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -13516,7 +13516,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "c.os[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "bob",
                       null
@@ -13525,7 +13525,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -13544,7 +13544,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "c.os[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob",
                   null
@@ -13553,7 +13553,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -13618,7 +13618,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "c.os[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "bob",
                       null
@@ -13627,7 +13627,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -13646,7 +13646,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "c.os[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob",
                   null
@@ -13655,7 +13655,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -13684,7 +13684,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "c.os[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "bob",
                       null
@@ -13693,7 +13693,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -13712,7 +13712,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "c.os[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob",
                   null
@@ -13721,7 +13721,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -13788,7 +13788,7 @@
                       "/cs/0/os/1/name"
                     ],
                     "name": "c.os[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "bob",
                       3
@@ -13797,7 +13797,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -13816,7 +13816,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "c.os[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob",
                   3
@@ -13825,7 +13825,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -13854,7 +13854,7 @@
                       "/cs/0/os/1/name"
                     ],
                     "name": "c.os[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "bob",
                       3
@@ -13863,7 +13863,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -13882,7 +13882,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "c.os[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob",
                   3
@@ -13891,7 +13891,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -14088,7 +14088,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -14097,7 +14097,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "c.pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "c.pos"
@@ -14125,7 +14125,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -14134,7 +14134,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "c.pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "c.pos"
@@ -14172,7 +14172,7 @@
                   {
                     "locations": [],
                     "name": "rows[].n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -14181,7 +14181,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "c.pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "c.pos"
@@ -14209,7 +14209,7 @@
               {
                 "locations": [],
                 "name": "rows[].n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -14218,7 +14218,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "c.pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "c.pos"
@@ -14292,7 +14292,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -14301,7 +14301,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "c.pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "c.pos"
@@ -14329,7 +14329,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -14338,7 +14338,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "c.pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "c.pos"
@@ -14376,7 +14376,7 @@
                   {
                     "locations": [],
                     "name": "rows[].n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -14385,7 +14385,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "c.pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "c.pos"
@@ -14413,7 +14413,7 @@
               {
                 "locations": [],
                 "name": "rows[].n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -14422,7 +14422,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "c.pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "c.pos"
@@ -14498,7 +14498,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -14507,7 +14507,7 @@
                       "/cs/0/os/1/name"
                     ],
                     "name": "c.pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "c.pos"
@@ -14535,7 +14535,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -14544,7 +14544,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "c.pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "c.pos"
@@ -14582,7 +14582,7 @@
                   {
                     "locations": [],
                     "name": "rows[].n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -14591,7 +14591,7 @@
                       "/cs/0/os/1/name"
                     ],
                     "name": "c.pos[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "c.pos"
@@ -14619,7 +14619,7 @@
               {
                 "locations": [],
                 "name": "rows[].n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -14628,7 +14628,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "c.pos[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "c.pos"
@@ -14839,7 +14839,7 @@
                       "/os/1"
                     ],
                     "name": "$input.os[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "bob",
                       null
@@ -14848,7 +14848,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -14867,7 +14867,7 @@
                   "/os/1"
                 ],
                 "name": "$input.os[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob",
                   null
@@ -14876,7 +14876,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -14902,7 +14902,7 @@
                       "/os/1"
                     ],
                     "name": "$input.os[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "bob",
                       null
@@ -14911,7 +14911,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -14930,7 +14930,7 @@
                   "/os/1"
                 ],
                 "name": "$input.os[].name",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   "bob",
                   null
@@ -14939,7 +14939,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -14992,7 +14992,7 @@
                       "/os/1"
                     ],
                     "name": "$input.os[].name",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "bob",
                       null
@@ -15001,7 +15001,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -15020,7 +15020,7 @@
                   "/os/1"
                 ],
                 "name": "$input.os[].name",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "bob",
                   null
@@ -15029,7 +15029,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -15055,7 +15055,7 @@
                       "/os/1"
                     ],
                     "name": "$input.os[].name",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "bob",
                       null
@@ -15064,7 +15064,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -15083,7 +15083,7 @@
                   "/os/1"
                 ],
                 "name": "$input.os[].name",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "bob",
                   null
@@ -15092,7 +15092,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -15147,7 +15147,7 @@
                       "/os/1/name"
                     ],
                     "name": "$input.os[].name",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "bob",
                       3
@@ -15156,7 +15156,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -15175,7 +15175,7 @@
                   "/os/1/name"
                 ],
                 "name": "$input.os[].name",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "bob",
                   3
@@ -15184,7 +15184,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -15210,7 +15210,7 @@
                       "/os/1/name"
                     ],
                     "name": "$input.os[].name",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "bob",
                       3
@@ -15219,7 +15219,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -15238,7 +15238,7 @@
                   "/os/1/name"
                 ],
                 "name": "$input.os[].name",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "bob",
                   3
@@ -15247,7 +15247,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -15406,7 +15406,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -15415,7 +15415,7 @@
                       "$params:/os/1"
                     ],
                     "name": "$params.os[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "bob",
                       null
@@ -15434,7 +15434,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -15457,7 +15457,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -15466,7 +15466,7 @@
                       "$params:/os/1"
                     ],
                     "name": "$params.os[].name",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       "bob",
                       null
@@ -15485,7 +15485,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -15566,7 +15566,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -15575,7 +15575,7 @@
                       "$params:/os/1"
                     ],
                     "name": "$params.os[].name",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "bob",
                       null
@@ -15594,7 +15594,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -15617,7 +15617,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -15626,7 +15626,7 @@
                       "$params:/os/1"
                     ],
                     "name": "$params.os[].name",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "bob",
                       null
@@ -15645,7 +15645,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -15725,7 +15725,7 @@
                   {
                     "locations": [],
                     "name": "rows[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -15734,7 +15734,7 @@
                       "$params:/os/1/name"
                     ],
                     "name": "$params.os[].name",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "bob",
                       3
@@ -15753,7 +15753,7 @@
               {
                 "locations": [],
                 "name": "rows[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -15943,7 +15943,7 @@
                   {
                     "locations": [],
                     "name": "rows[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -15964,7 +15964,7 @@
               {
                 "locations": [],
                 "name": "rows[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -15992,7 +15992,7 @@
                   {
                     "locations": [],
                     "name": "rows[].n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16001,7 +16001,7 @@
                       "/os/1/name"
                     ],
                     "name": "$input.os[].name",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": [
                       "bob",
                       3
@@ -16025,7 +16025,7 @@
               {
                 "locations": [],
                 "name": "rows[].n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -16034,7 +16034,7 @@
                   "/os/1/name"
                 ],
                 "name": "$input.os[].name",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": [
                   "bob",
                   3
@@ -16083,7 +16083,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16107,7 +16107,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16130,7 +16130,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -16147,7 +16147,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -16160,7 +16160,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16183,7 +16183,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -16196,7 +16196,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16219,7 +16219,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16251,7 +16251,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -16282,7 +16282,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16306,7 +16306,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16336,7 +16336,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16360,7 +16360,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16383,7 +16383,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -16400,7 +16400,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -16413,7 +16413,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16436,7 +16436,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -16449,7 +16449,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16472,7 +16472,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16504,7 +16504,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -16535,7 +16535,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16559,7 +16559,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16589,7 +16589,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16597,7 +16597,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -16613,7 +16613,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16649,7 +16649,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -16662,7 +16662,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16694,7 +16694,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16717,7 +16717,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16733,7 +16733,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -16749,7 +16749,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -16780,7 +16780,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16788,7 +16788,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -16804,7 +16804,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16834,7 +16834,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16842,7 +16842,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": true
                   }
                 ],
@@ -16858,7 +16858,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16894,7 +16894,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -16907,7 +16907,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16939,7 +16939,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -16962,7 +16962,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -16978,7 +16978,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": true
                   }
                 ],
@@ -16994,7 +16994,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -17025,7 +17025,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17033,7 +17033,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": true
                   }
                 ],
@@ -17049,7 +17049,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17079,7 +17079,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17087,7 +17087,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -17103,7 +17103,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17139,7 +17139,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -17152,7 +17152,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17184,7 +17184,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17207,7 +17207,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17223,7 +17223,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -17239,7 +17239,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -17270,7 +17270,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17278,7 +17278,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -17294,7 +17294,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17324,7 +17324,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17332,7 +17332,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {}
                   }
                 ],
@@ -17348,7 +17348,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17384,7 +17384,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -17397,7 +17397,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17429,7 +17429,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17452,7 +17452,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17468,7 +17468,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {}
                   }
                 ],
@@ -17484,7 +17484,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -17515,7 +17515,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17523,7 +17523,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": {}
                   }
                 ],
@@ -17539,7 +17539,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17576,7 +17576,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17600,7 +17600,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17623,7 +17623,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -17640,7 +17640,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -17653,7 +17653,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17676,7 +17676,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17708,7 +17708,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -17739,7 +17739,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17763,7 +17763,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17800,7 +17800,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17824,7 +17824,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17847,7 +17847,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -17864,7 +17864,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -17877,7 +17877,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -17900,7 +17900,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17932,7 +17932,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -17963,7 +17963,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -17987,7 +17987,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -18024,7 +18024,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18032,7 +18032,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -18048,7 +18048,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -18084,7 +18084,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -18097,7 +18097,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -18120,7 +18120,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18136,7 +18136,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -18152,7 +18152,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -18183,7 +18183,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18191,7 +18191,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -18207,7 +18207,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -18237,7 +18237,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18261,7 +18261,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -18284,7 +18284,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -18301,7 +18301,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -18314,7 +18314,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -18337,7 +18337,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18369,7 +18369,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -18400,7 +18400,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18424,7 +18424,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -18454,7 +18454,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18478,7 +18478,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -18501,7 +18501,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -18518,7 +18518,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -18531,7 +18531,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -18554,7 +18554,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18586,7 +18586,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -18617,7 +18617,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18641,7 +18641,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -18677,7 +18677,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18687,6 +18687,14 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -18701,7 +18709,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -18739,7 +18747,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18747,6 +18755,14 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "absent",
                     "value": null
                   }
@@ -18763,7 +18779,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -18862,7 +18878,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18872,6 +18888,14 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -18886,7 +18910,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -18924,7 +18948,7 @@
                   {
                     "locations": [],
                     "name": "es[].v",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -18932,6 +18956,14 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "absent",
                     "value": null
                   }
@@ -18948,7 +18980,7 @@
               {
                 "locations": [],
                 "name": "es[].v",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -18997,7 +19029,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -19018,7 +19050,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19041,7 +19073,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -19049,7 +19081,7 @@
                       "/j"
                     ],
                     "name": "$input.j",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -19073,7 +19105,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19109,7 +19141,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -19122,7 +19154,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19145,7 +19177,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -19161,7 +19193,7 @@
                       "/j"
                     ],
                     "name": "$input.j",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -19185,7 +19217,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -19216,7 +19248,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -19224,7 +19256,7 @@
                       "/j"
                     ],
                     "name": "$input.j",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -19248,7 +19280,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19283,7 +19315,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -19304,7 +19336,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19327,7 +19359,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -19335,7 +19367,7 @@
                       "/j"
                     ],
                     "name": "$input.j",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -19359,7 +19391,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19395,7 +19427,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -19408,7 +19440,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19431,7 +19463,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -19447,7 +19479,7 @@
                       "/j"
                     ],
                     "name": "$input.j",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -19471,7 +19503,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -19502,7 +19534,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -19510,7 +19542,7 @@
                       "/j"
                     ],
                     "name": "$input.j",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -19534,7 +19566,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19569,7 +19601,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -19590,7 +19622,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19613,7 +19645,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -19621,7 +19653,7 @@
                       "/j"
                     ],
                     "name": "$input.j",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -19629,7 +19661,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -19645,7 +19677,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19681,7 +19713,7 @@
                       "/things/0/es"
                     ],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -19694,7 +19726,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19717,7 +19749,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -19733,7 +19765,7 @@
                       "/j"
                     ],
                     "name": "$input.j",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -19741,7 +19773,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -19757,7 +19789,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -19788,7 +19820,7 @@
                   {
                     "locations": [],
                     "name": "es[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   },
                   {
@@ -19796,7 +19828,7 @@
                       "/j"
                     ],
                     "name": "$input.j",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -19804,7 +19836,7 @@
                       "/k"
                     ],
                     "name": "$input.k",
-                    "outcome": "found",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -19820,7 +19852,7 @@
               {
                 "locations": [],
                 "name": "es[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -19973,7 +20005,7 @@
                   {
                     "locations": [],
                     "name": "es",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -19994,7 +20026,7 @@
               {
                 "locations": [],
                 "name": "es",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],

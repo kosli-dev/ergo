@@ -257,7 +257,7 @@
                       "/trail/compliance_status/attestations_statuses/findings/attestation_data/truncated"
                     ],
                     "name": "findings.truncated",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "findings"
@@ -279,7 +279,7 @@
                   "/trail/compliance_status/attestations_statuses/findings/attestation_data/truncated"
                 ],
                 "name": "findings.truncated",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "findings"
@@ -1013,7 +1013,7 @@
                       "/items/1/d/b/x"
                     ],
                     "name": "cov.x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "cov"
@@ -1025,7 +1025,7 @@
                       "/items/1/d/b/n"
                     ],
                     "name": "cov.n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "cov"
@@ -1047,7 +1047,7 @@
                   "/items/1/d/b/x"
                 ],
                 "name": "cov.x",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "cov"
@@ -1059,7 +1059,7 @@
                   "/items/1/d/b/n"
                 ],
                 "name": "cov.n",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "cov"
@@ -1088,7 +1088,7 @@
                       "/items/1/d/b/x"
                     ],
                     "name": "d.b.x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 1
                   },
                   {
@@ -1096,7 +1096,7 @@
                       "/items/1/d/b/n"
                     ],
                     "name": "d.b.n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -1114,7 +1114,7 @@
                   "/items/1/d/b/x"
                 ],
                 "name": "d.b.x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               },
               {
@@ -1122,7 +1122,7 @@
                   "/items/1/d/b/n"
                 ],
                 "name": "d.b.n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -2093,7 +2093,7 @@
                       "/rounds/1/d/b/x"
                     ],
                     "name": "cov.x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "cov"
@@ -2115,7 +2115,7 @@
                   "/rounds/1/d/b/x"
                 ],
                 "name": "cov.x",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "cov"
@@ -2144,7 +2144,7 @@
                       "/rounds/0/cov/n"
                     ],
                     "name": ".cov.n",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 9
                   }
                 ],
@@ -2162,7 +2162,7 @@
                   "/rounds/0/cov/n"
                 ],
                 "name": ".cov.n",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 9
               }
             ],
@@ -2450,7 +2450,7 @@
                   "/rounds/0/d/items/0"
                 ],
                 "name": "lst[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "lst"
@@ -2858,7 +2858,7 @@
                   {
                     "locations": [],
                     "name": "cov",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -2879,7 +2879,7 @@
               {
                 "locations": [],
                 "name": "cov",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -3375,7 +3375,7 @@
                   "/rounds/0/cov/xs/1"
                 ],
                 "name": ".cov.xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -3438,7 +3438,7 @@
                   "/rounds/0/cov/xs/1"
                 ],
                 "name": ".cov.xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -3697,7 +3697,7 @@
                       "/rounds/0/items/1/cov"
                     ],
                     "name": "cov",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -3715,7 +3715,7 @@
                   "/rounds/0/items/1/cov"
                 ],
                 "name": "cov",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -3765,7 +3765,7 @@
                       "/rounds/0/items/1/cov"
                     ],
                     "name": "cov",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -3783,7 +3783,7 @@
                   "/rounds/0/items/1/cov"
                 ],
                 "name": "cov",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -3833,7 +3833,7 @@
                       "/rounds/0/items/1/cov"
                     ],
                     "name": "cov",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": 2
                   }
                 ],
@@ -3851,7 +3851,7 @@
                   "/rounds/0/items/1/cov"
                 ],
                 "name": "cov",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -3904,7 +3904,7 @@
                   {
                     "locations": [],
                     "name": "cov",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": []
                   }
                 ],
@@ -3925,7 +3925,7 @@
               {
                 "locations": [],
                 "name": "cov",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": []
               }
             ],
@@ -4258,7 +4258,7 @@
                   "/rounds/0/cov/xs/1"
                 ],
                 "name": ".cov.xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   1,
                   2
@@ -4308,7 +4308,7 @@
                   "/rounds/0/d/b/xs/0"
                 ],
                 "name": "cov.xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "cov"
@@ -4463,7 +4463,7 @@
                   "/things/0/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -4567,7 +4567,7 @@
                       "/things/0/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -4591,7 +4591,7 @@
                   "/things/0/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -4607,7 +4607,7 @@
                   "/things/0/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -4711,7 +4711,7 @@
                       "/things/0/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -4735,7 +4735,7 @@
                   "/things/0/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -4751,7 +4751,7 @@
                   "/things/0/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -4974,7 +4974,7 @@
                       "/things/0/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -4998,7 +4998,7 @@
                   "/things/0/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -5014,7 +5014,7 @@
                   "/things/0/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -5098,7 +5098,7 @@
                       "/things/0/xs/2"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "n": 1,
@@ -5173,7 +5173,7 @@
                   "/things/0/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -5280,7 +5280,7 @@
                   "/things/0/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -5375,7 +5375,7 @@
                   "/things/0/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -5445,7 +5445,7 @@
                       "/things/1/xs/2"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "n": 1,
@@ -5520,7 +5520,7 @@
                   "/things/1/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -5627,7 +5627,7 @@
                   "/things/1/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -5722,7 +5722,7 @@
                   "/things/1/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -5792,7 +5792,7 @@
                       "/things/2/xs/2"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "n": 1,
@@ -5834,7 +5834,7 @@
                       "/things/2/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -5867,7 +5867,7 @@
                   "/things/2/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -5909,7 +5909,7 @@
                   "/things/2/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -5938,7 +5938,7 @@
                       "/things/2/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -5960,7 +5960,7 @@
                   "/things/2/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -5974,7 +5974,7 @@
                   "/things/2/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -6033,7 +6033,7 @@
                       "/things/2/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -6055,7 +6055,7 @@
                   "/things/2/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -6069,7 +6069,7 @@
                   "/things/2/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -6139,7 +6139,7 @@
                       "/things/3/xs/2"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "n": 1,
@@ -6181,7 +6181,7 @@
                       "/things/3/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -6216,7 +6216,7 @@
                   "/things/3/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -6258,7 +6258,7 @@
                   "/things/3/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -6289,7 +6289,7 @@
                       "/things/3/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -6313,7 +6313,7 @@
                   "/things/3/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -6329,7 +6329,7 @@
                   "/things/3/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -6388,7 +6388,7 @@
                       "/things/3/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -6412,7 +6412,7 @@
                   "/things/3/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -6428,7 +6428,7 @@
                   "/things/3/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -6658,7 +6658,7 @@
                       "/things/4/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -6682,7 +6682,7 @@
                   "/things/4/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -6698,7 +6698,7 @@
                   "/things/4/xs/2"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "n": 1,
@@ -6909,7 +6909,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "hi": 1,
@@ -6977,7 +6977,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "hi": 1,
@@ -7045,7 +7045,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "hi": 1,
@@ -7113,7 +7113,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "hi": 1,
@@ -7159,7 +7159,7 @@
                       "/kids/0/items/0"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "hi": 1,
@@ -7183,7 +7183,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "hi": 1,
@@ -7479,7 +7479,7 @@
                       "/kids/0/items/0"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "early": "2025-12-28",
@@ -7526,7 +7526,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "early": "2025-12-28",
@@ -7595,7 +7595,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "early": "2025-12-28",
@@ -7664,7 +7664,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "early": "2025-12-28",
@@ -7733,7 +7733,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "early": "2025-12-28",
@@ -7802,7 +7802,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "early": "2025-12-28",
@@ -8155,7 +8155,7 @@
                   "/fams/0/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fam": {
@@ -8218,7 +8218,7 @@
                   "/fams/0/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fam": {
@@ -8281,7 +8281,7 @@
                   "/fams/0/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fam": {
@@ -8521,7 +8521,7 @@
                       "/fams/0/kids/0/items/0"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "early": "2025-12-28",
@@ -8564,7 +8564,7 @@
                   "/fams/0/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "early": "2025-12-28",
@@ -8636,7 +8636,7 @@
                   "/fams/0/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "early": "2025-12-28",
@@ -8700,7 +8700,7 @@
                   "/fams/0/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "early": "2025-12-28",
@@ -8956,7 +8956,7 @@
                           "/kids/0/xs/0/items/0"
                         ],
                         "name": "x.items[]",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           {
                             "hi": 1,
@@ -9014,7 +9014,7 @@
                   "/kids/0/xs/0"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "items": [
@@ -9079,7 +9079,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "hi": 1,
@@ -9262,7 +9262,7 @@
                       "/kids/0/items/0"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "hi": 1,
@@ -9287,7 +9287,7 @@
                   "/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "hi": 1,
@@ -9443,7 +9443,7 @@
                       "/fams/0/meta/xs"
                     ],
                     "name": "fam.pr.xs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "fam.pr"
@@ -9462,7 +9462,7 @@
                       "/fams/0/kids/0/items/0"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "lo": 2,
@@ -9485,7 +9485,7 @@
                   "/fams/0/meta/xs"
                 ],
                 "name": "fam.pr.xs",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "fam.pr"
@@ -9504,7 +9504,7 @@
                   "/fams/0/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "lo": 2,
@@ -9537,7 +9537,7 @@
                       "/fams/0/meta/xs"
                     ],
                     "name": "fam.pr.xs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "fam.pr"
@@ -9556,7 +9556,7 @@
                       "/fams/0/kids/0/items/0"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "lo": 2,
@@ -9579,7 +9579,7 @@
                   "/fams/0/meta/xs"
                 ],
                 "name": "fam.pr.xs",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "fam.pr"
@@ -9598,7 +9598,7 @@
                   "/fams/0/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "lo": 2,
@@ -9631,7 +9631,7 @@
                       "/fams/0/meta/xs"
                     ],
                     "name": "fam.pr.xs",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "fam.pr"
@@ -9650,7 +9650,7 @@
                       "/fams/0/kids/0/items/0"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "lo": 2,
@@ -9673,7 +9673,7 @@
                   "/fams/0/meta/xs"
                 ],
                 "name": "fam.pr.xs",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "fam.pr"
@@ -9692,7 +9692,7 @@
                   "/fams/0/kids/0/items/0"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "lo": 2,
@@ -10114,7 +10114,7 @@
                       "/fams/0/kids/0/items/2"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "fam": {
@@ -10179,7 +10179,7 @@
                   "/fams/0/kids/0/items/2"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fam": {
@@ -10383,7 +10383,7 @@
                       "/fams/0/kids/0/items/2"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "fam": {
@@ -10448,7 +10448,7 @@
                   "/fams/0/kids/0/items/2"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fam": {
@@ -10652,7 +10652,7 @@
                       "/fams/0/kids/0/items/2"
                     ],
                     "name": "items[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       {
                         "fam": {
@@ -10688,7 +10688,7 @@
                       "/fams/0/z"
                     ],
                     "name": "fam.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "ab"
                   }
                 ],
@@ -10717,7 +10717,7 @@
                   "/fams/0/kids/0/items/2"
                 ],
                 "name": "items[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "fam": {
@@ -10753,7 +10753,7 @@
                   "/fams/0/z"
                 ],
                 "name": "fam.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "ab"
               }
             ],
@@ -11118,7 +11118,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -11155,7 +11155,7 @@
                       "/prs/0/xs/1"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       2,
                       5
@@ -11193,7 +11193,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -11238,7 +11238,7 @@
                       "/prs/0/xs/1"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       2,
                       5
@@ -11280,7 +11280,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -11355,7 +11355,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -11425,7 +11425,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -11462,7 +11462,7 @@
                       "/prs/0/xs/1"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       2,
                       5
@@ -11500,7 +11500,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -11545,7 +11545,7 @@
                       "/prs/0/xs/1"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       2,
                       5
@@ -11587,7 +11587,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -11662,7 +11662,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -11697,7 +11697,7 @@
                       "/prs/0/coverage/z"
                     ],
                     "name": "cov.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "cov"
@@ -11719,7 +11719,7 @@
                   "/prs/0/coverage/z"
                 ],
                 "name": "cov.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "cov"
@@ -11732,7 +11732,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -11769,7 +11769,7 @@
                       "/prs/0/xs/1"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       2,
                       5
@@ -11780,7 +11780,7 @@
                       "/prs/0/coverage/z"
                     ],
                     "name": "pr.coverage.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": "12"
                   }
                 ],
@@ -11807,7 +11807,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -11818,7 +11818,7 @@
                   "/prs/0/coverage/z"
                 ],
                 "name": "pr.coverage.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "12"
               }
             ],
@@ -11852,7 +11852,7 @@
                       "/prs/0/xs/1"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       2,
                       5
@@ -11863,7 +11863,7 @@
                       "/prs/0/coverage/z"
                     ],
                     "name": "cov.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "cov"
@@ -11894,7 +11894,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -11905,7 +11905,7 @@
                   "/prs/0/coverage/z"
                 ],
                 "name": "cov.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "cov"
@@ -11934,7 +11934,7 @@
                       "/prs/0/coverage/z"
                     ],
                     "name": "cov.z",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "cov"
@@ -11956,7 +11956,7 @@
                   "/prs/0/coverage/z"
                 ],
                 "name": "cov.z",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "cov"
@@ -11969,7 +11969,7 @@
                   "/prs/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -12103,7 +12103,7 @@
                       "/fams/0/kids/0/xs/1"
                     ],
                     "name": "xs[]",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "value": [
                       2,
                       5
@@ -12141,7 +12141,7 @@
                   "/fams/0/kids/0/xs/1"
                 ],
                 "name": "xs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   2,
                   5
@@ -12192,7 +12192,7 @@
                           "/fams/0/kids/0/gs/0/xs/1"
                         ],
                         "name": "g.xs[]",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": [
                           2,
                           5
@@ -12236,7 +12236,7 @@
                   "/fams/0/kids/0/gs/0"
                 ],
                 "name": "gs[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": [
                   {
                     "xs": [
@@ -12543,7 +12543,7 @@
                       "/rounds/1/d/b/x"
                     ],
                     "name": "cov.x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "cov"
@@ -12565,7 +12565,7 @@
                   "/rounds/1/d/b/x"
                 ],
                 "name": "cov.x",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "cov"
@@ -12963,7 +12963,7 @@
                       "/trail/artifacts/web/attestations/pr/pull_requests/1/reviews/count"
                     ],
                     "name": "rev.count",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "rev"
@@ -12985,7 +12985,7 @@
                   "/trail/artifacts/web/attestations/pr/pull_requests/1/reviews/count"
                 ],
                 "name": "rev.count",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "rev"
@@ -14778,7 +14778,7 @@
                               "/pull_requests/2/reviews/0/state"
                             ],
                             "name": "pull_requests[2].reviews[0].state",
-                            "outcome": "found",
+                            "outcome": "usable",
                             "value": "bad"
                           }
                         ],
@@ -14831,7 +14831,7 @@
                   "/pull_requests/2/reviews/1/state"
                 ],
                 "name": "pull_requests[].reviews[].state",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "reviews"
@@ -15417,7 +15417,7 @@
                           "/trail/d/items/0/x"
                         ],
                         "name": "entry.x",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": 1
                       }
                     ],
@@ -15438,7 +15438,7 @@
                       "/trail/d/b/x"
                     ],
                     "name": "cov.x",
-                    "outcome": "found",
+                    "outcome": "usable",
                     "part": {
                       "id": "b-7",
                       "name": "cov"
@@ -15460,7 +15460,7 @@
                   "/trail/d/b/x"
                 ],
                 "name": "cov.x",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": "b-7",
                   "name": "cov"
@@ -15473,7 +15473,7 @@
                   "/trail/d/items/1"
                 ],
                 "name": "lst[]",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "lst"
@@ -18009,7 +18009,7 @@
                           "/things/0/ws/0/k"
                         ],
                         "name": "w.k",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": 2
                       }
                     ],
@@ -18039,7 +18039,7 @@
                   "/things/0/ws/0"
                 ],
                 "name": "item 1 of lst",
-                "outcome": "found",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "lst"

@@ -135,7 +135,7 @@ _with_refs(def, checked) := _with_listed(def, checked, _listed_refs(checked))
 _with_listed(def, checked, refs) := object.union(def, {"$refs_of": checked}) if {
 	data.ergo_reading == true
 	count(refs) > 0
-} else := object.union(def, {"$refs": _ref_entries(refs)}) if count(refs) > 0
+} else := object.union(def, {"$refs": _ref_entries_in(refs, checked)}) if count(refs) > 0
 
 _with_listed(def, _, refs) := def if count(refs) == 0
 
@@ -404,3 +404,72 @@ _inputs_once(row) := object.union(row, {"inputs": _once(row.inputs)})
 _names(x) := sort(object.keys(x)) if is_object(x)
 
 _names(x) := [i | some i, _ in x] if is_array(x)
+
+_ahead_check_defs(req, parts) := {n: _ahead_refs(def) | some n, def in parts.defs} if {
+	parts.defs
+} else := _requirement_check_defs(req)
+
+_ahead_refs(def) := object.union(object.remove(def, ["$refs_of"]), {"$refs": _ref_entries_in(_listed_refs(def["$refs_of"]), def["$refs_of"])}) if "$refs_of" in object.keys(def)
+
+else := def
+
+_ref_entries_in(refs, check) := [{"name": t[0], "value": t[1], "locations": t[2], "outcome": t[3]} | some t in sort({[_ref_label(r), _ref_shown(r), _ref_locations(r), _ref_use(check, r)] | some r in refs})]
+
+_ref_use(check, r) := "unusable" if {
+	_ref_state(r) == "value"
+	_ref_unfit(check, r, _ref_shown(r))
+} else := _outcome_word(_ref_state(r))
+
+_ref_unfit(check, r, _) if _wrong_step(check, r)
+
+_ref_unfit(check, r, v) if {
+	walk(check, [p, x])
+	not _under_literal(check, p)
+	_ref_node_unfit(x, r, v)
+}
+
+_ref_node_unfit(x, r, v) if {
+	x.op == "compare"
+	not _list_cmp(x)
+	some f in _compare_sides
+	x[f] == r
+	k := _ref_side_kind(x)
+	not _m_fits_kind(v, k)
+}
+
+_ref_node_unfit(x, r, v) if {
+	_list_cmp(x)
+	x.right == r
+	not _list_right_usable(x.cmp, v)
+}
+
+_ref_node_unfit(x, r, v) if {
+	x.op == "compare_time"
+	some f in _compare_sides
+	x[f] == r
+	not _m_time(v)
+}
+
+_ref_node_unfit(x, r, v) if {
+	_side_form(x) == "add"
+	r in x.add
+	not is_number(v)
+}
+
+_ref_node_unfit(x, r, v) if {
+	_side_form(x) == "join"
+	r in x.join
+	not is_string(v)
+}
+
+_ref_node_unfit(x, r, _) if {
+	some f in ["values", "patterns"]
+	x[f] == {"ref": r}
+	_node_param_broken(x)
+}
+
+_ref_side_kind(x) := "a number" if "within" in object.keys(x)
+
+else := "text" if x.cmp in _text_cmps
+
+else := "a number" if not x.cmp in {"eq", "excludes", "includes", "ne"}

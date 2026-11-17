@@ -74,7 +74,7 @@
                           "/things/0/type"
                         ],
                         "name": "type",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "Story"
                       }
                     ],
@@ -106,7 +106,7 @@
                           "/things/0/state"
                         ],
                         "name": "state",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": "Open"
                       }
                     ],
@@ -133,7 +133,7 @@
                   "/things/0/state"
                 ],
                 "name": "state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "Open"
               },
               {
@@ -141,7 +141,7 @@
                   "/things/0/type"
                 ],
                 "name": "type",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "Story"
               }
             ],
@@ -235,7 +235,7 @@
                   "/things/0/state"
                 ],
                 "name": "state",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": "Done"
               },
               {
@@ -350,7 +350,7 @@
                           "/things/0/y"
                         ],
                         "name": "y",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": 2
                       }
                     ],
@@ -385,7 +385,7 @@
                   "/things/0/y"
                 ],
                 "name": "y",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -539,7 +539,7 @@
                           "/things/1/x"
                         ],
                         "name": "x",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": 2
                       },
                       {
@@ -579,7 +579,7 @@
                           "/things/1/x"
                         ],
                         "name": "x",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": 2
                       }
                     ],
@@ -614,7 +614,7 @@
                   "/things/1/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 2
               }
             ],
@@ -681,7 +681,7 @@
                           "/things/0/x"
                         ],
                         "name": "x",
-                        "outcome": "found",
+                        "outcome": "usable",
                         "value": 1
                       },
                       {
@@ -689,7 +689,7 @@
                           "$params:/l"
                         ],
                         "name": "$params.l",
-                        "outcome": "found",
+                        "outcome": "unusable",
                         "value": "text"
                       }
                     ],
@@ -727,7 +727,7 @@
                   "$params:/l"
                 ],
                 "name": "$params.l",
-                "outcome": "found",
+                "outcome": "unusable",
                 "value": "text"
               },
               {
@@ -735,7 +735,7 @@
                   "/things/0/x"
                 ],
                 "name": "x",
-                "outcome": "found",
+                "outcome": "usable",
                 "value": 1
               }
             ],

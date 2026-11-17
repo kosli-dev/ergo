@@ -60,3 +60,7 @@ test_a_model_check_with_an_inputs_list_does_not_echo_an_entry_that_is_not_a_path
 	check := {"op": "present", "path": ["x"], "inputs": [{"z": 1}, ["x"]]}
 	[i.name | some i in ergo._check_inputs({"x": 1}, check)] == ["x"]
 }
+
+test_a_ref_that_is_not_a_path_in_the_input_or_the_params_has_no_location if {
+	ergo._ref_entries_in({["x"]}, {}) == [{"name": "<invalid ref>", "value": null, "locations": [], "outcome": "absent"}]
+}

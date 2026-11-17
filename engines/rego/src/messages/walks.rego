@@ -7,13 +7,72 @@ _messaged(raw, _, _, _) := raw if raw.passed == true
 _messaged(raw, check, req, subj) := _keyed_rooted(object.union(raw, said), check, subj) if {
 	raw.passed == false
 	not "message" in object.keys(raw)
+	not _m_marked_cause(raw.cause)
 	said := _row_said(_labelled_for(check, req, subj), subj, raw)
 }
+
+_messaged(raw, check, req, subj) := _keyed_rooted(object.union(object.union(raw, _row_said(c, subj, raw)), _m_marks(c, subj, raw)), check, subj) if {
+	raw.passed == false
+	not "message" in object.keys(raw)
+	_m_marked_cause(raw.cause)
+	c := _labelled_for(check, req, subj)
+}
+
+_m_marked_cause("unusable")
+
+_m_marked_cause("not_an_object")
+
+_m_marked_cause("ambiguous")
 
 _row_said(check, subj, raw) := {"message": _row_message(check, subj, raw)} if {
 	not _all_of_run(check)
 	not _any_of_run(check)
 }
+
+_m_marks(check, subj, raw) := _m_all_of_marks(check, subj, raw) if _all_of_run(check)
+
+else := _m_any_of_marks(check, subj, raw) if _any_of_run(check)
+
+else := _m_unusable_marks(check, subj, raw)
+
+_m_unusable_marks(check, subj, raw) := {"inputs": _m_marked(raw.inputs, names)} if {
+	names := _m_unusable_names_of(check, subj, raw.cause)
+	count(names) > 0
+} else := {}
+
+_m_unusable_names_of(check, subj, "unusable") := _m_unusable_names(_m_with_sides(_m_walked(check, subj)), subj) if not _walk_run(check)
+
+else := set()
+
+_m_unusable_names_of(_, _, cause) := set() if cause != "unusable"
+
+_m_all_of_marks(check, subj, raw) := _m_parts_marks(raw, "failed_assertions", [_m_unusable_names_of(check.checks[fa.at], subj, fa.cause) | some fa in raw.failed_assertions]) if {
+	some fa in raw.failed_assertions
+	fa.cause == "unusable"
+} else := {}
+
+_m_any_of_marks(check, subj, raw) := _m_parts_marks(raw, "ergo/outs", [_m_unusable_names_of(check.checks[i], subj, o.cause) | some i, o in raw["ergo/outs"]]) if {
+	some o in raw["ergo/outs"]
+	o.cause == "unusable"
+} else := {}
+
+_m_parts_marks(raw, key, ns) := {key: [object.union(o, {"inputs": _m_marked(o.inputs, ns[k])}) | some k, o in raw[key]], "inputs": _m_marked(raw.inputs, names)} if {
+	names := union({n | some n in ns})
+	count(names) > 0
+} else := {}
+
+_m_unusable_names(check, subj) := {s.name |
+	some f in _m_fault(subj, check)
+	s := _m_shown(subj, f[0])
+	s.state == "value"
+}
+
+_m_marked(inputs, names) := [_m_marked_input(i, names) | some i in inputs]
+
+_m_marked_input(i, names) := object.union(i, {"ergo/outcome": "unusable"}) if {
+	i.name in names
+	not i["ergo/worked"]
+} else := i
 
 _row_said(check, subj, raw) := {"message": concat("; ", ms), "ergo/texts": ts} if {
 	_all_of_run(check)
@@ -611,7 +670,9 @@ _m_walk_sentence(c, subj, cause, r) := r.root_msgs if "root_msgs" in object.keys
 
 else := _walk_parts(c, subj, {"cause": cause}, r)
 
-_m_own_msg(check, c, m, one) := {"own_msg": [_m_aliased(_m_unalias(a, one, x)) | some x in m]} if {
+_m_own_msg(check, c, m, [read, subj, cause]) := object.union(_m_own_part(check, c, m, count(read) == 1), {"read": _m_marked(read, _m_unusable_names_of(c, subj, cause))})
+
+_m_own_part(check, c, m, one) := {"own_msg": [_m_aliased(_m_unalias(a, one, x)) | some x in m]} if {
 	a := check.items[count(check.items) - 1].as
 	_reads_name(c, a)
 	not _m_reads_other(c, a)

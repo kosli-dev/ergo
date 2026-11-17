@@ -180,7 +180,7 @@ test_a_ref_step_in_from_finds_the_subjects if {
 	rep := report(trail_doc, trail_req("fingerprint exists")) with data.params as {"artifact": "app"}
 	rep.requirements.s.subjects == {"total": 1, "matching": 1}
 	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(trail.artifacts named by $params.artifact)) >= 1"
-	rep.requirements.s.checks["$min_subjects"]["$refs"] == [{"name": "$params.artifact", "value": "app", "locations": ["$params:/artifact"], "outcome": "found"}]
+	rep.requirements.s.checks["$min_subjects"]["$refs"] == [{"name": "$params.artifact", "value": "app", "locations": ["$params:/artifact"], "outcome": "usable"}]
 	rep.requirements.s.status == "met"
 }
 
@@ -290,7 +290,7 @@ test_named_by_a_field_reads_the_key_the_subjects_field_holds if {
 		{"id": "v1", "severity": "high", "age": 3},
 		{"id": "v2", "severity": "low", "age": 40},
 	]}
-	_sentence_rows({"c": "age is at most $params.limits named by severity"}, doc, {"limits": {"high": 5, "low": 30}}) == [["c", true, "satisfied", [_in("age", 3, ["/things/0/age"]), _in("$params.limits named by severity", 5, ["$params:/limits/high"]), _in("severity", "high", ["/things/0/severity"])]], ["c", false, "value", [_seen("age", 40, ["/things/1/age"], "found"), _seen("$params.limits named by severity", 30, ["$params:/limits/low"], "found"), _seen("severity", "low", ["/things/1/severity"], "found")]]]
+	_sentence_rows({"c": "age is at most $params.limits named by severity"}, doc, {"limits": {"high": 5, "low": 30}}) == [["c", true, "satisfied", [_in("age", 3, ["/things/0/age"]), _in("$params.limits named by severity", 5, ["$params:/limits/high"]), _in("severity", "high", ["/things/0/severity"])]], ["c", false, "value", [_seen("age", 40, ["/things/1/age"], "usable"), _seen("$params.limits named by severity", 30, ["$params:/limits/low"], "usable"), _seen("severity", "low", ["/things/1/severity"], "usable")]]]
 	_sentence_rows({"c": "age is at most $params.limits[severity]"}, doc, {"limits": {"high": 5, "low": 30}}) == _sentence_rows({"c": "age is at most $params.limits named by severity"}, doc, {"limits": {"high": 5, "low": 30}})
 	ergo.report(doc, _sentence_policy({"c": "age is at most $params.limits[severity]"}), {}).requirements.s.checks.c.expression == "age is at most $params.limits named by severity"
 	rep := ergo.report(doc, _sentence_policy({"c": "age is at most $params.limits named by severity"}), {})
@@ -300,7 +300,7 @@ test_named_by_a_field_reads_the_key_the_subjects_field_holds if {
 
 test_named_by_a_field_reads_a_key_of_the_subject_too if {
 	doc := {"things": [{"id": 1, "k": "a", "m": {"a": 1, "b": 2}}, {"id": 2, "k": "b", "m": {"a": 1, "b": 2}}]}
-	_sentence_rows({"c": "m named by k is 1"}, doc, {}) == [["c", true, "satisfied", [_in("m named by k", 1, ["/things/0/m/a"]), _in("k", "a", ["/things/0/k"])]], ["c", false, "value", [_seen("m named by k", 2, ["/things/1/m/b"], "found"), _seen("k", "b", ["/things/1/k"], "found")]]]
+	_sentence_rows({"c": "m named by k is 1"}, doc, {}) == [["c", true, "satisfied", [_in("m named by k", 1, ["/things/0/m/a"]), _in("k", "a", ["/things/0/k"])]], ["c", false, "value", [_seen("m named by k", 2, ["/things/1/m/b"], "usable"), _seen("k", "b", ["/things/1/k"], "usable")]]]
 }
 
 test_named_by_a_field_on_a_subject_that_isnt_an_object_fails_as_not_an_object if {
@@ -399,7 +399,7 @@ test_subject_is_the_subject_itself_when_the_subject_is_a_string if {
 		{"allowed_regions": ["eu-west-1"]},
 	) == [
 		["eu-west-1", true, "satisfied", [{"name": "s", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}, {"name": "$params.allowed_regions", "value": ["eu-west-1"], "locations": ["$params:/allowed_regions"]}]],
-		["us-east-1", false, "value", [_seen("s", "us-east-1", ["/deployment/regions/1"], "found"), _seen("$params.allowed_regions", ["eu-west-1"], ["$params:/allowed_regions"], "found")]],
+		["us-east-1", false, "value", [_seen("s", "us-east-1", ["/deployment/regions/1"], "usable"), _seen("$params.allowed_regions", ["eu-west-1"], ["$params:/allowed_regions"], "usable")]],
 	]
 	rep := _subject_report({"deployment": {"regions": ["eu-west-1"]}}, "every deployment.regions", {"c": "s is one of $params.allowed_regions"}, {"allowed_regions": ["eu-west-1"]})
 	rep.requirements.r.checks.c.expression == "s is in $params.allowed_regions"
@@ -443,13 +443,13 @@ test_subject_on_a_null_subject_fails_as_null_and_on_the_wrong_type_as_value_or_u
 }
 
 test_a_subjects_name_reads_the_subject_and_never_a_field_with_the_same_name if {
-	_subject_rows({"xs": [{"id": "a", "s": 1}]}, "every xs", "s is 1", {}) == [[{"id": "a", "s": 1}, false, "unusable", [_seen("s", {"id": "a", "s": 1}, ["/xs/0"], "found")]]]
+	_subject_rows({"xs": [{"id": "a", "s": 1}]}, "every xs", "s is 1", {}) == [[{"id": "a", "s": 1}, false, "unusable", [_seen("s", {"id": "a", "s": 1}, ["/xs/0"], "unusable")]]]
 }
 
 test_subject_works_after_and_and_in_an_any_of_option_and_names_the_subject if {
 	rows := _subject_rows({"xs": [1, 2]}, "every xs", "s is 1 and s is a number", {})
 	[[r[0], r[1], r[2]] | some r in rows] == [[1, true, "satisfied"], [2, false, "value"]]
-	_subject_report({"xs": [1, 2]}, "every xs", {"c": "s is 1 and s is a number"}, {}).results[4].failures == [_assertion("s is 1", "value", ["$policy:/requirements/r/checks/c#1"], [_seen("s", 2, ["/xs/1"], "found")], "s is 2", [])]
+	_subject_report({"xs": [1, 2]}, "every xs", {"c": "s is 1 and s is a number"}, {}).results[4].failures == [_assertion("s is 1", "value", ["$policy:/requirements/r/checks/c#1"], [_seen("s", 2, ["/xs/1"], "usable")], "s is 2", [])]
 	options := _subject_rows({"xs": [1, "a", null]}, "every xs", {"any_of": {"num": "s is a number", "str": ["s is a string", "s is 'a'"]}}, {})
 	[[r[0], r[1], r[2]] | some r in options] == [[1, true, "satisfied"], ["a", true, "satisfied"], [null, false, "null"]]
 	_subject_report({"xs": [1]}, "every xs", {"c": {"any_of": {"num": "s is a number", "str": "s is a string"}}}, {}).requirements.r.checks.c.expression == "one of: num(s is a number) | str(s is a string)"

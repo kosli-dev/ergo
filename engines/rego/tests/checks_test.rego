@@ -91,7 +91,7 @@ test_in_does_not_match_a_null_field_against_null_in_values if {
 test_in_fails_closed_on_a_wrong_typed_field if verdict({"id": ["MIT"]}, allowed_licence) == false
 
 test_in_shows_the_field_value_in_inputs if {
-	inputs_of({"id": "GPL-3.0"}, allowed_licence) == [_seen("id", "GPL-3.0", ["/items/0/id"], "found")]
+	inputs_of({"id": "GPL-3.0"}, allowed_licence) == [_seen("id", "GPL-3.0", ["/items/0/id"], "usable")]
 }
 
 test_equals_on_match if verdict({"state": "MERGED"}, is_merged) == true
@@ -323,7 +323,7 @@ test_any_of_echoes_both_sides_of_a_two_sided_leaf if {
 }
 
 test_any_of_echoes_an_absent_field_as_null if {
-	inputs_of({"type": "Story"}, flavoured) == [_seen("state", null, ["/items/0"], "absent"), _seen("type", "Story", ["/items/0/type"], "found")]
+	inputs_of({"type": "Story"}, flavoured) == [_seen("state", null, ["/items/0"], "absent"), _seen("type", "Story", ["/items/0/type"], "usable")]
 }
 
 test_inputs_echo_the_read_path if {
@@ -594,7 +594,7 @@ trail_rows(check) := [[r.passed, r.cause, r.inputs] | some r in rows_for(report(
 
 test_a_ref_step_in_a_path_reads_the_key_it_names if {
 	trail_rows(attested) == [[true, "satisfied", [{"name": "attestations named by $params.att.status", "value": "COMPLETE", "locations": ["/trail/artifacts/app/attestations/pull-request/status"]}]]] with data.params as {"artifact": "app", "att": "pull-request"}
-	trail_rows(attested) == [[false, "value", [_seen("attestations named by $params.att.status", "FAILED", ["/trail/artifacts/app/attestations/junit/status"], "found")]]] with data.params as {"artifact": "app", "att": "junit"}
+	trail_rows(attested) == [[false, "value", [_seen("attestations named by $params.att.status", "FAILED", ["/trail/artifacts/app/attestations/junit/status"], "usable")]]] with data.params as {"artifact": "app", "att": "junit"}
 }
 
 test_a_ref_step_is_never_a_list_position if {
@@ -663,7 +663,7 @@ test_a_field_holding_an_object_like_ergos_absent_marker_is_there if {
 		"m": "o does not exist",
 		"p": "o exists",
 	})) == [
-		["m", 1, false, "value", [_seen("o", absent_lookalike, ["/items/0/o"], "found")]],
+		["m", 1, false, "value", [_seen("o", absent_lookalike, ["/items/0/o"], "usable")]],
 		["p", 1, true, "satisfied", [{"name": "o", "value": absent_lookalike, "locations": ["/items/0/o"]}]],
 	]
 }
@@ -862,7 +862,7 @@ test_a_position_past_the_end_or_an_empty_list_fails_as_absent if {
 test_numbers_and_times_in_one_sort_field_fail_as_unusable_on_the_times if {
 	rows := _for_rows({"for": "last of xs sorted by t as x", "assert": "x exists"}, [{"id": 1, "xs": [{"t": 1}, {"t": "2026-10-01T00:00:00Z"}]}], {})
 	rows[0][1] == "unusable"
-	rows[0][2] == [_item("item 2 of xs", "unusable", {"t": "2026-10-01T00:00:00Z"}, ["/things/0/xs/1"], [_seen("xs[1].t", "2026-10-01T00:00:00Z", ["/things/0/xs/1/t"], "found")], "t is \"2026-10-01T00:00:00Z\", which isn't a number", [])]
+	rows[0][2] == [_item("item 2 of xs", "unusable", {"t": "2026-10-01T00:00:00Z"}, ["/things/0/xs/1"], [_seen("xs[1].t", "2026-10-01T00:00:00Z", ["/things/0/xs/1/t"], "unusable")], "t is \"2026-10-01T00:00:00Z\", which isn't a number", [])]
 }
 
 test_a_pick_can_come_second_and_start_from_the_first_name if {
@@ -880,8 +880,8 @@ test_a_pick_can_come_second_and_start_from_the_first_name if {
 
 test_a_failed_line_lists_a_value_it_reads_twice_once if {
 	things := [{"id": 1, "commits": [{"ts": 5, "files": ["a"]}]}]
-	_line_inputs({"for": "every commits as c", "assert": "c.ts is at least c.ts plus 1"}, things) == [[_seen("c.ts", 5, ["/things/0/commits/0/ts"], "found"), _in("c.ts plus 1", 6, ["/things/0/commits/0/ts"])]]
-	_line_inputs({"for": "every commits as c", "assert": "count of c.files is at least count of c.files plus 1"}, things) == [[_in("count of c.files", 1, ["/things/0/commits/0/files/0"]), _seen("c.files[]", ["a"], ["/things/0/commits/0/files/0"], "found"), _in("count of c.files plus 1", 2, ["/things/0/commits/0/files/0"])]]
+	_line_inputs({"for": "every commits as c", "assert": "c.ts is at least c.ts plus 1"}, things) == [[_seen("c.ts", 5, ["/things/0/commits/0/ts"], "usable"), _in("c.ts plus 1", 6, ["/things/0/commits/0/ts"])]]
+	_line_inputs({"for": "every commits as c", "assert": "count of c.files is at least count of c.files plus 1"}, things) == [[_in("count of c.files", 1, ["/things/0/commits/0/files/0"]), _seen("c.files[]", ["a"], ["/things/0/commits/0/files/0"], "usable"), _in("count of c.files plus 1", 2, ["/things/0/commits/0/files/0"])]]
 }
 
 test_a_list_beside_the_first_still_passes_when_the_first_list_is_empty_and_may_be if {
