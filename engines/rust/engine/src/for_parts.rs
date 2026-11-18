@@ -329,7 +329,7 @@ pub fn for_failures(
     let mut item_made: Vec<String> = Vec::new();
     for f in failed {
         for piece in text(f, "ergo/text").split("; ") {
-            if piece.starts_with("item ") || list(f, "failed_assertions").is_empty() {
+            if piece.starts_with("item ") || !text(f, "item").starts_with("item ") {
                 ops::push_new(&mut item_made, piece.to_string());
             }
         }
