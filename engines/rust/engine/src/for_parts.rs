@@ -321,26 +321,121 @@ pub fn for_failures(
     ctx: &Ctx,
 ) -> Vec<Failure> {
     let aliases: Vec<&str> = line.items.iter().map(|i| i.alias.as_str()).collect();
-    let mut out: Vec<Failure> = Vec::new();
-    let mut free_texts: Vec<String> = Vec::new();
-    let roots: Vec<String> = message
-        .split("; ")
-        .filter(|m| !m.is_empty() && !m.starts_with("item "))
-        .map(str::to_string)
+    let bare = |f: &Value| {
+        text(f, "cause") == "not_an_object"
+            && !f.get("value").is_some_and(Value::is_object)
+            && !list(f, "failed_assertions").is_empty()
+    };
+    let mut item_made: Vec<String> = Vec::new();
+    for f in failed {
+        for piece in text(f, "ergo/text").split("; ") {
+            if piece.starts_with("item ") || list(f, "failed_assertions").is_empty() {
+                ops::push_new(&mut item_made, piece.to_string());
+            }
+        }
+    }
+    let whose_roots = line.whose_roots(ctx);
+    let list_names: Vec<String> = line
+        .items
+        .iter()
+        .map(|i| crate::name::name(&i.path))
         .collect();
-    for (i, sentence) in line.sentences.iter().enumerate() {
-        if line.sentences[..i].iter().any(|s| s.text == sentence.text) {
+    let mut texts_once: Vec<&str> = Vec::new();
+    for s in &line.sentences {
+        if !texts_once.contains(&s.text.as_str()) {
+            texts_once.push(&s.text);
+        }
+    }
+    let frees: Vec<Option<(Cause, String, Vec<Value>)>> = line
+        .sentences
+        .iter()
+        .map(|sentence| {
+            let free = !line
+                .items
+                .iter()
+                .any(|it| for_line::reads_alias(&sentence.check, &it.alias));
+            if !free {
+                return None;
+            }
+            let ran = ops::run_full(&sentence.check, ctx);
+            if ran.verdict.passed() {
+                return None;
+            }
+            let said = match ran.message {
+                Some(text) if matches!(sentence.check, Check::Walk(_)) => text,
+                _ => ops::message::message(&sentence.check, ctx, &ran.verdict),
+            };
+            let sides = ops::message::side_names(&sentence.check);
+            let inputs = ran
+                .verdict
+                .inputs
+                .iter()
+                .map(|input| crate::parts::with_outcome(input, &said, &sides))
+                .collect();
+            Some((ran.verdict.cause, said, inputs))
+        })
+        .collect();
+    let free_said: Vec<String> = frees
+        .iter()
+        .flatten()
+        .flat_map(|(_, said, _)| said.split("; ").map(str::to_string).collect::<Vec<_>>())
+        .collect();
+    let off_subject = row_cause == Cause::NotAnObject && !ctx.subject.value.is_object();
+    let owns: Vec<Vec<String>> = (0..line.sentences.len())
+        .map(|i| {
+            if off_subject {
+                Vec::new()
+            } else {
+                line.sentence_roots(i, ctx)
+            }
+        })
+        .collect();
+    let mut owned: Vec<Vec<String>> = vec![Vec::new(); line.sentences.len()];
+    let mut walk_texts: Vec<String> = Vec::new();
+    for clause in message.split("; ") {
+        if clause.is_empty()
+            || ops::message::cap_note(clause).is_some()
+            || item_made.iter().any(|t| t == clause)
+            || free_said.iter().any(|t| t == clause)
+        {
             continue;
         }
-        let free = !line
-            .items
+        if let Some(i) = owns.iter().position(|o| o.iter().any(|t| t == clause)) {
+            ops::push_new(&mut owned[i], clause.to_string());
+        } else if off_subject
+            || whose_roots.iter().any(|t| t == clause)
+            || list_names.iter().any(|n| {
+                clause.starts_with(&format!("{n} "))
+                    || n.match_indices('.')
+                        .any(|(at, _)| clause.starts_with(&format!("{} ", &n[..at])))
+            })
+            || texts_once.len() != 1
+        {
+            ops::push_new(&mut walk_texts, clause.to_string());
+        } else {
+            ops::push_new(&mut owned[0], clause.to_string());
+        }
+    }
+    let roots: Vec<String> = message
+        .split("; ")
+        .filter(|m| !m.is_empty() && !item_made.iter().any(|t| t == m))
+        .map(str::to_string)
+        .collect();
+    let mut out: Vec<Failure> = Vec::new();
+    for (i, sentence) in line.sentences.iter().enumerate() {
+        let first = line
+            .sentences
             .iter()
-            .any(|it| for_line::reads_alias(&sentence.check, &it.alias));
+            .position(|s| s.text == sentence.text)
+            .unwrap_or(i);
+        if first != i {
+            continue;
+        }
         let mut causes: Vec<Cause> = Vec::new();
         let mut inputs: Vec<Value> = Vec::new();
         let mut items: Vec<Failure> = Vec::new();
         let mut moved: Vec<String> = Vec::new();
-        for f in failed {
+        for f in failed.iter().filter(|f| !bare(f)) {
             for l in list(f, "failed_assertions") {
                 if text(&l, "assertion") != sentence.text {
                     continue;
@@ -351,49 +446,36 @@ pub fn for_failures(
                         ops::push_new(&mut inputs, x);
                     }
                 }
-                if !free && let Some(entry) = line_item(f, &l, &aliases, &roots, &mut moved) {
+                if frees[i].is_none()
+                    && let Some(entry) = line_item(f, &l, &aliases, &roots, &mut moved)
+                {
                     items.push(entry);
                 }
             }
         }
-        let mut said = String::new();
-        if free {
-            let ran = ops::run_full(&sentence.check, ctx);
-            if !ran.verdict.passed() {
-                said = match ran.message {
-                    Some(text) if matches!(sentence.check, Check::Walk(_)) => text,
-                    _ => ops::message::message(&sentence.check, ctx, &ran.verdict),
-                };
+        let said = match &frees[i] {
+            Some((cause, said, free_inputs)) => {
                 if causes.is_empty() {
-                    causes.push(ran.verdict.cause);
-                    let sides = ops::message::side_names(&sentence.check);
-                    for input in &ran.verdict.inputs {
-                        ops::push_new(&mut inputs, crate::parts::with_outcome(input, &said, &sides));
+                    causes.push(*cause);
+                    for x in free_inputs {
+                        ops::push_new(&mut inputs, x.clone());
                     }
                 }
-                free_texts.extend(said.split("; ").map(str::to_string));
+                said.clone()
             }
-        }
-        if said.is_empty() {
-            let owns = if row_cause == Cause::NotAnObject {
-                Vec::new()
-            } else {
-                line.sentence_roots(i, ctx)
-            };
-            let mut own: Vec<String> = Vec::new();
-            for clause in message.split("; ") {
-                if (moved.iter().any(|m| m == clause) || owns.iter().any(|o| o == clause))
-                    && !free_texts.iter().any(|t| t == clause)
-                {
-                    ops::push_new(&mut own, clause.to_string());
+            None => {
+                let mut own: Vec<String> = Vec::new();
+                for clause in message.split("; ") {
+                    if owned[i].iter().any(|o| o == clause) || moved.iter().any(|m| m == clause) {
+                        ops::push_new(&mut own, clause.to_string());
+                    }
                 }
+                for m in moved {
+                    ops::push_new(&mut own, m);
+                }
+                own.join("; ")
             }
-            for m in moved {
-                ops::push_new(&mut own, m);
-            }
-            said = own.join("; ");
-            free_texts.extend(own);
-        }
+        };
         if said.is_empty() && items.is_empty() {
             continue;
         }
@@ -408,19 +490,34 @@ pub fn for_failures(
             locations: places.get(i).cloned().into_iter().collect(),
         });
     }
-    let mut breaks: Vec<Failure> = failed
+    let mut lists: Vec<Failure> = Vec::new();
+    let mut rest: Vec<Failure> = Vec::new();
+    for f in failed
         .iter()
-        .filter(|f| list(f, "failed_assertions").is_empty())
-        .filter_map(|f| dead_entry(line, f, ctx))
-        .collect();
-    if failed.is_empty() {
-        let walk: Vec<&str> = message
-            .split("; ")
-            .filter(|m| !m.is_empty() && !m.starts_with("item ") && !free_texts.iter().any(|t| t == m))
-            .collect();
-        if !walk.is_empty() {
-            let label = list_label(line, walk[0]);
-            breaks.push(Failure::List(Part {
+        .filter(|f| list(f, "failed_assertions").is_empty() || bare(f))
+    {
+        let said = text(f, "ergo/text");
+        if !said.is_empty()
+            && list(f, "failed_items").is_empty()
+            && said.split("; ").all(|p| whose_roots.iter().any(|t| t == p))
+        {
+            for p in said.split("; ") {
+                ops::push_new(&mut walk_texts, p.to_string());
+            }
+            continue;
+        }
+        if let Some(entry) = dead_entry(line, f, ctx) {
+            match entry {
+                Failure::List(_) => lists.push(entry),
+                _ => rest.push(entry),
+            }
+        }
+    }
+    if !walk_texts.is_empty() {
+        let label = list_label(line, &walk_texts[0]);
+        lists.insert(
+            0,
+            Failure::List(Part {
                 name: label.clone(),
                 cause: row_cause,
                 inputs: row_inputs
@@ -432,17 +529,9 @@ pub fn for_failures(
                     .cloned()
                     .collect(),
                 failures: Vec::new(),
-                message: walk.join("; "),
-            }));
-        }
-    }
-    let mut lists: Vec<Failure> = Vec::new();
-    let mut rest: Vec<Failure> = Vec::new();
-    for b in breaks {
-        match b {
-            Failure::List(_) => lists.push(b),
-            _ => rest.push(b),
-        }
+                message: walk_texts.join("; "),
+            }),
+        );
     }
     out.extend(lists);
     out.extend(rest);

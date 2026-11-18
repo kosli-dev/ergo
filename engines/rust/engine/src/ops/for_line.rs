@@ -1819,6 +1819,29 @@ impl For {
         texts
     }
 
+    /// What the `whose` clauses of the `for` line's own items say about a
+    /// root they read outside the items, when it can't be read or used.
+    pub fn whose_roots(&self, ctx: &Ctx) -> Vec<String> {
+        let outer = outer_ctx(ctx);
+        let mut texts: Vec<String> = Vec::new();
+        for check in self.items.iter().flat_map(|item| item.whose.iter()) {
+            let mut found: Vec<String> = Vec::new();
+            if let Some((_, text)) = super::message::root_flaw(&[check], &outer) {
+                found.push(text);
+            }
+            if let Some((_, more)) = sentence_root_flaw(&root_forms(check), &outer) {
+                found.extend(more);
+            }
+            found.extend(super::message::walked_roots_ahead(None, &[check], &outer, &[]));
+            for text in found {
+                for piece in text.split("; ") {
+                    push_new(&mut texts, piece.to_string());
+                }
+            }
+        }
+        texts
+    }
+
     pub fn run(&self, ctx: &Ctx) -> Run {
         let mut run = self.run_lines(ctx);
         if run.verdict.cause != Cause::Satisfied {
