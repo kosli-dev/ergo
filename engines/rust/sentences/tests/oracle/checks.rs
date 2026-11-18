@@ -10077,7 +10077,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("x.e is after x.a", "x.e is after x.a", &[], &[]),
     ("z is 3", "z is 3", &[], &[]),
     ("count of o is 1", "count of o is 1", &[], &[]),
-    ("count of o whose v is 1 is 1", "count of o whose v is 1 is 1", &[], &[]),
+    (
+        "count of o whose v is 1 is 1",
+        "count of o whose v is 1 is 1",
+        &[],
+        &[],
+    ),
     (
         "count of xs whose v is m named by $params.k is 1",
         "count of xs whose v equals m named by $params.k is 1",
@@ -10098,8 +10103,37 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("sum of o is 1", "sum of o is 1", &[], &[]),
-    ("x.v is at least $params.z", "x.v is at least $params.z", &[], &[]),
+    (
+        "x.v is at least $params.z",
+        "x.v is at least $params.z",
+        &[],
+        &[],
+    ),
     ("x.v is at least z", "x.v is at least z", &[], &[]),
+    (
+        "count of xs whose $input.z is m named by $params.k is 1",
+        "count of xs whose $input.z equals m named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose $params.z is m named by $params.k is 1",
+        "count of xs whose $params.z equals m named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is $params.z and whose u is $input.z and whose v is m named by $params.k is 1",
+        "count of xs whose v equals $params.z and whose u equals $input.z and whose v equals m named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is $params.z and whose u is $input.z and whose v is m named by $params.k exists",
+        "every xs whose v equals $params.z and whose u equals $input.z and whose v equals m named by $params.k exists",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
