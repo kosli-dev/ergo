@@ -1824,6 +1824,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                 pieces.as_deref(),
                 walk,
                 ctx,
+                false,
             ),
             _ => Part {
                 name: filter.text.clone(),
@@ -2294,6 +2295,38 @@ fn key_ref_entries(paths: &[&Path], ctx: &Ctx, inputs: &[Value]) -> Vec<Value> {
     found
 }
 
+/// The `$params` and `$input` paths among `paths` that can't be read, or that
+/// `check` can't use, as entries of an assertion's `inputs`.
+pub(crate) fn root_inputs(paths: &[&Path], check: &Check, ctx: &Ctx) -> Vec<Value> {
+    let mut out: Vec<Value> = Vec::new();
+    for path in paths {
+        if !matches!(path.start, Start::Params | Start::Input)
+            || path
+                .steps
+                .iter()
+                .any(|s| matches!(s, Step::Ref(_) | Step::Field(_)))
+        {
+            continue;
+        }
+        let Some(input) = ops::read_path(path, ctx).inputs.into_iter().next() else {
+            continue;
+        };
+        let mut entry = parts::with_outcome(&input, "", &[]);
+        match input.state {
+            Outcome::Found if crate::checks::ref_unfit(&[check], path, &input.value, ctx) => {
+                entry["outcome"] = json!("unusable");
+            }
+            Outcome::Found => continue,
+            Outcome::NotAnObject if path.start == Start::Params => {
+                entry["outcome"] = json!("unusable");
+            }
+            _ => {}
+        }
+        ops::push_new(&mut out, entry);
+    }
+    out
+}
+
 fn walk_base(walk: &ops::walk::Walk, ctx: &Ctx, said: &mut Vec<String>) -> Vec<Failure> {
     let Some((text, cause, input)) =
         ops::key_base::for_list(&walk.path, walk.if_any, ctx).and_then(|k| k.base)
@@ -2321,6 +2354,7 @@ fn walk_part(
     pieces: Option<&[String]>,
     walk: &ops::walk::Walk,
     ctx: &Ctx,
+    roots: bool,
 ) -> Part {
     let check = Check::Walk(Box::new(walk.clone()));
     let mut keys = key_ref_entries(&ops::key_base::every_path(&check), ctx, inputs);
@@ -2346,6 +2380,21 @@ fn walk_part(
             entry["outcome"] = json!("unusable");
         }
         keys.push(entry);
+    }
+    let root_paths = if roots {
+        walk.check.paths()
+    } else {
+        Vec::new()
+    };
+    for entry in root_inputs(&root_paths, &check, ctx) {
+        let name = entry.get("name").and_then(Value::as_str).unwrap_or_default();
+        if !inputs
+            .iter()
+            .chain(&keys)
+            .any(|i| i.get("name").and_then(Value::as_str) == Some(name))
+        {
+            keys.push(entry);
+        }
     }
     if let Some(pieces) = pieces.filter(|p| p.len() != failed.len()) {
         let capped = message
@@ -2643,6 +2692,7 @@ fn with_failures(
                         ran.pieces.as_deref(),
                         walk,
                         ctx,
+                        true,
                     ),
                     locations: at(None, 1),
                 }])

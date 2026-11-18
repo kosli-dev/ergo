@@ -541,6 +541,16 @@ pub fn for_failures(
         if said.is_empty() && items.is_empty() {
             continue;
         }
+        if inputs.is_empty()
+            && items.is_empty()
+            && ctx.params.is_some_and(|p| !p.is_object() && !p.is_null())
+        {
+            inputs = crate::subjects::root_inputs(
+                &ops::key_base::every_path(&sentence.check),
+                &sentence.check,
+                ctx,
+            );
+        }
         out.push(Failure::Assertion {
             part: Part {
                 name: sentence.text.clone(),
