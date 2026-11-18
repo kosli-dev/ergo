@@ -131,3 +131,22 @@ fn a_one_line_walk_says_the_value_before_a_missing_key_as_a_list_entry() {
     assert_eq!(assertion["failures"][0]["kind"], "list");
     assert_eq!(assertion["failures"][0]["message"], "o is missing");
 }
+
+#[test]
+fn a_walk_in_an_any_of_option_lists_the_params_it_reads_on_its_assertion() {
+    let check = json!({"any_of": {
+        "declared": "some ids.v is in $params.allowed",
+        "other": "id is \"x\""
+    }});
+    let params = json!({"allowed": ["a", "b"]});
+    let got = row(check, json!({"id": "t", "ids": [{"v": "c"}]}), params);
+    let assertion = &got["failures"][0]["failures"][0];
+    assert_eq!(assertion["kind"], "assertion");
+    assert_eq!(
+        assertion["inputs"],
+        json!([
+            {"locations": ["/things/0/ids/0/v"], "name": "ids[].v", "outcome": "usable", "value": ["c"]},
+            {"locations": ["$params:/allowed"], "name": "$params.allowed", "outcome": "usable", "value": ["a", "b"]}
+        ])
+    );
+}
