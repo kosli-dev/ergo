@@ -442,7 +442,31 @@ pub fn for_failures(
             std::iter::once(k.key_text.as_str()).chain(k.base.iter().map(|(t, _, _)| t.as_str()))
         })
         .collect();
+    let first_reads: Option<(String, String)> = (line.items.len() == 2
+        && matches!(line.items[0].how, for_line::How::Some { .. }))
+    .then(|| {
+        (
+            "item ".to_string(),
+            format!(" of {}: {}.", list_names[0], line.items[0].alias),
+        )
+    });
     for clause in message.split("; ") {
+        if let Some((lead, middle)) = &first_reads
+            && clause.starts_with(lead.as_str())
+            && clause.contains(middle.as_str())
+            && (clause.ends_with(" is missing")
+                || clause.ends_with(" is null")
+                || clause.contains(", which isn't "))
+        {
+            let alias = &line.items[0].alias;
+            let at = line
+                .sentences
+                .iter()
+                .position(|s| for_line::reads_alias(&s.check, alias))
+                .unwrap_or(0);
+            ops::push_new(&mut owned[at], clause.to_string());
+            continue;
+        }
         if clause.is_empty()
             || key_said.contains(&clause)
             || failed.iter().any(|f| {
