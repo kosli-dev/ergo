@@ -610,3 +610,52 @@ fn a_for_next_to_an_any_of_keeps_the_problems_of_the_options() {
     let read = one(json!({"c": {"for": "every ts as t", "any_of": {"a": "nonsense words"}}}));
     assert!(has_problem(&read, "option a: doesn't parse"));
 }
+
+fn ctx_of<'a>(subject: &'a Value, params: &'a Value) -> crate::path::Ctx<'a> {
+    crate::path::Ctx {
+        label: None,
+        item_by_item: true,
+        in_option: false,
+        subject: crate::path::Located {
+            value: subject,
+            location: crate::path::Location::input_root(),
+        },
+        input: subject,
+        params: Some(params),
+        aliases: BTreeMap::new(),
+    }
+}
+
+fn param(key: &str) -> Path {
+    Path {
+        start: crate::path::Start::Params,
+        steps: vec![crate::path::Step::Key(key.to_string())],
+    }
+}
+
+fn first_check(read: CheckRead) -> Check {
+    read.plan.unwrap().items.remove(0).check
+}
+
+#[test]
+fn a_param_a_for_line_sentence_compares_as_a_number_is_unfit_when_it_holds_text() {
+    let check = first_check(one(
+        json!({"c": {"for": "every xs as m", "assert": "m.v is at least $params.q"}}),
+    ));
+    let subject = json!({"xs": [{"v": 1}]});
+    let params = json!({"q": "s"});
+    let ctx = ctx_of(&subject, &params);
+    assert!(ref_unfit(&[&check], &param("q"), &json!("s"), &ctx));
+    assert!(!ref_unfit(&[&check], &param("q"), &json!(2), &ctx));
+}
+
+#[test]
+fn a_param_a_for_line_sentence_looks_in_is_unfit_when_it_isnt_a_list() {
+    let check = first_check(one(
+        json!({"c": {"for": "every xs as m", "assert": "m.v is in $params.q"}}),
+    ));
+    let subject = json!({"xs": [{"v": 1}]});
+    let params = json!({"q": "s"});
+    let ctx = ctx_of(&subject, &params);
+    assert!(ref_unfit(&[&check], &param("q"), &json!("s"), &ctx));
+}

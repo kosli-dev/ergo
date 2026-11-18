@@ -479,6 +479,10 @@ fn compare_unfit(check: &Check, reference: &Path, value: &Value) -> bool {
 
 pub(crate) fn ref_unfit(checks: &[&Check], reference: &Path, value: &Value, ctx: &Ctx) -> bool {
     checks.iter().any(|check| {
+        if let Check::For(line) = check {
+            let inner: Vec<&Check> = line.sentences.iter().map(|s| &s.check).collect();
+            return ref_unfit(&inner, reference, value, ctx);
+        }
         if crate::ops::for_line::nested_checks(check)
             .into_iter()
             .any(|inner| compare_unfit(inner, reference, value))

@@ -2427,7 +2427,13 @@ fn unfit_names(checks: &[&Check], ctx: &Ctx) -> Vec<(String, Value)> {
     let mut out: Vec<(String, Value)> = Vec::new();
     for check in checks {
         let mut refs = check.refs();
-        for path in ops::key_base::every_path(check) {
+        let mut paths = ops::key_base::every_path(check);
+        if let Check::For(line) = check {
+            for sentence in &line.sentences {
+                paths.extend(ops::key_base::every_path(&sentence.check));
+            }
+        }
+        for path in paths {
             if matches!(path.start, Start::Params | Start::Input) && !refs.contains(path) {
                 refs.push(path.clone());
             }
@@ -2497,6 +2503,23 @@ fn with_failures(
         .collect();
     let all: Vec<&Check> = ran.checks.iter().collect();
     row.inputs = outcomes(&read, &message, plan.all_of, &all);
+    if matches!(ran.checks.first(), Some(Check::For(_))) {
+        let worked: Vec<&str> = read
+            .iter()
+            .filter(|i| i.worked && !i.value.is_null())
+            .map(|i| i.name.as_str())
+            .collect();
+        for input in &mut row.inputs {
+            if input.get("outcome").is_none()
+                && input
+                    .get("name")
+                    .and_then(Value::as_str)
+                    .is_some_and(|n| worked.contains(&n))
+            {
+                input["outcome"] = json!("usable");
+            }
+        }
+    }
     let written = env
         .requirement
         .checks
