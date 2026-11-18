@@ -1365,7 +1365,7 @@ fn a_sentence_root_named_by_the_lines_alias_is_read_for_each_item() {
 }
 
 #[test]
-fn a_param_key_that_isnt_text_doesnt_name_an_item_that_isnt_an_object() {
+fn a_param_key_that_isnt_text_names_the_value_before_it_but_not_an_item_that_isnt_an_object() {
     let found = row(
         "every ws as w",
         json!("w.k named by $params.need is 1"),
@@ -1373,7 +1373,7 @@ fn a_param_key_that_isnt_text_doesnt_name_an_item_that_isnt_an_object() {
     );
     assert_eq!(
         found["message"],
-        "$params.need is {\"b\": 1}, which isn't text"
+        "$params.need is {\"b\": 1}, which isn't text; item 1 of ws: w.k is 1, which isn't an object"
     );
 }
 
