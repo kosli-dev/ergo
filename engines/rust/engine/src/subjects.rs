@@ -2398,7 +2398,10 @@ fn unfit_names(checks: &[&Check], ctx: &Ctx) -> Vec<(String, Value)> {
 
 fn mark_unfit(inputs: &mut [Value], unfit: &[(String, Value)]) {
     for input in inputs {
-        let name = input.get("name").and_then(Value::as_str).unwrap_or_default();
+        let name = input
+            .get("name")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
         let value = input.get("value").cloned().unwrap_or(Value::Null);
         if input.get("outcome").and_then(Value::as_str) == Some("usable")
             && unfit.iter().any(|(n, v)| n == name && *v == value)

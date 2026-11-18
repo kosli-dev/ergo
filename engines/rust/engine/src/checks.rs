@@ -403,7 +403,12 @@ fn steps_key(path: &Path, reference: &Path) -> bool {
     })
 }
 
-fn side_unfit(side: &crate::ops::compare::Side, reference: &Path, value: &Value, kind: Option<&str>) -> bool {
+fn side_unfit(
+    side: &crate::ops::compare::Side,
+    reference: &Path,
+    value: &Value,
+    kind: Option<&str>,
+) -> bool {
     use crate::ops::compare::Side;
     match side {
         Side::Path(path) if path == reference => match kind {
@@ -415,9 +420,9 @@ fn side_unfit(side: &crate::ops::compare::Side, reference: &Path, value: &Value,
             }
             _ => false,
         },
-        Side::Join(parts) => parts
-            .iter()
-            .any(|part| matches!(part, Side::Path(path) if path == reference) && !value.is_string()),
+        Side::Join(parts) => parts.iter().any(|part| {
+            matches!(part, Side::Path(path) if path == reference) && !value.is_string()
+        }),
         _ => false,
     }
 }

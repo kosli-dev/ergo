@@ -948,9 +948,14 @@ impl For {
                             &key_name,
                         )),
                     },
-                    Err(cause) => {
-                        failed.push(sort_failure(&found, cause, Value::Null, location, &text, &key_name))
-                    }
+                    Err(cause) => failed.push(sort_failure(
+                        &found,
+                        cause,
+                        Value::Null,
+                        location,
+                        &text,
+                        &key_name,
+                    )),
                 }
             }
             if let Some(first) = keys.iter().map(|(_, k, _, _)| kind(k)).min() {
@@ -1010,7 +1015,11 @@ impl For {
                     cands.dead.push(Dead {
                         order: found.order.clone(),
                         said: found.said.clone(),
-                        sorted: Some(sorted_stash(found, &crate::name::name(&sorted.path), Cause::Ambiguous)),
+                        sorted: Some(sorted_stash(
+                            found,
+                            &crate::name::name(&sorted.path),
+                            Cause::Ambiguous,
+                        )),
                         ..Dead::at(
                             found.name.clone(),
                             Cause::Ambiguous,
@@ -1832,7 +1841,12 @@ impl For {
             if let Some((_, more)) = sentence_root_flaw(&root_forms(check), &outer) {
                 found.extend(more);
             }
-            found.extend(super::message::walked_roots_ahead(None, &[check], &outer, &[]));
+            found.extend(super::message::walked_roots_ahead(
+                None,
+                &[check],
+                &outer,
+                &[],
+            ));
             for text in found {
                 for piece in text.split("; ") {
                     push_new(&mut texts, piece.to_string());
@@ -1881,10 +1895,7 @@ impl For {
             .filter(|p| !p.is_empty())
             .map(str::to_string)
             .collect();
-        let clauses: Vec<&str> = said
-            .split("; ")
-            .flat_map(|p| p.split(", and "))
-            .collect();
+        let clauses: Vec<&str> = said.split("; ").flat_map(|p| p.split(", and ")).collect();
         if texts
             .iter()
             .flat_map(|t| t.split(", and "))

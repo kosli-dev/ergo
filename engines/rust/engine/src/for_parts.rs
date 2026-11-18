@@ -72,7 +72,14 @@ fn entry_text(text: &str, name: &str) -> String {
     }
 }
 
-fn item(name: String, cause: Cause, inputs: Vec<Value>, failures: Vec<Failure>, message: String, of: &Value) -> Failure {
+fn item(
+    name: String,
+    cause: Cause,
+    inputs: Vec<Value>,
+    failures: Vec<Failure>,
+    message: String,
+    of: &Value,
+) -> Failure {
     Failure::Item {
         part: Part {
             name,
@@ -143,7 +150,14 @@ fn line_item(
         .into_iter()
         .filter(|x| alias_named(&text(x, "name"), aliases))
         .collect();
-    Some(item(text(f, "item"), cause_of(l), inputs, inner, message, f))
+    Some(item(
+        text(f, "item"),
+        cause_of(l),
+        inputs,
+        inner,
+        message,
+        f,
+    ))
 }
 
 fn whose_reads(whose: &[Check], f: &Value, ctx: &Ctx) -> Vec<Value> {
@@ -157,7 +171,7 @@ fn whose_reads(whose: &[Check], f: &Value, ctx: &Ctx) -> Vec<Value> {
     at.subject = crate::path::Located {
         value: object,
         location: crate::path::Location {
-            root: ctx.subject.location.root.clone(),
+            root: ctx.subject.location.root,
             pointer: place.clone(),
         },
     };
@@ -237,7 +251,14 @@ fn dead_entry(line: &For, f: &Value, ctx: &Ctx) -> Option<Failure> {
                 let said = entry_text(&text(x, "ergo/text"), &said_name(x));
                 (!said.is_empty()).then(|| {
                     if text(x, "item").starts_with("item ") {
-                        item(text(x, "item"), cause_of(x), whose_reads(last, x, ctx), Vec::new(), said, x)
+                        item(
+                            text(x, "item"),
+                            cause_of(x),
+                            whose_reads(last, x, ctx),
+                            Vec::new(),
+                            said,
+                            x,
+                        )
                     } else {
                         Failure::List(Part {
                             name: text(x, "item"),

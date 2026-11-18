@@ -10,7 +10,6 @@ use serde_json::Value;
 pub struct KeyBase {
     pub path: String,
     pub key: String,
-    pub key_input: Input,
     pub base: Option<(String, Cause, Input)>,
     pub off_object: bool,
 }
@@ -48,7 +47,12 @@ fn key_flaw(key: &Path, ctx: &Ctx) -> Option<(Outcome, String, Input)> {
     }
 }
 
-fn base_flaw(start: &path::Start, keys: &[String], tally: bool, ctx: &Ctx) -> Option<(String, Cause, Input)> {
+fn base_flaw(
+    start: &path::Start,
+    keys: &[String],
+    tally: bool,
+    ctx: &Ctx,
+) -> Option<(String, Cause, Input)> {
     let (mut at, mut location, _) = path::start_of(start, ctx).ok()?;
     if !at.is_object() {
         return None;
@@ -112,7 +116,15 @@ fn base_flaw(start: &path::Start, keys: &[String], tally: bool, ctx: &Ctx) -> Op
         Value::Object(_) => None,
         Value::Array(_) if tally => None,
         other => Some((
-            message::isnt(&named, other, if tally { "a list or an object" } else { "an object" }),
+            message::isnt(
+                &named,
+                other,
+                if tally {
+                    "a list or an object"
+                } else {
+                    "an object"
+                },
+            ),
             Cause::Unusable,
             input(named, Outcome::Unusable, other.clone(), &location),
         )),
@@ -130,7 +142,7 @@ pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
     let Step::Ref(key) = &path.steps[at] else {
         return None;
     };
-    let (_, text, key_input) = key_flaw(key, ctx)?;
+    let (_, text, _) = key_flaw(key, ctx)?;
     let keys: Vec<String> = path.steps[..at]
         .iter()
         .map_while(|step| match step {
@@ -138,13 +150,14 @@ pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
             _ => None,
         })
         .collect();
-    let base = (!keys.is_empty() && keys.len() == at && matches!(path.start, path::Start::Subject | path::Start::Own))
-        .then(|| base_flaw(&path.start, &keys, tally, ctx))
-        .flatten();
+    let base = (!keys.is_empty()
+        && keys.len() == at
+        && matches!(path.start, path::Start::Subject | path::Start::Own))
+    .then(|| base_flaw(&path.start, &keys, tally, ctx))
+    .flatten();
     Some(KeyBase {
         path: name::name(path),
         key: text,
-        key_input,
         base,
         off_object: matches!(path.start, path::Start::Subject | path::Start::Own)
             && matches!(path.steps.first(), Some(Step::Key(_)))
@@ -193,10 +206,7 @@ pub fn said_with_bases(said: &str, cause: Cause, bases: &[KeyBase]) -> (String, 
             }
         }
     }
-    (
-        pieces.join("; "),
-        Cause::worst(causes).unwrap_or(cause),
-    )
+    (pieces.join("; "), Cause::worst(causes).unwrap_or(cause))
 }
 
 fn outcome_of(cause: Cause) -> Outcome {
@@ -216,7 +226,13 @@ fn cause_of(state: Outcome) -> Option<Cause> {
 /// Rewrites a failed plain check's message and cause so that a base that
 /// can't take a key is said after its key, and gives each path input the
 /// worst outcome of its problems.
-pub fn rewrite(check: &Check, ctx: &Ctx, cause: &mut Cause, inputs: &mut [Input], said: String) -> Option<String> {
+pub fn rewrite(
+    check: &Check,
+    ctx: &Ctx,
+    cause: &mut Cause,
+    inputs: &mut [Input],
+    said: String,
+) -> Option<String> {
     if !matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
         || matches!(check, Check::Walk(_) | Check::For(_) | Check::AnyOf(_))
     {
@@ -248,13 +264,22 @@ pub fn rewrite(check: &Check, ctx: &Ctx, cause: &mut Cause, inputs: &mut [Input]
 
 /// The key and base inputs a failed plain check's assertion entry adds after
 /// `inputs`.
-pub fn entry_inputs(check: &Check, ctx: &Ctx, cause: Cause, inputs: &[serde_json::Value]) -> Vec<serde_json::Value> {
+pub fn entry_inputs(
+    check: &Check,
+    ctx: &Ctx,
+    cause: Cause,
+    inputs: &[serde_json::Value],
+) -> Vec<serde_json::Value> {
     if !matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
         || matches!(check, Check::Walk(_) | Check::For(_) | Check::AnyOf(_))
     {
         return Vec::new();
     }
-    let named = |v: &serde_json::Value| v.get("name").and_then(serde_json::Value::as_str).map(str::to_string);
+    let named = |v: &serde_json::Value| {
+        v.get("name")
+            .and_then(serde_json::Value::as_str)
+            .map(str::to_string)
+    };
     let mut seen: Vec<String> = inputs.iter().filter_map(named).collect();
     let bases = of_check(check, ctx);
     let mut keys: Vec<serde_json::Value> = Vec::new();
@@ -273,7 +298,7 @@ pub fn entry_inputs(check: &Check, ctx: &Ctx, cause: Cause, inputs: &[serde_json
             keys.push(crate::parts::with_outcome(&input, "", &[]));
         }
     }
-    keys.sort_by(|a, b| named(a).cmp(&named(b)));
+    keys.sort_by_key(|a| named(a));
     for kb in &bases {
         if let Some((_, _, input)) = &kb.base
             && !seen.contains(&input.name)

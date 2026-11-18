@@ -1123,10 +1123,10 @@ impl Reading {
                                 &scope.clone().with_subject(name).for_from_line(),
                             ) {
                                 Ok(check) => filters.push(Filter {
-                                        text,
-                                        check,
-                                        owner: name.to_string(),
-                                    }),
+                                    text,
+                                    check,
+                                    owner: name.to_string(),
+                                }),
                                 Err(found) => found_problems.extend(lower::in_from_line(found)),
                             },
                         }
