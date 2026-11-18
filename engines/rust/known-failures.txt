@@ -688,3 +688,25 @@ walks / a that clause whose key from $params isn't text reads the value before t
 walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name / an item of $input.os is null and $params.z is missing
 walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name, with a null param / an item of $input.os has no name and $params.z is null
 subjects / a condition with count of / counts the items of the list and keeps subjects with enough
+derived / a count with whose or that reads a named by key from $input that isn't text before the list, whether the list is empty, missing, null or not a list / the list is missing
+derived / a count with whose or that reads a named by key from $input that isn't text before the list, whether the list is empty, missing, null or not a list / the list is null
+messages / nothing hides a problem / the roots come first and then each item, and the row takes the worst cause
+subjects / a from line with every / fails min_subjects with the worst cause of a broken branch, lists each one, and still checks the subjects it read
+subjects / a from line with every where a list can't be read / gives each failed item of the $min_subjects row the location where its read stopped
+walks / a that key that can't be read, on a list item that isn't an object, names the item and never a field under it / the key is null and the item is text
+walks / a that key that can't be read, on a list item that isn't an object, names the item and never a field under it / the key is null and the items are an object whose focus isn't an object and text
+walks / a that key that isn't text, on a list item that isn't an object, names the item and never a field under it / the focus is an object, so only the key is said
+walks / a that key that isn't text, on a list item that isn't an object, names the item and never a field under it / the item is text
+walks / a whose key from $params that is missing is said before a list that can't be walked, and the row takes the worst cause / the list is missing
+walks / a whose key from $params that is missing is said before a list that can't be walked, and the row takes the worst cause / the list is null
+walks / a whose key from $params that is missing, said once before the items, doesn't count as one of the three items the message shows / five items without m show three and count two more
+walks / a whose key from $params that is null, beside items that fail on their own fields, says the key once and each item's own problem / an item without zz and an item whose m is null
+walks / a whose key from $params that is null, beside items that fail on their own fields, says the key once and each item's own problem / five mixed items
+walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is empty
+walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is missing
+walks / a whose key from $params that isn't text is said before a list that can't be walked, and the row takes the worst cause / the list is null
+walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / five mixed items say the key in each item and the item that isn't an object
+walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / two items without zz or m say the key in each item
+walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / five items without m show three and count two more
+walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / four items without m show three and count one more
+walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / three items without m show all three

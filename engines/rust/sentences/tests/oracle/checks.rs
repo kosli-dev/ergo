@@ -9678,6 +9678,25 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of es whose zz is m named by $params.k is $params.n",
+        "count of es whose zz equals m named by $params.k equals $params.n",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose zz is m named by $params.k exists",
+        "every es whose zz equals m named by $params.k exists",
+        &[],
+        &[],
+    ),
+    (
+        "some es whose zz is m named by $params.k exists",
+        "some es whose zz equals m named by $params.k exists",
+        &[],
+        &[],
+    ),
+    ("ys exists", "ys exists", &[], &[]),
     ("e.v is 2", "e.v is 2", &[], &[]),
     (
         "every es whose zz is m named by $input.k, if any, exists",
