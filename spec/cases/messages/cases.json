@@ -7527,7 +7527,7 @@
                       "/things/0/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       "k"
                     ]
@@ -7555,7 +7555,7 @@
                   "/things/0/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   "k"
                 ]
@@ -7986,7 +7986,7 @@
                       "/things/0/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -8014,7 +8014,7 @@
                   "/things/0/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -8613,7 +8613,7 @@
                       "/things/0/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -8642,7 +8642,7 @@
                   "/things/0/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -13522,7 +13522,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": "no"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
@@ -15341,7 +15350,7 @@
                       "/prs/0/c/z"
                     ],
                     "name": "pl.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -15387,7 +15396,7 @@
                   "/prs/0/c/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -15440,7 +15449,7 @@
                       "/prs/0/z"
                     ],
                     "name": "pr.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -15482,7 +15491,7 @@
                   "/prs/0/z"
                 ],
                 "name": "pr.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -15819,7 +15828,7 @@
                       "/prs/0/c/z"
                     ],
                     "name": "pl.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -15852,7 +15861,7 @@
                   "/prs/0/c/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -15881,7 +15890,7 @@
                       "/prs/0/z"
                     ],
                     "name": "pr.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   },
                   {
@@ -15905,7 +15914,7 @@
                   "/prs/0/z"
                 ],
                 "name": "pr.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -15947,7 +15956,7 @@
                       "/prs/0/z"
                     ],
                     "name": "pr.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -15976,7 +15985,7 @@
                   "/prs/0/z"
                 ],
                 "name": "pr.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -16001,7 +16010,7 @@
                       "/prs/0/c/z"
                     ],
                     "name": "pl.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -16029,7 +16038,7 @@
                   "/prs/0/c/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -17810,7 +17819,7 @@
                       "/prs/0/p"
                     ],
                     "name": "p",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -17836,7 +17845,7 @@
                   "/prs/0/p"
                 ],
                 "name": "p",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -17869,7 +17878,7 @@
                       "/prs/0/p"
                     ],
                     "name": "p",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -17895,7 +17904,7 @@
                   "/prs/0/p"
                 ],
                 "name": "p",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -18080,7 +18089,7 @@
                       "/prs/0/z"
                     ],
                     "name": "pr.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -18098,7 +18107,7 @@
                   "/prs/0/z"
                 ],
                 "name": "pr.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -18176,7 +18185,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -18217,7 +18226,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -18242,7 +18251,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -18283,7 +18292,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               },
               {
@@ -18406,7 +18415,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   },
                   {
@@ -18447,7 +18456,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               },
               {
@@ -18505,7 +18514,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": {}
                   }
                 ],
@@ -18534,7 +18543,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {}
               }
             ],
@@ -18559,7 +18568,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": {}
                   },
                   {
@@ -18591,7 +18600,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {}
               },
               {
@@ -18675,7 +18684,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": {}
                   },
                   {
@@ -18707,7 +18716,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {}
               },
               {
@@ -18763,7 +18772,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -18792,7 +18801,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -18817,7 +18826,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   },
                   {
@@ -18849,7 +18858,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -18933,7 +18942,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   },
                   {
@@ -18965,7 +18974,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -19022,7 +19031,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -19059,7 +19068,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -19084,7 +19093,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   },
                   {
@@ -19110,7 +19119,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -19218,7 +19227,7 @@
                       "/prs/0/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   },
                   {
@@ -19244,7 +19253,7 @@
                   "/prs/0/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -21639,7 +21648,7 @@
                       "/prs/0/z"
                     ],
                     "name": "pr.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       1
                     ]
@@ -21670,7 +21679,7 @@
                   "/prs/0/z"
                 ],
                 "name": "pr.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -21708,7 +21717,7 @@
                       "/prs/0/z"
                     ],
                     "name": "pr.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       1
                     ]
@@ -21739,7 +21748,7 @@
                   "/prs/0/z"
                 ],
                 "name": "pr.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -21772,7 +21781,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       1
                     ]
@@ -21798,7 +21807,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -21831,7 +21840,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       1
                     ]
@@ -21857,7 +21866,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -21890,7 +21899,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       1
                     ]
@@ -21916,7 +21925,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -21978,7 +21987,7 @@
                       "/prs/0/z"
                     ],
                     "name": "pr.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       1
                     ]
@@ -22026,7 +22035,7 @@
                   "/prs/0/z"
                 ],
                 "name": "pr.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -22081,7 +22090,7 @@
                       "/prs/0/z"
                     ],
                     "name": "pr.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       1
                     ]
@@ -22129,7 +22138,7 @@
                   "/prs/0/z"
                 ],
                 "name": "pr.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -22156,7 +22165,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       1
                     ]
@@ -22188,7 +22197,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -22215,7 +22224,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       1
                     ]
@@ -22247,7 +22256,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -22274,7 +22283,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       1
                     ]
@@ -22306,7 +22315,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   1
                 ]
@@ -22351,7 +22360,7 @@
                       "/prs/0/z"
                     ],
                     "name": "pr.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -22380,7 +22389,7 @@
                   "/prs/0/z"
                 ],
                 "name": "pr.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -22440,7 +22449,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -22464,7 +22473,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -22495,7 +22504,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -22519,7 +22528,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -22550,7 +22559,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -22574,7 +22583,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -23698,7 +23707,7 @@
                       "/prs/2/p"
                     ],
                     "name": "p",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -23724,7 +23733,7 @@
                   "/prs/2/p"
                 ],
                 "name": "p",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -23757,7 +23766,7 @@
                       "/prs/2/p"
                     ],
                     "name": "p",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -23783,7 +23792,7 @@
                   "/prs/2/p"
                 ],
                 "name": "p",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -23816,7 +23825,7 @@
                       "/prs/2/p"
                     ],
                     "name": "p",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -23842,7 +23851,7 @@
                   "/prs/2/p"
                 ],
                 "name": "p",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -23879,7 +23888,7 @@
                       "/prs/2/p"
                     ],
                     "name": "p",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -23909,7 +23918,7 @@
                   "/prs/2/p"
                 ],
                 "name": "p",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -24904,7 +24913,7 @@
                       "/prs/2/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -24930,7 +24939,7 @@
                   "/prs/2/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -24963,7 +24972,7 @@
                       "/prs/2/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -24989,7 +24998,7 @@
                   "/prs/2/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -25123,7 +25132,7 @@
                       "/prs/0/z"
                     ],
                     "name": "pr.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -25146,7 +25155,7 @@
                   "/prs/0/z"
                 ],
                 "name": "pr.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -25264,7 +25273,7 @@
                       "/prs/1/z"
                     ],
                     "name": "pr.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -25290,7 +25299,7 @@
                   "/prs/1/z"
                 ],
                 "name": "pr.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -26289,7 +26298,7 @@
                       "/prs/1/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   },
                   {
@@ -26321,7 +26330,7 @@
                   "/prs/1/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -26363,7 +26372,7 @@
                       "/prs/1/m"
                     ],
                     "name": "pr.m",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -26392,7 +26401,7 @@
                   "/prs/1/m"
                 ],
                 "name": "pr.m",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -26483,7 +26492,7 @@
                       "/prs/1/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -26512,7 +26521,7 @@
                   "/prs/1/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -26744,7 +26753,7 @@
                       "/prs/1/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   },
                   {
@@ -26776,7 +26785,7 @@
                   "/prs/1/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -26818,7 +26827,7 @@
                       "/prs/1/m"
                     ],
                     "name": "pr.m",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -26847,7 +26856,7 @@
                   "/prs/1/m"
                 ],
                 "name": "pr.m",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -26883,7 +26892,7 @@
                       "/prs/1/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -26912,7 +26921,7 @@
                   "/prs/1/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -27038,7 +27047,7 @@
                       "/prs/1/l"
                     ],
                     "name": "pr.l",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -27061,7 +27070,7 @@
                   "/prs/1/l"
                 ],
                 "name": "pr.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -27702,7 +27711,7 @@
                       "/gs/0/arts/0/c/z"
                     ],
                     "name": "art.cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "art.cov"
@@ -27748,7 +27757,7 @@
                   "/gs/0/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -28408,7 +28417,7 @@
                       "/arts/0/c/z"
                     ],
                     "name": "art.cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "art.cov"
@@ -28436,7 +28445,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -28476,7 +28485,7 @@
                       "/arts/0/c/z"
                     ],
                     "name": "art.cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "art.cov"
@@ -28504,7 +28513,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -29348,7 +29357,7 @@
                           "/arts/0/c/z"
                         ],
                         "name": "art.cov.z",
-                        "outcome": "usable",
+                        "outcome": "unusable",
                         "value": "s"
                       },
                       {
@@ -29464,7 +29473,7 @@
                           "/arts/0/c/z"
                         ],
                         "name": "art.cov.z",
-                        "outcome": "usable",
+                        "outcome": "unusable",
                         "value": "s"
                       },
                       {
@@ -29872,7 +29881,7 @@
                       "/arts/0/c/z"
                     ],
                     "name": "art.cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "art.cov"
@@ -29900,7 +29909,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -29940,7 +29949,7 @@
                       "/arts/0/c/z"
                     ],
                     "name": "art.cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "art.cov"
@@ -29968,7 +29977,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -30625,7 +30634,7 @@
                       "/arts/0/c/z"
                     ],
                     "name": "art.cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "art.cov"
@@ -30653,7 +30662,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -30694,7 +30703,7 @@
                       "/arts/0/c/z"
                     ],
                     "name": "art.cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "art.cov"
@@ -30722,7 +30731,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -31442,7 +31451,7 @@
                       "/arts/0/c/z"
                     ],
                     "name": "art.cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "art.cov"
@@ -31484,7 +31493,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -32126,7 +32135,7 @@
                       "/arts/0/c/z"
                     ],
                     "name": "art.cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "art.cov"
@@ -32159,7 +32168,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -32193,7 +32202,7 @@
                       "/arts/0/c/z"
                     ],
                     "name": "art.cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "art.cov"
@@ -32221,7 +32230,7 @@
                   "/arts/0/c/z"
                 ],
                 "name": "art.cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "art.cov"
@@ -33695,7 +33704,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/min"
+                    ],
+                    "name": "$params.min",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/one/assert"
@@ -33752,7 +33770,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/min"
+                    ],
+                    "name": "$params.min",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/two/assert/0"
@@ -33763,7 +33790,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/two/assert/1"
@@ -34941,7 +34977,7 @@
                       "/ts/0/z"
                     ],
                     "name": "t.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -34970,7 +35006,7 @@
                   "/ts/0/z"
                 ],
                 "name": "t.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -35012,7 +35048,7 @@
                       "/ts/0/p/z"
                     ],
                     "name": "pl.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -35040,7 +35076,7 @@
                   "/ts/0/p/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -35086,7 +35122,7 @@
                       "/ts/0/z"
                     ],
                     "name": "t.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -35110,7 +35146,7 @@
                   "/ts/0/z"
                 ],
                 "name": "t.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -35155,7 +35191,7 @@
                           "/ts/0/p/z"
                         ],
                         "name": "pl.z",
-                        "outcome": "usable",
+                        "outcome": "unusable",
                         "value": "s"
                       }
                     ],
@@ -35354,7 +35390,7 @@
                       "/ts/0/p/z"
                     ],
                     "name": "pl.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -35387,7 +35423,7 @@
                   "/ts/0/p/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -35472,7 +35508,7 @@
               {
                 "locations": [],
                 "name": "es",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -37082,7 +37118,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is missing",
+                "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is missing",
                 "name": "every es whose v is in $params.z, if any, is in $params.y"
               }
             ],
@@ -37094,7 +37130,7 @@
                 "value": []
               }
             ],
-            "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is missing",
+            "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -37139,7 +37175,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every_no_if_any"
                 ],
-                "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is missing",
+                "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is missing",
                 "name": "every es.v whose v is in $params.z is in $params.y"
               }
             ],
@@ -37151,7 +37187,7 @@
                 "value": []
               }
             ],
-            "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is missing",
+            "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -37196,7 +37232,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/some"
                 ],
-                "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is missing",
+                "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is missing",
                 "name": "some es whose v is in $params.z is in $params.y"
               }
             ],
@@ -37208,7 +37244,7 @@
                 "value": []
               }
             ],
-            "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is missing",
+            "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -37260,7 +37296,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is null",
+                "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is null",
                 "name": "every es whose v is in $params.z, if any, is in $params.y"
               }
             ],
@@ -37272,7 +37308,7 @@
                 "value": []
               }
             ],
-            "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is null",
+            "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -37318,7 +37354,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every_no_if_any"
                 ],
-                "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is null",
+                "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is null",
                 "name": "every es.v whose v is in $params.z is in $params.y"
               }
             ],
@@ -37330,7 +37366,7 @@
                 "value": []
               }
             ],
-            "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is null",
+            "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -37376,7 +37412,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/some"
                 ],
-                "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is null",
+                "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is null",
                 "name": "some es whose v is in $params.z is in $params.y"
               }
             ],
@@ -37388,7 +37424,7 @@
                 "value": []
               }
             ],
-            "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is null",
+            "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -37441,7 +37477,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "$params.z is missing; $params.y is \"s\", which isn't a list",
+                "message": "$params.y is \"s\", which isn't a list; $params.z is missing",
                 "name": "every es whose v is in $params.z, if any, is in $params.y"
               }
             ],
@@ -37453,7 +37489,7 @@
                 "value": []
               }
             ],
-            "message": "$params.z is missing; $params.y is \"s\", which isn't a list",
+            "message": "$params.y is \"s\", which isn't a list; $params.z is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -37499,7 +37535,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every_no_if_any"
                 ],
-                "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is []",
+                "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is []",
                 "name": "every es.v whose v is in $params.z is in $params.y"
               }
             ],
@@ -37511,7 +37547,7 @@
                 "value": []
               }
             ],
-            "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is []",
+            "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -37557,7 +37593,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/some"
                 ],
-                "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is []",
+                "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is []",
                 "name": "some es whose v is in $params.z is in $params.y"
               }
             ],
@@ -37569,7 +37605,7 @@
                 "value": []
               }
             ],
-            "message": "$params.z is missing; $params.y is \"s\", which isn't a list; es is []",
+            "message": "$params.y is \"s\", which isn't a list; $params.z is missing; es is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -39564,6 +39600,783 @@
                 }
               ],
               "message": "item 1 of xs: x.e is missing, and x.a is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+  {
+      "description": "the roots of one sentence, keys and sides alike, are said worst cause first and then by name",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "plain": "k is m named by $params.k",
+              "field": "s named by p is 1",
+              "sides": "x is at least y"
+            }
+          }
+        }
+      },
+      "params": {},
+      "cases": [
+        {
+          "description": "a missing key comes before a null value before it",
+          "rules": [
+            "problems.item_order",
+            "path.ref_step"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "k": 1,
+                "m": null,
+                "s": null,
+                "x": null
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "field",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/s"
+                      ],
+                      "name": "s named by p",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "p",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/field"
+                  ],
+                  "message": "p is missing; s is null",
+                  "name": "s named by p is 1"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/s"
+                  ],
+                  "name": "s named by p",
+                  "outcome": "absent",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "p",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "p is missing; s is null",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "plain",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/k"
+                      ],
+                      "name": "k",
+                      "outcome": "usable",
+                      "value": 1
+                    },
+                    {
+                      "locations": [
+                        "/things/0/m"
+                      ],
+                      "name": "m named by $params.k",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/m"
+                      ],
+                      "name": "m",
+                      "outcome": "null",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/plain"
+                  ],
+                  "message": "$params.k is missing; m is null",
+                  "name": "k equals m named by $params.k"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/k"
+                  ],
+                  "name": "k",
+                  "outcome": "usable",
+                  "value": 1
+                },
+                {
+                  "locations": [
+                    "/things/0/m"
+                  ],
+                  "name": "m named by $params.k",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "$params.k is missing; m is null",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "sides",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/x"
+                      ],
+                      "name": "x",
+                      "outcome": "null",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "y",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/sides"
+                  ],
+                  "message": "y is missing, and x is null",
+                  "name": "x is at least y"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "null",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "y",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "y is missing, and x is null",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "a value before the key that isn't an object comes before a missing key",
+          "rules": [
+            "problems.item_order",
+            "path.ref_step"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "k": 1,
+                "m": "s",
+                "s": "x",
+                "x": "1",
+                "y": "2"
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "field",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/s"
+                      ],
+                      "name": "s named by p",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "p",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/field"
+                  ],
+                  "message": "p is missing",
+                  "name": "s named by p is 1"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/s"
+                  ],
+                  "name": "s named by p",
+                  "outcome": "absent",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "p",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "p is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "plain",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/k"
+                      ],
+                      "name": "k",
+                      "outcome": "usable",
+                      "value": 1
+                    },
+                    {
+                      "locations": [
+                        "/things/0/m"
+                      ],
+                      "name": "m named by $params.k",
+                      "outcome": "unusable",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/m"
+                      ],
+                      "name": "m",
+                      "outcome": "unusable",
+                      "value": "s"
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/plain"
+                  ],
+                  "message": "m is \"s\", which isn't an object; $params.k is missing",
+                  "name": "k equals m named by $params.k"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/k"
+                  ],
+                  "name": "k",
+                  "outcome": "usable",
+                  "value": 1
+                },
+                {
+                  "locations": [
+                    "/things/0/m"
+                  ],
+                  "name": "m named by $params.k",
+                  "outcome": "unusable",
+                  "value": null
+                }
+              ],
+              "message": "m is \"s\", which isn't an object; $params.k is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "sides",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/x"
+                      ],
+                      "name": "x",
+                      "outcome": "unusable",
+                      "value": "1"
+                    },
+                    {
+                      "locations": [
+                        "/things/0/y"
+                      ],
+                      "name": "y",
+                      "outcome": "unusable",
+                      "value": "2"
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/sides"
+                  ],
+                  "message": "x is \"1\", which isn't a number, and y is \"2\", which isn't a number",
+                  "name": "x is at least y"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "unusable",
+                  "value": "1"
+                },
+                {
+                  "locations": [
+                    "/things/0/y"
+                  ],
+                  "name": "y",
+                  "outcome": "unusable",
+                  "value": "2"
+                }
+              ],
+              "message": "x is \"1\", which isn't a number, and y is \"2\", which isn't a number",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "roots of one cause come by name, $params first",
+          "rules": [
+            "problems.item_order",
+            "path.ref_step"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t"
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "field",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "s named by p",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "p",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/field"
+                  ],
+                  "message": "p is missing",
+                  "name": "s named by p is 1"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "s named by p",
+                  "outcome": "absent",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "p",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "p is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "plain",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "k",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "m named by $params.k",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "m",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/plain"
+                  ],
+                  "message": "$params.k is missing; k is missing; m is missing",
+                  "name": "k equals m named by $params.k"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "k",
+                  "outcome": "absent",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "m named by $params.k",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "$params.k is missing; k is missing; m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "sides",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "x",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "y",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/sides"
+                  ],
+                  "message": "x is missing, and y is missing",
+                  "name": "x is at least y"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "x",
+                  "outcome": "absent",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "y",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "x is missing, and y is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "the roots of one sentence, with a key from $params that is null and nothing on the subject",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "plain": "k is m named by $params.k"
+            }
+          }
+        }
+      },
+      "params": {
+        "k": null
+      },
+      "cases": [
+        {
+          "description": "says each missing root by name, then the null key",
+          "rules": [
+            "problems.item_order",
+            "path.ref_step"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t"
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "plain",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "k",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "m named by $params.k",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "$params:/k"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "null",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "m",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/plain"
+                  ],
+                  "message": "k is missing; m is missing; $params.k is null",
+                  "name": "k equals m named by $params.k"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "k",
+                  "outcome": "absent",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "m named by $params.k",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "k is missing; m is missing; $params.k is null",
               "passed": false,
               "requirement": "s",
               "subject": {

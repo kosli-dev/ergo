@@ -243,9 +243,10 @@ _check_outcome(check, subj, _) := object.union(
 
 _m_walk_outcome(_, _, r) := {} if r.cause == "satisfied"
 
-_m_walk_outcome(_, _, r) := {"message": _m_joined(r.root_msgs), "ergo/own": r.root_msgs, "ergo/texts": []} if {
+_m_walk_outcome(check, _, r) := {"message": _m_joined(ms), "ergo/own": ms, "ergo/texts": []} if {
 	r.cause != "satisfied"
 	"root_msgs" in object.keys(r)
+	ms := _roots_then_lists(r.root_msgs, _walk_list_names(check))
 }
 
 _m_walk_outcome(check, subj, r) := {"message": _m_joined(ps), "ergo/own": [p | some p in ps; not p in items], "ergo/texts": items} if {
@@ -253,7 +254,16 @@ _m_walk_outcome(check, subj, r) := {"message": _m_joined(ps), "ergo/own": [p | s
 	not "root_msgs" in object.keys(r)
 	parts := _walk_parts(check, subj, r, r)
 	items := _walk_item_texts(parts, r)
-	ps := _parts_ahead(parts, r)
+	ps := _roots_then_lists(_parts_ahead(parts, r), _walk_list_names(check))
+}
+
+_walk_list_names(check) := {_input_name(array.slice(p, 0, i)) |
+	p := check.path
+	is_array(p)
+	some i in numbers.range(1, count(p))
+	every seg in array.slice(p, 0, i) {
+		is_string(seg)
+	}
 }
 
 _walk_item_texts(parts, r) := parts if count(parts) == count(r.failed)

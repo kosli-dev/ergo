@@ -31833,7 +31833,7 @@
                   "/things/0/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -32117,7 +32117,7 @@
                       "/things/0/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -32145,7 +32145,7 @@
                   "/things/0/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -32193,7 +32193,7 @@
                       "/things/0/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": {
                       "a": 1
                     }
@@ -32223,7 +32223,7 @@
                   "/things/0/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -32846,7 +32846,7 @@
                       "/things/0/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -32878,7 +32878,7 @@
                   "/things/0/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -33276,7 +33276,7 @@
                       "/things/0/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -33308,7 +33308,7 @@
                   "/things/0/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -33654,7 +33654,7 @@
                       "/things/0/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -33686,7 +33686,7 @@
                   "/things/0/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -33924,7 +33924,7 @@
                       "/things/0/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -33956,7 +33956,7 @@
                   "/things/0/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -35589,7 +35589,7 @@
                       "/things/0/zz"
                     ],
                     "name": "zz",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -35619,7 +35619,7 @@
                   "/things/0/zz"
                 ],
                 "name": "zz",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -42347,7 +42347,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -42373,7 +42373,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/q"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/in_q/assert"
@@ -42430,7 +42439,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/q"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/least_q/assert"
@@ -42487,7 +42505,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/z"
+                    ],
+                    "name": "z",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/least_z/assert"
@@ -42525,7 +42552,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -42558,7 +42585,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/q"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/in_q/assert"
@@ -42598,7 +42634,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/q"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/least_q/assert"
@@ -42638,7 +42683,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/z"
+                    ],
+                    "name": "z",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/least_z/assert"
@@ -42659,7 +42713,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -43112,7 +43166,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -43139,7 +43193,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -43188,7 +43242,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -43240,7 +43294,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -43267,7 +43321,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -43302,7 +43356,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -43329,7 +43383,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -43418,7 +43472,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -43446,7 +43500,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -43473,7 +43527,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -43508,7 +43562,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -43535,7 +43589,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -43586,7 +43640,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -43628,7 +43682,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -43658,7 +43712,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -43685,7 +43739,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -44005,7 +44059,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -44048,7 +44102,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -44138,7 +44192,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": 3
                   }
                 ],
@@ -44178,7 +44232,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -44206,7 +44260,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -44249,7 +44303,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -44284,7 +44338,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -44327,7 +44381,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -44394,7 +44448,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -44421,7 +44475,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": {
                       "a": 1
                     }
@@ -44463,7 +44517,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -44493,7 +44547,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -44536,7 +44590,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -44571,7 +44625,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -44615,7 +44669,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -44738,7 +44792,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -44766,7 +44820,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -44810,7 +44864,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -44845,7 +44899,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -44889,7 +44943,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -44957,7 +45011,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -45016,7 +45070,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -45046,7 +45100,7 @@
                   {
                     "locations": [],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -45090,7 +45144,7 @@
               {
                 "locations": [],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -45132,7 +45186,7 @@
                   {
                     "locations": [],
                     "name": "$input.top.q",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -45148,7 +45202,7 @@
               {
                 "locations": [],
                 "name": "$input.top.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -45187,7 +45241,7 @@
                   {
                     "locations": [],
                     "name": "pl.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -45212,7 +45266,7 @@
               {
                 "locations": [],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -45265,7 +45319,7 @@
                   "/top/q"
                 ],
                 "name": "$input.top.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -45314,7 +45368,7 @@
                   "/prs/0/c/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -45367,7 +45421,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -45401,7 +45455,7 @@
                   {
                     "locations": [],
                     "name": "$params.q",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -45417,7 +45471,7 @@
               {
                 "locations": [],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -45698,7 +45752,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -45732,7 +45786,7 @@
                   {
                     "locations": [],
                     "name": "$params.q",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -45748,7 +45802,7 @@
               {
                 "locations": [],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -45794,7 +45848,7 @@
                   {
                     "locations": [],
                     "name": "$input.top.q",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -45810,7 +45864,7 @@
               {
                 "locations": [],
                 "name": "$input.top.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -45849,7 +45903,7 @@
                   {
                     "locations": [],
                     "name": "pl.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -45874,7 +45928,7 @@
               {
                 "locations": [],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -45929,7 +45983,7 @@
                   "/top/q"
                 ],
                 "name": "$input.top.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -45982,7 +46036,7 @@
                   "/prs/0/c/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -46037,7 +46091,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -46071,7 +46125,7 @@
                   {
                     "locations": [],
                     "name": "$params.q",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -46087,7 +46141,7 @@
               {
                 "locations": [],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -46277,7 +46331,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0"
+                    ],
+                    "name": "z",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/item/assert"
@@ -46949,7 +47012,16 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/z"
+                    ],
+                    "name": "z",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/item/assert"
@@ -47504,7 +47576,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -47553,7 +47625,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -47602,7 +47674,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -47621,7 +47693,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/z"
+                    ],
+                    "name": "z",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/item/assert"
@@ -47642,7 +47723,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -47691,7 +47772,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -47740,7 +47821,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -47789,7 +47870,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -47838,7 +47919,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -47887,7 +47968,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -47936,7 +48017,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -48120,7 +48201,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -48178,7 +48259,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -48231,7 +48312,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -48284,7 +48365,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -48305,7 +48386,18 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/z"
+                    ],
+                    "name": "z",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/item/assert"
@@ -48326,7 +48418,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -48379,7 +48471,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -48432,7 +48524,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -48485,7 +48577,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -48538,7 +48630,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -48591,7 +48683,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -48644,7 +48736,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -48844,7 +48936,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {
                   "a": 1
                 }
@@ -49169,7 +49261,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": 3
               }
             ],
@@ -49366,7 +49458,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -49421,7 +49513,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -49476,7 +49568,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -49531,7 +49623,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -49586,7 +49678,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -49641,7 +49733,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -49696,7 +49788,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -49751,7 +49843,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -49806,7 +49898,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -49861,7 +49953,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50057,7 +50149,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50136,7 +50228,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50202,7 +50294,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50221,7 +50313,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/z"
+                    ],
+                    "name": "z",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/item/assert"
@@ -50259,7 +50360,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50325,7 +50426,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50391,7 +50492,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50457,7 +50558,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50523,7 +50624,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50698,7 +50799,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50764,7 +50865,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50823,7 +50924,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50882,7 +50983,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -50941,7 +51042,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -51000,7 +51101,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -51059,7 +51160,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -51118,7 +51219,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -51279,7 +51380,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -51619,7 +51720,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -51668,7 +51769,7 @@
                   "/prs/0/c/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -51721,7 +51822,7 @@
                   "/prs/0/c/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -52094,7 +52195,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -52153,7 +52254,7 @@
                   "/prs/0/c/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -52216,7 +52317,7 @@
                   "/prs/0/c/z"
                 ],
                 "name": "pl.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -52565,7 +52666,7 @@
                   "$params:/q"
                 ],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -52715,7 +52816,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   },
                   {
@@ -52747,7 +52848,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -52780,7 +52881,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   },
                   {
@@ -52820,7 +52921,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -52918,7 +53019,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -52950,7 +53051,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   },
                   {
@@ -52988,7 +53089,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -53021,7 +53122,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   },
                   {
@@ -53067,7 +53168,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -53177,7 +53278,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -53241,7 +53342,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": true
               },
               {
@@ -53274,7 +53375,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": true
                   },
                   {
@@ -53314,7 +53415,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": true
               }
             ],
@@ -53363,7 +53464,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": true
               }
             ],
@@ -53412,7 +53513,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": true
               }
             ],
@@ -53639,7 +53740,7 @@
                   {
                     "locations": [],
                     "name": "w",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -53660,7 +53761,7 @@
               {
                 "locations": [],
                 "name": "w",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -53811,7 +53912,7 @@
                   {
                     "locations": [],
                     "name": "w",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -53832,7 +53933,7 @@
               {
                 "locations": [],
                 "name": "w",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -54091,7 +54192,7 @@
                   {
                     "locations": [],
                     "name": "w",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -54112,7 +54213,7 @@
               {
                 "locations": [],
                 "name": "w",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -54146,7 +54247,7 @@
                   {
                     "locations": [],
                     "name": "w.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -54167,7 +54268,7 @@
               {
                 "locations": [],
                 "name": "w.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -54201,7 +54302,7 @@
                   {
                     "locations": [],
                     "name": "w.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -54222,7 +54323,7 @@
               {
                 "locations": [],
                 "name": "w.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -54341,7 +54442,7 @@
                   {
                     "locations": [],
                     "name": "$params.q",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -54357,7 +54458,7 @@
               {
                 "locations": [],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -54396,7 +54497,7 @@
                   {
                     "locations": [],
                     "name": "$params.q",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -54412,7 +54513,7 @@
               {
                 "locations": [],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -54539,7 +54640,7 @@
                   {
                     "locations": [],
                     "name": "$params.q",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -54555,7 +54656,7 @@
               {
                 "locations": [],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -54604,7 +54705,7 @@
                   {
                     "locations": [],
                     "name": "$params.q",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -54620,7 +54721,7 @@
               {
                 "locations": [],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -54682,7 +54783,7 @@
                   {
                     "locations": [],
                     "name": "zb",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -54693,7 +54794,7 @@
                   {
                     "locations": [],
                     "name": "za",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -54735,13 +54836,13 @@
               {
                 "locations": [],
                 "name": "za",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
                 "locations": [],
                 "name": "zb",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -54769,7 +54870,7 @@
                   {
                     "locations": [],
                     "name": "zb",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -54780,7 +54881,7 @@
                   {
                     "locations": [],
                     "name": "za",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -54822,13 +54923,13 @@
               {
                 "locations": [],
                 "name": "za",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
                 "locations": [],
                 "name": "zb",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -54863,7 +54964,7 @@
                   {
                     "locations": [],
                     "name": "zb",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -54874,7 +54975,7 @@
                   {
                     "locations": [],
                     "name": "za",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -54923,13 +55024,13 @@
               {
                 "locations": [],
                 "name": "za",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
                 "locations": [],
                 "name": "zb",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -54957,7 +55058,7 @@
                   {
                     "locations": [],
                     "name": "zb",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   },
                   {
@@ -54968,7 +55069,7 @@
                   {
                     "locations": [],
                     "name": "za",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -55000,13 +55101,13 @@
               {
                 "locations": [],
                 "name": "za",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
                 "locations": [],
                 "name": "zb",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -55536,7 +55637,7 @@
                       "/prs/0/t/a"
                     ],
                     "name": "pr.t named by pr.p",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -55570,7 +55671,7 @@
                   "/prs/0/t/a"
                 ],
                 "name": "pr.t named by pr.p",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               },
               {
@@ -55655,7 +55756,7 @@
                       "/prs/0/t/a"
                     ],
                     "name": "pr.t named by pr.p",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -55705,7 +55806,7 @@
                   "/prs/0/t/a"
                 ],
                 "name": "pr.t named by pr.p",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -56111,7 +56212,7 @@
                       "/prs/0/z"
                     ],
                     "name": "z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "s"
                   }
                 ],
@@ -56141,7 +56242,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -56490,7 +56591,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": ""
               }
             ],
@@ -56681,7 +56782,7 @@
                   "/prs/0/z"
                 ],
                 "name": "z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "s"
               }
             ],
@@ -56973,7 +57074,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/least/assert"
@@ -57113,7 +57223,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/least/assert"
@@ -57402,7 +57521,7 @@
                   "$params:"
                 ],
                 "name": "$params",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": {}
               },
               {
@@ -57427,7 +57546,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params",
+                    "outcome": "unusable",
+                    "value": {}
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/least/assert"
@@ -60931,7 +61059,16 @@
               {
                 "cause": "ambiguous",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.n",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c/assert"
@@ -61163,7 +61300,16 @@
               {
                 "cause": "ambiguous",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.n",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c/assert"
@@ -65158,7 +65304,7 @@
                       "/cs/0/os/1/name"
                     ],
                     "name": "pos[].name",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -65205,7 +65351,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -65359,7 +65505,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -65418,7 +65564,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -65494,7 +65640,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -68461,7 +68607,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -70837,7 +70983,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -70887,7 +71033,7 @@
                       "/cs/0/os/1/name"
                     ],
                     "name": "pos[].name",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -70913,7 +71059,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -71083,7 +71229,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -94926,7 +95072,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -94978,7 +95124,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -95541,7 +95687,7 @@
                       "/cs/0/os/1/name"
                     ],
                     "name": "c.os[].name",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": [
                       "bob",
                       3
@@ -95563,7 +95709,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "c.os[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   "bob",
                   3
@@ -95615,7 +95761,7 @@
                   "/cs/0/os/1/name"
                 ],
                 "name": "c.pos[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "c.pos"
@@ -96673,7 +96819,7 @@
                   "/cs/0/p/1/name"
                 ],
                 "name": ".p[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   "bob",
                   3
@@ -96717,7 +96863,7 @@
                   "/cs/0/p/1/name"
                 ],
                 "name": ".p[].name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": [
                   "bob",
                   3
@@ -96887,7 +97033,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/os/0/name",
+                      "$params:/os/1"
+                    ],
+                    "name": "$params.os[].name",
+                    "outcome": "usable",
+                    "value": [
+                      "bob",
+                      null
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/contains/assert"
@@ -97045,7 +97204,20 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/os/0/name",
+                      "$params:/os/1"
+                    ],
+                    "name": "$params.os[].name",
+                    "outcome": "unusable",
+                    "value": [
+                      "bob",
+                      null
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/contains/assert"
@@ -97199,7 +97371,20 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/os/0/name",
+                      "$params:/os/1/name"
+                    ],
+                    "name": "$params.os[].name",
+                    "outcome": "unusable",
+                    "value": [
+                      "bob",
+                      3
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/in/assert"
@@ -97766,7 +97951,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/os/0/name",
+                      "$params:/os/1"
+                    ],
+                    "name": "$params.os[].name",
+                    "outcome": "usable",
+                    "value": [
+                      "bob",
+                      null
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/first/assert"
@@ -97818,7 +98016,20 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/os/0/name",
+                      "$params:/os/1"
+                    ],
+                    "name": "$params.os[].name",
+                    "outcome": "usable",
+                    "value": [
+                      "bob",
+                      null
+                    ]
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/two/assert/1"
@@ -98824,7 +99035,7 @@
               {
                 "locations": [],
                 "name": "$params.w",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -98932,7 +99143,7 @@
               {
                 "locations": [],
                 "name": "$params.l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -106618,6 +106829,474 @@
                 }
               ],
               "message": "item 1 of ws: w.n is 2; $params.k is 3, which isn't text",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+  {
+      "description": "a for line sorted by a key from $params that is missing says the key once and gives an item an entry only for its own problem",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "c": {
+                "for": "first of rows sorted by m named by $params.km as r",
+                "assert": "r.v is 1"
+              }
+            }
+          }
+        }
+      },
+      "params": {},
+      "cases": [
+        {
+          "description": "an item whose m is a list and an item without m",
+          "rules": [
+            "row.parts",
+            "problems.where_said"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "rows": [
+                  {
+                    "m": [
+                      5,
+                      1
+                    ]
+                  },
+                  {
+                    "m": {
+                      "a": 1
+                    }
+                  },
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "c",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/rows/0/m"
+                      ],
+                      "name": "rows[0].m",
+                      "outcome": "unusable",
+                      "value": null
+                    }
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/rows/0"
+                  ],
+                  "message": "m is [5, 1], which isn't an object",
+                  "name": "item 1 of rows",
+                  "value": {
+                    "m": [
+                      5,
+                      1
+                    ]
+                  }
+                },
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/rows/2"
+                      ],
+                      "name": "rows[2].m",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/rows/2"
+                  ],
+                  "message": "m is missing",
+                  "name": "item 3 of rows",
+                  "value": {
+                    "v": 1
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/rows/0",
+                    "/things/0/rows/1",
+                    "/things/0/rows/2"
+                  ],
+                  "name": "rows[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "m": [
+                        5,
+                        1
+                      ]
+                    },
+                    {
+                      "m": {
+                        "a": 1
+                      }
+                    },
+                    {
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.km",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "$params.km is missing; item 1 of rows: m is [5, 1], which isn't an object; item 3 of rows: m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "a for line's sentence reads a field it can't use",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "c": {
+                "for": "every xs as x",
+                "assert": "x.v is at least z"
+              },
+              "e": {
+                "for": "every xs as x",
+                "assert": "x.v is at least $params.z"
+              }
+            }
+          }
+        }
+      },
+      "params": {
+        "z": "s"
+      },
+      "cases": [
+        {
+          "description": "the field is unusable on the row, as a $params ref is",
+          "rules": [
+            "row.parts"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {
+                    "v": 1
+                  }
+                ],
+                "z": "s"
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "c",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/z"
+                      ],
+                      "name": "z",
+                      "outcome": "unusable",
+                      "value": "s"
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/c/assert"
+                  ],
+                  "message": "z is \"s\", which isn't a number",
+                  "name": "x.v is at least z"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/z"
+                  ],
+                  "name": "z",
+                  "outcome": "unusable",
+                  "value": "s"
+                }
+              ],
+              "message": "z is \"s\", which isn't a number",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "e",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:/z"
+                      ],
+                      "name": "$params.z",
+                      "outcome": "unusable",
+                      "value": "s"
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/e/assert"
+                  ],
+                  "message": "$params.z is \"s\", which isn't a number",
+                  "name": "x.v is at least $params.z"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "$params:/z"
+                  ],
+                  "name": "$params.z",
+                  "outcome": "unusable",
+                  "value": "s"
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "message": "$params.z is \"s\", which isn't a number",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "an empty list still lists the root on the sentence",
+          "rules": [
+            "row.parts",
+            "for.roots"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [],
+                "z": "s"
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "c",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/z"
+                      ],
+                      "name": "z",
+                      "outcome": "unusable",
+                      "value": "s"
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/c/assert"
+                  ],
+                  "message": "z is \"s\", which isn't a number",
+                  "name": "x.v is at least z"
+                },
+                {
+                  "cause": "value",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs"
+                      ],
+                      "name": "xs",
+                      "outcome": "usable",
+                      "value": []
+                    }
+                  ],
+                  "kind": "list",
+                  "message": "xs is []",
+                  "name": "xs"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": []
+                },
+                {
+                  "locations": [
+                    "/things/0/z"
+                  ],
+                  "name": "z",
+                  "outcome": "unusable",
+                  "value": "s"
+                }
+              ],
+              "message": "z is \"s\", which isn't a number; xs is []",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "e",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:/z"
+                      ],
+                      "name": "$params.z",
+                      "outcome": "unusable",
+                      "value": "s"
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/e/assert"
+                  ],
+                  "message": "$params.z is \"s\", which isn't a number",
+                  "name": "x.v is at least $params.z"
+                },
+                {
+                  "cause": "value",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs"
+                      ],
+                      "name": "xs",
+                      "outcome": "usable",
+                      "value": []
+                    }
+                  ],
+                  "kind": "list",
+                  "message": "xs is []",
+                  "name": "xs"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "$params:/z"
+                  ],
+                  "name": "$params.z",
+                  "outcome": "unusable",
+                  "value": "s"
+                },
+                {
+                  "locations": [],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": []
+                }
+              ],
+              "message": "$params.z is \"s\", which isn't a number; xs is []",
               "passed": false,
               "requirement": "s",
               "subject": {

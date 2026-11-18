@@ -386,7 +386,26 @@ _item_key_bases(c, item) := {b.cause |
 	p[0] != "$$input"
 	some b in _key_base_flaws(item, p, mode)
 	b.cause in _value_fault_causes
+	_key_bases_clean(item, c)
 }
+
+_key_bases_clean(item, c) if {
+	is_object(item)
+	every r in _key_base_reads(c) {
+		_key_base_read_fine(item, r[0])
+	}
+}
+
+_key_base_read_fine(_, p) if p[0] in _params_starts
+
+_key_base_read_fine(_, p) if p[0] == "$$input"
+
+_key_base_read_fine(_, p) if {
+	some seg in p
+	_ref_step_flaw(seg)
+}
+
+_key_base_read_fine(item, p) if _read_state(item, p) == "value"
 
 _tally_cond_cause(_, _, flaw) := flaw if not flaw in _no_read_fault_causes
 

@@ -77,7 +77,7 @@ test_a_whole_params_read_with_null_params_fails_as_absent_and_with_an_object_rea
 	check := "$params exists"
 	params_rows({"items": [{"id": 1}]}, check) == [[false, "absent", [_seen("$params", null, ["$params:"], "absent")]]] with data.params as null
 	params_rows({"items": [{"id": 1}]}, check) == [[true, "satisfied", [{"name": "$params", "value": {}, "locations": ["$params:"]}]]] with data.params as {}
-	params_rows({"items": [{"id": 1}]}, check) == [[false, "unusable", [_seen("$params", "x", ["$params:"], "usable")]]] with data.params as "x"
+	params_rows({"items": [{"id": 1}]}, check) == [[false, "unusable", [_seen("$params", "x", ["$params:"], "unusable")]]] with data.params as "x"
 }
 
 test_a_path_reads_params_input_lookups_positions_and_quoted_keys if {

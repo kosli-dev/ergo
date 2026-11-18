@@ -6032,7 +6032,7 @@
                       "/things/2/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -6107,7 +6107,7 @@
                   "/things/2/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -6136,7 +6136,7 @@
                       "/things/2/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -6158,7 +6158,7 @@
                   "/things/2/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -6231,7 +6231,7 @@
                       "/things/2/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -6253,7 +6253,7 @@
                   "/things/2/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -6379,7 +6379,7 @@
                       "/things/3/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -6456,7 +6456,7 @@
                   "/things/3/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -6487,7 +6487,7 @@
                       "/things/3/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -6511,7 +6511,7 @@
                   "/things/3/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -6586,7 +6586,7 @@
                       "/things/3/p/z"
                     ],
                     "name": "x.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "x"
@@ -6610,7 +6610,7 @@
                   "/things/3/p/z"
                 ],
                 "name": "x.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "x"
@@ -10886,7 +10886,7 @@
                       "/fams/0/z"
                     ],
                     "name": "fam.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "ab"
                   }
                 ],
@@ -10951,7 +10951,7 @@
                   "/fams/0/z"
                 ],
                 "name": "fam.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "ab"
               }
             ],
@@ -11895,7 +11895,7 @@
                       "/prs/0/coverage/z"
                     ],
                     "name": "cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "cov"
@@ -11917,7 +11917,7 @@
                   "/prs/0/coverage/z"
                 ],
                 "name": "cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "cov"
@@ -11978,7 +11978,7 @@
                       "/prs/0/coverage/z"
                     ],
                     "name": "pr.coverage.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "value": "12"
                   }
                 ],
@@ -12016,7 +12016,7 @@
                   "/prs/0/coverage/z"
                 ],
                 "name": "pr.coverage.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": "12"
               }
             ],
@@ -12061,7 +12061,7 @@
                       "/prs/0/coverage/z"
                     ],
                     "name": "cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "cov"
@@ -12103,7 +12103,7 @@
                   "/prs/0/coverage/z"
                 ],
                 "name": "cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "cov"
@@ -12132,7 +12132,7 @@
                       "/prs/0/coverage/z"
                     ],
                     "name": "cov.z",
-                    "outcome": "usable",
+                    "outcome": "unusable",
                     "part": {
                       "id": null,
                       "name": "cov"
@@ -12154,7 +12154,7 @@
                   "/prs/0/coverage/z"
                 ],
                 "name": "cov.z",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "part": {
                   "id": null,
                   "name": "cov"

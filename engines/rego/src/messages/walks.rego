@@ -127,7 +127,7 @@ _row_message(check, subj, raw) := _m_row_text(check, subj, raw.cause) if {
 	not _walk_run(check)
 }
 
-_m_row_text(check, subj, cause) := concat("; ", _m_roots_then_lists(ps, _m_list_names(check))) if {
+_m_row_text(check, subj, cause) := concat("; ", _roots_then_lists(ps, _m_list_names(check))) if {
 	cause in _value_fault_causes
 	ps := _m_null_key_parts(subj, check)
 	ps != []

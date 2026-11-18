@@ -1154,9 +1154,7 @@ _m_unled(name, t) := substring(t, count(name) + 2, -1) if startswith(t, concat("
 
 else := t
 
-_m_whose_said(c, item, cause) := concat("; ", bs) if {
+_m_whose_said(c, item, cause) := concat("; ", _m_cond_base_texts(item, c)) if {
 	count(_key_item_flaws({"whose": [c]})) > 0
 	_key_items_clean({"items": [{"iv": item}]}, [c])
-	bs := _m_cond_base_texts(item, c)
-	bs != []
 } else := _message(c, item, cause)

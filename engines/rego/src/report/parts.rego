@@ -129,7 +129,7 @@ _for_assertion_entry(row, at, where, t, i, a) := _policy_entry(
 			[x | some [_, _, l] in lines; some x in _with_outcomes(object.get(l, "inputs", [])); not _alias_named(x.name, aliases)],
 			[x | some l in t.free; l.assertion == a; some x in _with_outcomes(_anchored_inputs(l.inputs, at))],
 		),
-		[x | t.flawed; lines == []; some x in _with_outcomes(row.inputs); _for_sentence_read(x.name, where.check.checks[i])],
+		[x | lines == []; not a in {l.assertion | some l in t.free}; some x in _with_outcomes(row.inputs); _for_sentence_read(x.name, where.check.checks[i]); not _alias_named(x.name, aliases)],
 	)),
 	items,
 	t.said[i],
@@ -854,11 +854,56 @@ _whose_reads(whose, f) := [r |
 	r := _whose_read(c, p, f, _read_state(f.value, p))
 ] if _walk_kind(f.item) == "item"
 
-_parted_in(raw, at, where) := p if {
+_parted_in(raw, at, where) := _said_outcomes(_parted_in_of(raw, at, where))
+
+_parted_in_of(raw, at, where) := p if {
 	raw.passed == false
 	count(where.unfit) > 0
 	p := _parted(raw, at, where) with data.ergo_unfit as where.unfit
 } else := _parted(raw, at, where)
+
+_said_outcomes(row) := row if row.passed == true
+
+else := _said_outcomes_of(_unled_dropped(row))
+
+_said_outcomes_of(row) := object.union(row, {
+	"inputs": _said_unusable(row.inputs, row.message),
+	"failures": [_said_entry(e) | some e in row.failures],
+})
+
+_unled_dropped(row) := object.union(row, {
+	"message": concat("; ", [x | some x in ps; not endswith(x, ": ")]),
+	"failures": [e | some e in row.failures; not _blank_item(e)],
+}) if {
+	ps := _m_top_split(row.message, "; ")
+	some x in ps
+	endswith(x, ": ")
+} else := row
+
+_blank_item(e) if {
+	e.kind == "item"
+	e.message == ""
+	e.failures == []
+}
+
+_said_entry(e) := object.union(e, {"failures": [_said_assertion(f) | some f in e.failures]}) if e.kind == "option"
+
+else := _said_assertion(e)
+
+_said_assertion(e) := object.union(e, {"inputs": _said_unusable(e.inputs, e.message)}) if e.kind == "assertion"
+
+else := e
+
+_said_unusable(ins, message) := ins if not contains(message, ", which isn't ")
+
+else := [_said_input(i, names) | some i in ins] if {
+	names := {_m_clause_name(c) | some p in _m_top_split(message, "; "); some c in _m_top_split(p, ", and "); contains(c, ", which isn't ")}
+}
+
+_said_input(i, names) := object.union(i, {"outcome": "unusable"}) if {
+	i.outcome == "usable"
+	i.name in names
+} else := i
 
 _unfit_refs(check) := {_ref_label(r) | some r in _listed_refs(check); _ref_use(check, r) == "unusable"}
 
