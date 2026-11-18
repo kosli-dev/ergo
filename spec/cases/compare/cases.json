@@ -13553,6 +13553,14 @@
                   "name": "$input.m named by $params.a",
                   "outcome": "absent",
                   "value": null
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.a",
+                  "outcome": "absent",
+                  "value": null
                 }
               ],
               "kind": "assertion",
@@ -14376,6 +14384,14 @@
                     "/m"
                   ],
                   "name": "$input.m named by $params.a",
+                  "outcome": "null",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "$params:/a"
+                  ],
+                  "name": "$params.a",
                   "outcome": "null",
                   "value": null
                 }
@@ -15203,6 +15219,14 @@
                   "name": "$input.m named by $params.a",
                   "outcome": "unusable",
                   "value": null
+                },
+                {
+                  "locations": [
+                    "$params:/a"
+                  ],
+                  "name": "$params.a",
+                  "outcome": "unusable",
+                  "value": 3
                 }
               ],
               "kind": "assertion",
@@ -15407,6 +15431,14 @@
                     "name": "m named by $input.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -15469,6 +15501,14 @@
                       "a",
                       4
                     ]
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -15531,6 +15571,14 @@
                     "name": "k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -15588,6 +15636,14 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "absent",
                     "value": null
                   }
@@ -15679,6 +15735,14 @@
                     "name": "m named by $input.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -15741,6 +15805,14 @@
                       "a",
                       4
                     ]
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -15803,6 +15875,14 @@
                     "name": "k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -15860,6 +15940,14 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
                     "outcome": "null",
                     "value": null
                   }
@@ -15951,6 +16039,14 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -16013,6 +16109,14 @@
                       "a",
                       4
                     ]
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -16075,6 +16179,14 @@
                     "name": "k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -16134,6 +16246,14 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -16229,6 +16349,14 @@
                     "name": "m named by $params.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -16291,6 +16419,14 @@
                       "a",
                       4
                     ]
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -16353,6 +16489,14 @@
                     "name": "k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -16410,6 +16554,14 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
                     "outcome": "absent",
                     "value": null
                   }
@@ -16508,6 +16660,14 @@
                     "name": "m named by $params.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -16570,6 +16730,14 @@
                       "a",
                       4
                     ]
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -16632,6 +16800,14 @@
                     "name": "k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -16689,6 +16865,14 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.k",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
                     "outcome": "null",
                     "value": null
                   }
@@ -16787,6 +16971,14 @@
                     "name": "m named by $params.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -16849,6 +17041,14 @@
                       "a",
                       4
                     ]
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -16911,6 +17111,14 @@
                     "name": "k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -16970,6 +17178,14 @@
                     "name": "m named by $params.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",

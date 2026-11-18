@@ -517,8 +517,8 @@ _null_key_whose_row(check) := [[r.cause, r.message] |
 ]
 
 test_a_whose_key_from_the_input_that_is_null_is_named_once_and_the_worse_cause_of_an_item_wins if {
-	_null_key_whose_row({"for": "every rs whose v is m named by $input.k as r", "assert": "r.v is 1"}) == [["null", "$input.k is null"]]
-	_null_key_whose_row({"for": "every rs whose zz is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
+	_null_key_whose_row({"for": "every rs whose v is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: m is missing; item 2 of rs: m is missing"]]
+	_null_key_whose_row({"for": "every rs whose zz is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: zz is missing, and m is missing; item 2 of rs: zz is missing, and m is missing"]]
 }
 
 test_a_second_whose_that_reads_a_list_input_key_through_an_alias_never_says_an_object_item_isnt_an_object if {

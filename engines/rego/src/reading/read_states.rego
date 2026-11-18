@@ -171,6 +171,11 @@ _walk_list_state(subj, path) := _worst_of({_walk_read_state(subj, path)} | {f.ca
 	fs != []
 } else := _walk_read_state(subj, path)
 
+_tally_list_state(subj, path) := _worst_of({_walk_read_state(subj, path)} | bases) if {
+	bases := _key_base_causes(subj, path, "tally")
+	bases != set()
+} else := _walk_read_state(subj, path)
+
 _walk_read_state(subj, path) := _worst_of(flaws) if {
 	flaws := {f | some seg in path; f := _ref_step_flaw(seg)}
 	flaws != set()
@@ -307,6 +312,12 @@ _clear_path_states(subj, check) := set() if {
 	not _reads_unreadable_ref(check, p)
 	s := _state_at(check, subj, p)
 	s != "value"
+} | _key_base_states(subj, check)
+
+_key_base_states(subj, check) := {s |
+	some p in _read_paths(check)
+	_reads_unreadable_ref(check, p)
+	some s in _key_base_causes(subj, p, "object")
 }
 
 _reads_unreadable_ref(check, p) if {
@@ -690,7 +701,13 @@ _answers_presence(check, subj, "") if {
 	_read_state(subj, check.path) in _no_value_states
 }
 
-_key_list_flaws(subj, path, if_any) := [{"cause": c, "prefix": prefix, "value": v} |
+_key_list_flaws(subj, path, if_any) := _key_base_flaws(subj, path, _key_list_mode(if_any))
+
+_key_list_mode(true) := "if_any"
+
+_key_list_mode(false) := "list"
+
+_key_base_flaws(subj, path, mode) := [{"cause": c, "prefix": at, "value": _resolved(subj, at), "kind": _key_base_kind(mode, at, prefix)} |
 	i := min({j | some j, seg in path; _ref_step_flaw(seg)})
 	not _ref_step_off(path)
 	i > 0
@@ -698,27 +715,65 @@ _key_list_flaws(subj, path, if_any) := [{"cause": c, "prefix": prefix, "value": 
 	every seg in prefix {
 		is_string(seg)
 	}
-	v := _resolved(subj, prefix)
-	c := _key_list_cause(v)
-	_key_list_kept(c, if_any)
+	c := _key_base_cause(subj, prefix, mode)
+	_key_base_kept(c, mode)
+	at := _key_base_at(subj, prefix, c)
 ]
+
+_key_base_causes(subj, path, mode) := {f.cause | some f in _key_base_flaws(subj, path, mode)}
 
 _ref_step_off(path) if {
 	some seg in path
 	_ref_step_flaw(seg) == "not_an_object"
 }
 
-_key_list_kept(c, _) if c != "value"
+_key_base_kept(c, _) if c != "value"
 
-_key_list_kept("value", false)
+_key_base_kept("value", "list")
 
-_key_list_cause(v) := "absent" if v == _absent
-
-else := "null" if v == null
-
-else := "value" if v == []
-
-else := "unusable" if {
-	not is_array(v)
+_key_base_cause(subj, prefix, mode) := s if {
+	s := _read_state(subj, prefix)
+	s in _value_fault_causes
+} else := "value" if {
+	_resolved(subj, prefix) == []
+	mode != "object"
+} else := "unusable" if {
+	v := _resolved(subj, prefix)
 	not is_object(v)
+	_key_base_needs_object(mode, v)
+}
+
+_key_base_needs_object("object", _)
+
+_key_base_needs_object(mode, v) if {
+	mode != "object"
+	not is_array(v)
+}
+
+_key_base_at(subj, prefix, c) := array.slice(prefix, 0, min(cuts)) if {
+	cuts := _key_base_cuts(subj, prefix, c)
+	cuts != set()
+} else := prefix
+
+_key_base_cuts(subj, prefix, "null") := {k | some k in numbers.range(1, count(prefix)); _resolved(subj, array.slice(prefix, 0, k)) == null}
+
+_key_base_cuts(subj, prefix, "unusable") := {k |
+	some k in numbers.range(1, count(prefix) - 1)
+	v := _resolved(subj, array.slice(prefix, 0, k))
+	v != _absent
+	not is_object(v)
+}
+
+_key_base_cuts(_, _, c) := set() if not c in {"null", "unusable"}
+
+_key_base_kind("object", _, _) := "an object"
+
+_key_base_kind(mode, at, prefix) := "an object" if {
+	mode != "object"
+	count(at) < count(prefix)
+}
+
+_key_base_kind(mode, at, prefix) := "a list or an object" if {
+	mode != "object"
+	count(at) == count(prefix)
 }

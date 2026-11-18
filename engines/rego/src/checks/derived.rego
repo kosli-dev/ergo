@@ -292,7 +292,7 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 } else := {"states": {st}, "list": _path_name(path), "values": [], "locations": [], "ergo/outcome": _outcome_word(st)} if {
 	path := side[_basic_form(side)]
 	not _walk_keys({"path": path}, subj)
-	st := _walk_read_state(subj, path)
+	st := _tally_list_state(subj, path)
 } else := r if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)

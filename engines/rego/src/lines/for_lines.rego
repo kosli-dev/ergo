@@ -525,7 +525,13 @@ _for_unsortable(item, w, names) := array.concat(unread, mixed) if {
 	]
 }
 
-_m_sort_why(item, e, names) := {"why": [m]} if {
+_m_sort_why(item, e, names) := {"why": array.concat(array.slice(ps, 0, n), [_m_leaf(e.i, concat("; ", array.slice(ps, n, count(ps))))])} if {
+	is_object(e.iv)
+	_key_base_flaws(e.iv, item.pick.by, "object") != [] with input as {"ergo/names": names}
+	n := count([seg | some seg in item.pick.by; _ref_step_flaw(seg)]) with input as {"ergo/names": names}
+	ps := split(_m_sort_text(item, e, "absent"), "; ") with input as {"ergo/names": names}
+	count(ps) > n
+} else := {"why": [m]} if {
 	is_object(e.iv)
 	state := _for_sort_state(item, e, names)
 	m := _m_sort_text(item, e, state) with input as {"ergo/names": names}
@@ -560,7 +566,7 @@ else := m if {
 _for_sort_state(item, x, names) := s if {
 	e := _focus_entry(x)
 	is_object(e.iv)
-	s := _walk_read_state(e.iv, item.pick.by) with input as {"ergo/names": names}
+	s := _worst_of({_walk_read_state(e.iv, item.pick.by)} | _key_base_causes(e.iv, item.pick.by, "object")) with input as {"ergo/names": names}
 	s != "value"
 } else := "unusable" if is_object(_focus_entry(x).iv)
 

@@ -180,7 +180,7 @@ _parent_pick(doc, req) := pick if {
 _parent_pick_of(doc, preq) := {"cause": c} if {
 	c := _target_cause(doc, preq)
 	not _fl_typed_only(doc, preq)
-} else := {"cause": _from_cause(preq)} if {
+} else := {"cause": _from_cause(doc, preq)} if {
 	_from_well_formed(preq)
 	_from_unreadable(preq)
 } else := r if {

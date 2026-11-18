@@ -934,6 +934,16 @@
                     "name": "x named by $params.key",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/key"
+                    ],
+                    "name": "$params.key",
+                    "outcome": "unusable",
+                    "value": [
+                      "a"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -989,6 +999,14 @@
                       "/things/0/x"
                     ],
                     "name": "x named by $params.key",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.key",
                     "outcome": "absent",
                     "value": null
                   }
@@ -1845,13 +1863,29 @@
                     "name": "x.y named by $params.i",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params.i is missing",
+                "message": "$params.i is missing; x.y is missing",
                 "name": "x.y named by $params.i exists"
               }
             ],
@@ -1865,7 +1899,7 @@
                 "value": null
               }
             ],
-            "message": "$params.i is missing",
+            "message": "$params.i is missing; x.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1895,13 +1929,29 @@
                     "name": "x.y named by $params.i",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x is null; $params.i is missing",
+                "message": "$params.i is missing; x is null",
                 "name": "x.y named by $params.i exists"
               }
             ],
@@ -1915,7 +1965,7 @@
                 "value": null
               }
             ],
-            "message": "x is null; $params.i is missing",
+            "message": "$params.i is missing; x is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1944,6 +1994,14 @@
                     ],
                     "name": "x.y named by $params.i",
                     "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "absent",
                     "value": null
                   }
                 ],
@@ -1997,6 +2055,14 @@
                     "name": "x.y named by $params.i",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -2046,6 +2112,14 @@
                     ],
                     "name": "x.y named by $params.i",
                     "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "absent",
                     "value": null
                   }
                 ],
@@ -2090,11 +2164,11 @@
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {
-            "cause": "null",
+            "cause": "absent",
             "check": "c",
             "failures": [
               {
-                "cause": "null",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -2102,7 +2176,23 @@
                       "/things/0"
                     ],
                     "name": "x.y named by $params.i",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
                     "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y",
+                    "outcome": "absent",
                     "value": null
                   }
                 ],
@@ -2110,7 +2200,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params.i is null",
+                "message": "$params.i is null; x.y is missing",
                 "name": "x.y named by $params.i exists"
               }
             ],
@@ -2120,11 +2210,11 @@
                   "/things/0"
                 ],
                 "name": "x.y named by $params.i",
-                "outcome": "null",
+                "outcome": "absent",
                 "value": null
               }
             ],
-            "message": "$params.i is null",
+            "message": "$params.i is null; x.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2154,13 +2244,29 @@
                     "name": "x.y named by $params.i",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x is null; $params.i is null",
+                "message": "$params.i is null; x is null",
                 "name": "x.y named by $params.i exists"
               }
             ],
@@ -2174,7 +2280,7 @@
                 "value": null
               }
             ],
-            "message": "x is null; $params.i is null",
+            "message": "$params.i is null; x is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2203,6 +2309,14 @@
                     ],
                     "name": "x.y named by $params.i",
                     "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "null",
                     "value": null
                   }
                 ],
@@ -2256,6 +2370,14 @@
                     "name": "x.y named by $params.i",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -2305,6 +2427,14 @@
                     ],
                     "name": "x.y named by $params.i",
                     "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "null",
                     "value": null
                   }
                 ],
@@ -2363,13 +2493,31 @@
                     "name": "x.y named by $params.i",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "unusable",
+                    "value": [
+                      1
+                    ]
+                  },
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params.i is [1], which isn't text",
+                "message": "$params.i is [1], which isn't text; x.y is missing",
                 "name": "x.y named by $params.i exists"
               }
             ],
@@ -2383,7 +2531,7 @@
                 "value": null
               }
             ],
-            "message": "$params.i is [1], which isn't text",
+            "message": "$params.i is [1], which isn't text; x.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2413,13 +2561,31 @@
                     "name": "x.y named by $params.i",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "unusable",
+                    "value": [
+                      1
+                    ]
+                  },
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x is null; $params.i is [1], which isn't text",
+                "message": "$params.i is [1], which isn't text; x is null",
                 "name": "x.y named by $params.i exists"
               }
             ],
@@ -2433,7 +2599,7 @@
                 "value": null
               }
             ],
-            "message": "x is null; $params.i is [1], which isn't text",
+            "message": "$params.i is [1], which isn't text; x is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2463,6 +2629,16 @@
                     "name": "x.y named by $params.i",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "unusable",
+                    "value": [
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2515,6 +2691,16 @@
                     "name": "x.y named by $params.i",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "unusable",
+                    "value": [
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2565,6 +2751,16 @@
                     "name": "x.y named by $params.i",
                     "outcome": "not_an_object",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "unusable",
+                    "value": [
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",

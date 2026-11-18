@@ -80,7 +80,7 @@ _row_said(check, subj, raw) := {"message": concat("; ", ms), "ergo/texts": ts} i
 		some fa in raw.failed_assertions
 		i := min({j | some j, a in check.assertions; a == fa.assertion})
 	]
-	ms := _once(ts)
+	ms := _m_said_new(ts)
 	ms != []
 } else := {"message": _m_fallback(check)} if _all_of_run(check)
 
@@ -89,7 +89,7 @@ _row_said(check, subj, _) := {"message": concat("; ", ms), "ergo/texts": [_or_bl
 	causes := [_m_undecided(_option_line_cause(c, _assertion_cause(c, subj, ""), subj)) | some c in check.checks]
 	said := [_option_said(c, subj, causes[i]) | some i, c in check.checks]
 	texts := [_option_first(check.option_of, said, i) | some i, _ in said]
-	ms := [concat("", [nm, ": ", concat(", and ", lines)]) |
+	ms := [concat("", [nm, ": ", concat(", and ", _m_said_new(lines))]) |
 		some k, nm in check.option_of
 		not nm in array.slice(check.option_of, 0, k)
 		lines := [t | some i, t in texts; check.option_of[i] == nm; t != null]
@@ -149,7 +149,7 @@ _m_key_list_text(name, f) := concat("", [name, " is ", _m_state_word(f.cause)]) 
 
 _m_key_list_text(name, f) := concat("", [name, " is []"]) if f.cause == "value"
 
-_m_key_list_text(name, f) := _m_isnt(name, f.value, "a list or an object") if f.cause == "unusable"
+_m_key_list_text(name, f) := _m_isnt(name, f.value, f.kind) if f.cause == "unusable"
 
 _walk_parts_of(check, _, _, r) := ms if {
 	r.failed != []
@@ -343,6 +343,27 @@ _m_fail_parts(cause, fails, roots) := [_m_fail(f, roots) |
 ] if cause != "satisfied"
 
 _m_joined(parts) := _m_joined_once(_once(parts))
+
+_m_said_new(texts) := [t |
+	some k, x in texts
+	before := {c | some j, y in texts; j < k; some p in _m_text_parts(y); some c in p}
+	t := concat("; ", [concat(", and ", cs) | some p in _m_text_parts(x); cs := [c | some c in p; not c in before]; cs != []])
+	t != ""
+]
+
+_m_text_parts(x) := [_m_quote_split(p, ", and ") | some p in _m_quote_split(x, "; ")]
+
+_m_quote_split(t, sep) := [concat(sep, array.slice(ps, cuts[g], cuts[g + 1])) | some g in numbers.range(0, count(cuts) - 2)] if {
+	ps := split(t, sep)
+	ends := [e | some i, _ in ps; e := i + 1; _m_shut(concat(sep, array.slice(ps, 0, e)))]
+	cuts := array.concat([0], _m_last_cut(ends, count(ps)))
+}
+
+_m_last_cut(ends, n) := ends if ends[count(ends) - 1] == n
+
+else := array.concat(ends, [n])
+
+_m_shut(s) if count(indexof_n(replace(replace(s, "\\\\", ""), "\\\"", ""), "\"")) % 2 == 0
 
 _m_joined_once(ms) := concat("; ", ms) if count(ms) <= 3
 
@@ -631,6 +652,13 @@ _m_cond_message(c, item, cause) := concat("; ", array.concat(_m_null_before_key(
 	cs := _once(array.concat(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, wc), _m_blocked_early(item, wc)), _m_faults(item, wc)), _m_blocked_late(item, wc)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
 	cs != []
 } else := _m_fallback(c)
+
+_m_cond_base_texts(item, c) := _once([_m_key_list_text(_input_name(f.prefix), f) |
+	some [p, mode] in _key_base_reads(c)
+	not p[0] in _params_starts
+	not p[0] == "$$input"
+	some f in _key_base_flaws(item, p, mode)
+])
 
 _m_item_tallies(item, c, "unusable") := [_m_isnt(_input_name(p), v, "a list") |
 	some side in _m_tally_sides(c)

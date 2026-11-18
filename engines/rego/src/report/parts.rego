@@ -2,7 +2,7 @@ package ergo
 
 import rego.v1
 
-_row_stash_keys := ["failed_items", "failed_assertions", "ergo/texts", "ergo/own", "ergo/outs", "ergo/for_texts", "ergo/key_lists"]
+_row_stash_keys := ["failed_items", "failed_assertions", "ergo/texts", "ergo/own", "ergo/outs", "ergo/for_texts", "ergo/key_lists", "ergo/key_bases"]
 
 _parted(row, _, _) := _passed_row(row) if row.passed == true
 
@@ -190,7 +190,7 @@ _for_walk_entry_of(f, rec, at, first_whose, whose) := object.union(
 	some x in object.get(f, "failed_items", [])
 	_ = x["ergo/sorted"]
 } else := object.union(
-	_entry("item", f.item, f.cause, [{"name": x.name, "value": f.value, "locations": f.locations, "outcome": x.outcome}], [], concat("; ", [_entry_text(m, f.item) | some m in rec.walk])),
+	_entry("item", f.item, f.cause, [{"name": x.name, "value": f.value, "locations": f.locations, "outcome": x.outcome}], [], _sorted_item_text(rec.walk, f.item)),
 	{"value": x.value, "locations": _anchored_all([{"locations": [x.at]}], at)[0].locations},
 ) if {
 	x := f["ergo/sorted"]
@@ -277,7 +277,7 @@ _entry(kind, name, cause, inputs, failures, message) := {
 
 _policy_entry(kind, name, cause, inputs, failures, message, locations) := object.union(_entry(kind, name, cause, inputs, failures, message), {"locations": locations})
 
-_row_failures(row, _, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, array.concat(ins, _tally_key_ref_entries(where.check, ins, row.cause)), [], row.message, [_assertion_at(where, null, 0)])] if {
+_row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, _with_key_bases(array.concat(ins, _check_key_ref_entries(where.check, ins, row.cause)), object.get(row, "ergo/key_bases", []), at), [], row.message, [_assertion_at(where, null, 0)])] if {
 	not _walks(where.check)
 	not _all_of_run(where.check)
 	not _any_of_run(where.check)
@@ -288,7 +288,7 @@ _row_failures(row, at, where, _) := [_policy_entry(
 	"assertion",
 	fa.assertion,
 	fa.cause,
-	array.concat(_with_outcomes(_anchored_inputs(fa.inputs, at)), _sentence_ref_entries(where.check.checks[fa.at], fa.inputs)),
+	_sentence_inputs(where.check.checks[fa.at], fa, at),
 	[],
 	row["ergo/texts"][k],
 	[_assertion_at(where, null, fa.at)],
@@ -302,7 +302,7 @@ _row_failures(row, at, where, _) := [_policy_entry(
 	_group_cause({row["ergo/outs"][i].line | some i, n in where.check.option_of; n == nm}),
 	[],
 	[_option_assertion(row, at, where, nm, i) | some i, n in where.check.option_of; n == nm; row["ergo/outs"][i].line != "satisfied"],
-	concat(", and ", _once([t | some i, n in where.check.option_of; n == nm; t := row["ergo/texts"][i]; t != ""])),
+	concat(", and ", _m_said_new([t | some i, n in where.check.option_of; n == nm; t := row["ergo/texts"][i]; t != ""])),
 	[where.option_ats[nm]],
 ) |
 	some nm in sort({n | some n in where.check.option_of})
@@ -312,7 +312,7 @@ _option_assertion(row, at, where, nm, i) := _policy_entry(
 	"assertion",
 	where.check.assertions[i],
 	row["ergo/outs"][i].cause,
-	array.concat(_with_outcomes(_anchored_inputs(row["ergo/outs"][i].inputs, at)), _sentence_ref_entries(where.check.checks[i], row["ergo/outs"][i].inputs)),
+	_sentence_inputs(where.check.checks[i], row["ergo/outs"][i], at),
 	[],
 	row["ergo/texts"][i],
 	[_assertion_at(where, nm, count([j | some j, n in array.slice(where.check.option_of, 0, i); n == nm]))],
@@ -338,25 +338,30 @@ _walk_param_entries(check, inputs) := [x |
 	not x.name in {i.name | some i in inputs}
 ]
 
-_tally_key_ref_entries(check, inputs, cause) := [x |
-	some x in _key_flaw_entries([seg |
-		walk(check, [_, y])
-		is_object(y)
-		some f in _tally_forms
-		p := object.get(y, f, null)
+_check_key_ref_entries(check, inputs, cause) := [x |
+	some x in _key_flaw_entries(_once([seg |
+		walk(check, [_, p])
 		is_array(p)
-		some seg in p
-	])
+		count(p) > 1
+		is_string(p[0])
+		some k, seg in p
+		k > 0
+		_is_ref(seg)
+	]))
 	not x.name in {i.name | some i in inputs}
 ] if {
-	cause in {"absent", "null", "unusable"}
-	some i in inputs
-	_tally_input_name(i.name)
+	cause in _value_fault_causes
 } else := []
 
-_tally_input_name(name) if startswith(name, "count of ")
+_key_base_entries(bases, at) := _anchored_all([object.union(object.remove(x.input, _input_stash_keys), {"outcome": _key_list_outcome(x.cause)}) | some x in bases], at)
 
-_tally_input_name(name) if startswith(name, "sum of ")
+_sentence_inputs(c, o, at) := _with_key_bases(array.concat(array.concat(_with_outcomes(_anchored_inputs(o.inputs, at)), _sentence_ref_entries(c, o.inputs)), _sentence_key_entries(c, o)), o.key_bases, at)
+
+_with_key_bases(ins, bases, at) := array.concat(ins, [x | some x in _key_base_entries(bases, at); not x.name in {i.name | some i in ins}])
+
+_sentence_key_entries(c, o) := _check_key_ref_entries(c, o.inputs, o.cause) if not _walks(c)
+
+else := []
 
 _sentence_ref_entries(c, inputs) := _walk_cond_ref_entries(_walk_cond_refs(c), inputs) if {
 	_walks(c)
@@ -577,6 +582,11 @@ _item_outcome(cause, value) := cause if cause in _failed_read_states
 else := "usable" if value != null
 
 else := "null"
+
+_sorted_item_text(texts, name) := concat("; ", [_entry_text(m, name) | some m in texts; startswith(m, concat("", [name, ": "]))]) if {
+	some m in texts
+	startswith(m, concat("", [name, ": "]))
+} else := concat("; ", texts)
 
 _entry_text(text, name) := substring(text, count(name) + 2, -1) if startswith(text, concat("", [name, ": "]))
 

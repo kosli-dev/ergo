@@ -21211,7 +21211,29 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rs/0"
+                        ],
+                        "name": "r.x.y named by $params.i",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/0"
+                    ],
+                    "message": "r.x.y is missing",
+                    "name": "item 1 of rs",
+                    "value": {}
+                  }
+                ],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
@@ -21233,7 +21255,7 @@
                 ]
               }
             ],
-            "message": "$params.i is missing",
+            "message": "$params.i is missing; item 1 of rs: r.x.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21370,12 +21392,34 @@
         "input": {"things": [{"id": "t1", "rs": [{}]}]},
         "results": [
           {
-            "cause": "null",
+            "cause": "absent",
             "check": "c",
             "failures": [
               {
-                "cause": "null",
-                "failures": [],
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rs/0"
+                        ],
+                        "name": "r.x.y named by $params.i",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/0"
+                    ],
+                    "message": "r.x.y is missing",
+                    "name": "item 1 of rs",
+                    "value": {}
+                  }
+                ],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
@@ -21397,7 +21441,7 @@
                 ]
               }
             ],
-            "message": "$params.i is null",
+            "message": "$params.i is null; item 1 of rs: r.x.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21539,7 +21583,29 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rs/0"
+                        ],
+                        "name": "r.x.y named by $params.i",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/0"
+                    ],
+                    "message": "r.x.y is missing",
+                    "name": "item 1 of rs",
+                    "value": {}
+                  }
+                ],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
@@ -21561,7 +21627,7 @@
                 ]
               }
             ],
-            "message": "$params.i is [1], which isn't text",
+            "message": "$params.i is [1], which isn't text; item 1 of rs: r.x.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -31004,11 +31070,11 @@
             }
           },
           {
-            "cause": "absent",
+            "cause": "unusable",
             "check": "c",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "unusable",
                 "failures": [],
                 "inputs": [
                   {
@@ -31016,7 +31082,7 @@
                       "/things/1/rows/0/m"
                     ],
                     "name": "rows[0].m named by $params.km",
-                    "outcome": "absent",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -31024,7 +31090,7 @@
                 "locations": [
                   "/things/1/rows/0"
                 ],
-                "message": "$params.km is missing",
+                "message": "m is [5, 1], which isn't an object",
                 "name": "item 1 of rows",
                 "value": {
                   "m": [
@@ -31053,7 +31119,7 @@
                 ]
               }
             ],
-            "message": "$params.km is missing",
+            "message": "$params.km is missing; item 1 of rows: m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "a missing key",
             "subject": {
@@ -31151,11 +31217,11 @@
             }
           },
           {
-            "cause": "null",
+            "cause": "unusable",
             "check": "c",
             "failures": [
               {
-                "cause": "null",
+                "cause": "unusable",
                 "failures": [],
                 "inputs": [
                   {
@@ -31163,7 +31229,7 @@
                       "/things/1/rows/0/m"
                     ],
                     "name": "rows[0].m named by $params.kz",
-                    "outcome": "null",
+                    "outcome": "unusable",
                     "value": null
                   }
                 ],
@@ -31171,7 +31237,7 @@
                 "locations": [
                   "/things/1/rows/0"
                 ],
-                "message": "$params.kz is null",
+                "message": "m is [5, 1], which isn't an object",
                 "name": "item 1 of rows",
                 "value": {
                   "m": [
@@ -31200,7 +31266,7 @@
                 ]
               }
             ],
-            "message": "$params.kz is null",
+            "message": "$params.kz is null; item 1 of rows: m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "a null key",
             "subject": {
@@ -31318,7 +31384,7 @@
                 "locations": [
                   "/things/1/rows/0"
                 ],
-                "message": "$params.kn is 1, which isn't text",
+                "message": "m is [5, 1], which isn't an object",
                 "name": "item 1 of rows",
                 "value": {
                   "m": [
@@ -31347,7 +31413,7 @@
                 ]
               }
             ],
-            "message": "$params.kn is 1, which isn't text",
+            "message": "$params.kn is 1, which isn't text; item 1 of rows: m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "a number key",
             "subject": {
@@ -31547,7 +31613,7 @@
                 "locations": [
                   "/things/1/rows/0"
                 ],
-                "message": "$params.ko is {\"a\": 1}, which isn't text",
+                "message": "m is [5, 1], which isn't an object",
                 "name": "item 1 of rows",
                 "value": {
                   "m": [
@@ -31576,7 +31642,7 @@
                 ]
               }
             ],
-            "message": "$params.ko is {\"a\": 1}, which isn't text",
+            "message": "$params.ko is {\"a\": 1}, which isn't text; item 1 of rows: m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "an object key",
             "subject": {
@@ -39962,6 +40028,14 @@
                       "/things/0/x"
                     ],
                     "name": "x named by $params.v",
+                    "outcome": "unusable",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.v",
                     "outcome": "unusable",
                     "value": null
                   }

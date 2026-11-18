@@ -21164,6 +21164,14 @@
                     "name": "m named by $input.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -21231,6 +21239,14 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "absent",
                     "value": null
                   }
@@ -21306,6 +21322,14 @@
                     "name": "k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -21379,6 +21403,14 @@
                     "name": "m named by $input.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -21446,6 +21478,14 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
                     "outcome": "absent",
                     "value": null
                   }
@@ -21518,6 +21558,14 @@
                         "v": 4
                       }
                     ]
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -21595,6 +21643,14 @@
                     "name": "m named by $input.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -21662,6 +21718,14 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
                     "outcome": "null",
                     "value": null
                   }
@@ -21737,6 +21801,14 @@
                     "name": "k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -21810,6 +21882,14 @@
                     "name": "m named by $input.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -21877,6 +21957,14 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $input.k",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
                     "outcome": "null",
                     "value": null
                   }
@@ -21949,6 +22037,14 @@
                         "v": 4
                       }
                     ]
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -22026,6 +22122,14 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -22095,6 +22199,14 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -22168,6 +22280,14 @@
                     "name": "k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -22241,6 +22361,14 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -22310,6 +22438,14 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -22380,6 +22516,14 @@
                         "v": 4
                       }
                     ]
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -22455,6 +22599,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -22517,6 +22669,14 @@
                         "v": 4
                       }
                     ]
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -22671,6 +22831,14 @@
                     "name": "$input.m named by $input.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -22754,6 +22922,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -22895,6 +23071,14 @@
                     "name": "$input.m named by $input.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -22991,6 +23175,14 @@
                         "v": 4
                       }
                     ]
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -23066,6 +23258,14 @@
                         "v": 4
                       }
                     ]
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -23141,6 +23341,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -23190,6 +23398,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -23239,6 +23455,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -23295,6 +23519,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -23344,6 +23576,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -23393,6 +23633,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -23449,6 +23697,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -23498,6 +23754,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -23547,6 +23811,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -23603,6 +23875,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -23652,6 +23932,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -23701,6 +23989,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -23757,6 +24053,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -23806,6 +24110,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -23854,6 +24166,14 @@
                     "locations": [],
                     "name": "es[]",
                     "outcome": "usable",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
                     "value": []
                   }
                 ],
@@ -23911,6 +24231,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": {}
                   }
                 ],
                 "kind": "assertion",
@@ -23960,6 +24288,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": {}
                   }
                 ],
                 "kind": "assertion",
@@ -24009,6 +24345,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": {}
                   }
                 ],
                 "kind": "assertion",
@@ -24649,6 +24993,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -24913,6 +25265,14 @@
                     "name": "es[].v",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -24962,6 +25322,14 @@
                     "name": "es[]",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -25018,6 +25386,14 @@
                     "name": "es.v",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -25067,6 +25443,14 @@
                     "name": "es",
                     "outcome": "absent",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -25123,6 +25507,14 @@
                     "name": "es.v",
                     "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -25172,6 +25564,14 @@
                     "name": "es",
                     "outcome": "null",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -25228,6 +25628,14 @@
                     "name": "es.v",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -25277,6 +25685,14 @@
                     "name": "es",
                     "outcome": "usable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",

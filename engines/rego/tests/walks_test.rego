@@ -752,9 +752,9 @@ test_a_null_on_the_items_own_path_is_named_after_a_roots_problem if {
 	input_doc := {"things": [{"id": 1, "rs": [{"x": null}, {"x": {}}]}]}
 	msgs := {[p, r.cause, r.message] | some p in [{}, {"i": null}, {"i": [1]}]; some r in ergo.report(input_doc, policy, p).results; r.check == "c"}
 	msgs == {
-		[{}, "absent", "$params.i is missing; item 1 of rs: r.x is null"],
-		[{"i": null}, "null", "$params.i is null; item 1 of rs: r.x is null"],
-		[{"i": [1]}, "unusable", "$params.i is [1], which isn't text; item 1 of rs: r.x is null"],
+		[{}, "absent", "$params.i is missing; item 1 of rs: r.x is null; item 2 of rs: r.x.y is missing"],
+		[{"i": null}, "absent", "$params.i is null; item 1 of rs: r.x is null; item 2 of rs: r.x.y is missing"],
+		[{"i": [1]}, "unusable", "$params.i is [1], which isn't text; item 1 of rs: r.x is null; item 2 of rs: r.x.y is missing"],
 	}
 }
 
