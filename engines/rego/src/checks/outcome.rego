@@ -257,7 +257,7 @@ _m_walk_outcome(check, subj, r) := {"message": _m_joined(ps), "ergo/own": [p | s
 	ps := _walk_roots_sorted(_parts_ahead(parts, r), check)
 }
 
-_walk_roots_sorted(ps, check) := ps if count([p | some p in ps; not startswith(p, "item ")]) < 2
+_walk_roots_sorted(ps, check) := ps if count([p | some p in ps; _m_root_clause(p, _walk_list_names(check))]) < 2
 
 else := _roots_then_lists(ps, _walk_list_names(check))
 

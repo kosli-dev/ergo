@@ -28085,5 +28085,1379 @@
           ]
         }
       ]
+    },
+  {
+      "description": "a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "count": "count of es.v that is m named by $params.k is 0",
+              "every": "every es.v that is m named by $params.k exists"
+            }
+          }
+        }
+      },
+      "params": {
+        "k": 3
+      },
+      "cases": [
+        {
+          "description": "the focus holds m",
+          "rules": [
+            "walk.flaws",
+            "problems.where_said",
+            "row.parts"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "es": [
+                  {
+                    "v": {
+                      "m": {
+                        "a": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "count",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/es/0/v"
+                      ],
+                      "name": "count of es.v that equals m named by $params.k",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/es/0/v"
+                      ],
+                      "name": "es[].v",
+                      "outcome": "usable",
+                      "value": [
+                        {
+                          "m": {
+                            "a": 1
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:/k"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "unusable",
+                      "value": 3
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count"
+                  ],
+                  "message": "$params.k is 3, which isn't text",
+                  "name": "count of es.v that equals m named by $params.k is 0"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "count of es.v that equals m named by $params.k",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "es[].v",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "m": {
+                        "a": 1
+                      }
+                    }
+                  ]
+                }
+              ],
+              "message": "$params.k is 3, which isn't text",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "every",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/es/0/v"
+                      ],
+                      "name": "es[].v",
+                      "outcome": "usable",
+                      "value": [
+                        {
+                          "m": {
+                            "a": 1
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:/k"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "unusable",
+                      "value": 3
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/every"
+                  ],
+                  "message": "$params.k is 3, which isn't text",
+                  "name": "every es.v that equals m named by $params.k exists"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "es[].v",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "m": {
+                        "a": 1
+                      }
+                    }
+                  ]
+                }
+              ],
+              "message": "$params.k is 3, which isn't text",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "the focus has no m, and the item has one",
+          "rules": [
+            "walk.flaws",
+            "problems.where_said",
+            "row.parts"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "es": [
+                  {
+                    "v": {},
+                    "m": {
+                      "a": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "count",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/es/0/v"
+                      ],
+                      "name": "count of es.v that equals m named by $params.k",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/es/0/v"
+                      ],
+                      "name": "es[].v",
+                      "outcome": "usable",
+                      "value": [
+                        {}
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:/k"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "unusable",
+                      "value": 3
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count"
+                  ],
+                  "message": "$params.k is 3, which isn't text; item 1 of es: v: m is missing",
+                  "name": "count of es.v that equals m named by $params.k is 0"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "count of es.v that equals m named by $params.k",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "es[].v",
+                  "outcome": "usable",
+                  "value": [
+                    {}
+                  ]
+                }
+              ],
+              "message": "$params.k is 3, which isn't text; item 1 of es: v: m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "every",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/es/0/v"
+                          ],
+                          "name": "es[0].v.m",
+                          "outcome": "unusable",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/es/0"
+                      ],
+                      "message": "v: m is missing",
+                      "name": "item 1 of es",
+                      "value": {
+                        "m": {
+                          "a": 1
+                        },
+                        "v": {}
+                      }
+                    }
+                  ],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:/k"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "unusable",
+                      "value": 3
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/every"
+                  ],
+                  "message": "$params.k is 3, which isn't text",
+                  "name": "every es.v that equals m named by $params.k exists"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "es[].v",
+                  "outcome": "usable",
+                  "value": [
+                    {}
+                  ]
+                }
+              ],
+              "message": "$params.k is 3, which isn't text; item 1 of es: v: m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "one focus has no m and another holds null",
+          "rules": [
+            "walk.flaws",
+            "problems.where_said",
+            "row.parts"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "es": [
+                  {
+                    "v": {}
+                  },
+                  {
+                    "v": {
+                      "m": null
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "count",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/es/0/v",
+                        "/things/0/es/1/v"
+                      ],
+                      "name": "count of es.v that equals m named by $params.k",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/es/0/v",
+                        "/things/0/es/1/v"
+                      ],
+                      "name": "es[].v",
+                      "outcome": "usable",
+                      "value": [
+                        {},
+                        {
+                          "m": null
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:/k"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "unusable",
+                      "value": 3
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count"
+                  ],
+                  "message": "$params.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is null",
+                  "name": "count of es.v that equals m named by $params.k is 0"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/es/0/v",
+                    "/things/0/es/1/v"
+                  ],
+                  "name": "count of es.v that equals m named by $params.k",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/es/0/v",
+                    "/things/0/es/1/v"
+                  ],
+                  "name": "es[].v",
+                  "outcome": "usable",
+                  "value": [
+                    {},
+                    {
+                      "m": null
+                    }
+                  ]
+                }
+              ],
+              "message": "$params.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is null",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "every",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/es/0/v"
+                          ],
+                          "name": "es[0].v.m",
+                          "outcome": "unusable",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/es/0"
+                      ],
+                      "message": "v: m is missing",
+                      "name": "item 1 of es",
+                      "value": {
+                        "v": {}
+                      }
+                    },
+                    {
+                      "cause": "null",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/es/1/v/m"
+                          ],
+                          "name": "es[1].v.m",
+                          "outcome": "unusable",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/es/1"
+                      ],
+                      "message": "v: m is null",
+                      "name": "item 2 of es",
+                      "value": {
+                        "v": {
+                          "m": null
+                        }
+                      }
+                    }
+                  ],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:/k"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "unusable",
+                      "value": 3
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/every"
+                  ],
+                  "message": "$params.k is 3, which isn't text",
+                  "name": "every es.v that equals m named by $params.k exists"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/es/0/v",
+                    "/things/0/es/1/v"
+                  ],
+                  "name": "es[].v",
+                  "outcome": "usable",
+                  "value": [
+                    {},
+                    {
+                      "m": null
+                    }
+                  ]
+                }
+              ],
+              "message": "$params.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is null",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "a that clause whose key from $params is missing reads the value before the key on the focus",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "count": "count of es.v that is m named by $params.k is 0",
+              "every": "every es.v that is m named by $params.k exists"
+            }
+          }
+        }
+      },
+      "cases": [
+        {
+          "description": "the focus holds m",
+          "rules": [
+            "walk.flaws",
+            "problems.where_said"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "es": [
+                  {
+                    "v": {
+                      "m": {
+                        "a": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "count",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/es/0/v"
+                      ],
+                      "name": "count of es.v that equals m named by $params.k",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/es/0/v"
+                      ],
+                      "name": "es[].v",
+                      "outcome": "usable",
+                      "value": [
+                        {
+                          "m": {
+                            "a": 1
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count"
+                  ],
+                  "message": "$params.k is missing",
+                  "name": "count of es.v that equals m named by $params.k is 0"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "count of es.v that equals m named by $params.k",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "es[].v",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "m": {
+                        "a": 1
+                      }
+                    }
+                  ]
+                }
+              ],
+              "message": "$params.k is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "every",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/es/0/v"
+                      ],
+                      "name": "es[].v",
+                      "outcome": "usable",
+                      "value": [
+                        {
+                          "m": {
+                            "a": 1
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/every"
+                  ],
+                  "message": "$params.k is missing",
+                  "name": "every es.v that equals m named by $params.k exists"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "es[].v",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "m": {
+                        "a": 1
+                      }
+                    }
+                  ]
+                }
+              ],
+              "message": "$params.k is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "the focus has no m",
+          "rules": [
+            "walk.flaws",
+            "problems.where_said"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "es": [
+                  {
+                    "v": {}
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "count",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/es/0/v"
+                      ],
+                      "name": "count of es.v that equals m named by $params.k",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/es/0/v"
+                      ],
+                      "name": "es[].v",
+                      "outcome": "usable",
+                      "value": [
+                        {}
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count"
+                  ],
+                  "message": "$params.k is missing; item 1 of es: v: m is missing",
+                  "name": "count of es.v that equals m named by $params.k is 0"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "count of es.v that equals m named by $params.k",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "es[].v",
+                  "outcome": "usable",
+                  "value": [
+                    {}
+                  ]
+                }
+              ],
+              "message": "$params.k is missing; item 1 of es: v: m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "every",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/es/0/v"
+                          ],
+                          "name": "es[0].v.m",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/es/0"
+                      ],
+                      "message": "v: m is missing",
+                      "name": "item 1 of es",
+                      "value": {
+                        "v": {}
+                      }
+                    }
+                  ],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/every"
+                  ],
+                  "message": "$params.k is missing",
+                  "name": "every es.v that equals m named by $params.k exists"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/es/0/v"
+                  ],
+                  "name": "es[].v",
+                  "outcome": "usable",
+                  "value": [
+                    {}
+                  ]
+                }
+              ],
+              "message": "$params.k is missing; item 1 of es: v: m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "an item of a list a whose reads from $input is a root, said worst cause first and then by name",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "every": "every xs whose v is in $input.os.name and whose w is at least $params.z exists",
+              "count": "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1"
+            }
+          }
+        }
+      },
+      "cases": [
+        {
+          "description": "an item of $input.os is null and $params.z is missing",
+          "rules": [
+            "problems.item_order",
+            "walk.flaws"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {
+                    "v": "a",
+                    "w": 1
+                  }
+                ]
+              }
+            ],
+            "os": [
+              {
+                "name": "a"
+              },
+              null
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "count",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "name": "xs[]",
+                      "outcome": "usable",
+                      "value": [
+                        {
+                          "v": "a",
+                          "w": 1
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "/os/0/name",
+                        "/os/1"
+                      ],
+                      "name": "$input.os[].name",
+                      "outcome": "unusable",
+                      "value": [
+                        "a",
+                        null
+                      ]
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count"
+                  ],
+                  "message": "item 2 of $input.os is null, which isn't an object; $params.z is missing",
+                  "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "v": "a",
+                      "w": 1
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/os/0/name",
+                    "/os/1"
+                  ],
+                  "name": "$input.os[].name",
+                  "outcome": "unusable",
+                  "value": [
+                    "a",
+                    null
+                  ]
+                }
+              ],
+              "message": "item 2 of $input.os is null, which isn't an object; $params.z is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "every",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [
+                    {
+                      "cause": "unusable",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0/v"
+                          ],
+                          "name": "xs[0].v",
+                          "outcome": "unusable",
+                          "value": "a"
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "item 2 of $input.os is null, which isn't an object",
+                      "name": "item 1 of xs",
+                      "value": {
+                        "v": "a",
+                        "w": 1
+                      }
+                    }
+                  ],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/os/0/name",
+                        "/os/1"
+                      ],
+                      "name": "$input.os[].name",
+                      "outcome": "unusable",
+                      "value": [
+                        "a",
+                        null
+                      ]
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/every"
+                  ],
+                  "message": "$params.z is missing",
+                  "name": "every xs whose v is in $input.os.name and whose w is at least $params.z exists"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/os/0/name",
+                    "/os/1"
+                  ],
+                  "name": "$input.os[].name",
+                  "outcome": "unusable",
+                  "value": [
+                    "a",
+                    null
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "v": "a",
+                      "w": 1
+                    }
+                  ]
+                }
+              ],
+              "message": "item 2 of $input.os is null, which isn't an object; $params.z is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "an item of a list a whose reads from $input is a root, said worst cause first and then by name, with a null param",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "every": "every xs whose v is in $input.os.name and whose w is at least $params.z exists",
+              "count": "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1"
+            }
+          }
+        }
+      },
+      "params": {
+        "z": null
+      },
+      "cases": [
+        {
+          "description": "an item of $input.os has no name and $params.z is null",
+          "rules": [
+            "problems.item_order",
+            "walk.flaws"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {
+                    "v": "a",
+                    "w": 1
+                  }
+                ]
+              }
+            ],
+            "os": [
+              {
+                "name": "a"
+              },
+              {}
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "count",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "name": "xs[]",
+                      "outcome": "usable",
+                      "value": [
+                        {
+                          "v": "a",
+                          "w": 1
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "/os/0/name",
+                        "/os/1"
+                      ],
+                      "name": "$input.os[].name",
+                      "outcome": "usable",
+                      "value": [
+                        "a",
+                        null
+                      ]
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count"
+                  ],
+                  "message": "item 2 of $input.os: name is missing; $params.z is null",
+                  "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "v": "a",
+                      "w": 1
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/os/0/name",
+                    "/os/1"
+                  ],
+                  "name": "$input.os[].name",
+                  "outcome": "usable",
+                  "value": [
+                    "a",
+                    null
+                  ]
+                }
+              ],
+              "message": "item 2 of $input.os: name is missing; $params.z is null",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "every",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0/v"
+                          ],
+                          "name": "xs[0].v",
+                          "outcome": "absent",
+                          "value": "a"
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "item 2 of $input.os: name is missing",
+                      "name": "item 1 of xs",
+                      "value": {
+                        "v": "a",
+                        "w": 1
+                      }
+                    }
+                  ],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/os/0/name",
+                        "/os/1"
+                      ],
+                      "name": "$input.os[].name",
+                      "outcome": "usable",
+                      "value": [
+                        "a",
+                        null
+                      ]
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/every"
+                  ],
+                  "message": "$params.z is null",
+                  "name": "every xs whose v is in $input.os.name and whose w is at least $params.z exists"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/os/0/name",
+                    "/os/1"
+                  ],
+                  "name": "$input.os[].name",
+                  "outcome": "usable",
+                  "value": [
+                    "a",
+                    null
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "v": "a",
+                      "w": 1
+                    }
+                  ]
+                }
+              ],
+              "message": "item 2 of $input.os: name is missing; $params.z is null",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
     }
 ]

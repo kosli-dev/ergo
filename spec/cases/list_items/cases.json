@@ -10728,7 +10728,7 @@
     ]
   },
   {
-    "description": "two names read from outside the item in a whose, each with items that can't be used, are each named once, in the order the sentence reads them",
+    "description": "two names read from outside the item in a whose, each with items that can't be used, are each named once, worst cause first and then by name",
     "policy": {
       "ergo_spec": "{{spec}}",
       "subjects": {
@@ -11443,7 +11443,7 @@
     ]
   },
   {
-    "description": "two names read from outside the item in a whose, one with an item without the name, are each named once, in the order the sentence reads them",
+    "description": "two names read from outside the item in a whose, one with an item without the name, are each named once, worst cause first and then by name",
     "policy": {
       "ergo_spec": "{{spec}}",
       "subjects": {
@@ -11875,7 +11875,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 2 of pos: name is missing; item 2 of $params.os: name is missing",
+                "message": "item 2 of $params.os: name is missing; item 2 of pos: name is missing",
                 "name": "count of rows whose v is in pos.name and whose v is in $params.os.name is 1"
               }
             ],
@@ -11916,7 +11916,7 @@
                 ]
               }
             ],
-            "message": "item 2 of pos: name is missing; item 2 of $params.os: name is missing",
+            "message": "item 2 of $params.os: name is missing; item 2 of pos: name is missing",
             "passed": false,
             "requirement": "r",
             "subject": {

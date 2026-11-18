@@ -144,7 +144,7 @@ _walk_parts(check, subj, raw, r) := _m_root_sorted(_once([t |
 ])) if {
 	raw["ergo/key_texts"] == true
 	_ = [subj, r]
-} else := [_m_leaf_in(f.item, _m_key_list_text(_input_name(f["ergo/base"].prefix), f["ergo/base"]), _dotted_roots([check.path])) |
+} else := [_m_leaf_in(f.item, _key_focus_text(f.path, f.item, f["ergo/base"].prefix, _m_key_list_text(_input_name(f["ergo/base"].prefix), f["ergo/base"])), _dotted_roots([check.path])) |
 	some p in sort({f.path | some f in r.fails})
 	some f in r.fails
 	f.path == p
@@ -438,13 +438,13 @@ _m_tally(subj, side) := ts if {
 
 _m_tally_key_items(subj, side) := array.concat(
 	[["root", t] | some t in _m_root_sorted(_once([t | some c in side.whose; some [p, _] in _key_base_reads(c); some t in _m_key_texts(p)]))],
-	[["root", _m_leaf_in(e.i, _m_key_list_text(_input_name(f.prefix), f), roots)] |
+	[["root", _m_leaf_in(e.i, _key_focus_text(array.concat(e.c, f.prefix), e.i, f.prefix, _m_key_list_text(_input_name(f.prefix), f)), roots)] |
 		some e in w.items
 		some c in side.whose
 		some [p, mode] in _key_base_reads(c)
 		not p[0] in _params_starts
 		p[0] != "$$input"
-		some f in _key_base_flaws(e.iv, p, mode)
+		some f in _key_base_flaws(_key_focus(e), p, mode)
 	],
 ) if {
 	f := _basic_form(side)

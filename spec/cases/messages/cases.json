@@ -40387,5 +40387,1315 @@
           ]
         }
       ]
+    },
+  {
+      "description": "a count of or a sum of with more than three items it can't read says the first three and then and N more, last",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "count": "count of xs whose v is 1 is 0",
+              "sum": "sum of xs.v is 0",
+              "count_in_option": {
+                "any_of": {
+                  "a": "count of xs whose v is 1 is 0",
+                  "b": "id is \"x\""
+                }
+              },
+              "count_with_root": "count of xs whose v is 1 is $params.n"
+            }
+          }
+        }
+      },
+      "cases": [
+        {
+          "description": "four items without v",
+          "rules": [
+            "message.items",
+            "tally.fail"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {},
+                  {},
+                  {},
+                  {}
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "count",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3"
+                      ],
+                      "name": "count of xs whose v is 1",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3"
+                      ],
+                      "name": "xs[]",
+                      "outcome": "usable",
+                      "value": [
+                        {},
+                        {},
+                        {},
+                        {}
+                      ]
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count"
+                  ],
+                  "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+                  "name": "count of xs whose v is 1 is 0"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3"
+                  ],
+                  "name": "count of xs whose v is 1",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {},
+                    {},
+                    {},
+                    {}
+                  ]
+                }
+              ],
+              "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "count_in_option",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0",
+                            "/things/0/xs/1",
+                            "/things/0/xs/2",
+                            "/things/0/xs/3"
+                          ],
+                          "name": "count of xs whose v is 1",
+                          "value": null
+                        },
+                        {
+                          "locations": [
+                            "/things/0/xs/0",
+                            "/things/0/xs/1",
+                            "/things/0/xs/2",
+                            "/things/0/xs/3"
+                          ],
+                          "name": "xs[]",
+                          "outcome": "usable",
+                          "value": [
+                            {},
+                            {},
+                            {},
+                            {}
+                          ]
+                        }
+                      ],
+                      "kind": "assertion",
+                      "locations": [
+                        "$policy:/requirements/s/checks/count_in_option/any_of/a"
+                      ],
+                      "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+                      "name": "count of xs whose v is 1 is 0"
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "option",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count_in_option/any_of/a"
+                  ],
+                  "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+                  "name": "a"
+                },
+                {
+                  "cause": "value",
+                  "failures": [
+                    {
+                      "cause": "value",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/id"
+                          ],
+                          "name": "id",
+                          "outcome": "usable",
+                          "value": "t"
+                        }
+                      ],
+                      "kind": "assertion",
+                      "locations": [
+                        "$policy:/requirements/s/checks/count_in_option/any_of/b"
+                      ],
+                      "message": "id is \"t\"",
+                      "name": "id is \"x\""
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "option",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count_in_option/any_of/b"
+                  ],
+                  "message": "id is \"t\"",
+                  "name": "b"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3"
+                  ],
+                  "name": "count of xs whose v is 1",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/id"
+                  ],
+                  "name": "id",
+                  "outcome": "usable",
+                  "value": "t"
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {},
+                    {},
+                    {},
+                    {}
+                  ]
+                }
+              ],
+              "message": "a: item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more; b: id is \"t\"",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "count_with_root",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3"
+                      ],
+                      "name": "count of xs whose v is 1",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3"
+                      ],
+                      "name": "xs[]",
+                      "outcome": "usable",
+                      "value": [
+                        {},
+                        {},
+                        {},
+                        {}
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.n",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count_with_root"
+                  ],
+                  "message": "$params.n is missing, and item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+                  "name": "count of xs whose v is 1 equals $params.n"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3"
+                  ],
+                  "name": "count of xs whose v is 1",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {},
+                    {},
+                    {},
+                    {}
+                  ]
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.n",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "$params.n is missing, and item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "sum",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3"
+                      ],
+                      "name": "sum of xs.v",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3"
+                      ],
+                      "name": "xs[].v",
+                      "outcome": "usable",
+                      "value": [
+                        null,
+                        null,
+                        null,
+                        null
+                      ]
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/sum"
+                  ],
+                  "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+                  "name": "sum of xs.v is 0"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3"
+                  ],
+                  "name": "sum of xs.v",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3"
+                  ],
+                  "name": "xs[].v",
+                  "outcome": "usable",
+                  "value": [
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                }
+              ],
+              "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "five items without v",
+          "rules": [
+            "message.items",
+            "tally.fail"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {},
+                  {},
+                  {},
+                  {},
+                  {}
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "count",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3",
+                        "/things/0/xs/4"
+                      ],
+                      "name": "count of xs whose v is 1",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3",
+                        "/things/0/xs/4"
+                      ],
+                      "name": "xs[]",
+                      "outcome": "usable",
+                      "value": [
+                        {},
+                        {},
+                        {},
+                        {},
+                        {}
+                      ]
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count"
+                  ],
+                  "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+                  "name": "count of xs whose v is 1 is 0"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3",
+                    "/things/0/xs/4"
+                  ],
+                  "name": "count of xs whose v is 1",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3",
+                    "/things/0/xs/4"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {},
+                    {},
+                    {},
+                    {},
+                    {}
+                  ]
+                }
+              ],
+              "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "count_in_option",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0",
+                            "/things/0/xs/1",
+                            "/things/0/xs/2",
+                            "/things/0/xs/3",
+                            "/things/0/xs/4"
+                          ],
+                          "name": "count of xs whose v is 1",
+                          "value": null
+                        },
+                        {
+                          "locations": [
+                            "/things/0/xs/0",
+                            "/things/0/xs/1",
+                            "/things/0/xs/2",
+                            "/things/0/xs/3",
+                            "/things/0/xs/4"
+                          ],
+                          "name": "xs[]",
+                          "outcome": "usable",
+                          "value": [
+                            {},
+                            {},
+                            {},
+                            {},
+                            {}
+                          ]
+                        }
+                      ],
+                      "kind": "assertion",
+                      "locations": [
+                        "$policy:/requirements/s/checks/count_in_option/any_of/a"
+                      ],
+                      "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+                      "name": "count of xs whose v is 1 is 0"
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "option",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count_in_option/any_of/a"
+                  ],
+                  "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+                  "name": "a"
+                },
+                {
+                  "cause": "value",
+                  "failures": [
+                    {
+                      "cause": "value",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/id"
+                          ],
+                          "name": "id",
+                          "outcome": "usable",
+                          "value": "t"
+                        }
+                      ],
+                      "kind": "assertion",
+                      "locations": [
+                        "$policy:/requirements/s/checks/count_in_option/any_of/b"
+                      ],
+                      "message": "id is \"t\"",
+                      "name": "id is \"x\""
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "option",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count_in_option/any_of/b"
+                  ],
+                  "message": "id is \"t\"",
+                  "name": "b"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3",
+                    "/things/0/xs/4"
+                  ],
+                  "name": "count of xs whose v is 1",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/id"
+                  ],
+                  "name": "id",
+                  "outcome": "usable",
+                  "value": "t"
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3",
+                    "/things/0/xs/4"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {},
+                    {},
+                    {},
+                    {},
+                    {}
+                  ]
+                }
+              ],
+              "message": "a: item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more; b: id is \"t\"",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "count_with_root",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3",
+                        "/things/0/xs/4"
+                      ],
+                      "name": "count of xs whose v is 1",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3",
+                        "/things/0/xs/4"
+                      ],
+                      "name": "xs[]",
+                      "outcome": "usable",
+                      "value": [
+                        {},
+                        {},
+                        {},
+                        {},
+                        {}
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.n",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count_with_root"
+                  ],
+                  "message": "$params.n is missing, and item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+                  "name": "count of xs whose v is 1 equals $params.n"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3",
+                    "/things/0/xs/4"
+                  ],
+                  "name": "count of xs whose v is 1",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3",
+                    "/things/0/xs/4"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {},
+                    {},
+                    {},
+                    {},
+                    {}
+                  ]
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.n",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "$params.n is missing, and item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "sum",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3",
+                        "/things/0/xs/4"
+                      ],
+                      "name": "sum of xs.v",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0",
+                        "/things/0/xs/1",
+                        "/things/0/xs/2",
+                        "/things/0/xs/3",
+                        "/things/0/xs/4"
+                      ],
+                      "name": "xs[].v",
+                      "outcome": "usable",
+                      "value": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                      ]
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/sum"
+                  ],
+                  "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+                  "name": "sum of xs.v is 0"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3",
+                    "/things/0/xs/4"
+                  ],
+                  "name": "sum of xs.v",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1",
+                    "/things/0/xs/2",
+                    "/things/0/xs/3",
+                    "/things/0/xs/4"
+                  ],
+                  "name": "xs[].v",
+                  "outcome": "usable",
+                  "value": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                }
+              ],
+              "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "a value whose text holds which isn't or a semicolon is read as usable when the check can use it",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "eq": "x is \"z\"",
+              "at_least": "x is at least y",
+              "options": {
+                "any_of": {
+                  "a": "x is \"z\"",
+                  "b": "x is \"w\""
+                }
+              }
+            }
+          }
+        }
+      },
+      "cases": [
+        {
+          "description": "the text holds which isn't",
+          "rules": [
+            "row.parts",
+            "message.value"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "x": "a, which isn't b",
+                "y": "c"
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "at_least",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/x"
+                      ],
+                      "name": "x",
+                      "outcome": "unusable",
+                      "value": "a, which isn't b"
+                    },
+                    {
+                      "locations": [
+                        "/things/0/y"
+                      ],
+                      "name": "y",
+                      "outcome": "unusable",
+                      "value": "c"
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/at_least"
+                  ],
+                  "message": "x is \"a, which isn't b\", which isn't a number, and y is \"c\", which isn't a number",
+                  "name": "x is at least y"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "unusable",
+                  "value": "a, which isn't b"
+                },
+                {
+                  "locations": [
+                    "/things/0/y"
+                  ],
+                  "name": "y",
+                  "outcome": "unusable",
+                  "value": "c"
+                }
+              ],
+              "message": "x is \"a, which isn't b\", which isn't a number, and y is \"c\", which isn't a number",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "eq",
+              "failures": [
+                {
+                  "cause": "value",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/x"
+                      ],
+                      "name": "x",
+                      "outcome": "usable",
+                      "value": "a, which isn't b"
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/eq"
+                  ],
+                  "message": "x is \"a, which isn't b\"",
+                  "name": "x is \"z\""
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": "a, which isn't b"
+                }
+              ],
+              "message": "x is \"a, which isn't b\"",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "options",
+              "failures": [
+                {
+                  "cause": "value",
+                  "failures": [
+                    {
+                      "cause": "value",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/x"
+                          ],
+                          "name": "x",
+                          "outcome": "usable",
+                          "value": "a, which isn't b"
+                        }
+                      ],
+                      "kind": "assertion",
+                      "locations": [
+                        "$policy:/requirements/s/checks/options/any_of/a"
+                      ],
+                      "message": "x is \"a, which isn't b\"",
+                      "name": "x is \"z\""
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "option",
+                  "locations": [
+                    "$policy:/requirements/s/checks/options/any_of/a"
+                  ],
+                  "message": "x is \"a, which isn't b\"",
+                  "name": "a"
+                },
+                {
+                  "cause": "value",
+                  "failures": [
+                    {
+                      "cause": "value",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/x"
+                          ],
+                          "name": "x",
+                          "outcome": "usable",
+                          "value": "a, which isn't b"
+                        }
+                      ],
+                      "kind": "assertion",
+                      "locations": [
+                        "$policy:/requirements/s/checks/options/any_of/b"
+                      ],
+                      "message": "x is \"a, which isn't b\"",
+                      "name": "x is \"w\""
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "option",
+                  "locations": [
+                    "$policy:/requirements/s/checks/options/any_of/b"
+                  ],
+                  "message": "x is \"a, which isn't b\"",
+                  "name": "b"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": "a, which isn't b"
+                }
+              ],
+              "message": "a: x is \"a, which isn't b\"; b: x is \"a, which isn't b\"",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "the text holds a semicolon and which isn't",
+          "rules": [
+            "row.parts",
+            "message.value"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "x": "a; y is 1, which isn't b",
+                "y": 2
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "at_least",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/x"
+                      ],
+                      "name": "x",
+                      "outcome": "unusable",
+                      "value": "a; y is 1, which isn't b"
+                    },
+                    {
+                      "locations": [
+                        "/things/0/y"
+                      ],
+                      "name": "y",
+                      "outcome": "usable",
+                      "value": 2
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/at_least"
+                  ],
+                  "message": "x is \"a; y is 1, which isn't b\", which isn't a number",
+                  "name": "x is at least y"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "unusable",
+                  "value": "a; y is 1, which isn't b"
+                },
+                {
+                  "locations": [
+                    "/things/0/y"
+                  ],
+                  "name": "y",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "message": "x is \"a; y is 1, which isn't b\", which isn't a number",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "eq",
+              "failures": [
+                {
+                  "cause": "value",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/x"
+                      ],
+                      "name": "x",
+                      "outcome": "usable",
+                      "value": "a; y is 1, which isn't b"
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/eq"
+                  ],
+                  "message": "x is \"a; y is 1, which isn't b\"",
+                  "name": "x is \"z\""
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": "a; y is 1, which isn't b"
+                }
+              ],
+              "message": "x is \"a; y is 1, which isn't b\"",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "options",
+              "failures": [
+                {
+                  "cause": "value",
+                  "failures": [
+                    {
+                      "cause": "value",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/x"
+                          ],
+                          "name": "x",
+                          "outcome": "usable",
+                          "value": "a; y is 1, which isn't b"
+                        }
+                      ],
+                      "kind": "assertion",
+                      "locations": [
+                        "$policy:/requirements/s/checks/options/any_of/a"
+                      ],
+                      "message": "x is \"a; y is 1, which isn't b\"",
+                      "name": "x is \"z\""
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "option",
+                  "locations": [
+                    "$policy:/requirements/s/checks/options/any_of/a"
+                  ],
+                  "message": "x is \"a; y is 1, which isn't b\"",
+                  "name": "a"
+                },
+                {
+                  "cause": "value",
+                  "failures": [
+                    {
+                      "cause": "value",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/x"
+                          ],
+                          "name": "x",
+                          "outcome": "usable",
+                          "value": "a; y is 1, which isn't b"
+                        }
+                      ],
+                      "kind": "assertion",
+                      "locations": [
+                        "$policy:/requirements/s/checks/options/any_of/b"
+                      ],
+                      "message": "x is \"a; y is 1, which isn't b\"",
+                      "name": "x is \"w\""
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "option",
+                  "locations": [
+                    "$policy:/requirements/s/checks/options/any_of/b"
+                  ],
+                  "message": "x is \"a; y is 1, which isn't b\"",
+                  "name": "b"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": "a; y is 1, which isn't b"
+                }
+              ],
+              "message": "a: x is \"a; y is 1, which isn't b\"; b: x is \"a; y is 1, which isn't b\"",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
     }
 ]

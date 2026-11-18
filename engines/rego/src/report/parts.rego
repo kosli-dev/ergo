@@ -904,7 +904,12 @@ else := e
 _said_unusable(ins, message) := ins if not contains(message, ", which isn't ")
 
 else := [_said_input(i, names) | some i in ins] if {
-	names := {_m_clause_name(c) | some p in _m_top_split(message, "; "); some c in _m_top_split(p, ", and "); contains(c, ", which isn't ")}
+	names := {_m_clause_name(c) | some p in _m_top_split(message, "; "); some c in _m_top_split(p, ", and "); _m_isnt_clause(c)}
+}
+
+_m_isnt_clause(c) if {
+	some k in indexof_n(c, ", which isn't ")
+	_clause_quotes_shut(substring(c, 0, k))
 }
 
 _said_input(i, names) := object.union(i, {"outcome": "unusable"}) if {

@@ -6,11 +6,29 @@ _m_root_sorted(clauses) := _roots_then_lists(clauses, set())
 
 _roots_then_lists(clauses, lists) := array.concat(
 	array.concat(
-		[x[2] | some x in sort([[_m_clause_rank(c), _m_clause_name(c), c] | some c in clauses; not startswith(c, "item "); not _m_clause_name(c) in lists])],
-		[c | some c in clauses; not startswith(c, "item "); _m_clause_name(c) in lists],
+		[x[2] | some x in sort([[_m_clause_rank(c), _m_clause_name(c), c] | some c in clauses; _m_root_clause(c, lists); not _m_clause_name(c) in lists])],
+		[c | some c in clauses; _m_root_clause(c, lists); _m_clause_name(c) in lists],
 	),
-	[c | some c in clauses; startswith(c, "item ")],
+	[c | some c in clauses; not _m_root_clause(c, lists)],
 )
+
+_m_root_clause(c, lists) if {
+	not _m_list_item_clause(c, lists)
+	not regex.match(`^and [0-9]+ more$`, c)
+}
+
+_m_list_item_clause(c, lists) if {
+	startswith(c, "item ")
+	rest := substring(c, indexof(c, " of ") + 4, -1)
+	some l in lists
+	_m_names_list(rest, l)
+}
+
+_m_names_list(rest, l) if rest == l
+
+_m_names_list(rest, l) if startswith(rest, concat("", [l, ":"]))
+
+_m_names_list(rest, l) if startswith(rest, concat("", [l, " "]))
 
 _m_top_sorted(m, lists) := m if {
 	not contains(m, "; ")

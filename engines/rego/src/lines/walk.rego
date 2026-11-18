@@ -711,13 +711,13 @@ _key_item_row(check, subj) := {"cause": cause, "inputs": raw.inputs, "failed": _
 	w.items != []
 	w.fails == []
 	_key_items_clean(w, _key_item_conds(check))
-	fails := [{"path": array.concat(e.i, f.prefix), "item": e.i, "cause": f.cause, "value": _key_list_value(f.value), "at": _item_read_at(w, e, f.prefix), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": "", "ergo/base": f, "read_outcome": _worst_of({f.cause} | {x | some seg in p; x := _ref_step_flaw(seg); x in _value_fault_causes})} |
+	fails := [{"path": array.concat(e.c, f.prefix), "item": e.i, "cause": f.cause, "value": _key_list_value(f.value), "at": _item_read_at(w, e, array.concat(object.get(e, "r", []), f.prefix)), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": "", "ergo/base": f, "read_outcome": _worst_of({f.cause} | {x | some seg in p; x := _ref_step_flaw(seg); x in _value_fault_causes})} |
 		some e in w.items
 		some c in _key_item_conds(check)
 		some [p, mode] in _key_base_reads(c)
 		not p[0] in _params_starts
 		p[0] != "$$input"
-		some f in _key_base_flaws(e.iv, p, mode)
+		some f in _key_base_flaws(_key_focus(e), p, mode)
 	]
 	raw := _walk_read_row(check, subj)
 	cause := _worst_of(flaws | {f.cause | some f in fails})
@@ -729,14 +729,22 @@ else := {}
 
 _key_items_clean(w, conds) if {
 	every e in w.items {
-		is_object(e.iv)
+		is_object(_key_focus(e))
 		every c in conds {
 			every r in _key_base_reads(c) {
-				_key_item_read_fine(e.iv, r[0])
+				_key_item_read_fine(_key_focus(e), r[0])
 			}
 		}
 	}
 }
+
+_key_focus(e) := e.v if object.get(e, "r", []) != []
+
+else := e.iv
+
+_key_focus_text(path, item, prefix, t) := concat("", [_input_name(array.slice(path, count(item), count(path) - count(prefix))), ": ", t]) if count(path) > count(item) + count(prefix)
+
+else := t
 
 _key_item_read_fine(_, p) if p[0] in _params_starts
 
