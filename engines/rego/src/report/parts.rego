@@ -363,24 +363,30 @@ _tally_list_entries(row, at, check, ins) := [_entry("list", n, cause, _tally_lis
 
 _clause_cause(c) := "absent" if endswith(c, " is missing")
 
-else := "null" if endswith(c, " is null")
+_clause_cause(c) := "null" if endswith(c, " is null")
 
-else := "unusable"
+_clause_cause(c) := "unusable" if {
+	not endswith(c, " is missing")
+	not endswith(c, " is null")
+}
 
 _tally_list_read(n, cause, row, ins, at) := [object.union(x, {"outcome": cause}) | some x in _key_base_entries(object.get(row, "ergo/key_bases", []), at); x.name == n] if {
 	some b in object.get(row, "ergo/key_bases", [])
 	b.input.name == n
 } else := [object.union(x, {"outcome": cause}) | some x in ins; x.name == n]
 
-_row_failures(row, at, where, _) := [_tallied_entry(_policy_entry(
-	"assertion",
-	fa.assertion,
-	fa.cause,
-	_sentence_inputs(where.check.checks[fa.at], fa, at),
-	[],
-	row["ergo/texts"][k],
-	[_assertion_at(where, null, fa.at)],
-), where.check.checks[fa.at], fa, at) |
+_row_failures(row, at, where, _) := [_tallied_entry(
+	_policy_entry(
+		"assertion",
+		fa.assertion,
+		fa.cause,
+		_sentence_inputs(where.check.checks[fa.at], fa, at),
+		[],
+		row["ergo/texts"][k],
+		[_assertion_at(where, null, fa.at)],
+	),
+	where.check.checks[fa.at], fa, at,
+) |
 	some k, fa in row.failed_assertions
 ] if _all_of_run(where.check)
 
@@ -403,15 +409,18 @@ _row_failures(row, at, where, _) := [_policy_entry(
 	some nm in sort({n | some n in where.check.option_of})
 ] if _any_of_run(where.check)
 
-_option_assertion(row, at, where, nm, i) := _tallied_entry(_policy_entry(
-	"assertion",
-	where.check.assertions[i],
-	row["ergo/outs"][i].cause,
-	_sentence_inputs(where.check.checks[i], row["ergo/outs"][i], at),
-	[],
-	row["ergo/texts"][i],
-	[_assertion_at(where, nm, count([j | some j, n in array.slice(where.check.option_of, 0, i); n == nm]))],
-), where.check.checks[i], row["ergo/outs"][i], at)
+_option_assertion(row, at, where, nm, i) := _tallied_entry(
+	_policy_entry(
+		"assertion",
+		where.check.assertions[i],
+		row["ergo/outs"][i].cause,
+		_sentence_inputs(where.check.checks[i], row["ergo/outs"][i], at),
+		[],
+		row["ergo/texts"][i],
+		[_assertion_at(where, nm, count([j | some j, n in array.slice(where.check.option_of, 0, i); n == nm]))],
+	),
+	where.check.checks[i], row["ergo/outs"][i], at,
+)
 
 _row_failures(row, at, where, ins) := [_policy_entry(
 	"assertion",
