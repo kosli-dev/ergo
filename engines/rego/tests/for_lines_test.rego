@@ -84,7 +84,7 @@ test_an_empty_first_list_a_for_line_tolerates_skips_only_the_sentences_that_read
 test_an_empty_list_a_one_item_for_line_tolerates_still_runs_the_sentences_that_dont_read_it if {
 	things := [{"id": 1, "xs": [], "z": 3}, {"id": 2, "xs": [], "z": 1}, {"id": 3, "z": 3}]
 	every line in ["every xs, if any, as m", "every xs whose k is 1, if any, as m"] {
-		_said_rows({"for": line, "assert": ["m.v is 1", "z is 1"]}, things) == [[1, "value", "z is 3", [_assertion("z is 1", "value", ["$policy:/requirements/s/checks/c/assert/1"], [_seen("z", 3, ["/things/0/z"], "usable")], "z is 3", [])]], [2, "satisfied", null, []], [3, "absent", "xs is missing", [_list("xs", "absent", [_seen("xs", null, ["/things/2"], "absent")], "xs is missing")]]]
+		_said_rows({"for": line, "assert": ["m.v is 1", "z is 1"]}, things) == [[1, "value", "z is 3", [_assertion("z is 1", "value", ["$policy:/requirements/s/checks/c/assert/1"], [_seen("z", 3, ["/things/0/z"], "usable")], "z is 3", [])]], [2, "satisfied", null, []], [3, "absent", "z is 3; xs is missing", [_assertion("z is 1", "value", ["$policy:/requirements/s/checks/c/assert/1"], [_seen("z", 3, ["/things/2/z"], "usable")], "z is 3", []), _list("xs", "absent", [_seen("xs", null, ["/things/2"], "absent")], "xs is missing")]]]
 	}
 	_said_rows({"for": "every xs whose k is 1, if any, as m", "assert": ["m.v is 1", "z is 1"]}, [{"id": 1, "xs": [{"k": 2}], "z": 3}]) == [[1, "value", "z is 3", [_assertion("z is 1", "value", ["$policy:/requirements/s/checks/c/assert/1"], [_seen("z", 3, ["/things/0/z"], "usable")], "z is 3", [])]]]
 	[row[1] | some row in _for_rows({"for": "every xs, if any, as m", "assert": "m.v is 1"}, [things[0]], {})] == ["satisfied"]
@@ -103,12 +103,12 @@ test_a_for_line_on_a_subject_that_isnt_an_object_fails_like_any_path_does if {
 	[[row[1], row[2], row[3]] | some row in _for_rows({"for": "every xs as x", "assert": "x is 1"}, ["s"], {})] == [["not_an_object", [_list("xs", "not_an_object", [], "thing is \"s\", which isn't an object")], []]]
 }
 
-test_a_for_list_whose_named_by_cant_be_read_fails_with_its_cause_as_a_walk_does if {
+test_a_for_list_whose_named_by_cant_be_read_fails_with_its_cause_and_puts_the_key_on_the_row if {
 	check := {"for": "every m named by $params.k as x", "assert": "x is 1"}
-	_for_rows(check, [{"id": 1, "m": {"a": [1]}}], {}) == [[1, "absent", [_assertion("x is 1", "absent", ["$policy:/requirements/s/checks/c/assert"], [_seen("$params.k", null, ["$params:"], "absent")], "$params.k is missing", [])], [_seen("m named by $params.k", [], [], "absent")]]]
+	_for_rows(check, [{"id": 1, "m": {"a": [1]}}], {}) == [[1, "absent", [], [_seen("m named by $params.k", [], [], "absent"), _seen("$params.k", null, ["$params:"], "absent")]]]
 	_for_rows(check, [{"id": 1, "m": {"a": [1]}}], {"k": "a"}) == [[1, "satisfied", [], [{"name": "m named by $params.k[]", "value": [1], "locations": ["/things/0/m/a/0"]}]]]
 	inner := {"for": "every xs as x, every m named by $params.k as y", "assert": "y is 1"}
-	_for_rows(inner, [{"id": 1, "xs": [1], "m": {"a": [1]}}], {}) == [[1, "absent", [_assertion("y is 1", "absent", ["$policy:/requirements/s/checks/c/assert"], [_seen("$params.k", null, ["$params:"], "absent")], "$params.k is missing", [])], [_seen("m named by $params.k", [], [], "absent"), _seen("xs[]", [1], ["/things/0/xs/0"], "usable")]]]
+	_for_rows(inner, [{"id": 1, "xs": [1], "m": {"a": [1]}}], {}) == [[1, "absent", [], [_seen("m named by $params.k", [], [], "absent"), _seen("xs[]", [1], ["/things/0/xs/0"], "usable"), _seen("$params.k", null, ["$params:"], "absent")]]]
 }
 
 test_a_for_line_whose_param_cant_be_used_fails_as_unusable_and_keeps_its_inputs if {
@@ -517,8 +517,8 @@ _null_key_whose_row(check) := [[r.cause, r.message] |
 ]
 
 test_a_whose_key_from_the_input_that_is_null_is_named_once_and_the_worse_cause_of_an_item_wins if {
-	_null_key_whose_row({"for": "every rs whose v is m named by $input.k as r", "assert": "r.v is 1"}) == [["null", "$input.k is null"]]
-	_null_key_whose_row({"for": "every rs whose zz is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
+	_null_key_whose_row({"for": "every rs whose v is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: m is missing; item 2 of rs: m is missing"]]
+	_null_key_whose_row({"for": "every rs whose zz is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: zz is missing, and m is missing; item 2 of rs: zz is missing, and m is missing"]]
 }
 
 test_a_second_whose_that_reads_a_list_input_key_through_an_alias_never_says_an_object_item_isnt_an_object if {

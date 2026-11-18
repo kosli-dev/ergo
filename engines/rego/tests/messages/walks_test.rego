@@ -7,6 +7,15 @@ test_message_of_a_passed_walk_has_no_parts if {
 	ergo._m_fail_parts("satisfied", [], set()) == []
 }
 
+test_a_clause_an_earlier_sentence_gave_is_left_out_but_a_quoted_value_is_one_clause if {
+	ergo._m_said_new(["x is missing", "x is missing, and y is missing", "y is missing"]) == ["x is missing", "y is missing"]
+	ergo._m_said_new(["x is \"a, and b\"", "x is \"a, and b\", and z is 1"]) == ["x is \"a, and b\"", "z is 1"]
+	ergo._m_said_new(["x is \"a\\\", and b\"", "x is \"a\\\", and b\"; z is 1"]) == ["x is \"a\\\", and b\"", "z is 1"]
+	ergo._m_said_new(["x is \"a\\\\\", and b is 1", "b is 1"]) == ["x is \"a\\\\\", and b is 1"]
+	ergo._m_said_new(["item 1 of xs: a; item 2 of xs: b", "item 2 of xs: b; c"]) == ["item 1 of xs: a; item 2 of xs: b", "c"]
+	ergo._m_quote_split("x is \"a, and b", ", and ") == ["x is \"a, and b"]
+}
+
 test_message_a_for_alias_loses_its_marker_and_a_value_that_spells_the_alias_stays if {
 	ergo._m_aliased("x is \u0002c, and \"$c: y\"") == "x is c, and \"$c: y\""
 	ergo._m_aliased("x is 1") == "x is 1"

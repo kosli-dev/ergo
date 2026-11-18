@@ -13008,6 +13008,27 @@
                         }
                       ]
                     }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "w.items.m",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ws/1"
+                    ],
+                    "message": "w.items.m is missing",
+                    "name": "item 2 of ws",
+                    "value": {
+                      "items": {}
+                    }
                   }
                 ],
                 "inputs": [],
@@ -13153,7 +13174,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items is {}, which isn't a list",
+            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items.m is missing; and 1 more",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13274,6 +13295,27 @@
                         }
                       ]
                     }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "w.items.m",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ws/1"
+                    ],
+                    "message": "w.items.m is missing",
+                    "name": "item 2 of ws",
+                    "value": {
+                      "items": {}
+                    }
                   }
                 ],
                 "inputs": [],
@@ -13360,7 +13402,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items is {}, which isn't a list",
+            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items.m is missing; and 1 more",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21168,7 +21210,25 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs"
+                        ],
+                        "name": "xs",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is []",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -21217,7 +21277,7 @@
                 "value": []
               }
             ],
-            "message": "$params.k is missing; q is missing",
+            "message": "$params.k is missing; xs is []; q is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21294,7 +21354,25 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/1/xs"
+                        ],
+                        "name": "xs",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is []",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -21343,7 +21421,7 @@
                 "value": []
               }
             ],
-            "message": "$params.k is missing; q is null",
+            "message": "$params.k is missing; xs is []; q is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21420,7 +21498,25 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/2/xs"
+                        ],
+                        "name": "xs",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is []",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -21469,7 +21565,7 @@
                 "value": []
               }
             ],
-            "message": "$params.k is missing",
+            "message": "$params.k is missing; xs is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -32554,7 +32650,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every"
@@ -38974,5 +39079,376 @@
         ]
       }
     ]
-  }
+  },
+  {
+      "description": "a clause that an earlier sentence of the row already gave",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "a": {
+                "assert": [
+                  "expires_at exists",
+                  "expires_at is after as_of"
+                ]
+              },
+              "b": {
+                "any_of": {
+                  "e": [
+                    "expires_at exists",
+                    "expires_at is after as_of"
+                  ],
+                  "f": "z is 1"
+                }
+              },
+              "c": {
+                "for": "every xs as x",
+                "assert": [
+                  "x.e exists",
+                  "x.e is after x.a"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "cases": [
+        {
+          "description": "is left out of the row's message and of the option's, and each sentence keeps its whole message",
+          "rules": [
+            "message.join",
+            "row.parts"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {}
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "a",
+              "failures": [
+                {
+                  "cause": "value",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "expires_at",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/a/assert/0"
+                  ],
+                  "message": "expires_at is missing",
+                  "name": "expires_at exists"
+                },
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "expires_at",
+                      "outcome": "absent",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0"
+                      ],
+                      "name": "as_of",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/a/assert/1"
+                  ],
+                  "message": "expires_at is missing, and as_of is missing",
+                  "name": "expires_at is after as_of"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "as_of",
+                  "outcome": "absent",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "expires_at",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "expires_at is missing; as_of is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "b",
+              "failures": [
+                {
+                  "cause": "value",
+                  "failures": [
+                    {
+                      "cause": "value",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0"
+                          ],
+                          "name": "expires_at",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "assertion",
+                      "locations": [
+                        "$policy:/requirements/s/checks/b/any_of/e/0"
+                      ],
+                      "message": "expires_at is missing",
+                      "name": "expires_at exists"
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0"
+                          ],
+                          "name": "expires_at",
+                          "outcome": "absent",
+                          "value": null
+                        },
+                        {
+                          "locations": [
+                            "/things/0"
+                          ],
+                          "name": "as_of",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "assertion",
+                      "locations": [
+                        "$policy:/requirements/s/checks/b/any_of/e/1"
+                      ],
+                      "message": "expires_at is missing, and as_of is missing",
+                      "name": "expires_at is after as_of"
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "option",
+                  "locations": [
+                    "$policy:/requirements/s/checks/b/any_of/e"
+                  ],
+                  "message": "expires_at is missing, and as_of is missing",
+                  "name": "e"
+                },
+                {
+                  "cause": "absent",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0"
+                          ],
+                          "name": "z",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "assertion",
+                      "locations": [
+                        "$policy:/requirements/s/checks/b/any_of/f"
+                      ],
+                      "message": "z is missing",
+                      "name": "z is 1"
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "option",
+                  "locations": [
+                    "$policy:/requirements/s/checks/b/any_of/f"
+                  ],
+                  "message": "z is missing",
+                  "name": "f"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "as_of",
+                  "outcome": "absent",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "expires_at",
+                  "outcome": "absent",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0"
+                  ],
+                  "name": "z",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "message": "e: expires_at is missing, and as_of is missing; f: z is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "c",
+              "failures": [
+                {
+                  "cause": "value",
+                  "failures": [
+                    {
+                      "cause": "value",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "x.e",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "x.e is missing",
+                      "name": "item 1 of xs",
+                      "value": {}
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/c/assert/0"
+                  ],
+                  "message": "",
+                  "name": "x.e exists"
+                },
+                {
+                  "cause": "absent",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "x.e",
+                          "outcome": "absent",
+                          "value": null
+                        },
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "x.a",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "x.e is missing, and x.a is missing",
+                      "name": "item 1 of xs",
+                      "value": {}
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/c/assert/1"
+                  ],
+                  "message": "",
+                  "name": "x.e is after x.a"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {}
+                  ]
+                }
+              ],
+              "message": "item 1 of xs: x.e is missing, and x.a is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    }
 ]

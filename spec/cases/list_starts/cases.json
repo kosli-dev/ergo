@@ -4953,7 +4953,16 @@
               {
                 "cause": "not_an_object",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/max_days"
+                    ],
+                    "name": "$params.max_days named by severity",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c"

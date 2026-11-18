@@ -2327,7 +2327,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/z/1"
+                        ],
+                        "name": "x.z[1]",
+                        "outcome": "usable",
+                        "value": 2
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/z/1"

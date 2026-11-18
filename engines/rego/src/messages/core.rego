@@ -165,12 +165,29 @@ _message(check, subj, cause) := concat("; ", ps) if {
 } else := _m_message(_m_with_sides(_m_walked(check, subj)), subj, cause)
 
 _m_null_key_parts(subj, check) := _once([x |
-	some side in _m_key_sides(check)
-	some p in _m_side_paths(side)
-	is_array(p)
+	some [p, mode] in _m_key_paths(check)
+	some x in _m_path_said(subj, p, mode)
+]) if {
+	some [p, mode] in _m_key_paths(check)
 	_key_step_later(p)
-	some x in _m_null_key_pair(subj, p)
-])
+	_m_null_key_pair(subj, p, mode)
+} else := []
+
+_m_key_paths(check) := [[p, _key_base_mode(piece)] |
+	some side in _m_key_sides(check)
+	some piece in _side_pieces(side)
+	some p in _m_side_paths(piece)
+	is_array(p)
+]
+
+_m_path_said(subj, p, mode) := xs if {
+	_key_step_later(p)
+	xs := _m_null_key_pair(subj, p, mode)
+} else := [_m_state_clause(s)] if {
+	not _key_step_later(p)
+	s := _m_shown(subj, p)
+	s.state in _no_value_states
+} else := []
 
 _m_key_sides(check) := check["$sides"] if _m_has_sides(check)
 
@@ -191,16 +208,21 @@ _key_step_later(p) if {
 	is_object(step)
 }
 
-_m_null_key_pair(subj, p) := _m_said_once(concat("", [_input_name(array.slice(p, 0, j)), " is null"]), _m_key_text(subj, p[i])) if {
+_m_null_key_pair(subj, p, mode) := _m_key_first(concat("", [_input_name(array.slice(p, 0, j)), " is null"]), _m_key_text(subj, p[i]), p[i]) if {
 	i := min({k | some k, step in p; _m_key_text(subj, step)})
 	i > 0
 	j := min({m | some m in numbers.range(1, i); _resolved(subj, array.slice(p, 0, m)) == null})
 	_input_name(array.slice(p, 0, j)) != "$params"
+} else := [_m_key_text(subj, p[i]), _m_key_list_text(_input_name(f.prefix), f)] if {
+	i := min({k | some k, step in p; _m_key_text(subj, step)})
+	some f in _key_base_flaws(subj, p, mode)
 }
 
-_m_said_once(first, second) := [second] if _m_aliased(first) == second
+_m_key_first(base, key, step) := [key] if _m_aliased(base) == key
 
-else := [first, second]
+else := [key, base] if _is_ref(step)
+
+else := [base, key]
 
 _m_key_text(subj, step) := t if {
 	t := _m_key_fault(subj, step)

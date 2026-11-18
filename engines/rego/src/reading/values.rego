@@ -256,12 +256,12 @@ _read_outcome(subj, path, i) := object.union(i, {"ergo/outcome": _outcome_word(_
 
 else := i
 
-_input_state(subj, path) := _input_state_of(path, _read_state(subj, path))
+_input_state(subj, path) := _input_state_of(path, _read_state(subj, path), _key_base_causes(subj, path, "object"))
 
-_input_state_of(path, state) := state if state == "not_an_object"
+_input_state_of(path, state, bases) := state if state == "not_an_object"
 
 else := s if {
-	s := _ref_step_state(path)
+	s := _worst_of({_ref_step_state(path)} | bases)
 } else := _ref_state(path) if {
 	path[0] in _params_starts
 	_params_not_given(path)

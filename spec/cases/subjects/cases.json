@@ -15925,7 +15925,16 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/arts/0/items/0/art/xs/1"
+                        ],
+                        "name": ".art.xs[1]",
+                        "outcome": "usable",
+                        "value": 6
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/arts/0/items/0/art/xs/1"
@@ -21197,7 +21206,7 @@
                 "locations": [
                   "$policy:/subjects/thing/from"
                 ],
-                "message": "$params.i is missing",
+                "message": "$params.i is missing; x.y is missing",
                 "name": "x.y named by $params.i does not exist"
               }
             ],
@@ -21211,7 +21220,7 @@
                 "value": null
               }
             ],
-            "message": "$params.i is missing",
+            "message": "$params.i is missing; x.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21261,7 +21270,7 @@
                 "locations": [
                   "$policy:/subjects/thing/from"
                 ],
-                "message": "x is null; $params.i is missing",
+                "message": "$params.i is missing; x is null",
                 "name": "x.y named by $params.i does not exist"
               }
             ],
@@ -21275,7 +21284,7 @@
                 "value": null
               }
             ],
-            "message": "x is null; $params.i is missing",
+            "message": "$params.i is missing; x is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21506,11 +21515,11 @@
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {
-            "cause": "null",
+            "cause": "absent",
             "check": "$applies",
             "failures": [
               {
-                "cause": "null",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -21518,7 +21527,7 @@
                       "/things/0"
                     ],
                     "name": "x.y named by $params.i",
-                    "outcome": "null",
+                    "outcome": "absent",
                     "value": null
                   }
                 ],
@@ -21526,7 +21535,7 @@
                 "locations": [
                   "$policy:/subjects/thing/from"
                 ],
-                "message": "$params.i is null",
+                "message": "$params.i is null; x.y is missing",
                 "name": "x.y named by $params.i does not exist"
               }
             ],
@@ -21536,11 +21545,11 @@
                   "/things/0"
                 ],
                 "name": "x.y named by $params.i",
-                "outcome": "null",
+                "outcome": "absent",
                 "value": null
               }
             ],
-            "message": "$params.i is null",
+            "message": "$params.i is null; x.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21590,7 +21599,7 @@
                 "locations": [
                   "$policy:/subjects/thing/from"
                 ],
-                "message": "x is null; $params.i is null",
+                "message": "$params.i is null; x is null",
                 "name": "x.y named by $params.i does not exist"
               }
             ],
@@ -21604,7 +21613,7 @@
                 "value": null
               }
             ],
-            "message": "x is null; $params.i is null",
+            "message": "$params.i is null; x is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21855,7 +21864,7 @@
                 "locations": [
                   "$policy:/subjects/thing/from"
                 ],
-                "message": "$params.i is [1], which isn't text",
+                "message": "$params.i is [1], which isn't text; x.y is missing",
                 "name": "x.y named by $params.i does not exist"
               }
             ],
@@ -21869,7 +21878,7 @@
                 "value": null
               }
             ],
-            "message": "$params.i is [1], which isn't text",
+            "message": "$params.i is [1], which isn't text; x.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21921,7 +21930,7 @@
                 "locations": [
                   "$policy:/subjects/thing/from"
                 ],
-                "message": "x is null; $params.i is [1], which isn't text",
+                "message": "$params.i is [1], which isn't text; x is null",
                 "name": "x.y named by $params.i does not exist"
               }
             ],
@@ -21935,7 +21944,7 @@
                 "value": null
               }
             ],
-            "message": "x is null; $params.i is [1], which isn't text",
+            "message": "$params.i is [1], which isn't text; x is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -22193,7 +22202,7 @@
                 "locations": [
                   "$policy:/subjects/thing/from"
                 ],
-                "message": "$input.i is [1], which isn't text",
+                "message": "$input.i is [1], which isn't text; x.y is missing",
                 "name": "x.y named by $input.i does not exist"
               }
             ],
@@ -22207,7 +22216,7 @@
                 "value": null
               }
             ],
-            "message": "$input.i is [1], which isn't text",
+            "message": "$input.i is [1], which isn't text; x.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -41842,5 +41851,333 @@
         }
       }
     ]
-  }
+  },
+  {
+      "description": "a from line whose named by key from $params is missing and whose value before the key can't take a key",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "m named by $params.k",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "c": "id exists"
+            }
+          }
+        }
+      },
+      "params": {},
+      "cases": [
+        {
+          "description": "says the key and then the value before it that is missing",
+          "rules": [
+            "path.ref_step"
+          ],
+          "input": {},
+          "results": [
+            {
+              "cause": "absent",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "message": "$params.k is missing; m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "says the key and then the value before it that is null",
+          "rules": [
+            "path.ref_step"
+          ],
+          "input": {
+            "m": null
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "message": "$params.k is missing; m is null",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "says the key and then the value before it that is text",
+          "rules": [
+            "path.ref_step"
+          ],
+          "input": {
+            "m": "s"
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "message": "$params.k is missing; m is \"s\", which isn't a list or an object",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "a from line whose named by key from $params is null and whose value before the key can't take a key",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "m named by $params.k",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "c": "id exists"
+            }
+          }
+        }
+      },
+      "params": {
+        "k": null
+      },
+      "cases": [
+        {
+          "description": "says the key and then the value before it that is missing",
+          "rules": [
+            "path.ref_step"
+          ],
+          "input": {},
+          "results": [
+            {
+              "cause": "absent",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "message": "$params.k is null; m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "says the key and then the value before it that is null",
+          "rules": [
+            "path.ref_step"
+          ],
+          "input": {
+            "m": null
+          },
+          "results": [
+            {
+              "cause": "null",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "message": "$params.k is null; m is null",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "says the key and then the value before it that is text",
+          "rules": [
+            "path.ref_step"
+          ],
+          "input": {
+            "m": "s"
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "message": "$params.k is null; m is \"s\", which isn't a list or an object",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "a from line whose named by key from $params isn't text and whose value before the key can't take a key",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "m named by $params.k",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "c": "id exists"
+            }
+          }
+        }
+      },
+      "params": {
+        "k": 3
+      },
+      "cases": [
+        {
+          "description": "says the key and then the value before it that is missing",
+          "rules": [
+            "path.ref_step"
+          ],
+          "input": {},
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "message": "$params.k is 3, which isn't text; m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "says the key and then the value before it that is null",
+          "rules": [
+            "path.ref_step"
+          ],
+          "input": {
+            "m": null
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "message": "$params.k is 3, which isn't text; m is null",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "says the key and then the value before it that is text",
+          "rules": [
+            "path.ref_step"
+          ],
+          "input": {
+            "m": "s"
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "message": "$params.k is 3, which isn't text; m is \"s\", which isn't a list or an object",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    }
 ]

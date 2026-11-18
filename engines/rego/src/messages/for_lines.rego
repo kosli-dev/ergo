@@ -237,6 +237,10 @@ _for_message(check, subj, r) := _m_joined(_m_for_empty(object.union(check, {"ite
 }
 
 _m_for_empty(check, subj, cause) := cs if {
+	ls := [t | some item in check.items; some t in _m_key_list_texts(subj, item.path, object.get(item, "if_any", false) == true)]
+	ls != []
+	cs := _once(array.concat([t | some item in check.items; some t in _m_key_texts(item.path)], ls))
+} else := cs if {
 	cause in _no_value_states
 	cs := _once([c | some item in check.items; some c in _m_key_states(subj, _m_for_item(item), cause)])
 	cs != []
@@ -515,7 +519,7 @@ _m_after_lead(lead, x) := substring(x, count(prefix), -1) if {
 
 _m_group_text(g) := g[0] if count(g) == 1
 
-else := concat(", and ", _m_first_marked(array.concat([g[0]], [_m_after_lead(_m_lead_of(g[0]), x) | some x in array.slice(g, 1, count(g))])))
+else := concat(", and ", _m_said_new(_m_first_marked(array.concat([g[0]], [_m_after_lead(_m_lead_of(g[0]), x) | some x in array.slice(g, 1, count(g))]))))
 
 _m_for_fail(f) := [_m_free_text(f, x, t) | some x in f.failed_items; some t in _m_inner_fail(x)] if {
 	not "msg" in object.keys(f)
@@ -619,6 +623,10 @@ _m_walk_leaf(e, leaf, cause, roots) := t if {
 	leaf != null
 	off := _m_keyed_off(object.get(input, ["ergo/names", "ergo/subject"], null), leaf, cause)
 	off != []
+} else := _m_leaf_in(e.i, concat("; ", bs), roots) if {
+	leaf != null
+	bs := _m_cond_base_texts(e.iv, leaf)
+	bs != []
 } else := _m_leaf_in(e.i, _message(leaf, e.iv, cause), roots) if leaf != null
 
 else := ""
@@ -778,7 +786,7 @@ _m_from_message(_, _, true, _) := {}
 
 _m_from_message(doc, req, false, cause) := {"message": m} if {
 	_from_unreadable(req)
-	ms := _m_from_refs(req, cause)
+	ms := array.concat(_m_from_refs(req, cause), [_m_key_list_text(_m_from_item_name(req, f.prefix), f) | some f in _key_base_flaws(doc, _from_path(req), "list")])
 	count(ms) > 0
 	m := _m_joined(ms)
 } else := {"message": m} if {
@@ -991,8 +999,6 @@ else := owners if {
 	owners := {i | some i, _ in check.checks; _for_root_of(check, subj, i, m)}
 	count(owners) > 0
 } else := {-1}
-
-_for_free_root(m, ts) if m in ts
 
 _for_free_root(m, ts) if {
 	every p in split(m, "; ") {

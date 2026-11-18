@@ -386,7 +386,7 @@ _min_subjects_cause(doc, req, matching) := _verdict_cause(_enough_subjects(doc, 
 
 _min_subjects_cause(doc, req, _) := _target_cause(doc, req)
 
-_min_subjects_cause(_, req, _) := _from_cause(req) if {
+_min_subjects_cause(doc, req, _) := _from_cause(doc, req) if {
 	_from_well_formed(req)
 	_from_unreadable(req)
 }

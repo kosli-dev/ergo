@@ -150,3 +150,76 @@ test_two_sentences_that_say_the_same_text_each_keep_it_and_the_row_says_it_once 
 	rows[0].message == "x is 5"
 	[f.message | some f in rows[0].failures] == ["x is 5", "x is 5"]
 }
+
+_refs_outcomes(check, params) := [[e.name, e.outcome] | some e in ergo.report({"things": [{"id": "t1", "t": "2026-01-01T00:00:00Z", "n": 1, "s": "a"}]}, _sentence_policy({"c": check}), params).requirements.s.checks.c["$refs"]]
+
+test_a_time_param_that_isnt_a_time_is_unusable_in_the_refs if {
+	_refs_outcomes("t is before $params.t", {"t": "nope"}) == [["$params.t", "unusable"]]
+	_refs_outcomes("t is before $params.t", {"t": "2026-02-01T00:00:00Z"}) == [["$params.t", "usable"]]
+}
+
+test_an_added_param_that_isnt_a_number_is_unusable_in_the_refs if {
+	_refs_outcomes("n equals 0 plus $params.q", {"q": "x"}) == [["$params.q", "unusable"]]
+	_refs_outcomes("n equals 0 plus $params.q", {"q": 1}) == [["$params.q", "usable"]]
+	_refs_outcomes("n equals 0 plus $params.q", {"q": null}) == [["$params.q", "null"]]
+	_refs_outcomes("n equals 0 plus $params.q", {}) == [["$params.q", "absent"]]
+}
+
+test_a_joined_param_that_isnt_text_is_unusable_in_the_refs if {
+	_refs_outcomes("s is $params.p followed by \"x\"", {"p": 3}) == [["$params.p", "unusable"]]
+	_refs_outcomes("s is $params.p followed by \"x\"", {"p": "a"}) == [["$params.p", "usable"]]
+	_refs_outcomes("s is $params.p followed by \"x\"", {"p": null}) == [["$params.p", "null"]]
+	_refs_outcomes("s is $params.p followed by \"x\"", {}) == [["$params.p", "absent"]]
+}
+
+test_a_pattern_param_that_isnt_a_list_of_patterns_is_unusable_in_the_refs if {
+	_refs_outcomes("s matches $params.l", {"l": ["("]}) == [["$params.l", "unusable"]]
+	_refs_outcomes("s matches $params.l", {"l": "a"}) == [["$params.l", "unusable"]]
+	_refs_outcomes("s matches $params.l", {"l": ["a"]}) == [["$params.l", "usable"]]
+	_refs_outcomes("s matches $params.l", {"l": null}) == [["$params.l", "null"]]
+}
+
+test_a_param_of_the_wrong_kind_is_unusable_on_a_row_that_fails_for_a_missing_side if {
+	rows := _parts_results({"things": [{"id": "m"}, {"id": "n", "x": null}]}, "x is at least $params.min", {"min": "a"})
+	[[i.name, i.outcome] | some i in rows[0].inputs] == [["x", "absent"], ["$params.min", "unusable"]]
+	[[i.name, i.outcome] | some i in rows[1].inputs] == [["x", "null"], ["$params.min", "unusable"]]
+	[[i.name, i.outcome] | some i in rows[0].failures[0].inputs] == [["x", "absent"], ["$params.min", "unusable"]]
+}
+
+test_a_param_of_the_right_kind_stays_usable_on_a_row_that_fails_for_a_missing_side if {
+	rows := _parts_results({"things": [{"id": "m"}]}, "x is at least $params.min", {"min": 2})
+	[[i.name, i.outcome] | some i in rows[0].inputs] == [["x", "absent"], ["$params.min", "usable"]]
+}
+
+test_a_plain_item_of_a_one_line_walk_reads_itself if {
+	rows := _parts_results({"things": [{"id": "t", "xs": [1, "a", null]}]}, "every xs is at least 2", {})
+	[[i.name, i.value, i.locations, i.outcome] | some f in rows[0].failures[0].failures; some i in f.inputs] == [
+		["xs[0]", 1, ["/things/0/xs/0"], "usable"],
+		["xs[1]", "a", ["/things/0/xs/1"], "unusable"],
+		["xs[2]", null, ["/things/0/xs/2"], "null"],
+	]
+}
+
+_copied_policy(checks) := {
+	"ergo_spec": ergo._spec,
+	"subjects": {
+		"c": {"from": "every distinct sbom.components", "identified_by": "name"},
+		"lic": {"from": "every c.licenses whose ok is true", "identified_by": "id"},
+	},
+	"requirements": {"r": {"subject": "lic", "checks": checks}},
+}
+
+test_a_failed_item_of_a_child_of_a_distinct_parent_lists_where_it_sits_under_every_copy if {
+	component := {"name": "a", "licenses": [{"id": "MIT", "ok": true, "gs": [{"ns": ["bad"]}]}, 5]}
+	rep := ergo.report({"sbom": {"components": [component, component]}}, _copied_policy({"g": "every gs.ns is \"fine\""}), {})
+	[[f.item, f.locations] | some r in rep.results; r.check == "$min_subjects"; some f in r.failed_items] == [
+		["item 1 of licenses", ["/sbom/components/0/licenses/0", "/sbom/components/1/licenses/0"]],
+		["item 2 of licenses", ["/sbom/components/0/licenses/1", "/sbom/components/1/licenses/1"]],
+	]
+	[e.failures[0].failures[0].inputs | some r in rep.results; r.check == "g"; some e in r.failures] == [[{
+		"name": "gs[0].ns[0]",
+		"value": "bad",
+		"locations": ["/sbom/components/0/licenses/0/gs/0/ns/0", "/sbom/components/1/licenses/0/gs/0/ns/0"],
+		"outcome": "usable",
+	}]]
+}

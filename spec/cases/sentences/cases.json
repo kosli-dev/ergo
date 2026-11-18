@@ -14459,6 +14459,14 @@
                     "name": "obj named by $params.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -14530,6 +14538,16 @@
                     "name": "obj named by $params.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": [
+                      "b"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -37074,7 +37092,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/0"
+                        ],
+                        "name": "items[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/0"
@@ -37097,7 +37135,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/1"
+                        ],
+                        "name": "items[1]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/1"
@@ -37218,7 +37276,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/0"
+                        ],
+                        "name": "items[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/0"
@@ -37241,7 +37319,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/1"
+                        ],
+                        "name": "items[1]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/1"
@@ -37432,7 +37530,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/0"
+                        ],
+                        "name": "items[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/0"
@@ -37455,7 +37573,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/1"
+                        ],
+                        "name": "items[1]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/1"
@@ -37572,7 +37710,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/0"
+                        ],
+                        "name": "items[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/0"
@@ -37595,7 +37753,27 @@
                   {
                     "cause": "value",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/items/1"
+                        ],
+                        "name": "items[1]",
+                        "outcome": "usable",
+                        "value": {
+                          "b": {
+                            "ks": [
+                              1,
+                              1,
+                              1
+                            ],
+                            "n": 9
+                          },
+                          "n": 1,
+                          "v": 1
+                        }
+                      }
+                    ],
                     "kind": "item",
                     "locations": [
                       "/bs/0/kids/0/items/1"
@@ -82284,13 +82462,32 @@
                     "name": "m named by $params.k1",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k1"
+                    ],
+                    "name": "$params.k1",
+                    "outcome": "unusable",
+                    "value": 1
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "$params.k1 is 1, which isn't text",
+                "message": "$params.k1 is 1, which isn't text; m is [5, 1], which isn't an object",
                 "name": "m named by $params.k1 is 1"
               }
             ],
@@ -82304,7 +82501,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k1 is 1, which isn't text",
+            "message": "$params.k1 is 1, which isn't text; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -82327,13 +82524,32 @@
                     "name": "m named by $params.k0",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k0"
+                    ],
+                    "name": "$params.k0",
+                    "outcome": "unusable",
+                    "value": 0
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/b"
                 ],
-                "message": "$params.k0 is 0, which isn't text",
+                "message": "$params.k0 is 0, which isn't text; m is [5, 1], which isn't an object",
                 "name": "m named by $params.k0 is 1"
               }
             ],
@@ -82347,7 +82563,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k0 is 0, which isn't text",
+            "message": "$params.k0 is 0, which isn't text; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -82370,13 +82586,32 @@
                     "name": "m named by $params.kf",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/kf"
+                    ],
+                    "name": "$params.kf",
+                    "outcome": "unusable",
+                    "value": 1
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params.kf is 1, which isn't text",
+                "message": "$params.kf is 1, which isn't text; m is [5, 1], which isn't an object",
                 "name": "m named by $params.kf is 1"
               }
             ],
@@ -82390,7 +82625,7 @@
                 "value": null
               }
             ],
-            "message": "$params.kf is 1, which isn't text",
+            "message": "$params.kf is 1, which isn't text; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -82413,13 +82648,32 @@
                     "name": "m named by $params.kt",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/kt"
+                    ],
+                    "name": "$params.kt",
+                    "outcome": "unusable",
+                    "value": true
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "$params.kt is true, which isn't text",
+                "message": "$params.kt is true, which isn't text; m is [5, 1], which isn't an object",
                 "name": "m named by $params.kt is 1"
               }
             ],
@@ -82433,7 +82687,7 @@
                 "value": null
               }
             ],
-            "message": "$params.kt is true, which isn't text",
+            "message": "$params.kt is true, which isn't text; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -82456,13 +82710,34 @@
                     "name": "m named by $params.ko",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/ko"
+                    ],
+                    "name": "$params.ko",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "$params.ko is {\"a\": 1}, which isn't text",
+                "message": "$params.ko is {\"a\": 1}, which isn't text; m is [5, 1], which isn't an object",
                 "name": "m named by $params.ko is 1"
               }
             ],
@@ -82476,7 +82751,7 @@
                 "value": null
               }
             ],
-            "message": "$params.ko is {\"a\": 1}, which isn't text",
+            "message": "$params.ko is {\"a\": 1}, which isn't text; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -82499,13 +82774,34 @@
                     "name": "m named by $params.kl",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/kl"
+                    ],
+                    "name": "$params.kl",
+                    "outcome": "unusable",
+                    "value": [
+                      "q"
+                    ]
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/f"
                 ],
-                "message": "$params.kl is [\"q\"], which isn't text",
+                "message": "$params.kl is [\"q\"], which isn't text; m is [5, 1], which isn't an object",
                 "name": "m named by $params.kl is 1"
               }
             ],
@@ -82519,7 +82815,7 @@
                 "value": null
               }
             ],
-            "message": "$params.kl is [\"q\"], which isn't text",
+            "message": "$params.kl is [\"q\"], which isn't text; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -82528,11 +82824,11 @@
             }
           },
           {
-            "cause": "null",
+            "cause": "unusable",
             "check": "g",
             "failures": [
               {
-                "cause": "null",
+                "cause": "unusable",
                 "failures": [],
                 "inputs": [
                   {
@@ -82540,15 +82836,34 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.kn",
+                    "outcome": "unusable",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/kn"
+                    ],
+                    "name": "$params.kn",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/g"
                 ],
-                "message": "$params.kn is null",
+                "message": "$params.kn is null; m is [5, 1], which isn't an object",
                 "name": "m named by $params.kn is 1"
               }
             ],
@@ -82558,11 +82873,11 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.kn",
-                "outcome": "null",
+                "outcome": "unusable",
                 "value": null
               }
             ],
-            "message": "$params.kn is null",
+            "message": "$params.kn is null; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -82571,11 +82886,11 @@
             }
           },
           {
-            "cause": "absent",
+            "cause": "unusable",
             "check": "h",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "unusable",
                 "failures": [],
                 "inputs": [
                   {
@@ -82583,15 +82898,34 @@
                       "/things/0/m"
                     ],
                     "name": "m named by $params.kx",
+                    "outcome": "unusable",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.kx",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/h"
                 ],
-                "message": "$params.kx is missing",
+                "message": "$params.kx is missing; m is [5, 1], which isn't an object",
                 "name": "m named by $params.kx is 1"
               }
             ],
@@ -82601,11 +82935,11 @@
                   "/things/0/m"
                 ],
                 "name": "m named by $params.kx",
-                "outcome": "absent",
+                "outcome": "unusable",
                 "value": null
               }
             ],
-            "message": "$params.kx is missing",
+            "message": "$params.kx is missing; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -82669,6 +83003,14 @@
                     "name": "n named by $params.k1",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k1"
+                    ],
+                    "name": "$params.k1",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -82713,6 +83055,14 @@
                     "name": "n named by $params.k1",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k1"
+                    ],
+                    "name": "$params.k1",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -82767,13 +83117,32 @@
                     "name": "t named by $params.k1",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k1"
+                    ],
+                    "name": "$params.k1",
+                    "outcome": "unusable",
+                    "value": 1
+                  },
+                  {
+                    "locations": [
+                      "/things/0/t"
+                    ],
+                    "name": "t",
+                    "outcome": "unusable",
+                    "value": [
+                      "x",
+                      "b"
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/l"
                 ],
-                "message": "$params.k1 is 1, which isn't text",
+                "message": "$params.k1 is 1, which isn't text; t is [\"x\", \"b\"], which isn't an object",
                 "name": "s is \"a\" followed by t named by $params.k1"
               }
             ],
@@ -82795,7 +83164,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k1 is 1, which isn't text",
+            "message": "$params.k1 is 1, which isn't text; t is [\"x\", \"b\"], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -82818,13 +83187,32 @@
                     "name": "m named by $params.k1",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k1"
+                    ],
+                    "name": "$params.k1",
+                    "outcome": "unusable",
+                    "value": 1
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/m"
                 ],
-                "message": "$params.k1 is 1, which isn't text",
+                "message": "$params.k1 is 1, which isn't text; m is [5, 1], which isn't an object",
                 "name": "m named by $params.k1 is 1"
               }
             ],
@@ -82838,7 +83226,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k1 is 1, which isn't text",
+            "message": "$params.k1 is 1, which isn't text; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -82849,29 +83237,21 @@
           {
             "cause": "unusable",
             "check": "n",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k1",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$params.k1 is 1, which isn't text",
-                "name": "n named by $params.k1"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $params.k1",
                 "outcome": "unusable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "$params:/k1"
+                ],
+                "name": "$params.k1",
+                "outcome": "unusable",
+                "value": 1
               }
             ],
             "message": "$params.k1 is 1, which isn't text",
@@ -82897,6 +83277,14 @@
                     "name": "m named by $params.k1",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k1"
+                    ],
+                    "name": "$params.k1",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -82940,6 +83328,14 @@
                     "name": "m named by $params.k0",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k0"
+                    ],
+                    "name": "$params.k0",
+                    "outcome": "unusable",
+                    "value": 0
                   }
                 ],
                 "kind": "assertion",
@@ -82983,6 +83379,14 @@
                     "name": "m named by $params.kf",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/kf"
+                    ],
+                    "name": "$params.kf",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -83026,6 +83430,14 @@
                     "name": "m named by $params.kt",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/kt"
+                    ],
+                    "name": "$params.kt",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -83069,6 +83481,16 @@
                     "name": "m named by $params.ko",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/ko"
+                    ],
+                    "name": "$params.ko",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
                   }
                 ],
                 "kind": "assertion",
@@ -83112,6 +83534,16 @@
                     "name": "m named by $params.kl",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/kl"
+                    ],
+                    "name": "$params.kl",
+                    "outcome": "unusable",
+                    "value": [
+                      "q"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -83155,6 +83587,14 @@
                     "name": "m named by $params.kn",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/kn"
+                    ],
+                    "name": "$params.kn",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -83196,6 +83636,14 @@
                       "/things/1/m"
                     ],
                     "name": "m named by $params.kx",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.kx",
                     "outcome": "absent",
                     "value": null
                   }
@@ -83258,6 +83706,14 @@
                     "name": "n named by $params.k1",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k1"
+                    ],
+                    "name": "$params.k1",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -83302,6 +83758,14 @@
                     "name": "n named by $params.k1",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k1"
+                    ],
+                    "name": "$params.k1",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -83356,6 +83820,14 @@
                     "name": "t named by $params.k1",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k1"
+                    ],
+                    "name": "$params.k1",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -83407,6 +83879,14 @@
                     "name": "m named by $params.k1",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k1"
+                    ],
+                    "name": "$params.k1",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -83438,29 +83918,21 @@
           {
             "cause": "unusable",
             "check": "n",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k1",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$params.k1 is 1, which isn't text",
-                "name": "n named by $params.k1"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $params.k1",
                 "outcome": "unusable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "$params:/k1"
+                ],
+                "name": "$params.k1",
+                "outcome": "unusable",
+                "value": 1
               }
             ],
             "message": "$params.k1 is 1, which isn't text",
@@ -83499,13 +83971,32 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 1
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "$input.k is 1, which isn't text",
+                "message": "$input.k is 1, which isn't text; m is [5, 1], which isn't an object",
                 "name": "m named by $input.k is 1"
               }
             ],
@@ -83519,7 +84010,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 1, which isn't text",
+            "message": "$input.k is 1, which isn't text; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -83540,6 +84031,14 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -83584,6 +84083,14 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -83638,13 +84145,32 @@
                     "name": "t named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 1
+                  },
+                  {
+                    "locations": [
+                      "/things/0/t"
+                    ],
+                    "name": "t",
+                    "outcome": "unusable",
+                    "value": [
+                      "x",
+                      "b"
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "$input.k is 1, which isn't text",
+                "message": "$input.k is 1, which isn't text; t is [\"x\", \"b\"], which isn't an object",
                 "name": "s is \"a\" followed by t named by $input.k"
               }
             ],
@@ -83666,7 +84192,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 1, which isn't text",
+            "message": "$input.k is 1, which isn't text; t is [\"x\", \"b\"], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -83689,13 +84215,32 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 1
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "$input.k is 1, which isn't text",
+                "message": "$input.k is 1, which isn't text; m is [5, 1], which isn't an object",
                 "name": "m named by $input.k is 1"
               }
             ],
@@ -83709,7 +84254,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 1, which isn't text",
+            "message": "$input.k is 1, which isn't text; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -83720,29 +84265,21 @@
           {
             "cause": "unusable",
             "check": "f",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$input.k is 1, which isn't text",
-                "name": "n named by $input.k"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $input.k",
                 "outcome": "unusable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "/k"
+                ],
+                "name": "$input.k",
+                "outcome": "unusable",
+                "value": 1
               }
             ],
             "message": "$input.k is 1, which isn't text",
@@ -83775,13 +84312,32 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 0
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      1,
+                      5
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "$input.k is 0, which isn't text",
+                "message": "$input.k is 0, which isn't text; m is [1, 5], which isn't an object",
                 "name": "m named by $input.k is 1"
               }
             ],
@@ -83795,7 +84351,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 0, which isn't text",
+            "message": "$input.k is 0, which isn't text; m is [1, 5], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -83816,6 +84372,14 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 0
                   }
                 ],
                 "kind": "assertion",
@@ -83860,6 +84424,14 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 0
                   }
                 ],
                 "kind": "assertion",
@@ -83914,13 +84486,32 @@
                     "name": "t named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 0
+                  },
+                  {
+                    "locations": [
+                      "/things/0/t"
+                    ],
+                    "name": "t",
+                    "outcome": "unusable",
+                    "value": [
+                      "b",
+                      "x"
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "$input.k is 0, which isn't text",
+                "message": "$input.k is 0, which isn't text; t is [\"b\", \"x\"], which isn't an object",
                 "name": "s is \"a\" followed by t named by $input.k"
               }
             ],
@@ -83942,7 +84533,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 0, which isn't text",
+            "message": "$input.k is 0, which isn't text; t is [\"b\", \"x\"], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -83965,13 +84556,32 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 0
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      1,
+                      5
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "$input.k is 0, which isn't text",
+                "message": "$input.k is 0, which isn't text; m is [1, 5], which isn't an object",
                 "name": "m named by $input.k is 1"
               }
             ],
@@ -83985,7 +84595,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 0, which isn't text",
+            "message": "$input.k is 0, which isn't text; m is [1, 5], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -83996,29 +84606,21 @@
           {
             "cause": "unusable",
             "check": "f",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$input.k is 0, which isn't text",
-                "name": "n named by $input.k"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $input.k",
                 "outcome": "unusable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "/k"
+                ],
+                "name": "$input.k",
+                "outcome": "unusable",
+                "value": 0
               }
             ],
             "message": "$input.k is 0, which isn't text",
@@ -84051,13 +84653,32 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 1
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "$input.k is 1, which isn't text",
+                "message": "$input.k is 1, which isn't text; m is [5, 1], which isn't an object",
                 "name": "m named by $input.k is 1"
               }
             ],
@@ -84071,7 +84692,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 1, which isn't text",
+            "message": "$input.k is 1, which isn't text; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -84092,6 +84713,14 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -84136,6 +84765,14 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 1
                   }
                 ],
                 "kind": "assertion",
@@ -84190,13 +84827,32 @@
                     "name": "t named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 1
+                  },
+                  {
+                    "locations": [
+                      "/things/0/t"
+                    ],
+                    "name": "t",
+                    "outcome": "unusable",
+                    "value": [
+                      "x",
+                      "b"
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "$input.k is 1, which isn't text",
+                "message": "$input.k is 1, which isn't text; t is [\"x\", \"b\"], which isn't an object",
                 "name": "s is \"a\" followed by t named by $input.k"
               }
             ],
@@ -84218,7 +84874,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 1, which isn't text",
+            "message": "$input.k is 1, which isn't text; t is [\"x\", \"b\"], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -84241,13 +84897,32 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 1
+                  },
+                  {
+                    "locations": [
+                      "/things/0/m"
+                    ],
+                    "name": "m",
+                    "outcome": "unusable",
+                    "value": [
+                      5,
+                      1
+                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "$input.k is 1, which isn't text",
+                "message": "$input.k is 1, which isn't text; m is [5, 1], which isn't an object",
                 "name": "m named by $input.k is 1"
               }
             ],
@@ -84261,7 +84936,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 1, which isn't text",
+            "message": "$input.k is 1, which isn't text; m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -84272,29 +84947,21 @@
           {
             "cause": "unusable",
             "check": "f",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$input.k is 1, which isn't text",
-                "name": "n named by $input.k"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $input.k",
                 "outcome": "unusable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "/k"
+                ],
+                "name": "$input.k",
+                "outcome": "unusable",
+                "value": 1
               }
             ],
             "message": "$input.k is 1, which isn't text",
@@ -84327,6 +84994,14 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -84368,6 +85043,14 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -84412,6 +85095,14 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -84466,6 +85157,14 @@
                     "name": "t named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -84517,6 +85216,14 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -84548,29 +85255,21 @@
           {
             "cause": "unusable",
             "check": "f",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$input.k is true, which isn't text",
-                "name": "n named by $input.k"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $input.k",
                 "outcome": "unusable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "/k"
+                ],
+                "name": "$input.k",
+                "outcome": "unusable",
+                "value": true
               }
             ],
             "message": "$input.k is true, which isn't text",
@@ -84603,6 +85302,16 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
                   }
                 ],
                 "kind": "assertion",
@@ -84644,6 +85353,16 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
                   }
                 ],
                 "kind": "assertion",
@@ -84688,6 +85407,16 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
                   }
                 ],
                 "kind": "assertion",
@@ -84742,6 +85471,16 @@
                     "name": "t named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
                   }
                 ],
                 "kind": "assertion",
@@ -84793,6 +85532,16 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
                   }
                 ],
                 "kind": "assertion",
@@ -84824,29 +85573,23 @@
           {
             "cause": "unusable",
             "check": "f",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$input.k is {\"a\": 1}, which isn't text",
-                "name": "n named by $input.k"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $input.k",
                 "outcome": "unusable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "/k"
+                ],
+                "name": "$input.k",
+                "outcome": "unusable",
+                "value": {
+                  "a": 1
+                }
               }
             ],
             "message": "$input.k is {\"a\": 1}, which isn't text",
@@ -84879,6 +85622,16 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": [
+                      "q"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -84920,6 +85673,16 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": [
+                      "q"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -84964,6 +85727,16 @@
                     "name": "n named by $input.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": [
+                      "q"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -85018,6 +85791,16 @@
                     "name": "t named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": [
+                      "q"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -85069,6 +85852,16 @@
                     "name": "m named by $input.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": [
+                      "q"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -85100,29 +85893,23 @@
           {
             "cause": "unusable",
             "check": "f",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$input.k is [\"q\"], which isn't text",
-                "name": "n named by $input.k"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $input.k",
                 "outcome": "unusable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "/k"
+                ],
+                "name": "$input.k",
+                "outcome": "unusable",
+                "value": [
+                  "q"
+                ]
               }
             ],
             "message": "$input.k is [\"q\"], which isn't text",
@@ -85155,6 +85942,14 @@
                     "name": "m named by $input.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -85310,6 +86105,14 @@
                     "name": "t named by $input.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -85361,6 +86164,14 @@
                     "name": "m named by $input.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -85392,34 +86203,21 @@
           {
             "cause": "null",
             "check": "f",
-            "failures": [
-              {
-                "cause": "null",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/k"
-                    ],
-                    "name": "$input.k",
-                    "outcome": "null",
-                    "value": null
-                  }
-                ],
-                "kind": "assertion",
-                "locations": [
-                  "$policy:/requirements/s/checks/f/assert"
-                ],
-                "message": "$input.k is null",
-                "name": "x is 1"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $input.k",
                 "outcome": "null",
                 "value": []
+              },
+              {
+                "locations": [
+                  "/k"
+                ],
+                "name": "$input.k",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$input.k is null",
@@ -85452,6 +86250,14 @@
                     "name": "m named by $input.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -85607,6 +86413,14 @@
                     "name": "t named by $input.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -85658,6 +86472,14 @@
                     "name": "m named by $input.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -85689,34 +86511,21 @@
           {
             "cause": "absent",
             "check": "f",
-            "failures": [
-              {
-                "cause": "absent",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input.k",
-                    "outcome": "absent",
-                    "value": null
-                  }
-                ],
-                "kind": "assertion",
-                "locations": [
-                  "$policy:/requirements/s/checks/f/assert"
-                ],
-                "message": "$input.k is missing",
-                "name": "x is 1"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $input.k",
                 "outcome": "absent",
                 "value": []
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.k",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "$input.k is missing",
@@ -85895,6 +86704,14 @@
                     "name": "n named by $params.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -85939,6 +86756,14 @@
                     "name": "n named by $params.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -85993,6 +86818,14 @@
                     "name": "t named by $params.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -86044,6 +86877,14 @@
                     "name": "m named by $params.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": true
                   }
                 ],
                 "kind": "assertion",
@@ -86075,29 +86916,21 @@
           {
             "cause": "unusable",
             "check": "e",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$params.k is true, which isn't text",
-                "name": "n named by $params.k"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $params.k",
                 "outcome": "unusable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": true
               }
             ],
             "message": "$params.k is true, which isn't text",
@@ -86135,6 +86968,16 @@
                     "name": "n named by $params.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
                   }
                 ],
                 "kind": "assertion",
@@ -86179,6 +87022,16 @@
                     "name": "n named by $params.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
                   }
                 ],
                 "kind": "assertion",
@@ -86233,6 +87086,16 @@
                     "name": "t named by $params.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
                   }
                 ],
                 "kind": "assertion",
@@ -86284,6 +87147,16 @@
                     "name": "m named by $params.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": {
+                      "a": 1
+                    }
                   }
                 ],
                 "kind": "assertion",
@@ -86315,29 +87188,23 @@
           {
             "cause": "unusable",
             "check": "e",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$params.k is {\"a\": 1}, which isn't text",
-                "name": "n named by $params.k"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $params.k",
                 "outcome": "unusable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": {
+                  "a": 1
+                }
               }
             ],
             "message": "$params.k is {\"a\": 1}, which isn't text",
@@ -86375,6 +87242,16 @@
                     "name": "n named by $params.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": [
+                      "q"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -86419,6 +87296,16 @@
                     "name": "n named by $params.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": [
+                      "q"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -86473,6 +87360,16 @@
                     "name": "t named by $params.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": [
+                      "q"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -86524,6 +87421,16 @@
                     "name": "m named by $params.k",
                     "outcome": "unusable",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": [
+                      "q"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -86555,29 +87462,23 @@
           {
             "cause": "unusable",
             "check": "e",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$params.k is [\"q\"], which isn't text",
-                "name": "n named by $params.k"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $params.k",
                 "outcome": "unusable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": [
+                  "q"
+                ]
               }
             ],
             "message": "$params.k is [\"q\"], which isn't text",
@@ -86729,6 +87630,14 @@
                     "name": "t named by $params.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -86780,6 +87689,14 @@
                     "name": "m named by $params.k",
                     "outcome": "null",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -86811,34 +87728,21 @@
           {
             "cause": "null",
             "check": "e",
-            "failures": [
-              {
-                "cause": "null",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "$params:/k"
-                    ],
-                    "name": "$params.k",
-                    "outcome": "null",
-                    "value": null
-                  }
-                ],
-                "kind": "assertion",
-                "locations": [
-                  "$policy:/requirements/s/checks/e/assert"
-                ],
-                "message": "$params.k is null",
-                "name": "x is 1"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $params.k",
                 "outcome": "null",
                 "value": []
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$params.k is null",
@@ -86990,6 +87894,14 @@
                     "name": "t named by $params.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -87041,6 +87953,14 @@
                     "name": "m named by $params.k",
                     "outcome": "absent",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -87072,34 +87992,21 @@
           {
             "cause": "absent",
             "check": "e",
-            "failures": [
-              {
-                "cause": "absent",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "$params:"
-                    ],
-                    "name": "$params.k",
-                    "outcome": "absent",
-                    "value": null
-                  }
-                ],
-                "kind": "assertion",
-                "locations": [
-                  "$policy:/requirements/s/checks/e/assert"
-                ],
-                "message": "$params.k is missing",
-                "name": "x is 1"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "n named by $params.k",
                 "outcome": "absent",
                 "value": []
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.k",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "$params.k is missing",
@@ -92309,7 +93216,16 @@
         {
           "cause": "absent",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.q",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/params"
@@ -101090,6 +102006,14 @@
               "name": "xs[]",
               "outcome": "usable",
               "value": []
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.k",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "kind": "assertion",
@@ -101145,6 +102069,14 @@
                 "/prs/0"
               ],
               "name": "pr named by $params.k",
+              "outcome": "absent",
+              "value": null
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.k",
               "outcome": "absent",
               "value": null
             }
@@ -101248,6 +102180,14 @@
               "name": "xs[].v",
               "outcome": "usable",
               "value": []
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.q",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "kind": "assertion",
@@ -101508,6 +102448,14 @@
                   "v": 2
                 }
               ]
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.k",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "kind": "assertion",
@@ -101589,6 +102537,14 @@
                 "/prs/0"
               ],
               "name": "pr named by $params.k",
+              "outcome": "absent",
+              "value": null
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.k",
               "outcome": "absent",
               "value": null
             }
@@ -101725,7 +102681,16 @@
         {
           "cause": "absent",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.q",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/right"

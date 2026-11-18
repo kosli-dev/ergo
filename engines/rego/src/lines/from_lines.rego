@@ -582,13 +582,13 @@ _from_unreadable(req) if {
 	not is_string(k)
 }
 
-_from_cause(req) := "unusable" if {
+_from_cause(doc, req) := "unusable" if {
 	_unreadable_input
 	is_array(data.ergo_document)
 } else := "unusable" if {
 	some r in _m_from_ref_list(req)
 	_m_from_params_unread(r.ref)
-} else := flaws[0] if {
+} else := _worst_of({f | some f in flaws} | _key_base_causes(doc, _from_path(req), "list")) if {
 	flaws := _from_path_flaws(req)
 	count(flaws) > 0
 } else := _worst_of(unread) if {

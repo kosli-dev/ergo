@@ -147,10 +147,7 @@ _copied_leaf(e, c) := object.union(e, object.union({"inputs": _copied_inputs(e.i
 
 _copied_failed(f, c) := object.union(f, object.union(
 	{"locations": _copied_locations(f.locations, c)},
-	object.union(
-		{"failed_items": _copied_inputs(f.failed_items, c) | "failed_items" in object.keys(f)},
-		{"failed_assertions": [_copied_line(l, c) | some l in f.failed_assertions] | "failed_assertions" in object.keys(f)},
-	),
+	{"failed_items": _copied_inputs(f.failed_items, c) | "failed_items" in object.keys(f)},
 ))
 
 _parents_evaluation(req, name, es, parts) := {
@@ -183,7 +180,7 @@ _parent_pick(doc, req) := pick if {
 _parent_pick_of(doc, preq) := {"cause": c} if {
 	c := _target_cause(doc, preq)
 	not _fl_typed_only(doc, preq)
-} else := {"cause": _from_cause(preq)} if {
+} else := {"cause": _from_cause(doc, preq)} if {
 	_from_well_formed(preq)
 	_from_unreadable(preq)
 } else := r if {
