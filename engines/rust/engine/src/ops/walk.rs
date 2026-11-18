@@ -1126,8 +1126,37 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     copies: Vec::new(),
                     seen: Some((item.item.value.clone(), item.item.location.clone())),
                 })
+            } else if let Some((check, _, _)) = undecided
+                && !super::key_base::missing_keys(check, ctx).is_empty()
+                && !matches!(
+                    check.paths().into_iter().find_map(|p| super::key_base::of_path(p, false, &focus)),
+                    Some(super::key_base::KeyBase { base: Some((_, Cause::Unusable, _)), .. })
+                )
+            {
+                return Judged {
+                    kept: false,
+                    passed: false,
+                    decided: true,
+                    failure: None,
+                };
             } else if let Some((check, verdict, _)) = undecided {
                 let at = &focus;
+                let keyed_base = (!super::key_base::missing_keys(check, ctx).is_empty())
+                    .then(|| {
+                        check
+                            .paths()
+                            .into_iter()
+                            .find_map(|p| super::key_base::of_path(p, false, at))
+                    })
+                    .flatten()
+                    .and_then(|kb| kb.base);
+                let verdict = &match &keyed_base {
+                    Some((_, cause, _)) => Verdict {
+                        cause: *cause,
+                        inputs: verdict.inputs.clone(),
+                    },
+                    None => verdict.clone(),
+                };
                 let item_segs = focus_segs(item, check);
                 let named = named_side(check, at);
                 let (steps, outside): (Vec<Step>, bool) = match &named {
@@ -1162,7 +1191,9 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 let walked_root = super::lists::field_walk_fault(check, at)
                     .filter(|(cause, _)| *cause == verdict.cause)
                     .map(|(_, text)| text);
-                let said = if let Some(fault) = message::root_fault(check, ctx, verdict.cause) {
+                let said = if let Some((text, _, _)) = &keyed_base {
+                    message::prefixed(&walked.item_name(item_segs), text)
+                } else if let Some(fault) = message::root_fault(check, ctx, verdict.cause) {
                     fault
                 } else if let Some(text) = walked_root {
                     text
@@ -1439,7 +1470,35 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
         let whose: Vec<&Check> = walk.whose.iter().collect();
         row.message = message::walked_roots_ahead(row.message.take(), &whose, &outer_ctx, &[]);
     }
+    whose_keys_first(walk, ctx, &mut row);
     row
+}
+
+fn whose_keys_first(walk: &Walk, ctx: &Ctx, row: &mut Run) {
+    let outer_ctx = outer(ctx);
+    let keys: Vec<(Cause, String)> = walk
+        .whose
+        .iter()
+        .flat_map(|check| super::key_base::missing_keys(check, &outer_ctx))
+        .collect();
+    if keys.is_empty() || row.verdict.cause == Cause::Unusable && row.failed_items.is_empty() {
+        return;
+    }
+    let said = row.message.clone().unwrap_or_default();
+    let mut parts: Vec<String> = keys.iter().map(|(_, text)| text.clone()).collect();
+    parts.extend(
+        said.split("; ")
+            .filter(|p| !p.is_empty() && !keys.iter().any(|(_, t)| t == p))
+            .map(str::to_string),
+    );
+    let failed = row.verdict.cause.is_failure();
+    row.verdict.cause = Cause::worst(
+        keys.iter()
+            .map(|(cause, _)| *cause)
+            .chain(failed.then_some(row.verdict.cause)),
+    )
+    .unwrap_or(row.verdict.cause);
+    row.message = Some(message::joined(parts));
 }
 
 fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
