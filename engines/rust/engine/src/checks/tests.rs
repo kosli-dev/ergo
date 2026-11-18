@@ -114,8 +114,8 @@ fn refs_are_read_once_from_the_params_and_the_input_and_sorted_by_name() {
     assert_eq!(
         found,
         [
-            json!({"name": "$input.i", "value": "z", "locations": ["/i"], "outcome": "usable"}),
-            json!({"name": "$params.a", "value": 1, "locations": ["$params:/a"], "outcome": "usable"}),
+            json!({"name": "$input.i", "value": "z", "locations": ["/i"], "outcome": "unusable"}),
+            json!({"name": "$params.a", "value": 1, "locations": ["$params:/a"], "outcome": "unusable"}),
             json!({"name": "$params.b", "value": [2], "locations": ["$params:/b"], "outcome": "usable"}),
         ]
     );

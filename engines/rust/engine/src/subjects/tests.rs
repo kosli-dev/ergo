@@ -203,7 +203,7 @@ fn a_filter_row_is_listed_for_every_subject_and_out_of_scope_ones_fail_with_valu
     assert_eq!(applies[1]["cause"], json!("value"));
     assert_eq!(
         input_of(&applies[1], 0),
-        json!({"name": "keep", "value": null, "locations": ["/ds/1"]})
+        json!({"name": "keep", "value": null, "locations": ["/ds/1"], "outcome": "absent"})
     );
     assert_eq!(
         input_of(&rows(&r, "$min_subjects")[0], 0)["locations"],

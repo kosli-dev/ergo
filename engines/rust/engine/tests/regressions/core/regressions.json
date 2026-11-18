@@ -1829,6 +1829,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "k1",
                     "k1"
@@ -1846,6 +1847,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "k1",
                     "k1"
@@ -1998,6 +2000,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -2012,6 +2015,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -2163,6 +2167,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "k1"
                   ]
@@ -2179,6 +2184,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "k1"
                   ]
@@ -2333,6 +2339,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "k1",
                     "zz"
@@ -2350,6 +2357,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "k1",
                     "zz"
@@ -2998,6 +3006,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": {
                     "a": 1
                   }
@@ -3014,6 +3023,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": {
                     "a": 1
                   }
@@ -3791,6 +3801,7 @@
                     "/sel"
                   ],
                   "name": "$input.sel",
+                  "outcome": "usable",
                   "value": [
                     "a"
                   ]
@@ -3807,6 +3818,7 @@
                     "/sel"
                   ],
                   "name": "$input.sel",
+                  "outcome": "usable",
                   "value": [
                     "a"
                   ]
@@ -5422,6 +5434,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": true
                 }
               ],
@@ -5436,6 +5449,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": true
                 }
               ],
@@ -5602,6 +5616,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "k1"
                   ]
@@ -5618,6 +5633,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "k1"
                   ]
@@ -5786,6 +5802,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     1
                   ]
@@ -5802,6 +5819,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     1
                   ]
@@ -6507,6 +6525,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": 3
                 }
               ],
@@ -6521,6 +6540,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": 3
                 }
               ],
@@ -6687,6 +6707,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": {
                     "a": 1
                   }
@@ -6703,6 +6724,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": {
                     "a": 1
                   }
@@ -7050,6 +7072,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": true
                 }
               ],
@@ -7064,6 +7087,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": true
                 }
               ],
@@ -7230,6 +7254,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "k1"
                   ]
@@ -7246,6 +7271,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "k1"
                   ]
@@ -7414,6 +7440,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     1
                   ]
@@ -7430,6 +7457,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     1
                   ]
@@ -8135,6 +8163,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": 3
                 }
               ],
@@ -8149,6 +8178,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": 3
                 }
               ],
@@ -8315,6 +8345,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": {
                     "a": 1
                   }
@@ -8331,6 +8362,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": {
                     "a": 1
                   }
@@ -8688,6 +8720,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "a"
                   ]
@@ -8704,6 +8737,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "a"
                   ]
@@ -8888,6 +8922,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -8902,6 +8937,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -8964,6 +9000,7 @@
               "value": 0
             }
           ],
+          "message": "g.a is {\"items\": [{\"x\": 1}]}, which isn't a list",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -8991,15 +9028,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/a"
+                  ],
+                  "name": "x",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from"
+              ],
+              "message": "x is missing",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/g/a"
               ],
               "name": "x",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "x is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -9310,6 +9371,7 @@
                     "$params:/key"
                   ],
                   "name": "$params.key",
+                  "outcome": "usable",
                   "value": [
                     "a"
                   ]
@@ -16674,6 +16736,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -16691,6 +16754,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -16756,6 +16820,7 @@
               "value": 0
             }
           ],
+          "message": "scans is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -16783,15 +16848,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -16880,6 +16969,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -16897,6 +16987,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -16962,6 +17053,7 @@
               "value": 0
             }
           ],
+          "message": "scans is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -16989,15 +17081,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -17090,6 +17206,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -17097,6 +17214,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -17114,6 +17232,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -17121,6 +17240,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -17186,6 +17306,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -17213,15 +17334,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans/prod"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans/prod"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -17313,6 +17458,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -17320,6 +17466,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -17337,6 +17484,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -17344,6 +17492,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -17409,6 +17558,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -17436,15 +17586,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans/prod"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans/prod"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -17531,6 +17705,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -17538,6 +17713,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -17555,6 +17731,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -17562,6 +17739,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -17729,6 +17907,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -17736,6 +17915,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -17753,6 +17933,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -17760,6 +17941,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -18935,6 +19117,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -18942,6 +19125,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -18959,6 +19143,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -18966,6 +19151,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -19119,6 +19305,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -19126,6 +19313,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -19143,6 +19331,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -19150,6 +19339,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -20246,6 +20436,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -20253,6 +20444,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -20267,6 +20459,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -20274,6 +20467,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -21314,6 +21508,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -21321,6 +21516,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -21335,6 +21531,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -21342,6 +21539,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -22049,6 +22247,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -22056,6 +22255,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -22070,6 +22270,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -22077,6 +22278,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -22574,6 +22776,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -22581,6 +22784,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -22595,6 +22799,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -22602,6 +22807,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "absent",
                   "value": null
                 }
               ],
@@ -23154,6 +23360,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -23161,6 +23368,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -23178,6 +23386,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -23185,6 +23394,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -23352,6 +23562,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -23359,6 +23570,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -23376,6 +23588,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -23383,6 +23596,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -24111,6 +24325,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -24118,6 +24333,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -24135,6 +24351,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -24142,6 +24359,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -24295,6 +24513,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -24302,6 +24521,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -24319,6 +24539,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -24326,6 +24547,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     1
@@ -25049,6 +25271,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -25056,6 +25279,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -25070,6 +25294,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -25077,6 +25302,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -25578,6 +25804,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -25585,6 +25812,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -25599,6 +25827,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -25606,6 +25835,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "null",
                   "value": null
                 }
               ],
@@ -26151,6 +26381,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -26158,6 +26389,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -26174,6 +26406,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -26181,6 +26414,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -26346,6 +26580,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -26353,6 +26588,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -26369,6 +26605,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -26376,6 +26613,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -27093,6 +27331,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -27100,6 +27339,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -27116,6 +27356,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -27123,6 +27364,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -27274,6 +27516,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -27281,6 +27524,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -27297,6 +27541,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -27304,6 +27549,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     null
                   ]
@@ -28213,6 +28459,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -28220,6 +28467,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -28234,6 +28482,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -28241,6 +28490,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -28752,6 +29002,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -28759,6 +29010,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -28773,6 +29025,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -28780,6 +29033,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": "a"
                 }
               ],
@@ -29111,6 +29365,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29128,6 +29383,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29193,6 +29449,7 @@
               "value": 0
             }
           ],
+          "message": "scans is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -29220,15 +29477,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    ""
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 ""
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -29307,6 +29588,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29324,6 +29606,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29389,6 +29672,7 @@
               "value": 0
             }
           ],
+          "message": "scans is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -29416,15 +29700,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    ""
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 ""
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -29507,6 +29815,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -29514,6 +29823,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29531,6 +29841,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -29538,6 +29849,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29603,6 +29915,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -29630,15 +29943,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -29720,6 +30057,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -29727,6 +30065,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29744,6 +30083,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -29751,6 +30091,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -29816,6 +30157,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -29843,15 +30185,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -32871,6 +33237,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -32888,6 +33255,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -32953,6 +33321,7 @@
               "value": 0
             }
           ],
+          "message": "scans is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -32980,15 +33349,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -33073,6 +33466,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33090,6 +33484,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33155,6 +33550,7 @@
               "value": 0
             }
           ],
+          "message": "scans is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -33182,15 +33578,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -33279,6 +33699,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -33286,6 +33707,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33303,6 +33725,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -33310,6 +33733,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33375,6 +33799,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -33402,15 +33827,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans/prod"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans/prod"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -33498,6 +33947,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -33505,6 +33955,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33522,6 +33973,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -33529,6 +33981,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -33594,6 +34047,7 @@
               "value": 0
             }
           ],
+          "message": "scans.prod is null",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -33621,15 +34075,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans/prod"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans/prod"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -35214,6 +35692,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -35221,6 +35700,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -35238,6 +35718,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -35245,6 +35726,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -35408,6 +35890,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -35415,6 +35898,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -35432,6 +35916,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -35439,6 +35924,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -35595,6 +36081,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -35602,6 +36089,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -35619,6 +36107,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -35626,6 +36115,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -35775,6 +36265,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -35782,6 +36273,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -35799,6 +36291,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -35806,6 +36299,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "a"
@@ -35961,6 +36455,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -35968,6 +36463,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -35982,6 +36478,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -35989,6 +36486,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -36139,6 +36637,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -36146,6 +36645,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -36160,6 +36660,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": 5
                 },
                 {
@@ -36167,6 +36668,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": []
                 }
               ],
@@ -37924,6 +38426,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "b"
@@ -37941,6 +38444,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "b"
@@ -38054,15 +38558,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -38175,6 +38703,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -38182,6 +38711,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "b"
@@ -38199,6 +38729,7 @@
                     "$params:/env"
                   ],
                   "name": "$params.env",
+                  "outcome": "usable",
                   "value": "prod"
                 },
                 {
@@ -38206,6 +38737,7 @@
                     "$params:/k"
                   ],
                   "name": "$params.k",
+                  "outcome": "usable",
                   "value": [
                     "a",
                     "b"
@@ -38319,15 +38851,39 @@
         {
           "cause": "absent",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/scans/prod"
+                  ],
+                  "name": "name",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/only/from"
+              ],
+              "message": "name is missing",
+              "name": "name is \"a\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/scans/prod"
               ],
               "name": "name",
+              "outcome": "absent",
               "value": null
             }
           ],
+          "message": "name is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -41170,12 +41726,35 @@
         {
           "cause": "unusable",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/env"
+                  ],
+                  "name": "env",
+                  "outcome": "usable",
+                  "value": "prod"
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from"
+              ],
+              "message": "the check is false",
+              "name": "env is \"prod\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0/env"
               ],
               "name": "env",
+              "outcome": "usable",
               "value": "prod"
             }
           ],
@@ -41189,12 +41768,35 @@
         {
           "cause": "unusable",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/env"
+                  ],
+                  "name": "env",
+                  "outcome": "usable",
+                  "value": "dev"
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from"
+              ],
+              "message": "the check is false",
+              "name": "env is \"prod\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/env"
               ],
               "name": "env",
+              "outcome": "usable",
               "value": "dev"
             }
           ],
@@ -41397,12 +41999,35 @@
         {
           "cause": "unusable",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0"
+                  ],
+                  "name": "zz",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from"
+              ],
+              "message": "the check is false",
+              "name": "zz is \"prod\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0"
               ],
               "name": "zz",
+              "outcome": "absent",
               "value": null
             }
           ],
@@ -41416,12 +42041,35 @@
         {
           "cause": "unusable",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1"
+                  ],
+                  "name": "zz",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from"
+              ],
+              "message": "the check is false",
+              "name": "zz is \"prod\""
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1"
               ],
               "name": "zz",
+              "outcome": "absent",
               "value": null
             }
           ],
@@ -42095,12 +42743,35 @@
         {
           "cause": "unusable",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/0/items/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from"
+              ],
+              "message": "the check is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/g/0/items/0/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 1
             }
           ],
@@ -42116,12 +42787,35 @@
         {
           "cause": "unusable",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/0/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from"
+              ],
+              "message": "the check is false",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/g/0/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
@@ -42966,14 +43660,46 @@
         {
           "cause": "unusable",
           "check": "$applies",
-          "failed_assertions": [
+          "failures": [
             {
-              "assertion": "env is \"prod\"",
-              "cause": "unusable"
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/env"
+                  ],
+                  "name": "env",
+                  "outcome": "usable",
+                  "value": "prod"
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from#1"
+              ],
+              "message": "the check is false",
+              "name": "env is \"prod\""
             },
             {
-              "assertion": "x is 1",
-              "cause": "unusable"
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from#2"
+              ],
+              "message": "the check is false",
+              "name": "x is 1"
             }
           ],
           "inputs": [
@@ -42982,6 +43708,7 @@
                 "/items/0/env"
               ],
               "name": "env",
+              "outcome": "usable",
               "value": "prod"
             },
             {
@@ -42989,6 +43716,7 @@
                 "/items/0/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 1
             }
           ],
@@ -43015,14 +43743,46 @@
         {
           "cause": "unusable",
           "check": "$applies",
-          "failed_assertions": [
+          "failures": [
             {
-              "assertion": "env is \"prod\"",
-              "cause": "unusable"
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/env"
+                  ],
+                  "name": "env",
+                  "outcome": "usable",
+                  "value": "dev"
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from#1"
+              ],
+              "message": "the check is false",
+              "name": "env is \"prod\""
             },
             {
-              "assertion": "x is 1",
-              "cause": "unusable"
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from#2"
+              ],
+              "message": "the check is false",
+              "name": "x is 1"
             }
           ],
           "inputs": [
@@ -43031,6 +43791,7 @@
                 "/items/1/env"
               ],
               "name": "env",
+              "outcome": "usable",
               "value": "dev"
             },
             {
@@ -43038,6 +43799,7 @@
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
@@ -44025,14 +44787,46 @@
         {
           "cause": "unusable",
           "check": "$applies",
-          "failed_assertions": [
+          "failures": [
             {
-              "assertion": "env is \"prod\"",
-              "cause": "unusable"
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/env"
+                  ],
+                  "name": "env",
+                  "outcome": "usable",
+                  "value": "prod"
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/e/from"
+              ],
+              "message": "the check is false",
+              "name": "env is \"prod\""
             },
             {
-              "assertion": "x is 1",
-              "cause": "unusable"
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from"
+              ],
+              "message": "the check is false",
+              "name": "x is 1"
             }
           ],
           "inputs": [
@@ -44041,6 +44835,7 @@
                 "/items/0/env"
               ],
               "name": "env",
+              "outcome": "usable",
               "value": "prod"
             },
             {
@@ -44048,6 +44843,7 @@
                 "/items/0/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 1
             }
           ],
@@ -44074,14 +44870,46 @@
         {
           "cause": "unusable",
           "check": "$applies",
-          "failed_assertions": [
+          "failures": [
             {
-              "assertion": "env is \"prod\"",
-              "cause": "unusable"
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/env"
+                  ],
+                  "name": "env",
+                  "outcome": "usable",
+                  "value": "dev"
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/e/from"
+              ],
+              "message": "the check is false",
+              "name": "env is \"prod\""
             },
             {
-              "assertion": "x is 1",
-              "cause": "unusable"
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/d/from"
+              ],
+              "message": "the check is false",
+              "name": "x is 1"
             }
           ],
           "inputs": [
@@ -44090,6 +44918,7 @@
                 "/items/1/env"
               ],
               "name": "env",
+              "outcome": "usable",
               "value": "dev"
             },
             {
@@ -44097,6 +44926,7 @@
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
@@ -45508,6 +46338,7 @@
                     "$params:"
                   ],
                   "name": "$params.k",
+                  "outcome": "unusable",
                   "value": null
                 }
               ],
@@ -45570,6 +46401,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -45597,18 +46429,51 @@
         {
           "cause": "unusable",
           "check": "a",
-          "failed_items": [],
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/0/c/0/v"
+                  ],
+                  "name": "c[].v",
+                  "outcome": "usable",
+                  "value": [
+                    1
+                  ]
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.k",
+                  "outcome": "unusable",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "$params is [], which isn't an object",
+              "name": "every c.v is in $params.k"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/0/c/0/v"
               ],
               "name": "c[].v",
+              "outcome": "usable",
               "value": [
                 1
               ]
             }
           ],
+          "message": "$params is [], which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -45619,18 +46484,51 @@
         {
           "cause": "unusable",
           "check": "a",
-          "failed_items": [],
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/c/0/v"
+                  ],
+                  "name": "c[].v",
+                  "outcome": "usable",
+                  "value": [
+                    2
+                  ]
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.k",
+                  "outcome": "unusable",
+                  "value": null
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/a"
+              ],
+              "message": "$params is [], which isn't an object",
+              "name": "every c.v is in $params.k"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/c/0/v"
               ],
               "name": "c[].v",
+              "outcome": "usable",
               "value": [
                 2
               ]
             }
           ],
+          "message": "$params is [], which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -49326,15 +50224,39 @@
         {
           "cause": "value",
           "check": "$applies",
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1/x"
+                  ],
+                  "name": "x",
+                  "outcome": "usable",
+                  "value": 2
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/subjects/e/from"
+              ],
+              "message": "x is 2",
+              "name": "x is 1"
+            }
+          ],
           "inputs": [
             {
               "locations": [
                 "/items/1/x"
               ],
               "name": "x",
+              "outcome": "usable",
               "value": 2
             }
           ],
+          "message": "x is 2",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -52115,6 +53037,44 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/fb"
+                  ],
+                  "name": "fa plus fb",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 1e-70000
+                },
+                {
+                  "locations": [
+                    "/things/0/fb"
+                  ],
+                  "name": "fb",
+                  "outcome": "usable",
+                  "value": 1e-70000
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus fb needs more than 15 digits",
+              "name": "fa plus fb is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -52129,6 +53089,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 1e-70000
             },
             {
@@ -52136,6 +53097,7 @@
                 "/things/0/fb"
               ],
               "name": "fb",
+              "outcome": "usable",
               "value": 1e-70000
             }
           ],
@@ -52569,7 +53531,7 @@
                   ],
                   "name": "fa",
                   "outcome": "usable",
-                  "value": -1e-06
+                  "value": -0.000001
                 },
                 {
                   "locations": [
@@ -52603,7 +53565,7 @@
               ],
               "name": "fa",
               "outcome": "usable",
-              "value": -1e-06
+              "value": -0.000001
             },
             {
               "locations": [
@@ -52614,7 +53576,6 @@
               "value": 0.1234567890123456
             }
           ],
-          "message": "fa plus fb needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -52788,6 +53749,40 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "sum of items.x",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "items[].x",
+                  "outcome": "usable",
+                  "value": [
+                    1e-70000,
+                    1e-70000
+                  ]
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "sum of items.x is 0 is false",
+              "name": "sum of items.x is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -52803,6 +53798,7 @@
                 "/things/0/items/1/x"
               ],
               "name": "items[].x",
+              "outcome": "usable",
               "value": [
                 1e-70000,
                 1e-70000
@@ -52982,6 +53978,40 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "sum of items.x",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "items[].x",
+                  "outcome": "usable",
+                  "value": [
+                    100000000000000000000,
+                    1000000000000000
+                  ]
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "sum of items.x is 0 is false",
+              "name": "sum of items.x is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -52997,6 +54027,7 @@
                 "/things/0/items/1/x"
               ],
               "name": "items[].x",
+              "outcome": "usable",
               "value": [
                 100000000000000000000,
                 1000000000000000
@@ -53176,6 +54207,40 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "sum of items.x",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "items[].x",
+                  "outcome": "usable",
+                  "value": [
+                    -0.000001,
+                    0.1234567890123456
+                  ]
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "sum of items.x is 0 is false",
+              "name": "sum of items.x is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -53191,6 +54256,7 @@
                 "/things/0/items/1/x"
               ],
               "name": "items[].x",
+              "outcome": "usable",
               "value": [
                 -0.000001,
                 0.1234567890123456
@@ -53370,6 +54436,57 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x",
+                    "/things/0/fa"
+                  ],
+                  "name": "sum of items.x plus fa",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "sum of items.x",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "items[].x",
+                  "outcome": "usable",
+                  "value": [
+                    1e-70000,
+                    1e-70000
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 1e-70000
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "sum of items.x plus fa is 0 is false",
+              "name": "sum of items.x plus fa is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -53394,6 +54511,7 @@
                 "/things/0/items/1/x"
               ],
               "name": "items[].x",
+              "outcome": "usable",
               "value": [
                 1e-70000,
                 1e-70000
@@ -53404,6 +54522,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 1e-70000
             }
           ],
@@ -53580,6 +54699,57 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x",
+                    "/things/0/fa"
+                  ],
+                  "name": "sum of items.x plus fa",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "sum of items.x",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "items[].x",
+                  "outcome": "usable",
+                  "value": [
+                    100000000000000000000,
+                    0.000000000000001
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 100000000000000000000
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "sum of items.x plus fa is 0 is false",
+              "name": "sum of items.x plus fa is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -53604,6 +54774,7 @@
                 "/things/0/items/1/x"
               ],
               "name": "items[].x",
+              "outcome": "usable",
               "value": [
                 100000000000000000000,
                 0.000000000000001
@@ -53614,6 +54785,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 100000000000000000000
             }
           ],
@@ -53790,6 +54962,57 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x",
+                    "/things/0/fa"
+                  ],
+                  "name": "sum of items.x plus fa",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "sum of items.x",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "items[].x",
+                  "outcome": "usable",
+                  "value": [
+                    -0.000001,
+                    0.1234567890123456
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": -0.000001
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "sum of items.x plus fa is 0 is false",
+              "name": "sum of items.x plus fa is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -53814,6 +55037,7 @@
                 "/things/0/items/1/x"
               ],
               "name": "items[].x",
+              "outcome": "usable",
               "value": [
                 -0.000001,
                 0.1234567890123456
@@ -53824,6 +55048,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": -0.000001
             }
           ],
@@ -54000,6 +55225,70 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "fa plus count of items",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 1e-70000
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "count of items",
+                  "value": 2
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "items[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "vals": [
+                        1e-70000,
+                        1e-70000
+                      ],
+                      "x": 1e-70000,
+                      "y": 1e-70000
+                    },
+                    {
+                      "vals": [
+                        1e-70000
+                      ],
+                      "x": 1e-70000,
+                      "y": 1e-70000
+                    }
+                  ]
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus count of items needs more than 15 digits",
+              "name": "fa plus count of items is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -54015,6 +55304,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 1e-70000
             },
             {
@@ -54031,6 +55321,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -54243,7 +55534,7 @@
                   ],
                   "name": "fa",
                   "outcome": "usable",
-                  "value": 1e-16
+                  "value": 0.0000000000000001
                 },
                 {
                   "locations": [
@@ -54263,18 +55554,18 @@
                   "value": [
                     {
                       "vals": [
-                        1e-16,
+                        0.0000000000000001,
                         -999999999999999
                       ],
-                      "x": 1e-16,
+                      "x": 0.0000000000000001,
                       "y": -999999999999999
                     },
                     {
                       "vals": [
-                        1e-16
+                        0.0000000000000001
                       ],
                       "x": -999999999999999,
-                      "y": 1e-16
+                      "y": 0.0000000000000001
                     }
                   ]
                 }
@@ -54303,7 +55594,7 @@
               ],
               "name": "fa",
               "outcome": "usable",
-              "value": 1e-16
+              "value": 0.0000000000000001
             },
             {
               "locations": [
@@ -54323,23 +55614,22 @@
               "value": [
                 {
                   "vals": [
-                    1e-16,
+                    0.0000000000000001,
                     -999999999999999
                   ],
-                  "x": 1e-16,
+                  "x": 0.0000000000000001,
                   "y": -999999999999999
                 },
                 {
                   "vals": [
-                    1e-16
+                    0.0000000000000001
                   ],
                   "x": -999999999999999,
-                  "y": 1e-16
+                  "y": 0.0000000000000001
                 }
               ]
             }
           ],
-          "message": "fa plus count of items needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -54554,16 +55844,16 @@
                     {
                       "vals": [
                         0.1234567890123456,
-                        -1e-06
+                        -0.000001
                       ],
                       "x": 0.1234567890123456,
-                      "y": -1e-06
+                      "y": -0.000001
                     },
                     {
                       "vals": [
                         0.1234567890123456
                       ],
-                      "x": -1e-06,
+                      "x": -0.000001,
                       "y": 0.1234567890123456
                     }
                   ]
@@ -54614,22 +55904,21 @@
                 {
                   "vals": [
                     0.1234567890123456,
-                    -1e-06
+                    -0.000001
                   ],
                   "x": 0.1234567890123456,
-                  "y": -1e-06
+                  "y": -0.000001
                 },
                 {
                   "vals": [
                     0.1234567890123456
                   ],
-                  "x": -1e-06,
+                  "x": -0.000001,
                   "y": 0.1234567890123456
                 }
               ]
             }
           ],
-          "message": "fa plus count of items needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -54803,6 +56092,61 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "fa plus seconds elapsed from s1 to s2",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 1e-70000
+                },
+                {
+                  "locations": [
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "seconds elapsed from s1 to s2",
+                  "value": 0.123456
+                },
+                {
+                  "locations": [
+                    "/things/0/s1"
+                  ],
+                  "name": "s1",
+                  "outcome": "usable",
+                  "value": 0
+                },
+                {
+                  "locations": [
+                    "/things/0/s2"
+                  ],
+                  "name": "s2",
+                  "outcome": "usable",
+                  "value": 0.123456
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus seconds elapsed from s1 to s2 needs more than 15 digits",
+              "name": "fa plus seconds elapsed from s1 to s2 is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -54818,6 +56162,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 1e-70000
             },
             {
@@ -54833,6 +56178,7 @@
                 "/things/0/s1"
               ],
               "name": "s1",
+              "outcome": "usable",
               "value": 0
             },
             {
@@ -54840,6 +56186,7 @@
                 "/things/0/s2"
               ],
               "name": "s2",
+              "outcome": "usable",
               "value": 0.123456
             }
           ],
@@ -55560,6 +56907,74 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x",
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "sum of items.x plus seconds elapsed from s1 to s2",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "sum of items.x",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "items[].x",
+                  "outcome": "usable",
+                  "value": [
+                    1e-70000,
+                    1e-70000
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "seconds elapsed from s1 to s2",
+                  "value": 0.123456
+                },
+                {
+                  "locations": [
+                    "/things/0/s1"
+                  ],
+                  "name": "s1",
+                  "outcome": "usable",
+                  "value": 0
+                },
+                {
+                  "locations": [
+                    "/things/0/s2"
+                  ],
+                  "name": "s2",
+                  "outcome": "usable",
+                  "value": 0.123456
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "sum of items.x plus seconds elapsed from s1 to s2 is 0 is false",
+              "name": "sum of items.x plus seconds elapsed from s1 to s2 is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -55585,6 +57000,7 @@
                 "/things/0/items/1/x"
               ],
               "name": "items[].x",
+              "outcome": "usable",
               "value": [
                 1e-70000,
                 1e-70000
@@ -55603,6 +57019,7 @@
                 "/things/0/s1"
               ],
               "name": "s1",
+              "outcome": "usable",
               "value": 0
             },
             {
@@ -55610,6 +57027,7 @@
                 "/things/0/s2"
               ],
               "name": "s2",
+              "outcome": "usable",
               "value": 0.123456
             }
           ],
@@ -55786,6 +57204,74 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x",
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "sum of items.x plus seconds elapsed from s1 to s2",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "sum of items.x",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "items[].x",
+                  "outcome": "usable",
+                  "value": [
+                    100,
+                    1234567890123456
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "seconds elapsed from s1 to s2",
+                  "value": 0.123456
+                },
+                {
+                  "locations": [
+                    "/things/0/s1"
+                  ],
+                  "name": "s1",
+                  "outcome": "usable",
+                  "value": 0
+                },
+                {
+                  "locations": [
+                    "/things/0/s2"
+                  ],
+                  "name": "s2",
+                  "outcome": "usable",
+                  "value": 0.123456
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "sum of items.x plus seconds elapsed from s1 to s2 is 0 is false",
+              "name": "sum of items.x plus seconds elapsed from s1 to s2 is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -55811,6 +57297,7 @@
                 "/things/0/items/1/x"
               ],
               "name": "items[].x",
+              "outcome": "usable",
               "value": [
                 100,
                 1234567890123456
@@ -55829,6 +57316,7 @@
                 "/things/0/s1"
               ],
               "name": "s1",
+              "outcome": "usable",
               "value": 0
             },
             {
@@ -55836,6 +57324,7 @@
                 "/things/0/s2"
               ],
               "name": "s2",
+              "outcome": "usable",
               "value": 0.123456
             }
           ],
@@ -56012,6 +57501,74 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x",
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "sum of items.x plus seconds elapsed from s1 to s2",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "sum of items.x",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0/x",
+                    "/things/0/items/1/x"
+                  ],
+                  "name": "items[].x",
+                  "outcome": "usable",
+                  "value": [
+                    -0.000001,
+                    0.1234567890123456
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/s1",
+                    "/things/0/s2"
+                  ],
+                  "name": "seconds elapsed from s1 to s2",
+                  "value": 0.123456
+                },
+                {
+                  "locations": [
+                    "/things/0/s1"
+                  ],
+                  "name": "s1",
+                  "outcome": "usable",
+                  "value": 0
+                },
+                {
+                  "locations": [
+                    "/things/0/s2"
+                  ],
+                  "name": "s2",
+                  "outcome": "usable",
+                  "value": 0.123456
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "sum of items.x plus seconds elapsed from s1 to s2 is 0 is false",
+              "name": "sum of items.x plus seconds elapsed from s1 to s2 is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -56037,6 +57594,7 @@
                 "/things/0/items/1/x"
               ],
               "name": "items[].x",
+              "outcome": "usable",
               "value": [
                 -0.000001,
                 0.1234567890123456
@@ -56055,6 +57613,7 @@
                 "/things/0/s1"
               ],
               "name": "s1",
+              "outcome": "usable",
               "value": 0
             },
             {
@@ -56062,6 +57621,7 @@
                 "/things/0/s2"
               ],
               "name": "s2",
+              "outcome": "usable",
               "value": 0.123456
             }
           ],
@@ -56238,6 +57798,44 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa",
+                    "/things/0/fb"
+                  ],
+                  "name": "fa plus fb plus 1",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 1e-70000
+                },
+                {
+                  "locations": [
+                    "/things/0/fb"
+                  ],
+                  "name": "fb",
+                  "outcome": "usable",
+                  "value": 1e-70000
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "fa plus fb plus 1 needs more than 15 digits",
+              "name": "fa plus fb plus 1 is at least 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -56252,6 +57850,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 1e-70000
             },
             {
@@ -56259,6 +57858,7 @@
                 "/things/0/fb"
               ],
               "name": "fb",
+              "outcome": "usable",
               "value": 1e-70000
             }
           ],
@@ -56462,7 +58062,7 @@
                   ],
                   "name": "fb",
                   "outcome": "usable",
-                  "value": 1e-16
+                  "value": 0.0000000000000001
                 }
               ],
               "kind": "assertion",
@@ -56496,10 +58096,9 @@
               ],
               "name": "fb",
               "outcome": "usable",
-              "value": 1e-16
+              "value": 0.0000000000000001
             }
           ],
-          "message": "fa plus fb plus 1 needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -56692,7 +58291,7 @@
                   ],
                   "name": "fa",
                   "outcome": "usable",
-                  "value": -1e-06
+                  "value": -0.000001
                 },
                 {
                   "locations": [
@@ -56726,7 +58325,7 @@
               ],
               "name": "fa",
               "outcome": "usable",
-              "value": -1e-06
+              "value": -0.000001
             },
             {
               "locations": [
@@ -56737,7 +58336,6 @@
               "value": 0.1234567890123456
             }
           ],
-          "message": "fa plus fb plus 1 needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -56911,6 +58509,79 @@
         {
           "cause": "unusable",
           "check": "c",
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1",
+                    "/things/0/fa",
+                    "/things/0/fb"
+                  ],
+                  "name": "count of items plus fa plus fb",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "count of items",
+                  "value": 2
+                },
+                {
+                  "locations": [
+                    "/things/0/items/0",
+                    "/things/0/items/1"
+                  ],
+                  "name": "items[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "vals": [
+                        1e-70000,
+                        1e-70000
+                      ],
+                      "x": 1e-70000,
+                      "y": 1e-70000
+                    },
+                    {
+                      "vals": [
+                        1e-70000
+                      ],
+                      "x": 1e-70000,
+                      "y": 1e-70000
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 1e-70000
+                },
+                {
+                  "locations": [
+                    "/things/0/fb"
+                  ],
+                  "name": "fb",
+                  "outcome": "usable",
+                  "value": 1e-70000
+                }
+              ],
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c"
+              ],
+              "message": "count of items plus fa plus fb needs more than 15 digits",
+              "name": "count of items plus fa plus fb is 0"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -56936,6 +58607,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -56959,6 +58631,7 @@
                 "/things/0/fa"
               ],
               "name": "fa",
+              "outcome": "usable",
               "value": 1e-70000
             },
             {
@@ -56966,6 +58639,7 @@
                 "/things/0/fb"
               ],
               "name": "fb",
+              "outcome": "usable",
               "value": 1e-70000
             }
           ],
@@ -57176,16 +58850,16 @@
                     {
                       "vals": [
                         100000000000000000000,
-                        1e-16
+                        0.0000000000000001
                       ],
                       "x": 100000000000000000000,
-                      "y": 1e-16
+                      "y": 0.0000000000000001
                     },
                     {
                       "vals": [
                         100000000000000000000
                       ],
-                      "x": 1e-16,
+                      "x": 0.0000000000000001,
                       "y": 100000000000000000000
                     }
                   ]
@@ -57204,7 +58878,7 @@
                   ],
                   "name": "fb",
                   "outcome": "usable",
-                  "value": 1e-16
+                  "value": 0.0000000000000001
                 }
               ],
               "kind": "assertion",
@@ -57245,16 +58919,16 @@
                 {
                   "vals": [
                     100000000000000000000,
-                    1e-16
+                    0.0000000000000001
                   ],
                   "x": 100000000000000000000,
-                  "y": 1e-16
+                  "y": 0.0000000000000001
                 },
                 {
                   "vals": [
                     100000000000000000000
                   ],
-                  "x": 1e-16,
+                  "x": 0.0000000000000001,
                   "y": 100000000000000000000
                 }
               ]
@@ -57273,10 +58947,9 @@
               ],
               "name": "fb",
               "outcome": "usable",
-              "value": 1e-16
+              "value": 0.0000000000000001
             }
           ],
-          "message": "count of items plus fa plus fb needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -57483,18 +59156,18 @@
                   "value": [
                     {
                       "vals": [
-                        -1e-06,
+                        -0.000001,
                         0.1234567890123456
                       ],
-                      "x": -1e-06,
+                      "x": -0.000001,
                       "y": 0.1234567890123456
                     },
                     {
                       "vals": [
-                        -1e-06
+                        -0.000001
                       ],
                       "x": 0.1234567890123456,
-                      "y": -1e-06
+                      "y": -0.000001
                     }
                   ]
                 },
@@ -57504,7 +59177,7 @@
                   ],
                   "name": "fa",
                   "outcome": "usable",
-                  "value": -1e-06
+                  "value": -0.000001
                 },
                 {
                   "locations": [
@@ -57552,18 +59225,18 @@
               "value": [
                 {
                   "vals": [
-                    -1e-06,
+                    -0.000001,
                     0.1234567890123456
                   ],
-                  "x": -1e-06,
+                  "x": -0.000001,
                   "y": 0.1234567890123456
                 },
                 {
                   "vals": [
-                    -1e-06
+                    -0.000001
                   ],
                   "x": 0.1234567890123456,
-                  "y": -1e-06
+                  "y": -0.000001
                 }
               ]
             },
@@ -57573,7 +59246,7 @@
               ],
               "name": "fa",
               "outcome": "usable",
-              "value": -1e-06
+              "value": -0.000001
             },
             {
               "locations": [
@@ -57584,7 +59257,6 @@
               "value": 0.1234567890123456
             }
           ],
-          "message": "count of items plus fa plus fb needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -57763,13 +59435,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "zz.x plus fa is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -57784,38 +59456,28 @@
                         "/things/0/items/0/x"
                       ],
                       "name": "zz.x",
-                      "value": 1e-70000
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
+                      "outcome": "usable",
                       "value": 1e-70000
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  1e-70000,
-                  1e-70000
-                ],
-                "x": 1e-70000,
-                "y": 1e-70000
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "zz.x plus fa needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      1e-70000,
+                      1e-70000
+                    ],
+                    "x": 1e-70000,
+                    "y": 1e-70000
+                  }
+                },
                 {
-                  "assertion": "zz.x plus fa is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -57830,30 +59492,41 @@
                         "/things/0/items/1/x"
                       ],
                       "name": "zz.x",
-                      "value": 1e-70000
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
+                      "outcome": "usable",
                       "value": 1e-70000
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "zz.x plus fa needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      1e-70000
+                    ],
+                    "x": 1e-70000,
+                    "y": 1e-70000
+                  }
                 }
               ],
-              "item": "item 2 of items",
-              "locations": [
-                "/things/0/items/1"
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 1e-70000
+                }
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  1e-70000
-                ],
-                "x": 1e-70000,
-                "y": 1e-70000
-              }
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c/assert/0"
+              ],
+              "message": "",
+              "name": "zz.x plus fa is 0"
             }
           ],
           "inputs": [
@@ -57863,6 +59536,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -58060,13 +59734,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "zz.x plus fa is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -58081,38 +59755,28 @@
                         "/things/0/items/0/x"
                       ],
                       "name": "zz.x",
-                      "value": 100000000000000000000
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
+                      "outcome": "usable",
                       "value": 100000000000000000000
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  100000000000000000000,
-                  10000000000
-                ],
-                "x": 100000000000000000000,
-                "y": 10000000000
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "zz.x plus fa needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      100000000000000000000,
+                      10000000000
+                    ],
+                    "x": 100000000000000000000,
+                    "y": 10000000000
+                  }
+                },
                 {
-                  "assertion": "zz.x plus fa is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -58127,30 +59791,41 @@
                         "/things/0/items/1/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 10000000000
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
-                      "value": 100000000000000000000
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "zz.x plus fa needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      100000000000000000000
+                    ],
+                    "x": 10000000000,
+                    "y": 100000000000000000000
+                  }
                 }
               ],
-              "item": "item 2 of items",
-              "locations": [
-                "/things/0/items/1"
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 100000000000000000000
+                }
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  100000000000000000000
-                ],
-                "x": 10000000000,
-                "y": 100000000000000000000
-              }
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c/assert/0"
+              ],
+              "message": "",
+              "name": "zz.x plus fa is 0"
             }
           ],
           "inputs": [
@@ -58160,6 +59835,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -58179,6 +59855,7 @@
               ]
             }
           ],
+          "message": "item 1 of items: zz.x plus fa needs more than 15 digits; item 2 of items: zz.x plus fa needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -58357,13 +60034,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
-              "cause": "value",
-              "failed_assertions": [
+              "cause": "unusable",
+              "failures": [
                 {
-                  "assertion": "zz.x plus fa is 0",
                   "cause": "value",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -58378,38 +60055,28 @@
                         "/things/0/items/0/x"
                       ],
                       "name": "zz.x",
-                      "value": -0.000001
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
+                      "outcome": "usable",
                       "value": -0.000001
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  -0.000001,
-                  0.1234567890123456
-                ],
-                "x": -0.000001,
-                "y": 0.1234567890123456
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "zz.x plus fa is -0.000002",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      -0.000001,
+                      0.1234567890123456
+                    ],
+                    "x": -0.000001,
+                    "y": 0.1234567890123456
+                  }
+                },
                 {
-                  "assertion": "zz.x plus fa is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -58424,30 +60091,41 @@
                         "/things/0/items/1/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 0.1234567890123456
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
-                      "value": -0.000001
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "zz.x plus fa needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      -0.000001
+                    ],
+                    "x": 0.1234567890123456,
+                    "y": -0.000001
+                  }
                 }
               ],
-              "item": "item 2 of items",
-              "locations": [
-                "/things/0/items/1"
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": -0.000001
+                }
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  -0.000001
-                ],
-                "x": 0.1234567890123456,
-                "y": -0.000001
-              }
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c/assert/0"
+              ],
+              "message": "",
+              "name": "zz.x plus fa is 0"
             }
           ],
           "inputs": [
@@ -58457,6 +60135,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -58654,13 +60333,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "zz.x plus zz.y is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -58675,6 +60354,7 @@
                         "/things/0/items/0/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 1e-70000
                     },
                     {
@@ -58682,31 +60362,28 @@
                         "/things/0/items/0/y"
                       ],
                       "name": "zz.y",
+                      "outcome": "usable",
                       "value": 1e-70000
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  1e-70000,
-                  1e-70000
-                ],
-                "x": 1e-70000,
-                "y": 1e-70000
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "zz.x plus zz.y needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      1e-70000,
+                      1e-70000
+                    ],
+                    "x": 1e-70000,
+                    "y": 1e-70000
+                  }
+                },
                 {
-                  "assertion": "zz.x plus zz.y is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -58721,6 +60398,7 @@
                         "/things/0/items/1/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 1e-70000
                     },
                     {
@@ -58728,23 +60406,32 @@
                         "/things/0/items/1/y"
                       ],
                       "name": "zz.y",
+                      "outcome": "usable",
                       "value": 1e-70000
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "zz.x plus zz.y needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      1e-70000
+                    ],
+                    "x": 1e-70000,
+                    "y": 1e-70000
+                  }
                 }
               ],
-              "item": "item 2 of items",
+              "inputs": [],
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/1"
+                "$policy:/requirements/r/checks/c/assert/0"
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  1e-70000
-                ],
-                "x": 1e-70000,
-                "y": 1e-70000
-              }
+              "message": "",
+              "name": "zz.x plus zz.y is 0"
             }
           ],
           "inputs": [
@@ -58754,6 +60441,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -58951,13 +60639,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "zz.x plus zz.y is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -58972,6 +60660,7 @@
                         "/things/0/items/0/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 100000000000000000000
                     },
                     {
@@ -58979,31 +60668,28 @@
                         "/things/0/items/0/y"
                       ],
                       "name": "zz.y",
+                      "outcome": "usable",
                       "value": 1000000000000000
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  100000000000000000000,
-                  1000000000000000
-                ],
-                "x": 100000000000000000000,
-                "y": 1000000000000000
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "zz.x plus zz.y needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      100000000000000000000,
+                      1000000000000000
+                    ],
+                    "x": 100000000000000000000,
+                    "y": 1000000000000000
+                  }
+                },
                 {
-                  "assertion": "zz.x plus zz.y is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -59018,6 +60704,7 @@
                         "/things/0/items/1/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 1000000000000000
                     },
                     {
@@ -59025,23 +60712,32 @@
                         "/things/0/items/1/y"
                       ],
                       "name": "zz.y",
+                      "outcome": "usable",
                       "value": 100000000000000000000
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "zz.x plus zz.y needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      100000000000000000000
+                    ],
+                    "x": 1000000000000000,
+                    "y": 100000000000000000000
+                  }
                 }
               ],
-              "item": "item 2 of items",
+              "inputs": [],
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/1"
+                "$policy:/requirements/r/checks/c/assert/0"
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  100000000000000000000
-                ],
-                "x": 1000000000000000,
-                "y": 100000000000000000000
-              }
+              "message": "",
+              "name": "zz.x plus zz.y is 0"
             }
           ],
           "inputs": [
@@ -59051,6 +60747,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -59070,6 +60767,7 @@
               ]
             }
           ],
+          "message": "item 1 of items: zz.x plus zz.y needs more than 15 digits; item 2 of items: zz.x plus zz.y needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -59248,13 +60946,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "zz.x plus zz.y is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -59269,6 +60967,7 @@
                         "/things/0/items/0/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": -0.000001
                     },
                     {
@@ -59276,31 +60975,28 @@
                         "/things/0/items/0/y"
                       ],
                       "name": "zz.y",
+                      "outcome": "usable",
                       "value": 0.1234567890123456
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  -0.000001,
-                  0.1234567890123456
-                ],
-                "x": -0.000001,
-                "y": 0.1234567890123456
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "zz.x plus zz.y needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      -0.000001,
+                      0.1234567890123456
+                    ],
+                    "x": -0.000001,
+                    "y": 0.1234567890123456
+                  }
+                },
                 {
-                  "assertion": "zz.x plus zz.y is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -59315,6 +61011,7 @@
                         "/things/0/items/1/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 0.1234567890123456
                     },
                     {
@@ -59322,23 +61019,32 @@
                         "/things/0/items/1/y"
                       ],
                       "name": "zz.y",
+                      "outcome": "usable",
                       "value": -0.000001
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "zz.x plus zz.y needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      -0.000001
+                    ],
+                    "x": 0.1234567890123456,
+                    "y": -0.000001
+                  }
                 }
               ],
-              "item": "item 2 of items",
+              "inputs": [],
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/1"
+                "$policy:/requirements/r/checks/c/assert/0"
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  -0.000001
-                ],
-                "x": 0.1234567890123456,
-                "y": -0.000001
-              }
+              "message": "",
+              "name": "zz.x plus zz.y is 0"
             }
           ],
           "inputs": [
@@ -59348,6 +61054,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -59545,13 +61252,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "sum of zz.vals is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -59567,34 +61274,31 @@
                         "/things/0/items/0/vals/1"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         1e-70000,
                         1e-70000
                       ]
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  1e-70000,
-                  1e-70000
-                ],
-                "x": 1e-70000,
-                "y": 1e-70000
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "sum of zz.vals needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      1e-70000,
+                      1e-70000
+                    ],
+                    "x": 1e-70000,
+                    "y": 1e-70000
+                  }
+                },
                 {
-                  "assertion": "sum of zz.vals is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -59608,25 +61312,34 @@
                         "/things/0/items/1/vals/0"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         1e-70000
                       ]
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "sum of zz.vals needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      1e-70000
+                    ],
+                    "x": 1e-70000,
+                    "y": 1e-70000
+                  }
                 }
               ],
-              "item": "item 2 of items",
+              "inputs": [],
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/1"
+                "$policy:/requirements/r/checks/c/assert/0"
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  1e-70000
-                ],
-                "x": 1e-70000,
-                "y": 1e-70000
-              }
+              "message": "",
+              "name": "sum of zz.vals is 0"
             }
           ],
           "inputs": [
@@ -59636,6 +61349,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -59833,13 +61547,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "sum of zz.vals is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -59855,34 +61569,31 @@
                         "/things/0/items/0/vals/1"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         100000000000000000000,
                         1000000000000000
                       ]
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  100000000000000000000,
-                  1000000000000000
-                ],
-                "x": 100000000000000000000,
-                "y": 1000000000000000
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "sum of zz.vals needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      100000000000000000000,
+                      1000000000000000
+                    ],
+                    "x": 100000000000000000000,
+                    "y": 1000000000000000
+                  }
+                },
                 {
-                  "assertion": "sum of zz.vals is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -59896,25 +61607,34 @@
                         "/things/0/items/1/vals/0"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         100000000000000000000
                       ]
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "sum of zz.vals needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      100000000000000000000
+                    ],
+                    "x": 1000000000000000,
+                    "y": 100000000000000000000
+                  }
                 }
               ],
-              "item": "item 2 of items",
+              "inputs": [],
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/1"
+                "$policy:/requirements/r/checks/c/assert/0"
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  100000000000000000000
-                ],
-                "x": 1000000000000000,
-                "y": 100000000000000000000
-              }
+              "message": "",
+              "name": "sum of zz.vals is 0"
             }
           ],
           "inputs": [
@@ -59924,6 +61644,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -59943,6 +61664,7 @@
               ]
             }
           ],
+          "message": "item 1 of items: sum of zz.vals needs more than 15 digits; item 2 of items: sum of zz.vals needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -60121,13 +61843,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "sum of zz.vals is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -60143,34 +61865,31 @@
                         "/things/0/items/0/vals/1"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         -0.000001,
                         0.1234567890123456
                       ]
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  -0.000001,
-                  0.1234567890123456
-                ],
-                "x": -0.000001,
-                "y": 0.1234567890123456
-              }
-            },
-            {
-              "cause": "value",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "sum of zz.vals needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      -0.000001,
+                      0.1234567890123456
+                    ],
+                    "x": -0.000001,
+                    "y": 0.1234567890123456
+                  }
+                },
                 {
-                  "assertion": "sum of zz.vals is 0",
                   "cause": "value",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -60184,25 +61903,34 @@
                         "/things/0/items/1/vals/0"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         -0.000001
                       ]
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "sum of zz.vals is -0.000001",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      -0.000001
+                    ],
+                    "x": 0.1234567890123456,
+                    "y": -0.000001
+                  }
                 }
               ],
-              "item": "item 2 of items",
+              "inputs": [],
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/1"
+                "$policy:/requirements/r/checks/c/assert/0"
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  -0.000001
-                ],
-                "x": 0.1234567890123456,
-                "y": -0.000001
-              }
+              "message": "",
+              "name": "sum of zz.vals is 0"
             }
           ],
           "inputs": [
@@ -60212,6 +61940,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -60409,13 +62138,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "sum of zz.vals plus fa is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -60440,41 +62169,31 @@
                         "/things/0/items/0/vals/1"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         1e-70000,
                         1e-70000
                       ]
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
-                      "value": 1e-70000
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  1e-70000,
-                  1e-70000
-                ],
-                "x": 1e-70000,
-                "y": 1e-70000
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "sum of zz.vals plus fa needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      1e-70000,
+                      1e-70000
+                    ],
+                    "x": 1e-70000,
+                    "y": 1e-70000
+                  }
+                },
                 {
-                  "assertion": "sum of zz.vals plus fa is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -60496,32 +62215,43 @@
                         "/things/0/items/1/vals/0"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         1e-70000
                       ]
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
-                      "value": 1e-70000
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "sum of zz.vals plus fa needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      1e-70000
+                    ],
+                    "x": 1e-70000,
+                    "y": 1e-70000
+                  }
                 }
               ],
-              "item": "item 2 of items",
-              "locations": [
-                "/things/0/items/1"
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 1e-70000
+                }
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  1e-70000
-                ],
-                "x": 1e-70000,
-                "y": 1e-70000
-              }
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c/assert/0"
+              ],
+              "message": "",
+              "name": "sum of zz.vals plus fa is 0"
             }
           ],
           "inputs": [
@@ -60531,6 +62261,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -60728,13 +62459,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "sum of zz.vals plus fa is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -60759,41 +62490,31 @@
                         "/things/0/items/0/vals/1"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         100000000000000000000,
                         0.000000000000001
                       ]
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
-                      "value": 100000000000000000000
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  100000000000000000000,
-                  0.000000000000001
-                ],
-                "x": 100000000000000000000,
-                "y": 0.000000000000001
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "sum of zz.vals plus fa needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      100000000000000000000,
+                      0.000000000000001
+                    ],
+                    "x": 100000000000000000000,
+                    "y": 0.000000000000001
+                  }
+                },
                 {
-                  "assertion": "sum of zz.vals plus fa is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -60815,32 +62536,43 @@
                         "/things/0/items/1/vals/0"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         100000000000000000000
                       ]
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
-                      "value": 100000000000000000000
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "sum of zz.vals plus fa needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      100000000000000000000
+                    ],
+                    "x": 0.000000000000001,
+                    "y": 100000000000000000000
+                  }
                 }
               ],
-              "item": "item 2 of items",
-              "locations": [
-                "/things/0/items/1"
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": 100000000000000000000
+                }
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  100000000000000000000
-                ],
-                "x": 0.000000000000001,
-                "y": 100000000000000000000
-              }
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c/assert/0"
+              ],
+              "message": "",
+              "name": "sum of zz.vals plus fa is 0"
             }
           ],
           "inputs": [
@@ -60850,6 +62582,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -61047,13 +62780,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "sum of zz.vals plus fa is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -61078,41 +62811,31 @@
                         "/things/0/items/0/vals/1"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         -0.000001,
                         0.1234567890123456
                       ]
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
-                      "value": -0.000001
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  -0.000001,
-                  0.1234567890123456
-                ],
-                "x": -0.000001,
-                "y": 0.1234567890123456
-              }
-            },
-            {
-              "cause": "value",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "sum of zz.vals plus fa needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      -0.000001,
+                      0.1234567890123456
+                    ],
+                    "x": -0.000001,
+                    "y": 0.1234567890123456
+                  }
+                },
                 {
-                  "assertion": "sum of zz.vals plus fa is 0",
                   "cause": "value",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -61134,32 +62857,43 @@
                         "/things/0/items/1/vals/0"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         -0.000001
                       ]
-                    },
-                    {
-                      "locations": [
-                        "/things/0/fa"
-                      ],
-                      "name": "fa",
-                      "value": -0.000001
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "sum of zz.vals plus fa is -0.000002",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      -0.000001
+                    ],
+                    "x": 0.1234567890123456,
+                    "y": -0.000001
+                  }
                 }
               ],
-              "item": "item 2 of items",
-              "locations": [
-                "/things/0/items/1"
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/fa"
+                  ],
+                  "name": "fa",
+                  "outcome": "usable",
+                  "value": -0.000001
+                }
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  -0.000001
-                ],
-                "x": 0.1234567890123456,
-                "y": -0.000001
-              }
+              "kind": "assertion",
+              "locations": [
+                "$policy:/requirements/r/checks/c/assert/0"
+              ],
+              "message": "",
+              "name": "sum of zz.vals plus fa is 0"
             }
           ],
           "inputs": [
@@ -61169,6 +62903,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -61366,13 +63101,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "zz.x plus count of zz.vals is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -61388,6 +63123,7 @@
                         "/things/0/items/0/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 1e-70000
                     },
                     {
@@ -61404,34 +63140,31 @@
                         "/things/0/items/0/vals/1"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         1e-70000,
                         1e-70000
                       ]
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  1e-70000,
-                  1e-70000
-                ],
-                "x": 1e-70000,
-                "y": 1e-70000
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "zz.x plus count of zz.vals needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      1e-70000,
+                      1e-70000
+                    ],
+                    "x": 1e-70000,
+                    "y": 1e-70000
+                  }
+                },
                 {
-                  "assertion": "zz.x plus count of zz.vals is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -61446,6 +63179,7 @@
                         "/things/0/items/1/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 1e-70000
                     },
                     {
@@ -61460,25 +63194,34 @@
                         "/things/0/items/1/vals/0"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         1e-70000
                       ]
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "zz.x plus count of zz.vals needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      1e-70000
+                    ],
+                    "x": 1e-70000,
+                    "y": 1e-70000
+                  }
                 }
               ],
-              "item": "item 2 of items",
+              "inputs": [],
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/1"
+                "$policy:/requirements/r/checks/c/assert/0"
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  1e-70000
-                ],
-                "x": 1e-70000,
-                "y": 1e-70000
-              }
+              "message": "",
+              "name": "zz.x plus count of zz.vals is 0"
             }
           ],
           "inputs": [
@@ -61488,6 +63231,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -61685,13 +63429,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "failed_assertions": [
+              "failures": [
                 {
-                  "assertion": "zz.x plus count of zz.vals is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -61707,6 +63451,7 @@
                         "/things/0/items/0/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 100000000000000000000
                     },
                     {
@@ -61723,34 +63468,31 @@
                         "/things/0/items/0/vals/1"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         100000000000000000000,
                         0.00000000000001
                       ]
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  100000000000000000000,
-                  0.00000000000001
-                ],
-                "x": 100000000000000000000,
-                "y": 0.00000000000001
-              }
-            },
-            {
-              "cause": "value",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "zz.x plus count of zz.vals needs more than 15 digits",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      100000000000000000000,
+                      0.00000000000001
+                    ],
+                    "x": 100000000000000000000,
+                    "y": 0.00000000000001
+                  }
+                },
                 {
-                  "assertion": "zz.x plus count of zz.vals is 0",
                   "cause": "value",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -61765,6 +63507,7 @@
                         "/things/0/items/1/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 0.00000000000001
                     },
                     {
@@ -61779,25 +63522,34 @@
                         "/things/0/items/1/vals/0"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         100000000000000000000
                       ]
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "zz.x plus count of zz.vals is 1.00000000000001",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      100000000000000000000
+                    ],
+                    "x": 0.00000000000001,
+                    "y": 100000000000000000000
+                  }
                 }
               ],
-              "item": "item 2 of items",
+              "inputs": [],
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/1"
+                "$policy:/requirements/r/checks/c/assert/0"
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  100000000000000000000
-                ],
-                "x": 0.00000000000001,
-                "y": 100000000000000000000
-              }
+              "message": "",
+              "name": "zz.x plus count of zz.vals is 0"
             }
           ],
           "inputs": [
@@ -61807,6 +63559,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
@@ -62004,13 +63757,13 @@
         {
           "cause": "unusable",
           "check": "c",
-          "failed_items": [
+          "failures": [
             {
-              "cause": "value",
-              "failed_assertions": [
+              "cause": "unusable",
+              "failures": [
                 {
-                  "assertion": "zz.x plus count of zz.vals is 0",
                   "cause": "value",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -62026,6 +63779,7 @@
                         "/things/0/items/0/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": -0.000001
                     },
                     {
@@ -62042,34 +63796,31 @@
                         "/things/0/items/0/vals/1"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         -0.000001,
                         0.1234567890123456
                       ]
                     }
-                  ]
-                }
-              ],
-              "item": "item 1 of items",
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "path": "item 1 of items",
-              "value": {
-                "vals": [
-                  -0.000001,
-                  0.1234567890123456
-                ],
-                "x": -0.000001,
-                "y": 0.1234567890123456
-              }
-            },
-            {
-              "cause": "unusable",
-              "failed_assertions": [
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "zz.x plus count of zz.vals is 1.999999",
+                  "name": "item 1 of items",
+                  "value": {
+                    "vals": [
+                      -0.000001,
+                      0.1234567890123456
+                    ],
+                    "x": -0.000001,
+                    "y": 0.1234567890123456
+                  }
+                },
                 {
-                  "assertion": "zz.x plus count of zz.vals is 0",
                   "cause": "unusable",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
@@ -62084,6 +63835,7 @@
                         "/things/0/items/1/x"
                       ],
                       "name": "zz.x",
+                      "outcome": "usable",
                       "value": 0.1234567890123456
                     },
                     {
@@ -62098,25 +63850,34 @@
                         "/things/0/items/1/vals/0"
                       ],
                       "name": "zz.vals[]",
+                      "outcome": "usable",
                       "value": [
                         -0.000001
                       ]
                     }
-                  ]
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/1"
+                  ],
+                  "message": "zz.x plus count of zz.vals needs more than 15 digits",
+                  "name": "item 2 of items",
+                  "value": {
+                    "vals": [
+                      -0.000001
+                    ],
+                    "x": 0.1234567890123456,
+                    "y": -0.000001
+                  }
                 }
               ],
-              "item": "item 2 of items",
+              "inputs": [],
+              "kind": "assertion",
               "locations": [
-                "/things/0/items/1"
+                "$policy:/requirements/r/checks/c/assert/0"
               ],
-              "path": "item 2 of items",
-              "value": {
-                "vals": [
-                  -0.000001
-                ],
-                "x": 0.1234567890123456,
-                "y": -0.000001
-              }
+              "message": "",
+              "name": "zz.x plus count of zz.vals is 0"
             }
           ],
           "inputs": [
@@ -62126,6 +63887,7 @@
                 "/things/0/items/1"
               ],
               "name": "items[]",
+              "outcome": "usable",
               "value": [
                 {
                   "vals": [
