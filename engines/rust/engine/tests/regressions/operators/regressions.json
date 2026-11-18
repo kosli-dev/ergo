@@ -3413,6 +3413,7 @@
                 "/things/0/items/1"
               ],
               "name": "count of items",
+              "outcome": "usable",
               "value": 2
             },
             {
@@ -3442,6 +3443,7 @@
               ]
             }
           ],
+          "message": "item 1 of items: x.v is 3, and count of items is 2; item 2 of items: x.v is 4, and count of items is 2",
           "passed": false,
           "requirement": "r1",
           "subject": {
@@ -3716,6 +3718,7 @@
                 "/things/0/items/1"
               ],
               "name": "count of items",
+              "outcome": "usable",
               "value": 2
             },
             {
@@ -3745,6 +3748,7 @@
               ]
             }
           ],
+          "message": "count of items is 2, and $params.q is 3",
           "passed": false,
           "requirement": "r1",
           "subject": {
@@ -3983,6 +3987,7 @@
                 "/things/0/fb"
               ],
               "name": "days elapsed from fa to fb",
+              "outcome": "usable",
               "value": 1
             },
             {
@@ -4028,6 +4033,7 @@
               ]
             }
           ],
+          "message": "fa is \"2026-10-01T00:00:00Z\", which isn't a number",
           "passed": false,
           "requirement": "r1",
           "subject": {

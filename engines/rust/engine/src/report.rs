@@ -408,11 +408,7 @@ impl RequirementRead<'_> {
             let every = if at == 0 { "Every" } else { "every" };
             descriptions.push(format!("{every} {level} id is unique"));
             let from = if self.reads_from(level) {
-                refs.extend(crate::checks::refs_read(
-                    &reading.source_refs(level),
-                    input,
-                    Some(params),
-                ));
+                refs.extend(source_refs_read(reading, level, input, params));
                 reading.infos[level].from_text.clone().unwrap_or_default()
             } else {
                 INVALID_FROM.to_string()
@@ -513,7 +509,7 @@ pub fn check_defs(
     };
     let from_refs = match policy.subject_of(requirement) {
         Some((name, _)) if read.reads_from(name) => {
-            crate::checks::refs_read(&reading.source_refs(name), input, Some(params))
+            source_refs_read(reading, name, input, params)
         }
         _ => Vec::new(),
     };
@@ -1052,3 +1048,27 @@ pub fn violations(report: &Value) -> Value {
 
 #[cfg(test)]
 mod tests;
+
+fn source_refs_read(reading: &Reading, name: &str, input: &Value, params: &Value) -> Vec<Value> {
+    let paths = reading.source_refs(name);
+    let keys: Vec<String> = reading
+        .lowered(name)
+        .map(|lowered| match &lowered.source {
+            crate::reading::Source::Root { path, .. }
+            | crate::reading::Source::Child { path, .. } => crate::path::step_refs(path),
+        })
+        .unwrap_or_default()
+        .iter()
+        .map(crate::name::name)
+        .collect();
+    let mut refs = crate::checks::refs_read(&paths, input, Some(params));
+    for entry in &mut refs {
+        let named = entry.get("name").and_then(Value::as_str).unwrap_or_default();
+        let value = entry.get("value").cloned().unwrap_or(Value::Null);
+        let fits = !keys.iter().any(|k| k == named) || value.is_string();
+        if entry.get("outcome").and_then(Value::as_str) == Some("usable") && !fits {
+            entry["outcome"] = json!("unusable");
+        }
+    }
+    refs
+}
