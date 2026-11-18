@@ -10134,6 +10134,43 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("ap.ok is true", "ap.ok is true", &[], &[]),
+    (
+        "count of es.v that is m named by $params.k is 0",
+        "count of es.v that equals m named by $params.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v is 1 is $params.n",
+        "count of xs whose v is 1 equals $params.n",
+        &[],
+        &[],
+    ),
+    ("count of xs whose v is 1 is 0", "count of xs whose v is 1 is 0", &[], &[]),
+    (
+        "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1",
+        "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1",
+        &[],
+        &[],
+    ),
+    ("d.ok is true", "d.ok is true", &[], &[]),
+    (
+        "every es.v that is m named by $params.k exists",
+        "every es.v that equals m named by $params.k exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is in $input.os.name and whose w is at least $params.z exists",
+        "every xs whose v is in $input.os.name and whose w is at least $params.z exists",
+        &[],
+        &[],
+    ),
+    ("id is \"x\"", "id is \"x\"", &[], &[]),
+    ("sum of xs.v is 0", "sum of xs.v is 0", &[], &[]),
+    ("x is \"w\"", "x is \"w\"", &[], &[]),
+    ("x is \"z\"", "x is \"z\"", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -14700,6 +14737,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every xs whose v is m named by $params.k as x",
         "every xs whose v equals m named by $params.k as x",
+        &[],
+        &[],
+    ),
+    (
+        "every commits as c, every approvers whose commit is c.id as ap",
+        "every commits as c, every approvers whose commit equals c.id as ap",
+        &[],
+        &[],
+    ),
+    (
+        "every envs as e, every deploys whose env is e as d",
+        "every envs as e, every deploys whose env equals e as d",
         &[],
         &[],
     ),
