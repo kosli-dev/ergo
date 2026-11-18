@@ -2321,7 +2321,7 @@ A failed row has a `message`: one line of plain text that says what Ergo found, 
 | `not_an_object` | the subject, by its name                    | `deployment is "str", which isn't an object` |
 | `ambiguous`     | the items that tie, and the key they tie on | `item 1 and item 2 of commits tie on ts`     |
 
-Where a row has no name for the subject, the message says `the subject`. A number Ergo works out is named after the words that asked for it, like `count of l is 5`. How values are printed:
+When a sentence can't read more than one name from outside its items, a field of the subject, `$params`, `$input`, a part or a key after `named by`, it says each of them, the worst cause first and then by name, and then the list it walks, then the items in list order. With `x` `null` and no `y`, `x is at least y` says `y is missing, and x is null`. With no `k` in the params and `xs` holding `[{"v": 1}, {"v": 1, "m": null}]`, `every xs whose v is m named by $params.k exists` says `$params.k is missing; item 1 of xs: m is missing; item 2 of xs: m is null`: the key once, then each item whose `m` can't take a key. Where a row has no name for the subject, the message says `the subject`. A number Ergo works out is named after the words that asked for it, like `count of l is 5`. How values are printed:
 
 - Text is in quotes. Text over 60 characters keeps the first 60 and ends with `…"`.
 - A list over 3 items shows the first 3 and then `and N more`, like `l is ["a", "b", "c", and 2 more]`.
@@ -2473,7 +2473,8 @@ A failed row says why in two places: its `message`, for a person, and its `failu
 1. Each entry is a part that failed: an `option` of an `any_of`, an `assertion` (a sentence), an `item` of a list that was walked, or a `list` that couldn't be walked. The entries under it are what failed inside it, and an entry with `failures` `[]` is a place where the check really failed.
 2. An entry's `inputs` are what that part read, each with its `name`, `value`, `locations` and `outcome`. `locations` are where, as [Where a value was read](#where-a-value-was-read) says, and `outcome` says which input to blame: `absent` and `null` are evidence that isn't there, `unusable` is a value of the wrong kind for the check, and `usable` is a value that was fine.
 3. An `item` has `value`, the item, and `locations`, where it sits in the input.
-4. A location that starts with `/` points into the input. One that starts with `$params:` points into the params, and one that starts with `$policy:` into the policy, at the option or the sentence. Neither is a value from the input.
+4. Each input sits on the entry that read it: a name from outside the items, like `$params.min`, on the `assertion`, once, what was read inside an item on that `item`, and a list's own read on its `list` entry. On a `for` line, what the line reads itself, like a key after `named by` in its `whose`, is in the row's own `inputs`. A `count of` or `sum of` whose list can't be walked, like `count of o is 1` with `o` holding `"s"`, has a `list` entry `o` under its assertion, with the input `o` and the `outcome` `unusable`.
+5. A location that starts with `/` points into the input. One that starts with `$params:` points into the params, and one that starts with `$policy:` into the policy, at the option or the sentence. Neither is a value from the input.
 
 With this policy:
 
