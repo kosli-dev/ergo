@@ -832,6 +832,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                 push_new(&mut once, clause);
             }
             if once.is_empty()
+                && ctx.params.is_none_or(|p| p.is_object() || p.is_null())
                 && let Check::Tally(t) = check
             {
                 for side in tally::tally_sides(t) {
