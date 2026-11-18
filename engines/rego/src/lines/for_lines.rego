@@ -6,7 +6,20 @@ _for_names := object.get(input, "ergo/names", {})
 
 _bound(names, name, v, at) := object.union(names, {name: v, "$at": object.union(object.get(names, "$at", {}), {"names": object.union(object.get(object.get(names, "$at", {}), "names", {}), {name: at})})})
 
-_for_row(check, subj) := _key_listed(_for_row_of(check, subj, _for_freed(check, subj, _for_row_raw(check, subj))), subj, check.items[0].path, object.get(check.items[0], "if_any", false) == true)
+_for_row(check, subj) := _for_key_cause(check, _key_listed(_for_row_of(check, subj, _for_freed(check, subj, _for_row_raw(check, subj))), subj, check.items[0].path, object.get(check.items[0], "if_any", false) == true))
+
+_for_key_cause(check, r) := object.union(r, {"cause": _worst_of({r.cause, "unusable"})}) if {
+	r.cause != "satisfied"
+	_for_key_not_text(check)
+} else := r
+
+_for_key_not_text(check) if {
+	some item in check.items
+	some c in object.get(item, "whose", [])
+	some [p, _] in _key_base_reads(c)
+	some seg in p
+	_ref_step_flaw(seg) == "unusable"
+}
 
 _for_freed(check, subj, r) := object.union(r, {"cause": _worst_or_value({r.cause, free.cause}), "free_lines": array.concat(object.get(r, "free_lines", []), lines), "unfreed": r}) if {
 	r.cause != "satisfied"

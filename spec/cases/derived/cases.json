@@ -24504,7 +24504,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -24547,7 +24556,7 @@
                 "value": []
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text; es is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -24561,18 +24570,28 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of es whose zz equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -24604,7 +24623,7 @@
                 "value": []
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text; es is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -24625,7 +24644,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -24668,7 +24696,7 @@
                 "value": []
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text; es is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -24682,18 +24710,28 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of es whose zz equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -24725,7 +24763,7 @@
                 "value": []
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text; es is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -27722,7 +27760,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$input.m is missing; item 1 of xs is null, which isn't an object; item 2 of xs is 1, which isn't an object; and 3 more",
+                "message": "$input.m is missing; item 1 of xs is null, which isn't an object; item 2 of xs is 1, which isn't an object; item 3 of xs is \"t\", which isn't an object; and 2 more",
                 "name": "count of xs whose tags contains $input.m named by key is 1"
               }
             ],
@@ -27765,7 +27803,7 @@
                 "value": null
               }
             ],
-            "message": "$input.m is missing; item 1 of xs is null, which isn't an object; item 2 of xs is 1, which isn't an object; and 3 more",
+            "message": "$input.m is missing; item 1 of xs is null, which isn't an object; item 2 of xs is 1, which isn't an object; item 3 of xs is \"t\", which isn't an object; and 2 more",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -27805,7 +27843,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/matches"
                 ],
-                "message": "$input.m is missing; item 1 of xs is null, which isn't an object; item 2 of xs is 1, which isn't an object; and 3 more",
+                "message": "$input.m is missing; item 1 of xs is null, which isn't an object; item 2 of xs is 1, which isn't an object; item 3 of xs is \"t\", which isn't an object; and 2 more",
                 "name": "count of xs whose v matches $input.m named by key is 1"
               }
             ],
@@ -27848,7 +27886,7 @@
                 "value": null
               }
             ],
-            "message": "$input.m is missing; item 1 of xs is null, which isn't an object; item 2 of xs is 1, which isn't an object; and 3 more",
+            "message": "$input.m is missing; item 1 of xs is null, which isn't an object; item 2 of xs is 1, which isn't an object; item 3 of xs is \"t\", which isn't an object; and 2 more",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -28135,7 +28173,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$input.m is 3, which isn't an object; item 1 of xs: key is missing; item 2 of xs: key is null; and 2 more",
+                "message": "$input.m is 3, which isn't an object; item 1 of xs: key is missing; item 2 of xs: key is null; item 3 of xs: tags is null, and key is 3, which isn't text; and 1 more",
                 "name": "count of xs whose tags contains $input.m named by key is 1"
               }
             ],
@@ -28189,7 +28227,7 @@
                 "value": 3
               }
             ],
-            "message": "$input.m is 3, which isn't an object; item 1 of xs: key is missing; item 2 of xs: key is null; and 2 more",
+            "message": "$input.m is 3, which isn't an object; item 1 of xs: key is missing; item 2 of xs: key is null; item 3 of xs: tags is null, and key is 3, which isn't text; and 1 more",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -28228,7 +28266,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/matches"
                 ],
-                "message": "$input.m is 3, which isn't an object; item 1 of xs: v is missing, and key is missing; item 2 of xs: v is missing, and key is null; and 2 more",
+                "message": "$input.m is 3, which isn't an object; item 1 of xs: v is missing, and key is missing; item 2 of xs: v is missing, and key is null; item 3 of xs: v is missing, and key is 3, which isn't text; and 1 more",
                 "name": "count of xs whose v matches $input.m named by key is 1"
               }
             ],
@@ -28282,7 +28320,7 @@
                 "value": 3
               }
             ],
-            "message": "$input.m is 3, which isn't an object; item 1 of xs: v is missing, and key is missing; item 2 of xs: v is missing, and key is null; and 2 more",
+            "message": "$input.m is 3, which isn't an object; item 1 of xs: v is missing, and key is missing; item 2 of xs: v is missing, and key is null; item 3 of xs: v is missing, and key is 3, which isn't text; and 1 more",
             "passed": false,
             "requirement": "s",
             "subject": {

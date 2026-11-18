@@ -13350,7 +13350,7 @@
                 "value": 2
               }
             ],
-            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; pull_requests is a list in item 1 of artifacts but \"none\" in item 4; and 1 more",
+            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; pull_requests is a list in item 1 of artifacts but \"none\" in item 4; item 1 of artifacts: item 1 of pull_requests is an object, item 4 of artifacts: pull_requests is text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20677,7 +20677,7 @@
                 "value": 2
               }
             ],
-            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; pull_requests is a list in item 1 of artifacts but \"none\" in item 4; and 1 more",
+            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; pull_requests is a list in item 1 of artifacts but \"none\" in item 4; item 1 of artifacts: item 1 of pull_requests is an object, item 4 of artifacts: pull_requests is text",
             "passed": false,
             "requirement": "r",
             "subject": {

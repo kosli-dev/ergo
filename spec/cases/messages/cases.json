@@ -13012,7 +13012,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items.m is missing; and 1 more",
+            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items.m is missing; item 2 of ws: w.items is {}, which isn't a list",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13240,7 +13240,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items.m is missing; and 1 more",
+            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items.m is missing; item 2 of ws: w.items is {}, which isn't a list",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -33061,7 +33061,7 @@
                 ]
               }
             ],
-            "message": "$params.min is \"s\", which isn't a number; $params.k is missing; item 1 of xs: x.v is null; and 1 more",
+            "message": "$params.min is \"s\", which isn't a number; $params.k is missing; item 1 of xs: x.v is null; item 2 of xs: x.v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {

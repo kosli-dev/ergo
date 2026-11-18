@@ -106452,7 +106452,7 @@
                   "value": 2
                 }
               ],
-              "message": "z is 2; item 1 of ws: w.n is 2; item 2 of ws: w.n is 2; and 2 more",
+              "message": "z is 2; item 1 of ws: w.n is 2; item 2 of ws: w.n is 2; item 2 of ws: w.ys is null; item 3 of ws: w.ys is missing",
               "passed": false,
               "requirement": "s",
               "subject": {

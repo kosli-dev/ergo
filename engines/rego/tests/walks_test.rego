@@ -736,7 +736,7 @@ test_a_roots_problem_comes_first_once_and_each_item_keeps_its_own_problems if {
 	_for_sentence_root_rows(checks, {"xs": [{"v": 1}, {"v": 3}]}) == {"c": ["absent", "z is missing; item 1 of xs: m.v is 1; item 2 of xs: m.v is 3"]}
 	_for_sentence_root_rows(checks, {"xs": [{"v": 1}, {"v": 3}], "z": null}) == {"c": ["null", "z is null; item 1 of xs: m.v is 1; item 2 of xs: m.v is 3"]}
 	_for_sentence_root_rows(checks, {"xs": [{"v": 1}, {"v": 3}], "z": "s"}) == {"c": ["unusable", "z is \"s\", which isn't a number; item 1 of xs: m.v is 1; item 2 of xs: m.v is 3"]}
-	_for_sentence_root_rows(checks, {"xs": [{"v": 1}, {}, {"v": null}, {"v": "t"}]}) == {"c": ["unusable", "z is missing; item 1 of xs: m.v is 1; item 2 of xs: m.v is missing; and 2 more"]}
+	_for_sentence_root_rows(checks, {"xs": [{"v": 1}, {}, {"v": null}, {"v": "t"}]}) == {"c": ["unusable", "z is missing; item 1 of xs: m.v is 1; item 2 of xs: m.v is missing; item 3 of xs: m.v is null; and 1 more"]}
 }
 
 test_a_roots_problem_said_once_still_lists_every_failed_item if {
@@ -2157,4 +2157,37 @@ test_a_for_line_count_says_a_walked_input_lists_kind_problem_once if {
 	rep := _said_once_report({"for": "every ms as m", "assert": "count of m.ws whose v is in $input.os.name is 2"}, [{"name": "bob"}, {"name": 3}])
 	_parts_row(rep, "c").cause == "unusable"
 	_parts_row(rep, "c").message == "$input.os[].name is [\"bob\", 3], which isn't a list of one kind of value"
+}
+
+_key_rows(checks, subject, params) := {r.check: [r.cause, r.message] |
+	some r in ergo.report({"things": [object.union({"id": "t"}, subject)]}, _sentence_policy(checks), params).results
+	not startswith(r.check, "$")
+}
+
+test_a_that_key_that_cant_be_read_on_an_item_that_isnt_an_object_names_the_item_and_never_a_field_under_it if {
+	checks := {"every": "every es.v that is m named by $params.k exists", "count": "count of es.v that is m named by $params.k is 0"}
+	_key_rows(checks, {"es": ["s"]}, {"k": null}) == {"every": ["not_an_object", "$params.k is null; item 1 of es is \"s\", which isn't an object"], "count": ["absent", "item 1 of es is \"s\", which isn't an object"]}
+	_key_rows(checks, {"es": ["s"]}, {"k": 3}) == {"every": ["not_an_object", "item 1 of es is \"s\", which isn't an object"], "count": ["unusable", "item 1 of es is \"s\", which isn't an object"]}
+	_key_rows(checks, {"es": [{"v": {"m": {"a": 1}}}]}, {"k": 3}) == {"every": ["unusable", "$params.k is 3, which isn't text"], "count": ["unusable", "$params.k is 3, which isn't text"]}
+}
+
+test_a_whose_key_said_before_the_items_is_not_one_of_the_three_items_the_message_shows if {
+	checks := {"every": "every es whose zz is m named by $params.k exists", "for": {"for": "every es whose zz is m named by $params.k as e", "assert": "e.v exists"}}
+	shown := "item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 2 more"
+	five := {"es": [{"zz": 2}, {"zz": 2}, {"zz": 2}, {"zz": 2}, {"zz": 2}]}
+	_key_rows(checks, five, {"k": 3}) == {c: ["unusable", concat("", ["$params.k is 3, which isn't text; ", shown])] | some c in ["every", "for"]}
+	_key_rows(checks, five, {}) == {c: ["absent", concat("", ["$params.k is missing; ", shown])] | some c in ["every", "for"]}
+}
+
+test_a_whose_key_that_isnt_text_is_said_before_a_list_that_cant_be_walked_and_the_row_takes_its_cause if {
+	checks := {"every": "every es whose zz is m named by $params.k exists", "some": "some es whose zz is m named by $params.k exists", "count": "count of es whose zz is m named by $params.k is 0", "for": {"for": "every es whose zz is m named by $params.k as e", "assert": "e.v exists"}}
+	_key_rows(checks, {}, {"k": 3}) == {c: ["unusable", "$params.k is 3, which isn't text; es is missing"] | some c in ["every", "some", "count", "for"]}
+	_key_rows(checks, {"es": null}, {}) == {c: ["absent", "$params.k is missing; es is null"] | some c in ["every", "some", "count", "for"]}
+}
+
+test_an_item_that_fails_on_its_own_field_keeps_a_whose_key_that_isnt_text_in_each_item if {
+	checks := {"every": "every es whose zz is m named by $params.k exists", "some": "some es whose zz is m named by $params.k exists", "for": {"for": "every es whose zz is m named by $params.k as e", "assert": "e.v exists"}}
+	said := "item 1 of es: $params.k is 3, which isn't text; item 2 of es: $params.k is 3, which isn't text"
+	_key_rows(checks, {"es": [{"v": 1}, {"v": 2}]}, {"k": 3}) == {c: ["unusable", said] | some c in ["every", "some", "for"]}
+	_key_rows({"every": checks.every}, {"es": [{"v": 2}, {"zz": 2, "m": null}]}, {"k": null}) == {"every": ["absent", "item 1 of es: zz is missing; $params.k is null"]}
 }

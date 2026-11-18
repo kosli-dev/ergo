@@ -37,7 +37,9 @@ else := i
 
 _for_texted(row) if _ = row["ergo/for_texts"]
 
-_for_failures(row, at, where, t) := _for_failures_of(row, at, where, t, array.concat([x[1] | some x in _for_key_flaws(where.check)], [e.message | some e in _key_list_parts(row, at)]))
+_for_failures(row, at, where, t) := _for_failures_of(row, at, where, t, array.concat([x[1] | some x in _for_key_flaws(where.check); not _key_said_in_item(row, x[1])], [e.message | some e in _key_list_parts(row, at)]))
+
+_key_said_in_item(row, k) if contains(row.message, concat("", [": ", k]))
 
 _for_failures_of(row, at, where, t, ks) := array.concat(
 	array.concat(
@@ -229,7 +231,7 @@ _for_walk_entry_of(f, rec, at, first_whose, whose, where) := object.union(
 }
 
 else := object.union(
-	_entry(_walk_kind(f.item), f.item, _whose_own_cause(first_whose, f), array.concat([_item_read(f) | _walk_kind(f.item) == "list"], _whose_reads(first_whose, f)), [], concat("; ", [_entry_text(m, f.item) | some m in rec.walk])),
+	_entry(_walk_kind(f.item), f.item, _whose_own_cause(first_whose, f, rec.walk), array.concat([_item_read(f) | _walk_kind(f.item) == "list"], _whose_reads(first_whose, f)), [], concat("; ", [_entry_text(m, f.item) | some m in rec.walk])),
 	{"value": f.value, "locations": f.locations},
 ) if {
 	rec.walk != []
@@ -253,12 +255,21 @@ _whose_read(c, p, f, "value") := {"name": _whose_read_name(p, f), "value": objec
 	not "unusable" in _key_item_flaws({"whose": [c]})
 }
 
-_whose_own_cause(whose, f) := _worst_of(causes) if {
+_whose_own_cause(whose, f, texts) := _worst_of(causes) if {
 	count(_key_item_flaws({"whose": whose})) > 0
+	not _texts_name_key(whose, texts)
 	is_object(f.value)
 	causes := {b.cause | some c in whose; some [p, mode] in _key_base_reads(c); not p[0] in _params_starts; p[0] != "$$input"; some b in _key_base_flaws(f.value, p, mode)}
 	count(causes) > 0
 } else := f.cause
+
+_texts_name_key(whose, texts) if {
+	some c in whose
+	some [p, _] in _key_base_reads(c)
+	some k in _m_key_texts(p)
+	some t in texts
+	contains(t, k)
+}
 
 _for_sorted_entry(x, s, text, at) := object.union(
 	_entry("item", x.item, x.cause, [{"name": s.name, "value": x.value, "locations": x.locations, "outcome": s.outcome}], [], _entry_text(text, x.item)),

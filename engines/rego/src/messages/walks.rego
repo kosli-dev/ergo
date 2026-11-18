@@ -383,9 +383,19 @@ else := array.concat(ends, [n])
 
 _m_shut(s) if count(split(replace(replace(s, "\\\\", ""), "\\\"", ""), "\"")) % 2 == 1
 
-_m_joined_once(ms) := concat("; ", ms) if count(ms) <= 3
+_m_joined_once(ms) := concat("; ", ms) if count(_m_item_leads(ms)) <= 3
 
-_m_joined_once(ms) := concat("; ", array.concat(array.slice(ms, 0, 3), [concat("", ["and ", _literal_text(count(ms) - 3), " more"])])) if count(ms) > 3
+_m_joined_once(ms) := concat("; ", array.concat([m | some m in ms; _m_shown_clause(m, shown)], [concat("", ["and ", _literal_text(count(leads) - 3), " more"])])) if {
+	leads := _m_item_leads(ms)
+	count(leads) > 3
+	shown := array.slice(leads, 0, 3)
+}
+
+_m_item_leads(ms) := _once([_m_item_lead(m) | some m in ms; startswith(m, "item ")])
+
+_m_shown_clause(m, _) if not startswith(m, "item ")
+
+_m_shown_clause(m, shown) if _m_item_lead(m) in shown
 
 _m_tally_shown(state, cause) if state == cause
 
@@ -436,6 +446,11 @@ _m_tally(subj, side) := ts if {
 	ts := _m_tally_key_items(subj, side)
 } else := _m_tally_walked_side(subj, side)
 
+_m_tally_fail_state(side, x) := "root" if {
+	count(_key_item_flaws(side)) > 0
+	not _path_through_item(x.item)
+} else := x.cause
+
 _m_tally_key_items(subj, side) := array.concat(
 	[["root", t] | some t in _m_root_sorted(_once([t | some c in side.whose; some [p, _] in _key_base_reads(c); some t in _m_key_texts(p)]))],
 	[["root", _m_leaf_in(e.i, _key_focus_text(array.concat(e.c, f.prefix), e.i, f.prefix, _m_key_list_text(_input_name(f.prefix), f)), roots)] |
@@ -459,7 +474,7 @@ _m_tally_key_items(subj, side) := array.concat(
 
 _m_tally_walked_side(subj, side) := array.concat(
 	array.concat(
-		[[x.cause, _m_fail(x, roots)] | some x in fs; not _m_tally_list_said(side, said, x)],
+		[[_m_tally_fail_state(side, x), _m_fail(x, roots)] | some x in fs; not _m_tally_list_said(side, said, x)],
 		array.concat(said, [["root", _m_fail(x, roots)] | some x in fs; _m_tally_list_said(side, said, x)]),
 	),
 	array.concat(_m_tally_items(subj, side), [["root", m] | w.items == []; some c in side.whose; some m in _key_root_texts(c)]),

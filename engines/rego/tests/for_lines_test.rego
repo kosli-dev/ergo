@@ -518,7 +518,22 @@ _null_key_whose_row(check) := [[r.cause, r.message] |
 
 test_a_whose_key_from_the_input_that_is_null_is_named_once_and_the_worse_cause_of_an_item_wins if {
 	_null_key_whose_row({"for": "every rs whose v is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: m is missing; item 2 of rs: m is missing"]]
-	_null_key_whose_row({"for": "every rs whose zz is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: zz is missing, and m is missing; item 2 of rs: zz is missing, and m is missing"]]
+	_null_key_whose_row({"for": "every rs whose zz is m named by $input.k as r", "assert": "r.v is 1"}) == [["absent", "$input.k is null; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
+}
+
+test_a_second_list_item_that_fails_on_its_own_field_keeps_a_whose_key_that_isnt_text_in_each_item if {
+	policy := _sentence_policy({"c": {"for": "every ws as w, every w.rs whose zz is m named by $params.k as r", "assert": "r.v exists"}})
+	doc := {"things": [{"id": "t", "ws": [{"rs": [{"v": 1}, {"v": 2}]}]}]}
+	[[r.cause, r.message] | some r in ergo.report(doc, policy, {"k": 3}).results; r.check == "c"] == [["unusable", "item 1 of ws: item 1 of w.rs: $params.k is 3, which isn't text; item 1 of ws: item 2 of w.rs: $params.k is 3, which isn't text"]]
+	nulls := {"things": [{"id": "t", "ws": [{"rs": [{"v": 1}, {"zz": 2, "m": null}]}]}]}
+	[[r.cause, r.message] | some r in ergo.report(nulls, policy, {"k": null}).results; r.check == "c"] == [["absent", "$params.k is null; item 1 of ws: item 1 of w.rs: zz is missing; item 1 of ws: item 2 of w.rs: m is null"]]
+}
+
+test_a_for_line_shows_three_items_after_a_sentence_that_doesnt_read_the_alias_and_never_counts_that_sentence if {
+	checks := {"c": {"for": "every xs as x", "assert": ["x.v is 1", "z is 3"]}}
+	_for_sentence_root_rows(checks, {"z": 2, "xs": [{"v": 2}, {"v": 2}, {"v": 2}, {"v": 2}, {"v": 2}]}) == {"c": ["value", "z is 2; item 1 of xs: x.v is 2; item 2 of xs: x.v is 2; item 3 of xs: x.v is 2; and 2 more"]}
+	two := {"c": {"for": "every ws as w, every w.ys as y", "assert": ["y is 1", "w.n is 1", "z is 3"]}}
+	_for_sentence_root_rows(two, {"z": 2, "ws": [{"n": 2, "ys": [1]}, {"n": 2, "ys": null}, {"n": 1}, {"n": 2}, {"n": 2}]}) == {"c": ["absent", "z is 2; item 1 of ws: w.n is 2; item 2 of ws: w.n is 2; item 2 of ws: w.ys is null; item 3 of ws: w.ys is missing; and 2 more"]}
 }
 
 test_a_second_whose_that_reads_a_list_input_key_through_an_alias_never_says_an_object_item_isnt_an_object if {

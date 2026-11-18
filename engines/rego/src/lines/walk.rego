@@ -4,6 +4,8 @@ import rego.v1
 
 _walk_row(check, subj) := object.union(r, {"other_roots": _walk_parts(check, subj, {"ergo/key_texts": true}, r)}) if {
 	r := _key_item_row(check, subj)
+} else := object.union(r, {"cause": _worst_of(_key_item_flaws(check) | {r.cause}), "other_roots": _walk_parts(check, subj, {"ergo/key_texts": true}, r)}) if {
+	r := _key_list_fail_row(check, subj)
 } else := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": _with_roots(_walk_parts(check, subj, raw, raw), ms)}) if {
 	_walk_flawed(check)
 	not _unreadable_input
@@ -440,12 +442,24 @@ _walk_failure(path, w, e, undecided, _, _, _) := {"path": e.c, "item": e.i, "cau
 	_focus_lost(e, undecided[0][0])
 }
 
-_walk_failure(path, w, e, undecided, _, _, _) := {"path": _walk_named_path(fe, p), "item": e.i, "cause": undecided[0][1], "value": _value_at(fe.iv, p), "at": _walk_named_at(w, fe, p), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": _m_walk_leaf(fe, undecided[0][0], _m_undecided(undecided[0][1]), _dotted_roots([path]))} if {
+_walk_failure(path, w, e, undecided, _, _, _) := {"path": _walk_named_path(fe, p), "item": e.i, "cause": undecided[0][1], "value": _value_at(fe.iv, p), "at": _walk_named_at(w, fe, p), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": _m_walk_leaf(_key_row_marked(w, fe, undecided[0][0]), undecided[0][0], _m_undecided(undecided[0][1]), _dotted_roots([path]))} if {
 	undecided != []
 	not _focus_lost(e, undecided[0][0])
 	fe := _focus_of(e, undecided[0][0])
-	p := _walk_first_path(undecided[0][0], fe.iv)
+	p := _walk_fail_path(w, fe, undecided[0][0], undecided[0][1])
 }
+
+_walk_fail_path(w, e, c, "unusable") := p if {
+	_key_row_marked(w, e, c)["ergo/unclean"] == true
+	p := [x[0] | some x in _key_base_reads(c); some seg in x[0]; _ref_step_flaw(seg) == "unusable"][0]
+} else := _walk_first_path(c, e.iv)
+
+_walk_fail_path(_, e, c, cause) := _walk_first_path(c, e.iv) if cause != "unusable"
+
+_key_row_marked(w, e, c) := object.union(e, {"ergo/unclean": true}) if {
+	count(_key_item_flaws({"whose": [c]})) > 0
+	not _key_items_clean(w, [c])
+} else := e
 
 _walk_named_path(_, p) := _as_subject_part(p) if _walk_outside(p)
 
@@ -723,6 +737,15 @@ _key_item_row(check, subj) := {"cause": cause, "inputs": raw.inputs, "failed": _
 	cause := _worst_of(flaws | {f.cause | some f in fails})
 }
 
+_key_list_fail_row(check, subj) := raw if {
+	check.op in _walk_ops
+	count(_key_item_flaws(check)) > 0
+	not _unreadable_input
+	raw := _walk_read_row(check, subj)
+	raw.cause != "satisfied"
+	_walk_list_fails(raw)
+}
+
 _fail_read_outcome(f) := {"ergo/read_outcome": f.read_outcome} if "read_outcome" in object.keys(f)
 
 else := {}
@@ -730,6 +753,7 @@ else := {}
 _key_items_clean(w, conds) if {
 	every e in w.items {
 		is_object(_key_focus(e))
+		not _walk_marked(_key_focus(e))
 		every c in conds {
 			every r in _key_base_reads(c) {
 				_key_item_read_fine(_key_focus(e), r[0])
