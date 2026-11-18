@@ -2345,6 +2345,32 @@ fn walk_base(walk: &ops::walk::Walk, ctx: &Ctx, said: &mut Vec<String>) -> Vec<F
     })]
 }
 
+fn push_params_refs(check: &Check, ctx: &Ctx, inputs: &[Value], keys: &mut Vec<Value>) {
+    for reference in check.refs() {
+        if reference.start != Start::Params {
+            continue;
+        }
+        let name = crate::name::name(&reference);
+        if inputs
+            .iter()
+            .chain(keys.iter())
+            .any(|i| i.get("name").and_then(Value::as_str) == Some(name.as_str()))
+        {
+            continue;
+        }
+        let Some(input) = ops::read_path(&reference, ctx).inputs.into_iter().next() else {
+            continue;
+        };
+        let mut entry = parts::with_outcome(&input, "", &[]);
+        if input.state == Outcome::Found
+            && crate::checks::ref_unfit(&[check], &reference, &input.value, ctx)
+        {
+            entry["outcome"] = json!("unusable");
+        }
+        keys.push(entry);
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 fn walk_part(
     name: &str,
@@ -2360,29 +2386,7 @@ fn walk_part(
 ) -> Part {
     let check = Check::Walk(Box::new(walk.clone()));
     let mut keys = key_ref_entries(&ops::key_base::every_path(&check), ctx, inputs);
-    for reference in check.refs() {
-        if reference.start != Start::Params {
-            continue;
-        }
-        let name = crate::name::name(&reference);
-        if inputs
-            .iter()
-            .chain(&keys)
-            .any(|i| i.get("name").and_then(Value::as_str) == Some(name.as_str()))
-        {
-            continue;
-        }
-        let Some(input) = ops::read_path(&reference, ctx).inputs.into_iter().next() else {
-            continue;
-        };
-        let mut entry = parts::with_outcome(&input, "", &[]);
-        if input.state == Outcome::Found
-            && crate::checks::ref_unfit(&[&check], &reference, &input.value, ctx)
-        {
-            entry["outcome"] = json!("unusable");
-        }
-        keys.push(entry);
-    }
+    push_params_refs(&check, ctx, inputs, &mut keys);
     let root_paths = if roots {
         walk.check.paths()
     } else {
@@ -2646,12 +2650,25 @@ fn with_failures(
                                         part: Part {
                                             name: line.text.clone(),
                                             cause: line.cause,
-                                            inputs: outcomes(
-                                                &line.inputs,
-                                                &line.said,
-                                                false,
-                                                &[&line.check],
-                                            ),
+                                            inputs: {
+                                                let mut inputs = outcomes(
+                                                    &line.inputs,
+                                                    &line.said,
+                                                    false,
+                                                    &[&line.check],
+                                                );
+                                                if matches!(line.check, Check::Walk(_)) {
+                                                    let mut refs = Vec::new();
+                                                    push_params_refs(
+                                                        &line.check,
+                                                        ctx,
+                                                        &inputs,
+                                                        &mut refs,
+                                                    );
+                                                    inputs.extend(refs);
+                                                }
+                                                inputs
+                                            },
                                             failures: Vec::new(),
                                             message: line.said.clone(),
                                         },

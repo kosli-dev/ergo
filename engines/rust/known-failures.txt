@@ -367,9 +367,7 @@ sentences / a root name of the wrong type on the left of a compare inside a rela
 sentences / a second for item whose whose takes its key from the subject / names pr.k alone, and keeps the first item when the name depends on it
 sentences / a sum of is not a value within a number / fails as unusable, absent or null like the sum does
 sentences / a sum of is not between two numbers / fails as absent or null when a value or the list is missing or null
-sentences / an any_of of sentences / passes when every sentence of one option passes, and fails with the first cause among its options
 sentences / an any_of of sentences that read a part / reads the part by its alias in each option
-sentences / an any_of of sentences with a param that isn't a list / fails as unusable even when another option passes
 sentences / an elapsed time is not a value within a number / fails as unusable, absent or null like the elapsed time does
 sentences / an elapsed time is not between two numbers / fails as unusable on times of two kinds or on text that isn't a time
 sentences / an elapsed time read with named by a field / lists the field right after the path it names, whichever end of the time it is
