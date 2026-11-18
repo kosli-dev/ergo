@@ -2063,7 +2063,7 @@ test_a_dot_in_a_from_whose_reads_the_field_named_like_the_subject if {
 _rooted_field_rows(doc) := [[r.check, r.cause, r.message] | some r in ergo.report({"ts": [doc]}, {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "ts", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"w": "every rows.n is at least m named by k", "p": "m named by k is 1"}}}}, {}).results; r.check in {"w", "p"}]
 
 test_a_named_by_field_on_the_right_of_every_reads_the_subjects_key_and_never_an_items if {
-	_rooted_field_rows({"id": 1, "k": null, "m": null, "rows": [{"n": 3}]}) == [["p", "null", "m is null; k is null"], ["w", "null", "m is null; k is null"]]
+	_rooted_field_rows({"id": 1, "k": null, "m": null, "rows": [{"n": 3}]}) == [["p", "null", "k is null; m is null"], ["w", "null", "k is null; m is null"]]
 	_rooted_field_rows({"id": 1, "k": null, "m": {}, "rows": [{"n": 3}]}) == [["p", "null", "k is null"], ["w", "null", "k is null"]]
 	_rooted_field_rows({"id": 1, "k": "m", "m": 3, "rows": [{"n": 3, "k": "n"}, {"n": 4}]}) == [["p", "unusable", "m is 3, which isn't an object"], ["w", "unusable", "m is 3, which isn't an object"]]
 }
@@ -2119,7 +2119,7 @@ test_an_item_that_isnt_an_object_and_a_null_item_under_a_named_by_key_are_each_s
 
 test_a_named_by_key_that_is_null_or_missing_or_not_text_keeps_saying_each_item_once if {
 	rows := _item_rows(_named_by_policy, {"prs": [{"id": "p0", "xs": [{"k": null}, {}, {"k": 1}]}]}, {})
-	rows.every == ["unusable", "item 1 of xs: m.k is null; m is {\"k\": null}, which isn't text; item 2 of xs: m is {}, which isn't text; item 3 of xs: m is {\"k\": 1}, which isn't text"]
+	rows.every == ["unusable", "item 1 of xs: m is {\"k\": null}, which isn't text; m.k is null; item 2 of xs: m is {}, which isn't text; item 3 of xs: m is {\"k\": 1}, which isn't text"]
 }
 
 test_a_walk_judges_an_item_with_short_numbers_beside_an_item_with_long_ones if {

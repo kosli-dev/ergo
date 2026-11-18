@@ -5339,25 +5339,35 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "$params.q",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is missing",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/g"
                 ],
-                "message": "$params.q is missing",
+                "message": "",
                 "name": "count of $params.q is 1"
               }
             ],
@@ -5388,25 +5398,35 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "$params.q",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is missing",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/h"
                 ],
-                "message": "$params.q is missing",
+                "message": "",
                 "name": "sum of $params.q is 1"
               }
             ],
@@ -6541,25 +6561,35 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "$params.q",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is null",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/g"
                 ],
-                "message": "$params.q is null",
+                "message": "",
                 "name": "count of $params.q is 1"
               }
             ],
@@ -6590,25 +6620,35 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "$params.q",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is null",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/h"
                 ],
-                "message": "$params.q is null",
+                "message": "",
                 "name": "sum of $params.q is 1"
               }
             ],
@@ -7749,25 +7789,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "$params.q",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is \"s\", which isn't a list or an object",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/g"
                 ],
-                "message": "$params.q is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of $params.q is 1"
               }
             ],
@@ -7780,7 +7830,7 @@
               {
                 "locations": [],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -7798,25 +7848,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "$params.q",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is \"s\", which isn't a list or an object",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/h"
                 ],
-                "message": "$params.q is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "sum of $params.q is 1"
               }
             ],
@@ -7829,7 +7889,7 @@
               {
                 "locations": [],
                 "name": "$params.q",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -8897,7 +8957,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "$params is missing",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -8915,7 +8984,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/g"
                 ],
-                "message": "$params is missing",
+                "message": "",
                 "name": "count of $params.q is 1"
               }
             ],
@@ -8946,7 +9015,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "$params is missing",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -8964,7 +9042,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/h"
                 ],
-                "message": "$params is missing",
+                "message": "",
                 "name": "sum of $params.q is 1"
               }
             ],
@@ -13317,7 +13395,16 @@
           "failures": [
             {
               "cause": "absent",
-              "failures": [],
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [],
+                  "kind": "list",
+                  "message": "$params.m is missing",
+                  "name": "$params.m"
+                }
+              ],
               "inputs": [
                 {
                   "locations": [],
@@ -13343,7 +13430,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/f"
               ],
-              "message": "$params.m is missing",
+              "message": "",
               "name": "count of $params.m named by k is 1"
             }
           ],
@@ -14150,7 +14237,16 @@
           "failures": [
             {
               "cause": "null",
-              "failures": [],
+              "failures": [
+                {
+                  "cause": "null",
+                  "failures": [],
+                  "inputs": [],
+                  "kind": "list",
+                  "message": "$params.m is null",
+                  "name": "$params.m"
+                }
+              ],
               "inputs": [
                 {
                   "locations": [],
@@ -14176,7 +14272,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/f"
               ],
-              "message": "$params.m is null",
+              "message": "",
               "name": "count of $params.m named by k is 1"
             }
           ],
@@ -14983,7 +15079,16 @@
           "failures": [
             {
               "cause": "unusable",
-              "failures": [],
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [],
+                  "kind": "list",
+                  "message": "$params.m is 3, which isn't a list or an object",
+                  "name": "$params.m"
+                }
+              ],
               "inputs": [
                 {
                   "locations": [],
@@ -15009,7 +15114,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/f"
               ],
-              "message": "$params.m is 3, which isn't a list or an object",
+              "message": "",
               "name": "count of $params.m named by k is 1"
             }
           ],
@@ -15889,7 +15994,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/m_is_k"
                 ],
-                "message": "m named by $input.k is null, and k is missing",
+                "message": "k is missing, and m named by $input.k is null",
                 "name": "m named by $input.k equals k"
               }
             ],
@@ -15911,7 +16016,7 @@
                 "value": null
               }
             ],
-            "message": "m named by $input.k is null, and k is missing",
+            "message": "k is missing, and m named by $input.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16814,7 +16919,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/m_is_k"
                 ],
-                "message": "m named by $params.k is null, and k is missing",
+                "message": "k is missing, and m named by $params.k is null",
                 "name": "m named by $params.k equals k"
               }
             ],
@@ -16836,7 +16941,7 @@
                 "value": null
               }
             ],
-            "message": "m named by $params.k is null, and k is missing",
+            "message": "k is missing, and m named by $params.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {

@@ -2200,7 +2200,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params.i is null; x.y is missing",
+                "message": "x.y is missing; $params.i is null",
                 "name": "x.y named by $params.i exists"
               }
             ],
@@ -2214,7 +2214,7 @@
                 "value": null
               }
             ],
-            "message": "$params.i is null; x.y is missing",
+            "message": "x.y is missing; $params.i is null",
             "passed": false,
             "requirement": "s",
             "subject": {

@@ -2,7 +2,9 @@ package ergo
 
 import rego.v1
 
-_walk_row(check, subj) := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": _with_roots(_walk_parts(check, subj, raw, raw), ms)}) if {
+_walk_row(check, subj) := object.union(r, {"other_roots": _walk_parts(check, subj, {"ergo/key_texts": true}, r)}) if {
+	r := _key_item_row(check, subj)
+} else := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": _with_roots(_walk_parts(check, subj, raw, raw), ms)}) if {
 	_walk_flawed(check)
 	not _unreadable_input
 	raw := _walk_read_row(check, subj)
@@ -545,7 +547,7 @@ _walk_worst(fails) := [c | some c in array.concat(_cause_precedence, ["value"]);
 
 _walk_failed("satisfied", _, _) := []
 
-_walk_failed(cause, fails, path) := [object.union({"path": _failed_name(f.path, _dotted_roots([path])), "item": _failed_name(f.item, _dotted_roots([path])), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "ergo/item": _fail_item(f)}, _plain_item_read(f, path)) |
+_walk_failed(cause, fails, path) := [object.union({"path": _failed_name(f.path, _dotted_roots([path])), "item": _failed_name(f.item, _dotted_roots([path])), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "ergo/item": _fail_item(f)}, object.union(_plain_item_read(f, path), _fail_read_outcome(f))) |
 	some p in sort({f.path | some f in fails})
 	some f in fails
 	f.path == p
@@ -687,3 +689,62 @@ _key_listed(r, subj, path, if_any) := object.union(r, {"ergo/key_lists": ls}) if
 _key_list_value(v) := null if v == _absent
 
 else := v
+
+_key_item_conds(check) := object.get(check, "whose", [])
+
+_key_item_flaws(check) := {f |
+	some c in _key_item_conds(check)
+	some [p, _] in _key_base_reads(c)
+	not p[0] in _params_starts
+	p[0] != "$$input"
+	some seg in p
+	f := _ref_step_flaw(seg)
+	f in _value_fault_causes
+}
+
+_key_item_row(check, subj) := {"cause": cause, "inputs": raw.inputs, "failed": _walk_failed(cause, fails, check.path), "fails": fails, "ergo/key_items": true} if {
+	check.op in {"every", "some"}
+	flaws := _key_item_flaws(check)
+	count(flaws) > 0
+	not _unreadable_input
+	w := _walk(_walk_start(check, subj), _walk_keys(check, subj), object.get(check, "if_any", false) == true)
+	w.items != []
+	w.fails == []
+	_key_items_clean(w, _key_item_conds(check))
+	fails := [{"path": array.concat(e.i, f.prefix), "item": e.i, "cause": f.cause, "value": _key_list_value(f.value), "at": _item_read_at(w, e, f.prefix), "iv": e.iv, "iat": _item_at(w, e), "lv": _item_levels(w, e), "msg": "", "ergo/base": f, "read_outcome": _worst_of({f.cause} | {x | some seg in p; x := _ref_step_flaw(seg); x in _value_fault_causes})} |
+		some e in w.items
+		some c in _key_item_conds(check)
+		some [p, mode] in _key_base_reads(c)
+		not p[0] in _params_starts
+		p[0] != "$$input"
+		some f in _key_base_flaws(e.iv, p, mode)
+	]
+	raw := _walk_read_row(check, subj)
+	cause := _worst_of(flaws | {f.cause | some f in fails})
+}
+
+_fail_read_outcome(f) := {"ergo/read_outcome": f.read_outcome} if "read_outcome" in object.keys(f)
+
+else := {}
+
+_key_items_clean(w, conds) if {
+	every e in w.items {
+		is_object(e.iv)
+		every c in conds {
+			every r in _key_base_reads(c) {
+				_key_item_read_fine(e.iv, r[0])
+			}
+		}
+	}
+}
+
+_key_item_read_fine(_, p) if p[0] in _params_starts
+
+_key_item_read_fine(_, p) if p[0] == "$$input"
+
+_key_item_read_fine(_, p) if {
+	some seg in p
+	_ref_step_flaw(seg)
+}
+
+_key_item_read_fine(iv, p) if _read_state(iv, p) == "value"

@@ -296,25 +296,35 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "findings",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "findings is missing",
+                    "name": "findings"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of findings",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "findings",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "findings is missing",
+                "message": "",
                 "name": "count of findings is 2"
               }
             ],
@@ -368,25 +378,35 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "findings",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "findings is null",
+                    "name": "findings"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of findings",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "findings",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "findings is null",
+                "message": "",
                 "name": "count of findings is 2"
               }
             ],
@@ -440,25 +460,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "findings",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "findings is \"abc\", which isn't a list or an object",
+                    "name": "findings"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of findings",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "findings",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "findings is \"abc\", which isn't a list or an object",
+                "message": "",
                 "name": "count of findings is 2"
               }
             ],
@@ -471,7 +501,7 @@
               {
                 "locations": [],
                 "name": "findings",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -514,25 +544,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "findings",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "findings is {\"id\": 1}, which isn't a list",
+                    "name": "findings"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of findings",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "findings",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "findings is {\"id\": 1}, which isn't a list",
+                "message": "",
                 "name": "count of findings is 2"
               }
             ],
@@ -545,7 +585,7 @@
               {
                 "locations": [],
                 "name": "findings",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -649,25 +689,35 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "findings",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "findings is missing",
+                    "name": "findings"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of findings",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "findings",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "findings is missing",
+                "message": "",
                 "name": "count of findings is 0"
               }
             ],
@@ -1272,25 +1322,35 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "findings",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "findings is missing",
+                    "name": "findings"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of findings whose severity is \"high\"",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "findings",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "findings is missing",
+                "message": "",
                 "name": "count of findings whose severity is \"high\" is 1"
               }
             ],
@@ -2050,7 +2110,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "pull_requests is missing",
+                    "name": "pull_requests"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -2068,7 +2137,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "pull_requests is missing",
+                "message": "",
                 "name": "count of pull_requests.commits is 3"
               }
             ],
@@ -2755,7 +2824,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "items is missing",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -2773,7 +2851,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "items is missing",
+                "message": "",
                 "name": "sum of items.usd is 30"
               }
             ],
@@ -2827,7 +2905,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "items is null",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -2845,7 +2932,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "items is null",
+                "message": "",
                 "name": "sum of items.usd is 30"
               }
             ],
@@ -2899,7 +2986,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "items is \"x\", which isn't a list or an object",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -2917,7 +3013,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "items is \"x\", which isn't a list or an object",
+                "message": "",
                 "name": "sum of items.usd is 30"
               }
             ],
@@ -6023,7 +6119,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "base is null, and extra is missing",
+                "message": "extra is missing, and base is null",
                 "name": "base plus extra is 5"
               }
             ],
@@ -6053,7 +6149,7 @@
                 "value": null
               }
             ],
-            "message": "base is null, and extra is missing",
+            "message": "extra is missing, and base is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -6269,7 +6365,23 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "findings",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "findings is missing",
+                    "name": "findings"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -6290,19 +6402,13 @@
                     "locations": [],
                     "name": "count of findings",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "findings",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "findings is missing",
+                "message": "",
                 "name": "base plus count of findings is 5"
               }
             ],
@@ -7697,18 +7803,28 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "findings",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "findings is missing",
+                    "name": "findings"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of findings",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "findings",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -7723,7 +7839,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "limit is null, and findings is missing",
+                "message": "limit is null",
                 "name": "count of findings equals limit"
               }
             ],
@@ -10731,25 +10847,35 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "$params.approvers",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.approvers is missing",
+                    "name": "$params.approvers"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $params.approvers",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.approvers",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params.approvers is missing",
+                "message": "",
                 "name": "count of $params.approvers is at least 2"
               }
             ],
@@ -10828,25 +10954,35 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "$params.approvers",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.approvers is null",
+                    "name": "$params.approvers"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $params.approvers",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.approvers",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params.approvers is null",
+                "message": "",
                 "name": "count of $params.approvers is at least 2"
               }
             ],
@@ -10925,25 +11061,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "$params.approvers",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.approvers is \"ann\", which isn't a list or an object",
+                    "name": "$params.approvers"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $params.approvers",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.approvers",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params.approvers is \"ann\", which isn't a list or an object",
+                "message": "",
                 "name": "count of $params.approvers is at least 2"
               }
             ],
@@ -10956,7 +11102,7 @@
               {
                 "locations": [],
                 "name": "$params.approvers",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -11615,25 +11761,35 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "x",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "x is missing",
+                    "name": "x"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of x",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "x",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x is missing",
+                "message": "",
                 "name": "count of x is between 1 and 3"
               }
             ],
@@ -11687,25 +11843,35 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "x",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "x is null",
+                    "name": "x"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of x",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "x",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x is null",
+                "message": "",
                 "name": "count of x is between 1 and 3"
               }
             ],
@@ -11759,25 +11925,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "x",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "x is \"abc\", which isn't a list or an object",
+                    "name": "x"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of x",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "x",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x is \"abc\", which isn't a list or an object",
+                "message": "",
                 "name": "count of x is between 1 and 3"
               }
             ],
@@ -11790,7 +11966,7 @@
               {
                 "locations": [],
                 "name": "x",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -15348,7 +15524,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "started is null, and ended is missing",
+                "message": "ended is missing, and started is null",
                 "name": "days elapsed from started to ended is at least 0"
               }
             ],
@@ -15378,7 +15554,7 @@
                 "value": null
               }
             ],
-            "message": "started is null, and ended is missing",
+            "message": "ended is missing, and started is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21623,18 +21799,28 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "zzs",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zzs is missing",
+                    "name": "zzs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of zzs",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zzs",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -21657,7 +21843,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count_is"
                 ],
-                "message": "m named by $input.k is null, and zzs is missing",
+                "message": "m named by $input.k is null",
                 "name": "count of zzs equals m named by $input.k"
               }
             ],
@@ -21815,7 +22001,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/plus_left"
                 ],
-                "message": "m named by $input.k is null, and k is missing",
+                "message": "k is missing, and m named by $input.k is null",
                 "name": "m named by $input.k plus 1 equals k"
               }
             ],
@@ -21844,7 +22030,7 @@
                 "value": null
               }
             ],
-            "message": "m named by $input.k is null, and k is missing",
+            "message": "k is missing, and m named by $input.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21939,7 +22125,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "zzs is missing",
+                    "name": "zzs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -21973,7 +22168,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/sum_is"
                 ],
-                "message": "m named by $input.k is null, and zzs is missing",
+                "message": "m named by $input.k is null",
                 "name": "sum of zzs.n equals m named by $input.k"
               }
             ],
@@ -25616,7 +25811,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "es is \"s\", which isn't a list or an object",
+                    "name": "es"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -25642,7 +25846,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/that"
                 ],
-                "message": "es is \"s\", which isn't a list or an object; $input.k is 3, which isn't text",
+                "message": "$input.k is 3, which isn't text",
                 "name": "count of es.v that equals m named by $input.k is 0"
               }
             ],
@@ -25659,7 +25863,7 @@
                 "value": []
               }
             ],
-            "message": "es is \"s\", which isn't a list or an object; $input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text; es is \"s\", which isn't a list or an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -25673,18 +25877,28 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "es",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is \"s\", which isn't a list or an object",
+                    "name": "es"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of es whose zz equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -25699,7 +25913,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/whose"
                 ],
-                "message": "es is \"s\", which isn't a list or an object; $input.k is 3, which isn't text",
+                "message": "$input.k is 3, which isn't text",
                 "name": "count of es whose zz equals m named by $input.k is 0"
               }
             ],
@@ -25712,11 +25926,11 @@
               {
                 "locations": [],
                 "name": "es",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
-            "message": "es is \"s\", which isn't a list or an object; $input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text; es is \"s\", which isn't a list or an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -26878,18 +27092,28 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "xs",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is missing",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of xs whose tags contains $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -26904,7 +27128,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$input.m is null; xs is missing",
+                "message": "$input.m is null",
                 "name": "count of xs whose tags contains $input.m named by key is 1"
               }
             ],
@@ -27111,18 +27335,28 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "xs",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is null",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of xs whose tags contains $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -27137,7 +27371,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$input.m is null; xs is null",
+                "message": "$input.m is null",
                 "name": "count of xs whose tags contains $input.m named by key is 1"
               }
             ],
@@ -27344,18 +27578,28 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "xs",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is 3, which isn't a list or an object",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of xs whose tags contains $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -27370,7 +27614,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$input.m is null; xs is 3, which isn't a list or an object",
+                "message": "$input.m is null",
                 "name": "count of xs whose tags contains $input.m named by key is 1"
               }
             ],
@@ -27383,7 +27627,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -27577,18 +27821,28 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "xs",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is \"s\", which isn't a list or an object",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of xs whose tags contains $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -27603,7 +27857,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$input.m is null; xs is \"s\", which isn't a list or an object",
+                "message": "$input.m is null",
                 "name": "count of xs whose tags contains $input.m named by key is 1"
               }
             ],
@@ -27616,7 +27870,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -27818,18 +28072,28 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "xs",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is {\"a\": {\"key\": \"a\", \"tags\": [\"x\"], \"v\": \"x\"}}, which isn't a list",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of xs whose tags contains $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -27844,7 +28108,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$input.m is null; xs is {\"a\": {\"key\": \"a\", \"tags\": [\"x\"], \"v\": \"x\"}}, which isn't a list",
+                "message": "$input.m is null",
                 "name": "count of xs whose tags contains $input.m named by key is 1"
               }
             ],
@@ -27857,7 +28121,7 @@
               {
                 "locations": [],
                 "name": "xs",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {

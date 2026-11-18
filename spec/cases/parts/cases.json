@@ -1197,7 +1197,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/alias"
                 ],
-                "message": "cov.x is missing, and cov.n is missing",
+                "message": "cov.n is missing, and cov.x is missing",
                 "name": "cov.x is at least cov.n"
               }
             ],
@@ -1227,7 +1227,7 @@
                 "value": null
               }
             ],
-            "message": "cov.x is missing, and cov.n is missing",
+            "message": "cov.n is missing, and cov.x is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1264,7 +1264,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/full"
                 ],
-                "message": "d.b.x is missing, and d.b.n is missing",
+                "message": "d.b.n is missing, and d.b.x is missing",
                 "name": "d.b.x is at least d.b.n"
               }
             ],
@@ -1286,7 +1286,7 @@
                 "value": null
               }
             ],
-            "message": "d.b.x is missing, and d.b.n is missing",
+            "message": "d.b.n is missing, and d.b.x is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2848,25 +2848,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "cov",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "cov is 1, which isn't a list or an object",
+                    "name": "cov"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of cov",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "cov",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/d"
                 ],
-                "message": "cov is 1, which isn't a list or an object",
+                "message": "",
                 "name": "count of cov is 1"
               }
             ],
@@ -2879,7 +2889,7 @@
               {
                 "locations": [],
                 "name": "cov",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -3921,25 +3931,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "cov",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "cov is 1, which isn't a list or an object",
+                    "name": "cov"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of cov",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "cov",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r1/checks/c"
                 ],
-                "message": "cov is 1, which isn't a list or an object",
+                "message": "",
                 "name": "count of cov is 1"
               }
             ],
@@ -3952,7 +3972,7 @@
               {
                 "locations": [],
                 "name": "cov",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],

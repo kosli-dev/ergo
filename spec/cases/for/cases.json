@@ -30983,60 +30983,7 @@
           {
             "cause": "absent",
             "check": "c",
-            "failures": [
-              {
-                "cause": "absent",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/m"
-                    ],
-                    "name": "rows[0].m named by $params.km",
-                    "outcome": "absent",
-                    "value": null
-                  }
-                ],
-                "kind": "item",
-                "locations": [
-                  "/things/0/rows/0"
-                ],
-                "message": "$params.km is missing",
-                "name": "item 1 of rows",
-                "value": {
-                  "m": {
-                    "q": 2
-                  },
-                  "v": 2
-                }
-              },
-              {
-                "cause": "absent",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/1/m"
-                    ],
-                    "name": "rows[1].m named by $params.km",
-                    "outcome": "absent",
-                    "value": null
-                  }
-                ],
-                "kind": "item",
-                "locations": [
-                  "/things/0/rows/1"
-                ],
-                "message": "$params.km is missing",
-                "name": "item 2 of rows",
-                "value": {
-                  "m": {
-                    "q": 1
-                  },
-                  "v": 1
-                }
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -31059,6 +31006,14 @@
                     "v": 1
                   }
                 ]
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.km",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "$params.km is missing",
@@ -31081,7 +31036,7 @@
                     "locations": [
                       "/things/1/rows/0/m"
                     ],
-                    "name": "rows[0].m named by $params.km",
+                    "name": "rows[0].m",
                     "outcome": "unusable",
                     "value": null
                   }
@@ -31117,6 +31072,14 @@
                     "v": 1
                   }
                 ]
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.km",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "$params.km is missing; item 1 of rows: m is [5, 1], which isn't an object",
@@ -31130,60 +31093,7 @@
           {
             "cause": "null",
             "check": "c",
-            "failures": [
-              {
-                "cause": "null",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/m"
-                    ],
-                    "name": "rows[0].m named by $params.kz",
-                    "outcome": "null",
-                    "value": null
-                  }
-                ],
-                "kind": "item",
-                "locations": [
-                  "/things/0/rows/0"
-                ],
-                "message": "$params.kz is null",
-                "name": "item 1 of rows",
-                "value": {
-                  "m": {
-                    "q": 2
-                  },
-                  "v": 2
-                }
-              },
-              {
-                "cause": "null",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/1/m"
-                    ],
-                    "name": "rows[1].m named by $params.kz",
-                    "outcome": "null",
-                    "value": null
-                  }
-                ],
-                "kind": "item",
-                "locations": [
-                  "/things/0/rows/1"
-                ],
-                "message": "$params.kz is null",
-                "name": "item 2 of rows",
-                "value": {
-                  "m": {
-                    "q": 1
-                  },
-                  "v": 1
-                }
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -31206,6 +31116,14 @@
                     "v": 1
                   }
                 ]
+              },
+              {
+                "locations": [
+                  "$params:/kz"
+                ],
+                "name": "$params.kz",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$params.kz is null",
@@ -31228,7 +31146,7 @@
                     "locations": [
                       "/things/1/rows/0/m"
                     ],
-                    "name": "rows[0].m named by $params.kz",
+                    "name": "rows[0].m",
                     "outcome": "unusable",
                     "value": null
                   }
@@ -31264,6 +31182,14 @@
                     "v": 1
                   }
                 ]
+              },
+              {
+                "locations": [
+                  "$params:/kz"
+                ],
+                "name": "$params.kz",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$params.kz is null; item 1 of rows: m is [5, 1], which isn't an object",
@@ -31277,60 +31203,7 @@
           {
             "cause": "unusable",
             "check": "c",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/m"
-                    ],
-                    "name": "rows[0].m named by $params.kn",
-                    "outcome": "unusable",
-                    "value": null
-                  }
-                ],
-                "kind": "item",
-                "locations": [
-                  "/things/0/rows/0"
-                ],
-                "message": "$params.kn is 1, which isn't text",
-                "name": "item 1 of rows",
-                "value": {
-                  "m": {
-                    "q": 2
-                  },
-                  "v": 2
-                }
-              },
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/1/m"
-                    ],
-                    "name": "rows[1].m named by $params.kn",
-                    "outcome": "unusable",
-                    "value": null
-                  }
-                ],
-                "kind": "item",
-                "locations": [
-                  "/things/0/rows/1"
-                ],
-                "message": "$params.kn is 1, which isn't text",
-                "name": "item 2 of rows",
-                "value": {
-                  "m": {
-                    "q": 1
-                  },
-                  "v": 1
-                }
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -31353,6 +31226,14 @@
                     "v": 1
                   }
                 ]
+              },
+              {
+                "locations": [
+                  "$params:/kn"
+                ],
+                "name": "$params.kn",
+                "outcome": "unusable",
+                "value": 1
               }
             ],
             "message": "$params.kn is 1, which isn't text",
@@ -31375,7 +31256,7 @@
                     "locations": [
                       "/things/1/rows/0/m"
                     ],
-                    "name": "rows[0].m named by $params.kn",
+                    "name": "rows[0].m",
                     "outcome": "unusable",
                     "value": null
                   }
@@ -31411,6 +31292,14 @@
                     "v": 1
                   }
                 ]
+              },
+              {
+                "locations": [
+                  "$params:/kn"
+                ],
+                "name": "$params.kn",
+                "outcome": "unusable",
+                "value": 1
               }
             ],
             "message": "$params.kn is 1, which isn't text; item 1 of rows: m is [5, 1], which isn't an object",
@@ -31506,60 +31395,7 @@
           {
             "cause": "unusable",
             "check": "c",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/m"
-                    ],
-                    "name": "rows[0].m named by $params.ko",
-                    "outcome": "unusable",
-                    "value": null
-                  }
-                ],
-                "kind": "item",
-                "locations": [
-                  "/things/0/rows/0"
-                ],
-                "message": "$params.ko is {\"a\": 1}, which isn't text",
-                "name": "item 1 of rows",
-                "value": {
-                  "m": {
-                    "q": 2
-                  },
-                  "v": 2
-                }
-              },
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/1/m"
-                    ],
-                    "name": "rows[1].m named by $params.ko",
-                    "outcome": "unusable",
-                    "value": null
-                  }
-                ],
-                "kind": "item",
-                "locations": [
-                  "/things/0/rows/1"
-                ],
-                "message": "$params.ko is {\"a\": 1}, which isn't text",
-                "name": "item 2 of rows",
-                "value": {
-                  "m": {
-                    "q": 1
-                  },
-                  "v": 1
-                }
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -31582,6 +31418,16 @@
                     "v": 1
                   }
                 ]
+              },
+              {
+                "locations": [
+                  "$params:/ko"
+                ],
+                "name": "$params.ko",
+                "outcome": "unusable",
+                "value": {
+                  "a": 1
+                }
               }
             ],
             "message": "$params.ko is {\"a\": 1}, which isn't text",
@@ -31604,7 +31450,7 @@
                     "locations": [
                       "/things/1/rows/0/m"
                     ],
-                    "name": "rows[0].m named by $params.ko",
+                    "name": "rows[0].m",
                     "outcome": "unusable",
                     "value": null
                   }
@@ -31640,6 +31486,16 @@
                     "v": 1
                   }
                 ]
+              },
+              {
+                "locations": [
+                  "$params:/ko"
+                ],
+                "name": "$params.ko",
+                "outcome": "unusable",
+                "value": {
+                  "a": 1
+                }
               }
             ],
             "message": "$params.ko is {\"a\": 1}, which isn't text; item 1 of rows: m is [5, 1], which isn't an object",
@@ -38190,7 +38046,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "$params is 3, which isn't a list or an object",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -38208,7 +38073,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is 3, which isn't a list or an object",
+                "message": "",
                 "name": "count of $params.a is 1"
               }
             ],
@@ -38253,7 +38118,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "$params is \"s\", which isn't a list or an object",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -38271,7 +38145,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of $params.a is 1"
               }
             ],
@@ -38316,7 +38190,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "$params is true, which isn't a list or an object",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -38334,7 +38217,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is true, which isn't a list or an object",
+                "message": "",
                 "name": "count of $params.a is 1"
               }
             ],
@@ -38379,7 +38262,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "$params is false, which isn't a list or an object",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -38397,7 +38289,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is false, which isn't a list or an object",
+                "message": "",
                 "name": "count of $params.a is 1"
               }
             ],
@@ -38442,7 +38334,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "$params is [], which isn't an object",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -38460,7 +38361,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is [], which isn't an object",
+                "message": "",
                 "name": "count of $params.a is 1"
               }
             ],
@@ -39115,7 +39016,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "$params is missing",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -39133,7 +39043,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is missing",
+                "message": "",
                 "name": "count of $params.a is 1"
               }
             ],
@@ -39178,25 +39088,35 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "$params",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is missing",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $params",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is missing",
+                "message": "",
                 "name": "count of $params is 1"
               }
             ],
@@ -39559,7 +39479,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "$params is [], which isn't an object",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -39577,7 +39506,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is [], which isn't an object",
+                "message": "",
                 "name": "count of item 1 of $params is 1"
               }
             ],
@@ -40174,7 +40103,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "zz is \"v\", which isn't a list, and $params is 3, which isn't an object",
+                "message": "$params is 3, which isn't an object, and zz is \"v\", which isn't a list",
                 "name": "zz contains $params.v"
               }
             ],
@@ -40196,7 +40125,7 @@
                 "value": null
               }
             ],
-            "message": "zz is \"v\", which isn't a list, and $params is 3, which isn't an object",
+            "message": "$params is 3, which isn't an object, and zz is \"v\", which isn't a list",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -40297,7 +40226,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "$params is [3], which isn't an object",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -40321,7 +40259,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is [3], which isn't an object",
+                "message": "",
                 "name": "sum of $params.v is 1"
               }
             ],
@@ -40372,7 +40310,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "$params is [3], which isn't an object",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -40396,7 +40343,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is [3], which isn't an object",
+                "message": "",
                 "name": "count of $params whose v is 1 is 1"
               }
             ],

@@ -994,19 +994,19 @@ _two_roots_policy := _item_policy({"has": {"pos": "os"}}, {
 
 _two_roots_rows(pos, os) := _item_rows(_two_roots_policy, {"prs": [{"id": "p0", "os": pos, "rows": [{"v": "bob"}], "ms": [{"ws": [{"v": "bob"}]}]}]}, {"os": os})
 
-test_two_roots_in_one_whose_are_each_named_in_the_order_the_sentence_reads_them if {
+test_two_roots_in_one_whose_are_each_named_worst_cause_first_and_then_by_name if {
 	pos := "pos[].name is [\"bob\", 3], which isn't a list of one kind of value"
 	params := "$params.os[].name is [\"bob\", 3], which isn't a list of one kind of value"
 	missing := "item 2 of pos: name is missing"
 	mixed := [{"name": "bob"}, {"name": 3}]
 	both := _two_roots_rows(mixed, mixed)
-	both.every == ["unusable", concat("; ", [pos, params])]
+	both.every == ["unusable", concat("; ", [params, pos])]
 	both.every_rev == ["unusable", concat("; ", [params, pos])]
-	both.for_count == ["unusable", concat("; ", [pos, params])]
+	both.for_count == ["unusable", concat("; ", [params, pos])]
 	one := _two_roots_rows([{"name": "bob"}, {}], mixed)
-	one.every == ["unusable", concat("; ", [missing, params])]
+	one.every == ["unusable", concat("; ", [params, missing])]
 	one.every_rev == ["unusable", concat("; ", [params, missing])]
-	one.for_count == ["unusable", concat("; ", [missing, params])]
+	one.for_count == ["unusable", concat("; ", [params, missing])]
 }
 
 test_a_part_that_is_text_or_null_on_the_right_of_a_list_phrase_says_so if {

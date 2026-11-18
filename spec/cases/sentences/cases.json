@@ -23613,7 +23613,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/f"
                 ],
-                "message": "x is 15, which isn't text, and p is 1, which isn't text",
+                "message": "p is 1, which isn't text, and x is 15, which isn't text",
                 "name": "x starts with p"
               }
             ],
@@ -23635,7 +23635,7 @@
                 "value": 1
               }
             ],
-            "message": "x is 15, which isn't text, and p is 1, which isn't text",
+            "message": "p is 1, which isn't text, and x is 15, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -39524,7 +39524,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x is 15, which isn't text, and p is 1, which isn't text",
+                "message": "p is 1, which isn't text, and x is 15, which isn't text",
                 "name": "x does not start with p"
               }
             ],
@@ -39546,7 +39546,7 @@
                 "value": 1
               }
             ],
-            "message": "x is 15, which isn't text, and p is 1, which isn't text",
+            "message": "p is 1, which isn't text, and x is 15, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -39583,7 +39583,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "x is 15, which isn't text, and q is 1, which isn't text",
+                "message": "q is 1, which isn't text, and x is 15, which isn't text",
                 "name": "x does not end with q"
               }
             ],
@@ -39605,7 +39605,7 @@
                 "value": 1
               }
             ],
-            "message": "x is 15, which isn't text, and q is 1, which isn't text",
+            "message": "q is 1, which isn't text, and x is 15, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -44355,25 +44355,35 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "l",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "l is missing",
+                    "name": "l"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of l",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "l",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "l is missing",
+                "message": "",
                 "name": "count of l is not between 2 and 3"
               }
             ],
@@ -44412,25 +44422,35 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "l",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "l is null",
+                    "name": "l"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of l",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "l",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "l is null",
+                "message": "",
                 "name": "count of l is not between 2 and 3"
               }
             ],
@@ -54486,7 +54506,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/ab"
                 ],
-                "message": "v is null, and t is null",
+                "message": "t is null, and v is null",
                 "name": "v is alphabetically before \"x\" followed by t"
               }
             ],
@@ -54508,7 +54528,7 @@
                 "value": null
               }
             ],
-            "message": "v is null, and t is null",
+            "message": "t is null, and v is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -54545,7 +54565,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/ao"
                 ],
-                "message": "v is null, and t is null",
+                "message": "t is null, and v is null",
                 "name": "v is alphabetically on or after \"x\" followed by t"
               }
             ],
@@ -54567,7 +54587,7 @@
                 "value": null
               }
             ],
-            "message": "v is null, and t is null",
+            "message": "t is null, and v is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -54663,7 +54683,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/e"
                 ],
-                "message": "v is null, and t is null",
+                "message": "t is null, and v is null",
                 "name": "v ends with t followed by \"dev\""
               }
             ],
@@ -54685,7 +54705,7 @@
                 "value": null
               }
             ],
-            "message": "v is null, and t is null",
+            "message": "t is null, and v is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -54781,7 +54801,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/ne"
                 ],
-                "message": "v is null, and t is null",
+                "message": "t is null, and v is null",
                 "name": "v does not end with t followed by \"dev\""
               }
             ],
@@ -54803,7 +54823,7 @@
                 "value": null
               }
             ],
-            "message": "v is null, and t is null",
+            "message": "t is null, and v is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -54840,7 +54860,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/ns"
                 ],
-                "message": "v is null, and t is null",
+                "message": "t is null, and v is null",
                 "name": "v does not start with \"x\" followed by t"
               }
             ],
@@ -54862,7 +54882,7 @@
                 "value": null
               }
             ],
-            "message": "v is null, and t is null",
+            "message": "t is null, and v is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -54899,7 +54919,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/s"
                 ],
-                "message": "v is null, and t is null",
+                "message": "t is null, and v is null",
                 "name": "v starts with \"x\" followed by t"
               }
             ],
@@ -54921,7 +54941,7 @@
                 "value": null
               }
             ],
-            "message": "v is null, and t is null",
+            "message": "t is null, and v is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -55476,7 +55496,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c2"
                 ],
-                "message": "p is 5, which isn't an object, and $input.o.a is 1, which isn't an object",
+                "message": "$input.o.a is 1, which isn't an object, and p is 5, which isn't an object",
                 "name": "tags contains p.q followed by $input.o.a.b"
               }
             ],
@@ -55508,7 +55528,7 @@
                 "value": null
               }
             ],
-            "message": "p is 5, which isn't an object, and $input.o.a is 1, which isn't an object",
+            "message": "$input.o.a is 1, which isn't an object, and p is 5, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -58588,25 +58608,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "l",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "l is \"abc\", which isn't a list or an object",
+                    "name": "l"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of l",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "l",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "l is \"abc\", which isn't a list or an object",
+                "message": "",
                 "name": "count of l is not between 2 and 3"
               }
             ],
@@ -58619,7 +58649,7 @@
               {
                 "locations": [],
                 "name": "l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -58637,25 +58667,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "l",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "l is 3, which isn't a list or an object",
+                    "name": "l"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of l",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "l",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "l is 3, which isn't a list or an object",
+                "message": "",
                 "name": "count of l is not between 2 and 3"
               }
             ],
@@ -58668,7 +58708,7 @@
               {
                 "locations": [],
                 "name": "l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -58686,25 +58726,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "l",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "l is {\"k\": 1}, which isn't a list",
+                    "name": "l"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of l",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "l",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "l is {\"k\": 1}, which isn't a list",
+                "message": "",
                 "name": "count of l is not between 2 and 3"
               }
             ],
@@ -58717,7 +58767,7 @@
               {
                 "locations": [],
                 "name": "l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -59270,7 +59320,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "items is missing",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -59288,7 +59347,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "items is missing",
+                "message": "",
                 "name": "sum of items.n is not between 2 and 3"
               }
             ],
@@ -59319,7 +59378,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "items is null",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -59337,7 +59405,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "items is null",
+                "message": "",
                 "name": "sum of items.n is not between 2 and 3"
               }
             ],
@@ -60357,7 +60425,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "s is \"yesterday\", which isn't a time, and e is \"today\", which isn't a time",
+                "message": "e is \"today\", which isn't a time, and s is \"yesterday\", which isn't a time",
                 "name": "days elapsed from s to e is not between 1 and 2"
               }
             ],
@@ -60387,7 +60455,7 @@
                 "value": "today"
               }
             ],
-            "message": "s is \"yesterday\", which isn't a time, and e is \"today\", which isn't a time",
+            "message": "e is \"today\", which isn't a time, and s is \"yesterday\", which isn't a time",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -61026,7 +61094,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "items is missing",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -61044,7 +61121,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "items is missing",
+                "message": "",
                 "name": "sum of items.n is not 3 within 0.5"
               }
             ],
@@ -61902,7 +61979,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "s is \"yesterday\", which isn't a time, and e is \"today\", which isn't a time",
+                "message": "e is \"today\", which isn't a time, and s is \"yesterday\", which isn't a time",
                 "name": "days elapsed from s to e is not 2 within 0.5"
               }
             ],
@@ -61932,7 +62009,7 @@
                 "value": "today"
               }
             ],
-            "message": "s is \"yesterday\", which isn't a time, and e is \"today\", which isn't a time",
+            "message": "e is \"today\", which isn't a time, and s is \"yesterday\", which isn't a time",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -62813,25 +62890,35 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "l",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "l is missing",
+                    "name": "l"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of l",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "l",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "l is missing",
+                "message": "",
                 "name": "count of l is not 3 within 1"
               }
             ],
@@ -62862,25 +62949,35 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "l",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "l is null",
+                    "name": "l"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of l",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "l",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "l is null",
+                "message": "",
                 "name": "count of l is not 3 within 1"
               }
             ],
@@ -62918,25 +63015,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "l",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "l is \"abc\", which isn't a list or an object",
+                    "name": "l"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of l",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "l",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "l is \"abc\", which isn't a list or an object",
+                "message": "",
                 "name": "count of l is not 3 within 1"
               }
             ],
@@ -62949,7 +63056,7 @@
               {
                 "locations": [],
                 "name": "l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -62967,25 +63074,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "l",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "l is 3, which isn't a list or an object",
+                    "name": "l"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of l",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "l",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "l is 3, which isn't a list or an object",
+                "message": "",
                 "name": "count of l is not 3 within 1"
               }
             ],
@@ -62998,7 +63115,7 @@
               {
                 "locations": [],
                 "name": "l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -63016,25 +63133,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "l",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "l is {\"k\": 1}, which isn't a list",
+                    "name": "l"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of l",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "l",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "l is {\"k\": 1}, which isn't a list",
+                "message": "",
                 "name": "count of l is not 3 within 1"
               }
             ],
@@ -63047,7 +63174,7 @@
               {
                 "locations": [],
                 "name": "l",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -69155,7 +69282,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "s is null; p is missing",
+                "message": "p is missing; s is null",
                 "name": "q equals s.x named by p"
               }
             ],
@@ -69185,7 +69312,7 @@
                 "value": null
               }
             ],
-            "message": "s is null; p is missing",
+            "message": "p is missing; s is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -69504,7 +69631,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "s.x is null; p is null",
+                "message": "p is null; s.x is null",
                 "name": "q equals s.x named by p"
               }
             ],
@@ -69534,7 +69661,7 @@
                 "value": null
               }
             ],
-            "message": "s.x is null; p is null",
+            "message": "p is null; s.x is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -69853,7 +69980,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "s is null; p is 3, which isn't text",
+                "message": "p is 3, which isn't text; s is null",
                 "name": "q equals s.x named by p"
               }
             ],
@@ -69883,7 +70010,7 @@
                 "value": 3
               }
             ],
-            "message": "s is null; p is 3, which isn't text",
+            "message": "p is 3, which isn't text; s is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -71484,7 +71611,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "rows is null",
+                    "name": "rows"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -71510,7 +71646,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "rows is null",
+                "message": "",
                 "name": "count of rows.w named by p is at least 1"
               }
             ],
@@ -71549,7 +71685,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "rows is null",
+                    "name": "rows"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -71575,7 +71720,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "rows is null",
+                "message": "",
                 "name": "sum of rows.n named by p is at least 1"
               }
             ],
@@ -71865,7 +72010,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "rows is null",
+                    "name": "rows"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -71891,7 +72045,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "rows is null; p is null",
+                "message": "p is null",
                 "name": "count of rows.w named by p is at least 1"
               }
             ],
@@ -71916,7 +72070,7 @@
                 "value": null
               }
             ],
-            "message": "rows is null; p is null",
+            "message": "p is null; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -71930,7 +72084,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "rows is null",
+                    "name": "rows"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -71956,7 +72119,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "rows is null; p is null",
+                "message": "p is null",
                 "name": "sum of rows.n named by p is at least 1"
               }
             ],
@@ -71981,7 +72144,7 @@
                 "value": null
               }
             ],
-            "message": "rows is null; p is null",
+            "message": "p is null; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -72075,7 +72238,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/f"
                 ],
-                "message": "rows is null; p is null",
+                "message": "p is null; rows is null",
                 "name": "rows.w named by p is \"xy\""
               }
             ],
@@ -72097,7 +72260,7 @@
                 "value": null
               }
             ],
-            "message": "rows is null; p is null",
+            "message": "p is null; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -72257,7 +72420,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "rows is null",
+                    "name": "rows"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -72283,7 +72455,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "rows is null; p is missing",
+                "message": "p is missing",
                 "name": "count of rows.w named by p is at least 1"
               }
             ],
@@ -72308,7 +72480,7 @@
                 "value": null
               }
             ],
-            "message": "rows is null; p is missing",
+            "message": "p is missing; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -72322,7 +72494,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "rows is null",
+                    "name": "rows"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -72348,7 +72529,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "rows is null; p is missing",
+                "message": "p is missing",
                 "name": "sum of rows.n named by p is at least 1"
               }
             ],
@@ -72373,7 +72554,7 @@
                 "value": null
               }
             ],
-            "message": "rows is null; p is missing",
+            "message": "p is missing; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -72467,7 +72648,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/f"
                 ],
-                "message": "rows is null; p is missing",
+                "message": "p is missing; rows is null",
                 "name": "rows.w named by p is \"xy\""
               }
             ],
@@ -72489,7 +72670,7 @@
                 "value": null
               }
             ],
-            "message": "rows is null; p is missing",
+            "message": "p is missing; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -72649,7 +72830,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "rows is null",
+                    "name": "rows"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -72675,7 +72865,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "rows is null; p is 3, which isn't text",
+                "message": "p is 3, which isn't text",
                 "name": "count of rows.w named by p is at least 1"
               }
             ],
@@ -72700,7 +72890,7 @@
                 "value": 3
               }
             ],
-            "message": "rows is null; p is 3, which isn't text",
+            "message": "p is 3, which isn't text; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -72714,7 +72904,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "rows is null",
+                    "name": "rows"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -72740,7 +72939,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "rows is null; p is 3, which isn't text",
+                "message": "p is 3, which isn't text",
                 "name": "sum of rows.n named by p is at least 1"
               }
             ],
@@ -72765,7 +72964,7 @@
                 "value": 3
               }
             ],
-            "message": "rows is null; p is 3, which isn't text",
+            "message": "p is 3, which isn't text; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -72859,7 +73058,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/f"
                 ],
-                "message": "rows is null; p is 3, which isn't text",
+                "message": "p is 3, which isn't text; rows is null",
                 "name": "rows.w named by p is \"xy\""
               }
             ],
@@ -72881,7 +73080,7 @@
                 "value": 3
               }
             ],
-            "message": "rows is null; p is 3, which isn't text",
+            "message": "p is 3, which isn't text; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -73049,7 +73248,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "rows is null",
+                    "name": "rows"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -73077,7 +73285,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "rows is null; p is [\"k\"], which isn't text",
+                "message": "p is [\"k\"], which isn't text",
                 "name": "count of rows.w named by p is at least 1"
               }
             ],
@@ -73104,7 +73312,7 @@
                 ]
               }
             ],
-            "message": "rows is null; p is [\"k\"], which isn't text",
+            "message": "p is [\"k\"], which isn't text; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -73118,7 +73326,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "rows is null",
+                    "name": "rows"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -73146,7 +73363,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "rows is null; p is [\"k\"], which isn't text",
+                "message": "p is [\"k\"], which isn't text",
                 "name": "sum of rows.n named by p is at least 1"
               }
             ],
@@ -73173,7 +73390,7 @@
                 ]
               }
             ],
-            "message": "rows is null; p is [\"k\"], which isn't text",
+            "message": "p is [\"k\"], which isn't text; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -73271,7 +73488,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/f"
                 ],
-                "message": "rows is null; p is [\"k\"], which isn't text",
+                "message": "p is [\"k\"], which isn't text; rows is null",
                 "name": "rows.w named by p is \"xy\""
               }
             ],
@@ -73295,7 +73512,7 @@
                 ]
               }
             ],
-            "message": "rows is null; p is [\"k\"], which isn't text",
+            "message": "p is [\"k\"], which isn't text; rows is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -73322,7 +73539,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "zz is missing",
+                    "name": "zz"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -73348,7 +73574,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "zz is missing",
+                "message": "",
                 "name": "count of zz.x named by p is at least 1"
               }
             ],
@@ -73387,7 +73613,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "zz is missing",
+                    "name": "zz"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -73413,7 +73648,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/b"
                 ],
-                "message": "zz is missing",
+                "message": "",
                 "name": "sum of zz.x named by p is at least 1"
               }
             ],
@@ -75099,7 +75334,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "zz is \"str\", which isn't a list or an object",
+                    "name": "zz"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -75125,7 +75369,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "zz is \"str\", which isn't a list or an object",
+                "message": "",
                 "name": "count of zz.x named by p is at least 1"
               }
             ],
@@ -75164,7 +75408,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "zz is \"str\", which isn't a list or an object",
+                    "name": "zz"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -75190,7 +75443,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/b"
                 ],
-                "message": "zz is \"str\", which isn't a list or an object",
+                "message": "",
                 "name": "sum of zz.x named by p is at least 1"
               }
             ],
@@ -75555,7 +75808,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "zz is \"str\", which isn't an object",
+                    "name": "zz"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -75581,7 +75843,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "zz is \"str\", which isn't an object",
+                "message": "",
                 "name": "count of zz.x named by p is at least 1"
               }
             ],
@@ -75620,7 +75882,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "zz is \"str\", which isn't an object",
+                    "name": "zz"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -75646,7 +75917,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/b"
                 ],
-                "message": "zz is \"str\", which isn't an object",
+                "message": "",
                 "name": "sum of zz.x named by p is at least 1"
               }
             ],
@@ -75993,7 +76264,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "zz is \"str\", which isn't an object",
+                    "name": "zz"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -76019,7 +76299,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "zz is \"str\", which isn't an object",
+                "message": "",
                 "name": "count of zz.x named by p is at least 1"
               }
             ],
@@ -76058,7 +76338,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "zz is \"str\", which isn't an object",
+                    "name": "zz"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -76084,7 +76373,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/b"
                 ],
-                "message": "zz is \"str\", which isn't an object",
+                "message": "",
                 "name": "sum of zz.x named by p is at least 1"
               }
             ],
@@ -76431,7 +76720,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "zz is \"str\", which isn't an object",
+                    "name": "zz"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -76457,7 +76755,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "p is 3, which isn't text, and zz is \"str\", which isn't an object",
+                "message": "p is 3, which isn't text",
                 "name": "count of zz.x named by p is at least 1"
               }
             ],
@@ -76496,7 +76794,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "zz is \"str\", which isn't an object",
+                    "name": "zz"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -76522,7 +76829,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/b"
                 ],
-                "message": "p is 3, which isn't text, and zz is \"str\", which isn't an object",
+                "message": "p is 3, which isn't text",
                 "name": "sum of zz.x named by p is at least 1"
               }
             ],
@@ -82863,7 +83170,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/g"
                 ],
-                "message": "$params.kn is null; m is [5, 1], which isn't an object",
+                "message": "m is [5, 1], which isn't an object; $params.kn is null",
                 "name": "m named by $params.kn is 1"
               }
             ],
@@ -82877,7 +83184,7 @@
                 "value": null
               }
             ],
-            "message": "$params.kn is null; m is [5, 1], which isn't an object",
+            "message": "m is [5, 1], which isn't an object; $params.kn is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -82925,7 +83232,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/h"
                 ],
-                "message": "$params.kx is missing; m is [5, 1], which isn't an object",
+                "message": "m is [5, 1], which isn't an object; $params.kx is missing",
                 "name": "m named by $params.kx is 1"
               }
             ],
@@ -82939,7 +83246,7 @@
                 "value": null
               }
             ],
-            "message": "$params.kx is missing; m is [5, 1], which isn't an object",
+            "message": "m is [5, 1], which isn't an object; $params.kx is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -92482,7 +92789,7 @@
           "locations": [
             "$policy:/requirements/r/checks/every"
           ],
-          "message": "m is null; k is null",
+          "message": "k is null; m is null",
           "name": "every xs equals m named by k"
         }
       ],
@@ -92514,7 +92821,7 @@
           ]
         }
       ],
-      "message": "m is null; k is null",
+      "message": "k is null; m is null",
       "passed": false,
       "requirement": "r",
       "subject": {
@@ -92551,7 +92858,7 @@
           "locations": [
             "$policy:/requirements/r/checks/other"
           ],
-          "message": "m is null; k2 is missing",
+          "message": "k2 is missing; m is null",
           "name": "every xs equals m named by k2"
         }
       ],
@@ -92583,7 +92890,7 @@
           ]
         }
       ],
-      "message": "m is null; k2 is missing",
+      "message": "k2 is missing; m is null",
       "passed": false,
       "requirement": "r",
       "subject": {
@@ -92628,7 +92935,7 @@
           "locations": [
             "$policy:/requirements/r/checks/plain"
           ],
-          "message": "m is null; k is null",
+          "message": "k is null; m is null",
           "name": "x equals m named by k"
         }
       ],
@@ -92658,7 +92965,7 @@
           "value": null
         }
       ],
-      "message": "m is null; k is null",
+      "message": "k is null; m is null",
       "passed": false,
       "requirement": "r",
       "subject": {
@@ -105251,7 +105558,7 @@
           "locations": [
             "$policy:/requirements/r/checks/key"
           ],
-          "message": "pr.k is null; $params.m named by pr.k is missing",
+          "message": "$params.m named by pr.k is missing; pr.k is null",
           "name": "count of xs whose v equals $params.m named by pr.k is 1"
         }
       ],
@@ -105292,7 +105599,7 @@
           "value": null
         }
       ],
-      "message": "pr.k is null; $params.m named by pr.k is missing",
+      "message": "$params.m named by pr.k is missing; pr.k is null",
       "passed": false,
       "requirement": "r",
       "subject": {
@@ -105597,18 +105904,28 @@
       "failures": [
         {
           "cause": "unusable",
-          "failures": [],
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "xs",
+                  "outcome": "unusable",
+                  "value": []
+                }
+              ],
+              "kind": "list",
+              "message": "xs is \"s\", which isn't a list or an object",
+              "name": "xs"
+            }
+          ],
           "inputs": [
             {
               "locations": [],
               "name": "count of xs whose v equals $params.m named by pr.k",
               "value": null
-            },
-            {
-              "locations": [],
-              "name": "xs",
-              "outcome": "usable",
-              "value": []
             },
             {
               "locations": [
@@ -105631,7 +105948,7 @@
           "locations": [
             "$policy:/requirements/r/checks/key"
           ],
-          "message": "xs is \"s\", which isn't a list or an object; pr.k is 3, which isn't text",
+          "message": "pr.k is 3, which isn't text",
           "name": "count of xs whose v equals $params.m named by pr.k is 1"
         }
       ],
@@ -105644,7 +105961,7 @@
         {
           "locations": [],
           "name": "xs",
-          "outcome": "usable",
+          "outcome": "unusable",
           "value": []
         },
         {
@@ -105664,7 +105981,7 @@
           "value": 3
         }
       ],
-      "message": "xs is \"s\", which isn't a list or an object; pr.k is 3, which isn't text",
+      "message": "pr.k is 3, which isn't text; xs is \"s\", which isn't a list or an object",
       "passed": false,
       "requirement": "r",
       "subject": {
@@ -105678,18 +105995,28 @@
       "failures": [
         {
           "cause": "unusable",
-          "failures": [],
+          "failures": [
+            {
+              "cause": "unusable",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [],
+                  "name": "xs",
+                  "outcome": "unusable",
+                  "value": []
+                }
+              ],
+              "kind": "list",
+              "message": "xs is \"s\", which isn't a list or an object",
+              "name": "xs"
+            }
+          ],
           "inputs": [
             {
               "locations": [],
               "name": "count of xs whose v equals pr named by pr.k",
               "value": null
-            },
-            {
-              "locations": [],
-              "name": "xs",
-              "outcome": "usable",
-              "value": []
             },
             {
               "locations": [
@@ -105712,7 +106039,7 @@
           "locations": [
             "$policy:/requirements/r/checks/named"
           ],
-          "message": "xs is \"s\", which isn't a list or an object; pr.k is 3, which isn't text",
+          "message": "pr.k is 3, which isn't text",
           "name": "count of xs whose v equals pr named by pr.k is 1"
         }
       ],
@@ -105725,7 +106052,7 @@
         {
           "locations": [],
           "name": "xs",
-          "outcome": "usable",
+          "outcome": "unusable",
           "value": []
         },
         {
@@ -105745,7 +106072,7 @@
           "value": null
         }
       ],
-      "message": "xs is \"s\", which isn't a list or an object; pr.k is 3, which isn't text",
+      "message": "pr.k is 3, which isn't text; xs is \"s\", which isn't a list or an object",
       "passed": false,
       "requirement": "r",
       "subject": {

@@ -1448,25 +1448,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "name",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "name is \"a\", which isn't a list or an object",
+                    "name": "name"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "name",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "name is \"a\", which isn't a list or an object",
+                "message": "",
                 "name": "count of name is 2"
               }
             ],
@@ -1479,7 +1489,7 @@
               {
                 "locations": [],
                 "name": "name",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -1642,25 +1652,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "n",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "n is 1, which isn't a list or an object",
+                    "name": "n"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of n",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum"
                 ],
-                "message": "n is 1, which isn't a list or an object",
+                "message": "",
                 "name": "sum of n is 3"
               }
             ],
@@ -1673,7 +1693,7 @@
               {
                 "locations": [],
                 "name": "n",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],

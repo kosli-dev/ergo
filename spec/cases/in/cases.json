@@ -595,7 +595,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x is \"a\", which isn't a number or text, and $params.allowed is [\"a\", 1], which isn't a list of one kind of value",
+                "message": "$params.allowed is [\"a\", 1], which isn't a list of one kind of value, and x is \"a\", which isn't a number or text",
                 "name": "x is in $params.allowed"
               }
             ],
@@ -620,7 +620,7 @@
                 ]
               }
             ],
-            "message": "x is \"a\", which isn't a number or text, and $params.allowed is [\"a\", 1], which isn't a list of one kind of value",
+            "message": "$params.allowed is [\"a\", 1], which isn't a list of one kind of value, and x is \"a\", which isn't a number or text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2108,7 +2108,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/in"
                 ],
-                "message": "x is \"click\", which isn't a number or text, and $input.sbom.components[].name is [\"click\", 3], which isn't a list of one kind of value",
+                "message": "$input.sbom.components[].name is [\"click\", 3], which isn't a list of one kind of value, and x is \"click\", which isn't a number or text",
                 "name": "x is in $input.sbom.components.name"
               }
             ],
@@ -2134,7 +2134,7 @@
                 ]
               }
             ],
-            "message": "x is \"click\", which isn't a number or text, and $input.sbom.components[].name is [\"click\", 3], which isn't a list of one kind of value",
+            "message": "$input.sbom.components[].name is [\"click\", 3], which isn't a list of one kind of value, and x is \"click\", which isn't a number or text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2175,7 +2175,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/not_in"
                 ],
-                "message": "x is \"click\", which isn't a number or text, and $input.sbom.components[].name is [\"click\", 3], which isn't a list of one kind of value",
+                "message": "$input.sbom.components[].name is [\"click\", 3], which isn't a list of one kind of value, and x is \"click\", which isn't a number or text",
                 "name": "x is not in $input.sbom.components.name"
               }
             ],
@@ -2201,7 +2201,7 @@
                 ]
               }
             ],
-            "message": "x is \"click\", which isn't a number or text, and $input.sbom.components[].name is [\"click\", 3], which isn't a list of one kind of value",
+            "message": "$input.sbom.components[].name is [\"click\", 3], which isn't a list of one kind of value, and x is \"click\", which isn't a number or text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9128,18 +9128,28 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "deps",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "deps is {\"n\": 2, \"name\": \"click\"}, which isn't a list",
+                    "name": "deps"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of deps whose name is in $input.sbom.components.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "deps",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -9158,7 +9168,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "deps is {\"n\": 2, \"name\": \"click\"}, which isn't a list",
+                "message": "",
                 "name": "count of deps whose name is in $input.sbom.components.name is 1"
               }
             ],
@@ -9171,7 +9181,7 @@
               {
                 "locations": [],
                 "name": "deps",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -9208,18 +9218,28 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "deps",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "deps is missing",
+                    "name": "deps"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of deps whose name is in $input.sbom.components.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "deps",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -9236,7 +9256,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/a"
                 ],
-                "message": "deps is missing",
+                "message": "",
                 "name": "count of deps whose name is in $input.sbom.components.name is 1"
               }
             ],
@@ -12892,7 +12912,29 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "xs",
+                        "outcome": "absent",
+                        "value": []
+                      },
+                      {
+                        "locations": [],
+                        "name": "xs",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is missing",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -12903,25 +12945,13 @@
                     "locations": [],
                     "name": "count of xs",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "xs is missing",
+                "message": "",
                 "name": "count of xs is more than count of xs"
               }
             ],
@@ -12952,7 +12982,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "xs is missing",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -12981,7 +13020,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/sum"
                 ],
-                "message": "xs is missing",
+                "message": "",
                 "name": "sum of xs.n is more than sum of xs.n"
               }
             ],
@@ -13019,7 +13058,29 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "xs",
+                        "outcome": "null",
+                        "value": []
+                      },
+                      {
+                        "locations": [],
+                        "name": "xs",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is null",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -13030,25 +13091,13 @@
                     "locations": [],
                     "name": "count of xs",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "xs is null",
+                "message": "",
                 "name": "count of xs is more than count of xs"
               }
             ],
@@ -13079,7 +13128,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "xs is null",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -13108,7 +13166,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/sum"
                 ],
-                "message": "xs is null",
+                "message": "",
                 "name": "sum of xs.n is more than sum of xs.n"
               }
             ],
@@ -14594,7 +14652,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x is missing, and $params.l is missing",
+                "message": "$params.l is missing, and x is missing",
                 "name": "x is in $params.l"
               }
             ],
@@ -14616,7 +14674,7 @@
                 "value": null
               }
             ],
-            "message": "x is missing, and $params.l is missing",
+            "message": "$params.l is missing, and x is missing",
             "passed": false,
             "requirement": "s",
             "subject": {

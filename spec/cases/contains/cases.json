@@ -1238,7 +1238,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x is [\"b\"], which isn't a list of numbers or text, and $params.banned is [\"a\", 1], which isn't a list of one kind of value",
+                "message": "$params.banned is [\"a\", 1], which isn't a list of one kind of value, and x is [\"b\"], which isn't a list of numbers or text",
                 "name": "x contains none of $params.banned"
               }
             ],
@@ -1265,7 +1265,7 @@
                 ]
               }
             ],
-            "message": "x is [\"b\"], which isn't a list of numbers or text, and $params.banned is [\"a\", 1], which isn't a list of one kind of value",
+            "message": "$params.banned is [\"a\", 1], which isn't a list of one kind of value, and x is [\"b\"], which isn't a list of numbers or text",
             "passed": false,
             "requirement": "s",
             "subject": {

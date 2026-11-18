@@ -1724,25 +1724,35 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "reviews",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "reviews is missing",
+                    "name": "reviews"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of reviews",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "reviews",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/pr/from"
                 ],
-                "message": "reviews is missing",
+                "message": "",
                 "name": "count of reviews is at least 1"
               }
             ],
@@ -21535,7 +21545,7 @@
                 "locations": [
                   "$policy:/subjects/thing/from"
                 ],
-                "message": "$params.i is null; x.y is missing",
+                "message": "x.y is missing; $params.i is null",
                 "name": "x.y named by $params.i does not exist"
               }
             ],
@@ -21549,7 +21559,7 @@
                 "value": null
               }
             ],
-            "message": "$params.i is null; x.y is missing",
+            "message": "x.y is missing; $params.i is null",
             "passed": false,
             "requirement": "s",
             "subject": {

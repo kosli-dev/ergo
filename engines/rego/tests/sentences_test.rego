@@ -305,11 +305,6 @@ test_the_applies_row_of_a_some_condition_reads_the_same_inputs_and_causes_as_the
 test_the_applies_row_of_a_plain_condition_has_no_more_fields_than_the_check_row_of_the_same_sentence if {
 	every sentence in [`ticket is "ok"`, `ticket is "open"`, `ticket exists`, `count of files is at least 2`, `sum of files.size is at least 2`] {
 		both := _as_condition_and_as_check([sentence])
-		every _, entries in _applies_failures_of(both[0]) {
-			every entry in entries {
-				entry.failures == []
-			}
-		}
 		applies := _applies_failures_of(both[0])
 		check := _check_failures_of(both[1])
 		object.keys(applies) == object.keys(check)

@@ -1430,7 +1430,16 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "commits is \"ann\", which isn't a list or an object",
+                    "name": "commits"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -1448,7 +1457,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "commits is \"ann\", which isn't a list or an object",
+                "message": "",
                 "name": "count of distinct commits.author is at least 2"
               }
             ],
@@ -1488,7 +1497,16 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "commits is missing",
+                    "name": "commits"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -1506,7 +1524,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "commits is missing",
+                "message": "",
                 "name": "count of distinct commits.author is at least 2"
               }
             ],
@@ -1544,7 +1562,16 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [],
+                    "kind": "list",
+                    "message": "commits is null",
+                    "name": "commits"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -1562,7 +1589,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "commits is null",
+                "message": "",
                 "name": "count of distinct commits.author is at least 2"
               }
             ],

@@ -2213,25 +2213,35 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "region",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "region is null",
+                    "name": "region"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of region",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/n"
                 ],
-                "message": "region is null",
+                "message": "",
                 "name": "count of region is 2"
               }
             ],
@@ -2262,25 +2272,35 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "region",
+                        "outcome": "null",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "region is null",
+                    "name": "region"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of region",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/t"
                 ],
-                "message": "region is null",
+                "message": "",
                 "name": "sum of region is 3"
               }
             ],
@@ -2311,25 +2331,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "region",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "region is \"s\", which isn't a list or an object",
+                    "name": "region"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of region",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/n"
                 ],
-                "message": "region is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of region is 2"
               }
             ],
@@ -2342,7 +2372,7 @@
               {
                 "locations": [],
                 "name": "region",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -2360,25 +2390,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "region",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "region is \"s\", which isn't a list or an object",
+                    "name": "region"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of region",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/t"
                 ],
-                "message": "region is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "sum of region is 3"
               }
             ],
@@ -2391,7 +2431,7 @@
               {
                 "locations": [],
                 "name": "region",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               }
             ],
@@ -5474,18 +5514,28 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "region",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "region is \"a\", which isn't a list or an object",
+                    "name": "region"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of region",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -5500,7 +5550,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "region is \"a\", which isn't a list or an object",
+                "message": "",
                 "name": "count of region equals $params.n"
               }
             ],
@@ -5513,7 +5563,7 @@
               {
                 "locations": [],
                 "name": "region",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {
@@ -5539,24 +5589,34 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "region",
+                        "outcome": "unusable",
+                        "value": []
+                      },
+                      {
+                        "locations": [],
+                        "name": "region",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "region is \"a\", which isn't a list or an object",
+                    "name": "region"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of region",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [],
@@ -5573,7 +5633,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/d"
                 ],
-                "message": "region is \"a\", which isn't a list or an object",
+                "message": "",
                 "name": "sum of region equals 1 plus count of region"
               }
             ],
@@ -5586,7 +5646,7 @@
               {
                 "locations": [],
                 "name": "region",
-                "outcome": "usable",
+                "outcome": "unusable",
                 "value": []
               },
               {

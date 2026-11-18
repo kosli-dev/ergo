@@ -218,11 +218,9 @@ _m_null_key_pair(subj, p, mode) := _m_key_first(concat("", [_input_name(array.sl
 	some f in _key_base_flaws(subj, p, mode)
 }
 
-_m_key_first(base, key, step) := [key] if _m_aliased(base) == key
+_m_key_first(base, key, _) := [key] if _m_aliased(base) == key
 
-else := [key, base] if _is_ref(step)
-
-else := [base, key]
+else := _m_root_sorted([key, base])
 
 _m_key_text(subj, step) := t if {
 	t := _m_key_fault(subj, step)
@@ -432,3 +430,10 @@ _m_message(check, subj, "not_an_object") := m if {
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := _m_fallback(check) if is_object(subj)
+
+_m_list_names(check) := {_input_name(array.slice(p, 0, i)) |
+	some side in _m_tally_parts(check)
+	p := side[_basic_form(side)]
+	is_array(p)
+	some i in numbers.range(1, count(p))
+}

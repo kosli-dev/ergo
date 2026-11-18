@@ -109,7 +109,7 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 		fe := _focus_of(e, c)
 		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
 		not cause in _not_failing_causes
-		said := _message(c, fe.iv, cause)
+		said := _m_whose_said(c, fe.iv, cause)
 		roots := _m_keyed_roots(object.get(names, "ergo/subject", null), c, cause)
 	] with input as {"ergo/names": names}
 	ms := _for_own_first(first, pairs)
@@ -126,7 +126,7 @@ _for_own_why(true, item, e, names) if {
 	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
 	not cause in _not_failing_causes
 	roots := _m_keyed_roots(object.get(names, "ergo/subject", null), c, cause) with input as {"ergo/names": names}
-	_m_own_said(_message(c, fe.iv, cause), roots) with input as {"ergo/names": names}
+	_m_own_said(_m_whose_said(c, fe.iv, cause), roots) with input as {"ergo/names": names}
 }
 
 _for_own_why_of(true, e, own) := {"why": [_m_why_text(_m_item_name(e.i, set()), own[0])]}
@@ -160,7 +160,7 @@ _for_own_texts(item, e, names) := [t |
 	own in _failed_read_states
 	subj := object.get(names, "ergo/subject", null)
 	roots := {piece | some r in array.concat(array.concat(_for_root_why(c, _m_undecided(own), subj), _m_keyed_off(subj, c, own)), _m_cond_root_texts(subj, c)); some piece in split(r, "; ")} with input as {"ergo/names": names}
-	said := _message(c, fe.iv, own) with input as {"ergo/names": names}
+	said := _m_whose_said(c, fe.iv, own) with input as {"ergo/names": names}
 	parts := [y | some z in split(said, "; "); some y in split(z, ", and "); not y in roots; not regex.match(`^and [0-9]+ more$`, y)]
 	parts != []
 	t := _m_aliased(concat(", and ", parts))
@@ -294,7 +294,19 @@ _m_list_found(subj, path) := [_m_is(_input_name(p), _value_at(subj, p))] if {
 	p := array.slice(path, 0, i)
 } else := []
 
-_for_message(check, _, r) := _m_for_joined(_for_ents(check, r)) if r.failed != []
+_for_message(check, _, r) := concat("; ", array.concat(ks, [_m_for_joined(_for_ents(check, r))])) if {
+	r.failed != []
+	ks := _for_whose_key_faults(check)
+	ks != []
+} else := _m_for_joined(_for_ents(check, r)) if r.failed != []
+
+_for_whose_key_faults(check) := _m_root_sorted(_once([_m_isnt(_ref_label(seg.ref), _ref_read(seg.ref), "text") |
+	some item in check.items
+	some c in object.get(item, "whose", [])
+	some [p, _] in _key_base_reads(c)
+	some seg in p
+	_ref_step_flaw(seg) == "unusable"
+]))
 
 _for_message_parts(check, subj, r) := _once([e.t | some e in _for_ents(check, r)]) if r.failed != []
 
@@ -888,13 +900,13 @@ _m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(c
 	row.cause == "missing"
 }
 
-_m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(check, subj, row.cause))}) if {
+_m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line_sorted(check, subj, row.cause))}) if {
 	row.passed == false
 	row.cause != "missing"
 	row.cause != "unusable"
 }
 
-_m_filter(check, subj, row) := object.union(object.union(row, {"message": _m_joined(_m_line(check, subj, row.cause))}), _m_unusable_marks(check, subj, row)) if {
+_m_filter(check, subj, row) := object.union(object.union(row, {"message": _m_joined(_m_line_sorted(check, subj, row.cause))}), _m_unusable_marks(check, subj, row)) if {
 	row.passed == false
 	row.cause == "unusable"
 }
@@ -1141,3 +1153,10 @@ _m_and_joined(xs) := concat(", and ", xs)
 _m_unled(name, t) := substring(t, count(name) + 2, -1) if startswith(t, concat("", [name, ": "]))
 
 else := t
+
+_m_whose_said(c, item, cause) := concat("; ", bs) if {
+	count(_key_item_flaws({"whose": [c]})) > 0
+	_key_items_clean({"items": [{"iv": item}]}, [c])
+	bs := _m_cond_base_texts(item, c)
+	bs != []
+} else := _message(c, item, cause)
