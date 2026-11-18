@@ -600,7 +600,14 @@ pub fn for_failures(
             for p in said.split("; ") {
                 ops::push_new(&mut walk_texts, p.to_string());
             }
-            continue;
+            let second = line.items.len() == 2
+                && !matches!(line.items[1].how, for_line::How::Pick { .. })
+                && cause_of(f) != Cause::NotAnObject
+                && text(f, "item").starts_with("item ")
+                && crate::parts::list_base(&text(f, "item")) == list_names[1];
+            if !second {
+                continue;
+            }
         }
         if let Some(entry) = dead_entry(line, f, ctx) {
             match entry {
