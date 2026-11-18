@@ -28,6 +28,7 @@
 
 mod cause;
 mod checks;
+mod for_parts;
 mod lower;
 mod name;
 mod names;

@@ -2332,7 +2332,23 @@ fn with_failures(
                     locations: at(None, 1),
                 }])
             }
-            Some(Check::For(_)) => None,
+            Some(Check::For(line)) => {
+                let failed: Vec<Value> = row
+                    .failed_items
+                    .as_ref()
+                    .and_then(Value::as_array)
+                    .cloned()
+                    .unwrap_or_default();
+                Some(crate::for_parts::for_failures(
+                    line,
+                    row.cause,
+                    &row.inputs,
+                    &message,
+                    &failed,
+                    &at(None, line.sentences.len()),
+                    ctx,
+                ))
+            }
             Some(check) => Some(vec![Failure::Assertion {
                 part: Part {
                     name: expression.to_string(),
