@@ -1673,6 +1673,7 @@ fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
 fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let mut failed_items = None;
     let mut rich: Vec<Value> = Vec::new();
+    let mut pieces: Option<Vec<String>> = None;
     let mut said: Vec<String> = Vec::new();
     let mut texts: Vec<String> = Vec::new();
     let verdicts: Vec<(&Filter, Verdict)> = filters
@@ -1682,6 +1683,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
             let mut verdict = ran.verdict;
             failed_items = ran.failed_items.map(Value::Array);
             rich = ran.rich;
+            pieces = ran.parts;
             let mut own = ran.message;
             if unreadable {
                 let keeps_own = verdict.cause.is_failure()
@@ -1793,6 +1795,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                 &text,
                 failed,
                 &rich,
+                pieces.as_deref(),
                 &walk.path,
                 ctx,
             ),
@@ -2198,6 +2201,7 @@ fn default_message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
 
 struct RanItems {
     rich: Vec<Value>,
+    pieces: Option<Vec<String>>,
     checks: Vec<Check>,
     verdicts: Vec<Verdict>,
     said: Vec<Option<String>>,
@@ -2251,10 +2255,44 @@ fn walk_part(
     message: &str,
     failed: &[Value],
     rich: &[Value],
+    pieces: Option<&[String]>,
     path: &Path,
     ctx: &Ctx,
 ) -> Part {
     let keys = key_ref_entries(&[path], ctx, inputs);
+    if let Some(pieces) = pieces.filter(|p| p.len() != failed.len()) {
+        let capped = message
+            .split("; ")
+            .any(|piece| ops::message::cap_note(piece).is_some());
+        let mut said: Vec<String> = Vec::new();
+        if capped {
+            for piece in pieces {
+                ops::push_new(&mut said, piece.clone());
+            }
+        } else {
+            for piece in message.split("; ").filter(|p| !p.is_empty()) {
+                ops::push_new(&mut said, piece.to_string());
+            }
+        }
+        let lists: Vec<String> = failed
+            .iter()
+            .map(|f| parts::list_base(f.get("item").and_then(Value::as_str).unwrap_or("")))
+            .collect();
+        return Part {
+            name: name.to_string(),
+            cause,
+            inputs: inputs
+                .iter()
+                .filter(|i| {
+                    !parts::item_input(i.get("name").and_then(Value::as_str).unwrap_or(""), &lists)
+                })
+                .cloned()
+                .chain(keys)
+                .collect(),
+            failures: Vec::new(),
+            message: said.join("; "),
+        };
+    }
     let failed: Vec<Value> = failed
         .iter()
         .map(|plain| {
@@ -2438,6 +2476,7 @@ fn with_failures(
                         &message,
                         &failed,
                         &ran.rich,
+                        ran.pieces.as_deref(),
                         &walk.path,
                         ctx,
                     ),
@@ -2513,6 +2552,7 @@ fn check_row(
     };
     let mut failed_items = None;
     let mut rich: Vec<Value> = Vec::new();
+    let mut pieces: Option<Vec<String>> = None;
     let mut said: Vec<Option<String>> = Vec::new();
     let checks: Vec<Check> = plan
         .items
@@ -2528,6 +2568,7 @@ fn check_row(
             let ran = walked_roots_run(check, ctx);
             failed_items = ran.failed_items.map(Value::Array);
             rich = ran.rich;
+            pieces = ran.parts;
             let mut verdict = ran.verdict;
             let mut own = ran.message;
             if env.unreadable.is_empty()
@@ -2613,6 +2654,7 @@ fn check_row(
         with_in(row, anc),
         RanItems {
             rich,
+            pieces,
             checks,
             verdicts,
             said,
