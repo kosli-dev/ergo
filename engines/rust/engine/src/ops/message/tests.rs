@@ -1,6 +1,39 @@
 use serde_json::{Value, json};
 
 #[test]
+fn a_clause_an_earlier_sentence_gave_is_left_out_and_the_rest_is_kept() {
+    let mut said: Vec<String> = Vec::new();
+    assert_eq!(
+        super::unsaid("expires_at is missing", &mut said),
+        "expires_at is missing"
+    );
+    assert_eq!(
+        super::unsaid("expires_at is missing, and as_of is missing", &mut said),
+        "as_of is missing"
+    );
+    assert_eq!(super::unsaid("as_of is missing", &mut said), "");
+}
+
+#[test]
+fn a_clause_said_twice_by_one_sentence_stays_twice() {
+    let mut said: Vec<String> = Vec::new();
+    assert_eq!(
+        super::unsaid("v is 2, and v is 2; w is 3", &mut said),
+        "v is 2, and v is 2; w is 3"
+    );
+    assert_eq!(super::unsaid("v is 2, and z is 1", &mut said), "z is 1");
+}
+
+#[test]
+fn a_separator_inside_a_quoted_value_doesnt_split_a_clause() {
+    let mut said = vec!["b is missing".to_string()];
+    assert_eq!(
+        super::unsaid(r#"a is "x; b is missing", and b is missing"#, &mut said),
+        r#"a is "x; b is missing""#
+    );
+}
+
+#[test]
 fn params_that_arent_an_object_follow_a_list_input_only_in_a_count_of_a_sum_of_or_a_plus() {
     let input = json!([{"id": "t", "k": "a", "n": 1, "v": "a", "rs": [{"v": "a", "n": 1}]}]);
     let checks = json!({
