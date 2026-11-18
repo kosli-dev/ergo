@@ -383,9 +383,15 @@ else := array.concat(ends, [n])
 
 _m_shut(s) if count(split(replace(replace(s, "\\\\", ""), "\\\"", ""), "\"")) % 2 == 1
 
-_m_joined_once(ms) := concat("; ", ms) if count(_m_item_leads(ms)) <= 3
+_m_joined_once(ms) := concat("; ", ms) if count(ms) <= 3
+
+_m_joined_once(ms) := concat("; ", ms) if {
+	count(ms) > 3
+	count(_m_item_leads(ms)) <= 3
+}
 
 _m_joined_once(ms) := concat("; ", array.concat([m | some m in ms; _m_shown_clause(m, shown)], [concat("", ["and ", _literal_text(count(leads) - 3), " more"])])) if {
+	count(ms) > 3
 	leads := _m_item_leads(ms)
 	count(leads) > 3
 	shown := array.slice(leads, 0, 3)

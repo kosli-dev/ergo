@@ -385,9 +385,15 @@ _m_for_unled(said, p) := [t] if {
 	i > 0
 } else := [p]
 
-_m_for_joined(ents) := concat("; ", _once([e.t | some e in ents])) if count(_m_for_counted(ents)) <= 3
+_m_for_joined(ents) := concat("; ", _once([e.t | some e in ents])) if count(ents) <= 3
+
+_m_for_joined(ents) := concat("; ", _once([e.t | some e in ents])) if {
+	count(ents) > 3
+	count(_m_for_counted(ents)) <= 3
+}
 
 _m_for_joined(ents) := concat("; ", array.concat(_once([e.t | some e in ents; _m_kept(e, shown, ents)]), [concat("", ["and ", _literal_text(count(counted) - 3), " more"])])) if {
+	count(ents) > 3
 	counted := _m_for_counted(ents)
 	count(counted) > 3
 	shown := array.slice(counted, 0, 3)
@@ -395,7 +401,22 @@ _m_for_joined(ents) := concat("; ", array.concat(_once([e.t | some e in ents; _m
 
 _m_for_counted(ents) := _once([_m_item_lead(e.t) | some e in ents; e.x == false; startswith(e.t, "item ")])
 
-_m_item_lead(t) := regex.find_n(`^item [0-9]+ of [^: ]+(: item [0-9]+ of [^: ]+)*`, t, 1)[0]
+_m_item_lead(t) := concat(": ", [_m_item_head(p) | some i, p in ps; i < n]) if {
+	ps := split(t, ": ")
+	n := count([i | some i, _ in ps; _m_items_up_to(ps, i)])
+}
+
+_m_items_up_to(ps, i) if {
+	every j in numbers.range(0, i) {
+		startswith(ps[j], "item ")
+	}
+}
+
+_m_item_head(p) := substring(p, 0, o + s) if {
+	o := indexof(p, " of ") + 4
+	s := indexof(substring(p, o, -1), " ")
+	s >= 0
+} else := p
 
 _m_kept(e, shown, _) if {
 	e.x == false

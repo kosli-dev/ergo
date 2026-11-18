@@ -739,6 +739,7 @@ _key_item_row(check, subj) := {"cause": cause, "inputs": raw.inputs, "failed": _
 
 _key_list_fail_row(check, subj) := raw if {
 	check.op in _walk_ops
+	object.get(check, "whose", []) != []
 	count(_key_item_flaws(check)) > 0
 	not _unreadable_input
 	raw := _walk_read_row(check, subj)
