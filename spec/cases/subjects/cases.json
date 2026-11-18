@@ -1587,12 +1587,6 @@
                     "locations": [],
                     "name": "count of reviews",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "reviews[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",

@@ -818,11 +818,11 @@ test_every_list_phrase_fails_every_row_as_unusable_when_an_item_or_what_it_reads
 	every _, words in _walking_list_phrases {
 		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name"]), _walk_right_doc(["click"]), {}) {
 			row[1] == "unusable"
-			endswith(row[2], "item 1 of $input.sbom.components is \"click\", which isn't an object")
+			startswith(row[2], "item 1 of $input.sbom.components is \"click\", which isn't an object")
 		}
 		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name.x"]), _walk_right_doc([{"name": "click"}]), {}) {
 			row[1] == "unusable"
-			endswith(row[2], "item 1 of $input.sbom.components: name is \"click\", which isn't an object")
+			startswith(row[2], "item 1 of $input.sbom.components: name is \"click\", which isn't an object")
 		}
 	}
 }
