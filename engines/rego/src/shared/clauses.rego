@@ -24,8 +24,6 @@ _m_list_item_clause(c, lists) if {
 	_m_names_list(rest, l)
 }
 
-_m_names_list(rest, l) if rest == l
-
 _m_names_list(rest, l) if startswith(rest, concat("", [l, ":"]))
 
 _m_names_list(rest, l) if startswith(rest, concat("", [l, " "]))
