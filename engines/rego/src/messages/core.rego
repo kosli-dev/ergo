@@ -208,7 +208,7 @@ _key_step_later(p) if {
 	is_object(step)
 }
 
-_m_null_key_pair(subj, p, mode) := _m_key_first(concat("", [_input_name(array.slice(p, 0, j)), " is null"]), _m_key_text(subj, p[i]), p[i]) if {
+_m_null_key_pair(subj, p, mode) := _m_key_first(concat("", [_input_name(array.slice(p, 0, j)), " is null"]), _m_key_text(subj, p[i])) if {
 	i := min({k | some k, step in p; _m_key_text(subj, step)})
 	i > 0
 	j := min({m | some m in numbers.range(1, i); _resolved(subj, array.slice(p, 0, m)) == null})
@@ -218,7 +218,7 @@ _m_null_key_pair(subj, p, mode) := _m_key_first(concat("", [_input_name(array.sl
 	some f in _key_base_flaws(subj, p, mode)
 }
 
-_m_key_first(base, key, _) := [key] if _m_aliased(base) == key
+_m_key_first(base, key) := [key] if _m_aliased(base) == key
 
 else := _m_root_sorted([key, base])
 
