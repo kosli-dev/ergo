@@ -89,7 +89,7 @@ pub struct Run {
     pub message: Option<String>,
 }
 
-fn all_paths(check: &Check) -> Vec<&Path> {
+pub(crate) fn all_paths(check: &Check) -> Vec<&Path> {
     let mut paths = check.paths();
     match check {
         Check::Tally(tally) => {

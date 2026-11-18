@@ -391,7 +391,26 @@ pub fn refs_of(plan: &Plan, input: &Value, params: Option<&Value>) -> Vec<Value>
         .iter()
         .flat_map(|item| item.check.listed_refs())
         .collect();
-    refs_walked(&paths, input, params)
+    let checks: Vec<&Check> = plan.items.iter().map(|item| &item.check).collect();
+    refs_walked_in(&paths, input, params, &checks)
+}
+
+fn steps_key(path: &Path, reference: &Path) -> bool {
+    path.steps.iter().any(|step| match step {
+        path::Step::Ref(key) => **key == *reference || steps_key(key, reference),
+        path::Step::Field(key) => steps_key(key, reference),
+        _ => false,
+    })
+}
+
+fn ref_unfit(checks: &[&Check], reference: &Path, value: &Value, ctx: &Ctx) -> bool {
+    checks.iter().any(|check| {
+        let keyed = !value.is_string()
+            && crate::ops::for_line::all_paths(check)
+                .into_iter()
+                .any(|path| steps_key(path, reference));
+        keyed || (check.refs().contains(reference) && check.flawed(ctx))
+    })
 }
 
 pub fn refs_of_checks(checks: &[&Check], input: &Value, params: Option<&Value>) -> Vec<Value> {
@@ -409,7 +428,7 @@ pub fn refs_of_checks(checks: &[&Check], input: &Value, params: Option<&Value>) 
                 .collect::<Vec<_>>()
         })
         .collect();
-    refs_walked(&paths, input, params)
+    refs_walked_in(&paths, input, params, checks)
 }
 
 pub fn refs_read(paths: &[Path], input: &Value, params: Option<&Value>) -> Vec<Value> {
@@ -418,6 +437,15 @@ pub fn refs_read(paths: &[Path], input: &Value, params: Option<&Value>) -> Vec<V
 }
 
 fn refs_walked(paths: &[(Path, bool)], input: &Value, params: Option<&Value>) -> Vec<Value> {
+    refs_walked_in(paths, input, params, &[])
+}
+
+fn refs_walked_in(
+    paths: &[(Path, bool)],
+    input: &Value,
+    params: Option<&Value>,
+    checks: &[&Check],
+) -> Vec<Value> {
     let ctx = Ctx {
         label: None,
         item_by_item: true,
@@ -433,7 +461,12 @@ fn refs_walked(paths: &[(Path, bool)], input: &Value, params: Option<&Value>) ->
     let mut entries: Vec<Value> = Vec::new();
     for (reference, walks) in paths {
         let read = path::read(reference, &ctx);
-        let outcome = ref_outcome(read.outcome);
+        let outcome = match (read.outcome, read.value) {
+            (path::Outcome::Found, Some(value)) if ref_unfit(checks, reference, value, &ctx) => {
+                "unusable"
+            }
+            (outcome, _) => ref_outcome(outcome),
+        };
         if let Some(walk) = crate::ops::lists::walked(reference, &ctx).filter(|_| *walks) {
             entries.push(serde_json::json!({
                 "name": walk.name,
