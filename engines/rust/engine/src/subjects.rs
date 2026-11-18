@@ -1939,22 +1939,29 @@ fn applies_row(env: &Env, judged: &Judged, applied: &Applied, anc: &[Anc]) -> Ro
     row.failed_items = applied.failed_items.clone();
     row.message = applied.message.clone();
     if !applied.matched {
-        let count = env
+        let filters: Vec<&Filter> = env
             .reading
             .lowered(env.subject)
-            .map_or(1, |lowered| lowered.filters.len());
-        let base = parts::joined("$policy:", &["subjects", env.subject, "from"]);
+            .map(|lowered| lowered.filters.iter().collect())
+            .unwrap_or_default();
+        let place = |k: usize| {
+            let owner = filters.get(k).map_or(env.subject, |f| f.owner.as_str());
+            let base = parts::joined("$policy:", &["subjects", owner, "from"]);
+            let own: Vec<usize> = (0..filters.len())
+                .filter(|j| filters[*j].owner == owner)
+                .collect();
+            match own.iter().position(|j| *j == k) {
+                Some(at) if own.len() > 1 => format!("{base}#{}", at + 1),
+                _ => base,
+            }
+        };
         row.failures = Some(parts::to_json(
             &applied
                 .parts
                 .iter()
                 .map(|(k, part)| Failure::Assertion {
                     part: part.clone(),
-                    locations: vec![if count > 1 {
-                        format!("{base}#{}", k + 1)
-                    } else {
-                        base.clone()
-                    }],
+                    locations: vec![place(*k)],
                 })
                 .collect::<Vec<_>>(),
         ));

@@ -610,17 +610,7 @@ impl For {
                 .map(|w| w.end_location.render())
                 .collect(),
             part: path::part_tag(&item.path, &outer).map(|(name, id)| Part { name, id }),
-            state: walked
-                .failures
-                .iter()
-                .find(|f| walked.items.is_empty() && !f.item.starts_with("item "))
-                .map_or(crate::path::Outcome::Found, |f| match f.cause {
-                    Cause::Absent => crate::path::Outcome::Absent,
-                    Cause::Null => crate::path::Outcome::Null,
-                    Cause::Unusable => crate::path::Outcome::Unusable,
-                    Cause::NotAnObject => crate::path::Outcome::NotAnObject,
-                    _ => crate::path::Outcome::Found,
-                }),
+            state: walk::list_state(&walked),
             null_at: None,
             worked: false,
         };

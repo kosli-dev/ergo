@@ -1263,6 +1263,22 @@ fn with_fields(inputs: &mut Vec<Input>, list: &str, path: &Path, ctx: &Ctx) {
     }
 }
 
+/// How reading a walked list ended, from the failure that names the list
+/// itself when it has no items.
+pub fn list_state(walked: &Walked) -> crate::path::Outcome {
+    walked
+        .failures
+        .iter()
+        .find(|f| walked.items.is_empty() && !f.item.starts_with("item "))
+        .map_or(crate::path::Outcome::Found, |f| match f.cause {
+            Cause::Absent => crate::path::Outcome::Absent,
+            Cause::Null => crate::path::Outcome::Null,
+            Cause::Unusable => crate::path::Outcome::Unusable,
+            Cause::NotAnObject => crate::path::Outcome::NotAnObject,
+            _ => crate::path::Outcome::Found,
+        })
+}
+
 fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     let outer = outer(ctx);
     let walked = self::walk(
@@ -1349,7 +1365,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             .map(|item| item.end_location.render())
             .collect(),
         part: tag,
-        state: crate::path::Outcome::Found,
+        state: list_state(&walked),
         null_at: None,
         worked: false,
     }];
