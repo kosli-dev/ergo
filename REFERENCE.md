@@ -2362,6 +2362,20 @@ $input.m is null; item 1 of xs is null, which isn't an object; item 2 of xs: key
 
 Other sentences that read such a root, like one with a second `whose`, still say it in each item.
 
+A path can break in more than one place, and then each problem is said. When a `named by` key from `$params` or `$input` can't be read, the value before it is read too, and if it is missing, `null` or can't take a key, that is said after the key. The row takes the worst cause, and the assertion's `inputs` list the key and that value, each with its own `outcome`. With no `k` in the params, `k is m named by $params.k` and this input:
+
+```json
+{"things": [{"id": "a", "k": 1, "m": "s"}]}
+```
+
+the row fails as `unusable` with:
+
+```text
+$params.k is missing; m is "s", which isn't an object
+```
+
+Where the path is walked, as in `every`, `count of` or a `for` line, the value can be a list too, so `count of o named by $params.k is 1` with `o` holding `"s"` says `$params.k is missing; o is "s", which isn't a list or an object`.
+
 An alias or a part is named as the policy calls it, never with a `$` before it: `item 1 of z: k is 1`, or `item 2 of lst: x is 2, and cov.x is 1` for a part on the right of an `every`. Names the policy writes with a `$`, like `$params.limit`, keep it. A value that spells an alias, like `"$z: x"`, prints as the input had it. A `count of`, a `sum of` or a `whose` that reads an item that isn't an object names it. With the check `count of commits whose signed is true is 3` and this input:
 
 ```json
@@ -2375,6 +2389,8 @@ item 1 of commits is null, which isn't an object; item 3 of commits is 5, which 
 ```
 
 A check written as several sentences gives the message of each sentence that failed, joined with `; `, like `x is 4; y is missing`. In an `any_of`, each option's message starts with its name, like `one: x is 4; two: y is missing`.
+
+A clause that an earlier sentence already gave isn't said again. With `assert: [expires_at exists, expires_at is after as_of]` on a subject that has neither, the message is `expires_at is missing; as_of is missing`, and each sentence's entry in `failures` still has its whole message.
 
 The `$applies` row of a subject that is out of scope says what the condition found, like `env is "staging"`.
 
