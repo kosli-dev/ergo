@@ -908,8 +908,9 @@ else := [_said_input(i, names) | some i in ins] if {
 }
 
 _m_isnt_clause(c) if {
-	some k in indexof_n(c, ", which isn't ")
-	_clause_quotes_shut(substring(c, 0, k))
+	ps := split(c, ", which isn't ")
+	some k in numbers.range(1, count(ps) - 1)
+	_clause_quotes_shut(concat(", which isn't ", array.slice(ps, 0, k)))
 }
 
 _said_input(i, names) := object.union(i, {"outcome": "unusable"}) if {
