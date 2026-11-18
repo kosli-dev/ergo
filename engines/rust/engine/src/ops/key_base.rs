@@ -424,6 +424,18 @@ pub fn for_list(path: &Path, if_any: bool, ctx: &Ctx) -> Option<ForKey> {
     })
 }
 
+/// Whether `path` has a `named by` key read from the subject or an alias,
+/// not from `$params` or `$input`, that can't be read or isn't text.
+pub fn field_key_flawed(path: &Path, ctx: &Ctx) -> bool {
+    path.steps.iter().any(|step| match step {
+        Step::Ref(key) | Step::Field(key) => {
+            !matches!(key.start, path::Start::Params | path::Start::Input)
+                && key_flaw(key, ctx).is_some()
+        }
+        _ => false,
+    })
+}
+
 /// The problem of the value before the first key of a `from` line's `path`
 /// that can't be read, when that value can't take a key, with its cause.
 pub fn from_base(path: &Path, ctx: &Ctx) -> Option<(String, Cause)> {

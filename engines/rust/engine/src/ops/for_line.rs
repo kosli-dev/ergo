@@ -587,11 +587,16 @@ impl For {
             },
         );
         if let Some(outcome) = walked.unreadable {
+            let state = if super::key_base::field_key_flawed(&item.path, &outer) {
+                crate::path::Outcome::Found
+            } else {
+                outcome
+            };
             return Cands {
                 live: Vec::new(),
                 dead: walked.failures.iter().map(Dead::of_failure).collect(),
                 list: Input {
-                    state: outcome,
+                    state,
                     ..empty_list(walked.name)
                 },
                 unreadable: Some(outcome.cause().unwrap_or(Cause::Unusable)),
