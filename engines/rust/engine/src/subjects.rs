@@ -2349,7 +2349,13 @@ fn with_failures(
                         part: Part {
                             name: item.text.clone(),
                             cause: v.cause,
-                            inputs: outcomes(&v.inputs, &said, false, &[check]),
+                            inputs: {
+                                let mut inputs = outcomes(&v.inputs, &said, false, &[check]);
+                                let extra =
+                                    ops::key_base::entry_inputs(check, ctx, v.cause, &inputs);
+                                inputs.extend(extra);
+                                inputs
+                            },
                             failures: Vec::new(),
                             message: said,
                         },
@@ -2461,6 +2467,8 @@ fn with_failures(
                     cause: row.cause,
                     inputs: {
                         let mut inputs = row.inputs.clone();
+                        let extra = ops::key_base::entry_inputs(check, ctx, row.cause, &inputs);
+                        inputs.extend(extra);
                         if let Check::Tally(tally) = check
                             && matches!(row.cause, Cause::Absent | Cause::Null)
                             && row.inputs.iter().any(|i| {
@@ -2533,6 +2541,20 @@ fn check_row(
             {
                 verdict.cause = cause;
                 own = Some(text);
+            }
+            if env.unreadable.is_empty() && !verdict.passed() {
+                let said = own
+                    .clone()
+                    .unwrap_or_else(|| default_message(check, ctx, &verdict));
+                if let Some(text) = ops::key_base::rewrite(
+                    check,
+                    ctx,
+                    &mut verdict.cause,
+                    &mut verdict.inputs,
+                    said,
+                ) {
+                    own = Some(text);
+                }
             }
             if !env.unreadable.is_empty() && verdict.cause != Cause::Ambiguous {
                 verdict.cause = Cause::Unusable;

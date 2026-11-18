@@ -1,0 +1,278 @@
+use super::{Check, Input, message};
+use crate::cause::Cause;
+use crate::name;
+use crate::path::{self, Ctx, Outcome, Path, Step};
+use serde_json::Value;
+
+/// A `named by` key, a `$input` key or a bracket key that can't be read, and
+/// the value before it when that value can't take a key either.
+#[derive(Debug, Clone)]
+pub struct KeyBase {
+    pub path: String,
+    pub key: String,
+    pub key_input: Input,
+    pub base: Option<(String, Cause, Input)>,
+    pub off_object: bool,
+}
+
+fn key_flaw(key: &Path, ctx: &Ctx) -> Option<(Outcome, String, Input)> {
+    let read = path::read(key, ctx);
+    let named = name::name(key);
+    let location: Vec<String> = read.location.iter().map(|l| l.render()).collect();
+    let input = |state: Outcome, value: Value| Input {
+        name: named.clone(),
+        value,
+        locations: location.clone(),
+        part: None,
+        state,
+        null_at: None,
+        worked: false,
+    };
+    match (read.outcome, read.value) {
+        (Outcome::Absent, _) => Some((
+            Outcome::Absent,
+            format!("{named} is missing"),
+            input(Outcome::Absent, Value::Null),
+        )),
+        (Outcome::Null, _) => Some((
+            Outcome::Null,
+            format!("{named} is null"),
+            input(Outcome::Null, Value::Null),
+        )),
+        (Outcome::Found, Some(value)) if !value.is_string() => Some((
+            Outcome::Unusable,
+            message::isnt(&named, value, "text"),
+            input(Outcome::Unusable, value.clone()),
+        )),
+        _ => None,
+    }
+}
+
+fn base_flaw(start: &path::Start, keys: &[String], tally: bool, ctx: &Ctx) -> Option<(String, Cause, Input)> {
+    let (mut at, mut location, _) = path::start_of(start, ctx).ok()?;
+    if !at.is_object() {
+        return None;
+    }
+    let full = Path {
+        start: start.clone(),
+        steps: keys.iter().map(|k| Step::Key(k.clone())).collect(),
+    };
+    let input = |name: String, state: Outcome, value: Value, location: &path::Location| Input {
+        name,
+        value,
+        locations: vec![location.render()],
+        part: None,
+        state,
+        null_at: None,
+        worked: false,
+    };
+    for (i, key) in keys.iter().enumerate() {
+        let here = Path {
+            start: start.clone(),
+            steps: keys[..i].iter().map(|k| Step::Key(k.clone())).collect(),
+        };
+        if i > 0 && at.is_null() {
+            let named = name::name(&here);
+            return Some((
+                format!("{named} is null"),
+                Cause::Null,
+                input(named, Outcome::Null, Value::Null, &location),
+            ));
+        }
+        let Some(object) = at.as_object() else {
+            let named = name::name(&here);
+            return Some((
+                message::isnt(&named, at, "an object"),
+                Cause::Unusable,
+                input(named, Outcome::Unusable, at.clone(), &location),
+            ));
+        };
+        match object.get(key) {
+            None => {
+                let named = name::name(&full);
+                return Some((
+                    format!("{named} is missing"),
+                    Cause::Absent,
+                    input(named, Outcome::Absent, Value::Null, &location),
+                ));
+            }
+            Some(next) => {
+                at = next;
+                location = location.key(key);
+            }
+        }
+    }
+    let named = name::name(&full);
+    match at {
+        Value::Null => Some((
+            format!("{named} is null"),
+            Cause::Null,
+            input(named, Outcome::Null, Value::Null, &location),
+        )),
+        Value::Object(_) => None,
+        Value::Array(_) if tally => None,
+        other => Some((
+            message::isnt(&named, other, if tally { "a list or an object" } else { "an object" }),
+            Cause::Unusable,
+            input(named, Outcome::Unusable, other.clone(), &location),
+        )),
+    }
+}
+
+/// The keys of `path` that can't be read, each with the value before it when
+/// that value can't take a key. `tally` says the path is a list a `count of`
+/// or a `sum of` walks.
+pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
+    let at = path
+        .steps
+        .iter()
+        .position(|step| matches!(step, Step::Ref(key) if key_flaw(key, ctx).is_some()))?;
+    let Step::Ref(key) = &path.steps[at] else {
+        return None;
+    };
+    let (_, text, key_input) = key_flaw(key, ctx)?;
+    let keys: Vec<String> = path.steps[..at]
+        .iter()
+        .map_while(|step| match step {
+            Step::Key(k) => Some(k.clone()),
+            _ => None,
+        })
+        .collect();
+    let base = (!keys.is_empty() && keys.len() == at && matches!(path.start, path::Start::Subject | path::Start::Own))
+        .then(|| base_flaw(&path.start, &keys, tally, ctx))
+        .flatten();
+    Some(KeyBase {
+        path: name::name(path),
+        key: text,
+        key_input,
+        base,
+        off_object: matches!(path.start, path::Start::Subject | path::Start::Own)
+            && matches!(path.steps.first(), Some(Step::Key(_)))
+            && path::start_of(&path.start, ctx).is_ok_and(|(value, _, _)| !value.is_object()),
+    })
+}
+
+/// The key and base problems of every path `check` reads.
+pub fn of_check(check: &Check, ctx: &Ctx) -> Vec<KeyBase> {
+    let counted: Vec<&Path> = match check {
+        Check::Tally(tally) => tally.counted_paths(),
+        _ => Vec::new(),
+    };
+    let mut paths: Vec<(&Path, bool)> = counted.into_iter().map(|p| (p, true)).collect();
+    paths.extend(check.paths().into_iter().map(|p| (p, false)));
+    let mut out: Vec<KeyBase> = Vec::new();
+    for (path, tally) in paths {
+        if let Some(found) = of_path(path, tally, ctx)
+            && !out.iter().any(|o| o.path == found.path)
+        {
+            out.push(found);
+        }
+    }
+    out
+}
+
+/// Says each base after its key in `said`, and gives the worst cause.
+pub fn said_with_bases(said: &str, cause: Cause, bases: &[KeyBase]) -> (String, Cause) {
+    let mut pieces: Vec<String> = said
+        .split("; ")
+        .filter(|p| !p.is_empty())
+        .map(str::to_string)
+        .collect();
+    let mut causes = vec![cause];
+    for kb in bases {
+        let Some((text, base_cause, _)) = &kb.base else {
+            continue;
+        };
+        causes.push(*base_cause);
+        pieces.retain(|p| p != text);
+        match pieces.iter().position(|p| *p == kb.key) {
+            Some(at) => pieces.insert(at + 1, text.clone()),
+            None => {
+                pieces.push(kb.key.clone());
+                pieces.push(text.clone());
+            }
+        }
+    }
+    (
+        pieces.join("; "),
+        Cause::worst(causes).unwrap_or(cause),
+    )
+}
+
+fn outcome_of(cause: Cause) -> Outcome {
+    match cause {
+        Cause::Absent => Outcome::Absent,
+        Cause::Null => Outcome::Null,
+        Cause::Unusable => Outcome::Unusable,
+        Cause::NotAnObject => Outcome::NotAnObject,
+        _ => Outcome::Found,
+    }
+}
+
+fn cause_of(state: Outcome) -> Option<Cause> {
+    state.cause()
+}
+
+/// Rewrites a failed plain check's message and cause so that a base that
+/// can't take a key is said after its key, and gives each path input the
+/// worst outcome of its problems.
+pub fn rewrite(check: &Check, ctx: &Ctx, cause: &mut Cause, inputs: &mut [Input], said: String) -> Option<String> {
+    if !matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
+        || matches!(check, Check::Walk(_) | Check::For(_) | Check::AnyOf(_))
+    {
+        return None;
+    }
+    let bases = of_check(check, ctx);
+    for kb in bases.iter().filter(|kb| kb.off_object) {
+        for input in inputs.iter_mut().filter(|i| i.name == kb.path) {
+            input.state = Outcome::NotAnObject;
+        }
+    }
+    if !bases.iter().any(|b| b.base.is_some()) {
+        return None;
+    }
+    let (text, worst) = said_with_bases(&said, *cause, &bases);
+    *cause = worst;
+    for kb in &bases {
+        let Some((_, base_cause, _)) = &kb.base else {
+            continue;
+        };
+        for input in inputs.iter_mut().filter(|i| i.name == kb.path) {
+            let now = cause_of(input.state);
+            let worse = Cause::worst(now.into_iter().chain([*base_cause])).unwrap_or(*base_cause);
+            input.state = outcome_of(worse);
+        }
+    }
+    Some(text)
+}
+
+/// The key and base inputs a failed plain check's assertion entry adds after
+/// `inputs`.
+pub fn entry_inputs(check: &Check, ctx: &Ctx, cause: Cause, inputs: &[serde_json::Value]) -> Vec<serde_json::Value> {
+    if !matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
+        || matches!(check, Check::Walk(_) | Check::For(_) | Check::AnyOf(_))
+    {
+        return Vec::new();
+    }
+    let named = |v: &serde_json::Value| v.get("name").and_then(serde_json::Value::as_str).map(str::to_string);
+    let mut seen: Vec<String> = inputs.iter().filter_map(named).collect();
+    let bases = of_check(check, ctx);
+    let mut keys: Vec<serde_json::Value> = Vec::new();
+    for kb in &bases {
+        if seen.contains(&kb.key_input.name) {
+            continue;
+        }
+        seen.push(kb.key_input.name.clone());
+        keys.push(crate::parts::with_outcome(&kb.key_input, "", &[]));
+    }
+    keys.sort_by(|a, b| named(a).cmp(&named(b)));
+    for kb in &bases {
+        if let Some((_, _, input)) = &kb.base
+            && !seen.contains(&input.name)
+        {
+            seen.push(input.name.clone());
+            keys.push(crate::parts::with_outcome(input, "", &[]));
+        }
+    }
+    keys
+}
