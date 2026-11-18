@@ -314,12 +314,13 @@ _entry(kind, name, cause, inputs, failures, message) := {
 
 _policy_entry(kind, name, cause, inputs, failures, message, locations) := object.union(_entry(kind, name, cause, inputs, failures, message), {"locations": locations})
 
-_row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, [i | some i in _with_key_bases(array.concat(ins, _check_key_ref_entries(where.check, ins, row.cause)), object.get(row, "ergo/key_bases", []), at); not i.name in names; not _item_input(i, _tally_list_names(where.check))], ls, _tally_rest(row.message, names), [_assertion_at(where, null, 0)])] if {
+_row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, [i | some i in _with_key_bases(array.concat(ins, _check_key_ref_entries(where.check, ins, row.cause)), object.get(row, "ergo/key_bases", []), at); not i.name in names; not _item_input(i, lists)], ls, _tally_rest(row.message, names), [_assertion_at(where, null, 0)])] if {
 	not _walks(where.check)
 	not _all_of_run(where.check)
 	not _any_of_run(where.check)
 	not where.check.op == "for"
-	ls := _tally_list_entries(row, at, where.check, ins)
+	lists := _tally_list_names(where.check)
+	ls := _tally_list_entries(row, at, lists, ins)
 	names := {e.name | some e in ls}
 }
 
@@ -353,10 +354,9 @@ _tally_list_names(check) := {_input_name(array.slice(p, 0, i)) |
 	}
 }
 
-_tally_list_entries(row, at, check, ins) := [] if count(_tally_list_names(check)) == 0
+_tally_list_entries(row, at, lists, ins) := [] if count(lists) == 0
 
 else := [_entry("list", n, cause, _tally_list_read(n, cause, row, ins, at), [], c) |
-	lists := _tally_list_names(check)
 	some c in _tally_clauses(row.message)
 	n := _m_clause_name(c)
 	n in lists
@@ -392,12 +392,17 @@ _row_failures(row, at, where, _) := [_tallied_entry(
 	some k, fa in row.failed_assertions
 ] if _all_of_run(where.check)
 
-_tallied_entry(e, c, o, at) := object.union(e, {"inputs": [i | some i in e.inputs; not i.name in names; not _item_input(i, _tally_list_names(c))], "failures": ls, "message": _tally_rest(e.message, names)}) if {
+_tallied_entry(e, c, o, at) := object.union(e, {"inputs": [i | some i in e.inputs; not i.name in names; not _item_input(i, lists)], "failures": ls, "message": _tally_rest(e.message, names)}) if {
 	not _walks(c)
-	ls := _tally_list_entries({"message": e.message, "ergo/key_bases": object.get(o, "key_bases", [])}, at, c, e.inputs)
+	lists := _tally_list_names(c)
+	ls := _tally_list_entries({"message": e.message, "ergo/key_bases": object.get(o, "key_bases", [])}, at, lists, e.inputs)
 	names := {x.name | some x in ls}
 	count(names) > 0
-} else := object.union(e, {"inputs": [i | some i in e.inputs; not _item_input(i, _tally_list_names(c))]}) if not _walks(c)
+} else := object.union(e, {"inputs": [i | some i in e.inputs; not _item_input(i, lists)]}) if {
+	not _walks(c)
+	lists := _tally_list_names(c)
+	count(lists) > 0
+}
 
 else := e
 
@@ -811,7 +816,7 @@ _applies_entries(row, at, evals, req, conds, ins) := [_policy_entry(
 	"assertion",
 	conds[name].expression,
 	e.assertion_cause,
-	[i | some i in ins; not i.name in names; not _item_input(i, _tally_list_names(_applies_to_of(req)[name]))],
+	[i | some i in ins; not i.name in names; not _item_input(i, lists)],
 	ls,
 	_tally_rest(row.message, names),
 	[conds[name].at],
@@ -819,7 +824,8 @@ _applies_entries(row, at, evals, req, conds, ins) := [_policy_entry(
 	count(evals) == 1
 	some name, e in evals
 	not "failed_items" in object.keys(row)
-	ls := _tally_list_entries(row, at, _applies_to_of(req)[name], ins)
+	lists := _tally_list_names(_applies_to_of(req)[name])
+	ls := _tally_list_entries(row, at, lists, ins)
 	names := {x.name | some x in ls}
 }
 

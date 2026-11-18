@@ -257,9 +257,16 @@ _m_walk_outcome(check, subj, r) := {"message": _m_joined(ps), "ergo/own": [p | s
 	ps := _walk_roots_sorted(_parts_ahead(parts, r), check)
 }
 
-_walk_roots_sorted(ps, check) := ps if count([p | some p in ps; _m_root_clause(p, _walk_list_names(check))]) < 2
+_walk_roots_sorted(ps, check) := ps if {
+	count([p | some p in ps; not startswith(p, "item ")]) == 0
+	count({_m_item_list_of(p) | some p in ps}) < 2
+} else := _walk_roots_sorted_in(ps, _walk_list_names(check))
 
-else := _roots_then_lists(ps, _walk_list_names(check))
+_m_item_list_of(p) := split(split(substring(p, indexof(p, " of ") + 4, -1), ":")[0], " ")[0]
+
+_walk_roots_sorted_in(ps, lists) := ps if count([p | some p in ps; _m_root_clause(p, lists)]) < 2
+
+else := _roots_then_lists(ps, lists)
 
 _walk_list_names(check) := {_input_name(array.slice(p, 0, i)) |
 	p := check.path

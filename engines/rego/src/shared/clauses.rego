@@ -4,17 +4,29 @@ import rego.v1
 
 _m_root_sorted(clauses) := _roots_then_lists(clauses, set())
 
-_roots_then_lists(clauses, lists) := array.concat(
+_roots_then_lists(clauses, lists) := _roots_then_lists_of([[_m_root_clause(c, lists), c] | some c in clauses], lists)
+
+_roots_then_lists_of(tagged, lists) := array.concat(
 	array.concat(
-		[x[2] | some x in sort([[_m_clause_rank(c), _m_clause_name(c), c] | some c in clauses; _m_root_clause(c, lists); not _m_clause_name(c) in lists])],
-		[c | some c in clauses; _m_root_clause(c, lists); _m_clause_name(c) in lists],
+		[x[2] | some x in sort([[_m_clause_rank(t[1]), _m_clause_name(t[1]), t[1]] | some t in tagged; t[0]; not _m_clause_name(t[1]) in lists])],
+		[t[1] | some t in tagged; t[0]; _m_clause_name(t[1]) in lists],
 	),
-	[c | some c in clauses; not _m_root_clause(c, lists)],
+	[t[1] | some t in tagged; not t[0]],
 )
 
-_m_root_clause(c, lists) if {
-	not _m_list_item_clause(c, lists)
-	not regex.match(`^and [0-9]+ more$`, c)
+_m_root_clause(c, lists) := false if {
+	_m_more_clause(c)
+	_ = lists
+}
+
+else := false if _m_list_item_clause(c, lists)
+
+else := true
+
+_m_more_clause(c) if {
+	startswith(c, "and ")
+	endswith(c, " more")
+	not contains(c, " is ")
 }
 
 _m_list_item_clause(c, lists) if {
