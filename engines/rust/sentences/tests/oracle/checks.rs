@@ -10147,7 +10147,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
-    ("count of xs whose v is 1 is 0", "count of xs whose v is 1 is 0", &[], &[]),
+    (
+        "count of xs whose v is 1 is 0",
+        "count of xs whose v is 1 is 0",
+        &[],
+        &[],
+    ),
     (
         "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1",
         "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1",
