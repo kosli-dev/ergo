@@ -1662,6 +1662,7 @@ struct Applied {
     failed_assertions: Option<Value>,
     failed_items: Option<Value>,
     message: Option<String>,
+    parts: Vec<(usize, Part)>,
 }
 
 fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
@@ -1671,13 +1672,16 @@ fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
 
 fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let mut failed_items = None;
+    let mut rich: Vec<Value> = Vec::new();
     let mut said: Vec<String> = Vec::new();
+    let mut texts: Vec<String> = Vec::new();
     let verdicts: Vec<(&Filter, Verdict)> = filters
         .iter()
         .map(|filter| {
             let ran = ops::run_full(&filter.check, ctx);
             let mut verdict = ran.verdict;
             failed_items = ran.failed_items.map(Value::Array);
+            rich = ran.rich;
             let mut own = ran.message;
             if unreadable {
                 let keeps_own = verdict.cause.is_failure()
@@ -1689,8 +1693,10 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                     own = None;
                 }
             }
-            if !verdict.passed() {
-                said.push(own.unwrap_or_else(|| {
+            if verdict.passed() {
+                texts.push(String::new());
+            } else {
+                let text = own.unwrap_or_else(|| {
                     if matches!(verdict.cause, Cause::Absent | Cause::Null) {
                         let mut unlabelled = ctx.clone();
                         unlabelled.label = None;
@@ -1698,7 +1704,9 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                     } else {
                         ops::message::message(&filter.check, ctx, &verdict)
                     }
-                }));
+                });
+                texts.push(text.clone());
+                said.push(text);
             }
             (filter, verdict)
         })
@@ -1727,12 +1735,10 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                 .collect(),
         )
     });
-    let inputs = merged_inputs(
-        verdicts
-            .iter()
-            .flat_map(|(_, v)| v.inputs.iter().cloned())
-            .collect(),
-    );
+    let read: Vec<Input> = verdicts
+        .iter()
+        .flat_map(|(_, v)| v.inputs.iter().cloned())
+        .collect();
     let mut once: Vec<String> = Vec::new();
     for text in said {
         ops::push_new(&mut once, text);
@@ -1744,17 +1750,70 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     } else {
         Some(once.join("; "))
     };
+    let checks: Vec<&Check> = filters.iter().map(|f| &f.check).collect();
+    let inputs = if matched {
+        merged_inputs(read)
+    } else {
+        outcomes(&read, message.as_deref().unwrap_or_default(), true, &checks)
+    };
+    let failed_items = if filters.len() == 1 {
+        failed_items
+    } else {
+        None
+    };
+    let parts: Vec<(usize, Part)> = if matched {
+        Vec::new()
+    } else if filters.len() > 1 {
+        verdicts
+            .iter()
+            .zip(&texts)
+            .enumerate()
+            .filter(|(_, ((_, v), _))| !v.passed())
+            .map(|(k, ((f, v), text))| {
+                (
+                    k,
+                    Part {
+                        name: f.text.clone(),
+                        cause: v.cause,
+                        inputs: outcomes(&v.inputs, text, false, &[&f.check]),
+                        failures: Vec::new(),
+                        message: text.clone(),
+                    },
+                )
+            })
+            .collect()
+    } else {
+        let (filter, verdict) = &verdicts[0];
+        let text = message.clone().unwrap_or_default();
+        let part = match (&filter.check, &failed_items) {
+            (Check::Walk(walk), Some(Value::Array(failed))) => walk_part(
+                &filter.text,
+                verdict.cause,
+                &inputs,
+                &text,
+                failed,
+                &rich,
+                &walk.path,
+                ctx,
+            ),
+            _ => Part {
+                name: filter.text.clone(),
+                cause: verdict.cause,
+                inputs: inputs.clone(),
+                failures: Vec::new(),
+                message: text,
+            },
+        };
+        vec![(0, part)]
+    };
     Applied {
         matched,
         message,
         cause,
         inputs,
         failed_assertions,
-        failed_items: if filters.len() == 1 {
-            failed_items
-        } else {
-            None
-        },
+        failed_items,
+        parts,
     }
 }
 
@@ -1879,6 +1938,27 @@ fn applies_row(env: &Env, judged: &Judged, applied: &Applied, anc: &[Anc]) -> Ro
     row.failed_assertions = applied.failed_assertions.clone();
     row.failed_items = applied.failed_items.clone();
     row.message = applied.message.clone();
+    if !applied.matched {
+        let count = env
+            .reading
+            .lowered(env.subject)
+            .map_or(1, |lowered| lowered.filters.len());
+        let base = parts::joined("$policy:", &["subjects", env.subject, "from"]);
+        row.failures = Some(parts::to_json(
+            &applied
+                .parts
+                .iter()
+                .map(|(k, part)| Failure::Assertion {
+                    part: part.clone(),
+                    locations: vec![if count > 1 {
+                        format!("{base}#{}", k + 1)
+                    } else {
+                        base.clone()
+                    }],
+                })
+                .collect::<Vec<_>>(),
+        ));
+    }
     with_in(row, anc)
 }
 
@@ -2156,6 +2236,60 @@ fn key_ref_entries(paths: &[&Path], ctx: &Ctx, inputs: &[Value]) -> Vec<Value> {
     found
 }
 
+#[allow(clippy::too_many_arguments)]
+fn walk_part(
+    name: &str,
+    cause: Cause,
+    inputs: &[Value],
+    message: &str,
+    failed: &[Value],
+    rich: &[Value],
+    path: &Path,
+    ctx: &Ctx,
+) -> Part {
+    let keys = key_ref_entries(&[path], ctx, inputs);
+    let failed: Vec<Value> = failed
+        .iter()
+        .map(|plain| {
+            rich.iter()
+                .find(|r| parts::same_failed(r, plain))
+                .cloned()
+                .unwrap_or_else(|| plain.clone())
+        })
+        .collect();
+    let walked = parts::walk_entries(&failed);
+    let lists: Vec<String> = failed
+        .iter()
+        .map(|f| parts::list_base(f.get("item").and_then(Value::as_str).unwrap_or("")))
+        .collect();
+    let mut said: Vec<String> = Vec::new();
+    for piece in message.split("; ") {
+        if !piece.is_empty()
+            && !walked.texts.iter().any(|t| t == piece)
+            && ops::message::cap_note(piece).is_none()
+        {
+            ops::push_new(&mut said, piece.to_string());
+        }
+    }
+    for root in &walked.roots {
+        ops::push_new(&mut said, root.clone());
+    }
+    Part {
+        name: name.to_string(),
+        cause,
+        inputs: inputs
+            .iter()
+            .filter(|i| {
+                !parts::item_input(i.get("name").and_then(Value::as_str).unwrap_or(""), &lists)
+            })
+            .cloned()
+            .chain(keys)
+            .collect(),
+        failures: parts::nest(walked.entries, ctx.input),
+        message: said.join("; "),
+    }
+}
+
 fn with_failures(
     env: &Env,
     name: &str,
@@ -2277,58 +2411,23 @@ fn with_failures(
                     .collect(),
             ),
             Some(Check::Walk(walk)) => {
-                let keys = key_ref_entries(&[&walk.path], ctx, &row.inputs);
                 let failed: Vec<Value> = row
                     .failed_items
                     .as_ref()
                     .and_then(Value::as_array)
                     .cloned()
-                    .unwrap_or_default()
-                    .into_iter()
-                    .map(|plain| {
-                        ran.rich
-                            .iter()
-                            .find(|rich| parts::same_failed(rich, &plain))
-                            .cloned()
-                            .unwrap_or(plain)
-                    })
-                    .collect();
-                let walked = parts::walk_entries(&failed);
-                let lists: Vec<String> = failed
-                    .iter()
-                    .map(|f| parts::list_base(f.get("item").and_then(Value::as_str).unwrap_or("")))
-                    .collect();
-                let mut said: Vec<String> = Vec::new();
-                for piece in message.split("; ") {
-                    if !piece.is_empty()
-                        && !walked.texts.iter().any(|t| t == piece)
-                        && ops::message::cap_note(piece).is_none()
-                    {
-                        ops::push_new(&mut said, piece.to_string());
-                    }
-                }
-                for root in &walked.roots {
-                    ops::push_new(&mut said, root.clone());
-                }
+                    .unwrap_or_default();
                 Some(vec![Failure::Assertion {
-                    part: Part {
-                        name: expression.to_string(),
-                        cause: row.cause,
-                        inputs: row
-                            .inputs
-                            .iter()
-                            .filter(|i| {
-                                !parts::item_input(
-                                    i.get("name").and_then(Value::as_str).unwrap_or(""),
-                                    &lists,
-                                )
-                            })
-                            .cloned()
-                            .chain(keys)
-                            .collect(),
-                        failures: parts::nest(walked.entries, env.input),
-                        message: said.join("; "),
-                    },
+                    part: walk_part(
+                        expression,
+                        row.cause,
+                        &row.inputs,
+                        &message,
+                        &failed,
+                        &ran.rich,
+                        &walk.path,
+                        ctx,
+                    ),
                     locations: at(None, 1),
                 }])
             }
