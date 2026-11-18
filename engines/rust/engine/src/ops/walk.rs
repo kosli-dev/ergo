@@ -1306,9 +1306,11 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         with_fields(&mut inputs, &walked.name, &walk.path, ctx);
         let mut cause = outcome.cause().unwrap_or(Cause::Unusable);
         let parts: Vec<String> = if walked.failures.is_empty() {
+            let keyed = super::key_base::of_path(&walk.path, true, &outer).is_some();
             let said = match cause {
                 Cause::Absent => Some(format!("{} is missing", walked.name)),
                 Cause::Null => Some(format!("{} is null", walked.name)),
+                _ if keyed => Some(String::new()),
                 _ => None,
             };
             match said {
@@ -1319,6 +1321,13 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
                             if let Some((text, base_cause, _)) = &kb.base {
                                 found.push(text.clone());
                                 cause = Cause::worst([cause, *base_cause]).unwrap_or(cause);
+                                if let Some(first) =
+                                    inputs.iter_mut().find(|i| i.name == walked.name)
+                                    && let Some(state) =
+                                        super::key_base::worse_state(first.state, *base_cause)
+                                {
+                                    first.state = state;
+                                }
                             } else if !walk.if_any
                                 && let Some(text) = super::key_base::empty_base(&walk.path, &outer)
                             {

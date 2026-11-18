@@ -1175,6 +1175,19 @@ fn unread_ref_cause(env: &Env, source: &Source, anc: &[Anc]) -> Option<Cause> {
     }
 }
 
+fn from_base(env: &Env, source: &Source, anc: &[Anc]) -> Option<(String, Cause)> {
+    let (Source::Root { path, .. } | Source::Child { path, .. }) = source;
+    let ctx = context(env, input_root(env), anc);
+    let (text, cause) = ops::key_base::from_base(path, &ctx)?;
+    let mut text = text.strip_prefix("$input.").unwrap_or(&text).to_string();
+    if let (Source::Child { .. }, Some(parent)) = (source, anc.last())
+        && let Some(rest) = text.strip_prefix(&format!("{}.", parent.name))
+    {
+        text = rest.to_string();
+    }
+    Some((text, cause))
+}
+
 fn read_entries<'a>(
     env: &Env<'a>,
     empty: &'a Value,
@@ -1182,7 +1195,8 @@ fn read_entries<'a>(
     anc: &[Anc<'a>],
 ) -> Read<'a> {
     if let Some(cause) = unread_ref_cause(env, &lowered.source, anc) {
-        return Read::Failed(cause);
+        let base = from_base(env, &lowered.source, anc).map(|(_, c)| c);
+        return Read::Failed(Cause::worst([cause].into_iter().chain(base)).unwrap_or(cause));
     }
     match &lowered.source {
         Source::Root {
@@ -1707,6 +1721,18 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                         ops::message::message(&filter.check, ctx, &verdict)
                     }
                 });
+                let text = if unreadable {
+                    text
+                } else {
+                    ops::key_base::rewrite(
+                        &filter.check,
+                        ctx,
+                        &mut verdict.cause,
+                        &mut verdict.inputs,
+                        text.clone(),
+                    )
+                    .unwrap_or(text)
+                };
                 texts.push(text.clone());
                 said.push(text);
             }
@@ -2004,7 +2030,12 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
         Read::Entries { entries, broken } => (entries, broken),
         Read::Failed(cause) => {
             let mut level = failed_level(env, anc, cause, true);
-            if let Some(said) = from_message(env, empty, lowered, anc, cause) {
+            if let Some(mut said) = from_message(env, empty, lowered, anc, cause) {
+                if let Some((text, _)) = from_base(env, &lowered.source, anc)
+                    && !said.split("; ").any(|p| p == text)
+                {
+                    said = format!("{said}; {text}");
+                }
                 for row in &mut level.min_subjects {
                     row.message = Some(said.clone());
                 }
@@ -2359,6 +2390,23 @@ fn walk_part(
     for root in &walked.roots {
         ops::push_new(&mut said, root.clone());
     }
+    let mut failures = parts::nest(walked.entries, ctx.input);
+    if failed.is_empty()
+        && let Some((text, base_cause, input)) =
+            ops::key_base::for_list(&walk.path, walk.if_any, ctx).and_then(|k| k.base)
+    {
+        said.retain(|s| *s != text);
+        failures.insert(
+            0,
+            Failure::List(Part {
+                name: input.name.clone(),
+                cause: base_cause,
+                inputs: vec![parts::with_outcome(&input, &text, &[])],
+                failures: Vec::new(),
+                message: text,
+            }),
+        );
+    }
     Part {
         name: name.to_string(),
         cause,
@@ -2370,7 +2418,7 @@ fn walk_part(
             .cloned()
             .chain(keys)
             .collect(),
-        failures: parts::nest(walked.entries, ctx.input),
+        failures,
         message: said.join("; "),
     }
 }
@@ -2603,11 +2651,8 @@ fn with_failures(
                                 })
                             })
                         {
-                            inputs.extend(key_ref_entries(
-                                &tally.counted_paths(),
-                                ctx,
-                                &row.inputs,
-                            ));
+                            let more = key_ref_entries(&tally.counted_paths(), ctx, &inputs);
+                            inputs.extend(more);
                         }
                         inputs
                     },

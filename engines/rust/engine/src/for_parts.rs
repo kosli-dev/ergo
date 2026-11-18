@@ -413,8 +413,16 @@ pub fn for_failures(
         .collect();
     let mut owned: Vec<Vec<String>> = vec![Vec::new(); line.sentences.len()];
     let mut walk_texts: Vec<String> = Vec::new();
+    let first_key = line.first_key(ctx);
+    let key_said: Vec<&str> = first_key
+        .iter()
+        .flat_map(|k| {
+            std::iter::once(k.key_text.as_str()).chain(k.base.iter().map(|(t, _, _)| t.as_str()))
+        })
+        .collect();
     for clause in message.split("; ") {
         if clause.is_empty()
+            || key_said.contains(&clause)
             || ops::message::cap_note(clause).is_some()
             || item_made.iter().any(|t| t == clause)
             || free_said.iter().any(|t| t == clause)
@@ -551,6 +559,18 @@ pub fn for_failures(
                     .collect(),
                 failures: Vec::new(),
                 message: walk_texts.join("; "),
+            }),
+        );
+    }
+    if let Some((text, cause, input)) = first_key.and_then(|k| k.base) {
+        lists.insert(
+            0,
+            Failure::List(Part {
+                name: input.name.clone(),
+                cause,
+                inputs: vec![crate::parts::with_outcome(&input, &text, &[])],
+                failures: Vec::new(),
+                message: text,
             }),
         );
     }

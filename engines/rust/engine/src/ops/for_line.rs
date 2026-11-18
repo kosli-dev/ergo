@@ -1880,9 +1880,52 @@ impl For {
                 &outer_ctx(ctx),
                 &counted,
             );
+            self.key_base_after_key(&mut run, ctx);
             self.free_first(&mut run, ctx);
         }
         run
+    }
+
+    /// The first list's `named by` key that can't be read, when there is one.
+    pub fn first_key(&self, ctx: &Ctx) -> Option<super::key_base::ForKey> {
+        let first = self.items.first()?;
+        let if_any = matches!(
+            first.how,
+            How::Every { if_any: true } | How::Some { if_any: true }
+        );
+        super::key_base::for_list(&first.path, if_any, ctx)
+    }
+
+    fn key_base_after_key(&self, run: &mut Run, ctx: &Ctx) {
+        let Some(found) = self.first_key(ctx) else {
+            return;
+        };
+        if !run
+            .verdict
+            .inputs
+            .iter()
+            .any(|input| input.name == found.key.name)
+        {
+            run.verdict.inputs.push(found.key.clone());
+        }
+        let Some((text, cause, _)) = found.base else {
+            return;
+        };
+        let said = run.message.clone().unwrap_or_default();
+        let mut pieces: Vec<String> = said
+            .split("; ")
+            .filter(|p| !p.is_empty() && *p != text)
+            .map(str::to_string)
+            .collect();
+        match pieces.iter().position(|p| *p == found.key_text) {
+            Some(at) => pieces.insert(at + 1, text),
+            None => {
+                pieces.push(found.key_text.clone());
+                pieces.push(text);
+            }
+        }
+        run.message = Some(pieces.join("; "));
+        run.verdict.cause = Cause::worst([run.verdict.cause, cause]).unwrap_or(cause);
     }
 
     fn free_first(&self, run: &mut Run, ctx: &Ctx) {

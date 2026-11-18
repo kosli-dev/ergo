@@ -12,6 +12,7 @@ pub struct KeyBase {
     pub key: String,
     pub base: Option<(String, Cause, Input)>,
     pub off_object: bool,
+    pub key_cause: Cause,
 }
 
 fn key_flaw(key: &Path, ctx: &Ctx) -> Option<(Outcome, String, Input)> {
@@ -142,7 +143,7 @@ pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
     let Step::Ref(key) = &path.steps[at] else {
         return None;
     };
-    let (_, text, _) = key_flaw(key, ctx)?;
+    let (key_outcome, text, _) = key_flaw(key, ctx)?;
     let keys: Vec<String> = path.steps[..at]
         .iter()
         .map_while(|step| match step {
@@ -162,6 +163,7 @@ pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
         off_object: matches!(path.start, path::Start::Subject | path::Start::Own)
             && matches!(path.steps.first(), Some(Step::Key(_)))
             && path::start_of(&path.start, ctx).is_ok_and(|(value, _, _)| !value.is_object()),
+        key_cause: key_outcome.cause().unwrap_or(Cause::Unusable),
     })
 }
 
@@ -219,6 +221,14 @@ fn outcome_of(cause: Cause) -> Outcome {
     }
 }
 
+/// The outcome of an input whose own outcome is `state`, once a base problem
+/// with `cause` is added to it, when that is worse.
+pub fn worse_state(state: Outcome, cause: Cause) -> Option<Outcome> {
+    let now = state.cause();
+    let worse = Cause::worst(now.into_iter().chain([cause]))?;
+    (Some(worse) != now).then(|| outcome_of(worse))
+}
+
 fn cause_of(state: Outcome) -> Option<Cause> {
     state.cause()
 }
@@ -255,7 +265,8 @@ pub fn rewrite(
         };
         for input in inputs.iter_mut().filter(|i| i.name == kb.path) {
             let now = cause_of(input.state);
-            let worse = Cause::worst(now.into_iter().chain([*base_cause])).unwrap_or(*base_cause);
+            let worse = Cause::worst(now.into_iter().chain([*base_cause, kb.key_cause]))
+                .unwrap_or(*base_cause);
             input.state = outcome_of(worse);
         }
     }
@@ -346,4 +357,89 @@ pub fn empty_base(path: &Path, ctx: &Ctx) -> Option<String> {
         }
         _ => None,
     }
+}
+
+/// A `for` line's first list whose `named by` key can't be read: the key's
+/// input and text, and the problem of the value before the key, when it has
+/// one (an empty list is one unless the line says `, if any,`).
+pub struct ForKey {
+    pub key: Input,
+    pub key_text: String,
+    pub base: Option<(String, Cause, Input)>,
+}
+
+/// The [`ForKey`] of a `for` line's first list `path`.
+pub fn for_list(path: &Path, if_any: bool, ctx: &Ctx) -> Option<ForKey> {
+    if !matches!(path.start, path::Start::Subject | path::Start::Own) {
+        return None;
+    }
+    let at = path
+        .steps
+        .iter()
+        .position(|step| matches!(step, Step::Ref(key) if key_flaw(key, ctx).is_some()))?;
+    let Step::Ref(key) = &path.steps[at] else {
+        return None;
+    };
+    let (_, key_text, key) = key_flaw(key, ctx)?;
+    let keys: Vec<String> = path.steps[..at]
+        .iter()
+        .map_while(|step| match step {
+            Step::Key(k) => Some(k.clone()),
+            _ => None,
+        })
+        .collect();
+    let mut base = None;
+    if !keys.is_empty() && keys.len() == at {
+        base = base_flaw(&path.start, &keys, true, ctx);
+        if base.is_none() && !if_any {
+            let before = Path {
+                start: path.start.clone(),
+                steps: path.steps[..at].to_vec(),
+            };
+            let read = path::read(&before, ctx);
+            if let (Outcome::Found, Some(Value::Array(items))) = (read.outcome, read.value)
+                && items.is_empty()
+            {
+                let named = name::name(&before);
+                base = Some((
+                    format!("{named} is []"),
+                    Cause::Value,
+                    Input {
+                        name: named,
+                        value: Value::Array(Vec::new()),
+                        locations: read.location.iter().map(|l| l.render()).collect(),
+                        part: None,
+                        state: Outcome::Found,
+                        null_at: None,
+                        worked: false,
+                    },
+                ));
+            }
+        }
+    }
+    Some(ForKey {
+        key,
+        key_text,
+        base,
+    })
+}
+
+/// The problem of the value before the first key of a `from` line's `path`
+/// that can't be read, when that value can't take a key, with its cause.
+pub fn from_base(path: &Path, ctx: &Ctx) -> Option<(String, Cause)> {
+    let at = path
+        .steps
+        .iter()
+        .position(|step| matches!(step, Step::Ref(key) if key_flaw(key, ctx).is_some()))?;
+    let keys: Vec<String> = path.steps[..at]
+        .iter()
+        .map_while(|step| match step {
+            Step::Key(k) => Some(k.clone()),
+            _ => None,
+        })
+        .collect();
+    if keys.is_empty() || keys.len() != at {
+        return None;
+    }
+    base_flaw(&path.start, &keys, true, ctx).map(|(text, cause, _)| (text, cause))
 }
