@@ -375,8 +375,24 @@ pub fn for_failures(
             }
         }
         if said.is_empty() {
-            said = moved.join("; ");
-            free_texts.extend(moved);
+            let owns = if row_cause == Cause::NotAnObject {
+                Vec::new()
+            } else {
+                line.sentence_roots(i, ctx)
+            };
+            let mut own: Vec<String> = Vec::new();
+            for clause in message.split("; ") {
+                if (moved.iter().any(|m| m == clause) || owns.iter().any(|o| o == clause))
+                    && !free_texts.iter().any(|t| t == clause)
+                {
+                    ops::push_new(&mut own, clause.to_string());
+                }
+            }
+            for m in moved {
+                ops::push_new(&mut own, m);
+            }
+            said = own.join("; ");
+            free_texts.extend(own);
         }
         if said.is_empty() && items.is_empty() {
             continue;

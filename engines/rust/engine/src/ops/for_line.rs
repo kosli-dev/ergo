@@ -1789,6 +1789,36 @@ impl For {
         inputs
     }
 
+    /// What the sentence at `idx` says about a root it reads outside the
+    /// items, when that root can't be read or used.
+    pub fn sentence_roots(&self, idx: usize, ctx: &Ctx) -> Vec<String> {
+        let Some(sentence) = self.sentences.get(idx) else {
+            return Vec::new();
+        };
+        let outer = outer_ctx(ctx);
+        let mut texts: Vec<String> = Vec::new();
+        let forms = root_forms(&sentence.check);
+        if let Some((_, found)) = sentence_root_flaw(&forms, &outer) {
+            for text in found {
+                for piece in text.split("; ") {
+                    push_new(&mut texts, piece.to_string());
+                }
+            }
+        }
+        let mut checks: Vec<&Check> = nested_checks(&sentence.check);
+        if let Check::Walk(walk) = &sentence.check {
+            checks.push(&walk.check);
+        }
+        for check in checks {
+            if let Some((_, text)) = super::message::root_flaw(&[check], &outer) {
+                for piece in text.split("; ") {
+                    push_new(&mut texts, piece.to_string());
+                }
+            }
+        }
+        texts
+    }
+
     pub fn run(&self, ctx: &Ctx) -> Run {
         let mut run = self.run_lines(ctx);
         if run.verdict.cause != Cause::Satisfied {
