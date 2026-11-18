@@ -2470,7 +2470,7 @@ and the check's `$refs` entry is `{"locations": ["$params:/regions"], "name": "$
 
 A failed row says why in two places: its `message`, for a person, and its `failures`, for a tool that builds audit evidence. To find the evidence for a failed row, read `failures` from the entry down:
 
-1. Each entry is a part that failed: an `option` of an `any_of`, an `assertion` (a sentence), an `item` of a list that was walked, or a `list` that couldn't be walked. The entries under it are what failed inside it, and an entry with `failures` `[]` is a place where the check really failed.
+1. Each entry is a part that failed: an `option` of an `any_of`, an `assertion` (a sentence), an `item` of a list that was walked, or a `list` that couldn't be walked. The entries under it are what failed inside it, and an entry with `failures` `[]` is a place where the check really failed. For now, a list walked inside an `any_of` option or an `assert` list has no `item` entries under its assertion, so its items show only in the message ([#688](https://github.com/kosli-dev/ergo/issues/688)).
 2. An entry's `inputs` are what that part read, each with its `name`, `value`, `locations` and `outcome`. `locations` are where, as [Where a value was read](#where-a-value-was-read) says, and `outcome` says which input to blame: `absent` and `null` are evidence that isn't there, `unusable` is a value of the wrong kind for the check, and `usable` is a value that was fine.
 3. An `item` has `value`, the item, and `locations`, where it sits in the input.
 4. Each input sits on the entry that read it: a name from outside the items, like `$params.min`, on the `assertion`, once, what was read inside an item on that `item`, and a list's own read on its `list` entry. On a `for` line, what the line reads itself, like a key after `named by` in its `whose`, is in the row's own `inputs`. A `count of` or `sum of` whose list can't be walked, like `count of o is 1` with `o` holding `"s"`, has a `list` entry `o` under its assertion, with the input `o` and the `outcome` `unusable`.
@@ -2504,7 +2504,7 @@ and this input:
 {"as_of": "2026-11-05T00:00:00Z", "grants": [{"id": "payments.approve", "granted_at": "2026-10-01T00:00:00Z"}]}
 ```
 
-the row of `payments.approve` for `expires` is below, without `requirement`, `subject` and `message`:
+the row of `payments.approve` for `expires` is below. It leaves out `requirement`, `subject` and the row's `message`, which is `approved exception: exception.approved_by is missing; expires: expires_at is missing`, but every entry keeps its own `message`:
 
 ```json
 {
@@ -2520,12 +2520,14 @@ the row of `payments.approve` for `expires` is below, without `requirement`, `su
           "inputs": [{"locations": ["/grants/0"], "name": "exception.approved_by", "outcome": "absent", "value": null}],
           "kind": "assertion",
           "locations": ["$policy:/requirements/fresh/checks/expires/any_of/approved exception/0"],
+          "message": "exception.approved_by is missing",
           "name": "exception.approved_by exists"
         }
       ],
       "inputs": [],
       "kind": "option",
       "locations": ["$policy:/requirements/fresh/checks/expires/any_of/approved exception"],
+      "message": "exception.approved_by is missing",
       "name": "approved exception"
     },
     {
@@ -2537,6 +2539,7 @@ the row of `payments.approve` for `expires` is below, without `requirement`, `su
           "inputs": [{"locations": ["/grants/0"], "name": "expires_at", "outcome": "absent", "value": null}],
           "kind": "assertion",
           "locations": ["$policy:/requirements/fresh/checks/expires/any_of/expires/0"],
+          "message": "expires_at is missing",
           "name": "expires_at exists"
         },
         {
@@ -2548,12 +2551,14 @@ the row of `payments.approve` for `expires` is below, without `requirement`, `su
           ],
           "kind": "assertion",
           "locations": ["$policy:/requirements/fresh/checks/expires/any_of/expires/1"],
+          "message": "expires_at is missing",
           "name": "expires_at is after $input.as_of"
         }
       ],
       "inputs": [],
       "kind": "option",
       "locations": ["$policy:/requirements/fresh/checks/expires/any_of/expires"],
+      "message": "expires_at is missing",
       "name": "expires"
     }
   ],
@@ -2566,7 +2571,7 @@ the row of `payments.approve` for `expires` is below, without `requirement`, `su
 }
 ```
 
-Its `failures` has one `option` entry for each option, and each has an `assertion` entry for every sentence that failed. The `expires` option failed because `expires_at` is `absent` (`outcome`) on the grant at `/grants/0`, and the `approved exception` option because `exception.approved_by` is. `$input.as_of` is `usable`: it read fine, and the check couldn't use it only because the other side was missing. `$policy:/requirements/fresh/checks/expires/any_of/expires/1` is the second sentence of the `expires` option, not a value from the input. The row's own `inputs` list what all the options read, once each.
+Its `failures` has one `option` entry for each option, and each has an `assertion` entry for every sentence that failed. Each entry's `message` is what the row's message says about that part, without the option's name in front, so the two sentences of `expires` both say `expires_at is missing`, and the row says it once. The `expires` option failed because `expires_at` is `absent` (`outcome`) on the grant at `/grants/0`, and the `approved exception` option because `exception.approved_by` is. `$input.as_of` is `usable`: it read fine, and the check couldn't use it only because the other side was missing. `$policy:/requirements/fresh/checks/expires/any_of/expires/1` is the second sentence of the `expires` option, not a value from the input. The row's own `inputs` list what all the options read, once each.
 
 ### Subjects in the report
 
