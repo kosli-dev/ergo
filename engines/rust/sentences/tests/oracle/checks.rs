@@ -10076,6 +10076,30 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("x.e exists", "x.e exists", &[], &[]),
     ("x.e is after x.a", "x.e is after x.a", &[], &[]),
     ("z is 3", "z is 3", &[], &[]),
+    ("count of o is 1", "count of o is 1", &[], &[]),
+    ("count of o whose v is 1 is 1", "count of o whose v is 1 is 1", &[], &[]),
+    (
+        "count of xs whose v is m named by $params.k is 1",
+        "count of xs whose v equals m named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is m named by $params.k exists",
+        "every xs whose v equals m named by $params.k exists",
+        &[],
+        &[],
+    ),
+    ("s named by p is 1", "s named by p is 1", &[], &[]),
+    (
+        "some xs whose v is m named by $params.k exists",
+        "some xs whose v equals m named by $params.k exists",
+        &[],
+        &[],
+    ),
+    ("sum of o is 1", "sum of o is 1", &[], &[]),
+    ("x.v is at least $params.z", "x.v is at least $params.z", &[], &[]),
+    ("x.v is at least z", "x.v is at least z", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

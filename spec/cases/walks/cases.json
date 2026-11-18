@@ -27689,5 +27689,401 @@
           ]
         }
       ]
+    },
+  {
+      "description": "a whose key from $params that is missing, beside conditions on the same items that read $params and $input",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "every": "every xs whose v is $params.z and whose u is $input.z and whose v is m named by $params.k exists",
+              "count": "count of xs whose v is $params.z and whose u is $input.z and whose v is m named by $params.k is 1", "params_left": "count of xs whose $params.z is m named by $params.k is 1", "input_left": "count of xs whose $input.z is m named by $params.k is 1"
+            }
+          }
+        }
+      },
+      "params": {
+        "z": 1
+      },
+      "cases": [
+        {
+          "description": "an item without m, beside conditions that read $params and $input fine",
+          "rules": [
+            "walk.flaws",
+            "row.parts",
+            "problems.where_said"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {
+                    "v": 1,
+                    "u": 1
+                  }
+                ]
+              }
+            ],
+            "z": 1
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "count",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "name": "count of xs whose v equals $params.z and whose u equals $input.z and whose v equals m named by $params.k",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "name": "xs[]",
+                      "outcome": "usable",
+                      "value": [
+                        {
+                          "u": 1,
+                          "v": 1
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "/z"
+                      ],
+                      "name": "$input.z",
+                      "outcome": "usable",
+                      "value": 1
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/count"
+                  ],
+                  "message": "$params.k is missing; item 1 of xs: m is missing",
+                  "name": "count of xs whose v equals $params.z and whose u equals $input.z and whose v equals m named by $params.k is 1"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "count of xs whose v equals $params.z and whose u equals $input.z and whose v equals m named by $params.k",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "u": 1,
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/z"
+                  ],
+                  "name": "$input.z",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "message": "$params.k is missing; item 1 of xs: m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "every",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].m",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "m is missing",
+                      "name": "item 1 of xs",
+                      "value": {
+                        "u": 1,
+                        "v": 1
+                      }
+                    }
+                  ],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/z"
+                      ],
+                      "name": "$input.z",
+                      "outcome": "usable",
+                      "value": 1
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/every"
+                  ],
+                  "message": "$params.k is missing",
+                  "name": "every xs whose v equals $params.z and whose u equals $input.z and whose v equals m named by $params.k exists"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/z"
+                  ],
+                  "name": "$input.z",
+                  "outcome": "usable",
+                  "value": 1
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "u": 1,
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "message": "$params.k is missing; item 1 of xs: m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "input_left",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "name": "count of xs whose $input.z equals m named by $params.k",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "name": "xs[]",
+                      "outcome": "usable",
+                      "value": [
+                        {
+                          "u": 1,
+                          "v": 1
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "/z"
+                      ],
+                      "name": "$input.z",
+                      "outcome": "usable",
+                      "value": 1
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/input_left"
+                  ],
+                  "message": "$params.k is missing; item 1 of xs: m is missing",
+                  "name": "count of xs whose $input.z equals m named by $params.k is 1"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "count of xs whose $input.z equals m named by $params.k",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "u": 1,
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/z"
+                  ],
+                  "name": "$input.z",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "message": "$params.k is missing; item 1 of xs: m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "params_left",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "name": "count of xs whose $params.z equals m named by $params.k",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "name": "xs[]",
+                      "outcome": "usable",
+                      "value": [
+                        {
+                          "u": 1,
+                          "v": 1
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.k",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/params_left"
+                  ],
+                  "message": "$params.k is missing; item 1 of xs: m is missing",
+                  "name": "count of xs whose $params.z equals m named by $params.k is 1"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "count of xs whose $params.z equals m named by $params.k",
+                  "value": null
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "u": 1,
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "message": "$params.k is missing; item 1 of xs: m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
     }
 ]
