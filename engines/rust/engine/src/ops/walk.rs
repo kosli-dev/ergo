@@ -1304,7 +1304,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         inputs.sort_by(|a, b| a.name.cmp(&b.name));
         inputs.dedup();
         with_fields(&mut inputs, &walked.name, &walk.path, ctx);
-        let cause = outcome.cause().unwrap_or(Cause::Unusable);
+        let mut cause = outcome.cause().unwrap_or(Cause::Unusable);
         let parts: Vec<String> = if walked.failures.is_empty() {
             let said = match cause {
                 Cause::Absent => Some(format!("{} is missing", walked.name)),
@@ -1313,7 +1313,21 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             };
             match said {
                 Some(said) => {
-                    let mut parts = vec![said];
+                    let mut parts = match super::key_base::of_path(&walk.path, true, &outer) {
+                        Some(kb) => {
+                            let mut found = vec![kb.key.clone()];
+                            if let Some((text, base_cause, _)) = &kb.base {
+                                found.push(text.clone());
+                                cause = Cause::worst([cause, *base_cause]).unwrap_or(cause);
+                            } else if !walk.if_any
+                                && let Some(text) = super::key_base::empty_base(&walk.path, &outer)
+                            {
+                                found.push(text);
+                            }
+                            found
+                        }
+                        None => vec![said],
+                    };
                     for root_cause in [Cause::Absent, Cause::Null, Cause::Unusable] {
                         if let Some(text) = root_alone(&walk.check, &outer, root_cause)
                             && !parts.contains(&text)

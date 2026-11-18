@@ -324,3 +324,26 @@ pub fn every_path(check: &Check) -> Vec<&Path> {
     }
     out
 }
+
+/// `o is []` when the value before the first key of `path` that can't be
+/// read is an empty list.
+pub fn empty_base(path: &Path, ctx: &Ctx) -> Option<String> {
+    let at = path
+        .steps
+        .iter()
+        .position(|step| matches!(step, Step::Ref(key) if key_flaw(key, ctx).is_some()))?;
+    if at == 0 || !path.steps[..at].iter().all(|s| matches!(s, Step::Key(_))) {
+        return None;
+    }
+    let before = Path {
+        start: path.start.clone(),
+        steps: path.steps[..at].to_vec(),
+    };
+    let read = path::read(&before, ctx);
+    match (read.outcome, read.value) {
+        (Outcome::Found, Some(Value::Array(items))) if items.is_empty() => {
+            Some(format!("{} is []", name::name(&before)))
+        }
+        _ => None,
+    }
+}

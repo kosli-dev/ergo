@@ -350,13 +350,11 @@ walks / a count of or a sum of that walks a $params or $input list of names of m
 walks / a count whose whose reads two named by keys that aren't text names both, in the order the sentence reads them, when the list is missing, null or text / the list is missing
 walks / a count whose whose reads two named by keys that aren't text names both, in the order the sentence reads them, when the list is missing, null or text / the list is null
 walks / a count whose whose reads two named by keys that aren't text names both, in the order the sentence reads them, when the list is missing, null or text / the list is text
-walks / a one-line every whose named by key from $params is missing / says only the key when the list is fine
 walks / a one-line every whose named by key from $params is missing / says the key and then the empty list
 walks / a one-line every whose named by key from $params is missing / says the key and then the list that isn't a list or an object, as unusable
 walks / a one-line every whose named by key from $params is missing / says the key and then the missing list
 walks / a one-line every whose named by key from $params is missing / says the key and then the null list
 walks / a one-line every whose whose reads a named by key from $params that is missing / says the key once and then an item whose value before the key isn't an object, which makes the row worse
-walks / a one-line every with if any whose named by key from $params is missing / says only the key on an empty list, which if any lets pass
 walks / a path whose named by key from $params is missing and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is missing, with the worst cause
 walks / a path whose named by key from $params is missing and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is null, with the worst cause
 walks / a path whose named by key from $params is missing and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is text, with the worst cause
@@ -366,7 +364,6 @@ walks / a path whose named by key from $params is null and whose value before th
 walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is missing, with the worst cause
 walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is null, with the worst cause
 walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is text, with the worst cause
-walks / a walk that can't be run as written / fails as unusable when a param its whose reads isn't a list, even with if any, and fails with the ref's cause when its named by can't be read
 walks / a walked path whose named by key from $params is missing, with a value partway that isn't an object / names the step that isn't an object
 walks / an $input list that a phrase walks fails a check on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it is null
 walks / an $input list that a phrase walks fails a check on an empty list when an item of it can't be read / fails, with an empty rows, when it holds names of more than one kind
