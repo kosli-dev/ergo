@@ -2432,6 +2432,9 @@ fn unfit_names(checks: &[&Check], ctx: &Ctx) -> Vec<(String, Value)> {
             for sentence in &line.sentences {
                 paths.extend(ops::key_base::every_path(&sentence.check));
             }
+            for whose in line.items.iter().flat_map(|item| item.whose.iter()) {
+                paths.extend(ops::key_base::every_path(whose));
+            }
         }
         for path in paths {
             if matches!(path.start, Start::Params | Start::Input) && !refs.contains(path) {

@@ -92,7 +92,8 @@ pub fn outcome(input: &Input, message: &str, sides: &[String]) -> Option<&'stati
     match input.state {
         Outcome::Found if input.value.is_null() => None,
         Outcome::Found
-            if sides.contains(&input.name) && unfit(&input.name, &input.value, message) =>
+            if (sides.contains(&input.name) || walked_root(&input.name))
+                && unfit(&input.name, &input.value, message) =>
         {
             Some("unusable")
         }
@@ -102,6 +103,10 @@ pub fn outcome(input: &Input, message: &str, sides: &[String]) -> Option<&'stati
         Outcome::Unusable => Some("unusable"),
         Outcome::NotAnObject => Some("not_an_object"),
     }
+}
+
+fn walked_root(name: &str) -> bool {
+    (name.starts_with("$params.") || name.starts_with("$input.")) && name.contains("[]")
 }
 
 fn unfit(name: &str, value: &Value, message: &str) -> bool {

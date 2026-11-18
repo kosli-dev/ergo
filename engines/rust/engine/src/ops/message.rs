@@ -215,6 +215,12 @@ fn side_paths(check: &Check) -> Vec<&Path> {
                 }
             })
             .collect(),
+        Check::AnyOf(any) => any
+            .options
+            .iter()
+            .flatten()
+            .flat_map(side_paths)
+            .collect(),
         _ => {
             let mut paths: Vec<&Path> = single_path(check).into_iter().collect();
             paths.extend(lists::right_paths(check));
