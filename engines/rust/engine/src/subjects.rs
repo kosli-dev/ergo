@@ -2571,12 +2571,13 @@ fn with_failures(
                     .filter(|option| option.cause != Cause::Satisfied)
                     .map(|option| {
                         let places = at(Some(&option.name), option.count);
-                        let mut said: Vec<String> = Vec::new();
-                        for line in &option.lines {
-                            if !line.said.is_empty() {
-                                ops::push_new(&mut said, line.said.clone());
-                            }
-                        }
+                        let mut once: Vec<String> = Vec::new();
+                        let said: Vec<String> = option
+                            .lines
+                            .iter()
+                            .map(|line| ops::message::unsaid(&line.said, &mut once))
+                            .filter(|line| !line.is_empty())
+                            .collect();
                         Failure::Option {
                             part: Part {
                                 name: option.name.clone(),
@@ -2796,10 +2797,12 @@ fn check_row(
                 None => default_message(check, ctx, v),
             })
             .collect();
-        let mut once: Vec<String> = Vec::new();
-        for text in messages {
-            ops::push_new(&mut once, text);
-        }
+        let mut said: Vec<String> = Vec::new();
+        let once: Vec<String> = messages
+            .iter()
+            .map(|text| ops::message::unsaid(text, &mut said))
+            .filter(|text| !text.is_empty())
+            .collect();
         row.message = Some(once.join("; "));
     }
     if plan.items.len() == 1 {

@@ -621,6 +621,55 @@ pub fn option_line_text(
     message(line, ctx, &verdict)
 }
 
+fn split_outside_quotes<'t>(text: &'t str, by: &str) -> Vec<&'t str> {
+    let mut out = Vec::new();
+    let mut from = 0;
+    let mut quoted = false;
+    let mut escaped = false;
+    let bytes = text.as_bytes();
+    let mut at = 0;
+    while at < bytes.len() {
+        let byte = bytes[at];
+        if escaped {
+            escaped = false;
+        } else if byte == b'\\' && quoted {
+            escaped = true;
+        } else if byte == b'"' {
+            quoted = !quoted;
+        } else if !quoted && text[at..].starts_with(by) {
+            out.push(&text[from..at]);
+            at += by.len();
+            from = at;
+            continue;
+        }
+        at += 1;
+    }
+    out.push(&text[from..]);
+    out
+}
+
+/// `text` without the clauses `said` held before it, adding the ones it
+/// keeps to `said`. A clause is a piece of `text` between `; ` or `, and `, outside
+/// quoted strings.
+pub fn unsaid(text: &str, said: &mut Vec<String>) -> String {
+    let before = said.len();
+    let mut groups: Vec<String> = Vec::new();
+    for group in split_outside_quotes(text, "; ") {
+        let mut kept: Vec<&str> = Vec::new();
+        for clause in split_outside_quotes(group, ", and ") {
+            if clause.is_empty() || said[..before].iter().any(|s| s == clause) {
+                continue;
+            }
+            said.push(clause.to_string());
+            kept.push(clause);
+        }
+        if !kept.is_empty() {
+            groups.push(kept.join(", and "));
+        }
+    }
+    groups.join("; ")
+}
+
 fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
     let in_option = Ctx {
         in_option: true,
@@ -643,10 +692,12 @@ fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
             continue;
         }
         let name = any.names.get(at).cloned().unwrap_or_default();
-        let mut once: Vec<String> = Vec::new();
-        for line in lines {
-            push_new(&mut once, line);
-        }
+        let mut said: Vec<String> = Vec::new();
+        let once: Vec<String> = lines
+            .iter()
+            .map(|line| unsaid(line, &mut said))
+            .filter(|line| !line.is_empty())
+            .collect();
         parts.push(format!("{name}: {}", once.join(", and ")));
     }
     if parts.is_empty() {

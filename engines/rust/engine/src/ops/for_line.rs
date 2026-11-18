@@ -1554,12 +1554,14 @@ impl For {
                 })
             })
             .collect();
+        let mut clauses: Vec<String> = Vec::new();
         for f in &sfails {
             let lines: &[String] = if two {
                 std::slice::from_ref(&f.text)
             } else {
                 &f.parts
             };
+            let prior = clauses.clone();
             let free = !f.reads_last
                 && !self
                     .items
@@ -1575,6 +1577,15 @@ impl For {
                     collect.free.extend(text.split("; ").map(str::to_string));
                 }
                 let text = unskipped(&text, &collect.skip);
+                let mut seen = prior.clone();
+                let text = if two {
+                    text
+                } else {
+                    super::message::unsaid(&text, &mut seen)
+                };
+                for clause in seen.into_iter().skip(prior.len()) {
+                    push_new(&mut clauses, clause);
+                }
                 if !text.is_empty() && !texts.contains(&text) {
                     texts.push(text);
                 }
