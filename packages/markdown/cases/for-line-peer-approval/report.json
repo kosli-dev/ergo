@@ -119,41 +119,81 @@
     {
       "cause": "value",
       "check": "peer approved",
-      "failed_items": [
+      "failures": [
         {
           "cause": "value",
-          "failed_assertions": [
+          "failures": [
             {
-              "assertion": "approver.state is \"APPROVED\"",
               "cause": "value",
-              "items": [
+              "failures": [
                 {
                   "cause": "value",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
                         "/releases/0/pull_requests/1/approvers/0/state"
                       ],
                       "name": "approver.state",
+                      "outcome": "usable",
                       "value": "COMMENTED"
                     }
                   ],
-                  "item": "item 1 of pr.approvers"
+                  "kind": "item",
+                  "locations": [
+                    "/releases/0/pull_requests/1/approvers/0"
+                  ],
+                  "message": "approver.state is \"COMMENTED\"",
+                  "name": "item 1 of pr.approvers",
+                  "value": {
+                    "state": "COMMENTED",
+                    "username": "bob"
+                  }
                 }
-              ]
-            },
+              ],
+              "inputs": [],
+              "kind": "item",
+              "locations": [
+                "/releases/0/pull_requests/1"
+              ],
+              "message": "",
+              "name": "item 2 of pull_requests",
+              "value": {
+                "approvers": [
+                  {
+                    "state": "COMMENTED",
+                    "username": "bob"
+                  }
+                ],
+                "author": "bob",
+                "number": 8
+              }
+            }
+          ],
+          "inputs": [],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/release/checks/peer approved/assert/0"
+          ],
+          "message": "",
+          "name": "approver.state is \"APPROVED\""
+        },
+        {
+          "cause": "value",
+          "failures": [
             {
-              "assertion": "approver.username does not equal pr.author",
               "cause": "value",
-              "items": [
+              "failures": [
                 {
                   "cause": "value",
+                  "failures": [],
                   "inputs": [
                     {
                       "locations": [
                         "/releases/0/pull_requests/1/approvers/0/username"
                       ],
                       "name": "approver.username",
+                      "outcome": "usable",
                       "value": "bob"
                     },
                     {
@@ -161,29 +201,48 @@
                         "/releases/0/pull_requests/1/author"
                       ],
                       "name": "pr.author",
+                      "outcome": "usable",
                       "value": "bob"
                     }
                   ],
-                  "item": "item 1 of pr.approvers"
+                  "kind": "item",
+                  "locations": [
+                    "/releases/0/pull_requests/1/approvers/0"
+                  ],
+                  "message": "approver.username is \"bob\", and pr.author is \"bob\"",
+                  "name": "item 1 of pr.approvers",
+                  "value": {
+                    "state": "COMMENTED",
+                    "username": "bob"
+                  }
                 }
-              ]
+              ],
+              "inputs": [],
+              "kind": "item",
+              "locations": [
+                "/releases/0/pull_requests/1"
+              ],
+              "message": "",
+              "name": "item 2 of pull_requests",
+              "value": {
+                "approvers": [
+                  {
+                    "state": "COMMENTED",
+                    "username": "bob"
+                  }
+                ],
+                "author": "bob",
+                "number": 8
+              }
             }
           ],
-          "item": "item 2 of pull_requests",
+          "inputs": [],
+          "kind": "assertion",
           "locations": [
-            "/releases/0/pull_requests/1"
+            "$policy:/requirements/release/checks/peer approved/assert/1"
           ],
-          "path": "item 2 of pull_requests",
-          "value": {
-            "approvers": [
-              {
-                "state": "COMMENTED",
-                "username": "bob"
-              }
-            ],
-            "author": "bob",
-            "number": 8
-          }
+          "message": "",
+          "name": "approver.username does not equal pr.author"
         }
       ],
       "inputs": [
@@ -193,6 +252,7 @@
             "/releases/0/pull_requests/1/approvers/0"
           ],
           "name": "pr.approvers[]",
+          "outcome": "usable",
           "value": [
             {
               "state": "APPROVED",
@@ -210,6 +270,7 @@
             "/releases/0/pull_requests/1"
           ],
           "name": "pull_requests[]",
+          "outcome": "usable",
           "value": [
             {
               "approvers": [
@@ -244,7 +305,7 @@
           ]
         }
       ],
-      "message": "item 2 of pull_requests: item 1 of approvers: approver.state is \"COMMENTED\", and approver.username is \"bob\", and pr.author is \"bob\"",
+      "message": "item 2 of pull_requests: item 1 of pr.approvers: approver.state is \"COMMENTED\", and approver.username is \"bob\", and pr.author is \"bob\"",
       "passed": false,
       "requirement": "release",
       "subject": {
@@ -255,24 +316,113 @@
     {
       "cause": "absent",
       "check": "signed",
-      "failed_items": [
-        {
-          "cause": "value",
-          "item": "item 2 of pull_requests[0].commits",
-          "locations": [
-            "/releases/0/pull_requests/0/commits/1/signed"
-          ],
-          "path": "pull_requests[0].commits[1].signed",
-          "value": false
-        },
+      "failures": [
         {
           "cause": "absent",
-          "item": "pull_requests[1].commits",
-          "locations": [
-            "/releases/0/pull_requests/1"
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [
+                {
+                  "cause": "value",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/releases/0/pull_requests/0/commits/1/signed"
+                      ],
+                      "name": "pull_requests[0].commits[1].signed",
+                      "outcome": "usable",
+                      "value": false
+                    }
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/releases/0/pull_requests/0/commits/1"
+                  ],
+                  "message": "signed is false",
+                  "name": "item 2 of commits",
+                  "value": {
+                    "sha": "a2",
+                    "signed": false
+                  }
+                }
+              ],
+              "inputs": [],
+              "kind": "item",
+              "locations": [
+                "/releases/0/pull_requests/0"
+              ],
+              "message": "",
+              "name": "item 1 of pull_requests",
+              "value": {
+                "approvers": [
+                  {
+                    "state": "APPROVED",
+                    "username": "bob"
+                  }
+                ],
+                "author": "ann",
+                "commits": [
+                  {
+                    "sha": "a1",
+                    "signed": true
+                  },
+                  {
+                    "sha": "a2",
+                    "signed": false
+                  }
+                ],
+                "number": 7
+              }
+            },
+            {
+              "cause": "absent",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/releases/0/pull_requests/1"
+                      ],
+                      "name": "pull_requests[1].commits",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "list",
+                  "message": "commits is missing",
+                  "name": "commits"
+                }
+              ],
+              "inputs": [],
+              "kind": "item",
+              "locations": [
+                "/releases/0/pull_requests/1"
+              ],
+              "message": "",
+              "name": "item 2 of pull_requests",
+              "value": {
+                "approvers": [
+                  {
+                    "state": "COMMENTED",
+                    "username": "bob"
+                  }
+                ],
+                "author": "bob",
+                "number": 8
+              }
+            }
           ],
-          "path": "pull_requests[1].commits",
-          "value": null
+          "inputs": [],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/release/checks/signed/assert"
+          ],
+          "message": "",
+          "name": "every pull_requests.commits.signed is true"
         }
       ],
       "inputs": [
@@ -282,6 +432,7 @@
             "/releases/0/pull_requests/0/commits/1/signed"
           ],
           "name": "pull_requests[].commits[].signed",
+          "outcome": "usable",
           "value": [
             true,
             false
