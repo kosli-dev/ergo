@@ -445,6 +445,17 @@ pub fn for_failures(
     for clause in message.split("; ") {
         if clause.is_empty()
             || key_said.contains(&clause)
+            || failed.iter().any(|f| {
+                let named = text(f, "item");
+                named.starts_with("item ")
+                    && clause
+                        .strip_prefix(&format!("{named}: "))
+                        .is_some_and(|rest| {
+                            list(f, "failed_assertions").iter().any(|l| {
+                                texts(l).iter().any(|t| t.split("; ").any(|p| p == rest))
+                            })
+                        })
+            })
             || ops::message::cap_note(clause).is_some()
             || item_made.iter().any(|t| t == clause)
             || free_said.iter().any(|t| t == clause)

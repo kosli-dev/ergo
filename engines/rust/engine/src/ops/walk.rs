@@ -1481,7 +1481,13 @@ fn whose_keys_first(walk: &Walk, ctx: &Ctx, row: &mut Run) {
         .iter()
         .flat_map(|check| super::key_base::missing_keys(check, &outer_ctx))
         .collect();
-    if keys.is_empty() || row.verdict.cause == Cause::Unusable && row.failed_items.is_empty() {
+    if keys.is_empty()
+        || row.verdict.cause == Cause::Unusable && row.failed_items.is_empty()
+        || walk
+            .whose
+            .iter()
+            .any(|check| !super::key_base::unusable_keys(check, &outer_ctx).is_empty())
+    {
         return;
     }
     let said = row.message.clone().unwrap_or_default();

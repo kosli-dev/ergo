@@ -1516,10 +1516,29 @@ impl For {
             if !verdict.passed() {
                 let own = sentence.reads_last && !reads_other(&sentence.check, alias);
                 let walks = matches!(sentence.check, Check::Walk(_));
-                let text = match (&ran.message, walks) {
+                let mut verdict = verdict;
+                let mut text = match (&ran.message, walks) {
                     (Some(said), true) => said.clone(),
                     _ => super::message::message(&sentence.check, ctx, &verdict),
                 };
+                if !walks
+                    && let Some((key, base, cause)) = sentence
+                        .check
+                        .paths()
+                        .into_iter()
+                        .find_map(|path| super::key_base::alias_base(path, ctx))
+                    && text == key
+                {
+                    text = format!("{key}; {base}");
+                    verdict.cause = Cause::worst([verdict.cause, cause]).unwrap_or(cause);
+                    for input in &mut verdict.inputs {
+                        if let Some(state) = super::key_base::worse_state(input.state, cause)
+                            && input.state != crate::path::Outcome::Found
+                        {
+                            input.state = state;
+                        }
+                    }
+                }
                 let parts = match ran.parts {
                     Some(parts) if walks && !parts.is_empty() => {
                         let mut once: Vec<String> = Vec::new();
@@ -1954,7 +1973,13 @@ impl For {
             .flat_map(|item| item.whose.iter())
             .flat_map(|check| super::key_base::missing_keys(check, &outer))
             .collect();
-        if keys.is_empty() {
+        if keys.is_empty()
+            || self
+                .items
+                .iter()
+                .flat_map(|item| item.whose.iter())
+                .any(|check| !super::key_base::unusable_keys(check, &outer).is_empty())
+        {
             return;
         }
         let said = run.message.clone().unwrap_or_default();

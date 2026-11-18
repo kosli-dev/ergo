@@ -424,6 +424,42 @@ pub fn for_list(path: &Path, if_any: bool, ctx: &Ctx) -> Option<ForKey> {
     })
 }
 
+/// For a path that starts at a `for` alias and whose `$params` or `$input`
+/// key can't be read: the key's text, and the problem of the value before
+/// the key with its cause, when that value can't take a key.
+pub fn alias_base(path: &Path, ctx: &Ctx) -> Option<(String, String, Cause)> {
+    if !matches!(path.start, path::Start::Alias(_)) {
+        return None;
+    }
+    let at = path.steps.iter().position(|step| {
+        matches!(step, Step::Ref(key) if matches!(key.start, path::Start::Params | path::Start::Input) && key_flaw(key, ctx).is_some())
+    })?;
+    let Step::Ref(key) = &path.steps[at] else {
+        return None;
+    };
+    let (_, key_text, _) = key_flaw(key, ctx)?;
+    let keys: Vec<String> = path.steps[..at]
+        .iter()
+        .map_while(|step| match step {
+            Step::Key(k) => Some(k.clone()),
+            _ => None,
+        })
+        .collect();
+    if keys.is_empty() || keys.len() != at {
+        return None;
+    }
+    let (start, _, _) = path::start_of(&path.start, ctx).ok()?;
+    if start.is_null() {
+        let named = name::name(&Path {
+            start: path.start.clone(),
+            steps: Vec::new(),
+        });
+        return Some((key_text, format!("{named} is null"), Cause::Null));
+    }
+    let (text, cause, _) = base_flaw(&path.start, &keys, false, ctx)?;
+    Some((key_text, text, cause))
+}
+
 /// What a `whose` check says about each `$params` or `$input` key it reads
 /// that is missing or `null`, with the cause: said once, before any item.
 pub fn missing_keys(check: &Check, ctx: &Ctx) -> Vec<(Cause, String)> {
