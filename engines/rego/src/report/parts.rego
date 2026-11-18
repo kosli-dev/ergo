@@ -335,11 +335,13 @@ else := concat(sep, [c | some c in cs; not _m_clause_name(c) in names]) if {
 	sep := _tally_sep(m, cs)
 }
 
-_tally_sep(m, cs) := ", and " if {
-	count(cs) == 1
-} else := ", and " if count(_m_top_split(m, "; ")) == 1
+_tally_sep(_, cs) := ", and " if count(cs) == 1
 
-else := "; "
+_tally_sep(m, cs) := _semi_or_and(count(_m_top_split(m, "; "))) if count(cs) != 1
+
+_semi_or_and(1) := ", and "
+
+_semi_or_and(n) := "; " if n != 1
 
 _tally_list_names(check) := {_input_name(array.slice(p, 0, i)) |
 	some side in _m_tally_parts(check)

@@ -378,7 +378,7 @@ _cond_side(item, side) := {"v": [_written(side)], "found": [x | x := _simple_fou
 
 _tally_cond_cause(c, item, "") := _leaf_cause(c, item) if not _derived_once(c)
 
-_tally_cond_cause(c, item, flaw) := _worst_of(({flaw} | _item_states_beside_key(c, item)) | _item_key_bases(c, item)) if flaw in _no_value_states
+_tally_cond_cause(c, item, flaw) := _worst_of((({flaw} | _item_states_beside_key(c, item)) | _item_key_bases(c, item))) if flaw in _no_value_states
 
 _item_key_bases(c, item) := {b.cause |
 	some [p, mode] in _key_base_reads(c)
