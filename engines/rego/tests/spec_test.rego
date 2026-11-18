@@ -157,10 +157,21 @@ test_the_equals_cases_pass if {
 	_compiled_differences("equals") == set()
 }
 
-test_the_in_cases_pass if {
-	_topic_failures("in") == _known_in("in")
-	_compiled_differences("in") == set()
-}
+test_the_in_cases_pass_part_1_of_4 if _part_passes("in", 0, 4)
+
+test_the_in_cases_pass_compiled_part_1_of_4 if _differences_compiled("in", _part("in", 0, 4)) == set()
+
+test_the_in_cases_pass_part_2_of_4 if _part_passes("in", 1, 4)
+
+test_the_in_cases_pass_compiled_part_2_of_4 if _differences_compiled("in", _part("in", 1, 4)) == set()
+
+test_the_in_cases_pass_part_3_of_4 if _part_passes("in", 2, 4)
+
+test_the_in_cases_pass_compiled_part_3_of_4 if _differences_compiled("in", _part("in", 2, 4)) == set()
+
+test_the_in_cases_pass_part_4_of_4 if _part_passes("in", 3, 4)
+
+test_the_in_cases_pass_compiled_part_4_of_4 if _differences_compiled("in", _part("in", 3, 4)) == set()
 
 test_the_list_items_cases_pass_part_1_of_6 if _case_part_passes("list_items", 0, 6)
 
