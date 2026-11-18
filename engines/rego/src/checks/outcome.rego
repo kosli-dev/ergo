@@ -246,7 +246,7 @@ _m_walk_outcome(_, _, r) := {} if r.cause == "satisfied"
 _m_walk_outcome(check, _, r) := {"message": _m_joined(ms), "ergo/own": ms, "ergo/texts": []} if {
 	r.cause != "satisfied"
 	"root_msgs" in object.keys(r)
-	ms := _roots_then_lists(r.root_msgs, _walk_list_names(check))
+	ms := _walk_roots_sorted(r.root_msgs, check)
 }
 
 _m_walk_outcome(check, subj, r) := {"message": _m_joined(ps), "ergo/own": [p | some p in ps; not p in items], "ergo/texts": items} if {
@@ -254,8 +254,12 @@ _m_walk_outcome(check, subj, r) := {"message": _m_joined(ps), "ergo/own": [p | s
 	not "root_msgs" in object.keys(r)
 	parts := _walk_parts(check, subj, r, r)
 	items := _walk_item_texts(parts, r)
-	ps := _roots_then_lists(_parts_ahead(parts, r), _walk_list_names(check))
+	ps := _walk_roots_sorted(_parts_ahead(parts, r), check)
 }
+
+_walk_roots_sorted(ps, check) := ps if count([p | some p in ps; not startswith(p, "item ")]) < 2
+
+else := _roots_then_lists(ps, _walk_list_names(check))
 
 _walk_list_names(check) := {_input_name(array.slice(p, 0, i)) |
 	p := check.path

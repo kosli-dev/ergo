@@ -353,7 +353,9 @@ _tally_list_names(check) := {_input_name(array.slice(p, 0, i)) |
 	}
 }
 
-_tally_list_entries(row, at, check, ins) := [_entry("list", n, cause, _tally_list_read(n, cause, row, ins, at), [], c) |
+_tally_list_entries(row, at, check, ins) := [] if count(_tally_list_names(check)) == 0
+
+else := [_entry("list", n, cause, _tally_list_read(n, cause, row, ins, at), [], c) |
 	lists := _tally_list_names(check)
 	some c in _tally_clauses(row.message)
 	n := _m_clause_name(c)
@@ -875,10 +877,15 @@ _unled_dropped(row) := object.union(row, {
 	"message": concat("; ", [x | some x in ps; not endswith(x, ": ")]),
 	"failures": [e | some e in row.failures; not _blank_item(e)],
 }) if {
+	_unled_said(row.message)
 	ps := _m_top_split(row.message, "; ")
 	some x in ps
 	endswith(x, ": ")
 } else := row
+
+_unled_said(m) if contains(m, ": ; ")
+
+_unled_said(m) if endswith(m, ": ")
 
 _blank_item(e) if {
 	e.kind == "item"

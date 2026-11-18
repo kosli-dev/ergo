@@ -12,7 +12,11 @@ _roots_then_lists(clauses, lists) := array.concat(
 	[c | some c in clauses; startswith(c, "item ")],
 )
 
-_m_top_sorted(m, lists) := concat("; ", _roots_then_lists(ps, lists)) if {
+_m_top_sorted(m, lists) := m if {
+	not contains(m, "; ")
+	not contains(m, ", and ")
+	_ = lists
+} else := concat("; ", _roots_then_lists(ps, lists)) if {
 	ps := _m_top_split(m, "; ")
 	count(ps) > 1
 } else := concat(", and ", _roots_then_lists(_m_top_split(m, ", and "), lists))
