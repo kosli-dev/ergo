@@ -107265,5 +107265,550 @@
           ]
         }
       ]
+    },
+  {
+      "description": "an item of a second list that the whose can't read is said beside an item that fails the sentence",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "envs": {
+                "for": "every envs as e, every deploys whose env is e as d",
+                "assert": "d.ok is true"
+              },
+              "commits": {
+                "for": "every commits as c, every approvers whose commit is c.id as ap",
+                "assert": "ap.ok is true"
+              }
+            }
+          }
+        }
+      },
+      "cases": [
+        {
+          "description": "one deploy and one approver fail the sentence, and one of each has no key",
+          "rules": [
+            "row.parts",
+            "for.second_items",
+            "for.second_failures"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "envs": [
+                  "prod"
+                ],
+                "deploys": [
+                  {
+                    "env": "prod",
+                    "ok": false
+                  },
+                  {
+                    "ok": true
+                  }
+                ],
+                "commits": [
+                  {
+                    "id": "c1"
+                  }
+                ],
+                "approvers": [
+                  {
+                    "commit": "c1",
+                    "ok": false
+                  },
+                  {
+                    "ok": true
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "absent",
+              "check": "commits",
+              "failures": [
+                {
+                  "cause": "value",
+                  "failures": [
+                    {
+                      "cause": "value",
+                      "failures": [
+                        {
+                          "cause": "value",
+                          "failures": [],
+                          "inputs": [
+                            {
+                              "locations": [
+                                "/things/0/approvers/0/ok"
+                              ],
+                              "name": "ap.ok",
+                              "outcome": "usable",
+                              "value": false
+                            }
+                          ],
+                          "kind": "item",
+                          "locations": [
+                            "/things/0/approvers/0"
+                          ],
+                          "message": "ap.ok is false",
+                          "name": "item 1 of approvers",
+                          "value": {
+                            "commit": "c1",
+                            "ok": false
+                          }
+                        }
+                      ],
+                      "inputs": [],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/commits/0"
+                      ],
+                      "message": "",
+                      "name": "item 1 of commits",
+                      "value": {
+                        "id": "c1"
+                      }
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/commits/assert"
+                  ],
+                  "message": "",
+                  "name": "ap.ok is true"
+                },
+                {
+                  "cause": "absent",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/approvers/1"
+                          ],
+                          "name": "approvers[1].commit",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/approvers/1"
+                      ],
+                      "message": "commit is missing",
+                      "name": "item 2 of approvers",
+                      "value": {
+                        "ok": true
+                      }
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/commits/0"
+                  ],
+                  "message": "",
+                  "name": "item 1 of commits",
+                  "value": {
+                    "id": "c1"
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/approvers/0",
+                    "/things/0/approvers/1"
+                  ],
+                  "name": "approvers[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "commit": "c1",
+                      "ok": false
+                    },
+                    {
+                      "ok": true
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/commits/0"
+                  ],
+                  "name": "commits[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "id": "c1"
+                    }
+                  ]
+                }
+              ],
+              "message": "item 1 of commits: item 1 of approvers: ap.ok is false; item 1 of commits: item 2 of approvers: commit is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "envs",
+              "failures": [
+                {
+                  "cause": "value",
+                  "failures": [
+                    {
+                      "cause": "value",
+                      "failures": [
+                        {
+                          "cause": "value",
+                          "failures": [],
+                          "inputs": [
+                            {
+                              "locations": [
+                                "/things/0/deploys/0/ok"
+                              ],
+                              "name": "d.ok",
+                              "outcome": "usable",
+                              "value": false
+                            }
+                          ],
+                          "kind": "item",
+                          "locations": [
+                            "/things/0/deploys/0"
+                          ],
+                          "message": "d.ok is false",
+                          "name": "item 1 of deploys",
+                          "value": {
+                            "env": "prod",
+                            "ok": false
+                          }
+                        }
+                      ],
+                      "inputs": [],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/envs/0"
+                      ],
+                      "message": "",
+                      "name": "item 1 of envs",
+                      "value": "prod"
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/envs/assert"
+                  ],
+                  "message": "",
+                  "name": "d.ok is true"
+                },
+                {
+                  "cause": "absent",
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/deploys/1"
+                          ],
+                          "name": "deploys[1].env",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/deploys/1"
+                      ],
+                      "message": "env is missing",
+                      "name": "item 2 of deploys",
+                      "value": {
+                        "ok": true
+                      }
+                    }
+                  ],
+                  "inputs": [],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/envs/0"
+                  ],
+                  "message": "",
+                  "name": "item 1 of envs",
+                  "value": "prod"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/deploys/0",
+                    "/things/0/deploys/1"
+                  ],
+                  "name": "deploys[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "env": "prod",
+                      "ok": false
+                    },
+                    {
+                      "ok": true
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "/things/0/envs/0"
+                  ],
+                  "name": "envs[]",
+                  "outcome": "usable",
+                  "value": [
+                    "prod"
+                  ]
+                }
+              ],
+              "message": "item 1 of envs: item 1 of deploys: d.ok is false; item 1 of envs: item 2 of deploys: env is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "description": "a root a for sentence can't use is said once, on the assertion, beside items that read fine",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "min": {
+                "for": "every xs as x",
+                "assert": "x.v is at least $params.min"
+              }
+            }
+          }
+        }
+      },
+      "params": {
+        "min": "s"
+      },
+      "cases": [
+        {
+          "description": "one item that reads fine",
+          "rules": [
+            "row.parts",
+            "for.roots",
+            "problems.where_said"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {
+                    "v": 2
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "min",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:/min"
+                      ],
+                      "name": "$params.min",
+                      "outcome": "unusable",
+                      "value": "s"
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/min/assert"
+                  ],
+                  "message": "$params.min is \"s\", which isn't a number",
+                  "name": "x.v is at least $params.min"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "$params:/min"
+                  ],
+                  "name": "$params.min",
+                  "outcome": "unusable",
+                  "value": "s"
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "v": 2
+                    }
+                  ]
+                }
+              ],
+              "message": "$params.min is \"s\", which isn't a number",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        {
+          "description": "one item that reads fine and one whose v is null",
+          "rules": [
+            "row.parts",
+            "for.roots",
+            "problems.where_said"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {
+                    "v": 2
+                  },
+                  {
+                    "v": null
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "min",
+              "failures": [
+                {
+                  "cause": "unusable",
+                  "failures": [
+                    {
+                      "cause": "null",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/1/v"
+                          ],
+                          "name": "x.v",
+                          "outcome": "null",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/1"
+                      ],
+                      "message": "x.v is null",
+                      "name": "item 2 of xs",
+                      "value": {
+                        "v": null
+                      }
+                    }
+                  ],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:/min"
+                      ],
+                      "name": "$params.min",
+                      "outcome": "unusable",
+                      "value": "s"
+                    }
+                  ],
+                  "kind": "assertion",
+                  "locations": [
+                    "$policy:/requirements/s/checks/min/assert"
+                  ],
+                  "message": "$params.min is \"s\", which isn't a number",
+                  "name": "x.v is at least $params.min"
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "$params:/min"
+                  ],
+                  "name": "$params.min",
+                  "outcome": "unusable",
+                  "value": "s"
+                },
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "v": 2
+                    },
+                    {
+                      "v": null
+                    }
+                  ]
+                }
+              ],
+              "message": "$params.min is \"s\", which isn't a number; item 2 of xs: x.v is null",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
     }
 ]

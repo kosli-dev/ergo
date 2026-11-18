@@ -29177,5 +29177,126 @@
           ]
         }
       ]
+    },
+  {
+      "description": "a for line whose whose reads a named by key from $params that isn't text says only the items whose own value can't take the key, the last one fine",
+      "policy": {
+        "ergo_spec": "{{spec}}",
+        "subjects": {
+          "thing": {
+            "from": "things",
+            "identified_by": "id"
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "thing",
+            "checks": {
+              "for": {
+                "for": "every xs whose v is m named by $params.k as x",
+                "assert": "x.v is 1"
+              }
+            }
+          }
+        }
+      },
+      "params": {
+        "k": 3
+      },
+      "cases": [
+        {
+          "description": "an item without m before an item whose m is an object",
+          "rules": [
+            "walk.flaws",
+            "problems.where_said",
+            "row.parts"
+          ],
+          "input": {
+            "things": [
+              {
+                "id": "t",
+                "xs": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": 1,
+                    "m": {
+                      "a": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "results": [
+            {
+              "cause": "unusable",
+              "check": "for",
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "name": "xs[0].m",
+                      "outcome": "unusable",
+                      "value": null
+                    }
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/xs/0"
+                  ],
+                  "message": "m is missing",
+                  "name": "item 1 of xs",
+                  "value": {
+                    "v": 1
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "locations": [
+                    "/things/0/xs/0",
+                    "/things/0/xs/1"
+                  ],
+                  "name": "xs[]",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "v": 1
+                    },
+                    {
+                      "m": {
+                        "a": 1
+                      },
+                      "v": 1
+                    }
+                  ]
+                },
+                {
+                  "locations": [
+                    "$params:/k"
+                  ],
+                  "name": "$params.k",
+                  "outcome": "unusable",
+                  "value": 3
+                }
+              ],
+              "message": "$params.k is 3, which isn't text; item 1 of xs: m is missing",
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      ]
     }
 ]
