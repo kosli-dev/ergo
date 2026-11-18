@@ -169,6 +169,18 @@ pub fn item_input(name: &str, lists: &[String]) -> bool {
     }
 }
 
+/// The name of an item read by its position: `xs[1]` for `item 2 of xs`.
+pub fn position_name(item: &str) -> String {
+    let Some(rest) = item.strip_prefix("item ") else {
+        return item.to_string();
+    };
+    let Some((number, list)) = rest.split_once(" of ") else {
+        return item.to_string();
+    };
+    let at = number.parse::<u64>().unwrap_or(1).saturating_sub(1);
+    format!("{list}[{at}]")
+}
+
 fn entry_text(text: &str, name: &str) -> String {
     match text.strip_prefix(&format!("{name}: ")) {
         Some(rest) => rest.to_string(),
@@ -256,8 +268,13 @@ pub fn walk_entries(failed_items: &[Value]) -> Walked {
         let cause = Cause::worst(causes).unwrap_or(Cause::Value);
         let inputs: Vec<Value> = same
             .iter()
-            .filter(|j| text_of(&failed_items[**j], "path") != *name || !is_item(name))
-            .map(|j| item_read(&failed_items[*j]))
+            .map(|j| {
+                let mut read = item_read(&failed_items[*j]);
+                if text_of(&failed_items[*j], "path") == *name && is_item(name) {
+                    read["name"] = json!(position_name(name));
+                }
+                read
+            })
             .collect();
         let mut said: Vec<String> = Vec::new();
         for j in &same {

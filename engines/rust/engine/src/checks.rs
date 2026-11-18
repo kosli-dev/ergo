@@ -403,7 +403,7 @@ fn steps_key(path: &Path, reference: &Path) -> bool {
     })
 }
 
-fn ref_unfit(checks: &[&Check], reference: &Path, value: &Value, ctx: &Ctx) -> bool {
+pub(crate) fn ref_unfit(checks: &[&Check], reference: &Path, value: &Value, ctx: &Ctx) -> bool {
     checks.iter().any(|check| {
         let keyed = !value.is_string()
             && crate::ops::for_line::all_paths(check)

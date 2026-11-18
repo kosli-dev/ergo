@@ -1796,7 +1796,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                 failed,
                 &rich,
                 pieces.as_deref(),
-                &walk.path,
+                walk,
                 ctx,
             ),
             _ => Part {
@@ -2256,10 +2256,35 @@ fn walk_part(
     failed: &[Value],
     rich: &[Value],
     pieces: Option<&[String]>,
-    path: &Path,
+    walk: &ops::walk::Walk,
     ctx: &Ctx,
 ) -> Part {
-    let keys = key_ref_entries(&[path], ctx, inputs);
+    let path = &walk.path;
+    let mut keys = key_ref_entries(&[path], ctx, inputs);
+    let check = Check::Walk(Box::new(walk.clone()));
+    for reference in check.refs() {
+        if reference.start != Start::Params {
+            continue;
+        }
+        let name = crate::name::name(&reference);
+        if inputs
+            .iter()
+            .chain(&keys)
+            .any(|i| i.get("name").and_then(Value::as_str) == Some(name.as_str()))
+        {
+            continue;
+        }
+        let Some(input) = ops::read_path(&reference, ctx).inputs.into_iter().next() else {
+            continue;
+        };
+        let mut entry = parts::with_outcome(&input, "", &[]);
+        if input.state == Outcome::Found
+            && crate::checks::ref_unfit(&[&check], &reference, &input.value, ctx)
+        {
+            entry["outcome"] = json!("unusable");
+        }
+        keys.push(entry);
+    }
     if let Some(pieces) = pieces.filter(|p| p.len() != failed.len()) {
         let capped = message
             .split("; ")
@@ -2477,7 +2502,7 @@ fn with_failures(
                         &failed,
                         &ran.rich,
                         ran.pieces.as_deref(),
-                        &walk.path,
+                        walk,
                         ctx,
                     ),
                     locations: at(None, 1),
