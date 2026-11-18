@@ -258,12 +258,20 @@ pub fn entry_inputs(check: &Check, ctx: &Ctx, cause: Cause, inputs: &[serde_json
     let mut seen: Vec<String> = inputs.iter().filter_map(named).collect();
     let bases = of_check(check, ctx);
     let mut keys: Vec<serde_json::Value> = Vec::new();
-    for kb in &bases {
-        if seen.contains(&kb.key_input.name) {
-            continue;
+    for path in every_path(check) {
+        for step in &path.steps {
+            let Step::Ref(key) = step else {
+                continue;
+            };
+            let Some((_, _, input)) = key_flaw(key, ctx) else {
+                continue;
+            };
+            if seen.contains(&input.name) {
+                continue;
+            }
+            seen.push(input.name.clone());
+            keys.push(crate::parts::with_outcome(&input, "", &[]));
         }
-        seen.push(kb.key_input.name.clone());
-        keys.push(crate::parts::with_outcome(&kb.key_input, "", &[]));
     }
     keys.sort_by(|a, b| named(a).cmp(&named(b)));
     for kb in &bases {
@@ -275,4 +283,19 @@ pub fn entry_inputs(check: &Check, ctx: &Ctx, cause: Cause, inputs: &[serde_json
         }
     }
     keys
+}
+
+/// Every path `check` reads, in its `whose` and inner checks too.
+pub fn every_path(check: &Check) -> Vec<&Path> {
+    let mut out: Vec<&Path> = Vec::new();
+    for inner in super::for_line::nested_checks(check) {
+        out.extend(inner.paths());
+        if let Check::Walk(walk) = inner {
+            out.push(&walk.path);
+        }
+        if let Check::Tally(tally) = inner {
+            out.extend(tally.counted_paths());
+        }
+    }
+    out
 }

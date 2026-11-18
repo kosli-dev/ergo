@@ -2989,7 +2989,7 @@ fn reads_other(check: &Check, alias: &str) -> bool {
         })
 }
 
-fn nested_checks(check: &Check) -> Vec<&Check> {
+pub(crate) fn nested_checks(check: &Check) -> Vec<&Check> {
     let mut out = vec![check];
     match check {
         Check::Walk(walk) => {

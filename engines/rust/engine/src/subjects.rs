@@ -2230,13 +2230,18 @@ fn key_ref_entries(paths: &[&Path], ctx: &Ctx, inputs: &[Value]) -> Vec<Value> {
     for path in paths {
         for reference in path::step_refs(path) {
             let read = ops::read_path(&reference, ctx);
-            let Some(input) = read.inputs.into_iter().next() else {
+            let Some(mut input) = read.inputs.into_iter().next() else {
                 continue;
             };
-            if !matches!(input.state, Outcome::Absent | Outcome::Null)
-                || inputs
-                    .iter()
-                    .any(|i| i.get("name").and_then(Value::as_str) == Some(&input.name))
+            if input.state == Outcome::Found && !input.value.is_string() {
+                input.state = Outcome::Unusable;
+            }
+            if !matches!(
+                input.state,
+                Outcome::Absent | Outcome::Null | Outcome::Unusable
+            ) || inputs
+                .iter()
+                .any(|i| i.get("name").and_then(Value::as_str) == Some(&input.name))
             {
                 continue;
             }
@@ -2259,9 +2264,8 @@ fn walk_part(
     walk: &ops::walk::Walk,
     ctx: &Ctx,
 ) -> Part {
-    let path = &walk.path;
-    let mut keys = key_ref_entries(&[path], ctx, inputs);
     let check = Check::Walk(Box::new(walk.clone()));
+    let mut keys = key_ref_entries(&ops::key_base::every_path(&check), ctx, inputs);
     for reference in check.refs() {
         if reference.start != Start::Params {
             continue;
@@ -2357,6 +2361,44 @@ fn walk_part(
             .collect(),
         failures: parts::nest(walked.entries, ctx.input),
         message: said.join("; "),
+    }
+}
+
+fn unfit_names(checks: &[&Check], ctx: &Ctx) -> Vec<(String, Value)> {
+    let mut out: Vec<(String, Value)> = Vec::new();
+    for check in checks {
+        for reference in check.refs() {
+            let read = path::read(&reference, ctx);
+            if let (Outcome::Found, Some(value)) = (read.outcome, read.value)
+                && crate::checks::ref_unfit(&[check], &reference, value, ctx)
+            {
+                ops::push_new(&mut out, (crate::name::name(&reference), value.clone()));
+            }
+        }
+    }
+    out
+}
+
+fn mark_unfit(inputs: &mut [Value], unfit: &[(String, Value)]) {
+    for input in inputs {
+        let name = input.get("name").and_then(Value::as_str).unwrap_or_default();
+        let value = input.get("value").cloned().unwrap_or(Value::Null);
+        if input.get("outcome").and_then(Value::as_str) == Some("usable")
+            && unfit.iter().any(|(n, v)| n == name && *v == value)
+        {
+            input["outcome"] = json!("unusable");
+        }
+    }
+}
+
+fn mark_unfit_entries(entries: &mut [Value], unfit: &[(String, Value)]) {
+    for entry in entries {
+        if let Some(Value::Array(inputs)) = entry.get_mut("inputs") {
+            mark_unfit(inputs, unfit);
+        }
+        if let Some(Value::Array(kids)) = entry.get_mut("failures") {
+            mark_unfit_entries(kids, unfit);
+        }
     }
 }
 
@@ -2558,6 +2600,13 @@ fn with_failures(
         }
     };
     row.failures = failures.map(|f| parts::to_json(&f));
+    let unfit = unfit_names(&all, ctx);
+    if !unfit.is_empty() {
+        mark_unfit(&mut row.inputs, &unfit);
+        if let Some(Value::Array(entries)) = &mut row.failures {
+            mark_unfit_entries(entries, &unfit);
+        }
+    }
 }
 
 fn check_row(
