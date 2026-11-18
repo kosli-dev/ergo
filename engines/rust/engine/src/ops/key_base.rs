@@ -535,3 +535,6 @@ pub fn from_base(path: &Path, ctx: &Ctx) -> Option<(String, Cause)> {
     }
     base_flaw(&path.start, &keys, true, ctx).map(|(text, cause, _)| (text, cause))
 }
+
+#[cfg(test)]
+mod tests;
