@@ -16787,7 +16787,16 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "usable",
+                    "value": 5
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/b_every_least_params"
@@ -17728,7 +17737,16 @@
                     }
                   }
                 ],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "usable",
+                    "value": 5
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/b_every_least_params"

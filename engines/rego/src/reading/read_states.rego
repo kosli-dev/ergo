@@ -166,6 +166,11 @@ else := "absent"
 
 _read_before_field(v) if v != _absent
 
+_walk_list_state(subj, path) := _worst_of({_walk_read_state(subj, path)} | {f.cause | some f in fs}) if {
+	fs := _key_list_flaws(subj, path, false)
+	fs != []
+} else := _walk_read_state(subj, path)
+
 _walk_read_state(subj, path) := _worst_of(flaws) if {
 	flaws := {f | some seg in path; f := _ref_step_flaw(seg)}
 	flaws != set()
@@ -683,4 +688,37 @@ _answers_presence(check, subj, "") if {
 	not _unreadable_ref(check)
 	not _params_not_given(check.path)
 	_read_state(subj, check.path) in _no_value_states
+}
+
+_key_list_flaws(subj, path, if_any) := [{"cause": c, "prefix": prefix, "value": v} |
+	i := min({j | some j, seg in path; _ref_step_flaw(seg)})
+	not _ref_step_off(path)
+	i > 0
+	prefix := array.slice(path, 0, i)
+	every seg in prefix {
+		is_string(seg)
+	}
+	v := _resolved(subj, prefix)
+	c := _key_list_cause(v)
+	_key_list_kept(c, if_any)
+]
+
+_ref_step_off(path) if {
+	some seg in path
+	_ref_step_flaw(seg) == "not_an_object"
+}
+
+_key_list_kept(c, _) if c != "value"
+
+_key_list_kept("value", false)
+
+_key_list_cause(v) := "absent" if v == _absent
+
+else := "null" if v == null
+
+else := "value" if v == []
+
+else := "unusable" if {
+	not is_array(v)
+	not is_object(v)
 }

@@ -23384,6 +23384,14 @@
                     "name": "xs.m named by $input.k",
                     "outcome": "not_an_object",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -23665,6 +23673,14 @@
                     "name": "xs.m named by $input.k",
                     "outcome": "not_an_object",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -23833,6 +23849,14 @@
                     "name": "$input.m named by $params.k",
                     "outcome": "unusable",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
                   }
                 ],
                 "kind": "assertion",
@@ -23938,6 +23962,14 @@
                     "name": "xs.m named by $input.k",
                     "outcome": "not_an_object",
                     "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -32453,6 +32485,14 @@
                       ""
                     ],
                     "name": "$input.k",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.m named by $input.k",
                     "outcome": "not_an_object",
                     "value": null
                   }

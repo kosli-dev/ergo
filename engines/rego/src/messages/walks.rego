@@ -135,18 +135,34 @@ _m_row_text(check, subj, cause) := concat("; ", ps) if {
 
 _walk_message(check, subj, raw, r) := _m_joined(_walk_parts(check, subj, raw, r))
 
-_walk_parts(check, _, _, r) := ms if {
+_walk_parts(check, subj, raw, r) := _once(array.concat(array.concat(_m_key_texts(check.path), ls), _walk_phrase_roots(check))) if {
+	r.failed == []
+	ls := _m_key_list_texts(subj, check.path, object.get(check, "if_any", false) == true)
+	ls != []
+} else := _walk_parts_of(check, subj, raw, r)
+
+_m_key_texts(path) := array.concat(_walk_key_ref_texts(path), [_m_isnt(_ref_label(seg.ref), _ref_read(seg.ref), "text") | some seg in path; _ref_step_flaw(seg) == "unusable"])
+
+_m_key_list_texts(subj, path, if_any) := [_m_key_list_text(_input_name(f.prefix), f) | some f in _key_list_flaws(subj, path, if_any)]
+
+_m_key_list_text(name, f) := concat("", [name, " is ", _m_state_word(f.cause)]) if f.cause in _no_value_states
+
+_m_key_list_text(name, f) := concat("", [name, " is []"]) if f.cause == "value"
+
+_m_key_list_text(name, f) := _m_isnt(name, f.value, "a list or an object") if f.cause == "unusable"
+
+_walk_parts_of(check, _, _, r) := ms if {
 	r.failed != []
 	ms := _m_fail_parts(r.cause, object.get(r, "fails", []), _dotted_roots([check.path]))
 	ms != []
 } else := [_m_named_fail(f) | some f in r.failed] if r.failed != []
 
-_walk_parts(check, subj, raw, r) := [_m_not_object(check, subj)] if {
+_walk_parts_of(check, subj, raw, r) := [_m_not_object(check, subj)] if {
 	r.failed == []
 	raw.cause == "not_an_object"
 }
 
-_walk_parts(check, _, raw, r) := _once(array.concat(_walk_list_texts(check.path, raw.cause), _walk_phrase_roots(check))) if {
+_walk_parts_of(check, _, raw, r) := _once(array.concat(_walk_list_texts(check.path, raw.cause), _walk_phrase_roots(check))) if {
 	r.failed == []
 	raw.cause in _no_value_states
 }
@@ -162,14 +178,14 @@ _walk_phrase_roots(check) := [m |
 	m := _m_root_alone(check.check, cause)
 ]
 
-_walk_parts(check, subj, raw, r) := fs if {
+_walk_parts_of(check, subj, raw, r) := fs if {
 	r.failed == []
 	raw.cause == "unusable"
 	fs := _m_walk_faults(subj, check)
 	fs != []
 }
 
-_walk_parts(check, subj, raw, r) := ms if {
+_walk_parts_of(check, subj, raw, r) := ms if {
 	r.failed == []
 	raw.cause == "unusable"
 	_m_walk_faults(subj, check) == []
@@ -177,7 +193,7 @@ _walk_parts(check, subj, raw, r) := ms if {
 	ms != []
 }
 
-_walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
+_walk_parts_of(check, subj, raw, r) := [_m_fallback(check)] if {
 	r.failed == []
 	raw.cause == "unusable"
 	_m_walk_faults(subj, check) == []
@@ -224,14 +240,14 @@ _m_walk_through_list(subj, path) if {
 	is_array(_m_resolved_prefix(subj, array.slice(path, 0, i)))
 }
 
-_walk_parts(check, subj, raw, r) := fs if {
+_walk_parts_of(check, subj, raw, r) := fs if {
 	r.failed == []
 	not raw.cause in _failed_read_states
 	fs := _m_list_found(subj, check.path)
 	fs != []
 }
 
-_walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
+_walk_parts_of(check, subj, raw, r) := [_m_fallback(check)] if {
 	r.failed == []
 	not raw.cause in _failed_read_states
 	_m_list_found(subj, check.path) == []

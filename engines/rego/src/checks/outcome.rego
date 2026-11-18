@@ -193,7 +193,7 @@ _check_outcome(check, subj, _) := object.union(
 		"cause": r.cause,
 		"failed_items": r.failed,
 	},
-	_m_walk_outcome(check, subj, r),
+	object.union(_m_walk_outcome(check, subj, r), object.filter(r, {"ergo/key_lists"})),
 ) if {
 	_walks(check)
 	_walk_run(check)
@@ -230,7 +230,7 @@ _check_outcome(check, subj, _) := object.union(
 		"cause": r.cause,
 		"failed_items": r.failed,
 	},
-	object.filter(r, {"message", "ergo/for_raw"}),
+	object.filter(r, {"message", "ergo/for_raw", "ergo/key_lists"}),
 ) if {
 	check.op == "for"
 	_walk_run(check)

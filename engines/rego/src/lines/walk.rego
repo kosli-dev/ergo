@@ -38,8 +38,8 @@ _walk_flawed(check) if _param_broken(check, set())
 
 _walk_flawed(_) if _unreadable_input
 
-_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": [], "ergo/outcome": _outcome_word(state)}], _walk_side_inputs(subj, check))), "failed": _walk_failed(state, _null_prefix_fails(check, subj), check.path)} if {
-	state := _walk_read_state(subj, check.path)
+_walk_read_row(check, subj) := _key_listed({"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": [], "ergo/outcome": _outcome_word(state)}], _walk_side_inputs(subj, check))), "failed": _walk_failed(state, _null_prefix_fails(check, subj), check.path)}, subj, check.path, object.get(check, "if_any", false) == true) if {
+	state := _walk_list_state(subj, check.path)
 	not _walk_keys(check, subj)
 }
 
@@ -676,9 +676,14 @@ _walk_key_ref_texts(path) := [concat("", [_ref_label(seg.ref), " is ", _key_ref_
 	f in _no_value_states
 ]
 
-_walk_key_ref_entries(path) := _ref_read_entries({seg.ref |
-	some seg in path
-	_ref_step_flaw(seg) in _no_value_states
-})
-
 _key_ref_word := {"absent": "missing", "null": "null"}
+
+_key_listed(r, subj, path, if_any) := object.union(r, {"ergo/key_lists": ls}) if {
+	r.cause != "satisfied"
+	ls := [object.union(f, {"input": _path_input(subj, f.prefix)}) | some f in _key_list_flaws(subj, path, if_any)]
+	ls != []
+} else := r
+
+_key_list_value(v) := null if v == _absent
+
+else := v

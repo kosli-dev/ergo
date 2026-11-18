@@ -237,6 +237,10 @@ _for_message(check, subj, r) := _m_joined(_m_for_empty(object.union(check, {"ite
 }
 
 _m_for_empty(check, subj, cause) := cs if {
+	ls := [t | some item in check.items; some t in _m_key_list_texts(subj, item.path, object.get(item, "if_any", false) == true)]
+	ls != []
+	cs := _once(array.concat([t | some item in check.items; some t in _m_key_texts(item.path)], ls))
+} else := cs if {
 	cause in _no_value_states
 	cs := _once([c | some item in check.items; some c in _m_key_states(subj, _m_for_item(item), cause)])
 	cs != []
@@ -991,8 +995,6 @@ else := owners if {
 	owners := {i | some i, _ in check.checks; _for_root_of(check, subj, i, m)}
 	count(owners) > 0
 } else := {-1}
-
-_for_free_root(m, ts) if m in ts
 
 _for_free_root(m, ts) if {
 	every p in split(m, "; ") {

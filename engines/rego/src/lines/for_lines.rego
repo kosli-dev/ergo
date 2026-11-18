@@ -6,7 +6,15 @@ _for_names := object.get(input, "ergo/names", {})
 
 _bound(names, name, v, at) := object.union(names, {name: v, "$at": object.union(object.get(names, "$at", {}), {"names": object.union(object.get(object.get(names, "$at", {}), "names", {}), {name: at})})})
 
-_for_row(check, subj) := _for_row_of(check, subj, _for_row_raw(check, subj))
+_for_row(check, subj) := _key_listed(_for_row_of(check, subj, _for_freed(check, subj, _for_row_raw(check, subj))), subj, check.items[0].path, object.get(check.items[0], "if_any", false) == true)
+
+_for_freed(check, subj, r) := object.union(r, {"cause": _worst_or_value({r.cause, free.cause}), "free_lines": array.concat(object.get(r, "free_lines", []), lines), "unfreed": r}) if {
+	r.cause != "satisfied"
+	free := _for_lines(_for_unaliased(check), subj, _for_names)
+	ran := {l.assertion | some f in r.failed; some l in object.get(f, "failed_assertions", [])} | {l.assertion | some l in object.get(r, "free_lines", [])}
+	lines := [l | some l in free.lines; not l.assertion in ran]
+	lines != []
+} else := r
 
 _for_row_of(check, subj, r) := r if {
 	r.cause == "satisfied"
@@ -207,6 +215,9 @@ _for_hoisted_texts(check, r) := [p |
 _for_item_parts(check, subj, r, once) := [] if {
 	"root_msgs" in object.keys(r)
 	r.failed == []
+} else := _for_message_parts(check, subj, r.unfreed) if {
+	"unfreed" in object.keys(r)
+	r.failed == []
 } else := [] if {
 	"free_lines" in object.keys(r)
 	r.failed == []
@@ -312,12 +323,15 @@ _for_unwalked(check, w) := [f | some f in array.concat(w.fails, _walk_stop(w))] 
 
 else := w.fails if w.fails != []
 
-else := [object.union(object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {})), _for_input_key_why(check.items[1].path))]
+else := array.concat([object.union(object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {})), _for_input_key_why(check.items[1].path))], [{"path": f.prefix, "item": f.prefix, "cause": f.cause, "value": _key_list_value(f.value)} | some f in _key_list_flaws(object.get(input, ["ergo/names", "ergo/subject"], null), check.items[1].path, object.get(check.items[1], "if_any", false) == true)])
 
 _for_input_key_why(path) := {"why": [_m_isnt("$input", data.ergo_document, "an object")]} if _reads_input_key({"path": path})
 
 else := {"why": ks, "root_why": true, "free": true} if {
 	ks := _walk_key_ref_texts(path)
+	ks != []
+} else := {"why": ks, "root_why": true, "free": true} if {
+	ks := [_m_isnt(_ref_label(seg.ref), _ref_read(seg.ref), "text") | some seg in path; _ref_step_flaw(seg) == "unusable"]
 	ks != []
 } else := {}
 
@@ -406,7 +420,7 @@ _for_unread(subj, path, names) := _key_state(object.get(_fb(subj, path[i]), _fk(
 	i := _bad_field_at(subj, path)
 	_null_before_field(subj, array.slice(path, 0, i)) with input as {"ergo/names": names}
 } else := s if {
-	s := _walk_read_state(subj, path) with input as {"ergo/names": names}
+	s := _walk_list_state(subj, path) with input as {"ergo/names": names}
 }
 
 _open_before_field(subj, prefix) if _read_before_field(_resolved(subj, prefix))
@@ -659,8 +673,6 @@ _for_copied(j, i, w, copies) := object.union(j, {"failure": _copied_failure(j.fa
 
 _copied_failure(f, ats) := object.union(f, {"ats": ats})
 
-_copied_line(l, c) := object.union(l, object.union({"inputs": _copied_inputs(l.inputs, c) | "inputs" in object.keys(l)}, {"items": [object.union(x, {"inputs": _copied_inputs(x.inputs, c)}) | some x in l.items] | "items" in object.keys(l)}))
-
 _copied_inputs(xs, c) := [object.union(x, {"locations": _copied_locations(x.locations, c)}) | some x in xs]
 
 _copied_locations(ls, c) := [m | some l in ls; some m in _copied_location(l, c)]
@@ -741,7 +753,16 @@ _for_raw(e) := {"raw": e.iv} if {
 	not is_object(e.iv)
 } else := {}
 
-_for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object", "lines": []} if {
+_for_inner(check, subj, names, w) := _for_inner_freed(check, subj, names, _for_inner_raw(check, subj, names, w))
+
+_for_inner_freed(check, subj, names, res) := object.union(res, {"cause": _worst_or_value({res.cause} | {l.cause | some l in lines}), "lines": array.concat(res.lines, lines)}) if {
+	not res.passed
+	ran := {l.assertion | some l in res.lines}
+	lines := [l | some l in _for_lines(_for_without(check, check.items[1].as), subj, names).lines; not l.assertion in ran]
+	lines != []
+} else := res
+
+_for_inner_raw(check, subj, names, w) := {"passed": false, "cause": "not_an_object", "lines": []} if {
 	check.items[1].path[0] == concat("", ["$", check.items[0].as])
 	count(check.items[1].path) > 1
 	not is_object(names[check.items[0].as])

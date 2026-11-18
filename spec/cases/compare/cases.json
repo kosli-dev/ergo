@@ -5552,7 +5552,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/k"
@@ -6745,7 +6754,16 @@
               {
                 "cause": "null",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/n"
+                    ],
+                    "name": "$params.n",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/k"
@@ -7944,7 +7962,16 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/n"
+                    ],
+                    "name": "$params.n",
+                    "outcome": "unusable",
+                    "value": "a"
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/k"
@@ -9083,7 +9110,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/k"

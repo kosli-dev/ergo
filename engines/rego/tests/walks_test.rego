@@ -1419,10 +1419,11 @@ test_a_broken_list_beside_the_first_is_listed_once_next_to_the_first_items_that_
 	rows[0][2] == [_assertion("x.t is more than y.t", "value", ["$policy:/requirements/s/checks/c/assert"], [], "", [_item("item 2 of xs", "value", {"t": 0}, ["/things/0/xs/1"], [], "", [_item("item 1 of ys", "value", {"zs": [{"t": 1}]}, ["/things/0/ys/0"], [], "", [_item("item 1 of zs", "value", {"t": 1}, ["/things/0/ys/0/zs/0"], [_seen("x.t", 0, ["/things/0/xs/1/t"], "usable"), _seen("y.t", 1, ["/things/0/ys/0/zs/0/t"], "usable")], "x.t is 0, and y.t is 1", [])])])]), _item("item 2 of ys", "absent", {}, ["/things/0/ys/1"], [], "", [_list("zs", "absent", [_seen("ys[1].zs", null, ["/things/0/ys/1"], "absent")], "zs is missing")])]
 }
 
-test_a_second_list_inside_the_first_whose_named_by_key_cant_be_read_is_one_root_on_the_assertion if {
+test_a_second_list_inside_the_first_whose_named_by_key_cant_be_read_is_one_root_on_the_row if {
 	check := {"for": "every prs as pr, every pr.m named by $params.k as y", "assert": "y is 1"}
 	rows := _for_rows(check, [{"id": 1, "prs": [{"m": {"a": [1]}}]}], {})
-	rows[0][2] == [_assertion("y is 1", "absent", ["$policy:/requirements/s/checks/c/assert"], [_seen("$params.k", null, ["$params:"], "absent")], "$params.k is missing", [])]
+	rows[0][2] == []
+	_seen("$params.k", null, ["$params:"], "absent") in rows[0][3]
 }
 
 test_each_key_named_by_a_list_is_a_subject_even_when_the_object_holding_them_is_missing_or_not_an_object if {

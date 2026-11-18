@@ -13008,6 +13008,27 @@
                         }
                       ]
                     }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "w.items.m",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ws/1"
+                    ],
+                    "message": "w.items.m is missing",
+                    "name": "item 2 of ws",
+                    "value": {
+                      "items": {}
+                    }
                   }
                 ],
                 "inputs": [],
@@ -13153,7 +13174,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items is {}, which isn't a list",
+            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items.m is missing; and 1 more",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13274,6 +13295,27 @@
                         }
                       ]
                     }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "w.items.m",
+                        "outcome": "absent",
+                        "value": []
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ws/1"
+                    ],
+                    "message": "w.items.m is missing",
+                    "name": "item 2 of ws",
+                    "value": {
+                      "items": {}
+                    }
                   }
                 ],
                 "inputs": [],
@@ -13360,7 +13402,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items is {}, which isn't a list",
+            "message": "item 1 of ws: item 1 of w.items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items.m is missing; and 1 more",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21168,7 +21210,25 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs"
+                        ],
+                        "name": "xs",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is []",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -21217,7 +21277,7 @@
                 "value": []
               }
             ],
-            "message": "$params.k is missing; q is missing",
+            "message": "$params.k is missing; xs is []; q is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21294,7 +21354,25 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/1/xs"
+                        ],
+                        "name": "xs",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is []",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -21343,7 +21421,7 @@
                 "value": []
               }
             ],
-            "message": "$params.k is missing; q is null",
+            "message": "$params.k is missing; xs is []; q is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21420,7 +21498,25 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/2/xs"
+                        ],
+                        "name": "xs",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is []",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -21469,7 +21565,7 @@
                 "value": []
               }
             ],
-            "message": "$params.k is missing",
+            "message": "$params.k is missing; xs is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -32554,7 +32650,16 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every"

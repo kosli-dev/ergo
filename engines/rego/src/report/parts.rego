@@ -2,12 +2,12 @@ package ergo
 
 import rego.v1
 
-_row_stash_keys := ["failed_items", "failed_assertions", "ergo/texts", "ergo/own", "ergo/outs", "ergo/for_texts"]
+_row_stash_keys := ["failed_items", "failed_assertions", "ergo/texts", "ergo/own", "ergo/outs", "ergo/for_texts", "ergo/key_lists"]
 
 _parted(row, _, _) := _passed_row(row) if row.passed == true
 
 _parted(row, at, where) := object.union(object.remove(row, _row_stash_keys), {
-	"inputs": _with_outcomes(row.inputs),
+	"inputs": _for_row_inputs(row, where),
 	"failures": _for_failures(row, at, where, t),
 }) if {
 	row.passed == false
@@ -25,37 +25,55 @@ _parted(row, at, where) := object.union(object.remove(row, _row_stash_keys), {
 
 _for_texted(row) if _ = row["ergo/for_texts"]
 
-_for_failures(row, at, where, t) := _for_failures_of(row, at, where, t, _for_key_texts(where.check))
-
-_for_failures_of(row, at, where, t, []) := array.concat(
-	[e | some i, a in where.check.assertions; e := _for_assertion_entry(row, at, where, t, i, a)],
-	_nested_items([e | some kind in ["list", "item"]; some e in _for_row_breaks(row, t, at, where); _leveled_kind(e) == kind]),
-)
+_for_failures(row, at, where, t) := _for_failures_of(row, at, where, t, array.concat([x[1] | some x in _for_key_flaws(where.check)], [e.message | some e in _key_list_parts(row, at)]))
 
 _for_failures_of(row, at, where, t, ks) := array.concat(
-	[_for_keyed_entry(e, i, where.check) | some i, a in where.check.assertions; e := _for_assertion_entry(row, at, where, object.union(t, {"said": [_for_keyed_said(s, j, ks) | some j, s in t.said]}), i, a)],
-	_nested_items([e | some kind in ["list", "item"]; some e in _for_row_breaks(row, t, at, where); _leveled_kind(e) == kind; not _for_key_break(e, ks)]),
-) if ks != []
+	array.concat(
+		asserted,
+		_nested_items([p | some kind in ["list", "item"]; some e in _for_row_breaks(row, t, at, where); _leveled_kind(e) == kind; not _for_said_under(e, asserted); some p in _for_key_pruned(e, ks)]),
+	),
+	_key_list_parts(row, at),
+) if asserted := [e | some i, a in where.check.assertions; e := _for_assertion_entry(row, at, where, t, i, a)]
 
-_for_key_texts(check) := _once([k | some item in check.items; some k in _walk_key_ref_texts(item.path)])
-
-_for_keyed_said(s, 0, ks) := concat("; ", _once(array.concat(ks, [x | some x in split(s, "; "); x != ""])))
-
-_for_keyed_said(s, j, _) := s if j > 0
-
-_for_keyed_entry(e, 0, check) := object.union(e, {"inputs": _once(array.concat(e.inputs, [x | some item in check.items; some x in _with_outcomes(_walk_key_ref_entries(item.path))]))})
-
-_for_keyed_entry(e, i, _) := e if i > 0
-
-_for_key_break(e, ks) if _for_key_leaf(e, ks)
-
-_for_key_break(e, ks) if {
-	e.message == ""
-	count(e.failures) > 0
-	every f in e.failures {
-		_for_key_leaf(f, ks)
+_for_said_under(e, asserted) if {
+	e.kind == "list"
+	said := {concat(": ", [x.name, x.message]) | some a in asserted; some x in a.failures; x.message != ""}
+	every m in split(e.message, "; ") {
+		m in said
 	}
 }
+
+_key_list_parts(row, at) := [_entry("list", x.input.name, x.cause, _anchored_all([object.union(object.remove(x.input, _input_stash_keys), {"outcome": _key_list_outcome(x.cause)})], at), [], _m_key_list_text(x.input.name, x)) | some x in object.get(row, "ergo/key_lists", [])]
+
+_key_list_outcome("value") := "usable"
+
+_key_list_outcome(c) := c if c != "value"
+
+_for_key_flaws(check) := [[x, _for_key_text(x, x.outcome)] | some item in check.items; some x in _key_flaw_entries(item.path)]
+
+_key_flaw_entries(path) := [object.union(object.remove(x, _input_stash_keys), {"outcome": f}) |
+	some seg in path
+	f := _ref_step_flaw(seg)
+	some x in _ref_read_entries({seg.ref})
+]
+
+_for_key_text(x, "unusable") := _m_isnt(x.name, x.value, "text")
+
+_for_key_text(x, f) := concat("", [x.name, " is ", _key_ref_word[f]]) if f in _no_value_states
+
+_for_row_inputs(row, where) := _once(array.concat(_with_outcomes(row.inputs), [x[0] | some x in _for_key_flaws(where.check)]))
+
+_for_key_pruned(e, ks) := [] if _for_key_leaf(e, ks)
+
+else := [object.union(e, {"failures": kept})] if {
+	e.message == ""
+	count(e.failures) > 0
+	kept := [f | some f in e.failures; not _for_key_leaf(f, ks)]
+	kept != []
+} else := [] if {
+	e.message == ""
+	count(e.failures) > 0
+} else := [e]
 
 _for_key_leaf(e, ks) if {
 	e.failures == []
@@ -266,8 +284,6 @@ _row_failures(row, _, where, ins) := [_policy_entry("assertion", where.check.exp
 	not where.check.op == "for"
 }
 
-_row_failures(row, _, where, ins) := [_policy_entry("assertion", a, row.cause, ins, [], row.message, [_assertion_at(where, null, i)]) | some i, a in where.check.assertions] if where.check.op == "for"
-
 _row_failures(row, at, where, _) := [_policy_entry(
 	"assertion",
 	fa.assertion,
@@ -306,9 +322,9 @@ _row_failures(row, at, where, ins) := [_policy_entry(
 	"assertion",
 	where.check.expression,
 	row.cause,
-	array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists)], _with_outcomes(_walk_key_ref_entries(where.check.path))), _walk_cond_ref_entries(_walk_cond_refs(where.check), row.inputs)),
-	_walk_entries(row, _item_owned(row, texts), at),
-	concat("; ", _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts)))),
+	_once(array.concat(array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists)], _key_flaw_entries(where.check.path)), _walk_cond_ref_entries(_walk_cond_refs(where.check), row.inputs)), _walk_param_entries(where.check, row.inputs))),
+	array.concat(_walk_entries(row, _item_owned(row, texts), at), _key_list_parts(row, at)),
+	concat("; ", [m | some m in _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts))); not m in {e.message | some e in _key_list_parts(row, at)}]),
 	[_assertion_at(where, null, 0)],
 )] if {
 	_walks(where.check)
@@ -317,18 +333,23 @@ _row_failures(row, at, where, ins) := [_policy_entry(
 	lists := {_list_base(f.item) | some f in row.failed_items}
 }
 
+_walk_param_entries(check, inputs) := [x |
+	some x in _with_outcomes(_once([_path_input(null, p) | walk(object.get(check, "check", {}), [_, p]); is_array(p); count(p) > 0; p[0] == "$$params"]))
+	not x.name in {i.name | some i in inputs}
+]
+
 _tally_key_ref_entries(check, inputs, cause) := [x |
-	some x in _with_outcomes(_walk_key_ref_entries([seg |
+	some x in _key_flaw_entries([seg |
 		walk(check, [_, y])
 		is_object(y)
 		some f in _tally_forms
 		p := object.get(y, f, null)
 		is_array(p)
 		some seg in p
-	]))
+	])
 	not x.name in {i.name | some i in inputs}
 ] if {
-	cause in _no_value_states
+	cause in {"absent", "null", "unusable"}
 	some i in inputs
 	_tally_input_name(i.name)
 } else := []
@@ -648,7 +669,7 @@ _applies_entries(row, at, evals, req, conds, ins) := [_policy_entry(
 	"assertion",
 	conds[name].expression,
 	e.assertion_cause,
-	array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists)], _with_outcomes(_walk_key_ref_entries(object.get(c, "path", [])))), _walk_cond_ref_entries(_walk_cond_refs(c), row.inputs)),
+	array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists)], _key_flaw_entries(object.get(c, "path", []))), _walk_cond_ref_entries(_walk_cond_refs(c), row.inputs)),
 	_walk_entries(row, _item_owned(row, texts), at),
 	concat("; ", _once(array.concat(object.get(e, "ergo/own", [row.message]), _root_texts(row, texts)))),
 	[conds[name].at],
@@ -688,12 +709,8 @@ _applies_entries(_, at, evals, req, conds, _) := [_policy_entry(
 ] if {
 	count(evals) > 1
 	failed := [n | some n in _applies_to_names(req); evals[n].assertion_cause != "satisfied"]
-	texts := [_unpassed_message(evals[n]) | some n in failed]
+	texts := [evals[n].message | some n in failed]
 }
-
-_unpassed_message(e) := e.message if e.passed == false
-
-else := ""
 
 _condition_at(req, name) := _joined("$policy:", ["subjects", owner, "from"]) if {
 	owner := _resolution_of(req).filter_owners[name]
@@ -713,8 +730,6 @@ _whose_reads(whose, f) := [r |
 	not _walk_outside(p)
 	r := _whose_read(c, p, f, _read_state(f.value, p))
 ] if _walk_kind(f.item) == "item"
-
-else := []
 
 _parted_in(raw, at, where) := p if {
 	raw.passed == false

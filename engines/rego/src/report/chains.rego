@@ -147,10 +147,7 @@ _copied_leaf(e, c) := object.union(e, object.union({"inputs": _copied_inputs(e.i
 
 _copied_failed(f, c) := object.union(f, object.union(
 	{"locations": _copied_locations(f.locations, c)},
-	object.union(
-		{"failed_items": _copied_inputs(f.failed_items, c) | "failed_items" in object.keys(f)},
-		{"failed_assertions": [_copied_line(l, c) | some l in f.failed_assertions] | "failed_assertions" in object.keys(f)},
-	),
+	{"failed_items": _copied_inputs(f.failed_items, c) | "failed_items" in object.keys(f)},
 ))
 
 _parents_evaluation(req, name, es, parts) := {
