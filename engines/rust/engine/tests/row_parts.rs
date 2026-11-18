@@ -56,7 +56,11 @@ fn a_for_line_key_that_cant_be_read_is_said_before_a_list_that_fails_whatever_th
     let check = json!({"for": "every o named by $params.k as x", "assert": ["x is 1", "z is 3"]});
     for (o, said, cause) in [
         (Value::Null, "o is null", "absent"),
-        (json!("s"), "o is \"s\", which isn't a list or an object", "unusable"),
+        (
+            json!("s"),
+            "o is \"s\", which isn't a list or an object",
+            "unusable",
+        ),
         (json!([]), "o is []", "absent"),
     ] {
         let got = row(check.clone(), json!({"id": "t", "z": 2, "o": o}), json!({}));
@@ -77,7 +81,8 @@ fn a_for_line_key_that_cant_be_read_is_said_before_a_list_that_fails_whatever_th
 
 #[test]
 fn a_whose_key_that_is_missing_is_said_once_and_each_item_says_the_value_before_it() {
-    let check = json!({"for": "every xs whose v is m named by $params.k as x", "assert": "x.v is 1"});
+    let check =
+        json!({"for": "every xs whose v is m named by $params.k as x", "assert": "x.v is 1"});
     let got = row(check, json!({"id": "t", "xs": [{"v": 1}]}), json!({}));
     assert_eq!(
         got["message"],

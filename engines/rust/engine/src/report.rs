@@ -508,9 +508,7 @@ pub fn check_defs(
         )
     };
     let from_refs = match policy.subject_of(requirement) {
-        Some((name, _)) if read.reads_from(name) => {
-            source_refs_read(reading, name, input, params)
-        }
+        Some((name, _)) if read.reads_from(name) => source_refs_read(reading, name, input, params),
         _ => Vec::new(),
     };
     let mut min_def = CheckDef::added(min_description, min_expression);
@@ -1063,7 +1061,10 @@ fn source_refs_read(reading: &Reading, name: &str, input: &Value, params: &Value
         .collect();
     let mut refs = crate::checks::refs_read(&paths, input, Some(params));
     for entry in &mut refs {
-        let named = entry.get("name").and_then(Value::as_str).unwrap_or_default();
+        let named = entry
+            .get("name")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
         let value = entry.get("value").cloned().unwrap_or(Value::Null);
         let fits = !keys.iter().any(|k| k == named) || value.is_string();
         if entry.get("outcome").and_then(Value::as_str) == Some("usable") && !fits {

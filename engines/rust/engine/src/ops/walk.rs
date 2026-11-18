@@ -1129,8 +1129,14 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
             } else if let Some((check, _, _)) = undecided
                 && !super::key_base::missing_keys(check, ctx).is_empty()
                 && !matches!(
-                    check.paths().into_iter().find_map(|p| super::key_base::of_path(p, false, &focus)),
-                    Some(super::key_base::KeyBase { base: Some((_, Cause::Unusable, _)), .. })
+                    check
+                        .paths()
+                        .into_iter()
+                        .find_map(|p| super::key_base::of_path(p, false, &focus)),
+                    Some(super::key_base::KeyBase {
+                        base: Some((_, Cause::Unusable, _)),
+                        ..
+                    })
                 )
             {
                 return Judged {

@@ -368,13 +368,11 @@ pub fn for_failures(
     for f in failed {
         let mut after_key = false;
         for piece in text(f, "ergo/text").split("; ") {
-            if after_key
-                || piece.starts_with("item ")
-                || !text(f, "item").starts_with("item ")
-            {
+            if after_key || piece.starts_with("item ") || !text(f, "item").starts_with("item ") {
                 ops::push_new(&mut item_made, piece.to_string());
             }
-            after_key = piece.starts_with("item ") && key_texts.iter().any(|k| piece.ends_with(k.as_str()));
+            after_key =
+                piece.starts_with("item ") && key_texts.iter().any(|k| piece.ends_with(k.as_str()));
         }
     }
     let whose_roots = line.whose_roots(ctx);
@@ -475,9 +473,9 @@ pub fn for_failures(
                     && clause
                         .strip_prefix(&format!("{named}: "))
                         .is_some_and(|rest| {
-                            list(f, "failed_assertions").iter().any(|l| {
-                                texts(l).iter().any(|t| t.split("; ").any(|p| p == rest))
-                            })
+                            list(f, "failed_assertions")
+                                .iter()
+                                .any(|l| texts(l).iter().any(|t| t.split("; ").any(|p| p == rest)))
                         })
             })
             || ops::message::cap_note(clause).is_some()

@@ -2389,7 +2389,10 @@ fn walk_part(
         Vec::new()
     };
     for entry in root_inputs(&root_paths, &check, ctx) {
-        let name = entry.get("name").and_then(Value::as_str).unwrap_or_default();
+        let name = entry
+            .get("name")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
         if !inputs
             .iter()
             .chain(&keys)

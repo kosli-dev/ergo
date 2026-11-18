@@ -42,8 +42,12 @@ fn keyed(start: Start, keys: &[&str], key: &str) -> Path {
 fn a_for_line_list_with_a_missing_key_says_the_key_and_a_missing_base() {
     let subject = json!({"z": 2});
     let params = json!({});
-    let found = for_list(&keyed(Start::Subject, &["o"], "k"), false, &ctx(&subject, &params, &[]))
-        .unwrap();
+    let found = for_list(
+        &keyed(Start::Subject, &["o"], "k"),
+        false,
+        &ctx(&subject, &params, &[]),
+    )
+    .unwrap();
     assert_eq!(found.key_text, "$params.k is missing");
     assert_eq!(found.key.state, Outcome::Absent);
     let (text, cause, input) = found.base.unwrap();
@@ -56,8 +60,12 @@ fn a_for_line_list_with_a_missing_key_says_the_key_and_a_missing_base() {
 fn a_for_line_list_with_a_null_key_says_a_null_base() {
     let subject = json!({"o": null});
     let params = json!({"k": null});
-    let found = for_list(&keyed(Start::Subject, &["o"], "k"), false, &ctx(&subject, &params, &[]))
-        .unwrap();
+    let found = for_list(
+        &keyed(Start::Subject, &["o"], "k"),
+        false,
+        &ctx(&subject, &params, &[]),
+    )
+    .unwrap();
     assert_eq!(found.key_text, "$params.k is null");
     let (text, cause, _) = found.base.unwrap();
     assert_eq!((text.as_str(), cause), ("o is null", Cause::Null));
@@ -67,8 +75,12 @@ fn a_for_line_list_with_a_null_key_says_a_null_base() {
 fn a_for_line_list_with_a_key_that_isnt_text_says_a_base_that_isnt_a_list_or_an_object() {
     let subject = json!({"o": "s"});
     let params = json!({"k": 3});
-    let found = for_list(&keyed(Start::Subject, &["o"], "k"), false, &ctx(&subject, &params, &[]))
-        .unwrap();
+    let found = for_list(
+        &keyed(Start::Subject, &["o"], "k"),
+        false,
+        &ctx(&subject, &params, &[]),
+    )
+    .unwrap();
     assert_eq!(found.key_text, "$params.k is 3, which isn't text");
     assert_eq!(found.key.state, Outcome::Unusable);
     let (text, cause, _) = found.base.unwrap();
