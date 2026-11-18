@@ -687,3 +687,4 @@ walks / a that clause whose key from $params isn't text reads the value before t
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / the focus holds m
 walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name / an item of $input.os is null and $params.z is missing
 walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name, with a null param / an item of $input.os has no name and $params.z is null
+subjects / a condition with count of / counts the items of the list and keeps subjects with enough
