@@ -38349,12 +38349,6 @@
                     "locations": [],
                     "name": "count of $params.a",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params[].a",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -40243,16 +40237,6 @@
                     ],
                     "name": "sum of $params.v",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:/0"
-                    ],
-                    "name": "$params[].v",
-                    "outcome": "usable",
-                    "value": [
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -40327,16 +40311,6 @@
                     ],
                     "name": "count of $params whose v is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:/0"
-                    ],
-                    "name": "$params[]",
-                    "outcome": "usable",
-                    "value": [
-                      3
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -55726,22 +55700,6 @@
                     ],
                     "name": "count of xs whose v is in pr.t named by pr.p",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0",
-                      "/prs/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      },
-                      {
-                        "v": 2
-                      }
-                    ]
                   },
                   {
                     "locations": [

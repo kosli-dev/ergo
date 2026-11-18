@@ -988,74 +988,6 @@
                     ],
                     "name": "count of groups.teams.units.cells",
                     "value": 15
-                  },
-                  {
-                    "locations": [
-                      "/orgs/0/repos/1/groups/0/teams/0/units/0/cells/0",
-                      "/orgs/0/repos/1/groups/0/teams/0/units/0/cells/1",
-                      "/orgs/0/repos/1/groups/0/teams/0/units/1/cells/0",
-                      "/orgs/0/repos/1/groups/0/teams/0/units/1/cells/1",
-                      "/orgs/0/repos/1/groups/0/teams/1/units/0/cells/0",
-                      "/orgs/0/repos/1/groups/0/teams/1/units/0/cells/1",
-                      "/orgs/0/repos/1/groups/0/teams/1/units/1/cells/0",
-                      "/orgs/0/repos/1/groups/0/teams/1/units/1/cells/1",
-                      "/orgs/0/repos/1/groups/1/teams/0/units/0/cells/0",
-                      "/orgs/0/repos/1/groups/1/teams/0/units/0/cells/1",
-                      "/orgs/0/repos/1/groups/1/teams/0/units/1/cells/0",
-                      "/orgs/0/repos/1/groups/1/teams/1/units/0/cells/0",
-                      "/orgs/0/repos/1/groups/1/teams/1/units/0/cells/1",
-                      "/orgs/0/repos/1/groups/1/teams/1/units/1/cells/0",
-                      "/orgs/0/repos/1/groups/1/teams/1/units/1/cells/1"
-                    ],
-                    "name": "groups[].teams[].units[].cells[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      },
-                      {
-                        "ok": true
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2128,18 +2060,6 @@
                     ],
                     "name": "count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/k10/0",
-                      "/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/k10/1"
-                    ],
-                    "name": "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2593,26 +2513,6 @@
                     ],
                     "name": "count of xs whose n equals count of b.x.z",
                     "value": 0
-                  },
-                  {
-                    "locations": [
-                      "/bs/0/kids/1/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "b": {
-                          "x": {
-                            "z": [
-                              1,
-                              1
-                            ]
-                          }
-                        },
-                        "n": 2
-                      }
-                    ]
                   },
                   {
                     "locations": [

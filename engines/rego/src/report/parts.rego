@@ -314,7 +314,7 @@ _entry(kind, name, cause, inputs, failures, message) := {
 
 _policy_entry(kind, name, cause, inputs, failures, message, locations) := object.union(_entry(kind, name, cause, inputs, failures, message), {"locations": locations})
 
-_row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, [i | some i in _with_key_bases(array.concat(ins, _check_key_ref_entries(where.check, ins, row.cause)), object.get(row, "ergo/key_bases", []), at); not i.name in names], ls, _tally_rest(row.message, names), [_assertion_at(where, null, 0)])] if {
+_row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, [i | some i in _with_key_bases(array.concat(ins, _check_key_ref_entries(where.check, ins, row.cause)), object.get(row, "ergo/key_bases", []), at); not i.name in names; not _item_input(i, _tally_list_names(where.check))], ls, _tally_rest(row.message, names), [_assertion_at(where, null, 0)])] if {
 	not _walks(where.check)
 	not _all_of_run(where.check)
 	not _any_of_run(where.check)
@@ -392,12 +392,14 @@ _row_failures(row, at, where, _) := [_tallied_entry(
 	some k, fa in row.failed_assertions
 ] if _all_of_run(where.check)
 
-_tallied_entry(e, c, o, at) := object.union(e, {"inputs": [i | some i in e.inputs; not i.name in names], "failures": ls, "message": _tally_rest(e.message, names)}) if {
+_tallied_entry(e, c, o, at) := object.union(e, {"inputs": [i | some i in e.inputs; not i.name in names; not _item_input(i, _tally_list_names(c))], "failures": ls, "message": _tally_rest(e.message, names)}) if {
 	not _walks(c)
 	ls := _tally_list_entries({"message": e.message, "ergo/key_bases": object.get(o, "key_bases", [])}, at, c, e.inputs)
 	names := {x.name | some x in ls}
 	count(names) > 0
-} else := e
+} else := object.union(e, {"inputs": [i | some i in e.inputs; not _item_input(i, _tally_list_names(c))]}) if not _walks(c)
+
+else := e
 
 _row_failures(row, at, where, _) := [_policy_entry(
 	"option",
@@ -909,6 +911,7 @@ else := [_said_input(i, names) | some i in ins] if {
 
 _m_isnt_clause(c) if {
 	ps := split(c, ", which isn't ")
+	count(ps) > 1
 	some k in numbers.range(1, count(ps) - 1)
 	_clause_quotes_shut(concat(", which isn't ", array.slice(ps, 0, k)))
 }

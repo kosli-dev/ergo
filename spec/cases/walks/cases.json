@@ -12428,12 +12428,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1"
@@ -12649,12 +12643,6 @@
                     "locations": [],
                     "name": "count of rows.v that is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -12759,12 +12747,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1"
@@ -12982,12 +12964,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1"
@@ -13090,12 +13066,6 @@
                     "locations": [],
                     "name": "count of rows whose v is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -13313,12 +13283,6 @@
                     "locations": [],
                     "name": "count of rows.v that is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -14265,12 +14229,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1"
@@ -14347,12 +14305,6 @@
                     "locations": [],
                     "name": "sum of rows.n that is in c.pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].n",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -14469,12 +14421,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1"
@@ -14551,12 +14497,6 @@
                     "locations": [],
                     "name": "sum of rows.n that is in c.pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].n",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -14675,12 +14615,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1/name"
@@ -14757,12 +14691,6 @@
                     "locations": [],
                     "name": "sum of rows.n that is in c.pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].n",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -16118,12 +16046,6 @@
                     "locations": [],
                     "name": "count of rows whose v is in $params.os.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -16167,12 +16089,6 @@
                     "locations": [],
                     "name": "sum of rows.n that is in $input.os.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].n",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -19220,12 +19136,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       ""
                     ],
@@ -19538,12 +19448,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -19854,12 +19758,6 @@
                     "locations": [],
                     "name": "count of es whose zz equals m named by $input.k and whose v equals m named by $input.j",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -25942,23 +25840,6 @@
                     },
                     {
                       "locations": [
-                        "/things/0/xs/0",
-                        "/things/0/xs/1"
-                      ],
-                      "name": "xs[]",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "v": 1
-                        },
-                        {
-                          "m": null,
-                          "v": 1
-                        }
-                      ]
-                    },
-                    {
-                      "locations": [
                         "$params:"
                       ],
                       "name": "$params.k",
@@ -26369,22 +26250,6 @@
                     },
                     {
                       "locations": [
-                        "/things/0/xs/0",
-                        "/things/0/xs/1"
-                      ],
-                      "name": "xs[]",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "v": 1
-                        },
-                        {
-                          "v": 1
-                        }
-                      ]
-                    },
-                    {
-                      "locations": [
                         "$params:/k"
                       ],
                       "name": "$params.k",
@@ -26661,26 +26526,6 @@
                       ],
                       "name": "count of xs whose v equals m named by $params.k",
                       "value": null
-                    },
-                    {
-                      "locations": [
-                        "/things/0/xs/0",
-                        "/things/0/xs/1"
-                      ],
-                      "name": "xs[]",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "m": {},
-                          "v": 1
-                        },
-                        {
-                          "m": {
-                            "a": 1
-                          },
-                          "v": 1
-                        }
-                      ]
                     },
                     {
                       "locations": [
@@ -27753,19 +27598,6 @@
                     },
                     {
                       "locations": [
-                        "/things/0/xs/0"
-                      ],
-                      "name": "xs[]",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "u": 1,
-                          "v": 1
-                        }
-                      ]
-                    },
-                    {
-                      "locations": [
                         "/z"
                       ],
                       "name": "$input.z",
@@ -27933,19 +27765,6 @@
                     },
                     {
                       "locations": [
-                        "/things/0/xs/0"
-                      ],
-                      "name": "xs[]",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "u": 1,
-                          "v": 1
-                        }
-                      ]
-                    },
-                    {
-                      "locations": [
                         "/z"
                       ],
                       "name": "$input.z",
@@ -28021,19 +27840,6 @@
                       ],
                       "name": "count of xs whose $params.z equals m named by $params.k",
                       "value": null
-                    },
-                    {
-                      "locations": [
-                        "/things/0/xs/0"
-                      ],
-                      "name": "xs[]",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "u": 1,
-                          "v": 1
-                        }
-                      ]
                     },
                     {
                       "locations": [
@@ -28148,20 +27954,6 @@
                       ],
                       "name": "count of es.v that equals m named by $params.k",
                       "value": null
-                    },
-                    {
-                      "locations": [
-                        "/things/0/es/0/v"
-                      ],
-                      "name": "es[].v",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "m": {
-                            "a": 1
-                          }
-                        }
-                      ]
                     },
                     {
                       "locations": [
@@ -28313,16 +28105,6 @@
                       ],
                       "name": "count of es.v that equals m named by $params.k",
                       "value": null
-                    },
-                    {
-                      "locations": [
-                        "/things/0/es/0/v"
-                      ],
-                      "name": "es[].v",
-                      "outcome": "usable",
-                      "value": [
-                        {}
-                      ]
                     },
                     {
                       "locations": [
@@ -28482,20 +28264,6 @@
                       ],
                       "name": "count of es.v that equals m named by $params.k",
                       "value": null
-                    },
-                    {
-                      "locations": [
-                        "/things/0/es/0/v",
-                        "/things/0/es/1/v"
-                      ],
-                      "name": "es[].v",
-                      "outcome": "usable",
-                      "value": [
-                        {},
-                        {
-                          "m": null
-                        }
-                      ]
                     },
                     {
                       "locations": [
@@ -28709,20 +28477,6 @@
                     },
                     {
                       "locations": [
-                        "/things/0/es/0/v"
-                      ],
-                      "name": "es[].v",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "m": {
-                            "a": 1
-                          }
-                        }
-                      ]
-                    },
-                    {
-                      "locations": [
                         "$params:"
                       ],
                       "name": "$params.k",
@@ -28867,16 +28621,6 @@
                       ],
                       "name": "count of es.v that equals m named by $params.k",
                       "value": null
-                    },
-                    {
-                      "locations": [
-                        "/things/0/es/0/v"
-                      ],
-                      "name": "es[].v",
-                      "outcome": "usable",
-                      "value": [
-                        {}
-                      ]
                     },
                     {
                       "locations": [
@@ -29056,19 +28800,6 @@
                       ],
                       "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z",
                       "value": null
-                    },
-                    {
-                      "locations": [
-                        "/things/0/xs/0"
-                      ],
-                      "name": "xs[]",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "v": "a",
-                          "w": 1
-                        }
-                      ]
                     },
                     {
                       "locations": [
@@ -29290,19 +29021,6 @@
                       ],
                       "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z",
                       "value": null
-                    },
-                    {
-                      "locations": [
-                        "/things/0/xs/0"
-                      ],
-                      "name": "xs[]",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "v": "a",
-                          "w": 1
-                        }
-                      ]
                     },
                     {
                       "locations": [

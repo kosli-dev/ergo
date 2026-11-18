@@ -2026,18 +2026,6 @@
                     ],
                     "name": "sum of region",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/xs/1/0",
-                      "/xs/1/1"
-                    ],
-                    "name": "region[]",
-                    "outcome": "usable",
-                    "value": [
-                      "a",
-                      "b"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2095,16 +2083,6 @@
                     ],
                     "name": "count of region",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/xs/2/0"
-                    ],
-                    "name": "region[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2158,16 +2136,6 @@
                     ],
                     "name": "sum of region",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/xs/2/0"
-                    ],
-                    "name": "region[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -5345,16 +5313,6 @@
                   },
                   {
                     "locations": [
-                      "/xs/1/0"
-                    ],
-                    "name": "region[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  },
-                  {
-                    "locations": [
                       "$params:/n"
                     ],
                     "name": "$params.n",
@@ -5421,26 +5379,6 @@
                     ],
                     "name": "sum of region",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/xs/1/0"
-                    ],
-                    "name": "region[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  },
-                  {
-                    "locations": [
-                      "/xs/1/0"
-                    ],
-                    "name": "region[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   },
                   {
                     "locations": [
@@ -5697,26 +5635,6 @@
                     ],
                     "name": "count of $input.ws whose ref equals region",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/ws/0",
-                      "/ws/1",
-                      "/ws/2"
-                    ],
-                    "name": "$input.ws[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "ref": "p"
-                      },
-                      {
-                        "ref": "q"
-                      },
-                      {
-                        "ref": "p"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -5994,29 +5912,6 @@
                     ],
                     "name": "count of $input.ys whose k equals s",
                     "value": 0
-                  },
-                  {
-                    "locations": [
-                      "/ys/0",
-                      "/ys/1",
-                      "/ys/2"
-                    ],
-                    "name": "$input.ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "k": "a",
-                        "s": "z"
-                      },
-                      {
-                        "k": "b",
-                        "s": "b"
-                      },
-                      {
-                        "k": "c",
-                        "s": "c"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -7712,22 +7607,6 @@
                   },
                   {
                     "locations": [
-                      "/xs/0/ws/0",
-                      "/xs/0/ws/1"
-                    ],
-                    "name": "ws[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "x": 1
-                      },
-                      {
-                        "x": 2
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/xs/0"
                     ],
                     "name": "region[0].y",
@@ -7962,18 +7841,6 @@
                   },
                   {
                     "locations": [
-                      "/xs/2/ws/0"
-                    ],
-                    "name": "ws[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "x": 2
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/xs/2/name"
                     ],
                     "name": "region.name",
@@ -8047,18 +7914,6 @@
                     ],
                     "name": "count of ws whose x equals region[0].y",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/xs/2/ws/0"
-                    ],
-                    "name": "ws[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "x": 2
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -9305,18 +9160,6 @@
                     ],
                     "name": "sum of region",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/xs/1/0",
-                      "/xs/1/1"
-                    ],
-                    "name": "region[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -10040,18 +9883,6 @@
                   },
                   {
                     "locations": [
-                      "/xs/0/ys/0"
-                    ],
-                    "name": "ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "thing": 1
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/xs/0/thing"
                     ],
                     "name": "p",
@@ -10279,33 +10110,6 @@
                     ],
                     "name": "count of ys whose count of s is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/ys/0",
-                      "/things/0/ys/1",
-                      "/things/0/ys/2"
-                    ],
-                    "name": "ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "k": 1,
-                        "s": [
-                          1
-                        ]
-                      },
-                      {
-                        "k": 2,
-                        "s": [
-                          1,
-                          2
-                        ]
-                      },
-                      {
-                        "k": 3
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -10378,33 +10182,6 @@
                     ],
                     "name": "count of ys whose item 1 of s is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/ys/0",
-                      "/things/0/ys/1",
-                      "/things/0/ys/2"
-                    ],
-                    "name": "ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "k": 1,
-                        "s": [
-                          1
-                        ]
-                      },
-                      {
-                        "k": 2,
-                        "s": [
-                          1,
-                          2
-                        ]
-                      },
-                      {
-                        "k": 3
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -11420,19 +11197,6 @@
                     ],
                     "name": "count of xs whose \"item\" is 1",
                     "value": 0
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "item": 3,
-                        "v": 1
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -11510,19 +11274,6 @@
                     ],
                     "name": "count of xs whose \"item\" is 1",
                     "value": 0
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "item": 3,
-                        "v": 1
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -14043,22 +13794,6 @@
                     ],
                     "name": "count of ys whose \"a<b\" is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/ys/0",
-                      "/things/0/ys/1"
-                    ],
-                    "name": "ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      },
-                      {
-                        "v": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -14185,22 +13920,6 @@
                     ],
                     "name": "count of ys whose \"a\\\"b\" is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/ys/0",
-                      "/things/0/ys/1"
-                    ],
-                    "name": "ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      },
-                      {
-                        "v": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -14327,22 +14046,6 @@
                     ],
                     "name": "count of ys whose \"a\\\\b\" is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/ys/0",
-                      "/things/0/ys/1"
-                    ],
-                    "name": "ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      },
-                      {
-                        "v": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",

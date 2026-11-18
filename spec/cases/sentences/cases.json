@@ -35486,18 +35486,6 @@
                         ],
                         "name": "count of xs",
                         "value": 1
-                      },
-                      {
-                        "locations": [
-                          "/things/1/xs/0"
-                        ],
-                        "name": "xs[]",
-                        "outcome": "usable",
-                        "value": [
-                          {
-                            "signed": false
-                          }
-                        ]
                       }
                     ],
                     "kind": "assertion",
@@ -35655,18 +35643,6 @@
                         ],
                         "name": "count of xs",
                         "value": 1
-                      },
-                      {
-                        "locations": [
-                          "/things/2/xs/0"
-                        ],
-                        "name": "xs[]",
-                        "outcome": "usable",
-                        "value": [
-                          {
-                            "signed": false
-                          }
-                        ]
                       }
                     ],
                     "kind": "assertion",
@@ -44208,18 +44184,6 @@
                     ],
                     "name": "count of l",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/things/0/l/0",
-                      "/things/0/l/1"
-                    ],
-                    "name": "l[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -44284,20 +44248,6 @@
                     ],
                     "name": "count of l",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/things/0/l/0",
-                      "/things/0/l/1",
-                      "/things/0/l/2"
-                    ],
-                    "name": "l[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2,
-                      3
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -58468,18 +58418,6 @@
                     ],
                     "name": "count of l",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/things/1/l/0",
-                      "/things/1/l/1"
-                    ],
-                    "name": "l[]",
-                    "outcome": "usable",
-                    "value": [
-                      "a",
-                      "b"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -58873,16 +58811,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/things/0/items/0/n"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      2
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -58935,18 +58863,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/things/1/items/0/n",
-                      "/things/1/items/1/n"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -59001,16 +58917,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/things/2/items/0/n"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      3
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -59070,16 +58976,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/items/0/n"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      "2"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -59131,16 +59027,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/1/items/1/n/0"
-                    ],
-                    "name": "items[].n[]",
-                    "outcome": "usable",
-                    "value": [
-                      2
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -59201,18 +59087,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/items/0/n",
-                      "/things/0/items/1"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -59267,16 +59141,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/1/items/0/n"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -60716,16 +60580,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/things/0/items/0/n"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      3
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -60777,16 +60631,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": 3.5
-                  },
-                  {
-                    "locations": [
-                      "/things/1/items/0/n"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      3.5
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -60839,18 +60683,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": 3.2
-                  },
-                  {
-                    "locations": [
-                      "/things/2/items/0/n",
-                      "/things/2/items/1/n"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      2,
-                      1.2
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -60913,16 +60745,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/items/0/n"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      "3"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -60975,18 +60797,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/1/items/0/n",
-                      "/things/1/items/1"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -61041,16 +60851,6 @@
                     ],
                     "name": "sum of items.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/2/items/0/n"
-                    ],
-                    "name": "items[].n",
-                    "outcome": "usable",
-                    "value": [
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -62825,18 +62625,6 @@
                     ],
                     "name": "count of l",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/things/0/l/0",
-                      "/things/0/l/1"
-                    ],
-                    "name": "l[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -88795,28 +88583,6 @@
               ],
               "name": "count of approvers whose state is \"APPROVED\"",
               "value": 2
-            },
-            {
-              "locations": [
-                "/prs/0/approvers/0",
-                "/prs/0/approvers/1"
-              ],
-              "name": "approvers[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "approved_at": "2026-01-03T00:00:00Z",
-                  "assigned_at": "2026-01-02T00:00:00Z",
-                  "state": "APPROVED",
-                  "username": "bob"
-                },
-                {
-                  "approved_at": "2026-01-03T00:00:00Z",
-                  "assigned_at": "2026-01-04T00:00:00Z",
-                  "state": "APPROVED",
-                  "username": "ann"
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -88882,28 +88648,6 @@
               ],
               "name": "count of approvers whose username does not equal author",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/approvers/0",
-                "/prs/0/approvers/1"
-              ],
-              "name": "approvers[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "approved_at": "2026-01-03T00:00:00Z",
-                  "assigned_at": "2026-01-02T00:00:00Z",
-                  "state": "APPROVED",
-                  "username": "bob"
-                },
-                {
-                  "approved_at": "2026-01-03T00:00:00Z",
-                  "assigned_at": "2026-01-04T00:00:00Z",
-                  "state": "APPROVED",
-                  "username": "ann"
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -89294,18 +89038,6 @@
               ],
               "name": "count of approvers.username whose state is \"APPROVED\"",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/approvers/0/username",
-                "/prs/0/approvers/1/username"
-              ],
-              "name": "approvers[].username",
-              "outcome": "usable",
-              "value": [
-                "bob",
-                "ann"
-              ]
             }
           ],
           "kind": "assertion",
@@ -89409,23 +89141,6 @@
               ],
               "name": "count of approvers whose state is \"APPROVED\"",
               "value": 2
-            },
-            {
-              "locations": [
-                "/prs/0/approvers/0",
-                "/prs/0/approvers/1"
-              ],
-              "name": "approvers[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "state": "APPROVED"
-                },
-                {
-                  "state": "APPROVED",
-                  "username": null
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -89486,23 +89201,6 @@
               ],
               "name": "count of approvers whose username does not equal author",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/approvers/0",
-                "/prs/0/approvers/1"
-              ],
-              "name": "approvers[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "state": "APPROVED"
-                },
-                {
-                  "state": "APPROVED",
-                  "username": null
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -89712,23 +89410,6 @@
             },
             {
               "locations": [
-                "/prs/0/approvers/0",
-                "/prs/0/approvers/1"
-              ],
-              "name": "approvers[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "state": "APPROVED"
-                },
-                {
-                  "state": "APPROVED",
-                  "username": null
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0/author"
               ],
               "name": "pr.author",
@@ -89802,23 +89483,6 @@
               ],
               "name": "count of approvers whose state is \"APPROVED\" and whose username does not equal pr.author",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/approvers/0",
-                "/prs/0/approvers/1"
-              ],
-              "name": "approvers[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "state": "APPROVED"
-                },
-                {
-                  "state": "APPROVED",
-                  "username": null
-                }
-              ]
             },
             {
               "locations": [
@@ -89955,12 +89619,6 @@
               "locations": [],
               "name": "count of deployments whose finished_at is after started_at",
               "value": 0
-            },
-            {
-              "locations": [],
-              "name": "deployments[]",
-              "outcome": "usable",
-              "value": []
             }
           ],
           "kind": "assertion",
@@ -90007,18 +89665,6 @@
               ],
               "name": "count of approvers.username whose state is \"APPROVED\"",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/approvers/0",
-                "/prs/0/approvers/1/username"
-              ],
-              "name": "approvers[].username",
-              "outcome": "usable",
-              "value": [
-                null,
-                null
-              ]
             }
           ],
           "kind": "assertion",
@@ -90163,20 +89809,6 @@
               ],
               "name": "count of xs.meta.b whose k is 1",
               "value": null
-            },
-            {
-              "locations": [
-                "/things/0/xs/0/meta",
-                "/things/0/xs/1/meta/b"
-              ],
-              "name": "xs[].meta.b",
-              "outcome": "usable",
-              "value": [
-                null,
-                {
-                  "k": 1
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -91213,24 +90845,6 @@
               ],
               "name": "count of xs.meta whose k is 1",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0/meta",
-                "/prs/0/xs/1/meta"
-              ],
-              "name": "xs[].meta",
-              "outcome": "usable",
-              "value": [
-                {
-                  "k": 1,
-                  "n": 2,
-                  "t": 1
-                },
-                {
-                  "n": 1
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -91492,24 +91106,6 @@
               ],
               "name": "count of xs.meta whose n is at least t",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0/meta",
-                "/prs/0/xs/1/meta"
-              ],
-              "name": "xs[].meta",
-              "outcome": "usable",
-              "value": [
-                {
-                  "k": 1,
-                  "n": 2,
-                  "t": 1
-                },
-                {
-                  "n": 1
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -91625,24 +91221,6 @@
               ],
               "name": "count of approvers whose username equals pr named by k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/approvers/0",
-                "/prs/0/approvers/1"
-              ],
-              "name": "approvers[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "k": "z",
-                  "username": "bob"
-                },
-                {
-                  "k": "y",
-                  "username": "ann"
-                }
-              ]
             },
             {
               "locations": [
@@ -91804,22 +91382,6 @@
             },
             {
               "locations": [
-                "/prs/0/approvers/0",
-                "/prs/0/approvers/1"
-              ],
-              "name": "approvers[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "username": "bob"
-                },
-                {
-                  "username": "ann"
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0"
               ],
               "name": "pr",
@@ -91920,18 +91482,6 @@
             },
             {
               "locations": [
-                "/prs/0/approvers/0"
-              ],
-              "name": "approvers[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "username": "bob"
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0/author"
               ],
               "name": "pr.author",
@@ -92002,18 +91552,6 @@
             },
             {
               "locations": [
-                "/prs/0/approvers/0"
-              ],
-              "name": "approvers[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "username": "bob"
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0"
               ],
               "name": "pr.author",
@@ -92081,18 +91619,6 @@
               ],
               "name": "count of approvers whose username does not equal pr.author",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/approvers/0"
-              ],
-              "name": "approvers[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "username": "bob"
-                }
-              ]
             },
             {
               "locations": [
@@ -92444,18 +91970,6 @@
               ],
               "name": "count of approvers.username whose state is \"APPROVED\"",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/approvers/0",
-                "/prs/0/approvers/1/username"
-              ],
-              "name": "approvers[].username",
-              "outcome": "usable",
-              "value": [
-                null,
-                null
-              ]
             }
           ],
           "kind": "assertion",
@@ -94031,18 +93545,6 @@
               ],
               "name": "sum of xs.v whose $params.k is 1",
               "value": 4
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0/v",
-                "/prs/0/xs/1/v"
-              ],
-              "name": "xs[].v",
-              "outcome": "usable",
-              "value": [
-                3,
-                1
-              ]
             }
           ],
           "kind": "assertion",
@@ -95403,24 +94905,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0",
-                "/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "k": "a",
-                  "v": 5
-                },
-                {
-                  "k": "z",
-                  "v": 5
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0"
               ],
               "name": "pr",
@@ -95637,23 +95121,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0",
-                "/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "k": "a",
-                  "v": 5
-                },
-                {
-                  "v": 5
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0"
               ],
               "name": "pr",
@@ -95860,24 +95327,6 @@
               ],
               "name": "count of xs whose v equals pr named by k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0",
-                "/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "k": "a",
-                  "v": 5
-                },
-                {
-                  "k": null,
-                  "v": 5
-                }
-              ]
             },
             {
               "locations": [
@@ -96094,24 +95543,6 @@
               ],
               "name": "count of xs whose v equals pr named by k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0",
-                "/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "k": "a",
-                  "v": 5
-                },
-                {
-                  "k": 3,
-                  "v": 5
-                }
-              ]
             },
             {
               "locations": [
@@ -96542,18 +95973,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0"
               ],
               "name": "k",
@@ -96723,18 +96142,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0/k"
               ],
               "name": "k",
@@ -96901,18 +96308,6 @@
               ],
               "name": "count of xs whose v equals pr named by pr.k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -97449,18 +96844,6 @@
             },
             {
               "locations": [
-                "/xs/0"
-              ],
-              "name": "$input.xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 5
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/ls/1"
               ],
               "name": "item 1 of l",
@@ -97527,18 +96910,6 @@
               ],
               "name": "count of $input.xs whose v equals item 1 of l",
               "value": null
-            },
-            {
-              "locations": [
-                "/xs/0"
-              ],
-              "name": "$input.xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 5
-                }
-              ]
             },
             {
               "locations": [
@@ -97610,18 +96981,6 @@
               ],
               "name": "count of $input.xs whose v equals item 1 of l",
               "value": null
-            },
-            {
-              "locations": [
-                "/xs/0"
-              ],
-              "name": "$input.xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 5
-                }
-              ]
             },
             {
               "locations": [
@@ -98263,23 +97622,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "$params:/d"
               ],
               "name": "$params.d named by pr.k.e",
@@ -98463,23 +97805,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/m/w"
               ],
               "name": "$input.m named by pr.k",
@@ -98570,23 +97895,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0/k"
               ],
               "name": "k",
@@ -98661,23 +97969,6 @@
                   ],
                   "name": "count of xs whose v equals $params.m named by pr.k",
                   "value": 0
-                },
-                {
-                  "locations": [
-                    "/prs/0/xs/0"
-                  ],
-                  "name": "xs[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "m": {
-                        "w": 2,
-                        "z": 1
-                      },
-                      "pr": "z",
-                      "v": 1
-                    }
-                  ]
                 },
                 {
                   "locations": [
@@ -98820,23 +98111,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "$params:/m/w"
               ],
               "name": "$params.m named by pr.k",
@@ -98924,23 +98198,6 @@
               ],
               "name": "count of xs whose v equals pl named by pr.k",
               "value": 0
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -99040,23 +98297,6 @@
               ],
               "name": "count of xs whose v equals $params.d named by pr.k.e",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -99226,23 +98466,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/m"
               ],
               "name": "$input.m named by pr.k",
@@ -99333,23 +98556,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0"
               ],
               "name": "k",
@@ -99424,23 +98630,6 @@
                   ],
                   "name": "count of xs whose v equals $params.m named by pr.k",
                   "value": null
-                },
-                {
-                  "locations": [
-                    "/prs/0/xs/0"
-                  ],
-                  "name": "xs[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "m": {
-                        "w": 2,
-                        "z": 1
-                      },
-                      "pr": "z",
-                      "v": 1
-                    }
-                  ]
                 },
                 {
                   "locations": [
@@ -99583,23 +98772,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "$params:/m"
               ],
               "name": "$params.m named by pr.k",
@@ -99687,23 +98859,6 @@
               ],
               "name": "count of xs whose v equals pl named by pr.k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -99803,22 +98958,6 @@
               ],
               "name": "count of xs whose v equals $params.d named by pr.k.e",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -99986,22 +99125,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/m"
               ],
               "name": "$input.m named by pr.k",
@@ -100091,22 +99214,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0/k"
               ],
               "name": "k",
@@ -100180,22 +99287,6 @@
                   ],
                   "name": "count of xs whose v equals $params.m named by pr.k",
                   "value": null
-                },
-                {
-                  "locations": [
-                    "/prs/0/xs/0"
-                  ],
-                  "name": "xs[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "m": {
-                        "w": 2,
-                        "z": 1
-                      },
-                      "v": 1
-                    }
-                  ]
                 },
                 {
                   "locations": [
@@ -100337,22 +99428,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "$params:/m"
               ],
               "name": "$params.m named by pr.k",
@@ -100439,22 +99514,6 @@
               ],
               "name": "count of xs whose v equals pl named by pr.k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -100553,22 +99612,6 @@
               ],
               "name": "count of xs whose v equals $params.d named by pr.k.e",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -100736,22 +99779,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/m"
               ],
               "name": "$input.m named by pr.k",
@@ -100841,22 +99868,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0/k"
               ],
               "name": "k",
@@ -100930,22 +99941,6 @@
                   ],
                   "name": "count of xs whose v equals $params.m named by pr.k",
                   "value": null
-                },
-                {
-                  "locations": [
-                    "/prs/0/xs/0"
-                  ],
-                  "name": "xs[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "m": {
-                        "w": 2,
-                        "z": 1
-                      },
-                      "v": 1
-                    }
-                  ]
                 },
                 {
                   "locations": [
@@ -101087,22 +100082,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "$params:/m"
               ],
               "name": "$params.m named by pr.k",
@@ -101189,22 +100168,6 @@
               ],
               "name": "count of xs whose v equals pl named by pr.k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -101511,19 +100474,6 @@
             },
             {
               "locations": [
-                "/arts/0/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/arts/0/m/w"
               ],
               "name": "art.m named by pr.k",
@@ -101718,18 +100668,6 @@
               ],
               "name": "count of xs whose v equals art.m named by pr.k",
               "value": null
-            },
-            {
-              "locations": [
-                "/arts/0/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -102151,16 +101089,6 @@
               ],
               "name": "count of xs.n that equals $params.m named by k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0/n"
-              ],
-              "name": "xs[].n",
-              "outcome": "usable",
-              "value": [
-                1
-              ]
             }
           ],
           "kind": "assertion",
@@ -102309,12 +101237,6 @@
               "value": null
             },
             {
-              "locations": [],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": []
-            },
-            {
               "locations": [
                 "$params:"
               ],
@@ -102364,12 +101286,6 @@
               "locations": [],
               "name": "count of xs whose v equals pr named by $params.k",
               "value": null
-            },
-            {
-              "locations": [],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": []
             },
             {
               "locations": [
@@ -102437,12 +101353,6 @@
               "locations": [],
               "name": "count of xs whose v equals $params.q",
               "value": null
-            },
-            {
-              "locations": [],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": []
             }
           ],
           "kind": "assertion",
@@ -102535,12 +101445,6 @@
               "value": null
             },
             {
-              "locations": [],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": []
-            },
-            {
               "locations": [
                 "/prs/0"
               ],
@@ -102598,12 +101502,6 @@
               "locations": [],
               "name": "count of xs whose v equals $params.m named by pr.k",
               "value": null
-            },
-            {
-              "locations": [],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": []
             },
             {
               "locations": [
@@ -102742,22 +101640,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0",
-                "/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ]
-            },
-            {
-              "locations": [
                 "$params:"
               ],
               "name": "$params.k",
@@ -102822,22 +101704,6 @@
               ],
               "name": "count of xs whose v equals pr named by $params.k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0",
-                "/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ]
             },
             {
               "locations": [
@@ -102921,22 +101787,6 @@
               ],
               "name": "count of xs whose v equals $params.q",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0",
-                "/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -103046,22 +101896,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0",
-                "/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0"
               ],
               "name": "pr.z",
@@ -103134,22 +101968,6 @@
               ],
               "name": "count of xs whose v equals $params.m named by pr.k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0",
-                "/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ]
             },
             {
               "locations": [
@@ -103364,22 +102182,6 @@
               ],
               "name": "count of xs whose v equals $params.a.b",
               "value": null
-            },
-            {
-              "locations": [
-                "/arts/0/prs/0/xs/0",
-                "/arts/0/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 5
-                },
-                {
-                  "v": 6
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -103442,22 +102244,6 @@
               ],
               "name": "count of xs whose v equals art.a.b",
               "value": null
-            },
-            {
-              "locations": [
-                "/arts/0/prs/0/xs/0",
-                "/arts/0/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 5
-                },
-                {
-                  "v": 6
-                }
-              ]
             },
             {
               "locations": [
@@ -103536,22 +102322,6 @@
               ],
               "name": "count of xs whose v equals pl.b",
               "value": null
-            },
-            {
-              "locations": [
-                "/arts/0/prs/0/xs/0",
-                "/arts/0/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 5
-                },
-                {
-                  "v": 6
-                }
-              ]
             },
             {
               "locations": [
@@ -103641,22 +102411,6 @@
             },
             {
               "locations": [
-                "/arts/0/prs/0/xs/0",
-                "/arts/0/prs/0/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 5
-                },
-                {
-                  "v": 6
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/arts/0/prs/0/a"
               ],
               "name": "pr.a.b",
@@ -103731,12 +102485,6 @@
               "locations": [],
               "name": "count of xs whose $params.q is at least v",
               "value": null
-            },
-            {
-              "locations": [],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": []
             }
           ],
           "kind": "assertion",
@@ -103872,12 +102620,6 @@
               "locations": [],
               "name": "count of xs whose v is less than $params.q",
               "value": null
-            },
-            {
-              "locations": [],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": []
             }
           ],
           "kind": "assertion",
@@ -103923,18 +102665,6 @@
               ],
               "name": "count of xs whose $params.q is at least v",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/1/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -104074,18 +102804,6 @@
               ],
               "name": "count of xs whose v is less than $params.q",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/1/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -104140,22 +102858,6 @@
               ],
               "name": "count of xs whose $params.q is at least v",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/2/xs/0",
-                "/prs/2/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -104313,22 +103015,6 @@
               ],
               "name": "count of xs whose v is less than $params.q",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/2/xs/0",
-                "/prs/2/xs/1"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -105060,18 +103746,6 @@
               ],
               "name": "count of xs whose $params.q does not exist",
               "value": 1
-            },
-            {
-              "locations": [
-                "/prs/1/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -105125,12 +103799,6 @@
               "locations": [],
               "name": "count of xs whose v equals $params.m named by $params.k",
               "value": 0
-            },
-            {
-              "locations": [],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": []
             }
           ],
           "kind": "assertion",
@@ -105244,18 +103912,6 @@
               ],
               "name": "count of xs whose v equals $params.m named by $params.k",
               "value": 0
-            },
-            {
-              "locations": [
-                "/prs/2/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 2
-                }
-              ]
             }
           ],
           "kind": "assertion",
@@ -105330,18 +103986,6 @@
               ],
               "name": "count of xs whose v equals $params.m named by pr.k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -105430,18 +104074,6 @@
             },
             {
               "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/0"
               ],
               "name": "k",
@@ -105524,18 +104156,6 @@
               ],
               "name": "count of xs whose v equals $params.m named by pr.k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/1/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -105624,18 +104244,6 @@
             },
             {
               "locations": [
-                "/prs/1/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/prs/1/k"
               ],
               "name": "k",
@@ -105721,18 +104329,6 @@
             },
             {
               "locations": [
-                "/prs/2/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "$params:"
               ],
               "name": "$params.m named by pr.k",
@@ -105815,18 +104411,6 @@
               ],
               "name": "count of xs whose v equals pr named by pr.k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/2/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -106097,18 +104681,6 @@
             },
             {
               "locations": [
-                "/prs/4/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "$params:"
               ],
               "name": "$params.m named by pr.k",
@@ -106191,18 +104763,6 @@
               ],
               "name": "count of xs whose v equals pr named by pr.k",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/4/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [
@@ -106290,18 +104850,6 @@
               ],
               "name": "count of xs whose v equals pl.x",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
             },
             {
               "locations": [

@@ -4843,26 +4843,6 @@
                   },
                   {
                     "locations": [
-                      "/0/items/0",
-                      "/0/items/1"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "tags": [
-                          "a"
-                        ]
-                      },
-                      {
-                        "tags": [
-                          "b"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       ""
                     ],
                     "name": "$input.k",
@@ -5005,26 +4985,6 @@
                   },
                   {
                     "locations": [
-                      "/0/items/0",
-                      "/0/items/1"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "tags": [
-                          "a"
-                        ]
-                      },
-                      {
-                        "tags": [
-                          "b"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       ""
                     ],
                     "name": "$input.k",
@@ -5113,20 +5073,6 @@
                     ],
                     "name": "count of items whose tags contains $input.r.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "tags": [
-                          "a"
-                        ]
-                      }
-                    ]
                   },
                   {
                     "locations": [

@@ -130,26 +130,6 @@
                     ],
                     "name": "count of findings",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/findings/0",
-                      "/releases/0/findings/1",
-                      "/releases/0/findings/2"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": 1
-                      },
-                      {
-                        "id": 2
-                      },
-                      {
-                        "id": 3
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -231,12 +211,6 @@
                     "locations": [],
                     "name": "count of findings",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -871,18 +845,6 @@
                     ],
                     "name": "count of findings whose severity is \"high\"",
                     "value": 0
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/findings/0"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "severity": "low"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -1028,22 +990,6 @@
                     ],
                     "name": "count of findings whose severity is \"high\"",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/findings/0",
-                      "/releases/0/findings/1"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "severity": "high"
-                      },
-                      {
-                        "severity": 5
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -1132,20 +1078,6 @@
                     ],
                     "name": "count of findings whose severity is \"high\"",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/findings/0",
-                      "/releases/0/findings/1"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "severity": "high"
-                      },
-                      {}
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -1234,22 +1166,6 @@
                     ],
                     "name": "count of findings whose severity is \"high\"",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/findings/0",
-                      "/releases/0/findings/1"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "severity": "high"
-                      },
-                      {
-                        "severity": null
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -1681,12 +1597,6 @@
                     "locations": [],
                     "name": "count of pull_requests.commits",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "pull_requests[].commits[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -1750,12 +1660,6 @@
                     "locations": [],
                     "name": "count of pull_requests.commits",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "pull_requests[].commits",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -1833,18 +1737,6 @@
                     ],
                     "name": "count of pull_requests.commits",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/pull_requests/0/commits/0"
-                    ],
-                    "name": "pull_requests[].commits[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "sha": "a"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -1932,18 +1824,6 @@
                     ],
                     "name": "count of pull_requests.commits",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/pull_requests/0/commits/0"
-                    ],
-                    "name": "pull_requests[].commits[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "sha": "a"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2031,18 +1911,6 @@
                     ],
                     "name": "count of pull_requests.commits",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/pull_requests/0/commits/0"
-                    ],
-                    "name": "pull_requests[].commits[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "sha": "a"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2289,18 +2157,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": 35
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      10,
-                      25
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2373,12 +2229,6 @@
                     "locations": [],
                     "name": "sum of items.usd",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -2453,18 +2303,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      10,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2550,18 +2388,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      10,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2647,18 +2473,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      10,
-                      "20"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -2744,18 +2558,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      10,
-                      true
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -3085,20 +2887,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1",
-                      "/releases/0/items/2/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      null,
-                      null,
-                      "x"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -4302,16 +4090,6 @@
                     ],
                     "name": "sum of xs",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      1000000000000000
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -4510,18 +4288,6 @@
                     ],
                     "name": "sum of xs",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/xs/0",
-                      "/releases/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      0.123456789012345,
-                      100
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -4740,18 +4506,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": 1.6
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      0.7,
-                      0.9
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -4834,18 +4588,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -4984,16 +4726,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      "x"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -5166,18 +4898,6 @@
                   },
                   {
                     "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      0.1,
-                      0.2
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/releases/0/total"
                     ],
                     "name": "total",
@@ -5278,18 +4998,6 @@
                   },
                   {
                     "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      0.1,
-                      0.2
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/releases/0"
                     ],
                     "name": "total",
@@ -5383,16 +5091,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      null
-                    ]
                   },
                   {
                     "locations": [
@@ -7702,22 +7400,6 @@
                   },
                   {
                     "locations": [
-                      "/releases/0/findings/0",
-                      "/releases/0/findings/1"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": 0
-                      },
-                      {
-                        "id": 1
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/releases/0"
                     ],
                     "name": "limit",
@@ -8013,22 +7695,6 @@
                   },
                   {
                     "locations": [
-                      "/releases/0/findings/0",
-                      "/releases/0/findings/1"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": 0
-                      },
-                      {
-                        "id": 1
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/releases/0/limit"
                     ],
                     "name": "limit",
@@ -8149,22 +7815,6 @@
                     ],
                     "name": "count of findings",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/findings/0",
-                      "/releases/0/findings/1"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": 0
-                      },
-                      {
-                        "id": 1
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -8337,18 +7987,6 @@
                     ],
                     "name": "count of findings",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/findings/0"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": 0
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -8577,26 +8215,6 @@
                     ],
                     "name": "count of findings",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/findings/0",
-                      "/releases/0/findings/1",
-                      "/releases/0/findings/2"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": 0
-                      },
-                      {
-                        "id": 1
-                      },
-                      {
-                        "id": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -8709,22 +8327,6 @@
                     ],
                     "name": "count of findings",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/findings/0",
-                      "/releases/0/findings/1"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": 0
-                      },
-                      {
-                        "id": 1
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -8954,22 +8556,6 @@
                     ],
                     "name": "count of findings",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/findings/0",
-                      "/releases/0/findings/1"
-                    ],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": 0
-                      },
-                      {
-                        "id": 1
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -9138,18 +8724,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": 9
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      4,
-                      5
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -9230,16 +8804,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      "x"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -10653,16 +10217,6 @@
                     ],
                     "name": "count of $params.approvers",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "$params:/approvers/0"
-                    ],
-                    "name": "$params.approvers[]",
-                    "outcome": "usable",
-                    "value": [
-                      "ann"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -10758,12 +10312,6 @@
                     "locations": [],
                     "name": "count of $params.approvers",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.approvers[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -11600,22 +11148,6 @@
                     ],
                     "name": "count of x",
                     "value": 4
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/x/0",
-                      "/releases/0/x/1",
-                      "/releases/0/x/2",
-                      "/releases/0/x/3"
-                    ],
-                    "name": "x[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2,
-                      3,
-                      4
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -11695,12 +11227,6 @@
                     "locations": [],
                     "name": "count of x",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "x[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -12156,12 +11682,6 @@
                     "locations": [],
                     "name": "sum of items.usd",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -12238,18 +11758,6 @@
                     ],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0/usd",
-                      "/releases/0/items/1/usd"
-                    ],
-                    "name": "items[].usd",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      "2"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -12840,16 +12348,6 @@
                     ],
                     "name": "count of xs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0"
-                    ],
-                    "name": "xs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -12902,18 +12400,6 @@
                     ],
                     "name": "count of xs.n",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/things/1/xs/0/n",
-                      "/things/1/xs/1/n"
-                    ],
-                    "name": "xs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -13013,18 +12499,6 @@
                     ],
                     "name": "count of xs whose k is in $params.missing",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "k": "a"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -13124,12 +12598,6 @@
                     "locations": [],
                     "name": "count of xs whose k is in $params.missing",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -13175,18 +12643,6 @@
                     ],
                     "name": "count of xs whose k is in $params.missing",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/1/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "k": "a"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -18912,24 +18368,6 @@
                     ],
                     "name": "count of xs whose days elapsed from started to ended is 1",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/vulns/0/xs/0",
-                      "/vulns/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "ended": 86400,
-                        "started": 0
-                      },
-                      {
-                        "ended": 172800,
-                        "started": 0
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -19104,23 +18542,6 @@
                     ],
                     "name": "count of xs whose days elapsed from started to ended is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/vulns/0/xs/0",
-                      "/vulns/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "ended": 86400,
-                        "started": 0
-                      },
-                      {
-                        "started": 0
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -19314,23 +18735,6 @@
                     ],
                     "name": "count of prs whose count of reviews is at least 2",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/prs/0",
-                      "/releases/0/prs/1"
-                    ],
-                    "name": "prs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "reviews": [
-                          1,
-                          2
-                        ]
-                      },
-                      {}
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20252,12 +19656,6 @@
                     "locations": [],
                     "name": "count of findings",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "findings[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -20849,16 +20247,6 @@
                     ],
                     "name": "count of xs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0"
-                    ],
-                    "name": "xs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20950,16 +20338,6 @@
                     ],
                     "name": "sum of xs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0"
-                    ],
-                    "name": "xs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -21062,19 +20440,6 @@
                     ],
                     "name": "count of items whose k is \"a\"",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "k": null,
-                        "x": "ab"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -21157,18 +20522,6 @@
                     ],
                     "name": "count of items whose k is \"a\"",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "x": "ab"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -21250,18 +20603,6 @@
                     ],
                     "name": "count of items whose k is \"a\"",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/releases/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "k": null
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -21718,22 +21059,6 @@
                     ],
                     "name": "count of rs whose v.y equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rs/0",
-                      "/things/0/rs/1"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": 4
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -22219,22 +21544,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/rs/0",
-                      "/things/0/rs/1"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": 4
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/k"
                     ],
                     "name": "$input.k",
@@ -22698,22 +22007,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/rs/0",
-                      "/things/0/rs/1"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": 4
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/k"
                     ],
                     "name": "$input.k",
@@ -22790,12 +22083,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -22848,22 +22135,6 @@
                     ],
                     "name": "count of rs whose zz equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rs/0",
-                      "/things/0/rs/1"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": 4
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -22931,20 +22202,6 @@
                     ],
                     "name": "count of ns whose zz equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/ns/0",
-                      "/things/0/ns/1"
-                    ],
-                    "name": "ns[]",
-                    "outcome": "usable",
-                    "value": [
-                      "a",
-                      {
-                        "v": 1
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23002,22 +22259,6 @@
                     ],
                     "name": "count of rs whose zz equals $input.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rs/0",
-                      "/things/0/rs/1"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": 4
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -23113,12 +22354,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       ""
                     ],
@@ -23171,20 +22406,6 @@
                     ],
                     "name": "count of ns whose zz equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/ns/0",
-                      "/things/0/ns/1"
-                    ],
-                    "name": "ns[]",
-                    "outcome": "usable",
-                    "value": [
-                      "a",
-                      {
-                        "v": 1
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23242,22 +22463,6 @@
                     ],
                     "name": "count of rs whose zz equals $input.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rs/0",
-                      "/things/0/rs/1"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": 4
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -23357,22 +22562,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/rs/0",
-                      "/things/0/rs/1"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": 4
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/k"
                     ],
                     "name": "$input.k",
@@ -23437,22 +22626,6 @@
                     ],
                     "name": "count of rs whose zz equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rs/0",
-                      "/things/0/rs/1"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": 4
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -23532,12 +22705,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       ""
                     ],
@@ -23589,12 +22756,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       ""
                     ],
@@ -23644,12 +22805,6 @@
                     "locations": [],
                     "name": "count of es whose v is in m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -23710,12 +22865,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -23767,12 +22916,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -23822,12 +22965,6 @@
                     "locations": [],
                     "name": "count of es whose v is in m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -23888,12 +23025,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -23945,12 +23076,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -24000,12 +23125,6 @@
                     "locations": [],
                     "name": "count of es whose v is in m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -24066,12 +23185,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -24123,12 +23236,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -24178,12 +23285,6 @@
                     "locations": [],
                     "name": "count of es whose v is in m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -24244,12 +23345,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -24301,12 +23396,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -24356,12 +23445,6 @@
                     "locations": [],
                     "name": "count of es whose v is in m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -24422,12 +23505,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -24479,12 +23556,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -24534,12 +23605,6 @@
                     "locations": [],
                     "name": "count of es whose v is in m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -24651,30 +23716,6 @@
                     ],
                     "name": "count of xs whose tags contains $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": "a",
-                        "tags": {
-                          "a": [
-                            "x"
-                          ]
-                        }
-                      },
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -24796,30 +23837,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": "a",
-                        "tags": {
-                          "a": [
-                            "x"
-                          ]
-                        }
-                      },
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/m"
                     ],
                     "name": "$input.m",
@@ -24933,27 +23950,6 @@
                     ],
                     "name": "count of xs whose tags contains $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -25071,28 +24067,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": null,
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/m"
                     ],
                     "name": "$input.m",
@@ -25182,12 +24156,6 @@
                     "locations": [],
                     "name": "count of es whose zz equals m named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -25346,27 +24314,6 @@
                   },
                   {
                     "locations": [
-                      "/arts/0/xs/0",
-                      "/arts/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/arts/0/m"
                     ],
                     "name": "art.m",
@@ -25456,12 +24403,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -25511,12 +24452,6 @@
                     "locations": [],
                     "name": "count of es whose zz equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -26019,27 +24954,6 @@
                   },
                   {
                     "locations": [
-                      "/arts/0/ws/0/xs/0",
-                      "/arts/0/ws/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/arts/0/m"
                     ],
                     "name": "art.m",
@@ -26175,24 +25089,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      null,
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ],
-                        "v": "x"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       ""
                     ],
                     "name": "$input.d.m",
@@ -26267,24 +25163,6 @@
                     ],
                     "name": "count of xs whose tags contains $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      null,
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ],
-                        "v": "x"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -26400,29 +25278,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": 3,
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ],
-                        "v": "x"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       ""
                     ],
                     "name": "$input.d.m",
@@ -26502,29 +25357,6 @@
                     ],
                     "name": "count of xs whose tags contains $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": 3,
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ],
-                        "v": "x"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -26643,26 +25475,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/d"
                     ],
                     "name": "$input.d.m",
@@ -26739,26 +25551,6 @@
                     ],
                     "name": "count of xs whose tags contains $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -28339,12 +27131,6 @@
                     "value": 0
                   },
                   {
-                    "locations": [],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/m"
                     ],
@@ -28556,28 +27342,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": "a",
-                        "tags": "x",
-                        "v": 4
-                      },
-                      {
-                        "key": "b",
-                        "tags": [
-                          "x"
-                        ],
-                        "v": "x"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/m"
                     ],
                     "name": "$input.m",
@@ -28656,28 +27420,6 @@
                     ],
                     "name": "count of xs whose v matches $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": "a",
-                        "tags": "x",
-                        "v": 4
-                      },
-                      {
-                        "key": "b",
-                        "tags": [
-                          "x"
-                        ],
-                        "v": "x"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -28791,23 +27533,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x",
-                          1
-                        ],
-                        "v": "x"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/m"
                     ],
                     "name": "$input.m",
@@ -28879,23 +27604,6 @@
                     ],
                     "name": "count of xs whose v matches $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x",
-                          1
-                        ],
-                        "v": "x"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -29003,24 +27711,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1",
-                      "/things/0/xs/2",
-                      "/things/0/xs/3",
-                      "/things/0/xs/4"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      null,
-                      1,
-                      "t",
-                      null,
-                      2
-                    ]
-                  },
-                  {
-                    "locations": [
                       ""
                     ],
                     "name": "$input.m",
@@ -29101,24 +27791,6 @@
                     ],
                     "name": "count of xs whose v matches $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1",
-                      "/things/0/xs/2",
-                      "/things/0/xs/3",
-                      "/things/0/xs/4"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      null,
-                      1,
-                      "t",
-                      null,
-                      2
-                    ]
                   },
                   {
                     "locations": [
@@ -29240,32 +27912,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": [
-                          "item 2 of xs: y; z"
-                        ],
-                        "tags": {
-                          "a; b, and c": 1
-                        },
-                        "v": "x"
-                      },
-                      {
-                        "key": "b; c, and d",
-                        "tags": [
-                          "x"
-                        ],
-                        "v": "p; q, and r"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/m"
                     ],
                     "name": "$input.m",
@@ -29348,32 +27994,6 @@
                     ],
                     "name": "count of xs whose v matches $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": [
-                          "item 2 of xs: y; z"
-                        ],
-                        "tags": {
-                          "a; b, and c": 1
-                        },
-                        "v": "x"
-                      },
-                      {
-                        "key": "b; c, and d",
-                        "tags": [
-                          "x"
-                        ],
-                        "v": "p; q, and r"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -29504,36 +28124,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1",
-                      "/things/0/xs/2",
-                      "/things/0/xs/3"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "key": null,
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "key": 3,
-                        "tags": null
-                      },
-                      {
-                        "key": "a"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/m"
                     ],
                     "name": "$input.m",
@@ -29624,36 +28214,6 @@
                     ],
                     "name": "count of xs whose v matches $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1",
-                      "/things/0/xs/2",
-                      "/things/0/xs/3"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "key": null,
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "key": 3,
-                        "tags": null
-                      },
-                      {
-                        "key": "a"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -29806,30 +28366,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ],
-                        "v": "x"
-                      },
-                      {
-                        "key": "b",
-                        "tags": [
-                          "x"
-                        ],
-                        "v": "x"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       ""
                     ],
                     "name": "$input.m",
@@ -29966,24 +28502,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      null,
-                      {
-                        "key": 3,
-                        "tags": [
-                          "x"
-                        ],
-                        "v": "x"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/m"
                     ],
                     "name": "$input.m",
@@ -30111,20 +28629,6 @@
                     ],
                     "name": "count of xs.v whose tags contains $input.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0/v",
-                      "/things/0/xs/1/v",
-                      "/things/0/xs/2"
-                    ],
-                    "name": "xs[].v",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      null,
-                      null
-                    ]
                   },
                   {
                     "locations": [
@@ -30513,29 +29017,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1",
-                      "/things/0/xs/2"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      null,
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/things/0/c"
                     ],
                     "name": "cov.m",
@@ -30659,29 +29140,6 @@
                     ],
                     "name": "count of xs whose tags contains cov.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1",
-                      "/things/0/xs/2"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      null,
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -30839,29 +29297,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1",
-                      "/things/0/xs/2"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      null,
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/things/0/c/d"
                     ],
                     "name": "cov.m",
@@ -30986,29 +29421,6 @@
                     ],
                     "name": "count of xs whose tags contains cov.m named by key",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/xs/0",
-                      "/things/0/xs/1",
-                      "/things/0/xs/2"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      null,
-                      {
-                        "key": "a",
-                        "tags": [
-                          "x"
-                        ]
-                      },
-                      {
-                        "tags": [
-                          "x"
-                        ]
-                      }
-                    ]
                   },
                   {
                     "locations": [

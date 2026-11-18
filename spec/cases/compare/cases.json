@@ -5624,18 +5624,6 @@
                     ],
                     "name": "count of items whose w is at least $params.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "w": 3
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -6846,18 +6834,6 @@
                     ],
                     "name": "count of items whose w is at least $params.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "w": 3
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -8074,18 +8050,6 @@
                     ],
                     "name": "count of items whose w is at least $params.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "w": 3
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -9240,18 +9204,6 @@
                     ],
                     "name": "count of items whose w is at least $params.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "w": 3
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -10884,18 +10836,6 @@
                     ],
                     "name": "count of $params.objs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:/objs/0/n",
-                      "$params:/objs/1"
-                    ],
-                    "name": "$params.objs[].n",
-                    "outcome": "unusable",
-                    "value": [
-                      1,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -10951,18 +10891,6 @@
                     ],
                     "name": "sum of $params.objs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:/objs/0/n",
-                      "$params:/objs/1"
-                    ],
-                    "name": "$params.objs[].n",
-                    "outcome": "unusable",
-                    "value": [
-                      1,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -11620,18 +11548,6 @@
                     ],
                     "name": "count of $params.objs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:/objs/0/n",
-                      "$params:/objs/1"
-                    ],
-                    "name": "$params.objs[].n",
-                    "outcome": "unusable",
-                    "value": [
-                      1,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -11688,18 +11604,6 @@
                     ],
                     "name": "sum of $params.objs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:/objs/0/n",
-                      "$params:/objs/1"
-                    ],
-                    "name": "$params.objs[].n",
-                    "outcome": "unusable",
-                    "value": [
-                      1,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",

@@ -10277,18 +10277,6 @@
                     ],
                     "name": "count of rows whose v is in os.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -10349,19 +10337,6 @@
                     ],
                     "name": "count of rows whose v is in os.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "os": null,
-                        "v": "a"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",

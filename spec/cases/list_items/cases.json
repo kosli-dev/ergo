@@ -2534,19 +2534,6 @@
                     ],
                     "name": "count of rows whose v is in os.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -3432,19 +3419,6 @@
                     ],
                     "name": "count of rows whose v is in os.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "ann"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -3524,19 +3498,6 @@
                     ],
                     "name": "count of rows whose v is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "ann"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -4383,19 +4344,6 @@
                     ],
                     "name": "count of rows whose v is in os.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "ann"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -4475,19 +4423,6 @@
                     ],
                     "name": "count of rows whose v is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "ann"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -6126,24 +6061,6 @@
                   },
                   {
                     "locations": [
-                      "/cs/0/rows/0",
-                      "/cs/0/rows/1"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      },
-                      {
-                        "n": 2,
-                        "v": "ann"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1/name"
                     ],
@@ -6399,24 +6316,6 @@
                     ],
                     "name": "count of rows whose v is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/cs/0/rows/0",
-                      "/cs/0/rows/1"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      },
-                      {
-                        "n": 2,
-                        "v": "ann"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -6758,24 +6657,6 @@
                   },
                   {
                     "locations": [
-                      "/cs/0/rows/0",
-                      "/cs/0/rows/1"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      },
-                      {
-                        "n": 2,
-                        "v": "ann"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1/name"
                     ],
@@ -7114,24 +6995,6 @@
                   },
                   {
                     "locations": [
-                      "/cs/0/rows/0",
-                      "/cs/0/rows/1"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      },
-                      {
-                        "n": 2,
-                        "v": "ann"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0",
                       "/cs/0/os/1"
                     ],
@@ -7467,24 +7330,6 @@
                     ],
                     "name": "count of rows whose v is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/cs/0/rows/0",
-                      "/cs/0/rows/1"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      },
-                      {
-                        "n": 2,
-                        "v": "ann"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -8275,22 +8120,6 @@
                   },
                   {
                     "locations": [
-                      "/prs/0/xs/0",
-                      "/prs/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": "b"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/prs/0/c/0/z"
                     ],
                     "name": "pl[].z",
@@ -8449,22 +8278,6 @@
                     ],
                     "name": "count of xs whose v matches pl.z",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0",
-                      "/prs/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": "b"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -8684,22 +8497,6 @@
                   },
                   {
                     "locations": [
-                      "/prs/0/xs/0",
-                      "/prs/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": "b"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/prs/0/c/0/z",
                       "/prs/0/c/1/z"
                     ],
@@ -8913,22 +8710,6 @@
                     ],
                     "name": "count of xs whose v matches pl.z",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0",
-                      "/prs/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": "b"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -9148,22 +8929,6 @@
                   },
                   {
                     "locations": [
-                      "/prs/0/xs/0",
-                      "/prs/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      },
-                      {
-                        "v": "b"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/prs/0/c"
                     ],
                     "name": "pl.z",
@@ -9323,22 +9088,6 @@
                   },
                   {
                     "locations": [
-                      "/arts/0/xs/0/ys/0",
-                      "/arts/0/xs/0/ys/1"
-                    ],
-                    "name": "ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": "a"
-                      },
-                      {
-                        "n": "b"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/arts/0/c/0/z"
                     ],
                     "name": "art.cov[].z",
@@ -9442,22 +9191,6 @@
                     ],
                     "name": "count of ys whose n matches art.cov.z",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/arts/0/xs/0/ys/0",
-                      "/arts/0/xs/0/ys/1"
-                    ],
-                    "name": "ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": "a"
-                      },
-                      {
-                        "n": "b"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -9571,22 +9304,6 @@
                   },
                   {
                     "locations": [
-                      "/arts/0/xs/0/ys/0",
-                      "/arts/0/xs/0/ys/1"
-                    ],
-                    "name": "ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": "a"
-                      },
-                      {
-                        "n": "b"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/arts/0/c/0/z",
                       "/arts/0/c/1/z"
                     ],
@@ -9694,22 +9411,6 @@
                     ],
                     "name": "count of ys whose n matches art.cov.z",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/arts/0/xs/0/ys/0",
-                      "/arts/0/xs/0/ys/1"
-                    ],
-                    "name": "ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": "a"
-                      },
-                      {
-                        "n": "b"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -9823,22 +9524,6 @@
                   },
                   {
                     "locations": [
-                      "/arts/0/xs/0/ys/0",
-                      "/arts/0/xs/0/ys/1"
-                    ],
-                    "name": "ys[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": "a"
-                      },
-                      {
-                        "n": "b"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/arts/0/c"
                     ],
                     "name": "art.cov.z",
@@ -9944,22 +9629,6 @@
                     ],
                     "name": "count of rows whose v matches pos.p",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/cs/0/rows/0",
-                      "/cs/0/rows/1"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "abc"
-                      },
-                      {
-                        "v": 5
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -10295,22 +9964,6 @@
                   },
                   {
                     "locations": [
-                      "/cs/0/kids/0/rows/0",
-                      "/cs/0/kids/0/rows/1"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "abc"
-                      },
-                      {
-                        "v": 5
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/p",
                       "/cs/0/os/1/p"
                     ],
@@ -10631,22 +10284,6 @@
                   },
                   {
                     "locations": [
-                      "/cs/0/kids/0/rows/0",
-                      "/cs/0/kids/0/rows/1"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "abc"
-                      },
-                      {
-                        "v": 5
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/p",
                       "/cs/0/os/1/p"
                     ],
@@ -10790,18 +10427,6 @@
                   },
                   {
                     "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1/name"
                     ],
@@ -10908,18 +10533,6 @@
                     ],
                     "name": "count of rows whose v is in $params.os.name and whose v is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -11131,18 +10744,6 @@
                   },
                   {
                     "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1"
                     ],
@@ -11247,18 +10848,6 @@
                     ],
                     "name": "count of rows whose v is in $params.os.name and whose v is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -11503,18 +11092,6 @@
                   },
                   {
                     "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1/name"
                     ],
@@ -11621,18 +11198,6 @@
                     ],
                     "name": "count of rows whose v is in $params.os.name and whose v is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -11844,18 +11409,6 @@
                   },
                   {
                     "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1"
                     ],
@@ -11960,18 +11513,6 @@
                     ],
                     "name": "count of rows whose v is in $params.os.name and whose v is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -12209,18 +11750,6 @@
                   },
                   {
                     "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1/name"
                     ],
@@ -12327,18 +11856,6 @@
                     ],
                     "name": "count of rows whose v is in $params.os.name and whose v is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -12550,18 +12067,6 @@
                   },
                   {
                     "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1"
                     ],
@@ -12666,18 +12171,6 @@
                     ],
                     "name": "count of rows whose v is in $params.os.name and whose v is in pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -13061,18 +12554,6 @@
                     ],
                     "name": "count of rows whose v is in pn",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "bob"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -13707,19 +13188,6 @@
                     "value": 0
                   },
                   {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
-                  },
-                  {
                     "locations": [],
                     "name": "$input.lst[].name",
                     "outcome": "usable",
@@ -13831,19 +13299,6 @@
                     ],
                     "name": "count of rows whose n equals count of pl.name",
                     "value": 0
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
                   },
                   {
                     "locations": [],
@@ -14009,19 +13464,6 @@
                   },
                   {
                     "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       ""
                     ],
                     "name": "$input.lst.name",
@@ -14134,19 +13576,6 @@
                     ],
                     "name": "count of rows whose n equals count of pl.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -14305,19 +13734,6 @@
                   },
                   {
                     "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/lst"
                     ],
                     "name": "$input.lst.name",
@@ -14432,19 +13848,6 @@
                     ],
                     "name": "count of rows whose n equals count of pl.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -14605,19 +14008,6 @@
                   },
                   {
                     "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/lst"
                     ],
                     "name": "$input.lst.name",
@@ -14732,19 +14122,6 @@
                     ],
                     "name": "count of rows whose n equals count of pl.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -14908,19 +14285,6 @@
                     ],
                     "name": "count of rows whose v is in pos.name and whose w equals pos.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/cs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a",
-                        "w": "a"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -15196,12 +14560,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/lst/0/k",
                       "/lst/1"
@@ -15275,12 +14633,6 @@
                     "locations": [],
                     "name": "count of rows whose n equals count of pl.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -15373,12 +14725,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/lst/0/k",
                       "/lst/1"
@@ -15452,12 +14798,6 @@
                     "locations": [],
                     "name": "count of rows whose n equals count of pl.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -15550,12 +14890,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/lst/0",
                       "/lst/1"
@@ -15627,12 +14961,6 @@
                     "locations": [],
                     "name": "count of rows whose n equals count of pl.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -15820,12 +15148,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/lst"
                     ],
@@ -15886,12 +15208,6 @@
                     "locations": [],
                     "name": "count of rows whose n equals count of pl.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -15971,18 +15287,6 @@
                     ],
                     "name": "count of rows whose n equals count of $input.lst.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -16072,18 +15376,6 @@
                     ],
                     "name": "count of rows whose n equals count of pl.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -16193,12 +15485,6 @@
                     "locations": [],
                     "name": "count of rows whose n equals count of $params.lst.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -16253,18 +15539,6 @@
                     ],
                     "name": "count of rows whose n equals count of $params.lst.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -16337,12 +15611,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/cs/0/os/0/k",
                       "/cs/0/os/1"
@@ -16411,12 +15679,6 @@
                     "locations": [],
                     "name": "count of rows whose n equals count of c.pos.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -16504,12 +15766,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/cs/0/os/0/k",
                       "/cs/0/os/1"
@@ -16578,12 +15834,6 @@
                     "locations": [],
                     "name": "count of rows whose n equals count of c.pos.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -16671,12 +15921,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/cs/0/os"
                     ],
@@ -16737,12 +15981,6 @@
                     "locations": [],
                     "name": "count of rows whose n equals count of c.pos.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -17204,19 +16442,6 @@
                     ],
                     "name": "count of rows whose n equals count of $params.lst.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -17292,19 +16517,6 @@
                     ],
                     "name": "count of rows whose n equals count of $params.lst.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -17380,19 +16592,6 @@
                     ],
                     "name": "count of rows whose n equals count of $params.lst.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -18085,16 +17284,6 @@
                     ],
                     "name": "count of tags whose $input.k is in tags",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/tags/0"
-                    ],
-                    "name": "tags[]",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
                   },
                   {
                     "locations": [
@@ -24254,16 +23443,6 @@
                   },
                   {
                     "locations": [
-                      "/0/tags/0"
-                    ],
-                    "name": "tags[]",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/0/n",
                       "/0/m"
                     ],
@@ -24360,16 +23539,6 @@
                     ],
                     "name": "count of tags",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/0/tags/0"
-                    ],
-                    "name": "tags[]",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
                   },
                   {
                     "locations": [
@@ -24828,12 +23997,6 @@
                     "value": 0
                   },
                   {
-                    "locations": [],
-                    "name": "tags[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/0/n",
                       "/0"
@@ -24923,12 +24086,6 @@
                     "locations": [],
                     "name": "count of tags",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "tags[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -25544,23 +24701,6 @@
                   },
                   {
                     "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "t.rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/0/m"
                     ],
                     "name": "t.m named by $input.k",
@@ -26010,23 +25150,6 @@
                   },
                   {
                     "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/0/n",
                       "/0/m"
                     ],
@@ -26130,16 +25253,6 @@
                     ],
                     "name": "count of rs.v that equals $params.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/v"
-                    ],
-                    "name": "rs[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -26191,23 +25304,6 @@
                     ],
                     "name": "count of rs whose v equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -26644,16 +25740,6 @@
                     ],
                     "name": "sum of rs.n that is at least $params.q named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/n"
-                    ],
-                    "name": "rs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -26705,16 +25791,6 @@
                     ],
                     "name": "sum of rs.n whose $params.q named by $input.k is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/n"
-                    ],
-                    "name": "rs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -27084,23 +26160,6 @@
                     ],
                     "name": "count of t.rs whose v equals t.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "t.rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -27553,23 +26612,6 @@
                   },
                   {
                     "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/0/n",
                       "/0/m"
                     ],
@@ -27673,16 +26715,6 @@
                     ],
                     "name": "count of rs.v that equals $params.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/v"
-                    ],
-                    "name": "rs[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -27734,23 +26766,6 @@
                     ],
                     "name": "count of rs whose v equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -28187,16 +27202,6 @@
                     ],
                     "name": "sum of rs.n that is at least $params.q named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/n"
-                    ],
-                    "name": "rs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -28248,16 +27253,6 @@
                     ],
                     "name": "sum of rs.n whose $params.q named by $input.k is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/n"
-                    ],
-                    "name": "rs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -28627,23 +27622,6 @@
                     ],
                     "name": "count of t.rs whose v equals t.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "t.rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -29096,23 +28074,6 @@
                   },
                   {
                     "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/0/n",
                       "/0/m"
                     ],
@@ -29216,16 +28177,6 @@
                     ],
                     "name": "count of rs.v that equals $params.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/v"
-                    ],
-                    "name": "rs[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -29277,23 +28228,6 @@
                     ],
                     "name": "count of rs whose v equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -29730,16 +28664,6 @@
                     ],
                     "name": "sum of rs.n that is at least $params.q named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/n"
-                    ],
-                    "name": "rs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -29791,16 +28715,6 @@
                     ],
                     "name": "sum of rs.n whose $params.q named by $input.k is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/n"
-                    ],
-                    "name": "rs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -30170,23 +29084,6 @@
                     ],
                     "name": "count of t.rs whose v equals t.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "t.rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -30639,23 +29536,6 @@
                   },
                   {
                     "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/0/n",
                       "/0/m"
                     ],
@@ -30759,16 +29639,6 @@
                     ],
                     "name": "count of rs.v that equals $params.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/v"
-                    ],
-                    "name": "rs[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -30820,23 +29690,6 @@
                     ],
                     "name": "count of rs whose v equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "id": "r1",
-                        "n": 1,
-                        "tags": [
-                          "a"
-                        ],
-                        "v": "a"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -31273,16 +30126,6 @@
                     ],
                     "name": "sum of rs.n that is at least $params.q named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/n"
-                    ],
-                    "name": "rs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -31334,16 +30177,6 @@
                     ],
                     "name": "sum of rs.n whose $params.q named by $input.k is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/n"
-                    ],
-                    "name": "rs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -31829,24 +30662,6 @@
                   },
                   {
                     "locations": [
-                      "/0/rs/0",
-                      "/0/rs/1"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "v": "a"
-                      },
-                      {
-                        "n": 2,
-                        "v": "b"
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/0",
                       "$params:"
                     ],
@@ -31961,24 +30776,6 @@
                     ],
                     "name": "count of rs",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0",
-                      "/0/rs/1"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "v": "a"
-                      },
-                      {
-                        "n": 2,
-                        "v": "b"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -32099,18 +30896,6 @@
                   },
                   {
                     "locations": [
-                      "/0/rs/0/v",
-                      "/0/rs/1/v"
-                    ],
-                    "name": "rs[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a",
-                      "b"
-                    ]
-                  },
-                  {
-                    "locations": [
                       ""
                     ],
                     "name": "$input.k",
@@ -32174,18 +30959,6 @@
                   },
                   {
                     "locations": [
-                      "/0/rs/0/v",
-                      "/0/rs/1/v"
-                    ],
-                    "name": "rs[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a",
-                      "b"
-                    ]
-                  },
-                  {
-                    "locations": [
                       ""
                     ],
                     "name": "$input.k",
@@ -32246,24 +31019,6 @@
                     ],
                     "name": "count of rs whose v equals $params.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0",
-                      "/0/rs/1"
-                    ],
-                    "name": "rs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "v": "a"
-                      },
-                      {
-                        "n": 2,
-                        "v": "b"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -32342,18 +31097,6 @@
                     ],
                     "name": "sum of rs.n",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/n",
-                      "/0/rs/1/n"
-                    ],
-                    "name": "rs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
                   },
                   {
                     "locations": [
@@ -32442,18 +31185,6 @@
                     ],
                     "name": "sum of rs.n that is at least $params.q named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/0/rs/0/n",
-                      "/0/rs/1/n"
-                    ],
-                    "name": "rs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
                   },
                   {
                     "locations": [

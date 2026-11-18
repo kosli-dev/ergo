@@ -8954,19 +8954,6 @@
                     "value": 0
                   },
                   {
-                    "locations": [
-                      "/repos/0/deps/0"
-                    ],
-                    "name": "deps[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "name": "click"
-                      }
-                    ]
-                  },
-                  {
                     "locations": [],
                     "name": "$input.sbom.components[].name",
                     "outcome": "usable",
@@ -9038,19 +9025,6 @@
                     ],
                     "name": "count of deps whose name is in $input.sbom.components.name",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/repos/0/deps/0"
-                    ],
-                    "name": "deps[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "name": "click"
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -12707,20 +12681,6 @@
                       "name": "lock"
                     },
                     "value": 5
-                  },
-                  {
-                    "locations": [
-                      "/repos/0/lockfile/pkgs/0/n"
-                    ],
-                    "name": "lock.pkgs[].n",
-                    "outcome": "usable",
-                    "part": {
-                      "id": null,
-                      "name": "lock"
-                    },
-                    "value": [
-                      5
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -17011,22 +16971,6 @@
                   },
                   {
                     "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "s": "ab",
-                        "w": [
-                          1
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/l"
                     ],
                     "name": "$input.l",
@@ -17101,22 +17045,6 @@
                     ],
                     "name": "count of xs whose n is at least $input.z",
                     "value": 0
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "s": "ab",
-                        "w": [
-                          1
-                        ]
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -17994,22 +17922,6 @@
                   },
                   {
                     "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "s": "ab",
-                        "w": [
-                          1
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/l"
                     ],
                     "name": "$input.l",
@@ -18080,22 +17992,6 @@
                     ],
                     "name": "count of xs whose n is at least $input.z",
                     "value": 0
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "s": "ab",
-                        "w": [
-                          1
-                        ]
-                      }
-                    ]
                   },
                   {
                     "locations": [
