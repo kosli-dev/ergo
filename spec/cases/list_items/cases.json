@@ -20062,33 +20062,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20152,33 +20125,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20232,33 +20178,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20310,33 +20229,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20388,33 +20280,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20466,33 +20331,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20552,33 +20390,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20638,33 +20449,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20724,33 +20508,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20810,33 +20567,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -20896,33 +20626,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -21623,33 +21326,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -21713,33 +21389,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -21793,33 +21442,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -21871,33 +21493,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -21949,33 +21544,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -22027,33 +21595,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -22113,33 +21654,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -22199,33 +21713,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -22285,33 +21772,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -22371,33 +21831,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -22457,33 +21890,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23184,33 +22590,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23274,33 +22653,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23354,33 +22706,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23432,33 +22757,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23510,33 +22808,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23588,33 +22859,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23674,33 +22918,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23760,33 +22977,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23846,33 +23036,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -23932,33 +23095,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -24018,33 +23154,6 @@
                     "name": "$input named by $params.k",
                     "outcome": "not_an_object",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      ""
-                    ],
-                    "name": "$input",
-                    "outcome": "unusable",
-                    "value": [
-                      {
-                        "id": "t",
-                        "k": "a",
-                        "m": {
-                          "a": "a"
-                        },
-                        "tags": [
-                          "a"
-                        ],
-                        "xs": [
-                          {
-                            "m": {
-                              "a": "a"
-                            },
-                            "v": "a"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",

@@ -363,7 +363,7 @@ _m_last_cut(ends, n) := ends if ends[count(ends) - 1] == n
 
 else := array.concat(ends, [n])
 
-_m_shut(s) if count(indexof_n(replace(replace(s, "\\\\", ""), "\\\"", ""), "\"")) % 2 == 0
+_m_shut(s) if count(split(replace(replace(s, "\\\\", ""), "\\\"", ""), "\"")) % 2 == 1
 
 _m_joined_once(ms) := concat("; ", ms) if count(ms) <= 3
 

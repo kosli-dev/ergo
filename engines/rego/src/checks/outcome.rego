@@ -6,14 +6,15 @@ _check_outcome(check, subj, flaw) := object.union(
 	{
 		"inputs": _row_inputs(subj, check),
 		"passed": _check_passed(check, subj, flaw),
-		"cause": _row_cause(check, subj, flaw),
+		"cause": cause,
 	},
-	_key_base_stash(check, subj),
+	_key_base_stash(check, subj, cause),
 ) if {
 	not _all_of_run(check)
 	not _any_of_run(check)
 	not _walk_run(check)
 	not _derived_once(check)
+	cause := _row_cause(check, subj, flaw)
 }
 
 _check_outcome(check, subj, flaw) := object.union(
@@ -22,13 +23,14 @@ _check_outcome(check, subj, flaw) := object.union(
 		"passed": _once_passed(flaw, e),
 		"cause": _once_cause(flaw, e),
 	},
-	_key_base_stash(check, subj),
+	_key_base_stash(check, subj, e.cause),
 ) if {
 	_derived_once(check)
 	e := _derived_eval(check, subj)
 }
 
-_key_base_stash(check, subj) := {"ergo/key_bases": bs} if {
+_key_base_stash(check, subj, cause) := {"ergo/key_bases": bs} if {
+	cause in _value_fault_causes
 	bs := _key_base_inputs(check, subj)
 	bs != []
 } else := {}
@@ -333,14 +335,22 @@ _line_passed_or_elsewhere(n, nm, _) if n != nm
 
 _line_passed_or_elsewhere(_, _, "satisfied")
 
-_assertion_out(c, subj, "") := {"cause": e.cause, "inputs": _with_key_fields(subj, c, e.inputs), "key_bases": _key_base_inputs(c, subj)} if {
+_assertion_out(c, subj, "") := {"cause": e.cause, "inputs": _with_key_fields(subj, c, e.inputs), "key_bases": _assertion_key_bases(c, subj, e.cause)} if {
 	_derived_once(c)
 	e := _derived_eval(c, subj)
-} else := {"cause": _assertion_cause(c, subj, ""), "inputs": _with_key_fields(subj, c, _assertion_inputs(subj, c)), "key_bases": _assertion_key_bases(c, subj)}
+} else := {"cause": cause, "inputs": _with_key_fields(subj, c, _assertion_inputs(subj, c)), "key_bases": _assertion_key_bases(c, subj, cause)} if {
+	cause := _assertion_cause(c, subj, "")
+}
 
-_assertion_out(c, subj, flaw) := {"cause": _assertion_cause(c, subj, flaw), "inputs": _with_key_fields(subj, c, _assertion_inputs(subj, c)), "key_bases": _assertion_key_bases(c, subj)} if flaw != ""
+_assertion_out(c, subj, flaw) := {"cause": cause, "inputs": _with_key_fields(subj, c, _assertion_inputs(subj, c)), "key_bases": _assertion_key_bases(c, subj, cause)} if {
+	flaw != ""
+	cause := _assertion_cause(c, subj, flaw)
+}
 
-_assertion_key_bases(c, subj) := _key_base_inputs(c, subj) if not _walks(c)
+_assertion_key_bases(c, subj, cause) := _key_base_inputs(c, subj) if {
+	cause in _value_fault_causes
+	not _walks(c)
+}
 
 else := []
 
