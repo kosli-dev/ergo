@@ -1721,7 +1721,9 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                         ops::message::message(&filter.check, ctx, &verdict)
                     }
                 });
-                let text = if unreadable {
+                let text = if text == ops::message::FALLBACK {
+                    format!("{} is false", filter.text)
+                } else if unreadable {
                     text
                 } else {
                     ops::key_base::rewrite(

@@ -831,6 +831,15 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                 }
                 push_new(&mut once, clause);
             }
+            if once.is_empty()
+                && let Check::Tally(t) = check
+            {
+                for side in tally::tally_sides(t) {
+                    if let TallySide::Derived(derived) = side {
+                        push_new(&mut once, format!("{}{digits}", derived.text));
+                    }
+                }
+            }
             once
         }
         Cause::NotAnObject => {

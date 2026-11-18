@@ -11437,7 +11437,7 @@
               "locations": [
                 "$policy:/requirements/r1/checks/c"
               ],
-              "message": "sum of items.x is 0 is false",
+              "message": "sum of items.x needs more than 15 digits",
               "name": "sum of items.x is 0"
             }
           ],
@@ -11646,7 +11646,7 @@
               "locations": [
                 "$policy:/requirements/r1/checks/c"
               ],
-              "message": "sum of items.x is 0 is false",
+              "message": "sum of items.x needs more than 15 digits",
               "name": "sum of items.x is 0"
             }
           ],
