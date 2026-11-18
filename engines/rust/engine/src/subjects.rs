@@ -2294,6 +2294,22 @@ fn key_ref_entries(paths: &[&Path], ctx: &Ctx, inputs: &[Value]) -> Vec<Value> {
     found
 }
 
+fn walk_base(walk: &ops::walk::Walk, ctx: &Ctx, said: &mut Vec<String>) -> Vec<Failure> {
+    let Some((text, cause, input)) =
+        ops::key_base::for_list(&walk.path, walk.if_any, ctx).and_then(|k| k.base)
+    else {
+        return Vec::new();
+    };
+    said.retain(|s| *s != text);
+    vec![Failure::List(Part {
+        name: input.name.clone(),
+        cause,
+        inputs: vec![parts::with_outcome(&input, &text, &[])],
+        failures: Vec::new(),
+        message: text,
+    })]
+}
+
 #[allow(clippy::too_many_arguments)]
 fn walk_part(
     name: &str,
@@ -2349,6 +2365,7 @@ fn walk_part(
             .iter()
             .map(|f| parts::list_base(f.get("item").and_then(Value::as_str).unwrap_or("")))
             .collect();
+        let failures = walk_base(walk, ctx, &mut said);
         return Part {
             name: name.to_string(),
             cause,
@@ -2360,7 +2377,7 @@ fn walk_part(
                 .cloned()
                 .chain(keys)
                 .collect(),
-            failures: Vec::new(),
+            failures,
             message: said.join("; "),
         };
     }
@@ -2391,22 +2408,7 @@ fn walk_part(
         ops::push_new(&mut said, root.clone());
     }
     let mut failures = parts::nest(walked.entries, ctx.input);
-    if failed.is_empty()
-        && let Some((text, base_cause, input)) =
-            ops::key_base::for_list(&walk.path, walk.if_any, ctx).and_then(|k| k.base)
-    {
-        said.retain(|s| *s != text);
-        failures.insert(
-            0,
-            Failure::List(Part {
-                name: input.name.clone(),
-                cause: base_cause,
-                inputs: vec![parts::with_outcome(&input, &text, &[])],
-                failures: Vec::new(),
-                message: text,
-            }),
-        );
-    }
+    failures.splice(0..0, walk_base(walk, ctx, &mut said));
     Part {
         name: name.to_string(),
         cause,

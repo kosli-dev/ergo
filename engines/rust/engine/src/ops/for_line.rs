@@ -767,6 +767,39 @@ impl For {
             });
             let fault = keyed_input.clone().or(own_text.clone()).or(fault);
             let why = keyed_input.or(own_text).or(why);
+            let key_base = item
+                .whose
+                .iter()
+                .zip(&verdicts)
+                .filter(|(_, verdict)| verdict.cause.is_failure())
+                .find_map(|(check, _)| {
+                    check
+                        .paths()
+                        .into_iter()
+                        .find_map(|path| super::key_base::of_path(path, false, &at))
+                });
+            let (why, fault, undecided) = match key_base {
+                None => (why, fault, undecided),
+                Some(kb) => {
+                    let missing = matches!(kb.key_cause, Cause::Absent | Cause::Null);
+                    let (text, cause) = match (&kb.base, missing) {
+                        (None, true) => continue,
+                        (Some((base, cause, _)), true) => (
+                            base.clone(),
+                            Cause::worst([kb.key_cause, *cause]).unwrap_or(*cause),
+                        ),
+                        (Some((base, cause, _)), false) => (
+                            format!("{}; {base}", kb.key),
+                            Cause::worst([kb.key_cause, *cause]).unwrap_or(*cause),
+                        ),
+                        (None, false) => (kb.key.clone(), kb.key_cause),
+                    };
+                    let named = walked.item_name_dotted(&w.item_segs);
+                    let named = if depth > 0 { self.strip(&named) } else { named };
+                    let said = Some(super::message::prefixed(&named, &text));
+                    (said.clone(), said, Some(cause))
+                }
+            };
             let dead_item = |cause: Cause| Dead {
                 raw: (w.end.is_none() && !w.item.value.is_object()).then(|| w.item.value.clone()),
                 msg: if undecided.is_some() && depth == 0 && !matches!(item.how, How::Pick { .. }) {
@@ -1897,6 +1930,7 @@ impl For {
                 &counted,
             );
             self.key_base_after_key(&mut run, ctx);
+            self.whose_keys_first(&mut run, ctx);
             self.free_first(&mut run, ctx);
         }
         run
@@ -1910,6 +1944,33 @@ impl For {
             How::Every { if_any: true } | How::Some { if_any: true }
         );
         super::key_base::for_list(&first.path, if_any, ctx)
+    }
+
+    fn whose_keys_first(&self, run: &mut Run, ctx: &Ctx) {
+        let outer = outer_ctx(ctx);
+        let keys: Vec<(Cause, String)> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .flat_map(|check| super::key_base::missing_keys(check, &outer))
+            .collect();
+        if keys.is_empty() {
+            return;
+        }
+        let said = run.message.clone().unwrap_or_default();
+        let mut pieces: Vec<String> = keys.iter().map(|(_, text)| text.clone()).collect();
+        pieces.extend(
+            said.split("; ")
+                .filter(|p| !p.is_empty() && !keys.iter().any(|(_, t)| t == p))
+                .map(str::to_string),
+        );
+        run.message = Some(pieces.join("; "));
+        run.verdict.cause = Cause::worst(
+            keys.iter()
+                .map(|(cause, _)| *cause)
+                .chain([run.verdict.cause]),
+        )
+        .unwrap_or(run.verdict.cause);
     }
 
     fn key_base_after_key(&self, run: &mut Run, ctx: &Ctx) {

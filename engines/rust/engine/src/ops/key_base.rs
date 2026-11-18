@@ -424,6 +424,50 @@ pub fn for_list(path: &Path, if_any: bool, ctx: &Ctx) -> Option<ForKey> {
     })
 }
 
+/// What a `whose` check says about each `$params` or `$input` key it reads
+/// that is missing or `null`, with the cause: said once, before any item.
+pub fn missing_keys(check: &Check, ctx: &Ctx) -> Vec<(Cause, String)> {
+    let mut out: Vec<(Cause, String)> = Vec::new();
+    for path in check.paths() {
+        for step in &path.steps {
+            let Step::Ref(key) = step else {
+                continue;
+            };
+            if !matches!(key.start, path::Start::Params | path::Start::Input) {
+                continue;
+            }
+            match key_flaw(key, ctx) {
+                Some((outcome @ (Outcome::Absent | Outcome::Null), text, _)) => {
+                    if !out.iter().any(|(_, t)| *t == text) {
+                        out.push((outcome.cause().unwrap_or(Cause::Absent), text));
+                    }
+                }
+                Some(_) => return Vec::new(),
+                None => {}
+            }
+        }
+    }
+    out
+}
+
+/// What a check says about each `$params` or `$input` key it reads that
+/// holds something other than text.
+pub fn unusable_keys(check: &Check, ctx: &Ctx) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for path in check.paths() {
+        for step in &path.steps {
+            if let Step::Ref(key) = step
+                && matches!(key.start, path::Start::Params | path::Start::Input)
+                && let Some((Outcome::Unusable, text, _)) = key_flaw(key, ctx)
+                && !out.contains(&text)
+            {
+                out.push(text);
+            }
+        }
+    }
+    out
+}
+
 /// Whether `path` has a `named by` key read from the subject or an alias,
 /// not from `$params` or `$input`, that can't be read or isn't text.
 pub fn field_key_flawed(path: &Path, ctx: &Ctx) -> bool {

@@ -190,7 +190,18 @@ fn whose_reads(whose: &[Check], f: &Value, ctx: &Ctx) -> Vec<Value> {
                     _ => None,
                 })
                 .collect();
-            if keys.is_empty() || keys.len() != path.steps.len() {
+            if keys.len() != path.steps.len() {
+                if ops::key_base::of_path(path, false, &at).is_some() {
+                    out.push(json!({
+                        "name": format!("{base}.{}", crate::name::name(path)),
+                        "value": null,
+                        "locations": [place.clone()],
+                        "outcome": "absent",
+                    }));
+                }
+                continue;
+            }
+            if keys.is_empty() {
                 continue;
             }
             let mut at = Some(object);
@@ -348,11 +359,22 @@ pub fn for_failures(
             && !list(f, "failed_assertions").is_empty()
     };
     let mut item_made: Vec<String> = Vec::new();
+    let key_texts: Vec<String> = line
+        .items
+        .iter()
+        .flat_map(|i| i.whose.iter())
+        .flat_map(|check| ops::key_base::unusable_keys(check, ctx))
+        .collect();
     for f in failed {
+        let mut after_key = false;
         for piece in text(f, "ergo/text").split("; ") {
-            if piece.starts_with("item ") || !text(f, "item").starts_with("item ") {
+            if after_key
+                || piece.starts_with("item ")
+                || !text(f, "item").starts_with("item ")
+            {
                 ops::push_new(&mut item_made, piece.to_string());
             }
+            after_key = piece.starts_with("item ") && key_texts.iter().any(|k| piece.ends_with(k.as_str()));
         }
     }
     let whose_roots = line.whose_roots(ctx);
