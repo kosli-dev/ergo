@@ -403,8 +403,83 @@ fn steps_key(path: &Path, reference: &Path) -> bool {
     })
 }
 
+fn side_unfit(side: &crate::ops::compare::Side, reference: &Path, value: &Value, kind: Option<&str>) -> bool {
+    use crate::ops::compare::Side;
+    match side {
+        Side::Path(path) if path == reference => match kind {
+            Some("number") => !value.is_number(),
+            Some("text") => !value.is_string(),
+            Some("time") => {
+                !(value.is_number()
+                    || value.is_string() && crate::ops::time::read_time(value).is_some())
+            }
+            _ => false,
+        },
+        Side::Join(parts) => parts
+            .iter()
+            .any(|part| matches!(part, Side::Path(path) if path == reference) && !value.is_string()),
+        _ => false,
+    }
+}
+
+fn compare_unfit(check: &Check, reference: &Path, value: &Value) -> bool {
+    use crate::ops::compare::Cmp;
+    match check {
+        Check::Compare(compare) => {
+            let kind = if compare.within.is_some() {
+                Some("number")
+            } else {
+                match compare.cmp {
+                    Cmp::StartsWith
+                    | Cmp::EndsWith
+                    | Cmp::NotStartsWith
+                    | Cmp::NotEndsWith
+                    | Cmp::AlphabeticallyBefore
+                    | Cmp::AlphabeticallyAfter
+                    | Cmp::AlphabeticallyOnOrBefore
+                    | Cmp::AlphabeticallyOnOrAfter => Some("text"),
+                    Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => Some("number"),
+                    Cmp::Eq | Cmp::Ne => None,
+                }
+            };
+            side_unfit(&compare.left, reference, value, kind)
+                || side_unfit(&compare.right, reference, value, kind)
+        }
+        Check::CompareTime(compare) => {
+            side_unfit(&compare.left, reference, value, Some("time"))
+                || side_unfit(&compare.right, reference, value, Some("time"))
+        }
+        Check::Tally(tally) => {
+            use crate::ops::tally::{Side as TallySide, Test};
+            let kind = match &tally.test {
+                Test::Compare { cmp, within } => {
+                    if within.is_some() || matches!(cmp, Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte) {
+                        Some("number")
+                    } else {
+                        None
+                    }
+                }
+                Test::Between { .. } => Some("number"),
+            };
+            std::iter::once(&tally.left)
+                .chain(tally.right.as_ref())
+                .any(|side| match side {
+                    TallySide::Plain(plain) => side_unfit(plain, reference, value, kind),
+                    TallySide::Derived(_) => false,
+                })
+        }
+        _ => false,
+    }
+}
+
 pub(crate) fn ref_unfit(checks: &[&Check], reference: &Path, value: &Value, ctx: &Ctx) -> bool {
     checks.iter().any(|check| {
+        if crate::ops::for_line::nested_checks(check)
+            .into_iter()
+            .any(|inner| compare_unfit(inner, reference, value))
+        {
+            return true;
+        }
         let keyed = !value.is_string()
             && crate::ops::for_line::all_paths(check)
                 .into_iter()

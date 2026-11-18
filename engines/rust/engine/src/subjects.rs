@@ -1809,6 +1809,17 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
         };
         vec![(0, part)]
     };
+    let mut inputs = inputs;
+    let mut parts = parts;
+    if !matched {
+        let unfit = unfit_names(&checks, ctx);
+        if !unfit.is_empty() {
+            mark_unfit(&mut inputs, &unfit);
+            for (_, part) in &mut parts {
+                mark_unfit(&mut part.inputs, &unfit);
+            }
+        }
+    }
     Applied {
         matched,
         message,
@@ -2367,7 +2378,13 @@ fn walk_part(
 fn unfit_names(checks: &[&Check], ctx: &Ctx) -> Vec<(String, Value)> {
     let mut out: Vec<(String, Value)> = Vec::new();
     for check in checks {
-        for reference in check.refs() {
+        let mut refs = check.refs();
+        for path in ops::key_base::every_path(check) {
+            if matches!(path.start, Start::Params | Start::Input) && !refs.contains(path) {
+                refs.push(path.clone());
+            }
+        }
+        for reference in refs {
             let read = path::read(&reference, ctx);
             if let (Outcome::Found, Some(value)) = (read.outcome, read.value)
                 && crate::checks::ref_unfit(&[check], &reference, value, ctx)
