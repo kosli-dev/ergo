@@ -430,7 +430,7 @@ _ms_entries(doc, req) := [_entry("list", _m_from_root(req), row_cause, [{"name":
 	not _from_unreadable(req)
 	row_cause := _target_cause(doc, req)
 	text := _m_from_message(doc, req, false, row_cause).message
-} else := _ms_tree(req, doc, _ms_places(doc, req, w), _from_keys(req)) if {
+} else := _ms_tree(req, doc, _ms_places(req, w), _from_keys(req)) if {
 	_every_from(req)
 	not _fl_parent_unread(doc, req)
 	_from_well_formed(req)
@@ -443,7 +443,7 @@ _ms_entries(doc, req) := [_entry("list", _m_from_root(req), row_cause, [{"name":
 
 _ms_flat(req, _, p, keys) := {"levels": [], "entry": object.union(_entry("item", _fl_type_name(req, {"plain": true}, p.c), p.cause, [_ms_item_read(req, p, keys)], [], p.text), {"value": p.value, "locations": [p.at]}), "key": [1, [x | some x in p.c; is_number(x)], 1]} if p.plain
 
-_ms_places(_, req, w) := array.concat(
+_ms_places(req, w) := array.concat(
 	[{"c": f.path, "at": f.at, "cause": f.cause, "value": f.value, "text": _fl_fail_text(req, f), "note": false, "plain": false} | some p in sort({f.path | some f in w.fails}); some f in w.fails; f.path == p],
 	[x | some n in w.notes; some x in _ms_note_places(req, n)],
 )

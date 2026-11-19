@@ -364,7 +364,7 @@ _fl_note_text(req, n) := concat(", ", [cs[t[1]] | some t in sort([[it.path, k] |
 
 _fl_note_clauses(req, n) := [concat("", [_fl_type_name(req, n, t[1]), " is ", t[0]]) | some t in n.types] if "types" in object.keys(n)
 
-_fl_note_clauses(req, n) := [concat("", [_m_from_item_name(req, n.list.c), " is a list"]), concat("", [_m_from_item_name(req, n.other.c), " is ", _fl_type(n.other.v)])] if "list" in object.keys(n)
+_fl_note_clauses(req, n) := [concat("", [_fl_type_name(req, {}, n.list.c), " is a list"]), concat("", [_fl_type_name(req, {}, n.other.c), " is ", _fl_type(n.other.v)])] if "list" in object.keys(n)
 
 _fl_key_names(req) := count([k | some k in _from_keys(req); is_string(k)])
 

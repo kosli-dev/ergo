@@ -122,10 +122,9 @@ _tie_texts(row, t, f, rec) := t.items[j] if {
 	j := min({j | some j, g in row.failed_items; g.cause == "ambiguous"; t.items[j].walk != []})
 } else := rec
 
-_for_assertion_entry(row, at, where, t, i, a) := _for_free_entry(_for_assertion_base(row, at, where, t, i, a), row, at, where, t, i, a)
+_for_assertion_entry(row, at, where, t, i, a) := _for_free_entry(_for_assertion_base(row, at, where, t, i, a), row, at, where, i)
 
-_for_free_entry(e, row, at, where, t, i, _) := _tallied_entry(e, where.check.checks[i], {"cause": e.cause}, at, where, row) if {
-	_ = t
+_for_free_entry(e, row, at, where, i) := _tallied_entry(e, where.check.checks[i], {"cause": e.cause}, at, where, row) if {
 	_ = row["ergo/subj"]
 	not _reads_alias_of(where.check.checks[i], {item.as | some item in where.check.items})
 } else := e
