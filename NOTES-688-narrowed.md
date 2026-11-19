@@ -46,6 +46,10 @@ Julien decided to narrow PR 2. These cases now pin what the Rego engine gives to
 - for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with a null part
 - for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item that is null, with an item of the part without the name
 
+## Narrowed rows of cases that still fail on other rows
+
+The `for` rows of the five C7 cases above are pinned, and their `count` and `every` rows still fail: the `$params` root of the `whose` isn't on the assertion's inputs, and a `count of` item lists a read its message doesn't reach. "messages / a root in a whose that is missing, beside a list in a list whose inner lists can't be read" (B9) fails for the same root. "list_items / an any_of option that reads a field of a subject that is a list outside what it reads item by item fails on its own" says `the subject is …` in its entry and was left as it is.
+
 ## Classified as narrowed, but the case was wrong against a decision (moved to the Rego engine's output, not narrowed)
 
 - list_starts / every, some, count of and sum of walk a subject that is a list / an item that isn't an object fails as not_an_object, and a missing field as absent: decision 3 (a `count of` gets an `item` entry, a `sum of` says every item it can't read).
