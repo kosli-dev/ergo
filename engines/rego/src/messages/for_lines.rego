@@ -484,7 +484,16 @@ _m_for_fail(f) := array.concat([_m_under(object.get(f, "said", f.item), _m_group
 	f.failed_assertions != []
 }
 
-_m_for_groups(f) := _m_groups(_once([q | some ps in lines; some p in ps; q := _m_unskipped(p, object.get(f, "skip", [])); q != ""]), _m_two_list(f)) if lines := [_m_line_msg(l, f) | some l in f.failed_assertions]
+_m_for_groups(f) := _m_groups(_once([q | some ps in lines; some p in ps; q := _m_unskipped(p, object.get(f, "skip", [])); q != ""]), _m_two_list(f)) if lines := [_m_tally_pieces(l, _m_line_msg(l, f)) | some l in f.failed_assertions]
+
+_m_tally_pieces(l, ps) := [q | some p in ps; some q in _m_top_split(p, "; ")] if {
+	not "items" in object.keys(l)
+	_m_tally_line(l.assertion)
+} else := ps
+
+_m_tally_line(a) if contains(a, "count of ")
+
+_m_tally_line(a) if contains(a, "sum of ")
 
 _m_unskipped(p, skip) := p if skip == []
 
@@ -547,7 +556,15 @@ _m_grouped(texts, ls, _) := [texts] if count(_m_leads(ls)) == 0
 
 _m_grouped(texts, ls, true) := [[texts[j] | some j, l in ls; _m_in_group(l, lead, k, true)] | some k, lead in _m_pair_leads(ls)] if count(_m_leads(ls)) > 0
 
-_m_grouped(texts, ls, false) := [[texts[j] | some j, l in ls; l == lead] | some lead in _m_all_leads(ls)] if count(_m_leads(ls)) > 0
+_m_grouped(texts, ls, false) := [[texts[j] | some j, l in ls; l == lead] | some lead in _m_list_leads(ls)] if count(_m_leads(ls)) > 0
+
+_m_list_leads(ls) := [x[3] | some x in sort([[_m_list_at(ls, l), _m_lead_n(l), i, l] | some i, l in ls; not l in array.slice(ls, 0, i)])]
+
+_m_list_at(ls, l) := min({i | some i, k in ls; _m_lead_list(k) == _m_lead_list(l)})
+
+_m_lead_list(l) := substring(l, indexof(l, " of ") + 4, -1) if startswith(l, "item ")
+
+else := l
 
 _m_leads(ls) := [l | some i, l in ls; l != ""; not l in array.slice(ls, 0, i)]
 
@@ -557,8 +574,6 @@ _m_lead_n(l) := to_number(tok) if {
 	tok := split(substring(l, 5, -1), " ")[0]
 	regex.match(`^[0-9]+$`, tok)
 } else := 0
-
-_m_all_leads(ls) := [l | some i, l in ls; not l in array.slice(ls, 0, i)]
 
 _m_in_group(l, lead, _, _) if l == lead
 
