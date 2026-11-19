@@ -49,3 +49,9 @@ Already listed, under "A list in the middle of a name, or a subject that is a li
 The Rust engine passes the first ten with the pinned shape, so they can't go in `known-failures.txt`, which fails on a listed case that passes. The intro of "Left for a later PR" now says the Rust engine lists the ones it fails.
 
 The same script also finds these, outside the review's list and not looked at here: four `distinct` "distinct with a phrase that also reads a bare name" cases (already pinned), and cases in `for`, `messages` and `sentences` whose item input holds `[]` or a value next to a `for` alias.
+
+## B9 narrowed
+
+`spec/semantics.md` (`message.items`) now says B9 holds after `is`, `is not`, `is one of`, `is in` and the phrases that order numbers or times, and that `starts with`, `matches` and `contains` say only the root for now. `spec/OPEN.md` lists what is left for #700 under "Left for a later PR": those three phrases, the root from `$params` missing from the assertion's inputs, the Rust engine's missing B9 after `is`, `is not`, `is one of` and `is in`, and the `null` root after `is in` or `is one of` that fails a `count of` as `null` and an `every` as `absent`. `REFERENCE.md` makes no claim about B9 for a given phrase, so it is unchanged.
+
+The review's table has the `is in` row with `{"l": 3}` the wrong way round. Run again on this branch, `count of xs whose v is in $params.l is 1` with `xs` `[{"v": 1}, {}]` and `l` `3` gives `$params.l is 3, which isn't a list; item 2 of xs: v is missing` in `ergo.rego` and only `$params.l is 3, which isn't a list` in the Rust engine, in the `every` and `some` forms too. So `ergo.rego` already builds B9 for `is in` with a root of the wrong kind, and only the Rust engine is left for it.
