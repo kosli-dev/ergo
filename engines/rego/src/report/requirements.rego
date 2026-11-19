@@ -273,6 +273,17 @@ _anchored(row, at) := object.union(row, {"inputs": _tie_sorted(_anchored_all(row
 
 else := object.union(row, {"inputs": _tie_sorted(_anchored_all(row.inputs, at)), "failed_items": [_anchored_failed(f, at) | some f in row.failed_items]})
 
+_anchored_row(row, at, subj, req, check) := object.union(_anchored(row, at), {"ergo/subj": subj, "ergo/req": req}) if {
+	row.passed == false
+	_reads_items_later(check)
+} else := _anchored(row, at)
+
+_reads_items_later(check) if _all_of_run(check)
+
+_reads_items_later(check) if _any_of_run(check)
+
+_reads_items_later(check) if _tally_worded(check)
+
 _anchored_failed(f, at) := object.union(_anchored_all([f], at)[0], object.union(_anchored_inner(f, at), _anchored_lines(f, at)))
 
 _anchored_inner(f, at) := {"failed_items": _anchored_all(f.failed_items, at)} if "failed_items" in object.keys(f)
@@ -324,7 +335,7 @@ _subject_rows(entry, ref, req, req_name, fixed) := [row |
 			"subject": ref,
 			"check": check_name,
 		},
-		_parted_in(_anchored(_outcome(req, fixed.prepared[check_name], fixed.check_flaws[check_name], entry.subject), anchor), anchor, object.union(fixed.wheres[check_name], {"subj": entry.subject, "mcheck": _labelled_for(_list_read(fixed.prepared[check_name], req, entry.subject), req, entry.subject)})),
+		_parted_in(_anchored_row(_outcome(req, fixed.prepared[check_name], fixed.check_flaws[check_name], entry.subject), anchor, entry.subject, req, fixed.prepared[check_name]), anchor, fixed.wheres[check_name]),
 	)
 ]
 
