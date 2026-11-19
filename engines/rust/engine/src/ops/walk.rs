@@ -1294,7 +1294,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
             };
             Judged {
                 kept,
-                passed,
+                passed: passed && !alones.iter().any(Option::is_some),
                 decided: undecided.is_none(),
                 failure,
             }
@@ -1568,6 +1568,24 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
         };
     }
     let mut row = read_row(walk, ctx);
+    if flawed
+        && !row.failed_items.is_empty()
+        && walk
+            .whose
+            .iter()
+            .any(|check| super::tally::without_roots(check).is_some())
+    {
+        let outer_ctx = outer(ctx);
+        let whose: Vec<&Check> = walk.whose.iter().collect();
+        if let Some((cause, text)) = message::root_flaw(&whose, &outer_ctx) {
+            row.verdict.cause = Cause::worst([cause, row.verdict.cause]).unwrap_or(cause);
+            row.message = Some(message::joined(message::with_roots(
+                row.parts.clone(),
+                &text,
+            )));
+            return row;
+        }
+    }
     if flawed {
         row.verdict.cause = Cause::Unusable;
         row.failed_items = Vec::new();

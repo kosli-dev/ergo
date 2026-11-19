@@ -2579,7 +2579,16 @@ fn walk_part(
             keys.push(entry);
         }
     }
-    if let Some(pieces) = pieces.filter(|p| p.len() != failed.len()) {
+    let all_said = |p: &[String]| {
+        !rich.is_empty()
+            && rich.len() == failed.len()
+            && rich.iter().all(|r| {
+                r.get("ergo/text")
+                    .and_then(Value::as_str)
+                    .is_some_and(|t| p.iter().any(|piece| piece == t))
+            })
+    };
+    if let Some(pieces) = pieces.filter(|p| p.len() != failed.len() && !all_said(p)) {
         let capped = message
             .split("; ")
             .any(|piece| ops::message::cap_note(piece).is_some());

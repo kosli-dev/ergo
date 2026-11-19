@@ -472,17 +472,10 @@ messages / the order of the roots a count of names / puts the missing or null $p
 messages / the order of the roots a count of names when $params holds null / names each null $params root first, sorted, then the others in the order the sentence reads them
 messages / a count of in a for line, and the order of its roots / names the $params root first and each root once
 messages / a parent's part read in a whose, on a for line and in a count of / names a part of the wrong type once with no item
-messages / a parent's part read in a whose on a plain check, next to a list that can't be read / names a part that is null before a list that is missing
-messages / a parent's part read in a whose on a plain check, next to a list that can't be read / names a part that is missing before a list that is null
 messages / a parent's part read in a whose on a plain check, next to a list that can't be read / names a part of the wrong type before a list that is text
-messages / a parent's part read in a whose on a plain check, next to a list that can't be read / names a part that is a list before a list that is missing
 messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that has the wrong type, then the list that is text
-messages / a parent's part read in a that on a plain check, next to a list that can't be read / names a part that is null before a list that is missing
-messages / a parent's part read in a that on a plain check, next to a list that can't be read / names a part that is missing before a list that is null
 messages / a parent's part read in a that on a plain check, next to a list that can't be read / names a part of the wrong type before a list that is text
 messages / a parent's part read in a that on a plain check, next to a list that can't be read / names a part that is null on an empty list
-messages / a grandparent's part read in a whose on a plain check, next to a list that can't be read / names a part that is null before a list that is missing
-messages / a grandparent's part read in a whose on a plain check, next to a list that can't be read / names a part that is missing before a list that is null
 messages / a grandparent's part read in a whose on a plain check, next to a list that can't be read / names a part of the wrong type before a list that is text
 messages / a grandparent's part read in a whose on a plain check, next to a list that can't be read / names a part that is null on an empty list
 messages / a parent's part read in a that on a for line / names a part of the wrong type once, before what each item says
@@ -511,8 +504,6 @@ messages / a part that is a list, read in a whose beside a list that can't be re
 messages / a root on the right of the phrase and a root in a whose, both missing, beside a list that can't be read, are all said, then the list / no params and no list
 messages / a root on the right of the phrase and a root in a whose, both null, beside a list that is null, are all said, then the list / both params and the list null
 messages / a root in a whose that is missing, beside a list in a list whose inner lists can't be read, is said first and then each item / an inner list that is null and one that is missing
-messages / a root of the wrong type in a whose, beside items that fail on a list that can be read, is said first and the check fails as unusable / a root of the wrong type beside items that fail as absent is said first and the check fails as unusable
-messages / a root of the wrong type in a whose, beside items that fail on a list that can be read, is said first and the check fails as unusable / a root of the wrong type beside items that fail as null is said first and the check fails as unusable
 messages / a clause that an earlier sentence of the row already gave / is left out of the row's message and of the option's, and each sentence keeps its whole message
 messages / the roots of one sentence, keys and sides alike, are said worst cause first and then by name / a missing key comes before a null value before it
 messages / the roots of one sentence, keys and sides alike, are said worst cause first and then by name / a value before the key that isn't an object comes before a missing key
@@ -548,11 +539,6 @@ requirements / require some on a child subject with min_subjects 0 / fails the p
 requirements / require some on a child subject with min_subjects 3 / keeps a parent's own $min_subjects violation, and leaves out its failing pull request, when another of its pull requests passes
 row_parts / a count of and a sum of on a for line name the items they can't read under the item of the for line / items named through the alias, an inner list that is missing, a sentence that doesn't read the alias, and a second list
 row_parts / a list walked by a sentence on a for line with two lists sits under the item of the second list, named with its alias / an inner item that is missing a field, an inner list that is null, and an inner item that isn't an object
-row_parts / a root in a relative clause that can't be read is said first, and then each item the relative clause can't read, in a count of, a sum of, an every and a some / the root isn't a number, and items whose value is missing, null or not a number
-row_parts / a root in a relative clause that can't be read is said first, and then each item the relative clause can't read, in a count of, a sum of, an every and a some / the root is null, and an item whose value is null
-row_parts / a root in a relative clause that can't be read is said first, and then each item the relative clause can't read, in a count of, a sum of, an every and a some / the root is missing, and items whose value is missing or null
-row_parts / a root in a relative clause that can't be read is said first, and then each item the relative clause can't read, in a count of, a sum of, an every and a some / the root is null, and an item whose value is missing, so the row fails as absent
-row_parts / a root in a relative clause that can't be read is said first, and then each item the relative clause can't read, in a count of, a sum of, an every and a some / the root is missing, and an item that isn't an object
 row_parts / an every or a some that asks whether a field exists gives a missing field the outcome absent, as every other check does / an item without the field gives its input the outcome absent, and one whose field is null the outcome null
 row_parts / an every or a some that asks whether a field exists gives a missing field the outcome absent, as every other check does / a some with no item that has the field, beside an item that isn't an object
 row_parts / two sentences on a for line that walk the same list under the item say its items in list order, and a check with several sentences keeps their order / two sentences that walk the same inner list say its items in list order on a for line, and in the order of the sentences outside one
