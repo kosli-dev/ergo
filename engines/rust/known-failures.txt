@@ -25,7 +25,11 @@ derived / a count whose whose reads a part of the subject with a named by key fr
 derived / a count whose whose reads a root outside the item through a key the item holds and reads params that aren't an object says the params / the root is null, the first item is null and the second item's key isn't text
 derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is 3 and four items each have a problem, so the last one is counted
 derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is missing and five items aren't objects, so the message stops after three problems
+derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags mix kinds, so the count says what it says when the root reads
+derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and the item's key and field print with a semicolon and a comma
+derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / a root further back is null and the items have no key
 derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is missing and the first item is null
+derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is null and the first item's key isn't text
 derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a missing key inside the item
 derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a null key inside the item
 derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names the item's own field before the root that is text
@@ -727,6 +731,7 @@ walks / a path whose named by key from $params isn't text and whose value before
 walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is null, with the worst cause
 walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is text, with the worst cause
 walks / a that clause whose key from $params is missing reads the value before the key on the focus / the focus has no m
+walks / a that clause whose key from $params is missing reads the value before the key on the focus / the focus holds m
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / one focus has no m and another holds null
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / the focus has no m, and the item has one
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / the focus holds m

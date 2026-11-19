@@ -21763,7 +21763,70 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rs/0/v"
+                        ],
+                        "name": "rs[0].v.y",
+                        "outcome": "unusable",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rs/0"
+                        ],
+                        "name": "rs[0].m named by $input.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/0"
+                    ],
+                    "message": "v is \"a\", which isn't an object",
+                    "name": "item 1 of rs",
+                    "value": {
+                      "v": "a"
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rs/1/v"
+                        ],
+                        "name": "rs[1].v.y",
+                        "outcome": "unusable",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rs/1"
+                        ],
+                        "name": "rs[1].m named by $input.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/1"
+                    ],
+                    "message": "v is 4, which isn't an object",
+                    "name": "item 2 of rs",
+                    "value": {
+                      "v": 4
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -21786,7 +21849,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/whose_unusable"
                 ],
-                "message": "item 1 of rs: v is \"a\", which isn't an object; item 2 of rs: v is 4, which isn't an object",
+                "message": "$input.k is missing",
                 "name": "count of rs whose v.y equals m named by $input.k is 1"
               }
             ],
@@ -21816,7 +21879,7 @@
                 ]
               }
             ],
-            "message": "item 1 of rs: v is \"a\", which isn't an object; item 2 of rs: v is 4, which isn't an object",
+            "message": "$input.k is missing; item 1 of rs: v is \"a\", which isn't an object; item 2 of rs: v is 4, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -22250,7 +22313,70 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rs/0/v"
+                        ],
+                        "name": "rs[0].v.y",
+                        "outcome": "unusable",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rs/0"
+                        ],
+                        "name": "rs[0].m named by $input.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/0"
+                    ],
+                    "message": "v is \"a\", which isn't an object",
+                    "name": "item 1 of rs",
+                    "value": {
+                      "v": "a"
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rs/1/v"
+                        ],
+                        "name": "rs[1].v.y",
+                        "outcome": "unusable",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rs/1"
+                        ],
+                        "name": "rs[1].m named by $input.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/1"
+                    ],
+                    "message": "v is 4, which isn't an object",
+                    "name": "item 2 of rs",
+                    "value": {
+                      "v": 4
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -22273,7 +22399,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/whose_unusable"
                 ],
-                "message": "item 1 of rs: v is \"a\", which isn't an object; item 2 of rs: v is 4, which isn't an object",
+                "message": "$input.k is null",
                 "name": "count of rs whose v.y equals m named by $input.k is 1"
               }
             ],
@@ -22303,7 +22429,7 @@
                 ]
               }
             ],
-            "message": "item 1 of rs: v is \"a\", which isn't an object; item 2 of rs: v is 4, which isn't an object",
+            "message": "$input.k is null; item 1 of rs: v is \"a\", which isn't an object; item 2 of rs: v is 4, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -22744,7 +22870,70 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rs/0/v"
+                        ],
+                        "name": "rs[0].v.y",
+                        "outcome": "unusable",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rs/0"
+                        ],
+                        "name": "rs[0].m named by $input.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/0"
+                    ],
+                    "message": "$input.k is 3, which isn't text, and v is \"a\", which isn't an object",
+                    "name": "item 1 of rs",
+                    "value": {
+                      "v": "a"
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rs/1/v"
+                        ],
+                        "name": "rs[1].v.y",
+                        "outcome": "unusable",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rs/1"
+                        ],
+                        "name": "rs[1].m named by $input.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/1"
+                    ],
+                    "message": "$input.k is 3, which isn't text, and v is 4, which isn't an object",
+                    "name": "item 2 of rs",
+                    "value": {
+                      "v": 4
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -22767,7 +22956,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/whose_unusable"
                 ],
-                "message": "item 1 of rs: $input.k is 3, which isn't text, and v is \"a\", which isn't an object; item 2 of rs: $input.k is 3, which isn't text, and v is 4, which isn't an object",
+                "message": "",
                 "name": "count of rs whose v.y equals m named by $input.k is 1"
               }
             ],
@@ -26684,17 +26873,25 @@
                           "/things/0/xs/0/tags"
                         ],
                         "name": "xs[0].tags",
-                        "outcome": "unusable",
+                        "outcome": "usable",
                         "value": [
                           "x"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/0/key"
+                        ],
+                        "name": "xs[0].key",
+                        "outcome": "unusable",
+                        "value": 3
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "$input.m is null; key is 3, which isn't text",
+                    "message": "key is 3, which isn't text",
                     "name": "item 1 of xs",
                     "value": {
                       "key": 3,
@@ -26726,7 +26923,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/m"
                 ],
-                "message": "$input.m is null; item 1 of xs: key is 3, which isn't text",
+                "message": "$input.m is null",
                 "name": "count of xs whose tags contains $input.m named by key is 1"
               }
             ],
@@ -26907,10 +27104,18 @@
                           "/things/0/xs/0/tags"
                         ],
                         "name": "xs[0].tags",
-                        "outcome": "absent",
+                        "outcome": "usable",
                         "value": [
                           "x"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/0"
+                        ],
+                        "name": "xs[0].key",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -26934,10 +27139,18 @@
                           "/things/0/xs/1/tags"
                         ],
                         "name": "xs[1].tags",
-                        "outcome": "absent",
+                        "outcome": "usable",
                         "value": [
                           "x"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/1"
+                        ],
+                        "name": "xs[1].key",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -28996,36 +29209,7 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [
-                  {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/xs/0/v"
-                        ],
-                        "name": "xs[0].v",
-                        "outcome": "null",
-                        "value": "x"
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/xs/0"
-                    ],
-                    "message": "$input.m is null",
-                    "name": "item 1 of xs",
-                    "value": {
-                      "key": "a",
-                      "tags": [
-                        "x",
-                        1
-                      ],
-                      "v": "x"
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -29668,15 +29852,25 @@
                           "/things/0/xs/0/v"
                         ],
                         "name": "xs[0].v",
-                        "outcome": "unusable",
+                        "outcome": "usable",
                         "value": "x"
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/0/key"
+                        ],
+                        "name": "xs[0].key",
+                        "outcome": "unusable",
+                        "value": [
+                          "item 2 of xs: y; z"
+                        ]
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "$input.m is null; key is [\"item 2 of xs: y; z\"], which isn't text",
+                    "message": "key is [\"item 2 of xs: y; z\"], which isn't text",
                     "name": "item 1 of xs",
                     "value": {
                       "key": [
@@ -29711,7 +29905,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/matches"
                 ],
-                "message": "$input.m is null; item 1 of xs: key is [\"item 2 of xs: y; z\"], which isn't text",
+                "message": "$input.m is null",
                 "name": "count of xs whose v matches $input.m named by key is 1"
               }
             ],
