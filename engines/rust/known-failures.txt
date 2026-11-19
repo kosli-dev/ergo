@@ -546,7 +546,11 @@ sentences / the path before a named by field that can't be read / reads the fiel
 sentences / the path before a named by field that can't be read, in a count, a sum, a plus, an elapsed time, a some and a for line / ends absent when the path is missing, whatever the field holds
 sentences / the path before a named by field that can't be read, in a count, a sum, a plus, an elapsed time, a some and a for line / ends unusable when the path goes through a string, whatever the field holds
 sentences / the subject named by a key of each item, inside a relative clause / names the item that has no key
+sentences / the subject named by a key of each item, inside a relative clause / names the item whose key is null
+sentences / the subject named by a key of each item, inside a relative clause / names the item whose key isn't text
+sentences / the subject named by a key of each item, inside a relative clause / names the item whose key names a field the subject doesn't have
 sentences / the subject's name named by a key, inside and outside a relative clause / an approver without k fails as absent, whatever the subject's k
+sentences / the subject's name named by a key, inside and outside a relative clause / reads each approver's k inside, and is written wrong outside
 subject_name / a check that reads plain, on a plain value, a list and a from line that keeps lists / has the location of the subject itself for its name, one for each item for every and count of the subject name, and where each failed item was read
 subject_name / a count of a field named like the subject, written with a dot / a field that isn't a list or an object is said once, as the walk says it
 subject_name / a field after the subject name inside a whose of a check reads the subject / a field or a position after the subject on the right of a whose reads the subject's field

@@ -76,6 +76,13 @@ Gaps found:
 - Scratch scripts that ran one spec topic at a time and wrote a case's `results` from the engine were in `dist/t` (not committed). Keep them out of `dist` when running `opa test`: OPA loads any JSON there.
 - Gap: decision 38 for a key that isn't text. Rego (and `main`) say `item 1 of es: $params.k is 3, which isn't text` in each item, and the walks group "a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item" pins that, against decision 38's own example. Making `count of` follow 38 broke that group, so it was taken out; derived "the key is a number" (`whose_unusable`) holds the decided shape and fails in Rego.
 
+## Sixth builder, branch `row-parts-688-rego6`
+
+- CI risk: the two compiled `walks` spec tests took 35.6 and 39.0 s alone under `opa test` on `row-parts-688-rego5`, against 18.7 and 17.4 s on `main`. The walks topic grew from 185 to 248 cases, and the engine builds each walks report about a fifth slower (6.8 s against 5.6 s for all of them in `opa eval --profile`, spread over the new tree-building rules, with no single hot rule). The walks spec tests now run in six parts by case (`_case_part`), and a compiled part takes about 17 s alone.
+- D13: every `named by` key that can't be read is said, worst cause first and then by name (`_m_tally_heads` for `count of`/`sum of` on an empty list, `_walk_key_msgs` for walks and `for` lines). `_m_key_root_state_in` is gone. `walk.flaws` and the spec changelog say so; the group is renamed "…names each key that can't be read, worst cause first".
+- D12: an item that reads a base outside the items through its own key lists every read, in the order of the sentence: `xs[1].v`, `pr named by k` (where the read stopped), `xs[1].k` (`_keyed_item_reads` for `count of`/`sum of`, `_keyed_walk_entry` for walks). A `count of` whose item text has no matching record (key `null` or not text) gets its item entry from the message clause (`_tally_keyed_found`).
+- D15: stopped, see the report. `path.field_step` on this branch still says a `null` before a field key ends the path `null` (`s.x named by p` with `s` `null` and no `p` is `null` with `p is missing; s is null`), for plain paths and for `for` lines alike, so decision 34 is carried for ref-step keys only.
+
 ## Checks run by the third builder
 
 - Full `opa test`: 58 fail and 4 error. The 4 errors are the compiled `walks` and `messages` spec tests hitting the 120 s timeout under the full parallel run; alone they pass in 80 to 90 s. The failures are the 2 unit tests below and the spec topics that hold the 160 failing cases.

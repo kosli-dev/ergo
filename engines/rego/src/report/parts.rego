@@ -482,7 +482,9 @@ _tally_said_in(t, m) if contains(m, t)
 
 _tally_said_in(_, m) if regex.match(`(^|; )and [0-9]+ more$`, m)
 
-_tally_item_texts(c, subj, cause, m) := {_m_aliased(r[1]) |
+_tally_item_texts(c, subj, cause, m) := _tally_record_texts(c, subj, cause, m) | {f.clause | some f in _tally_keyed_found(c, subj, m)}
+
+_tally_record_texts(c, subj, cause, m) := {_m_aliased(r[1]) |
 	is_object(c)
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
@@ -768,7 +770,7 @@ _walk_assertion_entry(row, at, where, ins) := _policy_entry(
 	where.check.expression,
 	row.cause,
 	_once(array.concat(array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists); not _walked_path_read(i, wname)], _key_flaw_entries(where.check.path)), _walk_cond_ref_entries(_walk_cond_refs(where.check), row.inputs)), _walk_param_entries(where.check, row.inputs))),
-	array.concat(entries, flaws),
+	array.concat([_keyed_walk_entry(x, where.check, row) | some x in entries], flaws),
 	_tally_rest(concat("; ", [m | some m in _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts))); not m in {e.message | some e in kls}]), {e.name | some e in flaws}),
 	[_assertion_at(where, null, 0)],
 ) if {
@@ -779,6 +781,38 @@ _walk_assertion_entry(row, at, where, ins) := _policy_entry(
 	wname := _m_aliased(_walked_name(where.check.path))
 	flaws := _walk_flaw_lists(row, at, where.check, entries)
 }
+
+_keyed_walk_entry(x, check, row) := object.union(x, {"inputs": reads}) if {
+	x.kind == "item"
+	x.failures == []
+	some c in object.get(check, "whose", [])
+	some s in _walk_sides_paths(c)
+	is_array(s[0])
+	_walk_outside(s[0])
+	_item_keyed(s[0])
+	every seg in check.path {
+		is_string(seg)
+	}
+	some i in x.inputs
+	i.name == _input_name(_as_subject_part(s[0]))
+	_keyed_base_fine(s[0], row["ergo/subj"])
+	n := to_number(trim_prefix(split(x.name, " of ")[0], "item "))
+	ip := array.concat(check.path, [n - 1])
+	reads := [r | some d in check.whose; some y in _walk_sides_paths(d); is_array(y[0]); some r in _keyed_walk_side_reads(x, y[0], ip)]
+} else := x
+
+_keyed_walk_side_reads(x, p, ip) := array.concat([i | some i in x.inputs; i.name == _input_name(_as_subject_part(p))], [_walk_item_read(x, [_fk(seg)], ip, true) | some seg in p; _item_key_step(seg)]) if {
+	_walk_outside(p)
+	_item_keyed(p)
+} else := [] if _walk_outside(p)
+
+else := [_walk_item_read(x, q, ip, false) | some q in _tally_item_paths(p)]
+
+_walk_item_read(x, q, ip, key) := {"name": _input_name(array.concat(ip, q)), "value": _tally_read_value(x.value, q), "locations": [_pointer(x.locations[0], x.value, q)], "outcome": _walk_item_outcome(x.value, q, key)}
+
+_walk_item_outcome(v, q, true) := _key_read_outcome(_probe(v, q))
+
+_walk_item_outcome(v, q, false) := _tally_read_outcome(v, q, "usable")
 
 _walk_flaw_lists(row, at, check, entries) := [_entry("list", n, cause, [object.union(object.remove(x, _input_stash_keys), {"value": _flaw_list_value(cause, x.value), "outcome": _key_list_outcome(cause)}) | some x in _anchored_all([_path_input(subj, p)], at)], [], c) |
 	some c in _tally_clauses(row.message)
@@ -1345,7 +1379,43 @@ _unusable_twin(i, ins) if {
 	j.locations == i.locations
 }
 
-_tally_item_parts(c, subj, cause, at, m) := _nested_items([x |
+_tally_item_parts(c, subj, cause, at, m) := _nested_items(array.concat(xs, _tally_keyed_extra(c, subj, at, m, xs))) if {
+	xs := _tally_item_records(c, subj, cause, at, m)
+}
+
+_tally_keyed_extra(c, subj, at, m, xs) := [x |
+	some f in _tally_keyed_found(c, subj, m)
+	not f.lead in {y.name | some y in xs}
+	x := _tally_leveled(_tally_item_entry(f.e, _tally_clause_cause(_m_after_lead(f.lead, f.clause), "unusable"), f.clause, f.side, f.w, f.roots, subj), f.e.i, f.w, at)
+]
+
+_tally_keyed_found(c, subj, m) := [{"side": side, "w": w, "roots": roots, "e": e, "lead": lead, "clause": clause} |
+	is_object(c)
+	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
+	some side in _m_tally_parts(mc)
+	_tally_outside_keyed(side, subj)
+	f := _basic_form(side)
+	every seg in side[f] {
+		is_string(seg)
+	}
+	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
+	roots := _dotted_roots([side[f]])
+	some clause in _m_top_split(m, "; ")
+	lead := _m_lead_of(clause)
+	some e in w.items
+	_m_item_name(e.i, roots) == lead
+]
+
+_tally_outside_keyed(side, subj) if {
+	some d in object.get(side, "whose", [])
+	some s in _walk_sides_paths(d)
+	is_array(s[0])
+	_walk_outside(s[0])
+	_item_keyed(s[0])
+	_keyed_base_fine(s[0], subj)
+}
+
+_tally_item_records(c, subj, cause, at, m) := [x |
 	is_object(c)
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
@@ -1359,8 +1429,8 @@ _tally_item_parts(c, subj, cause, at, m) := _nested_items([x |
 	r := _tally_unrooted(r0, m)
 	r != null
 	_tally_said_in(_m_aliased(r[1]), m)
-	x := _tally_record_entry(r, side, w, roots, at)
-])
+	x := _tally_record_entry(r, side, w, roots, at, subj)
+]
 
 _tally_unrooted(r, m) := _tally_kept(r, lead, ps, [p | some p in ps; not p in tops]) if {
 	head := _m_lead_of(r[1])
@@ -1395,12 +1465,12 @@ _tally_word_cause(c, cause) := "unusable" if {
 	cause in {"absent", "null"}
 }
 
-_tally_record_entry([state, text, src], side, w, roots, at) := _tally_leveled(_tally_item_entry(e, _tally_record_cause(state), text, side, w, roots), e.i, w, at) if {
+_tally_record_entry([state, text, src], side, w, roots, at, subj) := _tally_leveled(_tally_item_entry(e, _tally_record_cause(state), text, side, w, roots, subj), e.i, w, at) if {
 	e := src.item
 	_m_positions(e.i) != []
 }
 
-_tally_record_entry([state, text, src], _, w, roots, at) := _tally_leveled(_entry("list", _m_item_name(x.path, roots), x.cause, [{"name": _input_name(x.path), "value": x.value, "locations": [x.at], "outcome": x.cause}], [], text), x.path, w, at) if {
+_tally_record_entry([state, text, src], _, w, roots, at, _) := _tally_leveled(_entry("list", _m_item_name(x.path, roots), x.cause, [{"name": _input_name(x.path), "value": x.value, "locations": [x.at], "outcome": x.cause}], [], text), x.path, w, at) if {
 	x := src.fail
 	_m_positions(x.path) != []
 	_ = state
@@ -1410,20 +1480,23 @@ _tally_record_cause(state) := substring(state, 6, -1) if startswith(state, "focu
 
 else := state
 
-_tally_item_entry(e, cause, text, side, w, roots) := object.union(
-	_entry("item", _m_item_name(e.i, roots), cause, _tally_item_reads(e, cause, side, w, text), [], text),
+_tally_item_entry(e, cause, text, side, w, roots, subj) := object.union(
+	_entry("item", _m_item_name(e.i, roots), cause, _tally_item_reads(e, cause, side, w, text, subj), [], text),
 	{"value": e.iv, "locations": [_item_at(w, e)]},
 )
 
-_tally_item_reads(e, cause, side, w, text) := [{"name": _input_name(array.concat(e.c, ps[0])), "value": null, "locations": [_item_read_at(w, e, e.r)], "outcome": "not_an_object"}] if {
+_tally_item_reads(e, cause, side, w, text, subj) := [{"name": _input_name(array.concat(e.c, ps[0])), "value": null, "locations": [_item_read_at(w, e, e.r)], "outcome": "not_an_object"}] if {
 	e.r != []
 	not _read_state(e.iv, e.r) in {"absent", "unusable"}
 	not is_object(e.v)
 	ps := _once([p | some c in object.get(side, "whose", []); some x in _walk_sides_paths(c); is_array(x[0]); some p in _tally_item_paths(x[0]); p != []; every step in p { is_string(step) }])
 	ps != []
-	_ = [cause, text]
+	_ = [cause, text, subj]
 } else := [{"name": _input_name(e.c), "value": _walk_value(e.v, e, w), "locations": [_item_read_at(w, e, e.r)], "outcome": _tally_read_outcome(e.iv, e.r, cause)}] if {
 	e.r != []
+} else := rs if {
+	rs := _keyed_item_reads(e, side, w, subj)
+	rs != []
 }
 
 else := [{"name": _input_name(array.concat(e.i, p)), "value": _tally_read_value(e.iv, p), "locations": [_item_read_at(w, e, p)], "outcome": _tally_read_outcome(e.iv, p, _tally_said_cause(cause, ps, p, text))} |
@@ -1434,6 +1507,55 @@ else := [{"name": _input_name(array.concat(e.i, p)), "value": _tally_read_value(
 	ps != []
 	_ = text
 } else := [{"name": _item_input_name(e.i), "value": e.iv, "locations": [_item_read_at(w, e, [])], "outcome": _tally_read_outcome(e.iv, [], cause)}]
+
+_keyed_item_reads(e, side, w, subj) := [r |
+	some c in object.get(side, "whose", [])
+	some x in _walk_sides_paths(c)
+	is_array(x[0])
+	some r in _keyed_side_reads(e, x[0], w, subj)
+] if {
+	some c in object.get(side, "whose", [])
+	some x in _walk_sides_paths(c)
+	is_array(x[0])
+	_walk_outside(x[0])
+	_item_keyed(x[0])
+	_keyed_base_fine(x[0], subj)
+}
+
+_keyed_base_fine(p, subj) if {
+	shown := _as_subject_part(p)
+	i := min({j | some j, seg in shown; _item_key_step(seg)})
+	is_object(_value_at(subj, array.slice(shown, 0, i)))
+}
+
+_keyed_side_reads(e, p, w, subj) := array.concat([_keyed_outside_read(e, p, subj)], [_key_step_read(e, seg, w) | some seg in p; _item_key_step(seg)]) if {
+	_walk_outside(p)
+	_item_keyed(p)
+} else := [] if _walk_outside(p)
+
+else := [_plain_item_read_of(e, q, w) | some q in _tally_item_paths(p)]
+
+_plain_item_read_of(e, q, w) := {"name": _input_name(array.concat(e.i, q)), "value": _tally_read_value(e.iv, q), "locations": [_item_read_at(w, e, q)], "outcome": _tally_read_outcome(e.iv, q, "usable")}
+
+_key_step_read(e, seg, w) := {"name": _input_name(array.concat(e.i, [_fk(seg)])), "value": _tally_read_value(e.iv, [_fk(seg)]), "locations": [_item_read_at(w, e, [_fk(seg)])], "outcome": _key_read_outcome(_probe(e.iv, [_fk(seg)]))}
+
+_key_read_outcome(v) := "usable" if is_string(v)
+
+else := _key_state(v)
+
+_keyed_outside_read(e, p, subj) := {"name": _input_name(_as_subject_part(p)), "value": null, "locations": [_unread_pointer(subj, base)], "outcome": _key_read_outcome(bad[0])} if {
+	shown := _as_subject_part(p)
+	bad := [v | some seg in shown; _item_key_step(seg); v := _probe(e.iv, [_fk(seg)]); not is_string(v)]
+	bad != []
+	i := min({j | some j, seg in shown; _item_key_step(seg)})
+	base := array.slice(shown, 0, i)
+} else := {"name": _input_name(_as_subject_part(p)), "value": _tally_read_value(_start_of(subj, resolved), array.slice(resolved, 1, count(resolved))), "locations": [_unread_pointer(subj, resolved)], "outcome": _outcome_word(_read_state(subj, resolved))} if {
+	resolved := [_keyed_step(e, seg) | some seg in _as_subject_part(p)]
+}
+
+_keyed_step(e, seg) := _probe(e.iv, [_fk(seg)]) if _item_key_step(seg)
+
+else := seg
 
 _tally_item_paths(p) := array.concat([p | not _walk_outside(p)], [[_fk(seg)] | some seg in p; _item_key_step(seg)])
 
