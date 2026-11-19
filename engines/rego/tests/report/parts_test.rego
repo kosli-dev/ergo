@@ -32,6 +32,17 @@ test_an_intermediate_join_with_no_own_entries_takes_the_name_and_value_of_the_it
 	ergo._ms_join2([], [{"name": "xs", "value": 1, "locations": ["/xs"]}], []).name == "xs"
 }
 
+test_an_item_input_named_like_a_parent_keeps_its_dot_and_any_other_name_stays_plain if {
+	ergo._item_input_name(["cov", 0]) == ".cov[0]" with data.ergo_parent as {"cov": {"from": "covs"}}
+	ergo._item_input_name(["xs", 0]) == "xs[0]" with data.ergo_parent as {"cov": {"from": "covs"}}
+}
+
+test_a_counted_field_named_by_a_key_the_subject_lacks_is_found_by_the_whole_path_rule_first if {
+	c := ergo._s_written_check("count of xs named by k is 1")
+	ergo._tally_unkeyed_list_names(c, {}) == {"xs named by k"}
+	ergo._tally_list_paths(c, "xs named by k") == [["xs", {"named_by_field": "k"}]]
+}
+
 test_a_from_without_a_path_gives_no_key_reads if {
 	ergo._ms_key_reads({}) == []
 }
