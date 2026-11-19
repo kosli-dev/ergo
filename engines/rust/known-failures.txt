@@ -16,6 +16,7 @@ derived / a count or every whose whose reads a root outside the item through a k
 derived / a count whose whose reads a field of the parent with a named by key from the item, a null root next to the key / names the null field of the parent and then the missing key inside the item
 derived / a count whose whose reads a field of the subject with a named by key from the item, a null root next to the key / names the null field of the subject and then the missing key inside the item
 derived / a count whose whose reads a named by key from $input.k that is missing / the key is missing
+derived / a count whose whose reads a named by key from $input.k that isn't text / the key is a number
 derived / a count whose whose reads a part of the subject that is a path, with a named by key from the item, says the part once, first / names the part when the end of its path is null
 derived / a count whose whose reads a part of the subject that is a path, with a named by key from the item, says the part once, first / names the part when the start of its path is null
 derived / a count whose whose reads a part of the subject with a named by key from the item says the part once, first / names a missing part, not the path past it

@@ -1313,9 +1313,11 @@ _tally_item_reads(e, cause, side, w, text) := [{"name": _input_name(array.concat
 
 else := [{"name": _input_name(array.concat(e.i, p)), "value": _tally_read_value(e.iv, p), "locations": [_item_read_at(w, e, p)], "outcome": _tally_read_outcome(e.iv, p, _tally_said_cause(cause, ps, p, text))} |
 	some p in ps
+	not _tally_path_skipped(e, p, side)
 ] if {
 	ps := _once([p | some c in object.get(side, "whose", []); some x in _walk_sides_paths(c); is_array(x[0]); some p in _tally_item_paths(x[0])])
 	ps != []
+	_ = text
 } else := [{"name": _item_input_name(e.i), "value": e.iv, "locations": [_item_read_at(w, e, [])], "outcome": _tally_read_outcome(e.iv, [], cause)}]
 
 _tally_item_paths(p) := array.concat([p | not _walk_outside(p)], [[_fk(seg)] | some seg in p; _item_key_step(seg)])
@@ -1334,6 +1336,16 @@ _tally_read_outcome(v, p, cause) := _outcome_word(s) if {
 	s := _read_state(v, p)
 	s != "value"
 } else := _tally_value_outcome(cause)
+
+_tally_path_skipped(e, p, side) if {
+	some c in object.get(side, "whose", [])
+	qs := [q | some x in _walk_sides_paths(c); is_array(x[0]); some q in _tally_item_paths(x[0])]
+	some i, q in qs
+	q == p
+	some j, r in qs
+	j < i
+	_read_state(e.iv, r) in {"absent", "null", "not_an_object"}
+}
 
 _tally_said_cause(cause, ps, p, text) := cause if {
 	count(ps) == 1

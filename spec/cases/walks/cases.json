@@ -34154,14 +34154,6 @@
                         "name": "es[0].zz",
                         "outcome": "absent",
                         "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/es/0"
-                        ],
-                        "name": "es[0].m named by $params.k",
-                        "outcome": "absent",
-                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -34183,14 +34175,6 @@
                           "/things/0/es/1"
                         ],
                         "name": "es[1].zz",
-                        "outcome": "absent",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/es/1"
-                        ],
-                        "name": "es[1].m named by $params.k",
                         "outcome": "absent",
                         "value": null
                       }
@@ -34688,14 +34672,6 @@
                         "name": "es[2].zz",
                         "outcome": "absent",
                         "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/es/2"
-                        ],
-                        "name": "es[2].m named by $params.k",
-                        "outcome": "absent",
-                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -34751,14 +34727,6 @@
                           "/things/0/es/4"
                         ],
                         "name": "es[4].zz",
-                        "outcome": "not_an_object",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/es/4"
-                        ],
-                        "name": "es[4].m named by $params.k",
                         "outcome": "not_an_object",
                         "value": null
                       }
@@ -41707,14 +41675,6 @@
                           "/things/0/es/0"
                         ],
                         "name": "es[0].zz",
-                        "outcome": "not_an_object",
-                        "value": null
-                      },
-                      {
-                        "locations": [
-                          "/things/0/es/0"
-                        ],
-                        "name": "es[0].m named by $params.k",
                         "outcome": "not_an_object",
                         "value": null
                       }

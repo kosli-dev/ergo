@@ -405,8 +405,6 @@ _m_shown_clause(m, shown) if _m_item_lead(m) in shown
 
 _m_tally_shown(state, cause) if state == cause
 
-_m_tally_shown(state, _) if state in _failed_read_states
-
 _m_tally_shown("root", _)
 
 _m_tally_shown(state, _) if startswith(state, "focus ")
@@ -418,10 +416,22 @@ _m_tallies(subj, check, cause) := [c |
 	c := _m_joined(cs)
 ]
 
-_m_tally_said(subj, side, cause) := [x | some x in _m_tally(subj, side); _m_tally_shown(x[0], cause); not _m_tally_dropped(subj, side, cause, x)]
+_m_tally_said(subj, side, cause) := [x | some x in _m_tally(subj, side); _m_record_shown(x, cause); not _m_tally_dropped(subj, side, cause, x)]
+
+_m_key_flawed(c) if {
+	some r in _step_refs(c)
+	_ref_state(r) != "value"
+}
+
+_m_record_shown(x, cause) if _m_tally_shown(x[0], cause)
+
+_m_record_shown(x, _) if {
+	count(x) == 3
+	x[0] in _failed_read_states
+}
 
 _m_tally_dropped(subj, side, cause, x) if {
-	roots := {m | some c in object.get(side, "whose", []); _root_read_flaw(subj, c) == cause; some m in array.concat(_m_root_texts(subj, c, cause), _m_walked_tally_texts(subj, _walked_tallies(c), cause))}
+	roots := {m | some c in object.get(side, "whose", []); _root_read_flaw(subj, c) == cause; not _m_key_flawed(c); some m in array.concat(_m_root_texts(subj, c, cause), _m_walked_tally_texts(subj, _walked_tallies(c), cause))}
 	roots != set()
 	not x[1] in roots
 	not _items_judged_alone(subj, side)
