@@ -467,11 +467,6 @@ _fl_typed_only(doc, req) if {
 	_fl_broken(doc, _from_keys(req)).fails == []
 }
 
-_fl_fail_name(req, path) := _visible_path_name(_visible(path), _m_from_root(req)) if {
-	path != []
-	_chained(req)
-} else := _input_path_name(path)
-
 _fl_parent_unread(doc, req) if {
 	_chained(req)
 	not _walkable(doc)

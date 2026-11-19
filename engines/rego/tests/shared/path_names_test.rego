@@ -35,3 +35,7 @@ test_a_path_with_no_name_is_called_the_subject_and_never_it if {
 	ergo._steps_name([0]) == "the subject[0]"
 	ergo._walk_root_name([]) == ["the subject"]
 }
+
+test_the_input_path_of_nothing_is_the_input if {
+	ergo._input_path_name([]) == "$input"
+}
