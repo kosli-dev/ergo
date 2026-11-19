@@ -1963,13 +1963,15 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
             .map(|(k, ((f, v), text))| {
                 (
                     k,
-                    Part {
-                        name: f.text.clone(),
-                        cause: v.cause,
-                        inputs: outcomes(&v.inputs, text, false, &[&f.check]),
-                        failures: Vec::new(),
-                        message: text.clone(),
-                    },
+                    sentence_part(
+                        &f.check,
+                        &f.text,
+                        v.cause,
+                        outcomes(&v.inputs, text, false, &[&f.check]),
+                        text,
+                        ctx,
+                        false,
+                    ),
                 )
             })
             .collect()
@@ -1989,6 +1991,9 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                 ctx,
                 false,
             ),
+            (Check::Tally(tally), _) if tally.counts() && !verdict.passed() => {
+                tally_part(&filter.text, verdict.cause, &inputs, &text, tally, ctx)
+            }
             _ => Part {
                 name: filter.text.clone(),
                 cause: verdict.cause,
@@ -2656,6 +2661,44 @@ fn walk_part(
     }
 }
 
+pub(crate) fn sentence_part(
+    check: &Check,
+    name: &str,
+    cause: Cause,
+    inputs: Vec<Value>,
+    message: &str,
+    ctx: &Ctx,
+    roots: bool,
+) -> Part {
+    match check {
+        Check::Walk(walk) if cause != Cause::Satisfied => {
+            let run = ops::walk::run(walk, ctx);
+            walk_part(
+                name,
+                cause,
+                &inputs,
+                message,
+                &run.failed_items,
+                &run.rich,
+                None,
+                walk,
+                ctx,
+                roots,
+            )
+        }
+        Check::Tally(tally) if tally.counts() && cause != Cause::Satisfied => {
+            tally_part(name, cause, &inputs, message, tally, ctx)
+        }
+        _ => Part {
+            name: name.to_string(),
+            cause,
+            inputs,
+            failures: Vec::new(),
+            message: message.to_string(),
+        },
+    }
+}
+
 fn tally_part(
     name: &str,
     cause: Cause,
@@ -2832,20 +2875,11 @@ fn with_failures(
                     let said = own
                         .clone()
                         .unwrap_or_else(|| default_message(check, ctx, v));
+                    let mut inputs = outcomes(&v.inputs, &said, false, &[check]);
+                    let extra = ops::key_base::entry_inputs(check, ctx, v.cause, &inputs);
+                    inputs.extend(extra);
                     Failure::Assertion {
-                        part: Part {
-                            name: item.text.clone(),
-                            cause: v.cause,
-                            inputs: {
-                                let mut inputs = outcomes(&v.inputs, &said, false, &[check]);
-                                let extra =
-                                    ops::key_base::entry_inputs(check, ctx, v.cause, &inputs);
-                                inputs.extend(extra);
-                                inputs
-                            },
-                            failures: Vec::new(),
-                            message: said,
-                        },
+                        part: sentence_part(check, &item.text, v.cause, inputs, &said, ctx, true),
                         locations: places.get(k).cloned().into_iter().collect(),
                     }
                 })
@@ -2859,13 +2893,6 @@ fn with_failures(
                     .filter(|option| option.cause != Cause::Satisfied)
                     .map(|option| {
                         let places = at(Some(&option.name), option.count);
-                        let mut once: Vec<String> = Vec::new();
-                        let said: Vec<String> = option
-                            .lines
-                            .iter()
-                            .map(|line| ops::message::unsaid(&line.said, &mut once))
-                            .filter(|line| !line.is_empty())
-                            .collect();
                         Failure::Option {
                             part: Part {
                                 name: option.name.clone(),
@@ -2875,30 +2902,32 @@ fn with_failures(
                                     .lines
                                     .iter()
                                     .map(|line| Failure::Assertion {
-                                        part: Part {
-                                            name: line.text.clone(),
-                                            cause: line.cause,
-                                            inputs: {
-                                                let mut inputs = outcomes(
-                                                    &line.inputs,
-                                                    &line.said,
-                                                    false,
-                                                    &[&line.check],
+                                        part: {
+                                            let mut inputs = outcomes(
+                                                &line.inputs,
+                                                &line.said,
+                                                false,
+                                                &[&line.check],
+                                            );
+                                            if matches!(line.check, Check::Walk(_)) {
+                                                let mut refs = Vec::new();
+                                                push_params_refs(
+                                                    &line.check,
+                                                    ctx,
+                                                    &inputs,
+                                                    &mut refs,
                                                 );
-                                                if matches!(line.check, Check::Walk(_)) {
-                                                    let mut refs = Vec::new();
-                                                    push_params_refs(
-                                                        &line.check,
-                                                        ctx,
-                                                        &inputs,
-                                                        &mut refs,
-                                                    );
-                                                    inputs.extend(refs);
-                                                }
-                                                inputs
-                                            },
-                                            failures: Vec::new(),
-                                            message: line.said.clone(),
+                                                inputs.extend(refs);
+                                            }
+                                            sentence_part(
+                                                &line.check,
+                                                &line.text,
+                                                line.cause,
+                                                inputs,
+                                                &line.said,
+                                                ctx,
+                                                true,
+                                            )
                                         },
                                         locations: places
                                             .get(line.at)
@@ -2907,7 +2936,7 @@ fn with_failures(
                                             .collect(),
                                     })
                                     .collect(),
-                                message: said.join(", and "),
+                                message: String::new(),
                             },
                             locations: vec![parts::joined(
                                 "$policy:",
