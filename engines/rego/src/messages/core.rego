@@ -379,7 +379,7 @@ _m_message(check, subj, cause) := m if {
 	m := concat(", and ", clauses)
 } else := _m_fallback(check) if cause in _no_value_states
 
-_m_unusable_before_faults(subj, check) := array.concat(array.concat(_m_key_faults(subj, check), _m_blocked_early(subj, check)), _m_params_faults_early(subj, check))
+_m_unusable_before_faults(subj, check, kf) := array.concat(array.concat(kf, _m_blocked_early(subj, check)), _m_params_faults_early(subj, check))
 
 _m_unusable_after_faults(subj, check) := array.concat(array.concat(array.concat(_m_blocked_late(subj, check), _m_walk_ref_faults(subj, check)), _m_tallies(subj, check, "unusable")), _m_params_beside_input(check))
 
@@ -413,9 +413,10 @@ _m_keyed_unread(subj, side) if {
 	_m_key_fault(subj, step)
 }
 
-_m_unusable_beside_keys(subj, check) := [] if {
-	_m_key_faults(subj, check) == []
-} else := [_m_state_clause(s) |
+_m_unusable_beside_keys(_, _, []) := []
+
+_m_unusable_beside_keys(subj, check, kf) := [_m_state_clause(s) |
+	kf != []
 	some s in _m_sources(subj, check)
 	s.state in _no_value_states
 	_m_side_said(s, "unusable", check)
@@ -423,7 +424,8 @@ _m_unusable_beside_keys(subj, check) := [] if {
 ]
 
 _m_message(check, subj, "unusable") := m if {
-	clauses := _once(array.concat(array.concat(array.concat(_m_unusable_before_faults(subj, check), _m_faults(subj, check)), _m_unusable_after_faults(subj, check)), _m_unusable_beside_keys(subj, check)))
+	kf := _m_key_faults(subj, check)
+	clauses := _once(array.concat(array.concat(array.concat(_m_unusable_before_faults(subj, check, kf), _m_faults(subj, check)), _m_unusable_after_faults(subj, check)), _m_unusable_beside_keys(subj, check, kf)))
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := m if {

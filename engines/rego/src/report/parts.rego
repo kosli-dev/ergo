@@ -435,7 +435,7 @@ _row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.ex
 	not _all_of_run(where.check)
 	not _any_of_run(where.check)
 	not where.check.op == "for"
-	lists := (_tally_list_names(where.check) | _tally_keyed_list_names(where.check, object.get(row, "ergo/subj", null))) | _tally_unkeyed_list_names(where.check, object.get(row, "ergo/subj", null))
+	lists := (_tally_list_names(where.check) | _tally_keyed_list_names(where.check, object.get(row, "ergo/subj", null))) | _tally_unkeyed_lists(where.check, object.get(row, "ergo/subj", null))
 	ls := _plain_tally_lists(row, at, lists, ins, where.check)
 	names := {e.name | some e in ls}
 	items := _tally_item_parts_of(row, where.check, at)
@@ -653,6 +653,10 @@ _tally_keyed_list_paths(check, subj, n) := [q |
 	q := array.concat(array.slice(p, 0, i), [k])
 	_m_aliased(_input_name(q)) == n
 ]
+
+_tally_unkeyed_lists(check, subj) := _tally_unkeyed_list_names(check, subj) if contains(object.get(check, "expression", ""), " named by ")
+
+else := set()
 
 _tally_unkeyed_list_names(check, subj) := {_m_aliased(_input_name(p)) |
 	some side in _m_tally_parts(check)
