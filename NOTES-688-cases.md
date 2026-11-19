@@ -1,6 +1,16 @@
 # #688 step 1: cases and spec text
 
-## Done
+## Second round (settled points B1-B12)
+
+Scripts edit only the `results` of the cases they change and keep the rest of each file as written. Done so far, on the existing cases:
+
+- B2: every `option` entry says `""` (68 cases).
+- Decision 2 in the existing cases: a walk, `count of` or `sum of` beside other sentences, in an option, or on a `for` line without reading the alias now has the entry the same sentence gets alone in a check. Taken from `main` by running the sentence alone, so the D3 items of a `count of` or `sum of` are still missing there.
+- B3: the `list` entry of a `count of` or `sum of` holds the list's own read, with its value and where the read stopped, taken from the same list walked by `every`. Done by hand where `main`'s `every` gives no `list` entry either (`$params` that isn't an object, `zz` holding `"str"` with a bad key, an `$applies` row, and `for` case 322's second list).
+- B5 and B6: the walked path is no longer an input of an assertion, in every form. Where the list itself failed and had no `list` entry, one is added (B7 and its neighbours), with the read taken from `<list> exists` on `main`.
+- Left as `main` has them, and listed in the report: a list problem hidden by another root (15 rows, like messages case 145, which pins it), a whole-list value clause like `approvers is [...]` from an `every … whose` that picks nothing (12 rows), and walked items said in the message with no `item` entries, which are D3 or D1 shapes (9 rows).
+
+## First round
 
 - `spec/cases/row_parts/cases.json`: 9 groups, 18 cases, written from the three decisions. All 18 fail on `main` (500ea825), as they should. The rows `main` already gets right are copied from it. The new trees copy the form the decision points to: the one-sentence plain walk for decision 2, the plain nested walk with the alias names for decision 1, and the `every … whose … exists` walk for the items of a `count of` decision 3 names.
 - `engines/rego/tests/spec_test.rego`: the new folder and its test. No engine changes.

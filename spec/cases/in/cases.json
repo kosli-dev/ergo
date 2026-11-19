@@ -9108,10 +9108,15 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/repos/0/deps"
+                        ],
                         "name": "deps",
                         "outcome": "unusable",
-                        "value": []
+                        "value": {
+                          "n": 2,
+                          "name": "click"
+                        }
                       }
                     ],
                     "kind": "list",
@@ -9198,10 +9203,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/repos/0"
+                        ],
                         "name": "deps",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -12529,22 +12536,6 @@
                     ],
                     "name": "count of .lock.pkgs",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/repos/0/lock/pkgs/0",
-                      "/repos/0/lock/pkgs/1",
-                      "/repos/0/lock/pkgs/2"
-                    ],
-                    "name": ".lock.pkgs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1
-                      },
-                      {},
-                      "t"
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -12878,16 +12869,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/repos/0"
+                        ],
                         "name": "xs",
                         "outcome": "absent",
-                        "value": []
-                      },
-                      {
-                        "locations": [],
-                        "name": "xs",
-                        "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -12946,7 +12933,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/repos/0"
+                        ],
+                        "name": "xs",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "xs is missing",
                     "name": "xs"
@@ -12962,18 +12958,6 @@
                     "locations": [],
                     "name": "sum of xs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.n",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.n",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -13024,16 +13008,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/repos/0/xs"
+                        ],
                         "name": "xs",
                         "outcome": "null",
-                        "value": []
-                      },
-                      {
-                        "locations": [],
-                        "name": "xs",
-                        "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -13092,7 +13072,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/repos/0/xs"
+                        ],
+                        "name": "xs",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "xs is null",
                     "name": "xs"
@@ -13108,18 +13097,6 @@
                     "locations": [],
                     "name": "sum of xs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.n",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.n",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -17484,16 +17461,6 @@
                     "name": "$input.l",
                     "outcome": "unusable",
                     "value": "s"
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0/n"
-                    ],
-                    "name": "xs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -17857,16 +17824,6 @@
                     "name": "$input.p",
                     "outcome": "unusable",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0/s"
-                    ],
-                    "name": "xs[].s",
-                    "outcome": "usable",
-                    "value": [
-                      "ab"
-                    ]
                   }
                 ],
                 "kind": "assertion",

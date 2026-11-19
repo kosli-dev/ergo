@@ -5345,10 +5345,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:"
+                        ],
                         "name": "$params.q",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -5404,10 +5406,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:"
+                        ],
                         "name": "$params.q",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -5476,14 +5480,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/i"
@@ -5533,14 +5530,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/j"
@@ -5747,7 +5737,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o1"
                 ],
-                "message": "$params.x.y is missing",
+                "message": "",
                 "name": "o1"
               },
               {
@@ -5787,7 +5777,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o2"
                 ],
-                "message": "$input.z is missing",
+                "message": "",
                 "name": "o2"
               }
             ],
@@ -6555,10 +6545,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:/q"
+                        ],
                         "name": "$params.q",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -6614,10 +6606,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:/q"
+                        ],
                         "name": "$params.q",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -6686,14 +6680,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/i"
@@ -6743,14 +6730,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/j"
@@ -6957,7 +6937,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o1"
                 ],
-                "message": "$params.x.y is null",
+                "message": "",
                 "name": "o1"
               },
               {
@@ -6997,7 +6977,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o2"
                 ],
-                "message": "$input.z is null",
+                "message": "",
                 "name": "o2"
               }
             ],
@@ -7771,10 +7751,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:/q"
+                        ],
                         "name": "$params.q",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "s"
                       }
                     ],
                     "kind": "list",
@@ -7830,10 +7812,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:/q"
+                        ],
                         "name": "$params.q",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "s"
                       }
                     ],
                     "kind": "list",
@@ -7902,14 +7886,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/i"
@@ -7959,14 +7936,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/j"
@@ -8151,7 +8121,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o1"
                 ],
-                "message": "$params.x is 5, which isn't an object",
+                "message": "",
                 "name": "o1"
               },
               {
@@ -8193,7 +8163,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o2"
                 ],
-                "message": "v is 1, which isn't a list",
+                "message": "",
                 "name": "o2"
               }
             ],
@@ -8925,7 +8895,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is missing",
                     "name": "$params"
@@ -8936,12 +8915,6 @@
                     "locations": [],
                     "name": "count of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -8983,7 +8956,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is missing",
                     "name": "$params"
@@ -8994,12 +8976,6 @@
                     "locations": [],
                     "name": "sum of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -9056,14 +9032,7 @@
                     "name": "$params"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/i"
@@ -9113,14 +9082,7 @@
                     "name": "$params"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/j"
@@ -11090,7 +11052,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/g/any_of/a"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -11098,26 +11060,35 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "$params:/objs/1"
+                            ],
+                            "name": "$params.objs[1].x",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
-                          "$params:/objs/0/x",
                           "$params:/objs/1"
                         ],
-                        "name": "$params.objs[].x",
-                        "outcome": "unusable",
-                        "value": [
-                          "y",
-                          null
-                        ]
+                        "message": "item 2 of $params.objs is 3, which isn't an object",
+                        "name": "item 2 of $params.objs",
+                        "value": 3
                       }
                     ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/s/checks/g/any_of/b"
                     ],
-                    "message": "item 2 of $params.objs is 3, which isn't an object",
+                    "message": "",
                     "name": "every $params.objs.x is \"y\""
                   }
                 ],
@@ -11126,7 +11097,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/g/any_of/b"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -11201,7 +11172,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/h/any_of/a"
                 ],
-                "message": "$params.objs is [{\"n\": 1, \"x\": \"y\"}, 3], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -11245,7 +11216,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/h/any_of/b"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -12354,12 +12325,6 @@
                   "value": null
                 },
                 {
-                  "locations": [],
-                  "name": "$params.m named by k",
-                  "outcome": "usable",
-                  "value": []
-                },
-                {
                   "locations": [
                     "/things/0/k"
                   ],
@@ -13223,7 +13188,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o1"
               ],
-              "message": "$params.m named by k is missing",
+              "message": "",
               "name": "o1"
             },
             {
@@ -13255,7 +13220,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o2"
               ],
-              "message": "v is \"a\", which isn't a number",
+              "message": "",
               "name": "o2"
             }
           ],
@@ -13303,7 +13268,16 @@
                 {
                   "cause": "absent",
                   "failures": [],
-                  "inputs": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.m",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
                   "kind": "list",
                   "message": "$params.m is missing",
                   "name": "$params.m"
@@ -13314,12 +13288,6 @@
                   "locations": [],
                   "name": "count of $params.m named by k",
                   "value": null
-                },
-                {
-                  "locations": [],
-                  "name": "$params.m named by k",
-                  "outcome": "absent",
-                  "value": []
                 },
                 {
                   "locations": [
@@ -14065,7 +14033,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o1"
               ],
-              "message": "$params.m is null",
+              "message": "",
               "name": "o1"
             },
             {
@@ -14097,7 +14065,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o2"
               ],
-              "message": "v is \"a\", which isn't a number",
+              "message": "",
               "name": "o2"
             }
           ],
@@ -14145,7 +14113,16 @@
                 {
                   "cause": "null",
                   "failures": [],
-                  "inputs": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:/m"
+                      ],
+                      "name": "$params.m",
+                      "outcome": "null",
+                      "value": null
+                    }
+                  ],
                   "kind": "list",
                   "message": "$params.m is null",
                   "name": "$params.m"
@@ -14156,12 +14133,6 @@
                   "locations": [],
                   "name": "count of $params.m named by k",
                   "value": null
-                },
-                {
-                  "locations": [],
-                  "name": "$params.m named by k",
-                  "outcome": "null",
-                  "value": []
                 },
                 {
                   "locations": [
@@ -14907,7 +14878,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o1"
               ],
-              "message": "$params.m is 3, which isn't an object",
+              "message": "",
               "name": "o1"
             },
             {
@@ -14939,7 +14910,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o2"
               ],
-              "message": "v is \"a\", which isn't a number",
+              "message": "",
               "name": "o2"
             }
           ],
@@ -14987,7 +14958,16 @@
                 {
                   "cause": "unusable",
                   "failures": [],
-                  "inputs": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:/m"
+                      ],
+                      "name": "$params.m",
+                      "outcome": "unusable",
+                      "value": 3
+                    }
+                  ],
                   "kind": "list",
                   "message": "$params.m is 3, which isn't a list or an object",
                   "name": "$params.m"
@@ -14998,12 +14978,6 @@
                   "locations": [],
                   "name": "count of $params.m named by k",
                   "value": null
-                },
-                {
-                  "locations": [],
-                  "name": "$params.m named by k",
-                  "outcome": "usable",
-                  "value": []
                 },
                 {
                   "locations": [

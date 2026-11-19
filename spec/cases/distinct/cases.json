@@ -1408,7 +1408,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/commits"
+                        ],
+                        "name": "commits",
+                        "outcome": "unusable",
+                        "value": "ann"
+                      }
+                    ],
                     "kind": "list",
                     "message": "commits is \"ann\", which isn't a list or an object",
                     "name": "commits"
@@ -1419,12 +1428,6 @@
                     "locations": [],
                     "name": "count of distinct commits.author",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "commits.author",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -1475,7 +1478,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s"
+                        ],
+                        "name": "commits",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "commits is missing",
                     "name": "commits"
@@ -1486,12 +1498,6 @@
                     "locations": [],
                     "name": "count of distinct commits.author",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "commits.author",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -1540,7 +1546,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/commits"
+                        ],
+                        "name": "commits",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "commits is null",
                     "name": "commits"
@@ -1551,12 +1566,6 @@
                     "locations": [],
                     "name": "count of distinct commits.author",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "commits.author",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -3886,18 +3895,6 @@
                     "name": "lo",
                     "outcome": "absent",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/s/xs/0/k",
-                      "/s/xs/1/k"
-                    ],
-                    "name": "xs[].k",
-                    "outcome": "usable",
-                    "value": [
-                      5,
-                      5
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -4293,18 +4290,6 @@
                     "name": "lo",
                     "outcome": "absent",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/s/xs/0/k",
-                      "/s/xs/1/k"
-                    ],
-                    "name": "xs[].k",
-                    "outcome": "usable",
-                    "value": [
-                      5,
-                      5
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -4700,18 +4685,6 @@
                     "name": "lo",
                     "outcome": "absent",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/s/xs/0/k",
-                      "/s/xs/1/k"
-                    ],
-                    "name": "xs[].k",
-                    "outcome": "usable",
-                    "value": [
-                      5,
-                      5
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -5110,18 +5083,6 @@
                     "name": "lo",
                     "outcome": "absent",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/s/xs/0/k",
-                      "/s/xs/1/k"
-                    ],
-                    "name": "xs[].k",
-                    "outcome": "usable",
-                    "value": [
-                      5,
-                      5
-                    ]
                   }
                 ],
                 "kind": "assertion",

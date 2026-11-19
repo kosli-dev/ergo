@@ -3276,7 +3276,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option/any_of/a"
                 ],
-                "message": "item 1 of xs: v is null; item 2 of xs: v is missing",
+                "message": "",
                 "name": "a"
               },
               {
@@ -3353,7 +3353,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option/any_of/b"
                 ],
-                "message": "item 2 of xs: k is \"z\", which isn't a number, and z is 2",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -8829,7 +8829,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option/any_of/a"
                 ],
-                "message": "item 1 of xs: item 2 of ys: n is missing; item 2 of xs: ys is missing",
+                "message": "",
                 "name": "a"
               },
               {
@@ -8861,7 +8861,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option/any_of/b"
                 ],
-                "message": "z is 2",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -8994,7 +8994,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option_two/any_of/a"
                 ],
-                "message": "item 1 of xs: v is 2; item 2 of xs: v is null, and z is 2",
+                "message": "",
                 "name": "a"
               },
               {
@@ -9072,7 +9072,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option_two/any_of/b"
                 ],
-                "message": "item 1 of xs: v is 2; item 2 of xs: v is null",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -9138,14 +9138,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.ys.n",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/u/from#1"
@@ -9223,14 +9216,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.ys.n",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/multi/assert/0"
@@ -9308,14 +9294,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.v",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/multi_some/assert/0"
@@ -9393,14 +9372,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/multi_whose/assert/0"
@@ -9481,14 +9453,7 @@
                         "name": "xs"
                       }
                     ],
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "xs.ys.n",
-                        "outcome": "absent",
-                        "value": []
-                      }
-                    ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/option/any_of/a/0"
@@ -9502,7 +9467,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option/any_of/a"
                 ],
-                "message": "xs is missing",
+                "message": "",
                 "name": "a"
               },
               {
@@ -9534,7 +9499,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option/any_of/b"
                 ],
-                "message": "z is 2",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -9590,14 +9555,7 @@
                         "name": "xs"
                       }
                     ],
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "xs.v",
-                        "outcome": "absent",
-                        "value": []
-                      }
-                    ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/option_two/any_of/a/0"
@@ -9631,7 +9589,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option_two/any_of/a"
                 ],
-                "message": "xs is missing, and z is 2",
+                "message": "",
                 "name": "a"
               },
               {
@@ -9658,14 +9616,7 @@
                         "name": "xs"
                       }
                     ],
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "xs.v",
-                        "outcome": "absent",
-                        "value": []
-                      }
-                    ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/option_two/any_of/b/0"
@@ -9679,7 +9630,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option_two/any_of/b"
                 ],
-                "message": "xs is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -9739,14 +9690,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.ys.n",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/u/from#1"
@@ -9824,14 +9768,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.ys.n",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/multi/assert/0"
@@ -9909,14 +9846,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.v",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/multi_some/assert/0"
@@ -9994,14 +9924,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/multi_whose/assert/0"
@@ -10082,14 +10005,7 @@
                         "name": "xs"
                       }
                     ],
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "xs.ys.n",
-                        "outcome": "null",
-                        "value": []
-                      }
-                    ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/option/any_of/a/0"
@@ -10103,7 +10019,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option/any_of/a"
                 ],
-                "message": "xs is null",
+                "message": "",
                 "name": "a"
               },
               {
@@ -10135,7 +10051,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option/any_of/b"
                 ],
-                "message": "z is 2",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -10191,14 +10107,7 @@
                         "name": "xs"
                       }
                     ],
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "xs.v",
-                        "outcome": "null",
-                        "value": []
-                      }
-                    ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/option_two/any_of/a/0"
@@ -10232,7 +10141,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option_two/any_of/a"
                 ],
-                "message": "xs is null, and z is 2",
+                "message": "",
                 "name": "a"
               },
               {
@@ -10259,14 +10168,7 @@
                         "name": "xs"
                       }
                     ],
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "xs.v",
-                        "outcome": "null",
-                        "value": []
-                      }
-                    ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/option_two/any_of/b/0"
@@ -10280,7 +10182,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option_two/any_of/b"
                 ],
-                "message": "xs is null",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -10340,14 +10242,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.ys.n",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/u/from#1"
@@ -10425,14 +10320,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.ys.n",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/multi/assert/0"
@@ -10510,14 +10398,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.v",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/multi_some/assert/0"
@@ -10595,14 +10476,7 @@
                     "name": "xs"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/multi_whose/assert/0"
@@ -10683,14 +10557,7 @@
                         "name": "xs"
                       }
                     ],
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "xs.ys.n",
-                        "outcome": "unusable",
-                        "value": []
-                      }
-                    ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/option/any_of/a/0"
@@ -10704,7 +10571,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option/any_of/a"
                 ],
-                "message": "xs is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -10736,7 +10603,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option/any_of/b"
                 ],
-                "message": "z is 2",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -10792,14 +10659,7 @@
                         "name": "xs"
                       }
                     ],
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "xs.v",
-                        "outcome": "unusable",
-                        "value": []
-                      }
-                    ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/option_two/any_of/a/0"
@@ -10833,7 +10693,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option_two/any_of/a"
                 ],
-                "message": "xs is \"s\", which isn't a list or an object, and z is 2",
+                "message": "",
                 "name": "a"
               },
               {
@@ -10860,14 +10720,7 @@
                         "name": "xs"
                       }
                     ],
-                    "inputs": [
-                      {
-                        "locations": [],
-                        "name": "xs.v",
-                        "outcome": "unusable",
-                        "value": []
-                      }
-                    ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/option_two/any_of/b/0"
@@ -10881,7 +10734,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/option_two/any_of/b"
                 ],
-                "message": "xs is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "b"
               }
             ],

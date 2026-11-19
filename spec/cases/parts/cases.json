@@ -2854,10 +2854,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/rounds/0/items/0/cov"
+                        ],
                         "name": "cov",
                         "outcome": "unusable",
-                        "value": []
+                        "value": 1
                       }
                     ],
                     "kind": "list",
@@ -3937,10 +3939,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/rounds/0/items/0/cov"
+                        ],
                         "name": "cov",
                         "outcome": "unusable",
-                        "value": []
+                        "value": 1
                       }
                     ],
                     "kind": "list",

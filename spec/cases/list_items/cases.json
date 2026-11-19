@@ -190,18 +190,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/v"
-                    ],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every/assert"
@@ -379,18 +368,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/v"
-                    ],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/that/assert"
@@ -479,20 +457,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/whose/assert"
@@ -585,18 +550,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/v"
-                    ],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every/assert"
@@ -782,18 +736,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/v"
-                    ],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/that/assert"
@@ -886,20 +829,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/whose/assert"
@@ -992,18 +922,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/v"
-                    ],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every/assert"
@@ -1181,18 +1100,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/v"
-                    ],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/that/assert"
@@ -1281,20 +1189,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/whose/assert"
@@ -1374,18 +1269,7 @@
                     "value": []
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/v"
-                    ],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every/assert"
@@ -1615,20 +1499,7 @@
                     "value": []
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": "a"
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/whose/assert"
@@ -6225,24 +6096,6 @@
                     "value": [
                       "bob",
                       3
-                    ]
-                  },
-                  {
-                    "locations": [
-                      "/cs/0/rows/0",
-                      "/cs/0/rows/1"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2,
-                        "v": "bob"
-                      },
-                      {
-                        "n": 2,
-                        "v": "ann"
-                      }
                     ]
                   }
                 ],
@@ -22405,12 +22258,6 @@
                     "locations": [],
                     "name": "count of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -22454,12 +22301,6 @@
                     "locations": [],
                     "name": "count of $input.m named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$input.m named by $params.k",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -22568,12 +22409,6 @@
                 "cause": "not_an_object",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
-                  },
                   {
                     "locations": [
                       ""
@@ -22694,12 +22529,6 @@
                     "locations": [],
                     "name": "count of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -22743,12 +22572,6 @@
                     "locations": [],
                     "name": "count of $input.m named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$input.m named by $params.k",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -22857,12 +22680,6 @@
                 "cause": "not_an_object",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
-                  },
                   {
                     "locations": [
                       ""
@@ -22983,12 +22800,6 @@
                     "locations": [],
                     "name": "count of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -23032,12 +22843,6 @@
                     "locations": [],
                     "name": "count of $input.m named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$input.m named by $params.k",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -23146,12 +22951,6 @@
                 "cause": "not_an_object",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
-                  },
                   {
                     "locations": [
                       ""
@@ -23275,12 +23074,6 @@
                         "locations": [],
                         "name": "sum of xs.m named by $input.k",
                         "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "xs.m named by $input.k",
-                        "outcome": "not_an_object",
-                        "value": []
                       }
                     ],
                     "kind": "assertion",
@@ -23296,7 +23089,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of_sum/any_of/a"
                 ],
-                "message": "$input is [an object with 6 keys], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -23328,7 +23121,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of_sum/any_of/b"
                 ],
-                "message": "k is \"a\"",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -23381,12 +23174,6 @@
                     "locations": [],
                     "name": "sum of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -23645,12 +23432,6 @@
                     "locations": [],
                     "name": "sum of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -23694,12 +23475,6 @@
                     "locations": [],
                     "name": "sum of m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -23750,12 +23525,6 @@
                     "locations": [],
                     "name": "sum of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -23832,12 +23601,6 @@
                         "locations": [],
                         "name": "sum of xs.m named by $input.k",
                         "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "xs.m named by $input.k",
-                        "outcome": "not_an_object",
-                        "value": []
                       }
                     ],
                     "kind": "assertion",
@@ -23853,7 +23616,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of_sum/any_of/a"
                 ],
-                "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"n\": 1, \"tags\": [], \"xs\": []}], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -23885,7 +23648,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of_sum/any_of/b"
                 ],
-                "message": "k is \"a\"",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -23938,12 +23701,6 @@
                     "locations": [],
                     "name": "sum of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -24194,12 +23951,6 @@
                     "locations": [],
                     "name": "sum of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -24243,12 +23994,6 @@
                     "locations": [],
                     "name": "sum of m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -24299,12 +24044,6 @@
                     "locations": [],
                     "name": "sum of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -24963,12 +24702,6 @@
                         "locations": [],
                         "name": "count of xs.m named by $input.k",
                         "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "xs.m named by $input.k",
-                        "outcome": "not_an_object",
-                        "value": []
                       }
                     ],
                     "kind": "assertion",
@@ -24984,7 +24717,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of/any_of/a"
                 ],
-                "message": "$input is [an object with 7 keys], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -25016,7 +24749,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of/any_of/b"
                 ],
-                "message": "k is \"a\"",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -25096,12 +24829,6 @@
                     "locations": [],
                     "name": "count of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -25689,12 +25416,6 @@
                     "locations": [],
                     "name": "sum of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -26425,12 +26146,6 @@
                         "locations": [],
                         "name": "count of xs.m named by $input.k",
                         "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "xs.m named by $input.k",
-                        "outcome": "not_an_object",
-                        "value": []
                       }
                     ],
                     "kind": "assertion",
@@ -26446,7 +26161,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of/any_of/a"
                 ],
-                "message": "$input is [an object with 6 keys], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -26478,7 +26193,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of/any_of/b"
                 ],
-                "message": "k is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -26558,12 +26273,6 @@
                     "locations": [],
                     "name": "count of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -27151,12 +26860,6 @@
                     "locations": [],
                     "name": "sum of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -27887,12 +27590,6 @@
                         "locations": [],
                         "name": "count of xs.m named by $input.k",
                         "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "xs.m named by $input.k",
-                        "outcome": "not_an_object",
-                        "value": []
                       }
                     ],
                     "kind": "assertion",
@@ -27908,7 +27605,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of/any_of/a"
                 ],
-                "message": "$input is [an object with 7 keys], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -27940,7 +27637,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of/any_of/b"
                 ],
-                "message": "k is null",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -28020,12 +27717,6 @@
                     "locations": [],
                     "name": "count of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -28613,12 +28304,6 @@
                     "locations": [],
                     "name": "sum of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -29349,12 +29034,6 @@
                         "locations": [],
                         "name": "count of xs.m named by $input.k",
                         "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "xs.m named by $input.k",
-                        "outcome": "not_an_object",
-                        "value": []
                       }
                     ],
                     "kind": "assertion",
@@ -29370,7 +29049,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of/any_of/a"
                 ],
-                "message": "$input is [an object with 7 keys], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -29402,7 +29081,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/any_of/any_of/b"
                 ],
-                "message": "k is 3, which isn't text",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -29482,12 +29161,6 @@
                     "locations": [],
                     "name": "count of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -30075,12 +29748,6 @@
                     "locations": [],
                     "name": "sum of xs.m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.m named by $input.k",
-                    "outcome": "not_an_object",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -31257,18 +30924,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/0/rs/0/v",
-                      "/0/rs/1/v"
-                    ],
-                    "name": "rs[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a",
-                      "b"
-                    ]
-                  },
-                  {
-                    "locations": [
                       ""
                     ],
                     "name": "$input.k",
@@ -31701,7 +31356,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/input_any_of/any_of/a"
                 ],
-                "message": "$input is [an object with 7 keys], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -31733,7 +31388,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/input_any_of/any_of/b"
                 ],
-                "message": "k is \"a\"",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -32067,7 +31722,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/params_any_of/any_of/a"
                 ],
-                "message": "$input is [an object with 7 keys], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -32099,7 +31754,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/params_any_of/any_of/b"
                 ],
-                "message": "k is \"a\"",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -32447,7 +32102,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/input_any_of/any_of/a"
                 ],
-                "message": "$input is [an object with 7 keys], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -32479,7 +32134,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/input_any_of/any_of/b"
                 ],
-                "message": "k is \"a\"",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -32813,7 +32468,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/params_any_of/any_of/a"
                 ],
-                "message": "$input is [an object with 7 keys], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -32845,7 +32500,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/params_any_of/any_of/b"
                 ],
-                "message": "k is \"a\"",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -33193,7 +32848,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/input_any_of/any_of/a"
                 ],
-                "message": "$input is [an object with 7 keys], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -33225,7 +32880,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/input_any_of/any_of/b"
                 ],
-                "message": "k is \"a\"",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -33559,7 +33214,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/params_any_of/any_of/a"
                 ],
-                "message": "$input is [an object with 7 keys], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -33591,7 +33246,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/params_any_of/any_of/b"
                 ],
-                "message": "k is \"a\"",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -36583,12 +36238,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/p"
                     ],
@@ -36643,12 +36292,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/p"
                     ],
@@ -36701,12 +36344,6 @@
                     "locations": [],
                     "name": "sum of rows.w named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -36821,7 +36458,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c/any_of/plain"
                 ],
-                "message": "t is [{\"name\": \"a\"}, {\"name\": \"b\"}], which isn't an object",
+                "message": "",
                 "name": "plain"
               },
               {
@@ -36829,26 +36466,37 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/1/0/name",
-                          "/things/1/1/name"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/1/1/name"
+                            ],
+                            "name": "t[1].name",
+                            "outcome": "usable",
+                            "value": "b"
+                          }
                         ],
-                        "name": "t[].name",
-                        "outcome": "usable",
-                        "value": [
-                          "a",
-                          "b"
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/1/1"
+                        ],
+                        "message": "name is \"b\"",
+                        "name": "item 2 of t",
+                        "value": {
+                          "name": "b"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/c/any_of/read"
                     ],
-                    "message": "item 2 of t: name is \"b\"",
+                    "message": "",
                     "name": "every name is \"a\""
                   }
                 ],
@@ -36857,7 +36505,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c/any_of/read"
                 ],
-                "message": "item 2 of t: name is \"b\"",
+                "message": "",
                 "name": "read"
               }
             ],

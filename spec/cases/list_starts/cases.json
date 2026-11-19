@@ -1454,10 +1454,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/0/name"
+                        ],
                         "name": "name",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "a"
                       }
                     ],
                     "kind": "list",
@@ -1529,14 +1531,7 @@
                     "name": "name"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "name",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every"
@@ -1611,14 +1606,7 @@
                     "name": "name"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "name",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some"
@@ -1658,10 +1646,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/0/n"
+                        ],
                         "name": "n",
                         "outcome": "unusable",
-                        "value": []
+                        "value": 1
                       }
                     ],
                     "kind": "list",

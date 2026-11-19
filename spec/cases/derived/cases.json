@@ -276,10 +276,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/releases/0"
+                        ],
                         "name": "findings",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -358,10 +360,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/releases/0/findings"
+                        ],
                         "name": "findings",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -440,10 +444,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/releases/0/findings"
+                        ],
                         "name": "findings",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "abc"
                       }
                     ],
                     "kind": "list",
@@ -524,10 +530,14 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/releases/0/findings"
+                        ],
                         "name": "findings",
                         "outcome": "unusable",
-                        "value": []
+                        "value": {
+                          "id": 1
+                        }
                       }
                     ],
                     "kind": "list",
@@ -669,10 +679,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/releases/0"
+                        ],
                         "name": "findings",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -1244,10 +1256,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/releases/0"
+                        ],
                         "name": "findings",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -1982,7 +1996,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0"
+                        ],
+                        "name": "pull_requests",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "pull_requests is missing",
                     "name": "pull_requests"
@@ -1993,12 +2016,6 @@
                     "locations": [],
                     "name": "count of pull_requests.commits",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "pull_requests.commits",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -2630,7 +2647,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0"
+                        ],
+                        "name": "items",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "items is missing",
                     "name": "items"
@@ -2641,12 +2667,6 @@
                     "locations": [],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "items.usd",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -2711,7 +2731,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/items"
+                        ],
+                        "name": "items",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "items is null",
                     "name": "items"
@@ -2722,12 +2751,6 @@
                     "locations": [],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "items.usd",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -2792,7 +2815,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/items"
+                        ],
+                        "name": "items",
+                        "outcome": "unusable",
+                        "value": "x"
+                      }
+                    ],
                     "kind": "list",
                     "message": "items is \"x\", which isn't a list or an object",
                     "name": "items"
@@ -2803,12 +2835,6 @@
                     "locations": [],
                     "name": "sum of items.usd",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "items.usd",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -6069,10 +6095,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/releases/0"
+                        ],
                         "name": "findings",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -7491,10 +7519,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/releases/0"
+                        ],
                         "name": "findings",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -10401,10 +10431,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:"
+                        ],
                         "name": "$params.approvers",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -10508,10 +10540,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:/approvers"
+                        ],
                         "name": "$params.approvers",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -10615,10 +10649,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:/approvers"
+                        ],
                         "name": "$params.approvers",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "ann"
                       }
                     ],
                     "kind": "list",
@@ -11293,10 +11329,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/releases/0"
+                        ],
                         "name": "x",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -11375,10 +11413,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/releases/0/x"
+                        ],
                         "name": "x",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -11457,10 +11497,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/releases/0/x"
+                        ],
                         "name": "x",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "abc"
                       }
                     ],
                     "kind": "list",
@@ -21130,10 +21172,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0"
+                        ],
                         "name": "zzs",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -21454,7 +21498,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "zzs",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "zzs is missing",
                     "name": "zzs"
@@ -21465,12 +21518,6 @@
                     "locations": [],
                     "name": "sum of zzs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zzs.n",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -24204,12 +24251,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:/k"
                     ],
@@ -24508,7 +24549,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "es is missing",
                     "name": "es"
@@ -24519,12 +24569,6 @@
                     "locations": [],
                     "name": "count of es.v that equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es.v",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -24576,10 +24620,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0"
+                        ],
                         "name": "es",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -24648,7 +24694,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "es is null",
                     "name": "es"
@@ -24659,12 +24714,6 @@
                     "locations": [],
                     "name": "count of es.v that equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es.v",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -24716,10 +24765,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/es"
+                        ],
                         "name": "es",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -24788,7 +24839,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
                     "kind": "list",
                     "message": "es is \"s\", which isn't a list or an object",
                     "name": "es"
@@ -24799,12 +24859,6 @@
                     "locations": [],
                     "name": "count of es.v that equals m named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es.v",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -24856,10 +24910,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/es"
+                        ],
                         "name": "es",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "s"
                       }
                     ],
                     "kind": "list",
@@ -25928,10 +25984,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0"
+                        ],
                         "name": "xs",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -26024,12 +26082,6 @@
                     "name": "$input.m",
                     "outcome": "null",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -26097,12 +26149,6 @@
                     "name": "$input.m",
                     "outcome": "null",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -26171,10 +26217,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/xs"
+                        ],
                         "name": "xs",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -26267,12 +26315,6 @@
                     "name": "$input.m",
                     "outcome": "null",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -26340,12 +26382,6 @@
                     "name": "$input.m",
                     "outcome": "null",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -26414,10 +26450,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/xs"
+                        ],
                         "name": "xs",
                         "outcome": "unusable",
-                        "value": []
+                        "value": 3
                       }
                     ],
                     "kind": "list",
@@ -26510,12 +26548,6 @@
                     "name": "$input.m",
                     "outcome": "null",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -26583,12 +26615,6 @@
                     "name": "$input.m",
                     "outcome": "null",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -26657,10 +26683,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/xs"
+                        ],
                         "name": "xs",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "s"
                       }
                     ],
                     "kind": "list",
@@ -26753,12 +26781,6 @@
                     "name": "$input.m",
                     "outcome": "null",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -26826,12 +26848,6 @@
                     "name": "$input.m",
                     "outcome": "null",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -26908,10 +26924,20 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/xs"
+                        ],
                         "name": "xs",
                         "outcome": "unusable",
-                        "value": []
+                        "value": {
+                          "a": {
+                            "key": "a",
+                            "tags": [
+                              "x"
+                            ],
+                            "v": "x"
+                          }
+                        }
                       }
                     ],
                     "kind": "list",
@@ -27012,12 +27038,6 @@
                     "name": "$input.m",
                     "outcome": "null",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -27093,12 +27113,6 @@
                     "name": "$input.m",
                     "outcome": "null",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",

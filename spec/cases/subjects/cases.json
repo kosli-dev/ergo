@@ -1724,10 +1724,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/pulls/0"
+                        ],
                         "name": "reviews",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -2184,14 +2186,7 @@
                     "name": "files"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "files.path",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/release/from"
@@ -2241,14 +2236,7 @@
                     "name": "files"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "files.path",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/release/from"
@@ -2298,14 +2286,7 @@
                     "name": "files"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "files.path",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/release/from"
@@ -2913,14 +2894,7 @@
                     "name": "files"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "files.path",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/release/from"
@@ -2970,14 +2944,7 @@
                     "name": "files"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "files.path",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/release/from"
@@ -3027,14 +2994,7 @@
                     "name": "files"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "files.path",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/release/from"
@@ -3523,14 +3483,7 @@
                     "name": "files"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "files.path",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/release/from"
@@ -3580,14 +3533,7 @@
                     "name": "files"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "files.path",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/release/from"
@@ -3637,14 +3583,7 @@
                     "name": "files"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "files.path",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/release/from"

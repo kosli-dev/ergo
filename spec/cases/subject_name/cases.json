@@ -1693,14 +1693,7 @@
                     "name": "region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/e"
@@ -1750,14 +1743,7 @@
                     "name": "region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/s"
@@ -1807,14 +1793,7 @@
                     "name": "region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/e"
@@ -1864,14 +1843,7 @@
                     "name": "region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/s"
@@ -2187,10 +2159,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/3"
+                        ],
                         "name": "region",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -2246,10 +2220,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/3"
+                        ],
                         "name": "region",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -2305,10 +2281,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/4"
+                        ],
                         "name": "region",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "s"
                       }
                     ],
                     "kind": "list",
@@ -2364,10 +2342,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/4"
+                        ],
                         "name": "region",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "s"
                       }
                     ],
                     "kind": "list",
@@ -2884,7 +2864,7 @@
                 "locations": [
                   "$policy:/requirements/allowed/checks/c/any_of/num"
                 ],
-                "message": "region is null",
+                "message": "",
                 "name": "num"
               },
               {
@@ -2936,7 +2916,7 @@
                 "locations": [
                   "$policy:/requirements/allowed/checks/c/any_of/str"
                 ],
-                "message": "region is null",
+                "message": "",
                 "name": "str"
               }
             ],
@@ -5458,10 +5438,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/2"
+                        ],
                         "name": "region",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "a"
                       }
                     ],
                     "kind": "list",
@@ -5533,16 +5515,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/2"
+                        ],
                         "name": "region",
                         "outcome": "unusable",
-                        "value": []
-                      },
-                      {
-                        "locations": [],
-                        "name": "region",
-                        "outcome": "unusable",
-                        "value": []
+                        "value": "a"
                       }
                     ],
                     "kind": "list",
@@ -9750,18 +9728,30 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/kids/0/kid"
+                        ],
+                        "name": ".kid",
+                        "outcome": "unusable",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "list",
+                    "message": ".kid is 1, which isn't a list or an object",
+                    "name": ".kid"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of .kid",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": ".kid",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -9808,18 +9798,30 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/kids/0"
+                        ],
+                        "name": ".kid",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": ".kid is missing",
+                    "name": ".kid"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of .kid",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": ".kid",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -12888,18 +12890,6 @@
                 "cause": "value",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/xs/1/item/0",
-                      "/xs/1/item/1"
-                    ],
-                    "name": ".item[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
-                  },
                   {
                     "locations": [
                       "/xs/1/item/0",

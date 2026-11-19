@@ -2169,14 +2169,7 @@
                     "name": "ws"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "ws",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c"
@@ -2233,14 +2226,7 @@
                     "name": "ws"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "ws",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c"

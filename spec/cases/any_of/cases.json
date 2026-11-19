@@ -91,7 +91,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/safe"
                 ],
-                "message": "type is \"Story\"",
+                "message": "",
                 "name": "safe"
               },
               {
@@ -123,7 +123,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/standard"
                 ],
-                "message": "state is \"Open\"",
+                "message": "",
                 "name": "standard"
               }
             ],
@@ -193,7 +193,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/safe"
                 ],
-                "message": "type is missing",
+                "message": "",
                 "name": "safe"
               },
               {
@@ -225,7 +225,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/standard"
                 ],
-                "message": "type is missing",
+                "message": "",
                 "name": "standard"
               }
             ],
@@ -335,7 +335,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/a"
                 ],
-                "message": "x is missing",
+                "message": "",
                 "name": "a"
               },
               {
@@ -367,7 +367,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/b"
                 ],
-                "message": "y is 2",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -564,7 +564,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/listed"
                 ],
-                "message": "$params.l is missing",
+                "message": "",
                 "name": "listed"
               },
               {
@@ -596,7 +596,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/one"
                 ],
-                "message": "x is 2",
+                "message": "",
                 "name": "one"
               }
             ],
@@ -706,7 +706,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/listed"
                 ],
-                "message": "x is 1, and $params.l is \"text\"",
+                "message": "",
                 "name": "listed"
               },
               {

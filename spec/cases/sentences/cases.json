@@ -17069,18 +17069,7 @@
                     "value": "grace"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/commits/0/author"
-                    ],
-                    "name": "commits[].author",
-                    "outcome": "usable",
-                    "value": [
-                      "grace"
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/alias_right/assert"
@@ -17125,32 +17114,47 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/commits/0/author"
+                        ],
+                        "name": "commits[0].author",
+                        "outcome": "usable",
+                        "value": "grace"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/commits/0"
+                    ],
+                    "message": "author is \"grace\", and approver is \"grace\"",
+                    "name": "item 1 of commits",
+                    "value": {
+                      "approver": "ada",
+                      "author": "grace"
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
                       "/things/0/approver"
                     ],
-                    "name": ".approver",
+                    "name": "approver",
                     "outcome": "usable",
                     "value": "grace"
-                  },
-                  {
-                    "locations": [
-                      "/things/0/commits/0/author"
-                    ],
-                    "name": "commits[].author",
-                    "outcome": "usable",
-                    "value": [
-                      "grace"
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/dot_right/assert"
                 ],
-                "message": "item 1 of commits: author is \"grace\", and .approver is \"grace\"",
+                "message": "",
                 "name": "every commits.author does not equal .approver"
               }
             ],
@@ -17378,58 +17382,55 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rows/2"
+                        ],
+                        "name": "rows[2]",
+                        "outcome": "usable",
+                        "value": {
+                          "g": [
+                            5,
+                            5,
+                            5,
+                            5,
+                            5
+                          ],
+                          "n": 5,
+                          "v": 9
+                        }
+                      }
+                    ],
+                    "kind": "item",
                     "locations": [
-                      "/things/0/rows/0",
-                      "/things/0/rows/1",
                       "/things/0/rows/2"
                     ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
+                    "message": "item 3 of rows is {\"g\": [5, 5, 5, 5, 5], \"n\": 5, \"v\": 9}",
+                    "name": "item 3 of rows",
+                    "value": {
+                      "g": [
+                        5,
+                        5,
+                        5,
+                        5,
+                        5
+                      ],
+                      "n": 5,
+                      "v": 9
+                    }
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/dot_right/assert"
                 ],
-                "message": "item 3 of rows is {\"g\": [5, 5, 5, 5, 5], \"n\": 5, \"v\": 9}",
+                "message": "",
                 "name": "every rows whose n equals count of .g is a list"
               }
             ],
@@ -18096,52 +18097,7 @@
                     "value": null
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0",
-                      "/things/0/rows/1",
-                      "/things/0/rows/2"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_whose/assert"
@@ -18243,52 +18199,7 @@
                     "value": null
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0",
-                      "/things/0/rows/1",
-                      "/things/0/rows/2"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every_sum/assert"
@@ -18390,52 +18301,7 @@
                     "value": null
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0",
-                      "/things/0/rows/1",
-                      "/things/0/rows/2"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every_whose/assert"
@@ -18546,52 +18412,7 @@
                     "value": "abc"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/1/rows/0",
-                      "/things/1/rows/1",
-                      "/things/1/rows/2"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_whose/assert"
@@ -18693,52 +18514,7 @@
                     "value": "abc"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/1/rows/0",
-                      "/things/1/rows/1",
-                      "/things/1/rows/2"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every_sum/assert"
@@ -18840,52 +18616,7 @@
                     "value": "abc"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/1/rows/0",
-                      "/things/1/rows/1",
-                      "/things/1/rows/2"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every_whose/assert"
@@ -19000,52 +18731,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/2/rows/0",
-                      "/things/2/rows/1",
-                      "/things/2/rows/2"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_whose/assert"
@@ -19153,52 +18839,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/2/rows/0",
-                      "/things/2/rows/1",
-                      "/things/2/rows/2"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every_sum/assert"
@@ -19306,52 +18947,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/2/rows/0",
-                      "/things/2/rows/1",
-                      "/things/2/rows/2"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every_whose/assert"
@@ -19468,52 +19064,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/3/rows/0",
-                      "/things/3/rows/1",
-                      "/things/3/rows/2"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_whose/assert"
@@ -19621,52 +19172,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/3/rows/0",
-                      "/things/3/rows/1",
-                      "/things/3/rows/2"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 2,
-                        "v": 1
-                      },
-                      {
-                        "g": [
-                          5,
-                          5,
-                          5,
-                          5,
-                          5
-                        ],
-                        "n": 5,
-                        "v": 9
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every_sum/assert"
@@ -34921,18 +34427,34 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/components/2/licenses/0/license/id"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/components/2/licenses/0/license/id"
+                            ],
+                            "name": "licenses[0].license.id",
+                            "outcome": "usable",
+                            "value": "WTFPL"
+                          }
                         ],
-                        "name": "licenses[].license.id",
-                        "outcome": "usable",
-                        "value": [
-                          "WTFPL"
-                        ]
-                      },
+                        "kind": "item",
+                        "locations": [
+                          "/components/2/licenses/0"
+                        ],
+                        "message": "license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+                        "name": "item 1 of licenses",
+                        "value": {
+                          "license": {
+                            "id": "WTFPL"
+                          }
+                        }
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "$params:/allowed_licenses"
@@ -34949,7 +34471,7 @@
                     "locations": [
                       "$policy:/requirements/licences/checks/allowed/any_of/declared"
                     ],
-                    "message": "item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+                    "message": "",
                     "name": "some licenses.license.id is in $params.allowed_licenses"
                   }
                 ],
@@ -34958,7 +34480,7 @@
                 "locations": [
                   "$policy:/requirements/licences/checks/allowed/any_of/declared"
                 ],
-                "message": "item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+                "message": "",
                 "name": "declared"
               },
               {
@@ -35035,7 +34557,7 @@
                 "locations": [
                   "$policy:/requirements/licences/checks/allowed/any_of/known"
                 ],
-                "message": "licenses is [{\"license\": {\"id\": \"WTFPL\"}}], and $params.known_package_licenses named by name is missing",
+                "message": "",
                 "name": "known"
               }
             ],
@@ -35192,7 +34714,7 @@
                 "locations": [
                   "$policy:/requirements/licences/checks/allowed/any_of/declared"
                 ],
-                "message": "$params.allowed_licenses is \"BSD-3-Clause\", which isn't a list",
+                "message": "",
                 "name": "declared"
               },
               {
@@ -35240,7 +34762,7 @@
                 "locations": [
                   "$policy:/requirements/licences/checks/allowed/any_of/known"
                 ],
-                "message": "$params.known_package_licenses named by name is missing",
+                "message": "",
                 "name": "known"
               }
             ],
@@ -35470,7 +34992,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/nested"
                 ],
-                "message": "x is missing, and x.y is missing",
+                "message": "",
                 "name": "nested"
               },
               {
@@ -35501,7 +35023,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/none"
                 ],
-                "message": "count of xs is 1",
+                "message": "",
                 "name": "none"
               },
               {
@@ -35509,24 +35031,37 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/1/xs/0/signed"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/1/xs/0/signed"
+                            ],
+                            "name": "xs[0].signed",
+                            "outcome": "usable",
+                            "value": false
+                          }
                         ],
-                        "name": "xs[].signed",
-                        "outcome": "usable",
-                        "value": [
-                          false
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/1/xs/0"
+                        ],
+                        "message": "signed is false",
+                        "name": "item 1 of xs",
+                        "value": {
+                          "signed": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/s/checks/c/any_of/signed"
                     ],
-                    "message": "item 1 of xs: signed is false",
+                    "message": "",
                     "name": "every xs.signed is true"
                   }
                 ],
@@ -35535,7 +35070,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/signed"
                 ],
-                "message": "item 1 of xs: signed is false",
+                "message": "",
                 "name": "signed"
               }
             ],
@@ -35627,7 +35162,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/nested"
                 ],
-                "message": "x.y is missing",
+                "message": "",
                 "name": "nested"
               },
               {
@@ -35658,7 +35193,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/none"
                 ],
-                "message": "count of xs is 1",
+                "message": "",
                 "name": "none"
               },
               {
@@ -35666,24 +35201,37 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/2/xs/0/signed"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/2/xs/0/signed"
+                            ],
+                            "name": "xs[0].signed",
+                            "outcome": "usable",
+                            "value": false
+                          }
                         ],
-                        "name": "xs[].signed",
-                        "outcome": "usable",
-                        "value": [
-                          false
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/2/xs/0"
+                        ],
+                        "message": "signed is false",
+                        "name": "item 1 of xs",
+                        "value": {
+                          "signed": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/s/checks/c/any_of/signed"
                     ],
-                    "message": "item 1 of xs: signed is false",
+                    "message": "",
                     "name": "every xs.signed is true"
                   }
                 ],
@@ -35692,7 +35240,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/signed"
                 ],
-                "message": "item 1 of xs: signed is false",
+                "message": "",
                 "name": "signed"
               }
             ],
@@ -36211,7 +35759,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/covered"
                 ],
-                "message": "cov is missing, and cov.pct is missing",
+                "message": "",
                 "name": "covered"
               },
               {
@@ -36243,7 +35791,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/waived"
                 ],
-                "message": "waived is false",
+                "message": "",
                 "name": "waived"
               }
             ],
@@ -36322,7 +35870,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/covered"
                 ],
-                "message": "cov.pct is missing",
+                "message": "",
                 "name": "covered"
               },
               {
@@ -36354,7 +35902,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/waived"
                 ],
-                "message": "waived is false",
+                "message": "",
                 "name": "waived"
               }
             ],
@@ -36559,7 +36107,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/by_bot"
                 ],
-                "message": "pr.author is \"ann\"",
+                "message": "",
                 "name": "by_bot"
               },
               {
@@ -36591,7 +36139,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/signed"
                 ],
-                "message": "signed is false",
+                "message": "",
                 "name": "signed"
               }
             ],
@@ -36657,7 +36205,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/by_bot"
                 ],
-                "message": "pr.author is \"ann\"",
+                "message": "",
                 "name": "by_bot"
               },
               {
@@ -36689,7 +36237,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c/any_of/signed"
                 ],
-                "message": "signed is missing",
+                "message": "",
                 "name": "signed"
               }
             ],
@@ -44311,10 +43859,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0"
+                        ],
                         "name": "l",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -44378,10 +43928,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/l"
+                        ],
                         "name": "l",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -58552,10 +58104,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/l"
+                        ],
                         "name": "l",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "abc"
                       }
                     ],
                     "kind": "list",
@@ -58611,10 +58165,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/1/l"
+                        ],
                         "name": "l",
                         "outcome": "unusable",
-                        "value": []
+                        "value": 3
                       }
                     ],
                     "kind": "list",
@@ -58670,10 +58226,14 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/2/l"
+                        ],
                         "name": "l",
                         "outcome": "unusable",
-                        "value": []
+                        "value": {
+                          "k": 1
+                        }
                       }
                     ],
                     "kind": "list",
@@ -59188,7 +58748,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2"
+                        ],
+                        "name": "items",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "items is missing",
                     "name": "items"
@@ -59199,12 +58768,6 @@
                     "locations": [],
                     "name": "sum of items.n",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "items.n",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -59246,7 +58809,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/3/items"
+                        ],
+                        "name": "items",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "items is null",
                     "name": "items"
@@ -59257,12 +58829,6 @@
                     "locations": [],
                     "name": "sum of items.n",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "items.n",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -60898,7 +60464,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/3"
+                        ],
+                        "name": "items",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "items is missing",
                     "name": "items"
@@ -60909,12 +60484,6 @@
                     "locations": [],
                     "name": "sum of items.n",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "items.n",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -62684,10 +62253,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0"
+                        ],
                         "name": "l",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -62743,10 +62314,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/1/l"
+                        ],
                         "name": "l",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -62809,10 +62382,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/l"
+                        ],
                         "name": "l",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "abc"
                       }
                     ],
                     "kind": "list",
@@ -62868,10 +62443,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/1/l"
+                        ],
                         "name": "l",
                         "outcome": "unusable",
-                        "value": []
+                        "value": 3
                       }
                     ],
                     "kind": "list",
@@ -62927,10 +62504,14 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/2/l"
+                        ],
                         "name": "l",
                         "outcome": "unusable",
-                        "value": []
+                        "value": {
+                          "k": 1
+                        }
                       }
                     ],
                     "kind": "list",
@@ -63002,18 +62583,6 @@
                     ],
                     "name": "count of m named by p",
                     "value": 2
-                  },
-                  {
-                    "locations": [
-                      "/things/0/m/k/0",
-                      "/things/0/m/k/1"
-                    ],
-                    "name": "m named by p[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
                   },
                   {
                     "locations": [
@@ -63186,18 +62755,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/m/k/0",
-                      "/things/0/m/k/1"
-                    ],
-                    "name": "m named by p[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/things/0/p"
                     ],
                     "name": "p",
@@ -63355,12 +62912,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/1"
                     ],
@@ -63428,12 +62979,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/1"
                     ],
@@ -63499,12 +63044,6 @@
                     "locations": [],
                     "name": "count of m named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -63588,12 +63127,6 @@
                     "locations": [],
                     "name": "sum of m named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -63845,12 +63378,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/2/p"
                     ],
@@ -63918,12 +63445,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/2/p"
                     ],
@@ -63989,12 +63510,6 @@
                     "locations": [],
                     "name": "count of m named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -64078,12 +63593,6 @@
                     "locations": [],
                     "name": "sum of m named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -64335,12 +63844,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/3/p"
                     ],
@@ -64408,12 +63911,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/3/p"
                     ],
@@ -64479,12 +63976,6 @@
                     "locations": [],
                     "name": "count of m named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -64568,12 +64059,6 @@
                     "locations": [],
                     "name": "sum of m named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -65581,14 +65066,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/m"
+                        ],
+                        "name": "m named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "m named by p is missing",
+                    "name": "m named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/1"
@@ -65636,14 +65133,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/m"
+                        ],
+                        "name": "m named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "m named by p is missing",
+                    "name": "m named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/1"
@@ -65691,14 +65200,26 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2/m"
+                        ],
+                        "name": "m named by p",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "m named by p is null",
+                    "name": "m named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/2/p"
@@ -65746,14 +65267,26 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2/m"
+                        ],
+                        "name": "m named by p",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "m named by p is null",
+                    "name": "m named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/2/p"
@@ -65803,12 +65336,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/3/p"
@@ -65858,12 +65385,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/3/p"
@@ -66477,12 +65998,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/1"
                     ],
@@ -66744,12 +66259,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/2/p"
                     ],
@@ -67009,12 +66518,6 @@
                     "locations": [],
                     "name": "count of m named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "m named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -67346,12 +66849,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "zz named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/p"
@@ -67693,14 +67190,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "zz named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1"
+                        ],
+                        "name": "zz named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz named by p is missing",
+                    "name": "zz named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/1"
@@ -68042,14 +67551,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "zz named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2"
+                        ],
+                        "name": "zz named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz named by p is missing",
+                    "name": "zz named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/2/p"
@@ -68391,14 +67912,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "zz named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/3"
+                        ],
+                        "name": "zz named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz named by p is missing",
+                    "name": "zz named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/3/p"
@@ -68768,12 +68301,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "zz named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/p"
                     ],
@@ -69114,14 +68641,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "zz named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/zz"
+                        ],
+                        "name": "zz named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz named by p is missing",
+                    "name": "zz named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/1"
@@ -69463,14 +69002,26 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "zz named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2/zz"
+                        ],
+                        "name": "zz named by p",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz named by p is null",
+                    "name": "zz named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/2/p"
@@ -69814,12 +69365,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "zz named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/3/p"
@@ -70169,14 +69714,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/rows"
+                        ],
+                        "name": "rows.w named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "rows.w named by p is missing",
+                    "name": "rows.w named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/1"
@@ -70224,14 +69781,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/rows"
+                        ],
+                        "name": "rows.w named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "rows.w named by p is missing",
+                    "name": "rows.w named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/1"
@@ -70285,12 +69854,6 @@
                     "locations": [],
                     "name": "count of rows.w named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -70350,12 +69913,6 @@
                     "locations": [],
                     "name": "sum of rows.n named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.n named by p",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -70528,14 +70085,26 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2/rows"
+                        ],
+                        "name": "rows.w named by p",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "rows.w named by p is null",
+                    "name": "rows.w named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/2/p"
@@ -70583,14 +70152,26 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2/rows"
+                        ],
+                        "name": "rows.w named by p",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "rows.w named by p is null",
+                    "name": "rows.w named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/2/p"
@@ -70644,12 +70225,6 @@
                     "locations": [],
                     "name": "count of rows.w named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -70709,12 +70284,6 @@
                     "locations": [],
                     "name": "sum of rows.n named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.n named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -70890,12 +70459,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/3/p"
                     ],
@@ -70944,12 +70507,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/3/p"
@@ -71003,12 +70560,6 @@
                     "locations": [],
                     "name": "count of rows.w named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -71068,12 +70619,6 @@
                     "locations": [],
                     "name": "sum of rows.n named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.n named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -71274,12 +70819,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/p"
                     ],
@@ -71347,12 +70886,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/p"
                     ],
@@ -71403,7 +70936,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rows"
+                        ],
+                        "name": "rows",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "rows is null",
                     "name": "rows"
@@ -71414,12 +70956,6 @@
                     "locations": [],
                     "name": "count of rows.w named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -71477,7 +71013,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rows"
+                        ],
+                        "name": "rows",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "rows is null",
                     "name": "rows"
@@ -71488,12 +71033,6 @@
                     "locations": [],
                     "name": "sum of rows.n named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.n named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -71673,12 +71212,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/1/p"
                     ],
@@ -71746,12 +71279,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/1/p"
                     ],
@@ -71802,7 +71329,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/rows"
+                        ],
+                        "name": "rows",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "rows is null",
                     "name": "rows"
@@ -71813,12 +71349,6 @@
                     "locations": [],
                     "name": "count of rows.w named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -71876,7 +71406,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/rows"
+                        ],
+                        "name": "rows",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "rows is null",
                     "name": "rows"
@@ -71887,12 +71426,6 @@
                     "locations": [],
                     "name": "sum of rows.n named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.n named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -72083,12 +71616,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/2"
                     ],
@@ -72156,12 +71683,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/2"
                     ],
@@ -72212,7 +71733,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2/rows"
+                        ],
+                        "name": "rows",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "rows is null",
                     "name": "rows"
@@ -72223,12 +71753,6 @@
                     "locations": [],
                     "name": "count of rows.w named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -72286,7 +71810,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2/rows"
+                        ],
+                        "name": "rows",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "rows is null",
                     "name": "rows"
@@ -72297,12 +71830,6 @@
                     "locations": [],
                     "name": "sum of rows.n named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.n named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -72493,12 +72020,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/3/p"
                     ],
@@ -72566,12 +72087,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/3/p"
                     ],
@@ -72622,7 +72137,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/3/rows"
+                        ],
+                        "name": "rows",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "rows is null",
                     "name": "rows"
@@ -72633,12 +72157,6 @@
                     "locations": [],
                     "name": "count of rows.w named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -72696,7 +72214,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/3/rows"
+                        ],
+                        "name": "rows",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "rows is null",
                     "name": "rows"
@@ -72707,12 +72234,6 @@
                     "locations": [],
                     "name": "sum of rows.n named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.n named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -72903,12 +72424,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/4/p"
                     ],
@@ -72980,12 +72495,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/4/p"
                     ],
@@ -73040,7 +72549,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/4/rows"
+                        ],
+                        "name": "rows",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "rows is null",
                     "name": "rows"
@@ -73051,12 +72569,6 @@
                     "locations": [],
                     "name": "count of rows.w named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.w named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -73118,7 +72630,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/4/rows"
+                        ],
+                        "name": "rows",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "rows is null",
                     "name": "rows"
@@ -73129,12 +72650,6 @@
                     "locations": [],
                     "name": "sum of rows.n named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows.n named by p",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -73331,7 +72846,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "zz",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "zz is missing",
                     "name": "zz"
@@ -73342,12 +72866,6 @@
                     "locations": [],
                     "name": "count of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -73405,7 +72923,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "zz",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "zz is missing",
                     "name": "zz"
@@ -73416,12 +72943,6 @@
                     "locations": [],
                     "name": "sum of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -73678,12 +73199,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/p"
                     ],
@@ -73809,12 +73324,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/1"
                     ],
@@ -73872,12 +73381,6 @@
                     "locations": [],
                     "name": "sum of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -74113,14 +73616,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1"
+                        ],
+                        "name": "zz.x named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz.x named by p is missing",
+                    "name": "zz.x named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/1"
@@ -74239,18 +73754,30 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2"
+                        ],
+                        "name": "zz.x named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz.x named by p is missing",
+                    "name": "zz.x named by p"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -74304,18 +73831,30 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2"
+                        ],
+                        "name": "zz.x named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz.x named by p is missing",
+                    "name": "zz.x named by p"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -74551,14 +74090,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2"
+                        ],
+                        "name": "zz.x named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz.x named by p is missing",
+                    "name": "zz.x named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/2/p"
@@ -74677,18 +74228,30 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/3"
+                        ],
+                        "name": "zz.x named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz.x named by p is missing",
+                    "name": "zz.x named by p"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -74742,18 +74305,30 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/3"
+                        ],
+                        "name": "zz.x named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz.x named by p is missing",
+                    "name": "zz.x named by p"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -74989,14 +74564,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/3"
+                        ],
+                        "name": "zz.x named by p",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz.x named by p is missing",
+                    "name": "zz.x named by p"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/3/p"
@@ -75126,7 +74713,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "outcome": "unusable",
+                        "value": "str"
+                      }
+                    ],
                     "kind": "list",
                     "message": "zz is \"str\", which isn't a list or an object",
                     "name": "zz"
@@ -75137,12 +74733,6 @@
                     "locations": [],
                     "name": "count of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -75200,7 +74790,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "outcome": "unusable",
+                        "value": "str"
+                      }
+                    ],
                     "kind": "list",
                     "message": "zz is \"str\", which isn't a list or an object",
                     "name": "zz"
@@ -75211,12 +74810,6 @@
                     "locations": [],
                     "name": "sum of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -75473,12 +75066,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/p"
                     ],
@@ -75600,7 +75187,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/zz"
+                        ],
+                        "name": "zz",
+                        "outcome": "unusable",
+                        "value": "str"
+                      }
+                    ],
                     "kind": "list",
                     "message": "zz is \"str\", which isn't an object",
                     "name": "zz"
@@ -75611,12 +75207,6 @@
                     "locations": [],
                     "name": "count of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -75674,7 +75264,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/zz"
+                        ],
+                        "name": "zz",
+                        "outcome": "unusable",
+                        "value": "str"
+                      }
+                    ],
                     "kind": "list",
                     "message": "zz is \"str\", which isn't an object",
                     "name": "zz"
@@ -75685,12 +75284,6 @@
                     "locations": [],
                     "name": "sum of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -75926,14 +75519,26 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/zz"
+                        ],
+                        "name": "zz",
+                        "outcome": "unusable",
+                        "value": "str"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz is \"str\", which isn't an object",
+                    "name": "zz"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/1"
@@ -76056,7 +75661,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2/zz"
+                        ],
+                        "name": "zz",
+                        "outcome": "unusable",
+                        "value": "str"
+                      }
+                    ],
                     "kind": "list",
                     "message": "zz is \"str\", which isn't an object",
                     "name": "zz"
@@ -76067,12 +75681,6 @@
                     "locations": [],
                     "name": "count of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -76130,7 +75738,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2/zz"
+                        ],
+                        "name": "zz",
+                        "outcome": "unusable",
+                        "value": "str"
+                      }
+                    ],
                     "kind": "list",
                     "message": "zz is \"str\", which isn't an object",
                     "name": "zz"
@@ -76141,12 +75758,6 @@
                     "locations": [],
                     "name": "sum of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -76382,14 +75993,26 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/2/zz"
+                        ],
+                        "name": "zz",
+                        "outcome": "unusable",
+                        "value": "str"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz is \"str\", which isn't an object",
+                    "name": "zz"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/2/p"
@@ -76512,7 +76135,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/3/zz"
+                        ],
+                        "name": "zz",
+                        "outcome": "unusable",
+                        "value": "str"
+                      }
+                    ],
                     "kind": "list",
                     "message": "zz is \"str\", which isn't an object",
                     "name": "zz"
@@ -76523,12 +76155,6 @@
                     "locations": [],
                     "name": "count of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -76586,7 +76212,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/3/zz"
+                        ],
+                        "name": "zz",
+                        "outcome": "unusable",
+                        "value": "str"
+                      }
+                    ],
                     "kind": "list",
                     "message": "zz is \"str\", which isn't an object",
                     "name": "zz"
@@ -76597,12 +76232,6 @@
                     "locations": [],
                     "name": "sum of zz.x named by p",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -76838,14 +76467,26 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "zz.x named by p",
-                    "outcome": "unusable",
-                    "value": []
-                  },
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/3/zz"
+                        ],
+                        "name": "zz",
+                        "outcome": "unusable",
+                        "value": "str"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zz is \"str\", which isn't an object",
+                    "name": "zz"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "/things/3/p"
@@ -79477,18 +79118,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/vals/0"
-                    ],
-                    "name": "vals[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/e/assert"
@@ -79570,18 +79200,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/vals/0"
-                    ],
-                    "name": "vals[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/f/assert"
@@ -80095,18 +79714,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/1/vals/0"
-                    ],
-                    "name": "vals[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/e/assert"
@@ -80188,18 +79796,7 @@
                     ]
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/1/vals/0"
-                    ],
-                    "name": "vals[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/f/assert"
@@ -80695,18 +80292,7 @@
                     "value": 3
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/2/vals/0"
-                    ],
-                    "name": "vals[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/e/assert"
@@ -80784,18 +80370,7 @@
                     "value": 3
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/2/vals/0"
-                    ],
-                    "name": "vals[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/f/assert"
@@ -81281,18 +80856,7 @@
                     "value": null
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/3/vals/0"
-                    ],
-                    "name": "vals[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/e/assert"
@@ -81370,18 +80934,7 @@
                     "value": null
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/3/vals/0"
-                    ],
-                    "name": "vals[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/f/assert"
@@ -81874,18 +81427,7 @@
                     "value": 1
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/4/vals/0"
-                    ],
-                    "name": "vals[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/e/assert"
@@ -81964,18 +81506,7 @@
                     "value": 1
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/4/vals/0"
-                    ],
-                    "name": "vals[]",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/f/assert"
@@ -83094,12 +82625,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $params.k1",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:/k1"
                     ],
@@ -83144,12 +82669,6 @@
                     "locations": [],
                     "name": "count of n named by $params.k1",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k1",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -83797,12 +83316,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $params.k1",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:/k1"
                     ],
@@ -83847,12 +83360,6 @@
                     "locations": [],
                     "name": "count of n named by $params.k1",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k1",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -84122,12 +83629,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -84172,12 +83673,6 @@
                     "locations": [],
                     "name": "count of n named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -84463,12 +83958,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -84513,12 +84002,6 @@
                     "locations": [],
                     "name": "count of n named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -84804,12 +84287,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -84854,12 +84331,6 @@
                     "locations": [],
                     "name": "count of n named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -85134,12 +84605,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -85184,12 +84649,6 @@
                     "locations": [],
                     "name": "count of n named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -85444,12 +84903,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -85496,12 +84949,6 @@
                     "locations": [],
                     "name": "count of n named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -85764,12 +85211,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -85816,12 +85257,6 @@
                     "locations": [],
                     "name": "count of n named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -86082,12 +85517,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -86132,12 +85561,6 @@
                     "locations": [],
                     "name": "count of n named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -86390,12 +85813,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       ""
                     ],
@@ -86440,12 +85857,6 @@
                     "locations": [],
                     "name": "count of n named by $input.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $input.k",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -86795,12 +86206,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:/k"
                     ],
@@ -86845,12 +86250,6 @@
                     "locations": [],
                     "name": "count of n named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -87059,12 +86458,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:/k"
                     ],
@@ -87111,12 +86504,6 @@
                     "locations": [],
                     "name": "count of n named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -87333,12 +86720,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:/k"
                     ],
@@ -87385,12 +86766,6 @@
                     "locations": [],
                     "name": "count of n named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "unusable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -87607,12 +86982,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:/k"
                     ],
@@ -87657,12 +87026,6 @@
                     "locations": [],
                     "name": "count of n named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "null",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -87871,12 +87234,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:"
                     ],
@@ -87921,12 +87278,6 @@
                     "locations": [],
                     "name": "count of n named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "n named by $params.k",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -93798,18 +93149,6 @@
               "name": "k",
               "outcome": "absent",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0/v",
-                "/prs/0/xs/1/v"
-              ],
-              "name": "xs[].v",
-              "outcome": "usable",
-              "value": [
-                1,
-                2
-              ]
             }
           ],
           "kind": "assertion",
@@ -94114,16 +93453,6 @@
               "name": "k",
               "outcome": "null",
               "value": null
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0/v"
-              ],
-              "name": "xs[].v",
-              "outcome": "usable",
-              "value": [
-                1
-              ]
             }
           ],
           "kind": "assertion",
@@ -94420,16 +93749,6 @@
               "name": "k",
               "outcome": "usable",
               "value": 3
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0/v"
-              ],
-              "name": "xs[].v",
-              "outcome": "usable",
-              "value": [
-                1
-              ]
             }
           ],
           "kind": "assertion",
@@ -98000,7 +97319,7 @@
           "locations": [
             "$policy:/requirements/r/checks/option/any_of/a"
           ],
-          "message": "count of xs whose v equals $params.m named by pr.k is 0",
+          "message": "",
           "name": "a"
         },
         {
@@ -98032,7 +97351,7 @@
           "locations": [
             "$policy:/requirements/r/checks/option/any_of/b"
           ],
-          "message": "id is \"p\"",
+          "message": "",
           "name": "b"
         }
       ],
@@ -98661,7 +97980,7 @@
           "locations": [
             "$policy:/requirements/r/checks/option/any_of/a"
           ],
-          "message": "pr.k is missing",
+          "message": "",
           "name": "a"
         },
         {
@@ -98693,7 +98012,7 @@
           "locations": [
             "$policy:/requirements/r/checks/option/any_of/b"
           ],
-          "message": "id is \"p\"",
+          "message": "",
           "name": "b"
         }
       ],
@@ -99318,7 +98637,7 @@
           "locations": [
             "$policy:/requirements/r/checks/option/any_of/a"
           ],
-          "message": "pr.k is null",
+          "message": "",
           "name": "a"
         },
         {
@@ -99350,7 +98669,7 @@
           "locations": [
             "$policy:/requirements/r/checks/option/any_of/b"
           ],
-          "message": "id is \"p\"",
+          "message": "",
           "name": "b"
         }
       ],
@@ -99972,7 +99291,7 @@
           "locations": [
             "$policy:/requirements/r/checks/option/any_of/a"
           ],
-          "message": "pr.k is 3, which isn't text",
+          "message": "",
           "name": "a"
         },
         {
@@ -100004,7 +99323,7 @@
           "locations": [
             "$policy:/requirements/r/checks/option/any_of/b"
           ],
-          "message": "id is \"p\"",
+          "message": "",
           "name": "b"
         }
       ],
@@ -100382,19 +99701,6 @@
           "inputs": [
             {
               "locations": [
-                "/arts/0/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
-            },
-            {
-              "locations": [
                 "/arts/0/prs/0/k"
               ],
               "name": "k",
@@ -100579,18 +99885,6 @@
             }
           ],
           "inputs": [
-            {
-              "locations": [
-                "/arts/0/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "v": 1
-                }
-              ]
-            },
             {
               "locations": [
                 "/arts/0/prs/0"
@@ -101392,12 +100686,6 @@
           "cause": "absent",
           "failures": [],
           "inputs": [
-            {
-              "locations": [],
-              "name": "xs[].v",
-              "outcome": "usable",
-              "value": []
-            },
             {
               "locations": [
                 "$params:"
@@ -102522,15 +101810,26 @@
       "failures": [
         {
           "cause": "unusable",
-          "failures": [],
-          "inputs": [
+          "failures": [
             {
-              "locations": [],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": []
+              "cause": "value",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/xs"
+                  ],
+                  "name": "xs",
+                  "outcome": "usable",
+                  "value": []
+                }
+              ],
+              "kind": "list",
+              "message": "xs is []",
+              "name": "xs"
             }
           ],
+          "inputs": [],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/every"
@@ -103445,14 +102744,7 @@
         {
           "cause": "absent",
           "failures": [],
-          "inputs": [
-            {
-              "locations": [],
-              "name": "xs[].v",
-              "outcome": "usable",
-              "value": []
-            }
-          ],
+          "inputs": [],
           "kind": "assertion",
           "locations": [
             "$policy:/subjects/pr/from"
@@ -104494,10 +103786,12 @@
               "failures": [],
               "inputs": [
                 {
-                  "locations": [],
+                  "locations": [
+                    "/prs/3/xs"
+                  ],
                   "name": "xs",
                   "outcome": "unusable",
-                  "value": []
+                  "value": "s"
                 }
               ],
               "kind": "list",
@@ -104585,10 +103879,12 @@
               "failures": [],
               "inputs": [
                 {
-                  "locations": [],
+                  "locations": [
+                    "/prs/3/xs"
+                  ],
                   "name": "xs",
                   "outcome": "unusable",
-                  "value": []
+                  "value": "s"
                 }
               ],
               "kind": "list",
@@ -104985,14 +104281,7 @@
               "value": {}
             }
           ],
-          "inputs": [
-            {
-              "locations": [],
-              "name": "xs[].v",
-              "outcome": "usable",
-              "value": []
-            }
-          ],
+          "inputs": [],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/c/assert"
@@ -105058,14 +104347,7 @@
               }
             }
           ],
-          "inputs": [
-            {
-              "locations": [],
-              "name": "xs[].v",
-              "outcome": "usable",
-              "value": []
-            }
-          ],
+          "inputs": [],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/c/assert"
@@ -105131,18 +104413,7 @@
               "value": {}
             }
           ],
-          "inputs": [
-            {
-              "locations": [
-                "/prs/2/xs/0/v"
-              ],
-              "name": "xs[].v",
-              "outcome": "usable",
-              "value": [
-                1
-              ]
-            }
-          ],
+          "inputs": [],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/c/assert"
