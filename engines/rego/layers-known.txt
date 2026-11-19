@@ -74,6 +74,7 @@ _for_listed_pairs -> _leaf_paths
 _for_picked -> _for_rest
 _for_read -> _with_key_fields
 _for_read_paths -> _leaf_paths
+_for_row_message -> _for_key_once
 _for_row_message -> _for_message
 _for_row_message -> _m_joined
 _for_row_message -> _m_tally_grouped
