@@ -60,6 +60,13 @@ Gaps found:
 - An item of `count of xs whose v equals pr named by k` whose key names a field the subject lacks (`pr named by k is missing`) gets an entry whose inputs are all `usable`: the read that failed (`pr.z`) has no input. How to name it isn't decided (D9/D10 cover a key read inside the item, not a base read outside through the item's key). Cases "the subject named by a key of each item ... names the item whose key names a field the subject doesn't have" and "the subject's name named by a key ... reads each approver's k inside" stay failing.
 - Decision-silent: "an every, a some, a for item or a count whose whose reads two named by keys on an empty list ... one key is missing and the other isn't text" says only the key that isn't text. D11 says a key is always said, but it speaks of items, not of a second key that fails worse.
 
+## Fifth builder, branch `row-parts-688-rego5` (in progress)
+
+- Narrowed: 29 cases pin today's Rego output (list in `NOTES-688-narrowed.md`, `spec/OPEN.md` "Differs from the decisions"). Three more were wrong against decisions 3 and 35 and moved to Rego's output.
+- D10/D11 rows filled from Rust moved to Rego's output where Rego follows the decision (11 cases).
+- C4/D5: a `named by` key that is missing no longer hides the other side (`_m_unkeyed_said`, `_m_unusable_beside_keys` in `messages/core.rego`).
+- Gap: decision 38 for a key that isn't text. Rego (and `main`) say `item 1 of es: $params.k is 3, which isn't text` in each item, and the walks group "a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item" pins that, against decision 38's own example. Making `count of` follow 38 broke that group, so it was taken out; derived "the key is a number" (`whose_unusable`) holds the decided shape and fails in Rego.
+
 ## Checks run by the third builder
 
 - Full `opa test`: 58 fail and 4 error. The 4 errors are the compiled `walks` and `messages` spec tests hitting the 120 s timeout under the full parallel run; alone they pass in 80 to 90 s. The failures are the 2 unit tests below and the spec topics that hold the 160 failing cases.
