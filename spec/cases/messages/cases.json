@@ -37816,7 +37816,7 @@
     "params": 3,
     "cases": [
       {
-        "description": "says the params, or the root, once, and not the list",
+        "description": "says the params, or the root, once, and then the list",
         "rules": ["walk.flaws", "tally.walk"],
         "input": {"ts": [{"id": "a", "p": {}}]},
         "results": [
@@ -38012,16 +38012,16 @@
     "params": 3,
     "cases": [
       {
-        "description": "says the root and not the list",
+        "description": "says the root, and then the empty list where it fails",
         "rules": ["walk.flaws", "tally.walk"],
         "input": {"ts": [{"id": "a", "p": {}, "es": []}]},
         "results": [
           {
-            "cause": "unusable",
+            "cause": "absent",
             "check": "count",
             "failures": [
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -38080,12 +38080,30 @@
             }
           },
           {
-            "cause": "unusable",
+            "cause": "absent",
             "check": "every",
             "failures": [
               {
-                "cause": "unusable",
-                "failures": [],
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is []",
+                    "name": "es"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -38120,7 +38138,7 @@
                 "value": []
               }
             ],
-            "message": "$input.z is missing",
+            "message": "$input.z is missing; es is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -38143,6 +38161,14 @@
                   {
                     "locations": [],
                     "name": "count of es whose v is in $params.z",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -38210,12 +38236,30 @@
             }
           },
           {
-            "cause": "unusable",
+            "cause": "absent",
             "check": "some",
             "failures": [
               {
-                "cause": "unusable",
-                "failures": [],
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is []",
+                    "name": "es"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -38258,7 +38302,7 @@
                 "value": null
               }
             ],
-            "message": "pl.z is missing",
+            "message": "pl.z is missing; es is []",
             "passed": false,
             "requirement": "r",
             "subject": {

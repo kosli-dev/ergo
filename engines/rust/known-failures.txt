@@ -610,7 +610,7 @@ messages / a parent's part read in a whose, on an empty list / fails when the pa
 messages / a parent's part read in a whose, on an empty list / fails when the part is null
 messages / a part that is null gives the same outcome in every sentence it is in / the part is null in a plain check, an every, a count of with whose and a for line
 messages / a path gives the same outcome in every sentence it is in / a param that is missing is missing in a plain check, an every, a count of with whose and a for line
-messages / a root in a whose beside an empty list, when the params aren't an object / says the root and not the list
+messages / a root in a whose beside an empty list, when the params aren't an object / says the root, and then the empty list where it fails
 messages / a root read through a null inside a relative clause / names the step that is null, once
 messages / a sum of a list that holds items that aren't objects / an item that isn't an object is named with its value
 messages / a sum of or a count of beside a plus names what it couldn't read / an item of the summed list that isn't a number is named by its position
