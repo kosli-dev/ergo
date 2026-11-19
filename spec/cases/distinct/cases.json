@@ -374,6 +374,14 @@
                 "locations": [],
                 "name": "in-scope c count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/sbom"
+                ],
+                "name": "sbom.components",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "sbom.components is missing",
@@ -418,6 +426,14 @@
                 "locations": [],
                 "name": "in-scope c count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/sbom/components"
+                ],
+                "name": "sbom.components",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "sbom.components is null",
@@ -462,6 +478,14 @@
                 "locations": [],
                 "name": "in-scope c count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/sbom/components"
+                ],
+                "name": "sbom.components",
+                "outcome": "unusable",
+                "value": "click"
               }
             ],
             "message": "sbom.components is \"click\", which isn't a list or an object",

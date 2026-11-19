@@ -207,6 +207,14 @@
                 "locations": [],
                 "name": "in-scope deployment count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/data"
+                ],
+                "name": "data.deployments",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "data.deployments is missing",
@@ -5417,6 +5425,14 @@
                 "locations": [],
                 "name": "in-scope artifact count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/artifacts"
+                ],
+                "name": "artifacts named by $params.name",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "artifacts.web is missing",
@@ -5492,6 +5508,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.k",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "$params.k is missing",
@@ -5528,6 +5552,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.k",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "$params.k is missing",
@@ -5589,6 +5621,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$params.k is null",
@@ -5625,6 +5665,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$params.k is null",
@@ -5694,6 +5742,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$input is null",
@@ -5763,6 +5819,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$input is null",
@@ -5826,6 +5890,16 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": [
+                  "x"
+                ]
               }
             ],
             "message": "$params.k is [\"x\"], which isn't text",
@@ -5862,6 +5936,16 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": [
+                  "x"
+                ]
               }
             ],
             "message": "$params.k is [\"x\"], which isn't text",
@@ -5923,6 +6007,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": 1
               }
             ],
             "message": "$params.k is 1, which isn't text",
@@ -5962,6 +6054,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": 1
               }
             ],
             "message": "$params.k is 1, which isn't text",
@@ -6019,6 +6119,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.k",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "$params.k is missing",
@@ -6054,6 +6162,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.k",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "$params.k is missing",
@@ -6114,6 +6230,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$params.k is null",
@@ -6149,6 +6273,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$params.k is null",
@@ -6211,6 +6343,16 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": [
+                  "x"
+                ]
               }
             ],
             "message": "$params.k is [\"x\"], which isn't text",
@@ -6246,6 +6388,16 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": [
+                  "x"
+                ]
               }
             ],
             "message": "$params.k is [\"x\"], which isn't text",
@@ -6306,6 +6458,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": 1
               }
             ],
             "message": "$params.k is 1, which isn't text",
@@ -6344,6 +6504,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": 1
               }
             ],
             "message": "$params.k is 1, which isn't text",
@@ -6408,6 +6576,14 @@
               {
                 "locations": [],
                 "name": "in-scope thing count",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
                 "value": 0
               }
             ],
@@ -6474,6 +6650,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": 1
               }
             ],
             "message": "$params.k is 1, which isn't text",
@@ -13182,7 +13366,10 @@
       },
       {
         "description": "fails min_subjects with the worst cause of a broken branch, lists each one, and still checks the subjects it read",
-        "rules": ["subjects.every.broken"],
+        "rules": [
+          "subjects.every.broken",
+          "message.join"
+        ],
         "input": {
           "artifacts": [
             {
@@ -13373,7 +13560,7 @@
                 "value": 2
               }
             ],
-            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; item 1 of artifacts: pull_requests is a list, item 4 of artifacts: pull_requests is text; item 1 of artifacts: item 1 of pull_requests is an object, item 4 of artifacts: pull_requests is text",
+            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; item 1 of artifacts: pull_requests is a list, item 4 of artifacts: pull_requests is text; item 1 of artifacts: item 1 of pull_requests is an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -13529,6 +13716,16 @@
                 "locations": [],
                 "name": "in-scope pull request count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/artifacts/pull_requests"
+                ],
+                "name": "artifacts.pull_requests",
+                "outcome": "unusable",
+                "value": {
+                  "url": "pr/7"
+                }
               }
             ],
             "message": "artifacts.pull_requests is {\"url\": \"pr/7\"}, which isn't a list",
@@ -14074,7 +14271,11 @@
     "cases": [
       {
         "description": "fails min_subjects as unusable when a name read as a list isn't one in every item, and still checks the value",
-        "rules": ["subjects.every_narrowed", "subjects.every"],
+        "rules": [
+          "subjects.every_narrowed",
+          "subjects.every",
+          "message.join"
+        ],
         "input": {"artifacts": [{"releases": 5}, {"releases": [{"id": "r1", "n": 1}]}]},
         "status": {"r": "not_met"},
         "expressions": {"r": {"$min_subjects": "count(matching(every artifacts.releases)) >= 1", "$unique_ids": "count(repeated(ids(every artifacts.releases))) == 0"}},
@@ -14200,7 +14401,7 @@
                 "value": 1
               }
             ],
-            "message": "item 1 of artifacts: releases is a number, item 2 of artifacts: releases is a list; item 1 of artifacts: releases is a number, item 2 of artifacts: item 1 of releases is an object",
+            "message": "item 1 of artifacts: releases is a number, item 2 of artifacts: releases is a list; item 2 of artifacts: item 1 of releases is an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -14316,7 +14517,11 @@
     "cases": [
       {
         "description": "fails min_subjects as unusable when a name read as a list isn't one in every item, and still checks the value",
-        "rules": ["subjects.every_narrowed", "subjects.every"],
+        "rules": [
+          "subjects.every_narrowed",
+          "subjects.every",
+          "message.join"
+        ],
         "input": {"artifacts": [{"releases": 5}, {"releases": [{"id": "r1", "n": 1}]}]},
         "status": {"r": "not_met"},
         "expressions": {"r": {"$min_subjects": "every artifacts.releases can be read", "$unique_ids": "count(repeated(ids(every artifacts.releases))) == 0"}},
@@ -14442,7 +14647,7 @@
                 "value": 1
               }
             ],
-            "message": "item 1 of artifacts: releases is a number, item 2 of artifacts: releases is a list; item 1 of artifacts: releases is a number, item 2 of artifacts: item 1 of releases is an object",
+            "message": "item 1 of artifacts: releases is a number, item 2 of artifacts: releases is a list; item 2 of artifacts: item 1 of releases is an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20731,7 +20936,10 @@
     "cases": [
       {
         "description": "gives each failed item of the $min_subjects row the location where its read stopped",
-        "rules": ["location.failed_items"],
+        "rules": [
+          "location.failed_items",
+          "message.join"
+        ],
         "input": {"artifacts": [{"pull_requests": [{"url": "pr/7", "approvals": 2}]}, {}, {"pull_requests": null}, {"pull_requests": "none"}]},
         "results": [
           {
@@ -20877,7 +21085,7 @@
                 "value": 2
               }
             ],
-            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; item 1 of artifacts: pull_requests is a list, item 4 of artifacts: pull_requests is text; item 1 of artifacts: item 1 of pull_requests is an object, item 4 of artifacts: pull_requests is text",
+            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; item 1 of artifacts: pull_requests is a list, item 4 of artifacts: pull_requests is text; item 1 of artifacts: item 1 of pull_requests is an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24502,7 +24710,25 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failures": [],
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input[0].y",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "item 1 of $input is missing",
+                "name": "item 1 of $input"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
@@ -24741,7 +24967,25 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failures": [],
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/0"
+                    ],
+                    "name": "artifact[0].c",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "item 1 of artifact is missing",
+                "name": "item 1 of artifact"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
@@ -24789,12 +25033,38 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failures": [],
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/0"
+                    ],
+                    "name": "artifact[0].c",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "artifact is null",
+                "name": "artifact"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope k count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "artifact[0].c",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "artifact is null",
@@ -24829,12 +25099,38 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failures": [],
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/0"
+                    ],
+                    "name": "artifact[0].c",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
+                "kind": "list",
+                "message": "artifact is \"s\", which isn't a list or an object",
+                "name": "artifact"
+              }
+            ],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope k count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "artifact[0].c",
+                "outcome": "unusable",
+                "value": null
               }
             ],
             "message": "artifact is \"s\", which isn't a list or an object",
@@ -34043,6 +34339,16 @@
                 "locations": [],
                 "name": "in-scope every item count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/builds/0/tests/0"
+                ],
+                "name": "builds[0].tests[0]",
+                "outcome": "unusable",
+                "value": {
+                  "id": "t1"
+                }
               }
             ],
             "message": "item 1 of builds: item 1 of tests is {\"id\": \"t1\"}, which isn't a list",
@@ -34532,6 +34838,16 @@
                 "locations": [],
                 "name": "in-scope every count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/deps"
+                ],
+                "name": "deps",
+                "outcome": "unusable",
+                "value": {
+                  "id": 1
+                }
               }
             ],
             "message": "deps is {\"id\": 1}, which isn't a list",
@@ -34695,6 +35011,14 @@
                 "locations": [],
                 "name": "in-scope every count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/deps"
+                ],
+                "name": "deps",
+                "outcome": "unusable",
+                "value": 3
               }
             ],
             "message": "deps is 3, which isn't a list or an object",
@@ -34880,6 +35204,14 @@
                 "locations": [],
                 "name": "in-scope every count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/deps"
+                ],
+                "name": "deps",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "deps is null",
@@ -36653,6 +36985,14 @@
                 "locations": [],
                 "name": "in-scope monitor count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/deployments/0"
+                ],
+                "name": "monitors",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "monitors is missing",
@@ -36693,6 +37033,14 @@
                 "locations": [],
                 "name": "in-scope monitor count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/deployments/1/monitors"
+                ],
+                "name": "monitors",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "monitors is null",
@@ -36733,6 +37081,14 @@
                 "locations": [],
                 "name": "in-scope monitor count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/deployments/2/monitors"
+                ],
+                "name": "monitors",
+                "outcome": "unusable",
+                "value": "x"
               }
             ],
             "message": "monitors is \"x\", which isn't a list or an object",
@@ -36775,6 +37131,16 @@
                 "locations": [],
                 "name": "in-scope monitor count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/deployments/3/monitors"
+                ],
+                "name": "monitors",
+                "outcome": "unusable",
+                "value": {
+                  "id": "m4"
+                }
               }
             ],
             "message": "monitors is {\"id\": \"m4\"}, which isn't a list",
@@ -40521,6 +40887,16 @@
                 "locations": [],
                 "name": "in-scope owner count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/batches/1/owner"
+                ],
+                "name": "owner",
+                "outcome": "unusable",
+                "value": {
+                  "name": "bob"
+                }
               }
             ],
             "message": "owner is {\"name\": \"bob\"}, which isn't a list",
@@ -40597,7 +40973,8 @@
         "rules": [
           "subjects.every.same",
           "subjects.failed_items",
-          "message.from"
+          "message.from",
+          "message.join"
         ],
         "input": {
           "builds": [
@@ -40718,7 +41095,7 @@
                 "value": 3
               }
             ],
-            "message": "item 1 of builds: tags is a list, item 2 of builds: tags is an object; item 1 of builds: item 1 of tags is a number, item 2 of builds: tags is an object",
+            "message": "item 1 of builds: tags is a list, item 2 of builds: tags is an object; item 1 of builds: item 1 of tags is a number",
             "passed": false,
             "requirement": "r",
             "subject": {

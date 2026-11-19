@@ -3651,23 +3651,12 @@
                         "value": 1
                       }
                     ],
-                    "kind": "item",
-                    "locations": [
-                      "/xs/0/0"
-                    ],
+                    "kind": "list",
                     "message": "item 1 of region is 1, which isn't a list or an object",
-                    "name": "item 1 of region",
-                    "value": 1
+                    "name": "item 1 of region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region[0]",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/c"
@@ -3715,23 +3704,12 @@
                         "value": 2
                       }
                     ],
-                    "kind": "item",
-                    "locations": [
-                      "/xs/1/0"
-                    ],
+                    "kind": "list",
                     "message": "item 1 of region is 2, which isn't a list or an object",
-                    "name": "item 1 of region",
-                    "value": 2
+                    "name": "item 1 of region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region[0]",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/c"
@@ -3778,23 +3756,12 @@
                         "value": null
                       }
                     ],
-                    "kind": "item",
-                    "locations": [
-                      "/xs/2"
-                    ],
+                    "kind": "list",
                     "message": "item 1 of region is missing",
-                    "name": "item 1 of region",
-                    "value": null
+                    "name": "item 1 of region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region[0]",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/c"
@@ -3844,14 +3811,7 @@
                     "name": "region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region[0]",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/c"
@@ -8992,23 +8952,12 @@
                         "value": 1
                       }
                     ],
-                    "kind": "item",
-                    "locations": [
-                      "/xs/0/0"
-                    ],
+                    "kind": "list",
                     "message": "item 1 of region is 1, which isn't a list or an object",
-                    "name": "item 1 of region",
-                    "value": 1
+                    "name": "item 1 of region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region[0]",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/e"
@@ -9200,23 +9149,12 @@
                         "value": 1
                       }
                     ],
-                    "kind": "item",
-                    "locations": [
-                      "/xs/1/0"
-                    ],
+                    "kind": "list",
                     "message": "item 1 of region is 1, which isn't a list or an object",
-                    "name": "item 1 of region",
-                    "value": 1
+                    "name": "item 1 of region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region[0]",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/e"

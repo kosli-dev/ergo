@@ -1,5 +1,42 @@
 # #688 step 1: cases and spec text
 
+## Fourth round (D1-D7)
+
+Scripts edit only the cases they change, as before. The row schema check finds 0 failing rows, and `check_rules.py`, `sentences_corpus.py --check` and `spec-placeholder.sh` pass.
+
+- D1: 7 `$min_subjects` rows say a clause that both rules give once (requirements 9/1, 10/1, subjects 74/3, 80/0, 81/0, 144/0, 251/0), and cite `message.join`. Text in `subjects.failed_items` and `message.join`, and the OPEN.md quote of subjects 74/3.
+- D2: subjects 164/1, 166/1-3 get a `list` entry; 232 keeps its entry. The rule "the row's inputs keep the read too" is applied to every `from: every` row with a `list` entry (23 more rows: distinct 0/5-7, requirements 3/3-5, 109/3-4, subjects 0/1, 24/0, 25/0, 74/4, 232/0, 233/1-3, 238/1, 250/0, that 20/0-1). subjects 21/1 gets its path read `artifacts named by $params.name` on the row's inputs. The `named by $params.k` key that can't be read goes on the row's inputs in subjects 22-23, 26-33 and messages 91-92. 166/2 keeps `absent` (OPEN.md gap), and its entry and input say `absent` too.
+- D2's plain bugs: (a) is in subject_name 24/0 and 57/0 (`every first of region is 1`): `item 1 of region` is now a `list` entry, and the assertion's inputs are `[]` (B6). (b) is in sentences 315/0 `f` (`for: every kids[1234567890123456] as k`): a `list` entry on the row. (c) has no case.
+- D4: the five OPEN.md lines are gone. No existing case had any of the five shapes, so 6 new groups (10 cases) after messages 146 pin lines 2-5. Line 1 (an empty `first of` list after a missing root) has no case, because it needs the C7 roots on a `for` row: the Rust builder adds it, with `$params.z is missing; ys is []`.
+- D5: derived 90 `plus_left`/`plus_right` say `$input.k is missing, and k is missing`. The key of the wrong type (case 2) hid `k is missing` the same way, so it says `$input.k is 3, which isn't text, and k is missing` too. Ask Julien if that reading is too broad.
+- D6: messages 145 and 146 stay `absent`; their case descriptions say why, cite `problems.all_said`, and `problems.all_said` says the cause comes only from what is said. The known-failures line follows the new description.
+- D7: for 261 `plain` cases 0 and 3: `pos[].name` is `absent` on the row and the assertion. Text in the `inputs` paragraph of `row.parts`.
+- CHANGELOG: the C1 sentence is rewritten for D1/D2, and five lines added. REFERENCE.md: one sentence on `$min_subjects` inputs and the `list` entry.
+
+### Count
+
+`diffmain.py cf8337aa`: 59 existing cases change, 12 are new (10 D4 cases, and messages 145 and 146 under their new descriptions).
+
+### Left for the Rust builder
+
+- D2 for lines without `every`: 209 failed `$min_subjects` rows still lack the path read or key on their `inputs` (messages 84-90, 93, requirements 0, 1, 2, 8, 11, 12, 24, 28, subjects 35-49, 61, 152-270). Values and locations need the engine.
+- D7 everywhere: a root read through a list whose items the message says are missing or `null` still says `usable` in many groups, like the `pos`, `os`, `$input.os`, `$params.os` and `lock.pkgs` roots in for 255-293, in 9-32, list_items 0-24 and walks 52-56, 85. A rough scan (inputs with `[]`, outcome `usable` and a `null` in the value) lists 163 groups, most of them walked paths on rows, which don't change.
+- The sentence oracle lacks 42 rows, 4 of them for the D4 sentences (`validate.py` prints them).
+
+### Gaps found (undecided)
+
+1. D2 says `failures` `[]` for subjects 21/1 and 28, lines without `every`, but `row.parts`, `subjects.failed_items` and the schema say such a row has `failures` only when its message names items. I left `failures` off them. If D2 means `[]`, every failed `$min_subjects` row of a line without `every` (about 240) gets it, and the schema's description changes.
+2. D2's 166/2 entry: I gave the input the outcome `absent`, to match the cause the row keeps. A `null` parent reads `null` elsewhere (the OPEN.md gap).
+
+### Changes the report
+
+- A `$min_subjects` row says a clause both rules give once.
+- A `from` line's list that can't be read is a `list` entry, a position that isn't there included, and its read is on the row's `inputs`; a `from` line's key that can't be read, and the path of a line without `every`, are on the row's `inputs`.
+- A position at the start of a walk that isn't there or isn't a list is a `list` entry.
+- A missing key or a key of the wrong type no longer hides a missing value across a `plus`.
+- A root read through a list with an item that lacks the value is `absent`.
+- Params that aren't an object no longer make a check that doesn't read them `unusable`.
+
 ## Third round (C1-C8)
 
 The scripts edit only the `results` of the cases they change, as before. The 23 rows that failed `spec/report/schema.json` now pass: a small jsonschema script over every row of every case (the row part of the schema, with `{{spec}}` filled in) finds none that fail. `.github/spec-schemas.py` wasn't run, because it builds a report with the engine for every case.

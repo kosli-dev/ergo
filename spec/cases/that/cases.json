@@ -2120,6 +2120,14 @@
                 "locations": [],
                 "name": "in-scope w count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "ws",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "ws is missing",
@@ -2164,6 +2172,14 @@
                 "locations": [],
                 "name": "in-scope w count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/ws"
+                ],
+                "name": "ws",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "ws is null",

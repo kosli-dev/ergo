@@ -20712,7 +20712,14 @@
     "cases": [
       {
         "description": "the key is missing",
-        "rules": ["compare.fail", "path.ref_step", "tally.fail", "tally.whose", "message.cause"],
+        "rules": [
+          "compare.fail",
+          "path.ref_step",
+          "tally.fail",
+          "tally.whose",
+          "message.cause",
+          "problems.all_said"
+        ],
         "input": {"things": [{"id": "t", "m": {"a": "a"}, "n": 1, "rs": [{"v": "a"}, {"v": 4}], "es": []}]},
         "results": [
           {
@@ -20925,7 +20932,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/plus_left"
                 ],
-                "message": "$input.k is missing",
+                "message": "$input.k is missing, and k is missing",
                 "name": "m named by $input.k plus 1 equals k"
               }
             ],
@@ -20954,7 +20961,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is missing",
+            "message": "$input.k is missing, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21006,7 +21013,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/plus_right"
                 ],
-                "message": "$input.k is missing",
+                "message": "$input.k is missing, and k is missing",
                 "name": "k equals 1 plus m named by $input.k"
               }
             ],
@@ -21035,7 +21042,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is missing",
+            "message": "$input.k is missing, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21686,7 +21693,14 @@
       },
       {
         "description": "the key is a number",
-        "rules": ["compare.fail", "path.ref_step", "tally.fail", "tally.whose", "message.cause"],
+        "rules": [
+          "compare.fail",
+          "path.ref_step",
+          "tally.fail",
+          "tally.whose",
+          "message.cause",
+          "problems.all_said"
+        ],
         "input": {"things": [{"id": "t", "m": {"a": "a"}, "n": 1, "rs": [{"v": "a"}, {"v": 4}], "es": []}], "k": 3},
         "results": [
           {
@@ -21899,7 +21913,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/plus_left"
                 ],
-                "message": "$input.k is 3, which isn't text",
+                "message": "$input.k is 3, which isn't text, and k is missing",
                 "name": "m named by $input.k plus 1 equals k"
               }
             ],
@@ -21928,7 +21942,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -21980,7 +21994,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/plus_right"
                 ],
-                "message": "$input.k is 3, which isn't text",
+                "message": "$input.k is 3, which isn't text, and k is missing",
                 "name": "k equals 1 plus m named by $input.k"
               }
             ],
@@ -22009,7 +22023,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {

@@ -71192,7 +71192,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "usable",
+                    "outcome": "absent",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -71218,7 +71218,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "absent",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -72382,7 +72382,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "usable",
+                    "outcome": "absent",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -72408,7 +72408,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "usable",
+                "outcome": "absent",
                 "part": {
                   "id": null,
                   "name": "pos"

@@ -14264,6 +14264,14 @@
                 "locations": [],
                 "name": "in-scope t count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.k",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "$params.k is missing",
@@ -14296,6 +14304,14 @@
                 "locations": [],
                 "name": "in-scope t count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": 5
               }
             ],
             "message": "$params.k is 5, which isn't text",
@@ -37816,8 +37832,12 @@
     "params": 3,
     "cases": [
       {
-        "description": "says the params, or the root, once, and then the list",
-        "rules": ["walk.flaws", "tally.walk"],
+        "description": "says the params, or the root, once, and then the list, and a check that doesn't read the params fails with the worst cause of what it says",
+        "rules": [
+          "walk.flaws",
+          "tally.walk",
+          "problems.all_said"
+        ],
         "input": {"ts": [{"id": "a", "p": {}}]},
         "results": [
           {
@@ -38012,8 +38032,12 @@
     "params": 3,
     "cases": [
       {
-        "description": "says the root, and then the empty list where it fails",
-        "rules": ["walk.flaws", "tally.walk"],
+        "description": "says the root, and then the empty list where it fails, and a check that doesn't read the params fails with the worst cause of what it says",
+        "rules": [
+          "walk.flaws",
+          "tally.walk",
+          "problems.all_said"
+        ],
         "input": {"ts": [{"id": "a", "p": {}, "es": []}]},
         "results": [
           {
@@ -38310,6 +38334,1758 @@
                 "es": [],
                 "id": "a",
                 "p": {}
+              },
+              "type": "t"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a root on the right of the phrase that is missing, beside a list that can't be read, is said first and then the list, with the worst cause",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "every": "every es.v, if any, is in $params.z",
+            "some": "some es.v is in $params.z"
+          },
+          "subject": "t"
+        }
+      },
+      "subjects": {
+        "t": {
+          "from": "ts",
+          "has": {
+            "pl": "p"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a list that is null",
+        "rules": ["problems.all_said", "tally.walk", "row.parts"],
+        "input": {"ts": [{"id": "a", "es": null}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "$params.z is missing",
+                "name": "every es.v, if any, is in $params.z"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es.v",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$params.z is missing; es is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "es": null,
+                "id": "a"
+              },
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "$params.z is missing",
+                "name": "some es.v is in $params.z"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es.v",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$params.z is missing; es is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "es": null,
+                "id": "a"
+              },
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a list that is missing",
+        "rules": ["problems.all_said", "tally.walk", "row.parts"],
+        "input": {"ts": [{"id": "a"}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "$params.z is missing",
+                "name": "every es.v, if any, is in $params.z"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es.v",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$params.z is missing; es is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "id": "a"
+              },
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "$params.z is missing",
+                "name": "some es.v is in $params.z"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es.v",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$params.z is missing; es is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "id": "a"
+              },
+              "type": "t"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a root on the right of the phrase of the wrong type, beside a list that can't be read, is said first and then the list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "every": "every es.v, if any, is in $params.z",
+            "some": "some es.v is in $params.z"
+          },
+          "subject": "t"
+        }
+      },
+      "subjects": {
+        "t": {
+          "from": "ts",
+          "has": {
+            "pl": "p"
+          }
+        }
+      }
+    },
+    "params": {"z": "s"},
+    "cases": [
+      {
+        "description": "a list that is missing",
+        "rules": ["problems.all_said", "tally.walk", "row.parts"],
+        "input": {"ts": [{"id": "a"}]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "$params.z is \"s\", which isn't a list",
+                "name": "every es.v, if any, is in $params.z"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es.v",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$params.z is \"s\", which isn't a list; es is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "id": "a"
+              },
+              "type": "t"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "$params.z is \"s\", which isn't a list",
+                "name": "some es.v is in $params.z"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es.v",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$params.z is \"s\", which isn't a list; es is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "id": "a"
+              },
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a list that is text",
+        "rules": ["problems.all_said", "tally.walk", "row.parts"],
+        "input": {"ts": [{"id": "a", "es": "s"}]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is \"s\", which isn't an object",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "$params.z is \"s\", which isn't a list",
+                "name": "every es.v, if any, is in $params.z"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es.v",
+                "outcome": "unusable",
+                "value": []
+              }
+            ],
+            "message": "$params.z is \"s\", which isn't a list; es is \"s\", which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "es": "s",
+                "id": "a"
+              },
+              "type": "t"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is \"s\", which isn't an object",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "unusable",
+                    "value": "s"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "$params.z is \"s\", which isn't a list",
+                "name": "some es.v is in $params.z"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es.v",
+                "outcome": "unusable",
+                "value": []
+              }
+            ],
+            "message": "$params.z is \"s\", which isn't a list; es is \"s\", which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "es": "s",
+                "id": "a"
+              },
+              "type": "t"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part that is a list, read in a whose beside a list that can't be read, is said first and then the list, and the row takes the part's cause when it is the worst",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "every": "every es whose v is in pl.z exists",
+            "some": "some es whose v is in pl.z exists"
+          },
+          "subject": "t"
+        }
+      },
+      "subjects": {
+        "t": {
+          "from": "ts",
+          "has": {
+            "pl": "p"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a list that is missing",
+        "rules": ["problems.all_said", "tally.walk", "row.parts"],
+        "input": {"ts": [{"id": "a", "p": [1]}]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/p/0"
+                    ],
+                    "name": "pl[].z",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": [
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "item 1 of pl is 1, which isn't an object",
+                "name": "every es whose v is in pl.z exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/p/0"
+                ],
+                "name": "pl[].z",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of pl is 1, which isn't an object; es is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "id": "a",
+                "p": [
+                  1
+                ]
+              },
+              "type": "t"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/p/0"
+                    ],
+                    "name": "pl[].z",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": [
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "item 1 of pl is 1, which isn't an object",
+                "name": "some es whose v is in pl.z exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/p/0"
+                ],
+                "name": "pl[].z",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of pl is 1, which isn't an object; es is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "id": "a",
+                "p": [
+                  1
+                ]
+              },
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a list that is null",
+        "rules": ["problems.all_said", "tally.walk", "row.parts"],
+        "input": {"ts": [{"id": "a", "p": [1], "es": null}]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/p/0"
+                    ],
+                    "name": "pl[].z",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": [
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "item 1 of pl is 1, which isn't an object",
+                "name": "every es whose v is in pl.z exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/p/0"
+                ],
+                "name": "pl[].z",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of pl is 1, which isn't an object; es is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "es": null,
+                "id": "a",
+                "p": [
+                  1
+                ]
+              },
+              "type": "t"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/p/0"
+                    ],
+                    "name": "pl[].z",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": [
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "item 1 of pl is 1, which isn't an object",
+                "name": "some es whose v is in pl.z exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/p/0"
+                ],
+                "name": "pl[].z",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of pl is 1, which isn't an object; es is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "es": null,
+                "id": "a",
+                "p": [
+                  1
+                ]
+              },
+              "type": "t"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a list that is empty",
+        "rules": ["problems.all_said", "tally.walk", "row.parts"],
+        "input": {"ts": [{"id": "a", "p": [1], "es": []}]},
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is []",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/p/0"
+                    ],
+                    "name": "pl[].z",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": [
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "item 1 of pl is 1, which isn't an object",
+                "name": "every es whose v is in pl.z exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/p/0"
+                ],
+                "name": "pl[].z",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of pl is 1, which isn't an object; es is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "es": [],
+                "id": "a",
+                "p": [
+                  1
+                ]
+              },
+              "type": "t"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is []",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/p/0"
+                    ],
+                    "name": "pl[].z",
+                    "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
+                    "value": [
+                      null
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "item 1 of pl is 1, which isn't an object",
+                "name": "some es whose v is in pl.z exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/ts/0/p/0"
+                ],
+                "name": "pl[].z",
+                "outcome": "unusable",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "message": "item 1 of pl is 1, which isn't an object; es is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "es": [],
+                "id": "a",
+                "p": [
+                  1
+                ]
+              },
+              "type": "t"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a root on the right of the phrase and a root in a whose, both missing, beside a list that can't be read, are all said, then the list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "every": "every es whose v is in $params.z, if any, is in $params.y",
+            "some": "some es whose v is in $params.z is in $params.y"
+          },
+          "subject": "t"
+        }
+      },
+      "subjects": {
+        "t": {
+          "from": "ts",
+          "has": {
+            "pl": "p"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "no params and no list",
+        "rules": ["problems.all_said", "tally.walk", "row.parts"],
+        "input": {"ts": [{"id": "a"}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "$params.y is missing; $params.z is missing",
+                "name": "every es whose v is in $params.z, if any, is in $params.y"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$params.y is missing; $params.z is missing; es is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "id": "a"
+              },
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "$params.y is missing; $params.z is missing",
+                "name": "some es whose v is in $params.z is in $params.y"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$params.y is missing; $params.z is missing; es is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "id": "a"
+              },
+              "type": "t"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a root on the right of the phrase and a root in a whose, both null, beside a list that is null, are all said, then the list",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "every": "every es whose v is in $params.z, if any, is in $params.y",
+            "some": "some es whose v is in $params.z is in $params.y"
+          },
+          "subject": "t"
+        }
+      },
+      "subjects": {
+        "t": {
+          "from": "ts",
+          "has": {
+            "pl": "p"
+          }
+        }
+      }
+    },
+    "params": {"y": null, "z": null},
+    "cases": [
+      {
+        "description": "both params and the list null",
+        "rules": ["problems.all_said", "tally.walk", "row.parts"],
+        "input": {"ts": [{"id": "a", "es": null}]},
+        "results": [
+          {
+            "cause": "null",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/y"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "$params.y is null; $params.z is null",
+                "name": "every es whose v is in $params.z, if any, is in $params.y"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$params.y is null; $params.z is null; es is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "es": null,
+                "id": "a"
+              },
+              "type": "t"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/y"
+                    ],
+                    "name": "$params.y",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/z"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/some"
+                ],
+                "message": "$params.y is null; $params.z is null",
+                "name": "some es whose v is in $params.z is in $params.y"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$params.y is null; $params.z is null; es is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "es": null,
+                "id": "a"
+              },
+              "type": "t"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a root in a whose that is missing, beside a list in a list whose inner lists can't be read, is said first and then each item",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "count": "count of gs.es whose v is in $params.z is 0",
+            "every": "every gs.es whose v is in $params.z, if any, exists"
+          },
+          "subject": "t"
+        }
+      },
+      "subjects": {
+        "t": {
+          "from": "ts",
+          "has": {
+            "pl": "p"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "an inner list that is null and one that is missing",
+        "rules": ["problems.all_said", "tally.walk", "row.parts", "message.items"],
+        "input": {"ts": [{"id": "a", "gs": [{"es": null}, {}]}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "count",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [
+                      {
+                        "cause": "null",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/ts/0/gs/0/es"
+                            ],
+                            "name": "gs[0].es",
+                            "outcome": "null",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "es is null",
+                        "name": "es"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/gs/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of gs",
+                    "value": {
+                      "es": null
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/ts/0/gs/1"
+                            ],
+                            "name": "gs[1].es",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "es is missing",
+                        "name": "es"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/gs/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of gs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ts/0/gs/0/es",
+                      "/ts/0/gs/1"
+                    ],
+                    "name": "count of gs.es whose v is in $params.z",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/count"
+                ],
+                "message": "$params.z is missing",
+                "name": "count of gs.es whose v is in $params.z is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/gs/0/es",
+                  "/ts/0/gs/1"
+                ],
+                "name": "count of gs.es whose v is in $params.z",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/ts/0/gs/0/es",
+                  "/ts/0/gs/1"
+                ],
+                "name": "gs[].es",
+                "outcome": "usable",
+                "value": [
+                  null,
+                  null
+                ]
+              }
+            ],
+            "message": "$params.z is missing; item 1 of gs: es is null; item 2 of gs: es is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "gs": [
+                  {
+                    "es": null
+                  },
+                  {}
+                ],
+                "id": "a"
+              },
+              "type": "t"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [
+                      {
+                        "cause": "null",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/ts/0/gs/0/es"
+                            ],
+                            "name": "gs[0].es",
+                            "outcome": "null",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "es is null",
+                        "name": "es"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/gs/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of gs",
+                    "value": {
+                      "es": null
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/ts/0/gs/1"
+                            ],
+                            "name": "gs[1].es",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "es is missing",
+                        "name": "es"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/ts/0/gs/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of gs",
+                    "value": {}
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/every"
+                ],
+                "message": "$params.z is missing",
+                "name": "every gs.es whose v is in $params.z, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/gs/0/es",
+                  "/ts/0/gs/1"
+                ],
+                "name": "gs[].es",
+                "outcome": "usable",
+                "value": [
+                  null,
+                  null
+                ]
+              }
+            ],
+            "message": "$params.z is missing; item 1 of gs: es is null; item 2 of gs: es is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "gs": [
+                  {
+                    "es": null
+                  },
+                  {}
+                ],
+                "id": "a"
               },
               "type": "t"
             }
