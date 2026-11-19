@@ -28827,7 +28827,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -28849,7 +28871,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$params.k is null; item 1 of es is \"s\", which isn't an object",
+                "message": "$params.k is null",
                 "name": "count of es.v that equals m named by $params.k is 0"
               }
             ],
@@ -28980,7 +29002,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "item 2 of es is \"s\", which isn't an object",
+                    "name": "item 2 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -29003,7 +29047,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$params.k is null; item 2 of es is \"s\", which isn't an object",
+                "message": "$params.k is null",
                 "name": "count of es.v that equals m named by $params.k is 0"
               }
             ],
@@ -34098,7 +34142,70 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "absent",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": {
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].zz",
+                        "outcome": "absent",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 2 of es",
+                    "value": {
+                      "v": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -34121,7 +34228,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "item 1 of es: $params.k is 3, which isn't text; item 2 of es: $params.k is 3, which isn't text",
+                "message": "",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               }
             ],
@@ -34502,7 +34609,169 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0/zz"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "unusable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0/m"
+                        ],
+                        "name": "es[0].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": {
+                      "m": {
+                        "a": 2
+                      },
+                      "v": 2,
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1/zz"
+                        ],
+                        "name": "es[1].zz",
+                        "outcome": "unusable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 2 of es",
+                    "value": {
+                      "v": 2,
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].zz",
+                        "outcome": "absent",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/2"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 3 of es",
+                    "value": {
+                      "v": {
+                        "m": null
+                      }
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/3/zz"
+                        ],
+                        "name": "es[3].zz",
+                        "outcome": "unusable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/3/m"
+                        ],
+                        "name": "es[3].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/3"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 4 of es",
+                    "value": {
+                      "m": null,
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/4"
+                        ],
+                        "name": "es[4].zz",
+                        "outcome": "not_an_object",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/4"
+                        ],
+                        "name": "es[4].m named by $params.k",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/4"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 5 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -34528,7 +34797,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "item 1 of es: $params.k is 3, which isn't text; item 2 of es: $params.k is 3, which isn't text; item 3 of es: $params.k is 3, which isn't text; and 2 more",
+                "message": "",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               }
             ],
@@ -40186,7 +40455,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0/v"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "unusable",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "v: $params.k is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": {
+                      "m": {
+                        "a": 1
+                      },
+                      "v": 1,
+                      "zz": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -40208,7 +40505,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_that/assert/0"
                 ],
-                "message": "item 1 of es: v: $params.k is 3, which isn't text",
+                "message": "",
                 "name": "count of es.v that equals m named by $params.k is 0"
               },
               {
@@ -41400,7 +41697,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "not_an_object",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m named by $params.k",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -41422,7 +41749,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_count/assert/0"
                 ],
-                "message": "item 1 of es: $params.k is 3, which isn't text",
+                "message": "",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               },
               {
@@ -41582,7 +41909,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -41596,7 +41945,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_that/assert/0"
                 ],
-                "message": "item 1 of es is \"s\", which isn't an object",
+                "message": "",
                 "name": "count of es.v that equals m named by $params.k is 0"
               },
               {

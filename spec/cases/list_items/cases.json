@@ -1415,18 +1415,7 @@
                     "value": []
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/v"
-                    ],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": [
-                      "a"
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/that/assert"
@@ -35652,7 +35641,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/0"
+                        ],
+                        "name": "t[0].c.name",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/0"
+                    ],
+                    "message": "c.name is missing",
+                    "name": "item 1 of t",
+                    "value": {
+                      "x": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -35676,7 +35689,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 1 of t: c.name is missing",
+                "message": "",
                 "name": "count of pl.name is 1"
               }
             ],
@@ -35855,7 +35868,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/0/c"
+                        ],
+                        "name": "t[0].c.name",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/0"
+                    ],
+                    "message": "c.name is missing",
+                    "name": "item 1 of t",
+                    "value": {
+                      "c": null
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -35879,7 +35916,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 1 of t: c.name is missing",
+                "message": "",
                 "name": "count of pl.name is 1"
               }
             ],
@@ -36058,7 +36095,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/0/c"
+                        ],
+                        "name": "t[0].c.name",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/0"
+                    ],
+                    "message": "c is 3, which isn't an object",
+                    "name": "item 1 of t",
+                    "value": {
+                      "c": 3
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -36082,7 +36143,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 1 of t: c is 3, which isn't an object",
+                "message": "",
                 "name": "count of pl.name is 1"
               }
             ],

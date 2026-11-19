@@ -8365,7 +8365,47 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/x/0/1"
+                            ],
+                            "name": "x[0][1].a",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/x/0/1"
+                        ],
+                        "message": "item 2 of it is 3, which isn't an object",
+                        "name": "item 2 of it",
+                        "value": 3
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/x/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of x",
+                    "value": [
+                      {
+                        "a": 1
+                      },
+                      3
+                    ]
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -8400,7 +8440,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of x: item 2 of it is 3, which isn't an object",
+                "message": "",
                 "name": "count of x[0] named by zz is 1"
               }
             ],
@@ -8455,7 +8495,44 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/x/0/0"
+                            ],
+                            "name": "x[0][0].a",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/x/0/0"
+                        ],
+                        "message": "item 1 of it is [], which isn't an object",
+                        "name": "item 1 of it",
+                        "value": []
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/x/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of x",
+                    "value": [
+                      []
+                    ]
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -8487,7 +8564,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of x: item 1 of it is [], which isn't an object",
+                "message": "",
                 "name": "count of x[0] named by zz is 1"
               }
             ],
@@ -8545,7 +8622,61 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [
+                      {
+                        "cause": "not_an_object",
+                        "failures": [
+                          {
+                            "cause": "not_an_object",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/things/0/x/0/0/0"
+                                ],
+                                "name": "x[0][0][0].a",
+                                "outcome": "not_an_object",
+                                "value": null
+                              }
+                            ],
+                            "kind": "item",
+                            "locations": [
+                              "/things/0/x/0/0/0"
+                            ],
+                            "message": "item 1 of it is 1, which isn't an object",
+                            "name": "item 1 of it",
+                            "value": 1
+                          }
+                        ],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/x/0/0"
+                        ],
+                        "message": "",
+                        "name": "item 1 of it",
+                        "value": [
+                          1
+                        ]
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/x/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of x",
+                    "value": [
+                      [
+                        1
+                      ]
+                    ]
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -8577,7 +8708,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of x: item 1 of it: item 1 of it is 1, which isn't an object",
+                "message": "",
                 "name": "count of x[0][0] named by zz is 1"
               }
             ],
@@ -8967,7 +9098,44 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/x/0/0"
+                            ],
+                            "name": "x[0][0].a",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/x/0/0"
+                        ],
+                        "message": "item 1 of it is 1, which isn't an object",
+                        "name": "item 1 of it",
+                        "value": 1
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/x/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of x",
+                    "value": [
+                      1
+                    ]
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -8999,7 +9167,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of x: item 1 of it is 1, which isn't an object",
+                "message": "",
                 "name": "count of x[0] named by zz is 1"
               }
             ],
@@ -11918,6 +12086,55 @@
               {
                 "cause": "value",
                 "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "lst",
+                        "outcome": "usable",
+                        "value": {
+                          "d": {
+                            "items": [
+                              {
+                                "x": 1
+                              }
+                            ]
+                          },
+                          "id": "t1"
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "lst is [{\"x\": 1}]",
+                    "name": "lst"
+                  },
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/d"
+                        ],
+                        "name": "lst",
+                        "outcome": "usable",
+                        "value": {
+                          "items": [
+                            {
+                              "x": 1
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "lst is [{\"x\": 1}]",
+                    "name": "lst"
+                  },
                   {
                     "cause": "value",
                     "failures": [],
@@ -15713,7 +15930,40 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/y/0/v"
+                            ],
+                            "name": "y[0].v",
+                            "outcome": "unusable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "v is 1, which isn't a list or an object",
+                        "name": "v"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/y/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of y",
+                    "value": {
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -15731,7 +15981,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of y: v is 1, which isn't a list or an object",
+                "message": "",
                 "name": "count of y[0].v is 1"
               }
             ],
@@ -15775,7 +16025,40 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/y/0/v"
+                            ],
+                            "name": "$input.y[0].v",
+                            "outcome": "unusable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "v is 1, which isn't a list or an object",
+                        "name": "v"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/y/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of $input.y",
+                    "value": {
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -15793,7 +16076,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of $input.y: v is 1, which isn't a list or an object",
+                "message": "",
                 "name": "count of $input.y[0].v is 1"
               }
             ],
@@ -20281,14 +20564,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_whose/assert"
@@ -20617,14 +20893,7 @@
                     "value": {}
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_whose/assert"
@@ -20969,14 +21238,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_whose/assert"
@@ -29777,23 +30039,17 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [
-                          "/arts/0/c/z"
-                        ],
+                        "locations": [],
                         "name": "art.cov.z",
-                        "outcome": "unusable",
-                        "part": {
-                          "id": null,
-                          "name": "art.cov"
-                        },
-                        "value": "s"
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/every/any_of/a"
                     ],
-                    "message": "art.cov.z is \"s\", which isn't a number",
+                    "message": "art.cov.z is missing",
                     "name": "every ys whose n is at least art.cov.z, if any, exists"
                   }
                 ],
@@ -29909,23 +30165,17 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [
-                          "/arts/0/c/z"
-                        ],
+                        "locations": [],
                         "name": "art.cov.z",
-                        "outcome": "unusable",
-                        "part": {
-                          "id": null,
-                          "name": "art.cov"
-                        },
-                        "value": "s"
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/some/any_of/a"
                     ],
-                    "message": "art.cov.z is \"s\", which isn't a number",
+                    "message": "art.cov.z is missing",
                     "name": "some ys whose n is at least art.cov.z exists"
                   }
                 ],
@@ -35399,14 +35649,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/alias/assert"
@@ -35741,10 +35984,6 @@
                         ],
                         "name": "pl.z",
                         "outcome": "unusable",
-                        "part": {
-                          "id": null,
-                          "name": "pl"
-                        },
                         "value": "s"
                       }
                     ],
@@ -36056,14 +36295,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/alias/assert"
@@ -36402,10 +36634,6 @@
                         ],
                         "name": "pl.z",
                         "outcome": "null",
-                        "part": {
-                          "id": null,
-                          "name": "pl"
-                        },
                         "value": null
                       }
                     ],
@@ -36999,10 +37227,6 @@
                         ],
                         "name": "pl.z",
                         "outcome": "absent",
-                        "part": {
-                          "id": null,
-                          "name": "pl"
-                        },
                         "value": null
                       }
                     ],
@@ -43042,7 +43266,92 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 1 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/1"
+                          ],
+                          "name": "xs[1].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/1"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 2 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/2"
+                          ],
+                          "name": "xs[2].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/2"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 3 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/3"
+                          ],
+                          "name": "xs[3].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/3"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 4 of xs",
+                      "value": {}
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -43059,7 +43368,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+                  "message": "",
                   "name": "count of xs whose v is 1 is 0"
                 }
               ],
@@ -43108,7 +43417,92 @@
                   "failures": [
                     {
                       "cause": "absent",
-                      "failures": [],
+                      "failures": [
+                        {
+                          "cause": "absent",
+                          "failures": [],
+                          "inputs": [
+                            {
+                              "locations": [
+                                "/things/0/xs/0"
+                              ],
+                              "name": "xs[0].v",
+                              "outcome": "absent",
+                              "value": null
+                            }
+                          ],
+                          "kind": "item",
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "message": "v is missing",
+                          "name": "item 1 of xs",
+                          "value": {}
+                        },
+                        {
+                          "cause": "absent",
+                          "failures": [],
+                          "inputs": [
+                            {
+                              "locations": [
+                                "/things/0/xs/1"
+                              ],
+                              "name": "xs[1].v",
+                              "outcome": "absent",
+                              "value": null
+                            }
+                          ],
+                          "kind": "item",
+                          "locations": [
+                            "/things/0/xs/1"
+                          ],
+                          "message": "v is missing",
+                          "name": "item 2 of xs",
+                          "value": {}
+                        },
+                        {
+                          "cause": "absent",
+                          "failures": [],
+                          "inputs": [
+                            {
+                              "locations": [
+                                "/things/0/xs/2"
+                              ],
+                              "name": "xs[2].v",
+                              "outcome": "absent",
+                              "value": null
+                            }
+                          ],
+                          "kind": "item",
+                          "locations": [
+                            "/things/0/xs/2"
+                          ],
+                          "message": "v is missing",
+                          "name": "item 3 of xs",
+                          "value": {}
+                        },
+                        {
+                          "cause": "absent",
+                          "failures": [],
+                          "inputs": [
+                            {
+                              "locations": [
+                                "/things/0/xs/3"
+                              ],
+                              "name": "xs[3].v",
+                              "outcome": "absent",
+                              "value": null
+                            }
+                          ],
+                          "kind": "item",
+                          "locations": [
+                            "/things/0/xs/3"
+                          ],
+                          "message": "v is missing",
+                          "name": "item 4 of xs",
+                          "value": {}
+                        }
+                      ],
                       "inputs": [
                         {
                           "locations": [
@@ -43125,7 +43519,7 @@
                       "locations": [
                         "$policy:/requirements/s/checks/count_in_option/any_of/a"
                       ],
-                      "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+                      "message": "",
                       "name": "count of xs whose v is 1 is 0"
                     }
                   ],
@@ -43220,7 +43614,92 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 1 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/1"
+                          ],
+                          "name": "xs[1].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/1"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 2 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/2"
+                          ],
+                          "name": "xs[2].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/2"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 3 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/3"
+                          ],
+                          "name": "xs[3].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/3"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 4 of xs",
+                      "value": {}
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -43245,7 +43724,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count_with_root"
                   ],
-                  "message": "$params.n is missing, and item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+                  "message": "$params.n is missing",
                   "name": "count of xs whose v is 1 equals $params.n"
                 }
               ],
@@ -43299,7 +43778,92 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 1 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/1"
+                          ],
+                          "name": "xs[1].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/1"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 2 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/2"
+                          ],
+                          "name": "xs[2].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/2"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 3 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/3"
+                          ],
+                          "name": "xs[3].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/3"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 4 of xs",
+                      "value": {}
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -43316,7 +43880,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/sum"
                   ],
-                  "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 1 more",
+                  "message": "",
                   "name": "sum of xs.v is 0"
                 }
               ],
@@ -43385,7 +43949,113 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 1 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/1"
+                          ],
+                          "name": "xs[1].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/1"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 2 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/2"
+                          ],
+                          "name": "xs[2].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/2"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 3 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/3"
+                          ],
+                          "name": "xs[3].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/3"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 4 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/4"
+                          ],
+                          "name": "xs[4].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/4"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 5 of xs",
+                      "value": {}
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -43403,7 +44073,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+                  "message": "",
                   "name": "count of xs whose v is 1 is 0"
                 }
               ],
@@ -43455,7 +44125,113 @@
                   "failures": [
                     {
                       "cause": "absent",
-                      "failures": [],
+                      "failures": [
+                        {
+                          "cause": "absent",
+                          "failures": [],
+                          "inputs": [
+                            {
+                              "locations": [
+                                "/things/0/xs/0"
+                              ],
+                              "name": "xs[0].v",
+                              "outcome": "absent",
+                              "value": null
+                            }
+                          ],
+                          "kind": "item",
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "message": "v is missing",
+                          "name": "item 1 of xs",
+                          "value": {}
+                        },
+                        {
+                          "cause": "absent",
+                          "failures": [],
+                          "inputs": [
+                            {
+                              "locations": [
+                                "/things/0/xs/1"
+                              ],
+                              "name": "xs[1].v",
+                              "outcome": "absent",
+                              "value": null
+                            }
+                          ],
+                          "kind": "item",
+                          "locations": [
+                            "/things/0/xs/1"
+                          ],
+                          "message": "v is missing",
+                          "name": "item 2 of xs",
+                          "value": {}
+                        },
+                        {
+                          "cause": "absent",
+                          "failures": [],
+                          "inputs": [
+                            {
+                              "locations": [
+                                "/things/0/xs/2"
+                              ],
+                              "name": "xs[2].v",
+                              "outcome": "absent",
+                              "value": null
+                            }
+                          ],
+                          "kind": "item",
+                          "locations": [
+                            "/things/0/xs/2"
+                          ],
+                          "message": "v is missing",
+                          "name": "item 3 of xs",
+                          "value": {}
+                        },
+                        {
+                          "cause": "absent",
+                          "failures": [],
+                          "inputs": [
+                            {
+                              "locations": [
+                                "/things/0/xs/3"
+                              ],
+                              "name": "xs[3].v",
+                              "outcome": "absent",
+                              "value": null
+                            }
+                          ],
+                          "kind": "item",
+                          "locations": [
+                            "/things/0/xs/3"
+                          ],
+                          "message": "v is missing",
+                          "name": "item 4 of xs",
+                          "value": {}
+                        },
+                        {
+                          "cause": "absent",
+                          "failures": [],
+                          "inputs": [
+                            {
+                              "locations": [
+                                "/things/0/xs/4"
+                              ],
+                              "name": "xs[4].v",
+                              "outcome": "absent",
+                              "value": null
+                            }
+                          ],
+                          "kind": "item",
+                          "locations": [
+                            "/things/0/xs/4"
+                          ],
+                          "message": "v is missing",
+                          "name": "item 5 of xs",
+                          "value": {}
+                        }
+                      ],
                       "inputs": [
                         {
                           "locations": [
@@ -43473,7 +44249,7 @@
                       "locations": [
                         "$policy:/requirements/s/checks/count_in_option/any_of/a"
                       ],
-                      "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+                      "message": "",
                       "name": "count of xs whose v is 1 is 0"
                     }
                   ],
@@ -43571,7 +44347,113 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 1 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/1"
+                          ],
+                          "name": "xs[1].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/1"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 2 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/2"
+                          ],
+                          "name": "xs[2].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/2"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 3 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/3"
+                          ],
+                          "name": "xs[3].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/3"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 4 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/4"
+                          ],
+                          "name": "xs[4].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/4"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 5 of xs",
+                      "value": {}
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -43597,7 +44479,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count_with_root"
                   ],
-                  "message": "$params.n is missing, and item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+                  "message": "$params.n is missing",
                   "name": "count of xs whose v is 1 equals $params.n"
                 }
               ],
@@ -43654,7 +44536,113 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/0"
+                          ],
+                          "name": "xs[0].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/0"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 1 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/1"
+                          ],
+                          "name": "xs[1].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/1"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 2 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/2"
+                          ],
+                          "name": "xs[2].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/2"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 3 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/3"
+                          ],
+                          "name": "xs[3].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/3"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 4 of xs",
+                      "value": {}
+                    },
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/xs/4"
+                          ],
+                          "name": "xs[4].v",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/xs/4"
+                      ],
+                      "message": "v is missing",
+                      "name": "item 5 of xs",
+                      "value": {}
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -43672,7 +44660,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/sum"
                   ],
-                  "message": "item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more",
+                  "message": "",
                   "name": "sum of xs.v is 0"
                 }
               ],

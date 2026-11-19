@@ -1115,7 +1115,34 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/0/0"
+                        ],
+                        "name": "t[0].name",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/0/0"
+                    ],
+                    "message": "item 1 of t is [{\"n\": 1, \"name\": \"a\"}], which isn't an object",
+                    "name": "item 1 of t",
+                    "value": [
+                      {
+                        "n": 1,
+                        "name": "a"
+                      }
+                    ]
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -1139,7 +1166,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 1 of t is [{\"n\": 1, \"name\": \"a\"}], which isn't an object",
+                "message": "",
                 "name": "count of name is 2"
               }
             ],
@@ -1373,7 +1400,34 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/0/0"
+                        ],
+                        "name": "t[0].n",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/0/0"
+                    ],
+                    "message": "item 1 of t is [{\"n\": 1, \"name\": \"a\"}], which isn't an object",
+                    "name": "item 1 of t",
+                    "value": [
+                      {
+                        "n": 1,
+                        "name": "a"
+                      }
+                    ]
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -1397,7 +1451,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/sum"
                 ],
-                "message": "item 1 of t is [{\"n\": 1, \"name\": \"a\"}], which isn't an object",
+                "message": "",
                 "name": "sum of n is 3"
               }
             ],

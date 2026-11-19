@@ -9670,20 +9670,36 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/0/k",
+                              "/s/ts/0/fs/1/k"
+                            ],
+                            "name": "t.fs[0].k",
+                            "outcome": "unusable",
+                            "value": 5
+                          }
                         ],
-                        "name": "t.fs[].k",
-                        "outcome": "usable",
-                        "value": [
-                          5,
-                          5
-                        ]
-                      },
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/0",
+                          "/s/ts/0/fs/1"
+                        ],
+                        "message": "k is 5, which isn't text",
+                        "name": "item 1 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "lo": 9,
+                          "ok": []
+                        }
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "/s/ts/0/pats"
@@ -9699,7 +9715,7 @@
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of t.fs: k is 5, which isn't text",
+                    "message": "",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -9812,20 +9828,36 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/0/k",
+                              "/s/ts/0/fs/1/k"
+                            ],
+                            "name": "t.fs[0].k",
+                            "outcome": "usable",
+                            "value": 5
+                          }
                         ],
-                        "name": "t.fs[].k",
-                        "outcome": "usable",
-                        "value": [
-                          5,
-                          5
-                        ]
-                      },
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/0",
+                          "/s/ts/0/fs/1"
+                        ],
+                        "message": "k is 5, and t.ok is [5]",
+                        "name": "item 1 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "lo": 9,
+                          "ok": []
+                        }
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "/s/ts/0/ok"
@@ -9841,7 +9873,7 @@
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of t.fs: k is 5, and t.ok is [5]",
+                    "message": "",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [

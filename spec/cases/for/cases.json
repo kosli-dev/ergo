@@ -25525,7 +25525,29 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/xs/0/tags/0"
+                            ],
+                            "name": "x.tags[0]",
+                            "outcome": "usable",
+                            "value": "t"
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/xs/0/tags/0"
+                        ],
+                        "message": "item 1 of x.tags is \"t\", and x.nums is [\"u\"]",
+                        "name": "item 1 of x.tags",
+                        "value": "t"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -25536,23 +25558,13 @@
                         "value": [
                           "u"
                         ]
-                      },
-                      {
-                        "locations": [
-                          "/things/0/xs/0/tags/0"
-                        ],
-                        "name": "x.tags[]",
-                        "outcome": "usable",
-                        "value": [
-                          "t"
-                        ]
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "item 1 of x.tags is \"t\", and x.nums is [\"u\"]",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "nums": [
@@ -25790,7 +25802,31 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rows/0/n"
+                            ],
+                            "name": "rows[0].n",
+                            "outcome": "usable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/rows/0"
+                        ],
+                        "message": "n is 1, and x.v is 5",
+                        "name": "item 1 of rows",
+                        "value": {
+                          "n": 1
+                        }
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -25805,7 +25841,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "item 1 of rows: n is 1, and x.v is 5",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "nums": [
@@ -27902,7 +27938,32 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/#rows/0/n"
+                            ],
+                            "name": "\"#rows\"[0].n",
+                            "outcome": "usable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/#rows/0"
+                        ],
+                        "message": "n is 1, and x.v is 5",
+                        "name": "item 1 of \"#rows\"",
+                        "value": {
+                          "n": 1,
+                          "z": 2
+                        }
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -27917,7 +27978,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "item 1 of \"#rows\": n is 1, and x.v is 5",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "v": 5,
@@ -38959,14 +39020,7 @@
                     "name": "$params"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params[0].a",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -40447,7 +40501,40 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "$params:/0/v"
+                            ],
+                            "name": "$params[0].v",
+                            "outcome": "unusable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "v is 1, which isn't a list or an object",
+                        "name": "v"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "$params:/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of $params",
+                    "value": {
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -40465,7 +40552,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of $params: v is 1, which isn't a list or an object",
+                "message": "",
                 "name": "count of $params[0].v is 1"
               }
             ],
@@ -45684,6 +45771,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": "s"
                   }
                 ],
@@ -46055,6 +46146,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": null
                   }
                 ],
@@ -46434,6 +46529,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": {
                       "a": 1
                     }
@@ -52181,6 +52280,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": "s"
                   }
                 ],
@@ -52234,6 +52337,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": "s"
                   }
                 ],
@@ -53127,6 +53234,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": null
                   }
                 ],
@@ -53180,6 +53291,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": null
                   }
                 ],
@@ -64530,7 +64645,29 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/lst/1"
+                        ],
+                        "name": "$input.lst[1].z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/lst/1"
+                    ],
+                    "message": "z is missing",
+                    "name": "item 2 of $input.lst",
+                    "value": {}
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -64545,7 +64682,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/input/assert"
                 ],
-                "message": "item 2 of $input.lst: z is missing",
+                "message": "",
                 "name": "count of $input.lst.z is 2"
               }
             ],
@@ -64597,7 +64734,29 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/c/1"
+                        ],
+                        "name": "pl[1].z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/c/1"
+                    ],
+                    "message": "z is missing",
+                    "name": "item 2 of pl",
+                    "value": {}
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -64616,7 +64775,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/part/assert"
                 ],
-                "message": "item 2 of pl: z is missing",
+                "message": "",
                 "name": "count of pl.z is 2"
               }
             ],
@@ -64684,6 +64843,23 @@
               {
                 "cause": "absent",
                 "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          ""
+                        ],
+                        "name": "$input.lst.z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$input.lst.z is missing",
+                    "name": "$input.lst.z"
+                  },
                   {
                     "cause": "absent",
                     "failures": [],
@@ -64763,11 +64939,19 @@
                     "inputs": [
                       {
                         "locations": [
-                          "/prs/0/c"
+                          "/prs/0"
                         ],
                         "name": "pl",
                         "outcome": "null",
-                        "value": null
+                        "value": {
+                          "c": null,
+                          "id": "p0",
+                          "xs": [
+                            {
+                              "v": 1
+                            }
+                          ]
+                        }
                       }
                     ],
                     "kind": "list",
@@ -75317,10 +75501,6 @@
                     ],
                     "name": "pl.z",
                     "outcome": "absent",
-                    "part": {
-                      "id": null,
-                      "name": "pl"
-                    },
                     "value": null
                   }
                 ],
@@ -75531,10 +75711,6 @@
                     ],
                     "name": "pl.z",
                     "outcome": "null",
-                    "part": {
-                      "id": null,
-                      "name": "pl"
-                    },
                     "value": null
                   }
                 ],
@@ -75745,10 +75921,6 @@
                     ],
                     "name": "pl.z",
                     "outcome": "unusable",
-                    "part": {
-                      "id": null,
-                      "name": "pl"
-                    },
                     "value": null
                   }
                 ],
@@ -107180,9 +107352,7 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [
-                            "/things/0/ws/1/o"
-                          ],
+                          "locations": [],
                           "name": "w.o",
                           "outcome": "unusable",
                           "value": "s"
@@ -107212,9 +107382,7 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [
-                            "/things/0/ws/2"
-                          ],
+                          "locations": [],
                           "name": "w.o",
                           "outcome": "absent",
                           "value": null

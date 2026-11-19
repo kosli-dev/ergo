@@ -3852,24 +3852,37 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/releases/1/files/0/path"
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/1/files/0/path"
+                        ],
+                        "name": "files[0].path",
+                        "outcome": "usable",
+                        "value": "docs/upgrade.md"
+                      }
                     ],
-                    "name": "files[].path",
-                    "outcome": "usable",
-                    "value": [
-                      "docs/upgrade.md"
-                    ]
+                    "kind": "item",
+                    "locations": [
+                      "/releases/1/files/0"
+                    ],
+                    "message": "path is \"docs/upgrade.md\"",
+                    "name": "item 1 of files",
+                    "value": {
+                      "path": "docs/upgrade.md"
+                    }
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/release/from#2"
                 ],
-                "message": "item 1 of files: path is \"docs/upgrade.md\"",
+                "message": "",
                 "name": "some files.path does not match \"^docs/\""
               }
             ],

@@ -1989,7 +1989,50 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/1/0"
+                        ],
+                        "name": "region[0]",
+                        "outcome": "unusable",
+                        "value": "a"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/1/0"
+                    ],
+                    "message": "item 1 of region is \"a\", which isn't a number",
+                    "name": "item 1 of region",
+                    "value": "a"
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/1/1"
+                        ],
+                        "name": "region[1]",
+                        "outcome": "unusable",
+                        "value": "b"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/1/1"
+                    ],
+                    "message": "item 2 of region is \"b\", which isn't a number",
+                    "name": "item 2 of region",
+                    "value": "b"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -2004,7 +2047,7 @@
                 "locations": [
                   "$policy:/requirements/allowed/checks/t"
                 ],
-                "message": "item 1 of region is \"a\", which isn't a number; item 2 of region is \"b\", which isn't a number",
+                "message": "",
                 "name": "sum of region is 3"
               }
             ],
@@ -4397,7 +4440,50 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/lists/0/0"
+                        ],
+                        "name": "list[0].plain",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/lists/0/0"
+                    ],
+                    "message": "item 1 of list is 1, which isn't an object",
+                    "name": "item 1 of list",
+                    "value": 1
+                  },
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/lists/0/1"
+                        ],
+                        "name": "list[1].plain",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/lists/0/1"
+                    ],
+                    "message": "item 2 of list is 2, which isn't an object",
+                    "name": "item 2 of list",
+                    "value": 2
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -4424,7 +4510,7 @@
                 "locations": [
                   "$policy:/requirements/l/checks/size"
                 ],
-                "message": "item 1 of list is 1, which isn't an object; item 2 of list is 2, which isn't an object",
+                "message": "",
                 "name": "count of plain is 2"
               }
             ],
@@ -7686,7 +7772,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/1/0"
+                        ],
+                        "name": "region[0].ws",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/1/0"
+                    ],
+                    "message": "ws is missing",
+                    "name": "item 1 of region",
+                    "value": {
+                      "y": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -7718,7 +7828,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/b"
                 ],
-                "message": "item 1 of region: ws is missing",
+                "message": "",
                 "name": "count of ws whose x equals region[0].y is 1"
               }
             ],
@@ -12989,6 +13099,18 @@
                       "/xs/1/item/0",
                       "/xs/1/item/1"
                     ],
+                    "name": ".item[]",
+                    "outcome": "usable",
+                    "value": [
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "locations": [
+                      "/xs/1/item/0",
+                      "/xs/1/item/1"
+                    ],
                     "name": "count of .item",
                     "value": 2
                   }
@@ -13291,14 +13413,7 @@
                     "name": "item"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "item",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c"
@@ -13695,14 +13810,7 @@
                     "name": ".rel"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": ".rel",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/rel/from"
