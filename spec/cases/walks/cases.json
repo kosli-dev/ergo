@@ -18810,7 +18810,7 @@
     ]
   },
   {
-    "description": "an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that isn't text in the order the sentence reads them",
+    "description": "an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"every": "every es whose zz is m named by $input.k and whose v is m named by $input.j, if any, exists", "some": "some es whose zz is m named by $input.k and whose v is m named by $input.j exists", "for": {"for": "every es whose zz is m named by $input.k and whose v is m named by $input.j as e", "assert": "e.v is 2"}, "count": "count of es whose zz is m named by $input.k and whose v is m named by $input.j is 0", "right": "every es whose zz is m named by $input.k, if any, is m named by $input.j"}}}},
     "cases": [
       {
@@ -18852,7 +18852,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is missing",
                 "name": "count of es whose zz equals m named by $input.k and whose v equals m named by $input.j is 0"
               }
             ],
@@ -18869,7 +18869,7 @@
                 "value": []
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -18906,7 +18906,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/every"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is missing",
                 "name": "every es whose zz equals m named by $input.k and whose v equals m named by $input.j, if any, exists"
               }
             ],
@@ -18918,7 +18918,7 @@
                 "value": []
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -18983,7 +18983,7 @@
                 "value": 3
               }
             ],
-            "message": "$input.j is 3, which isn't text; es is []",
+            "message": "$input.j is 3, which isn't text; $input.k is missing; es is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19028,7 +19028,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/right"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is missing",
                 "name": "every es whose zz equals m named by $input.k, if any, equals m named by $input.j"
               }
             ],
@@ -19048,7 +19048,7 @@
                 "value": null
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19164,7 +19164,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is null",
                 "name": "count of es whose zz equals m named by $input.k and whose v equals m named by $input.j is 0"
               }
             ],
@@ -19181,7 +19181,7 @@
                 "value": []
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19218,7 +19218,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/every"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is null",
                 "name": "every es whose zz equals m named by $input.k and whose v equals m named by $input.j, if any, exists"
               }
             ],
@@ -19230,7 +19230,7 @@
                 "value": []
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19295,7 +19295,7 @@
                 "value": 3
               }
             ],
-            "message": "$input.j is 3, which isn't text; es is []",
+            "message": "$input.j is 3, which isn't text; $input.k is null; es is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19340,7 +19340,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/right"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is null",
                 "name": "every es whose zz equals m named by $input.k, if any, equals m named by $input.j"
               }
             ],
@@ -19360,7 +19360,7 @@
                 "value": null
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19562,7 +19562,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/for/assert"
                 ],
-                "message": "$input.k is 3, which isn't text; $input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is 3, which isn't text",
                 "name": "e.v is 2"
               },
               {
@@ -19607,7 +19607,7 @@
                 "value": 3
               }
             ],
-            "message": "$input.k is 3, which isn't text; $input.j is 3, which isn't text; es is []",
+            "message": "$input.j is 3, which isn't text; $input.k is 3, which isn't text; es is []",
             "passed": false,
             "requirement": "s",
             "subject": {

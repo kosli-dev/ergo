@@ -223,10 +223,9 @@ _walk_parts_of(check, subj, raw, r) := [_m_fallback(check)] if {
 	_m_empty_walk_roots(check, subj, r) == []
 }
 
-_m_empty_walk_roots(check, subj, r) := ms if {
+_m_empty_walk_roots(check, subj, r) := _walk_key_msgs(check, subj, r) if {
 	_m_params_only_flaw(check, r)
-	ms := _walk_key_texts(check, r)
-	ms != []
+	_walk_key_texts(check, r) != []
 	_key_beats_roots(check, subj)
 } else := ms if {
 	_m_params_only_flaw(check, r)
@@ -503,8 +502,8 @@ _m_tally_key_items(subj, side) := array.concat(
 
 _m_tally_walked_side(subj, side) := array.concat(
 	array.concat(
-		array.concat(said, [["root", _m_fail(x, roots)] | some x in fs; _m_tally_list_said(side, said, x)]),
-		[["root", m] | w.items == []; some c in side.whose; some m in _key_root_texts(c)],
+		_m_tally_heads(said, side, w),
+		[["root", _m_fail(x, roots)] | some x in fs; _m_tally_list_said(side, said, x)],
 	),
 	[x[2] | some x in sort(array.concat(
 		[[_m_positions(x.path), 0, [_m_tally_fail_state(side, x), _m_fail(x, roots), {"fail": x}]] | some x in fs; not _m_tally_list_said(side, said, x)],
@@ -516,10 +515,16 @@ _m_tally_walked_side(subj, side) := array.concat(
 	roots := _dotted_roots([side[f]])
 	fs := array.concat(w.fails, _walk_stop(w))
 	said := array.concat(
-		[[_m_key_root_state_in(side, m), m] | some m in sort([m | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); _m_ref_first(m)])],
+		[["root", m] | some m in sort([m | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); _m_ref_first(m)])],
 		[["root", m] | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); not _m_ref_first(m)],
 	)
 }
+
+_m_tally_heads(said, side, w) := said if {
+	w.items != []
+} else := said if {
+	[t | some c in side.whose; some t in _key_root_texts(c)] == []
+} else := [["root", m] | some m in _m_root_sorted(_once(array.concat([x[1] | some x in said], [t | some c in side.whose; some t in _key_root_texts(c)])))]
 
 _m_tally_list_said(side, said, x) if {
 	said != []
@@ -636,27 +641,6 @@ _m_ref_first(m) if {
 	startswith(m, "$")
 	some word in [" is missing", " is null"]
 	endswith(m, word)
-}
-
-_m_key_root_state_in(side, m) := _m_key_root_state(side, m) if {
-	some c in side.whose
-	_key_root_texts(c) != []
-} else := "root"
-
-_m_key_root_state(side, m) := s if {
-	some c in side.whose
-	some r in _step_refs(c)
-	s := _ref_state(r)
-	s in _no_value_states
-	m == concat("", [_ref_label(r), " is ", _m_state_word(s)])
-	_m_key_on_focus(c, r)
-} else := "root"
-
-_m_key_on_focus(c, r) if {
-	walk(c, [_, p])
-	is_array(p)
-	{"ref": r} in p
-	not _read_off_item(p)
 }
 
 _m_said_in(m, parts) if {

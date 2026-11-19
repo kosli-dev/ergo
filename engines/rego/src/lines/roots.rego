@@ -290,6 +290,8 @@ _walk_key_texts(check, r) := _once([m |
 	some m in _key_root_texts(c)
 ])
 
+_walk_key_msgs(check, subj, r) := _m_root_sorted(_once(array.concat(_walk_key_texts(check, r), _walk_root_msgs(check, subj))))
+
 _key_beats_roots(check, subj) if {
 	not _walk_root_flaw(check, subj) in _root_read_flaws
 	not _leaf_root_flaw(check, subj) in _root_read_flaws
@@ -557,10 +559,9 @@ _rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {
 	ms != []
 } else := _rooted_main(check, subj, r)
 
-_rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": ms}) if {
+_rooted_main(check, subj, r) := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": _walk_key_msgs(check, subj, r)}) if {
 	r.cause in _not_failing_causes
-	ms := _walk_key_texts(check, r)
-	ms != []
+	_walk_key_texts(check, r) != []
 	_key_beats_roots(check, subj)
 } else := object.union(r, object.union({"cause": flaw, "failed": _rooted_failed(r)}, {"root_msgs": ms | ms := _walk_root_msgs(check, subj); ms != []})) if {
 	flaw := _walk_root_flaw(check, subj)
