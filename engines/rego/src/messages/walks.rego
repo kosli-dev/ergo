@@ -549,7 +549,7 @@ _m_positions(path) := [x | some x in path; is_number(x)]
 
 _m_tally_items(subj, side) := [x[2] | some x in _m_tally_items_at(subj, side)]
 
-_m_tally_items_at(subj, side) := [[_m_positions(e.i), 1, array.concat(x, [{"item": e}])] | some e in w.items; some x in array.concat(_m_whose_undecided(subj, alone, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
+_m_tally_items_at(subj, side) := [[_m_positions(e.i), [1, k], array.concat(x, [{"item": e}])] | some e in w.items; some k, x in array.concat(_m_whose_undecided(subj, alone, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	alone := _whose_alone(subj, side)
@@ -558,18 +558,11 @@ _m_tally_items_at(subj, side) := [[_m_positions(e.i), 1, array.concat(x, [{"item
 	long := _long_text(json.marshal([e.iv | some e in w.items]))
 }
 
-_m_whose_undecided(subj, side, e, flaws, roots) := [[_m_focus_state(e, c, cause), _m_focus_text(subj, c, e, cause, roots)] |
+_m_whose_undecided(subj, side, e, flaws, roots) := _once([[_m_focus_state(e, c, cause), _m_focus_text(subj, c, e, cause, roots)] |
 	some i, c in side.whose
 	cause := _tally_focus_cause(c, e, flaws[i])
 	not cause in _tally_decided_causes
-	not _m_undecided_before(side, e, flaws, i)
-]
-
-_m_undecided_before(side, e, flaws, i) if {
-	some j, c in side.whose
-	j < i
-	not _tally_focus_cause(c, e, flaws[j]) in _tally_decided_causes
-}
+])
 
 _m_focus_state(e, c, cause) := concat("", ["focus ", cause]) if {
 	e.r != []

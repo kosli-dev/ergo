@@ -1370,9 +1370,29 @@ _unusable_twin(i, ins) if {
 	j.locations == i.locations
 }
 
-_tally_item_parts(c, subj, cause, at, m) := _nested_items(array.concat(xs, _tally_keyed_extra(c, subj, at, m, xs))) if {
+_tally_item_parts(c, subj, cause, at, m) := _nested_items(_tally_one_per_item(array.concat(xs, _tally_keyed_extra(c, subj, at, m, xs)))) if {
 	xs := _tally_item_records(c, subj, cause, at, m)
 }
+
+_tally_one_per_item(es) := [_tally_joined_item(e, [y | some y in es; _tally_same_item(y, e)]) |
+	some k, e in es
+	not _tally_item_before(es, k, e)
+]
+
+_tally_item_before(es, k, e) if {
+	some j, y in es
+	j < k
+	_tally_same_item(y, e)
+}
+
+_tally_same_item(a, b) if {
+	a.kind == "item"
+	object.remove(a, ["message", "cause"]) == object.remove(b, ["message", "cause"])
+}
+
+_tally_joined_item(e, same) := e if count(same) < 2
+
+else := object.union(e, {"message": concat("; ", _once([y.message | some y in same; y.message != ""])), "cause": _worst_of({y.cause | some y in same})})
 
 _tally_keyed_extra(c, subj, at, m, xs) := [x |
 	some f in _tally_keyed_found(c, subj, m)

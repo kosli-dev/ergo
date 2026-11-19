@@ -58,3 +58,19 @@ test_an_item_names_every_condition_of_its_whose_it_cant_decide_and_not_only_the_
 	said := [x[1] | some x in ergo._m_tally_items({"es": [{"zz": 2, "v": 2}]}, keyed)] with data.ergo_params as {"k": "a", "j": 3}
 	"item 1 of es: $params.j is 3, which isn't text" in said
 }
+
+test_an_item_names_the_conditions_it_cant_decide_in_the_order_the_sentence_reads_them if {
+	side := _count_of_es([
+		{"op": "compare", "cmp": "eq", "left": ["w"], "right": {"literal": 1}},
+		{"op": "compare", "cmp": "eq", "left": ["v"], "right": {"literal": 1}},
+	])
+	[x[1] | some x in ergo._m_tally({"es": [{}]}, side)] == ["item 1 of es: w is missing", "item 1 of es: v is missing"]
+}
+
+test_an_item_two_conditions_cant_read_for_the_same_reason_is_named_once if {
+	side := _count_of_es([
+		{"op": "compare", "cmp": "eq", "left": ["v"], "right": {"literal": 1}},
+		{"op": "compare", "cmp": "eq", "left": ["w"], "right": {"literal": 1}},
+	])
+	[x[1] | some x in ergo._m_tally_items({"es": [null]}, side)] == ["item 1 of es is null, which isn't an object"]
+}

@@ -50,3 +50,16 @@ test_a_from_without_a_path_gives_no_key_reads if {
 test_a_list_named_in_a_message_but_found_in_no_path_keeps_the_input_it_was_read_from if {
 	ergo._tally_list_read("xs", "absent", {}, [{"name": "xs", "value": 1}, {"name": "ys", "value": 2}], []) == [{"name": "xs", "value": 1, "outcome": "absent"}]
 }
+
+test_an_item_two_conditions_of_a_count_cant_decide_is_one_entry_that_says_both if {
+	check := {
+		"op": "compare", "cmp": "eq", "expression": "count of es whose v is 1 and whose w is 1 is 0",
+		"left": {"count_of": ["es"], "text": "count of es whose v is 1 and whose w is 1", "whose": [
+			{"op": "compare", "cmp": "eq", "left": ["v"], "right": {"literal": 1}},
+			{"op": "compare", "cmp": "eq", "left": ["w"], "right": {"literal": 1}},
+		]},
+		"right": {"literal": 0},
+	}
+	parts := ergo._tally_item_parts(check, {"es": [{}]}, "absent", "/things/0", "item 1 of es: v is missing; item 1 of es: w is missing")
+	[[p.name, p.cause, p.message] | some p in parts] == [["item 1 of es", "absent", "v is missing; w is missing"]]
+}

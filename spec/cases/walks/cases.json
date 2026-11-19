@@ -35345,6 +35345,314 @@
     ]
   },
   {
+    "description": "a whose key from $params that isn't text, read by a later condition than one an item can't decide, is said after that condition's problem",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "count": "count of es whose v is 1 and whose zz is m named by $params.k is 0"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 3
+    },
+    "cases": [
+      {
+        "description": "an item without v says that v is missing and then the key",
+        "rules": [
+          "tally.whose",
+          "message.items",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "es": [
+                {
+                  "zz": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0/zz"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "usable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "v is missing; $params.k is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "name": "count of es whose v is 1 and whose zz equals m named by $params.k",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/count"
+                ],
+                "message": "",
+                "name": "count of es whose v is 1 and whose zz equals m named by $params.k is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "count of es whose v is 1 and whose zz equals m named by $params.k",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "zz": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of es: v is missing; item 1 of es: $params.k is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "two whose keys from $params, the second one not text, beside an item that fails the first condition, say both problems",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "count": "count of es whose zz is m named by $params.k and whose v is m named by $params.j is 0"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": "a",
+      "j": 3
+    },
+    "cases": [
+      {
+        "description": "an item without m says that m named by the first key is missing and then the second key",
+        "rules": [
+          "tally.whose",
+          "message.items",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "es": [
+                {
+                  "zz": 2,
+                  "v": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0/zz"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "usable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0/v"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "usable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m named by $params.j",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "m named by $params.k is missing; $params.j is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": {
+                      "v": 2,
+                      "zz": 2
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "name": "count of es whose zz equals m named by $params.k and whose v equals m named by $params.j",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/j"
+                    ],
+                    "name": "$params.j",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/count"
+                ],
+                "message": "",
+                "name": "count of es whose zz equals m named by $params.k and whose v equals m named by $params.j is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "count of es whose zz equals m named by $params.k and whose v equals m named by $params.j",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 2,
+                    "zz": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of es: m named by $params.k is missing; item 1 of es: $params.j is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a whose key from $params that is null, beside items that fail on their own fields, says the key once and each item's own problem",
     "policy": {
       "ergo_spec": "{{spec}}",

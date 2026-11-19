@@ -17029,7 +17029,7 @@
                     "locations": [
                       "/prs/0/xs/1"
                     ],
-                    "message": "aa is missing",
+                    "message": "aa is missing; b is missing",
                     "name": "item 2 of xs",
                     "value": {}
                   }
@@ -17093,7 +17093,7 @@
                 "value": null
               }
             ],
-            "message": "$params.q is missing; pr.z is missing; item 2 of xs: aa is missing",
+            "message": "$params.q is missing; pr.z is missing; item 2 of xs: aa is missing; item 2 of xs: b is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19126,7 +19126,7 @@
                     "locations": [
                       "/prs/0/xs/1"
                     ],
-                    "message": "v is missing",
+                    "message": "v is missing; w is missing",
                     "name": "item 2 of xs",
                     "value": {}
                   }
@@ -19190,7 +19190,7 @@
                 "value": 3
               }
             ],
-            "message": "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list; item 2 of xs: v is missing",
+            "message": "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list; item 2 of xs: v is missing; item 2 of xs: w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {

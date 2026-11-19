@@ -799,6 +799,7 @@ walks / a whose key from $params that isn't text, in a walk beside another sente
 walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds text
 walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is empty
 walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is missing
+walks / a whose key from $params that isn't text, read by a later condition than one an item can't decide, is said after that condition's problem / an item without v says that v is missing and then the key
 walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / five items without m show three and count two more
 walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / four items without m show three and count one more
 walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / three items without m show all three
@@ -818,6 +819,7 @@ walks / an item of a list a whose reads from $input is a root, said worst cause 
 walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name, with a null param / an item of $input.os has no name and $params.z is null
 walks / objects in a list that differ past 15 significant digits / compares each item on every digit, in this order
 walks / objects in a list that differ past 15 significant digits, in the other order / compares each item on every digit, in the other order
+walks / two whose keys from $params, the second one not text, beside an item that fails the first condition, say both problems / an item without m says that m named by the first key is missing and then the second key
 walks / whose under every / fails as value with no failed items when whose leaves no items
 walks / whose under some / fails as value with no failed items when whose keeps nothing
 walks / with params that aren't an object, an every, a some or a for item on an empty list still names the named by key it reads from $input / the key is a number
