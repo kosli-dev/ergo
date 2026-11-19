@@ -6927,6 +6927,14 @@
                 ],
                 "name": "in-scope scan count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "scans",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "scans is missing",
@@ -6984,6 +6992,14 @@
                 ],
                 "name": "in-scope scan count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "scans",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "scans is null",
@@ -7044,6 +7060,18 @@
                 ],
                 "name": "in-scope scan count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "scans",
+                "outcome": "unusable",
+                "value": [
+                  {
+                    "name": "sast"
+                  }
+                ]
               }
             ],
             "message": "scans is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
@@ -7100,6 +7128,14 @@
                 ],
                 "name": "in-scope scan count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "scans",
+                "outcome": "unusable",
+                "value": "sast"
               }
             ],
             "message": "scans is \"sast\", which isn't a list or an object",
@@ -7156,6 +7192,14 @@
                 ],
                 "name": "in-scope scan count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "scans",
+                "outcome": "unusable",
+                "value": 5
               }
             ],
             "message": "scans is 5, which isn't a list or an object",
@@ -8442,6 +8486,14 @@
                 ],
                 "name": "in-scope scan count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/scans/prod"
+                ],
+                "name": "scans named by $params.env",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "scans.prod is null",
@@ -8518,6 +8570,16 @@
                 ],
                 "name": "in-scope scan count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/scans/prod"
+                ],
+                "name": "scans named by $params.env",
+                "outcome": "unusable",
+                "value": [
+                  1
+                ]
               }
             ],
             "message": "scans.prod is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
@@ -8591,6 +8653,14 @@
                 ],
                 "name": "in-scope scan count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "scans named by $params.env",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "scans.prod is missing",
@@ -27175,6 +27245,14 @@
                 ],
                 "name": "in-scope k count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "artifact.x",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "x is missing",
@@ -27670,6 +27748,14 @@
                 ],
                 "name": "in-scope k count",
                 "value": 2
+              },
+              {
+                "locations": [
+                  "/artifacts/1"
+                ],
+                "name": "artifact.x",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "x is missing",
@@ -28808,6 +28894,14 @@
                 ],
                 "name": "in-scope k count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "item 1 of artifact",
+                "outcome": "unusable",
+                "value": null
               }
             ],
             "message": "item 1 of artifact is null, which isn't a list or an object",
@@ -28982,6 +29076,14 @@
                 ],
                 "name": "in-scope k count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "item 1 of artifact",
+                "outcome": "unusable",
+                "value": null
               }
             ],
             "message": "item 1 of artifact is null, which isn't a list or an object",
@@ -29156,6 +29258,14 @@
                 ],
                 "name": "in-scope k count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/artifacts/0/x"
+                ],
+                "name": "item 1 of artifact.x",
+                "outcome": "unusable",
+                "value": null
               }
             ],
             "message": "item 1 of x is null, which isn't a list or an object",
@@ -29550,6 +29660,14 @@
                 ],
                 "name": "in-scope k count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/ps/0"
+                ],
+                "name": "item 1 of p",
+                "outcome": "unusable",
+                "value": null
               }
             ],
             "message": "p is \"text\", which isn't a list or an object",
@@ -31096,6 +31214,14 @@
                 ],
                 "name": "in-scope string env, list keys count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "scans named by $params.es",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "scans.nope is missing",
@@ -34219,6 +34345,18 @@
                 "locations": [],
                 "name": "in-scope pr count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/trails/r/prs"
+                ],
+                "name": "trails.r.prs",
+                "outcome": "unusable",
+                "value": [
+                  {
+                    "id": 1
+                  }
+                ]
               }
             ],
             "message": "trails.r.prs is a list: write every trails.r.prs to read each item",
@@ -34855,6 +34993,18 @@
                 "locations": [],
                 "name": "in-scope keyed count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/build/tests"
+                ],
+                "name": "build named by $params.k",
+                "outcome": "unusable",
+                "value": [
+                  {
+                    "id": "t3"
+                  }
+                ]
               }
             ],
             "message": "build.tests is a list: write every build named by $params.k to read each item",
@@ -34874,6 +35024,21 @@
                 "locations": [],
                 "name": "in-scope plain count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/tests"
+                ],
+                "name": "tests",
+                "outcome": "unusable",
+                "value": [
+                  {
+                    "id": "t1"
+                  },
+                  {
+                    "id": "t2"
+                  }
+                ]
               }
             ],
             "message": "tests is a list: write every $input.tests to read each item",
@@ -35263,6 +35428,21 @@
                 "locations": [],
                 "name": "in-scope list count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/builds/0/tests"
+                ],
+                "name": "builds[0].tests",
+                "outcome": "unusable",
+                "value": [
+                  {
+                    "id": "t1"
+                  },
+                  {
+                    "id": "t2"
+                  }
+                ]
               }
             ],
             "message": "builds[0].tests is a list: write every builds[0].tests to read each item",
@@ -37594,6 +37774,21 @@
                 "locations": [],
                 "name": "in-scope plain monitor count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/deployments/0/monitors"
+                ],
+                "name": "deployment.monitors",
+                "outcome": "unusable",
+                "value": [
+                  {
+                    "id": "m1"
+                  },
+                  {
+                    "id": "m2"
+                  }
+                ]
               }
             ],
             "message": "monitors is a list: write every deployment.monitors to read each item",
@@ -37616,6 +37811,18 @@
                 "locations": [],
                 "name": "in-scope plain monitor count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/deployments/1/monitors"
+                ],
+                "name": "deployment.monitors",
+                "outcome": "unusable",
+                "value": [
+                  {
+                    "id": "m1"
+                  }
+                ]
               }
             ],
             "message": "monitors is a list: write every deployment.monitors to read each item",
@@ -39014,6 +39221,14 @@
                 "locations": [],
                 "name": "in-scope plain owner count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/batches/0"
+                ],
+                "name": "batch.owner",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "batch is a list: write every batch.owner to read each item",
@@ -39047,6 +39262,14 @@
                 "locations": [],
                 "name": "in-scope plain owner count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/batches/1"
+                ],
+                "name": "batch.owner",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "batch is a list: write every batch.owner to read each item",
@@ -39911,6 +40134,14 @@
                 ],
                 "name": "in-scope deep run count",
                 "value": 2
+              },
+              {
+                "locations": [
+                  "/builds"
+                ],
+                "name": "builds.test_runs",
+                "outcome": "unusable",
+                "value": null
               }
             ],
             "message": "builds is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
@@ -39933,6 +40164,23 @@
                 ],
                 "name": "in-scope test run count",
                 "value": 2
+              },
+              {
+                "locations": [
+                  "/build/test_runs"
+                ],
+                "name": "build.test_runs",
+                "outcome": "unusable",
+                "value": [
+                  {
+                    "integration": {
+                      "passed": true
+                    },
+                    "unit": {
+                      "passed": true
+                    }
+                  }
+                ]
               }
             ],
             "message": "build.test_runs is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
@@ -42153,6 +42401,14 @@
                 ],
                 "name": "in-scope t count",
                 "value": 1
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "build",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "$input is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",

@@ -3717,6 +3717,18 @@
                 "locations": [],
                 "name": "in-scope q count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/0/commits"
+                ],
+                "name": "p.commits",
+                "outcome": "unusable",
+                "value": [
+                  {
+                    "x": 1
+                  }
+                ]
               }
             ],
             "message": "commits is a list: write every p.commits to read each item",
