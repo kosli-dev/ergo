@@ -405,16 +405,20 @@ _m_shown_clause(m, shown) if _m_item_lead(m) in shown
 
 _m_tally_shown(state, cause) if state == cause
 
+_m_tally_shown(state, _) if state in _failed_read_states
+
 _m_tally_shown("root", _)
 
 _m_tally_shown(state, _) if startswith(state, "focus ")
 
 _m_tallies(subj, check, cause) := [c |
 	some side in _m_tally_parts(check)
-	cs := [x[1] | some x in _m_tally(subj, side); _m_tally_shown(x[0], cause); not _m_tally_dropped(subj, side, cause, x)]
+	cs := [x[1] | some x in _m_tally_said(subj, side, cause)]
 	count(cs) > 0
 	c := _m_joined(cs)
 ]
+
+_m_tally_said(subj, side, cause) := [x | some x in _m_tally(subj, side); _m_tally_shown(x[0], cause); not _m_tally_dropped(subj, side, cause, x)]
 
 _m_tally_dropped(subj, side, cause, x) if {
 	roots := {m | some c in object.get(side, "whose", []); _root_read_flaw(subj, c) == cause; some m in array.concat(_m_root_texts(subj, c, cause), _m_walked_tally_texts(subj, _walked_tallies(c), cause))}
@@ -480,10 +484,13 @@ _m_tally_key_items(subj, side) := array.concat(
 
 _m_tally_walked_side(subj, side) := array.concat(
 	array.concat(
-		[[_m_tally_fail_state(side, x), _m_fail(x, roots)] | some x in fs; not _m_tally_list_said(side, said, x)],
 		array.concat(said, [["root", _m_fail(x, roots)] | some x in fs; _m_tally_list_said(side, said, x)]),
+		[["root", m] | w.items == []; some c in side.whose; some m in _key_root_texts(c)],
 	),
-	array.concat(_m_tally_items(subj, side), [["root", m] | w.items == []; some c in side.whose; some m in _key_root_texts(c)]),
+	[x[2] | some x in sort(array.concat(
+		[[_m_positions(x.path), 0, [_m_tally_fail_state(side, x), _m_fail(x, roots), {"fail": x}]] | some x in fs; not _m_tally_list_said(side, said, x)],
+		_m_tally_items_at(subj, side),
+	))],
 ) if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
@@ -514,7 +521,11 @@ _m_tally_walked(c, w) := _m_cond_walked_texts(c) if array.concat(w.fails, _walk_
 
 else := []
 
-_m_tally_items(subj, side) := [x | some e in w.items; some x in array.concat(_m_whose_undecided(subj, side, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
+_m_positions(path) := [x | some x in path; is_number(x)]
+
+_m_tally_items(subj, side) := [x[2] | some x in _m_tally_items_at(subj, side)]
+
+_m_tally_items_at(subj, side) := [[_m_positions(e.i), 1, array.concat(x, [{"item": e}])] | some e in w.items; some x in array.concat(_m_whose_undecided(subj, side, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	flaws := [_cond_flaw(c) | some c in side.whose]
