@@ -117,6 +117,48 @@ Every change needs tests: new behaviour, bug fixes and changes to existing behav
 
 Rust tests never live inline in a source file. Tests that need private items go in `<file>/tests.rs`, and tests of the public API in the crate's `tests/` folder. A test attribute like `#[test]` anywhere outside `tests.rs` or a `tests/` folder is an inline test, and CI fails on it, and on an inline test module.
 
+### Test-driven changes
+
+Every change to what Ergo does starts with a unit test that fails. That covers new behaviour, a fix and a removal alike, in the Rego engine and in the Rust engine.
+
+1. Find the unit. Pick the smallest rule or function that decides what you're changing: given a few values (a subject, a check, a path's read, an item, a key's outcome), it gives a record, an entry, an input or a clause. The test goes beside it: for Rust in that file's `tests.rs`, for Rego in `engines/rego/tests/<area>/<topic>_test.rego`.
+2. Write the test first, with a name that says the behaviour, and run only it. It must fail, and fail for the reason you expect: read the assertion. A test that passes at once means the engine already does it, or the test is wrong.
+3. Make it pass with the smallest change. Then run the file's or folder's tests, and every unit test.
+4. Repeat for the next behaviour. Commit each red test and its fix.
+5. At the end of a round, and only then, run the spec cases of the topics you touched, and then everything. A case that fails there is a missing unit test: write it, see it fail, then fix. Don't fix straight from a case, and don't change a case to match the engine without a decision.
+
+Rego commands, from the repo root. The parts load as one package, so there's no build while you work:
+
+```sh
+opa test engines/rego/src engines/rego/tests/<area>/<topic>_test.rego --run <name> --var-values
+opa test engines/rego/src engines/rego/tests/support_test.rego engines/rego/tests/<area>
+opa test engines/rego/src engines/rego/tests/support_test.rego engines/rego/tests/{checks,lines,messages,policy,reading,report,sentences,shared} --timeout 120s
+```
+
+The first takes under a second, the second about a second and the third, every unit test, a few seconds. Don't name `engines/rego` as the folder for a unit test: it compiles every test file and costs several times as much. A test that reads `$params` or a parent sets them with `with data.ergo_params as {...}` or `with data.ergo_parent as {...}`. A feature file (`tests/<feature>_test.rego`) takes 10 to 60 seconds and runs at the end of a round with `--timeout 120s`. The full run in "Checks" takes minutes and runs once.
+
+Rust commands, from `engines/rust`. A native `cargo` with the toolchain pinned in `rust-toolchain.toml` is fastest, with one target directory shared by every worktree, so a build isn't repeated and no volume piles up:
+
+```sh
+export CARGO_TARGET_DIR=$HOME/.cache/ergo-cargo-target
+cargo test -j 4 -p ergo-policy-engine --lib <test name>
+cargo test -j 4 -p ergo-policy-engine --lib <module>::
+cargo test -j 4 -p ergo-policy-engine --lib
+cargo test -j 4 -p ergo-policy-engine --test cases
+cargo test -j 4 --workspace --no-fail-fast
+```
+
+One test takes about two seconds with the rebuild, the whole `--lib` under a second, the spec cases a few seconds and the workspace about half a minute. Don't create a Docker image or a volume per task: use the Docker command in `engines/rust/README.md` only for the CI checks.
+
+When there's no seam, because the decision is mixed with building text or with the whole report:
+
+- Don't test through `ergo.report` or the whole report as a way around it.
+- Make the smallest refactor that pulls the decision into its own rule or function, with no change in behaviour. The tests that pass before it must pass after it.
+- Then write the failing test against the new rule.
+- If that refactor is more than a few dozen lines, stop and say so in the round's report, with the rule you'd pull out. Don't start a large refactor in a round.
+
+A red test for a decision that a round won't build stays: `#[ignore = "<decision>"]` in Rust, and `todo_test_<name>` in Rego. OPA skips a `todo_` test and `opa test` exits 2, so a todo test can't land on `main`: turn it on or remove it before the pull request is ready.
+
 ## No comments
 
 There are no comments in the code or the tests, and it should stay that way.
