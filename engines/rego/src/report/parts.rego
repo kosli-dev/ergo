@@ -122,7 +122,27 @@ _tie_texts(row, t, f, rec) := t.items[j] if {
 	j := min({j | some j, g in row.failed_items; g.cause == "ambiguous"; t.items[j].walk != []})
 } else := rec
 
-_for_assertion_entry(row, at, where, t, i, a) := _policy_entry(
+_for_assertion_entry(row, at, where, t, i, a) := _for_free_entry(_for_assertion_base(row, at, where, t, i, a), row, at, where, t, i, a)
+
+_for_free_entry(e, row, at, where, t, i, a) := _tallied_entry(e, where.check.checks[i], {"cause": e.cause}, at, where, row) if {
+	not _for_line_of(row, t, a)
+	_ = row["ergo/subj"]
+	not _reads_alias_of(where.check.checks[i], {item.as | some item in where.check.items})
+} else := e
+
+_for_line_of(row, t, a) if {
+	some k, f in row.failed_items
+	"lines" in object.keys(t.items[k])
+	some l in f.failed_assertions
+	l.assertion == a
+}
+
+_reads_alias_of(c, aliases) if {
+	some a in aliases
+	_reads_name(c, a)
+}
+
+_for_assertion_base(row, at, where, t, i, a) := _policy_entry(
 	"assertion",
 	a,
 	_worst_or_value(causes),
@@ -325,7 +345,7 @@ _entry(kind, name, cause, inputs, failures, message) := {
 
 _policy_entry(kind, name, cause, inputs, failures, message, locations) := object.union(_entry(kind, name, cause, inputs, failures, message), {"locations": locations})
 
-_row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, [i | some i in _with_key_bases(array.concat(ins, _check_key_ref_entries(where.check, ins, row.cause, row.message)), object.get(row, "ergo/key_bases", []), at); not i.name in names; not _item_input(i, lists)], array.concat(ls, items), _tally_rest_of(row.message, names, texts), [_assertion_at(where, null, 0)])] if {
+_row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, [i | some i in _with_key_bases(array.concat(ins, _check_key_ref_entries(where.check, ins, row.cause, row.message)), object.get(row, "ergo/key_bases", []), at); not i.name in names; not _item_input(i, lists); not _tally_own_read(i, where.check)], array.concat(ls, items), _tally_rest_of(row.message, names, texts), [_assertion_at(where, null, 0)])] if {
 	not _walks(where.check)
 	not _all_of_run(where.check)
 	not _any_of_run(where.check)
@@ -401,6 +421,14 @@ else := concat("; ", [c |
 ])
 
 _and_more(q) if regex.match(`^and [0-9]+ more$`, q)
+
+_tally_own_read(i, c) if {
+	i.value == []
+	some side in _m_tally_parts(c)
+	p := side[_basic_form(side)]
+	is_array(p)
+	i.name == _input_name(p)
+}
 
 _tally_clauses(m) := ps if {
 	ps := _m_top_split(m, "; ")
@@ -491,7 +519,7 @@ _tallied_entry(e, c, o, at, where, row) := object.union(e, {"inputs": x.inputs, 
 	raw.passed == false
 	wrow := object.union(_anchored(_keyed_rooted(_for_said(raw), c, row["ergo/subj"]), at), {"ergo/subj": row["ergo/subj"], "ergo/req": row["ergo/req"]})
 	x := _walk_assertion_entry(wrow, at, object.union(where, {"check": object.union(c, {"expression": e.name}), "ats": {"": e.locations}}), _with_outcomes(wrow.inputs))
-} else := object.union(e, {"inputs": [i | some i in e.inputs; not i.name in names; not _item_input(i, lists)], "failures": array.concat(ls, items), "message": _tally_rest_of(e.message, names, texts)}) if {
+} else := object.union(e, {"inputs": [i | some i in e.inputs; not i.name in names; not _item_input(i, lists); not _tally_own_read(i, c)], "failures": array.concat(ls, items), "message": _tally_rest_of(e.message, names, texts)}) if {
 	not _walks(c)
 	count(_m_tally_parts(c)) > 0
 	subj := row["ergo/subj"]

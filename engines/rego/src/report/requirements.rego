@@ -284,6 +284,8 @@ _reads_items_later(check) if _any_of_run(check)
 
 _reads_items_later(check) if _tally_worded(check)
 
+_reads_items_later(check) if check.op == "for"
+
 _anchored_failed(f, at) := object.union(_anchored_all([f], at)[0], object.union(_anchored_inner(f, at), _anchored_lines(f, at)))
 
 _anchored_inner(f, at) := {"failed_items": _anchored_all(f.failed_items, at)} if "failed_items" in object.keys(f)
