@@ -759,3 +759,5 @@ subjects / a from line whose named by key from $params is null and whose value b
 subjects / a from line whose named by key from $params isn't text and whose value before the key can't take a key / says the key and then the value before it that is missing
 subjects / a from line whose named by key from $params isn't text and whose value before the key can't take a key / says the key and then the value before it that is null
 subjects / a from line whose named by key from $params isn't text and whose value before the key can't take a key / says the key and then the value before it that is text
+list_starts / a name in a whose is read from the row, so a bad list of the same name on the subject isn't blamed / a row with no field of that name fails as absent, naming the row's field and not the subject's
+list_starts / a name in a whose is read from the row, so a bad list of the same name on the subject isn't blamed / a row whose field is null fails as null, naming the row's field and not the subject's

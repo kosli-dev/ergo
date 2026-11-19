@@ -10323,8 +10323,16 @@
                           "/things/0/rows/0/v"
                         ],
                         "name": "rows[0].v",
-                        "outcome": "absent",
+                        "outcome": "usable",
                         "value": "a"
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rows/0"
+                        ],
+                        "name": "rows[0].os.name",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -10407,8 +10415,16 @@
                           "/things/0/rows/0/v"
                         ],
                         "name": "rows[0].v",
-                        "outcome": "null",
+                        "outcome": "usable",
                         "value": "a"
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rows/0/os"
+                        ],
+                        "name": "rows[0].os.name",
+                        "outcome": "null",
+                        "value": null
                       }
                     ],
                     "kind": "item",
