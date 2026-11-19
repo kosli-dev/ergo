@@ -247,18 +247,34 @@
           "failures": [
             {
               "cause": "value",
-              "failures": [],
-              "inputs": [
+              "failures": [
                 {
-                  "locations": [
-                    "/components/2/licenses/0/license/id"
+                  "cause": "value",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/components/2/licenses/0/license/id"
+                      ],
+                      "name": "licenses[0].license.id",
+                      "outcome": "usable",
+                      "value": "WTFPL"
+                    }
                   ],
-                  "name": "licenses[].license.id",
-                  "outcome": "usable",
-                  "value": [
-                    "WTFPL"
-                  ]
-                },
+                  "kind": "item",
+                  "locations": [
+                    "/components/2/licenses/0"
+                  ],
+                  "message": "license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+                  "name": "item 1 of licenses",
+                  "value": {
+                    "license": {
+                      "id": "WTFPL"
+                    }
+                  }
+                }
+              ],
+              "inputs": [
                 {
                   "locations": [
                     "$params:/allowed_licenses"
@@ -275,7 +291,7 @@
               "locations": [
                 "$policy:/requirements/licences/checks/licence allowed/any_of/declared"
               ],
-              "message": "item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+              "message": "",
               "name": "some licenses.license.id is in $params.allowed_licenses"
             }
           ],
@@ -284,7 +300,7 @@
           "locations": [
             "$policy:/requirements/licences/checks/licence allowed/any_of/declared"
           ],
-          "message": "item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+          "message": "",
           "name": "declared"
         },
         {
@@ -361,7 +377,7 @@
           "locations": [
             "$policy:/requirements/licences/checks/licence allowed/any_of/known"
           ],
-          "message": "licenses is [{\"license\": {\"id\": \"WTFPL\"}}], and $params.known_package_licenses named by name is missing",
+          "message": "",
           "name": "known"
         }
       ],
