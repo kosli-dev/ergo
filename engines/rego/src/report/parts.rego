@@ -667,7 +667,7 @@ _walk_assertion_entry(row, at, where, ins) := _policy_entry(
 	flaws := _walk_flaw_lists(row, at, where.check, entries)
 }
 
-_walk_flaw_lists(row, at, check, []) := [_entry("list", n, cause, [object.union(object.remove(x, _input_stash_keys), {"value": _flaw_list_value(cause, x.value), "outcome": _key_list_outcome(cause)}) | some x in _anchored_all([_path_input(subj, p)], at)], [], c) |
+_walk_flaw_lists(row, at, check, entries) := [_entry("list", n, cause, [object.union(object.remove(x, _input_stash_keys), {"value": _flaw_list_value(cause, x.value), "outcome": _key_list_outcome(cause)}) | some x in _anchored_all([_path_input(subj, p)], at)], [], c) |
 	some c in _tally_clauses(row.message)
 	n := _m_clause_name(c)
 	some k in numbers.range(1, count(check.path))
@@ -678,11 +678,10 @@ _walk_flaw_lists(row, at, check, []) := [_entry("list", n, cause, [object.union(
 	_m_aliased(_input_name(p)) == n
 	cause := _walk_clause_cause(c)
 ] if {
+	entries == []
 	is_array(check.path)
 	subj := row["ergo/subj"]
-}
-
-_walk_flaw_lists(_, _, _, entries) := [] if entries != []
+} else := []
 
 _walk_clause_cause(c) := "value" if {
 	not endswith(c, " is missing")
