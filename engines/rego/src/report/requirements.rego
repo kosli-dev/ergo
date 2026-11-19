@@ -480,7 +480,7 @@ _ms_read_name(req, path) := _rooted_steps_name(path, _m_from_root(req)) if path 
 
 else := _m_from_root(req)
 
-_ms_flat(req, doc, p, keys) := {"levels": [], "entry": _entry("list", _m_from_item_name(req, p.c), p.cause, [{"name": _ms_list_name(req, p.c, keys), "value": _ms_list_value(p, keys), "locations": [p.at], "outcome": _key_list_outcome(p.cause)}], [], p.text), "key": [0, [], 0]} if {
+_ms_flat(req, doc, p, keys) := {"levels": [], "entry": _entry("list", _m_from_item_name(req, p.c), p.cause, [{"name": _ms_list_name(req, p.c, keys), "value": _ms_list_value(doc, p, keys), "locations": [p.at], "outcome": _key_list_outcome(p.cause)}], [], p.text), "key": [0, [], 0]} if {
 	not p.plain
 	ws := [i | some i, _ in p.c; _ms_walked(p.c, keys, i)]
 	ws == []
@@ -521,9 +521,15 @@ _ms_list_name(req, c, keys) := _ms_read_name(req, keys) if is_number(c[count(c) 
 
 else := _ms_read_name(req, c)
 
-_ms_list_value(p, keys) := p.value if p.c == keys
+_ms_list_value(doc, p, keys) := _ms_value_at(doc, p) if p.c == keys
+
+else := _ms_value_at(doc, p) if not is_number(p.c[count(p.c) - 1])
 
 else := null
+
+_ms_value_at(doc, p) := p.value if p.value != null
+
+else := _tally_read_value(doc, p.c)
 
 _ms_text_after(text, outer, name, own) := _ms_cut(_ms_cut(text, concat("", [concat(": ", outer), ": "])), concat("", [name, ": "])) if not own
 

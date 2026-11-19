@@ -362,16 +362,15 @@ test_a_broken_branch_along_a_from_line_with_every_fails_min_subjects_with_the_wo
 		{"pull_requests": "none"},
 	]}
 	rep := _from_report(doc, _every_prs, {"c": "approvals is at least 1"}, {})
-	[[r.passed, r.cause, r.failed_items] | some r in rep.results; r.check == "$min_subjects"] == [[false, "unusable", [
-		{"path": "artifacts[0].pull_requests", "item": "artifacts[0].pull_requests", "cause": "unusable", "value": [{"url": "pr/7", "approvals": 2}], "locations": ["/artifacts/0/pull_requests"]},
-		{"path": "item 1 of artifacts[0].pull_requests", "item": "item 1 of artifacts[0].pull_requests", "cause": "unusable", "value": {"url": "pr/7", "approvals": 2}, "locations": ["/artifacts/0/pull_requests/0"]},
-		{"path": "artifacts[1].pull_requests", "item": "artifacts[1].pull_requests", "cause": "absent", "value": null, "locations": ["/artifacts/1"]},
-		{"path": "artifacts[2].pull_requests", "item": "artifacts[2].pull_requests", "cause": "null", "value": null, "locations": ["/artifacts/2/pull_requests"]},
-		{"path": "artifacts[3].pull_requests", "item": "artifacts[3].pull_requests", "cause": "unusable", "value": "none", "locations": ["/artifacts/3/pull_requests"]},
+	[[r.passed, r.cause, [[f.kind, f.name, f.cause, f.message, [[g.name, g.message] | some g in f.failures]] | some f in r.failures]] | some r in rep.results; r.check == "$min_subjects"] == [[false, "unusable", [
+		["item", "item 1 of artifacts", "unusable", "pull_requests is a list", [["item 1 of pull_requests", "item 1 of pull_requests is an object"]]],
+		["item", "item 2 of artifacts", "absent", "pull_requests is missing", []],
+		["item", "item 3 of artifacts", "null", "pull_requests is null", []],
+		["item", "item 4 of artifacts", "unusable", "pull_requests is text", []],
 	]]]
 	[[r.subject.id, r.cause] | some r in rep.results; r.check == "c"] == [["pr/7", "satisfied"], ["none", "not_an_object"]]
 	rep.requirements.r.status == "not_met"
-	[[v.check, v.failed_items[0].path] | some v in ergo.violations(rep); v.check == "$min_subjects"] == [["$min_subjects", "artifacts[0].pull_requests"]]
+	[[v.check, v.failures[0].name] | some v in ergo.violations(rep); v.check == "$min_subjects"] == [["$min_subjects", "item 1 of artifacts"]]
 	missing := _from_report({"artifacts": [{"pull_requests": [{"url": "pr/7"}]}, {}]}, _every_prs, {"c": "url exists"}, {})
 	[r.cause | some r in missing.results; r.check == "$min_subjects"] == ["absent"]
 	zero := ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": _every_prs, "requirements": {"r": {"subject": "pull request", "min_subjects": 0, "checks": {"c": "url exists"}}}}, {})
