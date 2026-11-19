@@ -563,7 +563,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   {
     "cause": "absent",
     "check": "$min_subjects",
-    "failed_items": [{"cause": "absent", "item": "artifacts[2].pull_requests", "locations": ["/artifacts/2"], "path": "artifacts[2].pull_requests", "value": null}],
+    "failures": [{"cause": "absent", "failures": [], "inputs": [{"locations": ["/artifacts/2"], "name": "artifacts[2].pull_requests", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/artifacts/2"], "message": "pull_requests is missing", "name": "item 3 of artifacts", "value": {"fingerprint": "sha-3"}}],
     "inputs": [{"locations": ["/artifacts/0/pull_requests/0", "/artifacts/0/pull_requests/1"], "name": "in-scope pull request count", "value": 2}],
     "message": "item 3 of artifacts: pull_requests is missing",
     "passed": false,
@@ -1444,16 +1444,26 @@ click passes on `declared` and prometheus-client on `known`. leftpad fails both,
       "failures": [
         {
           "cause": "value",
-          "failures": [],
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "kind": "item",
+              "locations": ["/components/2/licenses/0"],
+              "message": "license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+              "name": "item 1 of licenses",
+              "value": {"license": {"id": "WTFPL"}}
+            }
+          ],
           "kind": "assertion",
           "locations": ["$policy:/requirements/licences/checks/licence_allowed/any_of/declared"],
-          "message": "item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+          "message": "",
           "name": "some licenses.license.id is in $params.allowed_licenses"
         }
       ],
       "kind": "option",
       "locations": ["$policy:/requirements/licences/checks/licence_allowed/any_of/declared"],
-      "message": "item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+      "message": "",
       "name": "declared"
     },
     {
@@ -1478,7 +1488,7 @@ click passes on `declared` and prometheus-client on `known`. leftpad fails both,
       ],
       "kind": "option",
       "locations": ["$policy:/requirements/licences/checks/licence_allowed/any_of/known"],
-      "message": "licenses is [{\"license\": {\"id\": \"WTFPL\"}}], and $params.known_package_licenses named by name is missing",
+      "message": "",
       "name": "known"
     }
   ],
@@ -1487,7 +1497,7 @@ click passes on `declared` and prometheus-client on `known`. leftpad fails both,
 }
 ```
 
-The row reads every field the options read, once each. Its cause is the first, in the order of [causes](#causes), among the options, and an option's cause is the first among its sentences. Here `known` fails as `absent`, because the params have no licence for leftpad. An option with an `exists` sentence whose field is missing fails as `value` instead. `failures` has an `option` entry for each option that failed, by name, and under it an `assertion` entry for each of its sentences that failed, so a tool can see which option failed on which value. The row above leaves out `requirement`, `subject` and its own `inputs`, which are the entries the options read, once each. The check's `expression` is `one of: declared(some licenses.license.id is in $params.allowed_licenses) | known(licenses does not exist and $params.known_package_licenses named by name is in $params.allowed_licenses)`, with the options sorted by name.
+The row reads every field the options read, once each. Its cause is the first, in the order of [causes](#causes), among the options, and an option's cause is the first among its sentences. Here `known` fails as `absent`, because the params have no licence for leftpad. An option with an `exists` sentence whose field is missing fails as `value` instead. `failures` has an `option` entry for each option that failed, by name, and under it an `assertion` entry for each of its sentences that failed, so a tool can see which option failed on which value. A sentence that walks a list holds an `item` entry for each item that failed, as it does on its own. An option's own `message` is `""`, because the entries under it say everything. The row above leaves out `requirement`, `subject` and its own `inputs`, which are the entries the options read, once each. The check's `expression` is `one of: declared(some licenses.license.id is in $params.allowed_licenses) | known(licenses does not exist and $params.known_package_licenses named by name is in $params.allowed_licenses)`, with the options sorted by name.
 
 An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_of` that isn't an object, an empty one, an empty option, or an option that isn't a sentence or a list of them is written wrong, with `invalid any_of`, `empty any_of`, `empty option <name>` or `invalid option <name>`. A problem with a sentence starts with its option's name, and with the line's number when the option has more than one, like `option known: line 2: doesn't parse` or `option fast: values of mixed types`.
 
@@ -2306,7 +2316,7 @@ Several of these rules depend on how a number was written, not only on its value
 }
 ```
 
-Passing and failing rows have the same fields, and a failing row also has a [`message`](#messages). A failed row also has `failures`, with one entry for each part that failed, as [Finding the evidence for a failed row](#finding-the-evidence-for-a-failed-row) shows, and each of its inputs that reads a path has an `outcome`. The `$min_subjects` row of a subject whose `from` line has [`every`](#from-lines) has `failed_items` instead of `failures` for now. The rows in the examples of this page leave out `failures` and the `outcome` of inputs when the example isn't about them. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
+Passing and failing rows have the same fields, and a failing row also has a [`message`](#messages). A failed row also has `failures`, with one entry for each part that failed, as [Finding the evidence for a failed row](#finding-the-evidence-for-a-failed-row) shows, and each of its inputs that reads a path has an `outcome`. The rows in the examples of this page leave out `failures` and the `outcome` of inputs when the example isn't about them. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
 
 ### Messages
 
@@ -2527,7 +2537,7 @@ the row of `payments.approve` for `expires` is below. It leaves out `requirement
       "inputs": [],
       "kind": "option",
       "locations": ["$policy:/requirements/fresh/checks/expires/any_of/approved exception"],
-      "message": "exception.approved_by is missing",
+      "message": "",
       "name": "approved exception"
     },
     {
@@ -2558,7 +2568,7 @@ the row of `payments.approve` for `expires` is below. It leaves out `requirement
       "inputs": [],
       "kind": "option",
       "locations": ["$policy:/requirements/fresh/checks/expires/any_of/expires"],
-      "message": "expires_at is missing",
+      "message": "",
       "name": "expires"
     }
   ],
@@ -2571,7 +2581,7 @@ the row of `payments.approve` for `expires` is below. It leaves out `requirement
 }
 ```
 
-Its `failures` has one `option` entry for each option, and each has an `assertion` entry for every sentence that failed. Each entry's `message` is what the row's message says about that part, without the option's name in front, so the two sentences of `expires` both say `expires_at is missing`, and the row says it once. The `expires` option failed because `expires_at` is `absent` (`outcome`) on the grant at `/grants/0`, and the `approved exception` option because `exception.approved_by` is. `$input.as_of` is `usable`: it read fine, and the check couldn't use it only because the other side was missing. `$policy:/requirements/fresh/checks/expires/any_of/expires/1` is the second sentence of the `expires` option, not a value from the input. The row's own `inputs` list what all the options read, once each.
+Its `failures` has one `option` entry for each option, and each has an `assertion` entry for every sentence that failed. Each assertion's `message` is what the row's message says about that sentence, without the option's name in front, so the two sentences of `expires` both say `expires_at is missing`, and the row says it once. An option's own `message` is `""`, because its sentences say everything. The `expires` option failed because `expires_at` is `absent` (`outcome`) on the grant at `/grants/0`, and the `approved exception` option because `exception.approved_by` is. `$input.as_of` is `usable`: it read fine, and the check couldn't use it only because the other side was missing. `$policy:/requirements/fresh/checks/expires/any_of/expires/1` is the second sentence of the `expires` option, not a value from the input. The row's own `inputs` list what all the options read, once each.
 
 ### Subjects in the report
 
