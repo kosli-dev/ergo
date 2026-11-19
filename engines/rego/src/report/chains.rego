@@ -13,7 +13,7 @@ _evaluated(doc, req, name, parts) := object.union(_chain_evaluation(req, name, p
 	pick := _parent_pick(doc, req)
 }
 
-_evaluated(doc, req, name, parts) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand, _fixed(req), parts) if {
+_evaluated(doc, req, name, parts) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand, _fixed(req, name), parts) if {
 	_grand_chained(req)
 	parent := data.ergo_subject_sentences.chains[req.subject]
 	grand := data.ergo_subject_sentences.chains[parent]
@@ -78,7 +78,7 @@ _grandchild_evaluation(req, name, parent, grand, g, p, _) := {
 }
 
 _chain_evaluation(req, name, pick, parts) := _parents_evaluation(req, name, [_parent_evaluation(req, name, pick.parent, p, fixed) | some p in pick.parents], parts) if {
-	fixed := _fixed(req)
+	fixed := _fixed(req, name)
 	"parents" in object.keys(pick)
 	count(pick.parents) > 0
 }
@@ -135,14 +135,19 @@ else := object.union(e, {
 	c := {"from": token, "to": p.ats}
 }
 
-_copied_row(row, c) := object.union(row, object.union({"inputs": _copied_inputs(row.inputs, c)}, {"failed_items": [_copied_failed(f, c) | some f in row.failed_items] | "failed_items" in object.keys(row)}))
+_copied_row(row, c) := object.union(row, object.union(object.union({"inputs": _copied_inputs(row.inputs, c)}, {"failed_items": [_copied_failed(f, c) | some f in row.failed_items] | "failed_items" in object.keys(row)}), {"failures": [_copied_e1(e, c) | some e in row.failures] | "failures" in object.keys(row)}))
+
+_copied_e1(e, c) := object.union(_copied_leaf(e, c), {"failures": [_copied_e2(x, c) | some x in e.failures]})
+
+_copied_e2(e, c) := object.union(_copied_leaf(e, c), {"failures": [_copied_e3(x, c) | some x in e.failures]})
+
+_copied_e3(e, c) := object.union(_copied_leaf(e, c), {"failures": [_copied_leaf(x, c) | some x in e.failures]})
+
+_copied_leaf(e, c) := object.union(e, object.union({"inputs": _copied_inputs(e.inputs, c)}, {"locations": _copied_locations(e.locations, c) | "locations" in object.keys(e)}))
 
 _copied_failed(f, c) := object.union(f, object.union(
 	{"locations": _copied_locations(f.locations, c)},
-	object.union(
-		{"failed_items": _copied_inputs(f.failed_items, c) | "failed_items" in object.keys(f)},
-		{"failed_assertions": [_copied_line(l, c) | some l in f.failed_assertions] | "failed_assertions" in object.keys(f)},
-	),
+	{"failed_items": _copied_inputs(f.failed_items, c) | "failed_items" in object.keys(f)},
 ))
 
 _parents_evaluation(req, name, es, parts) := {
@@ -175,7 +180,7 @@ _parent_pick(doc, req) := pick if {
 _parent_pick_of(doc, preq) := {"cause": c} if {
 	c := _target_cause(doc, preq)
 	not _fl_typed_only(doc, preq)
-} else := {"cause": _from_cause(preq)} if {
+} else := {"cause": _from_cause(doc, preq)} if {
 	_from_well_formed(preq)
 	_from_unreadable(preq)
 } else := r if {

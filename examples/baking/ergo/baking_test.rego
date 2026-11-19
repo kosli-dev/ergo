@@ -103,7 +103,7 @@ test_workings_table_shows_the_good_batch_clause_by_clause if {
 test_workings_table_shows_a_missing_allergen_record_as_null if {
 	some row in workings_table["cake-batch-2026-03-18-004"]
 	row.check == "nut_free"
-	row.inputs == [{"name": "allergens", "value": null, "locations": ["/batches/3"]}]
+	row.inputs == [{"name": "allergens", "value": null, "locations": ["/batches/3"], "outcome": "absent"}]
 	row.passed == false
 }
 

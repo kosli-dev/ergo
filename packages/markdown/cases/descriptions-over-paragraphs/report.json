@@ -143,12 +143,38 @@
     {
       "cause": "value",
       "check": "nut free",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/batches/1/allergens"
+              ],
+              "name": "allergens",
+              "outcome": "usable",
+              "value": [
+                "nuts",
+                "milk"
+              ]
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/cake batch/checks/nut free/assert"
+          ],
+          "message": "allergens is [\"nuts\", \"milk\"]",
+          "name": "allergens does not contain \"nuts\""
+        }
+      ],
       "inputs": [
         {
           "locations": [
             "/batches/1/allergens"
           ],
           "name": "allergens",
+          "outcome": "usable",
           "value": [
             "nuts",
             "milk"
@@ -166,12 +192,35 @@
     {
       "cause": "unusable",
       "check": "nut free",
+      "failures": [
+        {
+          "cause": "unusable",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/batches/2/allergens"
+              ],
+              "name": "allergens",
+              "outcome": "unusable",
+              "value": "nuts"
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/cake batch/checks/nut free/assert"
+          ],
+          "message": "allergens is \"nuts\", which isn't a list",
+          "name": "allergens does not contain \"nuts\""
+        }
+      ],
       "inputs": [
         {
           "locations": [
             "/batches/2/allergens"
           ],
           "name": "allergens",
+          "outcome": "unusable",
           "value": "nuts"
         }
       ],
@@ -186,12 +235,35 @@
     {
       "cause": "absent",
       "check": "nut free",
+      "failures": [
+        {
+          "cause": "absent",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/batches/3"
+              ],
+              "name": "allergens",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/cake batch/checks/nut free/assert"
+          ],
+          "message": "allergens is missing",
+          "name": "allergens does not contain \"nuts\""
+        }
+      ],
       "inputs": [
         {
           "locations": [
             "/batches/3"
           ],
           "name": "allergens",
+          "outcome": "absent",
           "value": null
         }
       ],

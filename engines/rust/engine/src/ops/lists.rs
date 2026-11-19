@@ -163,6 +163,7 @@ impl Walked {
             part: self.part.clone(),
             state: Outcome::Found,
             null_at: None,
+            worked: false,
         }
     }
 }
@@ -795,6 +796,7 @@ fn right_shown(right: &Right, ctx: &Ctx, walks: bool) -> Vec<Input> {
                     part: None,
                     state: Outcome::Found,
                     null_at: None,
+                    worked: false,
                 }],
                 _ => pieces
                     .iter()

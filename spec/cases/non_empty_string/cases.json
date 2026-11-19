@@ -8,7 +8,25 @@
         "rules": ["non_empty_string.pass", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ],
         "expressions": {"s": {"c": "x is a non-empty string"}}
       },
@@ -17,7 +35,25 @@
         "rules": ["non_empty_string.pass"],
         "input": {"things": [{"id": "t1", "x": " "}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": " ", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": " "
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -25,7 +61,49 @@
         "rules": ["non_empty_string.fail"],
         "input": {"things": [{"id": "t1", "x": ""}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "usable",
+                    "value": ""
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is \"\"",
+                "name": "x is a non-empty string"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "usable",
+                "value": ""
+              }
+            ],
+            "message": "x is \"\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -33,7 +111,49 @@
         "rules": ["non_empty_string.fail"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is 1", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "usable",
+                    "value": 1
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is 1",
+                "name": "x is a non-empty string"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "usable",
+                "value": 1
+              }
+            ],
+            "message": "x is 1",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -41,7 +161,49 @@
         "rules": ["non_empty_string.fail", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is missing",
+                "name": "x is a non-empty string"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -49,7 +211,49 @@
         "rules": ["non_empty_string.fail", "path.null"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is null", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is null",
+                "name": "x is a non-empty string"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "x is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]

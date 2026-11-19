@@ -212,7 +212,7 @@ test_that_on_a_from_line_keeps_items_by_their_value_and_names_each_by_the_subjec
 	sort([r.subject.id | some r in apply_rows]) == ["apple", "bay"]
 	apple := [r | some r in apply_rows; r.subject.id == "apple"][0]
 	apple.cause == "value"
-	apple.inputs == [{"name": "w", "value": "apple", "locations": ["/ws/1"]}]
+	apple.inputs == [_seen("w", "apple", ["/ws/1"], "usable")]
 	apple.message == `w is "apple"`
 }
 
@@ -313,8 +313,8 @@ test_a_whose_in_the_from_line_reads_the_subjects_parts if {
 	rep := ergo.report({"rounds": [{"id": "a", "dd": {"b": {"x": 1, "n": 2}}}, {"id": "b", "dd": {"b": {"x": 2, "n": 2}}}, {"id": "c", "dd": {}}]}, policy, {})
 	[[r.subject.id, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"] == [
 		["a", "satisfied", [{"name": "cov.x", "part": {"id": null, "name": "cov"}, "value": 1, "locations": ["/rounds/0/dd/b/x"]}]],
-		["b", "value", [{"name": "cov.x", "part": {"id": null, "name": "cov"}, "value": 2, "locations": ["/rounds/1/dd/b/x"]}]],
-		["c", "absent", [{"name": "cov.x", "part": {"id": null, "name": "cov"}, "value": null, "locations": ["/rounds/2/dd"]}]],
+		["b", "value", [{"name": "cov.x", "part": {"id": null, "name": "cov"}, "value": 2, "locations": ["/rounds/1/dd/b/x"], "outcome": "usable"}]],
+		["c", "absent", [{"name": "cov.x", "part": {"id": null, "name": "cov"}, "value": null, "locations": ["/rounds/2/dd"], "outcome": "absent"}]],
 	]
 	rep.requirements.r.checks["$applies"].expression == "cov.x is 1"
 	[r.subject.id | some r in rep.results; r.check == "c"] == ["a"]

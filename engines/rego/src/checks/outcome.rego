@@ -2,25 +2,66 @@ package ergo
 
 import rego.v1
 
-_check_outcome(check, subj, flaw) := {
-	"inputs": _row_inputs(subj, check),
-	"passed": _check_passed(check, subj, flaw),
-	"cause": _row_cause(check, subj, flaw),
-} if {
+_check_outcome(check, subj, flaw) := object.union(
+	{
+		"inputs": _row_inputs(subj, check),
+		"passed": _check_passed(check, subj, flaw),
+		"cause": cause,
+	},
+	_key_base_stash(check, subj, cause),
+) if {
 	not _all_of_run(check)
 	not _any_of_run(check)
 	not _walk_run(check)
 	not _derived_once(check)
+	cause := _row_cause(check, subj, flaw)
 }
 
-_check_outcome(check, subj, flaw) := {
-	"inputs": _with_key_fields(subj, check, e.inputs),
-	"passed": _once_passed(flaw, e),
-	"cause": _once_cause(flaw, e),
-} if {
+_check_outcome(check, subj, flaw) := object.union(
+	{
+		"inputs": _with_key_fields(subj, check, e.inputs),
+		"passed": _once_passed(flaw, e),
+		"cause": _once_cause(flaw, e),
+	},
+	_key_base_stash(check, subj, e.cause),
+) if {
 	_derived_once(check)
 	e := _derived_eval(check, subj)
 }
+
+_key_base_stash(check, subj, cause) := {"ergo/key_bases": bs} if {
+	cause in _value_fault_causes
+	bs := _key_base_inputs(check, subj)
+	bs != []
+} else := {}
+
+_key_base_inputs(check, subj) := _once([{"input": _path_input(subj, f.prefix), "cause": f.cause} |
+	some [p, mode] in _key_base_reads(check)
+	some f in _key_base_flaws(subj, p, mode)
+])
+
+_key_base_reads(check) := [[p, _key_base_mode(piece)] |
+	some side in _key_base_sides(check)
+	some piece in _side_pieces(side)
+	some p in _side_paths(piece)
+	is_array(p)
+]
+
+_key_base_sides(check) := [check.left, check.right] if _two_sided(check)
+
+else := [check.path] if is_array(check.path)
+
+else := []
+
+_side_pieces(side) := side.add if _side_form(side) == "add"
+
+else := side.join if _side_form(side) == "join"
+
+else := [side]
+
+_key_base_mode(piece) := "tally" if _basic_form(piece) in _tally_forms
+
+else := "object"
 
 _once_passed("", e) := e.passed
 
@@ -193,7 +234,7 @@ _check_outcome(check, subj, _) := object.union(
 		"cause": r.cause,
 		"failed_items": r.failed,
 	},
-	_m_walk_outcome(check, subj, r),
+	object.union(_m_walk_outcome(check, subj, r), object.filter(r, {"ergo/key_lists"})),
 ) if {
 	_walks(check)
 	_walk_run(check)
@@ -202,15 +243,43 @@ _check_outcome(check, subj, _) := object.union(
 
 _m_walk_outcome(_, _, r) := {} if r.cause == "satisfied"
 
-_m_walk_outcome(_, _, r) := {"message": _m_joined(r.root_msgs)} if {
+_m_walk_outcome(check, _, r) := {"message": _m_joined(ms), "ergo/own": ms, "ergo/texts": []} if {
 	r.cause != "satisfied"
 	"root_msgs" in object.keys(r)
+	ms := _walk_roots_sorted(r.root_msgs, check)
 }
 
-_m_walk_outcome(check, subj, r) := {"message": _m_joined(_parts_ahead(_walk_parts(check, subj, r, r), r))} if {
+_m_walk_outcome(check, subj, r) := {"message": _m_joined(ps), "ergo/own": [p | some p in ps; not p in items], "ergo/texts": items} if {
 	r.cause != "satisfied"
 	not "root_msgs" in object.keys(r)
+	parts := _walk_parts(check, subj, r, r)
+	items := _walk_item_texts(parts, r)
+	ps := _walk_roots_sorted(_parts_ahead(parts, r), check)
 }
+
+_walk_roots_sorted(ps, check) := ps if {
+	count([p | some p in ps; not startswith(p, "item ")]) == 0
+	count({_m_item_list_of(p) | some p in ps}) < 2
+} else := _walk_roots_sorted_in(ps, _walk_list_names(check))
+
+_m_item_list_of(p) := split(split(substring(p, indexof(p, " of ") + 4, -1), ":")[0], " ")[0]
+
+_walk_roots_sorted_in(ps, lists) := ps if count([p | some p in ps; _m_root_clause(p, lists)]) < 2
+
+else := _roots_then_lists(ps, lists)
+
+_walk_list_names(check) := {_input_name(array.slice(p, 0, i)) |
+	p := check.path
+	is_array(p)
+	some i in numbers.range(1, count(p))
+	every seg in array.slice(p, 0, i) {
+		is_string(seg)
+	}
+}
+
+_walk_item_texts(parts, r) := parts if count(parts) == count(r.failed)
+
+else := []
 
 _walk_run(check) if {
 	check.op in {"every", "some", "for"}
@@ -223,7 +292,7 @@ _check_outcome(check, subj, _) := object.union(
 		"cause": r.cause,
 		"failed_items": r.failed,
 	},
-	object.filter(r, {"message"}),
+	object.filter(r, {"message", "ergo/for_raw", "ergo/key_lists"}),
 ) if {
 	check.op == "for"
 	_walk_run(check)
@@ -242,23 +311,30 @@ _check_outcome(check, subj, flaw) := {
 } if {
 	_all_of_run(check)
 	outs := [_assertion_out(c, subj, flaw) | some c in check.checks]
-	failed := [{"assertion": check.assertions[i], "cause": o.cause} | some i, o in outs; o.cause != "satisfied"]
+	failed := [{"assertion": check.assertions[i], "cause": o.cause, "inputs": o.inputs, "at": i, "key_bases": o.key_bases} | some i, o in outs; o.cause != "satisfied"]
 }
 
 _any_of_run(check) if {
 	check.op == "sentence_any_of"
 }
 
-_check_outcome(check, subj, flaw) := {
-	"inputs": _merged_inputs([i | some o in outs; some i in o.inputs]),
-	"passed": cause == "satisfied",
-	"cause": cause,
-} if {
+_check_outcome(check, subj, flaw) := object.union(
+	{
+		"inputs": _merged_inputs([i | some o in outs; some i in o.inputs]),
+		"passed": cause == "satisfied",
+		"cause": cause,
+	},
+	_option_outs(outs, lines, cause),
+) if {
 	_any_of_run(check)
 	outs := [_assertion_out(c, subj, flaw) | some c in check.checks]
 	lines := [_option_line_cause(c, outs[i].cause, subj) | some i, c in check.checks]
 	cause := _any_of_lines_cause(check.option_of, lines, flaw)
 }
+
+_option_outs(_, _, "satisfied") := {}
+
+_option_outs(outs, lines, cause) := {"ergo/outs": [{"cause": o.cause, "line": lines[i], "inputs": o.inputs, "key_bases": o.key_bases} | some i, o in outs]} if cause != "satisfied"
 
 _option_line_cause(c, cause, subj) := "missing" if {
 	cause == "value"
@@ -280,12 +356,24 @@ _line_passed_or_elsewhere(n, nm, _) if n != nm
 
 _line_passed_or_elsewhere(_, _, "satisfied")
 
-_assertion_out(c, subj, "") := {"cause": e.cause, "inputs": _with_key_fields(subj, c, e.inputs)} if {
+_assertion_out(c, subj, "") := {"cause": e.cause, "inputs": _with_key_fields(subj, c, e.inputs), "key_bases": _assertion_key_bases(c, subj, e.cause)} if {
 	_derived_once(c)
 	e := _derived_eval(c, subj)
-} else := {"cause": _assertion_cause(c, subj, ""), "inputs": _with_key_fields(subj, c, _assertion_inputs(subj, c))}
+} else := {"cause": cause, "inputs": _with_key_fields(subj, c, _assertion_inputs(subj, c)), "key_bases": _assertion_key_bases(c, subj, cause)} if {
+	cause := _assertion_cause(c, subj, "")
+}
 
-_assertion_out(c, subj, flaw) := {"cause": _assertion_cause(c, subj, flaw), "inputs": _with_key_fields(subj, c, _assertion_inputs(subj, c))} if flaw != ""
+_assertion_out(c, subj, flaw) := {"cause": cause, "inputs": _with_key_fields(subj, c, _assertion_inputs(subj, c)), "key_bases": _assertion_key_bases(c, subj, cause)} if {
+	flaw != ""
+	cause := _assertion_cause(c, subj, flaw)
+}
+
+_assertion_key_bases(c, subj, cause) := _key_base_inputs(c, subj) if {
+	cause in _value_fault_causes
+	not _walks(c)
+}
+
+else := []
 
 _assertion_cause(c, subj, "") := _row_cause(c, subj, "") if not _walks(c)
 

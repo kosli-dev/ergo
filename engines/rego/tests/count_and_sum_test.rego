@@ -386,7 +386,7 @@ test_a_count_can_go_in_a_whose_of_every_and_an_item_it_cant_decide_fails_the_wal
 }
 
 test_a_count_whose_named_by_cant_be_read_fails_with_its_cause if {
-	_tally_rows("count of m named by $params.k is 2", [{"id": 1, "m": {"a": [1, 2]}}], {}) == [[1, "absent", [{"name": "count of m named by $params.k", "value": null, "locations": []}, {"name": "m named by $params.k", "value": [], "locations": []}]]]
+	_tally_rows("count of m named by $params.k is 2", [{"id": 1, "m": {"a": [1, 2]}}], {}) == [[1, "absent", [_in("count of m named by $params.k", null, []), _seen("m named by $params.k", [], [], "absent")]]]
 }
 
 _sum_whose_cause(check, items) := [row[1] | some row in _tally_rows(check, [{"id": "t", "items": items}], {})]
@@ -461,19 +461,16 @@ test_a_count_whose_whose_reads_a_for_name_shows_its_list_and_not_its_number if {
 }
 
 test_a_count_whose_whose_reads_a_param_it_cant_use_shows_null if {
-	_tally_rows("count of xs whose s is one of $params.v is 1", [{"id": 1, "xs": [{"s": "a"}]}], {"v": 5}) == [[1, "unusable", [{"name": "count of xs whose s is in $params.v", "value": null, "locations": ["/things/0/xs/0"]}, {"name": "xs[]", "value": [{"s": "a"}], "locations": ["/things/0/xs/0"]}]]]
+	_tally_rows("count of xs whose s is one of $params.v is 1", [{"id": 1, "xs": [{"s": "a"}]}], {"v": 5}) == [[1, "unusable", [_in("count of xs whose s is in $params.v", null, ["/things/0/xs/0"]), _seen("xs[]", [{"s": "a"}], ["/things/0/xs/0"], "usable")]]]
 }
 
 test_a_count_whose_ref_cant_be_read_is_read_the_slow_way_and_fails_with_the_refs_cause if {
-	_tally_rows(`count of xs whose s is one of $params.missing is 1`, [{"id": 1, "xs": [{"s": "a"}]}], {}) == [[1, "absent", [{"name": "count of xs whose s is in $params.missing", "value": null, "locations": ["/things/0/xs/0"]}, {"name": "xs[]", "value": [{"s": "a"}], "locations": ["/things/0/xs/0"]}]]]
+	_tally_rows(`count of xs whose s is one of $params.missing is 1`, [{"id": 1, "xs": [{"s": "a"}]}], {}) == [[1, "absent", [_in("count of xs whose s is in $params.missing", null, ["/things/0/xs/0"]), _seen("xs[]", [{"s": "a"}], ["/things/0/xs/0"], "usable")]]]
 }
 
 test_a_count_whose_whose_reads_a_missing_param_fails_even_when_it_would_count_zero if {
 	things := [{"id": 1, "xs": []}, {"id": 2, "xs": [{"k": "a"}]}]
-	_tally_rows("count of xs whose k is one of $params.missing is 0", things, {}) == [
-		[1, "absent", [{"name": "count of xs whose k is in $params.missing", "value": null, "locations": []}, {"name": "xs[]", "value": [], "locations": []}]],
-		[2, "absent", [{"name": "count of xs whose k is in $params.missing", "value": null, "locations": ["/things/1/xs/0"]}, {"name": "xs[]", "value": [{"k": "a"}], "locations": ["/things/1/xs/0"]}]],
-	]
+	_tally_rows("count of xs whose k is one of $params.missing is 0", things, {}) == [[1, "absent", [_in("count of xs whose k is in $params.missing", null, []), _seen("xs[]", [], [], "usable")]], [2, "absent", [_in("count of xs whose k is in $params.missing", null, ["/things/1/xs/0"]), _seen("xs[]", [{"k": "a"}], ["/things/1/xs/0"], "usable")]]]
 	[row[1] | some row in _tally_rows("count of xs whose k is one of $params.v is 0", things, {"v": null})] == ["null", "null"]
 }
 
@@ -549,10 +546,7 @@ test_elapsed_fails_a_number_outside_the_years_rfc_3339_times_cover_so_millisecon
 }
 
 test_elapsed_fails_as_value_when_the_end_is_before_the_start if {
-	_elapsed_rows("days elapsed from p to q is at most 5", [{"id": 1, "p": "2026-01-02T00:00:00Z", "q": "2026-01-01T00:00:00Z"}, {"id": 2, "p": 5, "q": 4}], {}) == [
-		[1, false, "value", [{"name": "days elapsed from p to q", "value": null, "locations": ["/things/0/p", "/things/0/q"]}, {"name": "p", "value": "2026-01-02T00:00:00Z", "locations": ["/things/0/p"]}, {"name": "q", "value": "2026-01-01T00:00:00Z", "locations": ["/things/0/q"]}]],
-		[2, false, "value", [{"name": "days elapsed from p to q", "value": null, "locations": ["/things/1/p", "/things/1/q"]}, {"name": "p", "value": 5, "locations": ["/things/1/p"]}, {"name": "q", "value": 4, "locations": ["/things/1/q"]}]],
-	]
+	_elapsed_rows("days elapsed from p to q is at most 5", [{"id": 1, "p": "2026-01-02T00:00:00Z", "q": "2026-01-01T00:00:00Z"}, {"id": 2, "p": 5, "q": 4}], {}) == [[1, false, "value", [_in("days elapsed from p to q", null, ["/things/0/p", "/things/0/q"]), _seen("p", "2026-01-02T00:00:00Z", ["/things/0/p"], "usable"), _seen("q", "2026-01-01T00:00:00Z", ["/things/0/q"], "usable")]], [2, false, "value", [_in("days elapsed from p to q", null, ["/things/1/p", "/things/1/q"]), _seen("p", 5, ["/things/1/p"], "usable"), _seen("q", 4, ["/things/1/q"], "usable")]]]
 }
 
 test_elapsed_fails_closed_on_a_side_it_cant_read if {
@@ -733,10 +727,7 @@ test_a_count_named_by_a_missing_or_wrong_key_in_a_whose_fails_closed if {
 
 test_a_failed_line_that_counts_through_an_alias_lists_the_number_then_the_list if {
 	rows := _for_rows_full({"for": "every commits as commit", "assert": "count of commit.files is at least 2"}, [{"id": 1, "commits": [{"files": ["a", "b"]}, {"files": ["c"]}]}], {})
-	rows[0][2][0].failed_assertions[0].inputs == [
-		{"name": "count of commit.files", "value": 1, "locations": ["/things/0/commits/1/files/0"]},
-		{"name": "commit.files[]", "value": ["c"], "locations": ["/things/0/commits/1/files/0"]},
-	]
+	rows[0][2][0].failures[0].inputs == [_in("count of commit.files", 1, ["/things/0/commits/1/files/0"]), _seen("commit.files[]", ["c"], ["/things/0/commits/1/files/0"], "usable")]
 }
 
 test_a_ref_step_adds_the_key_it_read_and_stops_before_it_when_it_cannot_be_read if {
@@ -765,11 +756,11 @@ test_subject_walks_and_counts_a_subject_that_is_a_list if {
 	doc := {"xs": [["a", "b"], [1, 2], [1, "a"], [], null, "s"]}
 	rows := _subject_rows(doc, "every xs", "every s is a string", {})
 	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "value"], [false, "value"], [false, "value"], [false, "null"], [false, "unusable"]]
-	rows[1][3] == [{"name": "s[]", "value": [1, 2], "locations": ["/xs/1/0", "/xs/1/1"]}]
-	_subject_report(doc, "every xs", {"c": "every s is a string"}, {}).results[4].failed_items == [
-		{"cause": "value", "item": "item 1 of s", "path": "item 1 of s", "value": 1, "locations": ["/xs/1/0"]},
-		{"cause": "value", "item": "item 2 of s", "path": "item 2 of s", "value": 2, "locations": ["/xs/1/1"]},
-	]
+	rows[1][3] == [_seen("s[]", [1, 2], ["/xs/1/0", "/xs/1/1"], "usable")]
+	_subject_report(doc, "every xs", {"c": "every s is a string"}, {}).results[4].failures == [_assertion("every s is a string", "value", ["$policy:/requirements/r/checks/c"], [], "", [
+		_item("item 1 of s", "value", 1, ["/xs/1/0"], [_seen("s[0]", 1, ["/xs/1/0"], "usable")], "item 1 of s is 1", []),
+		_item("item 2 of s", "value", 2, ["/xs/1/1"], [_seen("s[1]", 2, ["/xs/1/1"], "usable")], "item 2 of s is 2", []),
+	])]
 	[[r[1], r[2]] | some r in _subject_rows(doc, "every xs", "some s is a string", {})] == [[true, "satisfied"], [false, "value"], [true, "satisfied"], [false, "value"], [false, "null"], [false, "unusable"]]
 	counts := _subject_rows(doc, "every xs", "count of s is 2", {})
 	[[r[1], r[2]] | some r in counts] == [[true, "satisfied"], [true, "satisfied"], [true, "satisfied"], [false, "value"], [false, "null"], [false, "unusable"]]
@@ -912,7 +903,7 @@ test_a_whose_value_from_the_input_that_is_null_is_named_beside_worse_items_but_a
 	_whose_null_row("count of rs whose zz is $input.k is 1") == [["absent", "$input.k is null; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
 	_whose_null_row("count of rs whose zz is m named by $input.k is 1") == [["absent", "item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
 	_whose_null_row("count of rs whose zz is m named by $params.k is 1") == [["absent", "item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
-	_whose_null_row("count of rs whose v is m named by $input.k is 1") == [["null", "$input.k is null"]]
+	_whose_null_row("count of rs whose v is m named by $input.k is 1") == [["absent", "$input.k is null; item 1 of rs: m is missing; item 2 of rs: m is missing"]]
 }
 
 test_a_whose_item_that_isnt_an_object_beside_a_key_that_is_missing_or_null_fails_as_not_an_object if {
@@ -944,18 +935,17 @@ test_a_whose_list_with_a_key_that_cant_be_read_is_read_before_any_item_so_the_ke
 test_a_whose_key_that_is_missing_decides_even_beside_worse_items if {
 	every check in [
 		"count of rs whose zz is m named by $input.k is 1",
-		"count of rs whose v is m named by $input.k is 1",
 		"count of rs whose zz is $input.m named by $input.k is 1",
 	] {
 		_whose_missing_row(check) == [["absent", "$input.k is missing"]]
 	}
+	_whose_missing_row("count of rs whose v is m named by $input.k is 1") == [["absent", "$input.k is missing; item 1 of rs: m is missing; item 2 of rs: m is missing"]]
 	_whose_missing_row("count of rs whose zz is m named by $params.k is 1") == [["absent", "$params.k is missing"]]
 }
 
 test_a_whose_key_that_isnt_text_fails_each_item_as_unusable if {
 	every check in [
 		"count of rs whose zz is m named by $input.k is 1",
-		"count of rs whose v is m named by $input.k is 1",
 		"count of rs whose zz is in m named by $input.k is 1",
 		"count of rs whose zz is $input.m named by $input.k is 1",
 	] {
@@ -963,6 +953,7 @@ test_a_whose_key_that_isnt_text_fails_each_item_as_unusable if {
 	}
 	_whose_number_row("count of rs whose zz is m named by $params.k is 1") == [["unusable", "item 1 of rs: $params.k is 3, which isn't text; item 2 of rs: $params.k is 3, which isn't text"]]
 	_whose_number_row("count of rs whose zz is in $input.k is 1") == [["unusable", "$input.k is 3, which isn't a list"]]
+	_whose_number_row("count of rs whose v is m named by $input.k is 1") == [["unusable", "$input.k is 3, which isn't text; item 1 of rs: m is missing; item 2 of rs: m is missing"]]
 }
 
 test_a_count_sum_or_plus_with_a_key_from_a_list_input_fails_as_not_an_object_not_that_it_needs_more_digits if {
@@ -978,4 +969,10 @@ test_a_count_sum_or_plus_with_a_key_from_a_list_input_fails_as_not_an_object_not
 		policy := {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"c": check}}}}
 		[[r.cause, r.message] | some r in ergo.report(doc, policy, {}).results; r.check == "c"] == [["not_an_object", message]]
 	}
+}
+
+test_a_count_or_sum_of_a_missing_or_null_list_says_the_list_is_absent_or_null if {
+	r := _subject_report({"xs": [{"id": 0, "n": null, "o": {}}]}, "every xs", {"a": "count of zz is 1", "b": "sum of zz is 1", "c": "count of n is 1", "d": "count of o.zz plus 1 is 1"}, {})
+	outcomes := {[x.check, i.name, i.outcome] | some x in r.results; x.check in {"a", "b", "c", "d"}; some i in x.inputs; i.value == []}
+	outcomes == {["a", "zz", "absent"], ["b", "zz", "absent"], ["c", "n", "null"], ["d", "o.zz", "absent"]}
 }

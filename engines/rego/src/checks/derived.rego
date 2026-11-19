@@ -254,7 +254,7 @@ _basic_inputs(subj, side) := _tally_inputs(subj, side, r) if {
 
 _tally_inputs(subj, side, t) := array.concat(
 	[
-		{"name": side.text, "value": object.get(t, "value", null), "locations": t.locations},
+		{"name": side.text, "value": object.get(t, "value", null), "locations": t.locations, "ergo/worked": true},
 		_tally_list_input(t),
 	],
 	_merged_inputs(array.concat(
@@ -263,7 +263,9 @@ _tally_inputs(subj, side, t) := array.concat(
 	)),
 )
 
-_tally_list_input(t) := {"name": t.list, "value": t.values, "locations": t.locations}
+_tally_list_input(t) := {"name": t.list, "value": t.values, "locations": t.locations, "ergo/outcome": t["ergo/outcome"]} if _ = t["ergo/outcome"]
+
+else := {"name": t.list, "value": t.values, "locations": t.locations}
 
 _basic_inputs(subj, side) := [_number_input(side.text, _first_or_null([x | x := _basic_value(subj, side)]), [from, to]), from, to] if {
 	_basic_form(side) == "elapsed"
@@ -280,16 +282,17 @@ _side_inputs(subj, side) := array.concat([_derived_input(subj, side, _side_text(
 	operands := [i | some operand in side.add; some i in _basic_inputs(subj, operand)]
 }
 
-_tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "values": [], "locations": []} if {
+_tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "values": [], "locations": [], "ergo/outcome": "not_an_object"} if {
 	path := side[_basic_form(side)]
 	not _off_subject(path)
 	not _old_subject_part(path)
 	not _reads_subject(path)
 	not _list_start(path, subj)
 	not is_object(subj)
-} else := {"states": {_walk_read_state(subj, path)}, "list": _path_name(path), "values": [], "locations": []} if {
+} else := {"states": {st}, "list": _path_name(path), "values": [], "locations": [], "ergo/outcome": _outcome_word(st)} if {
 	path := side[_basic_form(side)]
 	not _walk_keys({"path": path}, subj)
+	st := _tally_list_state(subj, path)
 } else := r if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
@@ -298,13 +301,19 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	judged := [_tally_judge(side, e, flaws, w, long) | some e in w.items]
 	kept := [e.v | some i, e in w.items; judged[i].kept]
 	read := [e.v | some i, e in w.items; judged[i].read]
-	walk_states := {x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}
+	stop := _walk_stop(w)
+	walk_states := {x.cause | some x in w.fails} | {x.cause | some x in stop}
 	judged_states := {c | some j in judged; some c in j.states}
 	flaw_states := {fl | some fl in flaws; fl != ""}
 	root_flaw_states := {fl | some c in side.whose; fl := _root_read_flaw(subj, c); fl != ""}
 	states := (((walk_states | judged_states) | _tally_number_states(f, _tally_distinct(side, read, subj, "read"))) | flaw_states) | root_flaw_states
-	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states))
+	r := object.union(object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_value(e.v, e, w) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept, subj, "kept"), states)), _tally_stop_outcome(stop))
 }
+
+_tally_stop_outcome(stop) := {"ergo/outcome": stop[0].cause} if {
+	stop != []
+	stop[0].cause in _no_value_states
+} else := {}
 
 _tally_judge(side, e, flaws, w, true) := j if {
 	_holds_numbers(e.iv)
@@ -323,8 +332,6 @@ _tally_judgement(side, e, flaws) := {"kept": kept, "read": read, "states": (unde
 }
 
 _tally_focus_cause(c, e, flaw) := _tally_cond_cause(c, e.iv, flaw) if e.r == []
-
-else := _tally_cond_cause(c, e.v, flaw) if flaw != ""
 
 else := _focus_lost_state(e) if _focus_lost(e, c)
 
@@ -369,7 +376,34 @@ _cond_side(item, side) := {"v": [_written(side)], "found": [x | x := _simple_fou
 
 _tally_cond_cause(c, item, "") := _leaf_cause(c, item) if not _derived_once(c)
 
-_tally_cond_cause(c, item, flaw) := _worst_of({flaw} | _item_states_beside_key(c, item)) if flaw in _no_value_states
+_tally_cond_cause(c, item, flaw) := _worst_of((({flaw} | _item_states_beside_key(c, item)) | _item_key_bases(c, item))) if flaw in _no_value_states
+
+_item_key_bases(c, item) := {b.cause |
+	some [p, mode] in _key_base_reads(c)
+	not p[0] in _params_starts
+	p[0] != "$$input"
+	some b in _key_base_flaws(item, p, mode)
+	b.cause in _value_fault_causes
+	_key_bases_clean(item, c)
+}
+
+_key_bases_clean(item, c) if {
+	is_object(item)
+	every r in _key_base_reads(c) {
+		_key_base_read_fine(item, r[0])
+	}
+}
+
+_key_base_read_fine(_, p) if p[0] in _params_starts
+
+_key_base_read_fine(_, p) if p[0] == "$$input"
+
+_key_base_read_fine(_, p) if {
+	some seg in p
+	_ref_step_flaw(seg)
+}
+
+_key_base_read_fine(item, p) if _read_state(item, p) == "value"
 
 _tally_cond_cause(_, _, flaw) := flaw if not flaw in _no_read_fault_causes
 

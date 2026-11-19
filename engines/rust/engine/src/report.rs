@@ -20,6 +20,7 @@ pub struct Row {
     pub message: Option<String>,
     pub failed_items: Option<Value>,
     pub failed_assertions: Option<Value>,
+    pub failures: Option<Value>,
 }
 
 impl Row {
@@ -47,14 +48,44 @@ impl Row {
                 json!(crate::ops::message::one_line(message)),
             );
         }
-        if let Some(items) = &self.failed_items {
+        if let Some(items) = self
+            .failed_items
+            .as_ref()
+            .filter(|_| self.check == "$min_subjects" || stash_kept())
+        {
             row.insert("failed_items".to_string(), items.clone());
         }
-        if let Some(assertions) = &self.failed_assertions {
+        if let Some(failures) = self.failures.as_ref().filter(|_| !self.passed()) {
+            row.insert("failures".to_string(), failures.clone());
+        }
+        if let Some(assertions) = self.failed_assertions.as_ref().filter(|_| stash_kept()) {
             row.insert("failed_assertions".to_string(), assertions.clone());
         }
         Value::Object(row)
     }
+}
+
+#[cfg(test)]
+thread_local! {
+    static STASH: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+#[cfg(test)]
+pub fn keeping_stash<T>(work: impl FnOnce() -> T) -> T {
+    let was = STASH.with(|on| on.replace(true));
+    let out = work();
+    STASH.with(|on| on.set(was));
+    out
+}
+
+#[cfg(test)]
+fn stash_kept() -> bool {
+    STASH.with(std::cell::Cell::get)
+}
+
+#[cfg(not(test))]
+fn stash_kept() -> bool {
+    false
 }
 
 pub fn input(name: &str, value: Value, locations: &[String]) -> Value {
@@ -105,6 +136,7 @@ pub fn row_of(
         message: None,
         failed_items: None,
         failed_assertions: None,
+        failures: None,
     }
 }
 
@@ -376,11 +408,7 @@ impl RequirementRead<'_> {
             let every = if at == 0 { "Every" } else { "every" };
             descriptions.push(format!("{every} {level} id is unique"));
             let from = if self.reads_from(level) {
-                refs.extend(crate::checks::refs_read(
-                    &reading.source_refs(level),
-                    input,
-                    Some(params),
-                ));
+                refs.extend(source_refs_read(reading, level, input, params));
                 reading.infos[level].from_text.clone().unwrap_or_default()
             } else {
                 INVALID_FROM.to_string()
@@ -480,9 +508,7 @@ pub fn check_defs(
         )
     };
     let from_refs = match policy.subject_of(requirement) {
-        Some((name, _)) if read.reads_from(name) => {
-            crate::checks::refs_read(&reading.source_refs(name), input, Some(params))
-        }
+        Some((name, _)) if read.reads_from(name) => source_refs_read(reading, name, input, params),
         _ => Vec::new(),
     };
     let mut min_def = CheckDef::added(min_description, min_expression);
@@ -887,6 +913,7 @@ fn policy_row(policy: &Policy) -> Row {
         message,
         failed_items: None,
         failed_assertions: None,
+        failures: None,
     }
 }
 
@@ -983,8 +1010,15 @@ pub fn violations(report: &Value) -> Value {
             .and_then(|def| def.get("$refs"))
             .and_then(Value::as_array)
         {
-            let listed = inputs.clone();
-            inputs.extend(refs.iter().filter(|r| !listed.contains(r)).cloned());
+            let bare = |entry: &Value| {
+                let mut entry = entry.clone();
+                if let Some(map) = entry.as_object_mut() {
+                    map.remove("outcome");
+                }
+                entry
+            };
+            let listed: Vec<Value> = inputs.iter().map(bare).collect();
+            inputs.extend(refs.iter().filter(|r| !listed.contains(&bare(r))).cloned());
         }
         let mut violation = Map::new();
         violation.insert("requirement".to_string(), requirement);
@@ -1000,7 +1034,7 @@ pub fn violations(report: &Value) -> Value {
             "cause".to_string(),
             row.get("cause").cloned().unwrap_or(Value::Null),
         );
-        for key in ["message", "failed_items", "failed_assertions"] {
+        for key in ["message", "failed_items", "failures"] {
             if let Some(value) = row.get(key) {
                 violation.insert(key.to_string(), value.clone());
             }
@@ -1012,3 +1046,30 @@ pub fn violations(report: &Value) -> Value {
 
 #[cfg(test)]
 mod tests;
+
+fn source_refs_read(reading: &Reading, name: &str, input: &Value, params: &Value) -> Vec<Value> {
+    let paths = reading.source_refs(name);
+    let keys: Vec<String> = reading
+        .lowered(name)
+        .map(|lowered| match &lowered.source {
+            crate::reading::Source::Root { path, .. }
+            | crate::reading::Source::Child { path, .. } => crate::path::step_refs(path),
+        })
+        .unwrap_or_default()
+        .iter()
+        .map(crate::name::name)
+        .collect();
+    let mut refs = crate::checks::refs_read(&paths, input, Some(params));
+    for entry in &mut refs {
+        let named = entry
+            .get("name")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        let value = entry.get("value").cloned().unwrap_or(Value::Null);
+        let fits = !keys.iter().any(|k| k == named) || value.is_string();
+        if entry.get("outcome").and_then(Value::as_str) == Some("usable") && !fits {
+            entry["outcome"] = json!("unusable");
+        }
+    }
+    refs
+}

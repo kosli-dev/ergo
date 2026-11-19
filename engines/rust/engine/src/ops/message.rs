@@ -191,6 +191,12 @@ fn key_steps(path: &Path) -> impl Iterator<Item = &Path> {
     })
 }
 
+/// The names of the values `check` compares or tests, not the keys it reads
+/// on the way.
+pub fn side_names(check: &Check) -> Vec<String> {
+    side_paths(check).into_iter().map(name::name).collect()
+}
+
 fn side_paths(check: &Check) -> Vec<&Path> {
     match check {
         Check::Compare(c) => c.left.paths().into_iter().chain(c.right.paths()).collect(),
@@ -209,6 +215,7 @@ fn side_paths(check: &Check) -> Vec<&Path> {
                 }
             })
             .collect(),
+        Check::AnyOf(any) => any.options.iter().flatten().flat_map(side_paths).collect(),
         _ => {
             let mut paths: Vec<&Path> = single_path(check).into_iter().collect();
             paths.extend(lists::right_paths(check));
@@ -592,6 +599,72 @@ fn unflawed_cause(line: &Check, ctx: &Ctx) -> Cause {
     }
 }
 
+/// What an `any_of` line that didn't pass says, run in its option's `ctx`.
+pub fn option_line_text(
+    line: &Check,
+    ctx: &Ctx,
+    said: Option<String>,
+    verdict: &Verdict,
+) -> String {
+    if let Some(said) = said {
+        return said;
+    }
+    let mut verdict = verdict.clone();
+    if verdict.cause == Cause::Unusable && line.flawed(ctx) {
+        verdict.cause = unflawed_cause(line, ctx);
+    }
+    message(line, ctx, &verdict)
+}
+
+fn split_outside_quotes<'t>(text: &'t str, by: &str) -> Vec<&'t str> {
+    let mut out = Vec::new();
+    let mut from = 0;
+    let mut quoted = false;
+    let mut escaped = false;
+    let bytes = text.as_bytes();
+    let mut at = 0;
+    while at < bytes.len() {
+        let byte = bytes[at];
+        if escaped {
+            escaped = false;
+        } else if byte == b'\\' && quoted {
+            escaped = true;
+        } else if byte == b'"' {
+            quoted = !quoted;
+        } else if !quoted && text[at..].starts_with(by) {
+            out.push(&text[from..at]);
+            at += by.len();
+            from = at;
+            continue;
+        }
+        at += 1;
+    }
+    out.push(&text[from..]);
+    out
+}
+
+/// `text` without the clauses `said` held before it, adding the ones it
+/// keeps to `said`. A clause is a piece of `text` between `; ` or `, and `, outside
+/// quoted strings.
+pub fn unsaid(text: &str, said: &mut Vec<String>) -> String {
+    let before = said.len();
+    let mut groups: Vec<String> = Vec::new();
+    for group in split_outside_quotes(text, "; ") {
+        let mut kept: Vec<&str> = Vec::new();
+        for clause in split_outside_quotes(group, ", and ") {
+            if clause.is_empty() || said[..before].iter().any(|s| s == clause) {
+                continue;
+            }
+            said.push(clause.to_string());
+            kept.push(clause);
+        }
+        if !kept.is_empty() {
+            groups.push(kept.join(", and "));
+        }
+    }
+    groups.join("; ")
+}
+
 fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
     let in_option = Ctx {
         in_option: true,
@@ -607,24 +680,19 @@ fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
                 if ran.verdict.passed() {
                     return None;
                 }
-                if let Some(said) = ran.message {
-                    return Some(said);
-                }
-                let mut verdict = ran.verdict;
-                if verdict.cause == Cause::Unusable && line.flawed(ctx) {
-                    verdict.cause = unflawed_cause(line, ctx);
-                }
-                Some(message(line, ctx, &verdict))
+                Some(option_line_text(line, ctx, ran.message, &ran.verdict))
             })
             .collect();
         if lines.is_empty() {
             continue;
         }
         let name = any.names.get(at).cloned().unwrap_or_default();
-        let mut once: Vec<String> = Vec::new();
-        for line in lines {
-            push_new(&mut once, line);
-        }
+        let mut said: Vec<String> = Vec::new();
+        let once: Vec<String> = lines
+            .iter()
+            .map(|line| unsaid(line, &mut said))
+            .filter(|line| !line.is_empty())
+            .collect();
         parts.push(format!("{name}: {}", once.join(", and ")));
     }
     if parts.is_empty() {
@@ -757,6 +825,16 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                     continue;
                 }
                 push_new(&mut once, clause);
+            }
+            if once.is_empty()
+                && ctx.params.is_none_or(|p| p.is_object() || p.is_null())
+                && let Check::Tally(t) = check
+            {
+                for side in tally::tally_sides(t) {
+                    if let TallySide::Derived(derived) = side {
+                        push_new(&mut once, format!("{}{digits}", derived.text));
+                    }
+                }
             }
             once
         }
@@ -1052,6 +1130,7 @@ fn plain_side_inputs(side: &Side, ctx: &Ctx) -> Vec<Input> {
                     part: None,
                     state: Outcome::Found,
                     null_at: None,
+                    worked: true,
                 }],
                 _ => pieces
                     .iter()
@@ -1075,6 +1154,7 @@ fn tally_inputs(side: &TallySide, ctx: &Ctx, cause: Cause) -> Vec<Input> {
                     part: None,
                     state: Outcome::Found,
                     null_at: None,
+                    worked: true,
                 }],
                 (Cause::Value, Err(_)) | (_, _) => {
                     let _ = counted;

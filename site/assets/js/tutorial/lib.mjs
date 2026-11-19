@@ -42,8 +42,13 @@ export const readReport = (report) => {
   }
   const row = rows.find((r) => r.check === "sentence");
   if (!row) return { state: "nothing" };
-  return { state: "result", passed: row.passed === true, cause: row.cause, inputs: row.inputs ?? [], failed: row.failed_assertions ?? [] };
+  return { state: "result", passed: row.passed === true, cause: row.cause, inputs: row.inputs ?? [], failed: failedSentences(row) };
 };
+
+const failedSentences = (row) =>
+  (row.failures ?? [])
+    .filter((e) => e.kind === "assertion" && (e.locations ?? []).some((l) => l.includes("#")))
+    .map((e) => ({ assertion: e.name, cause: e.cause }));
 
 export const makeRunner = (evaluate) => (input, policy) => {
   const out = evaluate({ input, policy });

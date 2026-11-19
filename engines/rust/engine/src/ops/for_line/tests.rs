@@ -10,11 +10,13 @@ fn row(for_line: &str, assertions: Value, subject: Value) -> Value {
     let mut subject = subject;
     subject["id"] = json!(1);
     let input = json!({"things": [subject]});
-    let report = crate::report(
-        &input,
-        &policy,
-        &json!({"k": "a", "list": ["x"], "kinds": "code", "need": {"b": 1}}),
-    );
+    let report = crate::report::keeping_stash(|| {
+        crate::report(
+            &input,
+            &policy,
+            &json!({"k": "a", "list": ["x"], "kinds": "code", "need": {"b": 1}}),
+        )
+    });
     report["results"]
         .as_array()
         .unwrap()
@@ -38,7 +40,7 @@ fn problems(for_line: &str) -> Value {
         "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": "x exists"}}}}
     });
     let input = json!({"things": [{"id": 1, "xs": {"a": 1}, "x": "a", "ys": ["a"]}]});
-    let report = crate::report(&input, &policy, &json!({}));
+    let report = crate::report::keeping_stash(|| crate::report(&input, &policy, &json!({})));
     let rows = report["results"].as_array().unwrap();
     assert!(rows.iter().all(|row| row["check"] != "c"));
     let well_formed = rows
@@ -116,7 +118,7 @@ fn every_passes_when_all_items_pass_and_lists_the_failures_otherwise() {
     assert_eq!(items(&some), ["item 2 of xs"]);
     assert_eq!(
         some["failed_items"][0]["failed_assertions"][0]["inputs"],
-        json!([{"name": "x.ok", "value": false, "locations": ["/things/0/xs/1/ok"]}])
+        json!([{"name": "x.ok", "value": false, "locations": ["/things/0/xs/1/ok"], "outcome": "usable"}])
     );
 }
 
@@ -252,7 +254,7 @@ fn an_empty_first_list_a_for_line_tolerates_still_runs_the_sentences_that_dont_r
         );
         assert_eq!(
             failed["message"],
-            "item 1 of approvers: state is missing; item 2 of approvers: state is \"REJECTED\""
+            "item 1 of approvers: ap.state is missing; item 2 of approvers: ap.state is \"REJECTED\""
         );
         assert_eq!(names(&failed), ["approvers[]", "commits[]"]);
     }
@@ -344,7 +346,9 @@ fn a_subject_that_is_not_an_object_fails_as_not_an_object_with_nothing_listed() 
         "subjects": {"thing": {"from": "things", "identified_by": "id"}},
         "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as x", "assert": "x is 1"}}}}
     });
-    let report = crate::report(&json!({"things": ["text"]}), &policy, &json!({}));
+    let report = crate::report::keeping_stash(|| {
+        crate::report(&json!({"things": ["text"]}), &policy, &json!({}))
+    });
     let found = report["results"]
         .as_array()
         .unwrap()
@@ -365,7 +369,9 @@ fn a_for_line_over_the_subject_by_its_name_fails_as_not_an_object_on_a_subject_t
             "subjects": {"thing": {"from": "every xs"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every thing as k", "assert": "k is 1"}}}}
         });
-        let report = crate::report(&json!({"xs": [subject]}), &policy, &json!({}));
+        let report = crate::report::keeping_stash(|| {
+            crate::report(&json!({"xs": [subject]}), &policy, &json!({}))
+        });
         let found = report["results"]
             .as_array()
             .unwrap()
@@ -386,7 +392,7 @@ fn a_failed_assertion_keeps_the_dot_of_a_field_named_like_the_subject() {
         "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every ys as k", "assert": ".thing is 1"}}}}
     });
     let input = json!({"xs": [{"thing": 2, "ys": [1]}]});
-    let report = crate::report(&input, &policy, &json!({}));
+    let report = crate::report::keeping_stash(|| crate::report(&input, &policy, &json!({})));
     let found = report["results"]
         .as_array()
         .unwrap()
@@ -518,7 +524,7 @@ fn a_failed_count_whose_whose_reads_a_part_lists_the_parts_value_with_its_locati
         }}}}
     });
     let input = json!({"things": [{"id": "t", "groups": [1], "items": [{"w": 1}, {"w": 2}], "meta": {"w": 2}}]});
-    let report = crate::report(&input, &policy, &json!({}));
+    let report = crate::report::keeping_stash(|| crate::report(&input, &policy, &json!({})));
     let found = report["results"]
         .as_array()
         .unwrap()
@@ -743,7 +749,7 @@ fn an_items_whose_reads_the_value_its_path_ends_at() {
     assert_eq!(found["cause"], "absent");
     assert_eq!(
         found["message"],
-        "item 1 of rs: m: s is missing; item 2 of rs: by is missing"
+        "item 1 of rs: m: s is missing; item 2 of rs: m.by is missing"
     );
 }
 
@@ -758,7 +764,7 @@ fn an_items_whose_fails_as_absent_when_the_value_its_path_ends_at_is_missing() {
     assert_eq!(found["message"], "item 2 of rs: m is missing");
     assert_eq!(
         found["failed_items"],
-        json!([{"path": "item 2 of rs", "item": "item 2 of rs", "cause": "absent", "value": null, "locations": ["/things/0/rs/1"], "failed_assertions": []}])
+        json!([{"path": "item 2 of rs", "item": "item 2 of rs", "cause": "absent", "value": null, "locations": ["/things/0/rs/1"], "failed_assertions": [], "ergo/said": "item 2 of rs: m", "ergo/text": "item 2 of rs: m is missing"}])
     );
 }
 
@@ -1198,7 +1204,7 @@ fn a_pick_that_finds_nothing_lists_the_list_it_looked_in_as_a_failure_of_its_own
     );
     assert_eq!(
         found["failed_items"][0]["failed_items"],
-        json!([{"cause": "absent", "item": "x.subs", "path": "x.subs", "value": null, "locations": []}])
+        json!([{"cause": "absent", "item": "x.subs", "path": "x.subs", "value": null, "locations": [], "ergo/said": "x.subs", "ergo/text": "x.subs is missing"}])
     );
     let past_the_end = row(
         "every items as x, item 2 of x.subs as y",
@@ -1359,7 +1365,7 @@ fn a_sentence_root_named_by_the_lines_alias_is_read_for_each_item() {
 }
 
 #[test]
-fn a_param_key_that_isnt_text_doesnt_name_an_item_that_isnt_an_object() {
+fn a_param_key_that_isnt_text_names_the_value_before_it_but_not_an_item_that_isnt_an_object() {
     let found = row(
         "every ws as w",
         json!("w.k named by $params.need is 1"),
@@ -1367,7 +1373,7 @@ fn a_param_key_that_isnt_text_doesnt_name_an_item_that_isnt_an_object() {
     );
     assert_eq!(
         found["message"],
-        "$params.need is {\"b\": 1}, which isn't text"
+        "$params.need is {\"b\": 1}, which isn't text; item 1 of ws: w.k is 1, which isn't an object"
     );
 }
 
@@ -1393,7 +1399,7 @@ fn an_item_that_lacks_the_field_is_still_an_object() {
     );
     assert_eq!(
         found["message"],
-        "item 1 of ws: item 1 of items: i is {\"a\": 1}, which isn't text"
+        "item 1 of ws: item 1 of w.items: i is {\"a\": 1}, which isn't text"
     );
 }
 
@@ -1431,7 +1437,8 @@ fn pr_row(
     });
     let mut pr = fields;
     pr["id"] = json!("p0");
-    let report = crate::report(&json!({"prs": [pr]}), &policy, &params);
+    let report =
+        crate::report::keeping_stash(|| crate::report(&json!({"prs": [pr]}), &policy, &params));
     let found = report["results"]
         .as_array()
         .unwrap()
@@ -1490,7 +1497,8 @@ fn two_roots_rows(pos: Value, os: Value) -> Vec<(String, Value)> {
         }}}
     });
     let input = json!({"prs": [{"id": "p0", "os": pos, "rows": [{"v": "bob"}], "ms": [{"ws": [{"v": "bob"}]}]}]});
-    let report = crate::report(&input, &policy, &json!({"os": os}));
+    let report =
+        crate::report::keeping_stash(|| crate::report(&input, &policy, &json!({"os": os})));
     ["every", "every_rev", "for_count"]
         .iter()
         .map(|check| {
@@ -1645,7 +1653,7 @@ fn params_that_are_not_an_object_leave_the_items_messages_of_a_for_line_that_doe
     assert_eq!(cause, "unusable");
     assert_eq!(
         message,
-        "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number"
+        "item 1 of xs is \"s\", which isn't an object; item 2 of xs: m.v is \"x\", which isn't a number"
     );
     let (_, message) = pr_row(
         json!(null),

@@ -2215,6 +2215,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every t.rs whose v is t.m named by $input.k",
         "every t.rs whose v equals t.m named by $input.k",
     ),
+    ("m named by $params.k", "m named by $params.k"),
+    (
+        "things whose x is at least $params.min",
+        "things whose x is at least $params.min",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

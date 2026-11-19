@@ -135,13 +135,18 @@ _with_refs(def, checked) := _with_listed(def, checked, _listed_refs(checked))
 _with_listed(def, checked, refs) := object.union(def, {"$refs_of": checked}) if {
 	data.ergo_reading == true
 	count(refs) > 0
-} else := object.union(def, {"$refs": _ref_entries(refs)}) if count(refs) > 0
+} else := object.union(def, {"$refs": _ref_entries_in(refs, checked)}) if count(refs) > 0
 
 _with_listed(def, _, refs) := def if count(refs) == 0
 
-_evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _evaluation_with(doc, req, name, _fixed(req)))
+_evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _evaluation_with(doc, req, name, _fixed(req, name)))
 
-_fixed(req) := {
+_fixed(req, name) := object.union(f, {
+	"wheres": {n: _where(name, n, c) | some n, c in f.prepared},
+	"conditions": {n: _condition_of(req, n, c) | some n, c in _applies_to_of(req)},
+}) if f := _fixed_of(req)
+
+_fixed_of(req) := {
 	"filter_flaws": {n: _flaw(check, _from_names(req, here)) |
 		some n, check in _applies_to_of(req)
 		here := _s_written_here(req, "applies_to", n)
@@ -198,7 +203,7 @@ _evaluation_with(doc, written, name, fixed) := {
 	refs := {i: _entry_ref_alone(entry, req, i in longs) | some i, entry in raw}
 	evals := {i: _applies_evals_alone(req, entry, fixed.filter_flaws, i in longs) | some i, entry in raw}
 	matches := {i: _subject_matches(evals[i], req) | some i, _ in raw}
-	applies := _applies_rows(raw, refs, evals, req, name)
+	applies := _applies_rows(raw, refs, evals, req, name, fixed.conditions)
 	matching := [raw[i] | some i, _ in raw; matches[i]]
 	groups := [rows |
 		some i, entry in raw
@@ -221,9 +226,9 @@ _applies_evals_alone(req, entry, flaws, false) := _applies_evals(req, entry.subj
 
 _applies_evals_alone(req, entry, flaws, true) := r if r := _applies_evals(req, entry.subject, flaws) with data.ergo_item as entry
 
-_subject_rows_alone(entry, ref, req, name, fixed, false) := _subject_rows(entry, ref, req, name, fixed.check_flaws, fixed.prepared)
+_subject_rows_alone(entry, ref, req, name, fixed, false) := _subject_rows(entry, ref, req, name, fixed)
 
-_subject_rows_alone(entry, ref, req, name, fixed, true) := r if r := _subject_rows(entry, ref, req, name, fixed.check_flaws, fixed.prepared) with data.ergo_item as entry
+_subject_rows_alone(entry, ref, req, name, fixed, true) := r if r := _subject_rows(entry, ref, req, name, fixed) with data.ergo_item as entry
 
 _with_ref_answer(check) := _ref_answered_compare(check) if {
 	is_object(check)
@@ -377,12 +382,16 @@ _results(policy, evaluations) := [_m_row_one_line(row) | some row in rows] if {
 	)
 }
 
-_m_row_one_line(row) := object.union(row, {"message": _m_one_line(row.message)}) if {
+_m_row_one_line(row) := object.union(row, object.union({"message": _m_one_line(row.message)}, {"failures": [_m_entry_one_line(e) | some e in row.failures] | "failures" in object.keys(row)})) if {
 	is_string(object.get(row, "message", null))
 	_m_separator_in(row.message)
 }
 
 else := row
+
+_m_entry_one_line(e) := object.union(e, {"message": _m_one_line(e.message), "failures": [_m_inner_one_line(x) | some x in e.failures]})
+
+_m_inner_one_line(e) := object.union(e, {"message": _m_one_line(e.message), "failures": [object.union(x, {"message": _m_one_line(x.message)}) | some x in e.failures]})
 
 _m_separator_in(m) if contains(m, "\u2028")
 
@@ -395,3 +404,72 @@ _inputs_once(row) := object.union(row, {"inputs": _once(row.inputs)})
 _names(x) := sort(object.keys(x)) if is_object(x)
 
 _names(x) := [i | some i, _ in x] if is_array(x)
+
+_ahead_check_defs(req, parts) := {n: _ahead_refs(def) | some n, def in parts.defs} if {
+	parts.defs
+} else := _requirement_check_defs(req)
+
+_ahead_refs(def) := object.union(object.remove(def, ["$refs_of"]), {"$refs": _ref_entries_in(_listed_refs(def["$refs_of"]), def["$refs_of"])}) if "$refs_of" in object.keys(def)
+
+else := def
+
+_ref_entries_in(refs, check) := [{"name": t[0], "value": t[1], "locations": t[2], "outcome": t[3]} | some t in sort({[_ref_label(r), _ref_shown(r), _ref_locations(r), _ref_use(check, r)] | some r in refs})]
+
+_ref_use(check, r) := "unusable" if {
+	_ref_state(r) == "value"
+	_ref_unfit(check, r, _ref_shown(r))
+} else := _outcome_word(_ref_state(r))
+
+_ref_unfit(check, r, _) if _wrong_step(check, r)
+
+_ref_unfit(check, r, v) if {
+	walk(check, [p, x])
+	not _under_literal(check, p)
+	_ref_node_unfit(x, r, v)
+}
+
+_ref_node_unfit(x, r, v) if {
+	x.op == "compare"
+	not _list_cmp(x)
+	some f in _compare_sides
+	x[f] == r
+	k := _ref_side_kind(x)
+	not _m_fits_kind(v, k)
+}
+
+_ref_node_unfit(x, r, v) if {
+	_list_cmp(x)
+	x.right == r
+	not _list_right_usable(x.cmp, v)
+}
+
+_ref_node_unfit(x, r, v) if {
+	x.op == "compare_time"
+	some f in _compare_sides
+	x[f] == r
+	not _m_time(v)
+}
+
+_ref_node_unfit(x, r, v) if {
+	_side_form(x) == "add"
+	r in x.add
+	not is_number(v)
+}
+
+_ref_node_unfit(x, r, v) if {
+	_side_form(x) == "join"
+	r in x.join
+	not is_string(v)
+}
+
+_ref_node_unfit(x, r, _) if {
+	some f in ["values", "patterns"]
+	x[f] == {"ref": r}
+	_node_param_broken(x)
+}
+
+_ref_side_kind(x) := "a number" if "within" in object.keys(x)
+
+else := "text" if x.cmp in _text_cmps
+
+else := "a number" if not x.cmp in {"eq", "excludes", "includes", "ne"}

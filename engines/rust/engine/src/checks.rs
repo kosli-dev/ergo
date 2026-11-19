@@ -283,6 +283,7 @@ fn read_form(
             let mut parts = Vec::new();
             let mut lowered_options = Vec::new();
             let mut lowered_names: Vec<String> = Vec::new();
+            let mut lowered_texts: Vec<Vec<String>> = Vec::new();
             let mut ok = !options.is_empty();
             for (option, read) in options {
                 match read {
@@ -307,6 +308,7 @@ fn read_form(
                             &mut problems,
                         );
                         lowered_names.push(option.to_string());
+                        lowered_texts.push(plan.items.iter().map(|i| i.text.clone()).collect());
                         lowered_options.push(plan.items.into_iter().map(|i| i.check).collect());
                         parts.push(format!(
                             "{option}({})",
@@ -325,6 +327,7 @@ fn read_form(
                     text: expression.clone(),
                     check: Check::AnyOf(AnyOf {
                         names: lowered_names,
+                        texts: lowered_texts,
                         options: lowered_options,
                     }),
                 }],
@@ -388,7 +391,115 @@ pub fn refs_of(plan: &Plan, input: &Value, params: Option<&Value>) -> Vec<Value>
         .iter()
         .flat_map(|item| item.check.listed_refs())
         .collect();
-    refs_walked(&paths, input, params)
+    let checks: Vec<&Check> = plan.items.iter().map(|item| &item.check).collect();
+    refs_walked_in(&paths, input, params, &checks)
+}
+
+fn steps_key(path: &Path, reference: &Path) -> bool {
+    path.steps.iter().any(|step| match step {
+        path::Step::Ref(key) => **key == *reference || steps_key(key, reference),
+        path::Step::Field(key) => steps_key(key, reference),
+        _ => false,
+    })
+}
+
+fn side_unfit(
+    side: &crate::ops::compare::Side,
+    reference: &Path,
+    value: &Value,
+    kind: Option<&str>,
+) -> bool {
+    use crate::ops::compare::Side;
+    match side {
+        Side::Path(path) if path == reference => match kind {
+            Some("number") => !value.is_number(),
+            Some("text") => !value.is_string(),
+            Some("time") => {
+                !(value.is_number()
+                    || value.is_string() && crate::ops::time::read_time(value).is_some())
+            }
+            _ => false,
+        },
+        Side::Join(parts) => parts.iter().any(|part| {
+            matches!(part, Side::Path(path) if path == reference) && !value.is_string()
+        }),
+        _ => false,
+    }
+}
+
+fn compare_unfit(check: &Check, reference: &Path, value: &Value) -> bool {
+    use crate::ops::compare::Cmp;
+    match check {
+        Check::Compare(compare) => {
+            let kind = if compare.within.is_some() {
+                Some("number")
+            } else {
+                match compare.cmp {
+                    Cmp::StartsWith
+                    | Cmp::EndsWith
+                    | Cmp::NotStartsWith
+                    | Cmp::NotEndsWith
+                    | Cmp::AlphabeticallyBefore
+                    | Cmp::AlphabeticallyAfter
+                    | Cmp::AlphabeticallyOnOrBefore
+                    | Cmp::AlphabeticallyOnOrAfter => Some("text"),
+                    Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => Some("number"),
+                    Cmp::Eq | Cmp::Ne => None,
+                }
+            };
+            side_unfit(&compare.left, reference, value, kind)
+                || side_unfit(&compare.right, reference, value, kind)
+        }
+        Check::CompareTime(compare) => {
+            side_unfit(&compare.left, reference, value, Some("time"))
+                || side_unfit(&compare.right, reference, value, Some("time"))
+        }
+        Check::Tally(tally) => {
+            use crate::ops::tally::{Side as TallySide, Test};
+            let kind = match &tally.test {
+                Test::Compare { cmp, within } => {
+                    if within.is_some() || matches!(cmp, Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte) {
+                        Some("number")
+                    } else {
+                        None
+                    }
+                }
+                Test::Between { .. } => Some("number"),
+            };
+            std::iter::once(&tally.left)
+                .chain(tally.right.as_ref())
+                .any(|side| match side {
+                    TallySide::Plain(plain) => side_unfit(plain, reference, value, kind),
+                    TallySide::Derived(_) => false,
+                })
+        }
+        _ => false,
+    }
+}
+
+pub(crate) fn ref_unfit(checks: &[&Check], reference: &Path, value: &Value, ctx: &Ctx) -> bool {
+    checks.iter().any(|check| {
+        if let Check::For(line) = check {
+            let inner: Vec<&Check> = line
+                .sentences
+                .iter()
+                .map(|s| &s.check)
+                .chain(line.items.iter().flat_map(|item| item.whose.iter()))
+                .collect();
+            return ref_unfit(&inner, reference, value, ctx);
+        }
+        if crate::ops::for_line::nested_checks(check)
+            .into_iter()
+            .any(|inner| compare_unfit(inner, reference, value))
+        {
+            return true;
+        }
+        let keyed = !value.is_string()
+            && crate::ops::for_line::all_paths(check)
+                .into_iter()
+                .any(|path| steps_key(path, reference));
+        keyed || (check.refs().contains(reference) && check.flawed(ctx))
+    })
 }
 
 pub fn refs_of_checks(checks: &[&Check], input: &Value, params: Option<&Value>) -> Vec<Value> {
@@ -406,7 +517,7 @@ pub fn refs_of_checks(checks: &[&Check], input: &Value, params: Option<&Value>) 
                 .collect::<Vec<_>>()
         })
         .collect();
-    refs_walked(&paths, input, params)
+    refs_walked_in(&paths, input, params, checks)
 }
 
 pub fn refs_read(paths: &[Path], input: &Value, params: Option<&Value>) -> Vec<Value> {
@@ -415,6 +526,15 @@ pub fn refs_read(paths: &[Path], input: &Value, params: Option<&Value>) -> Vec<V
 }
 
 fn refs_walked(paths: &[(Path, bool)], input: &Value, params: Option<&Value>) -> Vec<Value> {
+    refs_walked_in(paths, input, params, &[])
+}
+
+fn refs_walked_in(
+    paths: &[(Path, bool)],
+    input: &Value,
+    params: Option<&Value>,
+    checks: &[&Check],
+) -> Vec<Value> {
     let ctx = Ctx {
         label: None,
         item_by_item: true,
@@ -429,25 +549,43 @@ fn refs_walked(paths: &[(Path, bool)], input: &Value, params: Option<&Value>) ->
     };
     let mut entries: Vec<Value> = Vec::new();
     for (reference, walks) in paths {
+        let read = path::read(reference, &ctx);
+        let outcome = match (read.outcome, read.value) {
+            (path::Outcome::Found, Some(value)) if ref_unfit(checks, reference, value, &ctx) => {
+                "unusable"
+            }
+            (outcome, _) => ref_outcome(outcome),
+        };
         if let Some(walk) = crate::ops::lists::walked(reference, &ctx).filter(|_| *walks) {
             entries.push(serde_json::json!({
                 "name": walk.name,
                 "value": walk.value,
                 "locations": walk.locations,
+                "outcome": outcome,
             }));
             continue;
         }
-        let read = path::read(reference, &ctx);
         let locations: Vec<String> = read.location.iter().map(Location::render).collect();
         entries.push(serde_json::json!({
             "name": name::name(reference),
             "value": read.value.cloned().unwrap_or(Value::Null),
             "locations": locations,
+            "outcome": outcome,
         }));
     }
     entries.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
     entries.dedup();
     entries
+}
+
+fn ref_outcome(outcome: path::Outcome) -> &'static str {
+    match outcome {
+        path::Outcome::Found => "usable",
+        path::Outcome::Null => "null",
+        path::Outcome::Absent => "absent",
+        path::Outcome::Unusable => "unusable",
+        path::Outcome::NotAnObject => "not_an_object",
+    }
 }
 
 #[cfg(test)]

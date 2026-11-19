@@ -163,7 +163,7 @@ test_a_sentence_check_reports_its_description_meta_and_printed_sentence_only if 
 		{"allowed": ["a"]},
 	)
 	r.requirements.s.checks.a == {"description": "", "meta": {}, "expression": `x is "a"`}
-	r.requirements.s.checks.b == {"description": "In the list", "meta": {"id": "B-1"}, "expression": "x is in $params.allowed", "$refs": [{"name": "$params.allowed", "value": ["a"], "locations": ["$params:/allowed"]}]}
+	r.requirements.s.checks.b == {"description": "In the list", "meta": {"id": "B-1"}, "expression": "x is in $params.allowed", "$refs": [{"name": "$params.allowed", "value": ["a"], "locations": ["$params:/allowed"], "outcome": "usable"}]}
 	r.compliant
 }
 
@@ -241,10 +241,10 @@ test_an_any_of_of_sentences_is_written_wrong_when_its_shape_or_a_line_is if {
 test_every_and_some_joined_with_and_give_one_row_with_the_failed_sentences if {
 	doc := {"things": [{"id": "a", "n": 1, "xs": [{"v": 1}, {"v": 2}]}]}
 	r := ergo.report(doc, _sentence_policy({"c": "n is 1 and every xs.v is 1 and some xs.v is 2"}), {})
-	[[row.cause, row.failed_assertions, row.inputs] | some row in r.results; row.check == "c"] == [[
+	[[row.cause, row.failures, row.inputs] | some row in r.results; row.check == "c"] == [[
 		"value",
-		[{"assertion": "every xs.v is 1", "cause": "value"}],
-		[{"name": "n", "value": 1, "locations": ["/things/0/n"]}, {"name": "xs[].v", "value": [1, 2], "locations": ["/things/0/xs/0/v", "/things/0/xs/1/v"]}],
+		[_assertion("every xs.v is 1", "value", ["$policy:/requirements/s/checks/c#2"], [_seen("xs[].v", [1, 2], ["/things/0/xs/0/v", "/things/0/xs/1/v"], "usable")], "item 2 of xs: v is 2", [])],
+		[_seen("n", 1, ["/things/0/n"], "usable"), _seen("xs[].v", [1, 2], ["/things/0/xs/0/v", "/things/0/xs/1/v"], "usable")],
 	]]
 }
 
@@ -282,12 +282,7 @@ _deployments := {"deployments": [
 
 test_a_from_written_as_a_sentence_reads_its_path_and_keeps_the_subjects_whose_conditions_hold if {
 	rep := _from_report(_deployments, {"emergency change": {"from": `deployments whose environment is "prod" and whose change_type is "emergency"`, "identified_by": "id"}}, {"c": "id exists"}, {})
-	_from_rows(rep) == [
-		[1, "$applies", "satisfied", [{"name": "change_type", "value": "emergency", "locations": ["/deployments/0/change_type"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/0/environment"]}]],
-		[2, "$applies", "absent", [{"name": "change_type", "value": null, "locations": ["/deployments/1"]}, {"name": "environment", "value": "dev", "locations": ["/deployments/1/environment"]}]],
-		[3, "$applies", "value", [{"name": "change_type", "value": "standard", "locations": ["/deployments/2/change_type"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/2/environment"]}]],
-		[1, "c", "satisfied", [{"name": "id", "value": 1, "locations": ["/deployments/0/id"]}]],
-	]
+	_from_rows(rep) == [[1, "$applies", "satisfied", [_in("change_type", "emergency", ["/deployments/0/change_type"]), _in("environment", "prod", ["/deployments/0/environment"])]], [2, "$applies", "absent", [_seen("change_type", null, ["/deployments/1"], "absent"), _seen("environment", "dev", ["/deployments/1/environment"], "usable")]], [3, "$applies", "value", [_seen("change_type", "standard", ["/deployments/2/change_type"], "usable"), _seen("environment", "prod", ["/deployments/2/environment"], "usable")]], [1, "c", "satisfied", [_in("id", 1, ["/deployments/0/id"])]]]
 	rep.requirements.r.checks["$applies"].expression == `environment is "prod" and change_type is "emergency"`
 }
 
@@ -310,10 +305,12 @@ test_the_applies_row_of_a_some_condition_reads_the_same_inputs_and_causes_as_the
 test_the_applies_row_of_a_plain_condition_has_no_more_fields_than_the_check_row_of_the_same_sentence if {
 	every sentence in [`ticket is "ok"`, `ticket is "open"`, `ticket exists`, `count of files is at least 2`, `sum of files.size is at least 2`] {
 		both := _as_condition_and_as_check([sentence])
-		every _, row in _applies_failures_of(both[0]) {
-			row == {}
+		applies := _applies_failures_of(both[0])
+		check := _check_failures_of(both[1])
+		object.keys(applies) == object.keys(check)
+		every id, entries in applies {
+			[object.union(e, {"inputs": {i | some i in e.inputs}}) | some e in entries] == [object.union(e, {"inputs": {i | some i in e.inputs}}) | some e in check[id]]
 		}
-		_applies_failures_of(both[0]) == _check_failures_of(both[1])
 	}
 }
 
@@ -381,23 +378,25 @@ test_a_sentence_that_doesnt_read_the_item_is_said_once_whatever_its_cause if {
 test_a_params_sentence_that_doesnt_read_the_item_is_said_once if {
 	policy := {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"q": {"for": "every xs as m", "assert": "$params.q exists"}}}}}
 	input_doc := {"things": [{"id": 1, "xs": [{"v": 1}, {"v": 2}]}]}
-	msgs := {[p, r.cause, r.message, count(r.failed_items)] | some p in [{}, {"q": null}]; some r in ergo.report(input_doc, policy, p).results; r.check == "q"}
-	msgs == {[{}, "value", "$params.q is missing", 2], [{"q": null}, "value", "$params.q is null", 2]}
+	msgs := {[p, r.cause, r.message, r.failures] | some p in [{}, {"q": null}]; some r in ergo.report(input_doc, policy, p).results; r.check == "q"}
+	msgs == {
+		[{}, "value", "$params.q is missing", [_assertion("$params.q exists", "value", ["$policy:/requirements/r/checks/q/assert"], [_seen("$params.q", null, ["$params:"], "absent")], "$params.q is missing", [])]],
+		[{"q": null}, "value", "$params.q is null", [_assertion("$params.q exists", "value", ["$policy:/requirements/r/checks/q/assert"], [_seen("$params.q", null, ["$params:/q"], "null")], "$params.q is null", [])]],
+	}
 }
 
 test_failed_items_lists_every_item_when_the_list_a_sentence_looks_in_isnt_a_list if {
 	policy := {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as m", "assert": "m.v is in $params.q"}}}}}
 	input_doc := {"things": [{"id": 1, "xs": [{"v": 1}, {}]}]}
-	rows := {[q, r.cause, r.message, [[f.item, f.cause, [[a.assertion, a.cause] | some a in f.failed_assertions]] | some f in r.failed_items]] |
+	rows := {[q, r.cause, r.message, r.failures] |
 		some q in ["s", 3, {"a": 1}]
 		some r in ergo.report(input_doc, policy, {"q": q}).results
 		r.check == "c"
 	}
-	items := [["item 1 of xs", "unusable", [["m.v is in $params.q", "unusable"]]], ["item 2 of xs", "unusable", [["m.v is in $params.q", "unusable"]]]]
 	rows == {
-		["s", "unusable", "$params.q is \"s\", which isn't a list", items],
-		[3, "unusable", "$params.q is 3, which isn't a list", items],
-		[{"a": 1}, "unusable", "$params.q is {\"a\": 1}, which isn't a list", items],
+		["s", "unusable", "$params.q is \"s\", which isn't a list", [_assertion("m.v is in $params.q", "unusable", ["$policy:/requirements/r/checks/c/assert"], [_seen("$params.q", "s", ["$params:/q"], "unusable")], "$params.q is \"s\", which isn't a list", [])]],
+		[3, "unusable", "$params.q is 3, which isn't a list", [_assertion("m.v is in $params.q", "unusable", ["$policy:/requirements/r/checks/c/assert"], [_seen("$params.q", 3, ["$params:/q"], "unusable")], "$params.q is 3, which isn't a list", [])]],
+		[{"a": 1}, "unusable", "$params.q is {\"a\": 1}, which isn't a list", [_assertion("m.v is in $params.q", "unusable", ["$policy:/requirements/r/checks/c/assert"], [_seen("$params.q", {"a": 1}, ["$params:/q"], "unusable")], "$params.q is {\"a\": 1}, which isn't a list", [])]],
 	}
 }
 
@@ -609,24 +608,19 @@ test_last_of_in_a_sentence_points_to_the_for_line if {
 
 test_a_failed_line_names_an_alias_that_holds_a_list_as_the_sentence_writes_it if {
 	things := [{"id": 1, "batches": [["x", "y"], []]}]
-	_line_inputs({"for": "every batches as b", "assert": `first of b is "x"`}, things) == [[{"name": "item 1 of b", "value": null, "locations": ["/things/0/batches/1"]}]]
+	_line_inputs({"for": "every batches as b", "assert": `first of b is "x"`}, things) == [[_seen("item 1 of b", null, ["/things/0/batches/1"], "absent")]]
 	_line_inputs({"for": "every batches as b", "assert": "count of b is at least 3"}, things) == [
-		[{"name": "count of b", "value": 2, "locations": ["/things/0/batches/0/0", "/things/0/batches/0/1"]}, {"name": "b[]", "value": ["x", "y"], "locations": ["/things/0/batches/0/0", "/things/0/batches/0/1"]}],
-		[{"name": "count of b", "value": 0, "locations": []}, {"name": "b[]", "value": [], "locations": []}],
+		[_in("count of b", 2, ["/things/0/batches/0/0", "/things/0/batches/0/1"]), _seen("b[]", ["x", "y"], ["/things/0/batches/0/0", "/things/0/batches/0/1"], "usable")],
+		[_in("count of b", 0, []), _seen("b[]", [], [], "usable")],
 	]
-	_line_inputs({"for": "every m as x", "assert": "item 3 of x.q is 1"}, [{"id": 1, "m": [{"q": [1]}]}]) == [[{"name": "item 3 of x.q", "value": null, "locations": ["/things/0/m/0/q"]}]]
+	_line_inputs({"for": "every m as x", "assert": "item 3 of x.q is 1"}, [{"id": 1, "m": [{"q": [1]}]}]) == [[_seen("item 3 of x.q", null, ["/things/0/m/0/q"], "absent")]]
 }
 
 test_a_failed_line_names_an_alias_read_by_a_key_as_the_sentence_writes_it if {
 	things := [{"id": 1, "key": "k1", "n": [{"k1": [1, 2]}]}]
-	_line_inputs({"for": "every n as c", "assert": "c named by key is 9"}, things) == [[
-		{"name": "c named by key", "value": [1, 2], "locations": ["/things/0/n/0/k1"]},
-		{"name": "key", "value": "k1", "locations": ["/things/0/key"]},
-	]]
-	_line_inputs({"for": "every n as c", "assert": "first of c named by key is 9"}, things) == [[
-		{"name": "item 1 of c named by key", "value": 1, "locations": ["/things/0/n/0/k1/0"]},
-		{"name": "key", "value": "k1", "locations": ["/things/0/key"]},
-	]]
+	_line_inputs({"for": "every n as c", "assert": "c named by key is 9"}, things) == [[_seen("c named by key", [1, 2], ["/things/0/n/0/k1"], "unusable")]]
+	_line_inputs({"for": "every n as c", "assert": "first of c named by key is 9"}, things) == [[_seen("item 1 of c named by key", 1, ["/things/0/n/0/k1/0"], "usable")]]
+	[a.inputs | some r in ergo.report({"things": things}, _sentence_policy({"c": {"for": "every n as c", "assert": "first of c named by key is 9"}}), {}).results; r.check == "c"; some a in r.failures] == [[_seen("key", "k1", ["/things/0/key"], "usable")]]
 }
 
 as_sentences_checks(checks) := ergo.as_sentences({"subjects": {"s": {"from": "items"}}, "requirements": {"r": {"subject": "s", "checks": checks}}}).requirements.r.checks
@@ -748,5 +742,5 @@ test_as_sentences_leaves_an_empty_path_and_a_field_called_like_the_subject_as_th
 test_a_failed_sentence_of_a_second_for_item_that_starts_at_a_parents_part_names_its_items_without_the_part_marker if {
 	doc := {"artifact": {"n": "a", "ps": {"w": ["k1", "z"]}, "kids": [{"id": 1, "keys": ["k1"]}]}}
 	row := _part_for_row(doc, {"ap": "ps"}, {"for": "every keys as k, every artifact.ap.w as x", "assert": "x is k"}, {})
-	[[i.item | some i in a.items] | some a in row.failed_items[0].failed_assertions] == [["item 2 of artifact.ap.w"]]
+	row.failures == [_assertion("x equals k", "value", ["$policy:/requirements/r/checks/c/assert"], [], "", [_item("item 1 of keys", "value", "k1", ["/artifact/kids/0/keys/0"], [], "", [_item("item 2 of artifact.ap.w", "value", "z", ["/artifact/ps/w/1"], [_seen("x", "z", ["/artifact/ps/w/1"], "usable"), _seen("k", "k1", ["/artifact/kids/0/keys/0"], "usable")], "x is \"z\", and k is \"k1\"", [])])])]
 }

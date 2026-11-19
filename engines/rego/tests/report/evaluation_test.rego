@@ -60,3 +60,38 @@ test_a_model_check_with_an_inputs_list_does_not_echo_an_entry_that_is_not_a_path
 	check := {"op": "present", "path": ["x"], "inputs": [{"z": 1}, ["x"]]}
 	[i.name | some i in ergo._check_inputs({"x": 1}, check)] == ["x"]
 }
+
+test_a_ref_that_is_not_a_path_in_the_input_or_the_params_has_no_location if {
+	ergo._ref_entries_in({["x"]}, {}) == [{"name": "<invalid ref>", "value": null, "locations": [], "outcome": "absent"}]
+}
+
+test_message_of_a_row_writes_line_separators_as_escapes_at_every_level_of_its_failures if {
+	leaf := {"message": "c d"}
+	inner := {"message": "b c", "failures": [leaf]}
+	entry := {"message": "a b", "failures": [inner]}
+	row := ergo._m_row_one_line({"message": "x y", "failures": [entry]})
+	row.message == "x\\u2028y"
+	row.failures[0].message == "a\\u2028b"
+	row.failures[0].failures[0].message == "b\\u2028c"
+	row.failures[0].failures[0].failures[0].message == "c\\u2028d"
+}
+
+test_a_list_compare_whose_right_side_is_the_ref_itself_finds_a_ref_of_the_wrong_kind_unusable if {
+	node := {"op": "compare", "cmp": "in", "left": ["s"], "right": ["$$params", "l"]}
+	ergo._ref_node_unfit(node, ["$$params", "l"], "a")
+	ergo._ref_node_unfit(node, ["$$params", "l"], null)
+	not ergo._ref_node_unfit(node, ["$$params", "l"], ["a"])
+	not ergo._ref_node_unfit(node, ["$$params", "m"], "a")
+}
+
+test_a_row_that_fails_as_ambiguous_gets_its_unusable_inputs_marked_like_one_that_fails_as_unusable if {
+	every cause in ["unusable", "not_an_object", "ambiguous"] {
+		ergo._m_marked_cause(cause)
+	}
+	not ergo._m_marked_cause("absent")
+	not ergo._m_marked_cause("null")
+}
+
+test_a_check_with_no_written_policy_to_read_has_no_written_form if {
+	ergo._written_check({"req": "r", "name": "c"}) == null
+}

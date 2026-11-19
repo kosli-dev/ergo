@@ -7,7 +7,9 @@ fn row(check: Value, subject: Value) -> Value {
         "subjects": {"t": {"from": "every xs"}},
         "requirements": {"r": {"subject": "t", "checks": {"c": check}}}
     });
-    let report = crate::report(&json!({"xs": [subject]}), &policy, &json!({"w": "a"}));
+    let report = crate::report::keeping_stash(|| {
+        crate::report(&json!({"xs": [subject]}), &policy, &json!({"w": "a"}))
+    });
     report["results"]
         .as_array()
         .unwrap()

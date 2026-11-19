@@ -473,7 +473,7 @@ _walk_count_conds(check) := [c |
 	some c in object.get(x, "whose", [])
 ]
 
-_walk_root_msgs(check, subj) := _once(array.concat(
+_walk_root_msgs(check, subj) := _m_root_sorted(_once(array.concat(
 	sort([m | some c in _walk_count_conds(check); some m in array.concat(_m_root_texts_all(subj, c), _m_cond_walked_texts(c)); _m_ref_first(m)]),
 	array.concat(
 		[m |
@@ -485,7 +485,7 @@ _walk_root_msgs(check, subj) := _once(array.concat(
 			some m in array.concat(_m_cond_root_texts(subj, c), _m_walked_root_texts(c))
 		],
 	),
-))
+)))
 
 _m_cond_walked_texts(c) := [t |
 	walk(c, [_, x])

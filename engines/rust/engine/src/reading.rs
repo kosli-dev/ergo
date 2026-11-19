@@ -37,6 +37,7 @@ pub struct PartRead {
 pub struct Filter {
     pub text: String,
     pub check: Check,
+    pub owner: String,
 }
 
 #[derive(Debug, Clone)]
@@ -1098,7 +1099,11 @@ impl Reading {
                                     )
                                 };
                                 match lowered {
-                                    Ok(check) => filters.push(Filter { text, check }),
+                                    Ok(check) => filters.push(Filter {
+                                        text,
+                                        check,
+                                        owner: name.to_string(),
+                                    }),
                                     Err(found) => {
                                         found_problems.extend(lower::in_from_line(found));
                                     }
@@ -1117,7 +1122,11 @@ impl Reading {
                                 phrase,
                                 &scope.clone().with_subject(name).for_from_line(),
                             ) {
-                                Ok(check) => filters.push(Filter { text, check }),
+                                Ok(check) => filters.push(Filter {
+                                    text,
+                                    check,
+                                    owner: name.to_string(),
+                                }),
                                 Err(found) => found_problems.extend(lower::in_from_line(found)),
                             },
                         }

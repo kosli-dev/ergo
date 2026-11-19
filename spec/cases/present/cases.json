@@ -8,7 +8,25 @@
         "rules": ["present.pass", "path.inputs", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ],
         "expressions": {"s": {"c": "x exists"}}
       },
@@ -17,7 +35,25 @@
         "rules": ["present.pass"],
         "input": {"things": [{"id": "t1", "x": ""}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "", "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": ""
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -25,7 +61,25 @@
         "rules": ["present.pass"],
         "input": {"things": [{"id": "t1", "x": false}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": false, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": false
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -33,7 +87,25 @@
         "rules": ["present.pass"],
         "input": {"things": [{"id": "t1", "x": 0}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 0, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 0
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -41,7 +113,25 @@
         "rules": ["present.pass"],
         "input": {"things": [{"id": "t1", "x": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [], "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -49,7 +139,25 @@
         "rules": ["present.pass"],
         "input": {"things": [{"id": "t1", "x": {}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {}, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": {}
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -57,7 +165,49 @@
         "rules": ["present.missing", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is missing", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is missing",
+                "name": "x exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -65,7 +215,49 @@
         "rules": ["present.missing", "path.null"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is null", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is null",
+                "name": "x exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "x is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -73,7 +265,49 @@
         "rules": ["present.other", "path.not_an_object"],
         "input": {"things": ["t1"]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "thing is \"t1\", which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "thing is \"t1\", which isn't an object",
+                "name": "x exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "thing is \"t1\", which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -81,7 +315,49 @@
         "rules": ["present.other", "path.not_an_object"],
         "input": {"things": [null]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "c", "message": "thing is null, which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "thing is null, which isn't an object",
+                "name": "x exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "thing is null, which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -95,7 +371,49 @@
         "rules": ["present.missing", "path.absent", "path.inputs"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x.y is missing", "passed": false, "cause": "value", "inputs": [{"name": "x.y", "value": null, "locations": ["/things/0"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x.y is missing",
+                "name": "x.y exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x.y is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -103,7 +421,49 @@
         "rules": ["present.missing", "path.absent"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"requirement": "s", "subject": {"id": "t1", "type": "thing"}, "check": "c", "message": "x is null", "passed": false, "cause": "value", "inputs": [{"locations": ["/things/0/x"], "name": "x.y", "value": null}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x.y",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is null",
+                "name": "x.y exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x.y",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "x is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -111,7 +471,49 @@
         "rules": ["present.other", "path.unusable"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\", which isn't an object", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x.y",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is \"a\", which isn't an object",
+                "name": "x.y exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x.y",
+                "outcome": "unusable",
+                "value": null
+              }
+            ],
+            "message": "x is \"a\", which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -119,7 +521,49 @@
         "rules": ["present.other", "path.unusable"],
         "input": {"things": [{"id": "t1", "x": [{"y": 1}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [{\"y\": 1}], which isn't an object", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x.y",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is [{\"y\": 1}], which isn't an object",
+                "name": "x.y exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x.y",
+                "outcome": "unusable",
+                "value": null
+              }
+            ],
+            "message": "x is [{\"y\": 1}], which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -133,7 +577,25 @@
         "rules": ["present.pass", "path.inputs", "name.index"],
         "input": {"things": [{"id": "t1", "x": ["a", "b"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of x", "value": "b", "locations": ["/things/0/x/1"]}]}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x/1"
+                ],
+                "name": "item 2 of x",
+                "value": "b"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -141,7 +603,49 @@
         "rules": ["present.missing", "path.absent", "name.index"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "item 2 of x is missing", "passed": false, "cause": "value", "inputs": [{"name": "item 2 of x", "value": null, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "item 2 of x",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "item 2 of x is missing",
+                "name": "item 2 of x exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "item 2 of x",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "item 2 of x is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -149,7 +653,49 @@
         "rules": ["present.missing", "path.null", "name.index"],
         "input": {"things": [{"id": "t1", "x": ["a", null]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "item 2 of x is null", "passed": false, "cause": "value", "inputs": [{"name": "item 2 of x", "value": null, "locations": ["/things/0/x/1"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x/1"
+                    ],
+                    "name": "item 2 of x",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "item 2 of x is null",
+                "name": "item 2 of x exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x/1"
+                ],
+                "name": "item 2 of x",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "item 2 of x is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -157,7 +703,49 @@
         "rules": ["present.other", "path.unusable", "name.index"],
         "input": {"things": [{"id": "t1", "x": {"1": "a"}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is {\"1\": \"a\"}, which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "item 2 of x", "value": null, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "item 2 of x",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is {\"1\": \"a\"}, which isn't a list",
+                "name": "item 2 of x exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "item 2 of x",
+                "outcome": "unusable",
+                "value": null
+              }
+            ],
+            "message": "x is {\"1\": \"a\"}, which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -186,8 +774,44 @@
         "rules": ["present.pass", "path.start", "path.ref_step", "path.inputs", "name.ref_step", "path.steps"],
         "input": {"flag": true, "things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "by_ref", "passed": true, "cause": "satisfied", "inputs": [{"name": "x named by $params.key", "value": 1, "locations": ["/things/0/x/a"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "on_input", "passed": true, "cause": "satisfied", "inputs": [{"name": "$input.flag", "value": true, "locations": ["/flag"]}]}
+          {
+            "cause": "satisfied",
+            "check": "by_ref",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x/a"
+                ],
+                "name": "x named by $params.key",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "on_input",
+            "inputs": [
+              {
+                "locations": [
+                  "/flag"
+                ],
+                "name": "$input.flag",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -195,8 +819,92 @@
         "rules": ["present.missing", "path.start", "path.ref_step", "name.ref_step", "path.steps"],
         "input": {"things": [{"id": "t1", "x": {}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "by_ref", "message": "x named by $params.key is missing, and $params.key is \"a\"", "passed": false, "cause": "value", "inputs": [{"name": "x named by $params.key", "value": null, "locations": ["/things/0/x"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "on_input", "message": "$input.flag is missing", "passed": false, "cause": "value", "inputs": [{"name": "$input.flag", "value": null, "locations": [""]}]}
+          {
+            "cause": "value",
+            "check": "by_ref",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x named by $params.key",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/by_ref"
+                ],
+                "message": "x named by $params.key is missing, and $params.key is \"a\"",
+                "name": "x named by $params.key exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x named by $params.key",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x named by $params.key is missing, and $params.key is \"a\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "on_input",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.flag",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/on_input"
+                ],
+                "message": "$input.flag is missing",
+                "name": "$input.flag exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.flag",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "$input.flag is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -211,7 +919,59 @@
         "rules": ["present.other", "path.ref_step", "path.inputs", "name.ref_step"],
         "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.key is [\"a\"], which isn't text", "passed": false, "cause": "unusable", "inputs": [{"name": "x named by $params.key", "value": null, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x named by $params.key",
+                    "outcome": "unusable",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/key"
+                    ],
+                    "name": "$params.key",
+                    "outcome": "unusable",
+                    "value": [
+                      "a"
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.key is [\"a\"], which isn't text",
+                "name": "x named by $params.key exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x named by $params.key",
+                "outcome": "unusable",
+                "value": null
+              }
+            ],
+            "message": "$params.key is [\"a\"], which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -226,7 +986,57 @@
         "rules": ["present.other", "path.ref_step", "path.inputs", "name.ref_step"],
         "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.key is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x named by $params.key", "value": null, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x named by $params.key",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.key",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.key is missing",
+                "name": "x named by $params.key exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x named by $params.key",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "$params.key is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -257,7 +1067,69 @@
         "status": {"s": "not_applicable"},
         "compliant": true,
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "message": "status is missing", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null, "locations": ["/things/0"]}], "failed_assertions": [{"assertion": "status is \"COMPLETE\"", "cause": "absent"}, {"assertion": "status exists", "cause": "value"}]}
+          {
+            "cause": "value",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "status",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/thing/from#1"
+                ],
+                "message": "status is missing",
+                "name": "status is \"COMPLETE\""
+              },
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "status",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/thing/from#2"
+                ],
+                "message": "status is missing",
+                "name": "status exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "status",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "status is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -267,7 +1139,69 @@
         "status": {"s": "not_applicable"},
         "compliant": true,
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "message": "status is null", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null, "locations": ["/things/0/status"]}], "failed_assertions": [{"assertion": "status is \"COMPLETE\"", "cause": "null"}, {"assertion": "status exists", "cause": "value"}]}
+          {
+            "cause": "value",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/status"
+                    ],
+                    "name": "status",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/thing/from#1"
+                ],
+                "message": "status is null",
+                "name": "status is \"COMPLETE\""
+              },
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/status"
+                    ],
+                    "name": "status",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/thing/from#2"
+                ],
+                "message": "status is null",
+                "name": "status exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/status"
+                ],
+                "name": "status",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "status is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -277,8 +1211,44 @@
         "status": {"s": "met"},
         "compliant": true,
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "status", "value": "COMPLETE", "locations": ["/things/0/status"]}], "failed_assertions": []},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/status"
+                ],
+                "name": "status",
+                "value": "COMPLETE"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -309,7 +1279,49 @@
         "status": {"s": "not_met"},
         "compliant": false,
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "message": "build is \"abc\", which isn't an object", "passed": false, "cause": "unusable", "inputs": [{"name": "build.fingerprint", "value": null, "locations": ["/things/0/build"]}]}
+          {
+            "cause": "unusable",
+            "check": "$applies",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/build"
+                    ],
+                    "name": "build.fingerprint",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/subjects/thing/from"
+                ],
+                "message": "build is \"abc\", which isn't an object",
+                "name": "build.fingerprint exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/build"
+                ],
+                "name": "build.fingerprint",
+                "outcome": "unusable",
+                "value": null
+              }
+            ],
+            "message": "build is \"abc\", which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -324,7 +1336,49 @@
         "rules": ["present.no_params", "path.start", "path.inputs", "path.steps"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.flag is missing", "passed": false, "cause": "absent", "inputs": [{"name": "$params.flag", "value": null, "locations": ["$params:"]}]}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.flag",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.flag is missing",
+                "name": "$params.flag exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.flag",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "$params.flag is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -339,7 +1393,49 @@
         "rules": ["present.missing", "present.no_params", "path.inputs", "path.steps"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.flag is missing", "passed": false, "cause": "value", "inputs": [{"name": "$params.flag", "value": null, "locations": ["$params:"]}]}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.flag",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.flag is missing",
+                "name": "$params.flag exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.flag",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "$params.flag is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -353,9 +1449,111 @@
         "rules": ["location", "location.start", "location.one", "location.read"],
         "input": {"things": [{"id": "t1", "x": 1}, {"id": "t2"}, {"id": "t3", "x": null}]},
         "results": [
-          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/1"], "name": "x", "value": null}], "message": "x is missing", "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
-          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/2/x"], "name": "x", "value": null}], "message": "x is null", "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}}
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/1"
+                    ],
+                    "name": "x",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is missing",
+                "name": "x exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/1"
+                ],
+                "name": "x",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/2/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is null",
+                "name": "x exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/2/x"
+                ],
+                "name": "x",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "x is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t3",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -369,7 +1567,49 @@
         "rules": ["location.read", "location.one"],
         "input": {"things": [{"id": "t1", "x": "text"}]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y", "value": null}], "message": "x is \"text\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x.y",
+                    "outcome": "unusable",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is \"text\", which isn't an object",
+                "name": "x.y exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x.y",
+                "outcome": "unusable",
+                "value": null
+              }
+            ],
+            "message": "x is \"text\", which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -377,7 +1617,49 @@
         "rules": ["location.read", "location.one"],
         "input": {"things": [{"id": "t1", "x": {"z": 1}}]},
         "results": [
-          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y", "value": null}], "message": "x.y is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x.y",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x.y is missing",
+                "name": "x.y exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x.y",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x.y is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -385,7 +1667,49 @@
         "rules": ["location.read", "location.one"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y", "value": null}], "message": "x is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x.y",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x is null",
+                "name": "x.y exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x.y",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "x is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -393,7 +1717,49 @@
         "rules": ["location.read", "location.one"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y", "value": null}], "message": "x.y is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {
+            "cause": "value",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x.y is missing",
+                "name": "x.y exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x.y is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -407,8 +1773,68 @@
         "rules": ["location.read", "location.start"],
         "input": {"things": ["text", {"id": "t2", "x": 1}]},
         "results": [
-          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "message": "thing is \"text\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "text", "type": "thing"}},
-          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/1/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t2", "type": "thing"}}
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "not_an_object",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "thing is \"text\", which isn't an object",
+                "name": "x exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "thing is \"text\", which isn't an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "text",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/1/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -422,7 +1848,65 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is missing; x.y is missing",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "$params.i is missing; x.y is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -430,7 +1914,65 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "x is null; $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is missing; x is null",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "$params.i is missing; x is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -438,7 +1980,59 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [[1]]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is missing",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "$params.i is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": [
+                1
+              ],
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -446,7 +2040,57 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": ["s"]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is missing",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "$params.i is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "s",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -454,7 +2098,57 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [null]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is missing",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "$params.i is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -469,7 +2163,65 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {
+            "cause": "absent",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "x.y is missing; $params.i is null",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "absent",
+                "value": null
+              }
+            ],
+            "message": "x.y is missing; $params.i is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -477,7 +2229,65 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "x is null; $params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "null",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is null; x is null",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "$params.i is null; x is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -485,7 +2295,59 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [[1]]},
         "results": [
-          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is null",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "$params.i is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": [
+                1
+              ],
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -493,7 +2355,57 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": ["s"]},
         "results": [
-          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is null",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "$params.i is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "s",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -501,7 +2413,57 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [null]},
         "results": [
-          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+          {
+            "cause": "null",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is null",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "$params.i is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
         ]
       }
     ]
@@ -516,7 +2478,67 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "unusable",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "unusable",
+                    "value": [
+                      1
+                    ]
+                  },
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is [1], which isn't text; x.y is missing",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "unusable",
+                "value": null
+              }
+            ],
+            "message": "$params.i is [1], which isn't text; x.y is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -524,7 +2546,67 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "x is null; $params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "unusable",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "unusable",
+                    "value": [
+                      1
+                    ]
+                  },
+                  {
+                    "locations": [
+                      "/things/0/x"
+                    ],
+                    "name": "x",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is [1], which isn't text; x is null",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "unusable",
+                "value": null
+              }
+            ],
+            "message": "$params.i is [1], which isn't text; x is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -532,7 +2614,61 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [[1]]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "unusable",
+                    "value": [
+                      1
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is [1], which isn't text",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "$params.i is [1], which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": [
+                1
+              ],
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -540,7 +2676,59 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": ["s"]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "unusable",
+                    "value": [
+                      1
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is [1], which isn't text",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "$params.i is [1], which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "s",
+              "type": "thing"
+            }
+          }
         ]
       },
       {
@@ -548,7 +2736,59 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [null]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0"
+                    ],
+                    "name": "x.y named by $params.i",
+                    "outcome": "not_an_object",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/i"
+                    ],
+                    "name": "$params.i",
+                    "outcome": "unusable",
+                    "value": [
+                      1
+                    ]
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/c"
+                ],
+                "message": "$params.i is [1], which isn't text",
+                "name": "x.y named by $params.i exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "x.y named by $params.i",
+                "outcome": "not_an_object",
+                "value": null
+              }
+            ],
+            "message": "$params.i is [1], which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
         ]
       }
     ]

@@ -289,7 +289,7 @@ _anchored_line_inputs(l, at) := {"inputs": _anchored_inputs(l.inputs, at)} if "i
 
 else := {}
 
-_anchored_line_items(l, at) := {"items": [object.union(x, {"inputs": _anchored_inputs(x.inputs, at)}) | some x in l.items]} if "items" in object.keys(l)
+_anchored_line_items(l, at) := {"items": [object.union(_anchored_all([x], at)[0], {"inputs": _anchored_inputs(x.inputs, at)}) | some x in l.items]} if "items" in object.keys(l)
 
 else := {}
 
@@ -315,16 +315,16 @@ _entry_anchor(entry) := entry.at if object.get(entry, "ats", null) == null
 
 else := entry.ats
 
-_subject_rows(entry, ref, req, req_name, flaws, prepared) := [row |
+_subject_rows(entry, ref, req, req_name, fixed) := [row |
 	anchor := _entry_anchor(entry)
-	some check_name in _names(prepared)
+	some check_name in _names(fixed.prepared)
 	row := object.union(
 		{
 			"requirement": req_name,
 			"subject": ref,
 			"check": check_name,
 		},
-		_anchored(_outcome(req, prepared[check_name], flaws[check_name], entry.subject), anchor),
+		_parted_in(_anchored(_outcome(req, fixed.prepared[check_name], fixed.check_flaws[check_name], entry.subject), anchor), anchor, fixed.wheres[check_name]),
 	)
 ]
 
@@ -386,7 +386,7 @@ _min_subjects_cause(doc, req, matching) := _verdict_cause(_enough_subjects(doc, 
 
 _min_subjects_cause(doc, req, _) := _target_cause(doc, req)
 
-_min_subjects_cause(_, req, _) := _from_cause(req) if {
+_min_subjects_cause(doc, req, _) := _from_cause(doc, req) if {
 	_from_well_formed(req)
 	_from_unreadable(req)
 }
@@ -431,18 +431,20 @@ _repeats(sorted) := {x |
 	x[0] == sorted[i - 1][0]
 }
 
-_applies_rows(raw, refs, evals, req, req_name) := [row |
+_applies_rows(raw, refs, evals, req, req_name, conds) := [row |
 	some i, entry in raw
-	row := _applies_row(refs[i], entry, evals[i], req, req_name)
+	row := _applies_row(refs[i], entry, evals[i], req, req_name, conds)
 ] if {
 	_size(_applies_to_of(req)) > 0
 }
 
-_applies_rows(_, _, _, req, _) := [] if {
+_applies_rows(_, _, _, req, _, _) := [] if {
 	_size(_applies_to_of(req)) == 0
 }
 
-_applies_row(ref, entry, evals, req, req_name) := object.union(
+_applies_row(ref, entry, evals, req, req_name, conds) := _parted_applies_in(_applies_raw_row(ref, entry, evals, req, req_name), _entry_anchor(entry), evals, req, conds)
+
+_applies_raw_row(ref, entry, evals, req, req_name) := object.union(
 	{
 		"requirement": req_name,
 		"subject": ref,

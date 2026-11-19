@@ -78,6 +78,7 @@ fn a_walk_without_a_flawed_check_is_not_flawed_and_one_inside_an_any_of_is_asked
         &["xs"],
         vec![Check::AnyOf(crate::ops::any_of::AnyOf {
             names: Vec::new(),
+            texts: Vec::new(),
             options: vec![vec![Check::Walk(Box::new(inner))]],
         })],
         equals(json!(1)),

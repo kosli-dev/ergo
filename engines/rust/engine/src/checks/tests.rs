@@ -114,9 +114,9 @@ fn refs_are_read_once_from_the_params_and_the_input_and_sorted_by_name() {
     assert_eq!(
         found,
         [
-            json!({"name": "$input.i", "value": "z", "locations": ["/i"]}),
-            json!({"name": "$params.a", "value": 1, "locations": ["$params:/a"]}),
-            json!({"name": "$params.b", "value": [2], "locations": ["$params:/b"]}),
+            json!({"name": "$input.i", "value": "z", "locations": ["/i"], "outcome": "unusable"}),
+            json!({"name": "$params.a", "value": 1, "locations": ["$params:/a"], "outcome": "unusable"}),
+            json!({"name": "$params.b", "value": [2], "locations": ["$params:/b"], "outcome": "usable"}),
         ]
     );
 }
@@ -133,7 +133,9 @@ fn a_ref_that_cannot_be_read_shows_null_where_the_read_stopped() {
     };
     assert_eq!(
         refs_of(&plan, &json!({}), None),
-        [json!({"name": "$params.k", "value": null, "locations": ["$params:"]})]
+        [
+            json!({"name": "$params.k", "value": null, "locations": ["$params:"], "outcome": "absent"})
+        ]
     );
     let params = json!({});
     assert_eq!(
@@ -607,4 +609,53 @@ fn an_any_of_with_a_bad_option_next_to_a_field_no_check_has_keeps_its_problems()
 fn a_for_next_to_an_any_of_keeps_the_problems_of_the_options() {
     let read = one(json!({"c": {"for": "every ts as t", "any_of": {"a": "nonsense words"}}}));
     assert!(has_problem(&read, "option a: doesn't parse"));
+}
+
+fn ctx_of<'a>(subject: &'a Value, params: &'a Value) -> crate::path::Ctx<'a> {
+    crate::path::Ctx {
+        label: None,
+        item_by_item: true,
+        in_option: false,
+        subject: crate::path::Located {
+            value: subject,
+            location: crate::path::Location::input_root(),
+        },
+        input: subject,
+        params: Some(params),
+        aliases: BTreeMap::new(),
+    }
+}
+
+fn param(key: &str) -> Path {
+    Path {
+        start: crate::path::Start::Params,
+        steps: vec![crate::path::Step::Key(key.to_string())],
+    }
+}
+
+fn first_check(read: CheckRead) -> Check {
+    read.plan.unwrap().items.remove(0).check
+}
+
+#[test]
+fn a_param_a_for_line_sentence_compares_as_a_number_is_unfit_when_it_holds_text() {
+    let check = first_check(one(
+        json!({"c": {"for": "every xs as m", "assert": "m.v is at least $params.q"}}),
+    ));
+    let subject = json!({"xs": [{"v": 1}]});
+    let params = json!({"q": "s"});
+    let ctx = ctx_of(&subject, &params);
+    assert!(ref_unfit(&[&check], &param("q"), &json!("s"), &ctx));
+    assert!(!ref_unfit(&[&check], &param("q"), &json!(2), &ctx));
+}
+
+#[test]
+fn a_param_a_for_line_sentence_looks_in_is_unfit_when_it_isnt_a_list() {
+    let check = first_check(one(
+        json!({"c": {"for": "every xs as m", "assert": "m.v is in $params.q"}}),
+    ));
+    let subject = json!({"xs": [{"v": 1}]});
+    let params = json!({"q": "s"});
+    let ctx = ctx_of(&subject, &params);
+    assert!(ref_unfit(&[&check], &param("q"), &json!("s"), &ctx));
 }

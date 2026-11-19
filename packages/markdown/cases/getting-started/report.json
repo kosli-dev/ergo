@@ -154,12 +154,35 @@
     {
       "cause": "value",
       "check": "$applies",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/deployments/2/environment"
+              ],
+              "name": "environment",
+              "outcome": "usable",
+              "value": "staging"
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/subjects/deployment/from"
+          ],
+          "message": "environment is \"staging\"",
+          "name": "environment is \"prod\""
+        }
+      ],
       "inputs": [
         {
           "locations": [
             "/deployments/2/environment"
           ],
           "name": "environment",
+          "outcome": "usable",
           "value": "staging"
         }
       ],
@@ -193,12 +216,35 @@
     {
       "cause": "absent",
       "check": "approved",
+      "failures": [
+        {
+          "cause": "absent",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/deployments/1"
+              ],
+              "name": "approved_by",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/prod_deploy/checks/approved/assert"
+          ],
+          "message": "approved_by is missing",
+          "name": "approved_by is a non-empty string"
+        }
+      ],
       "inputs": [
         {
           "locations": [
             "/deployments/1"
           ],
           "name": "approved_by",
+          "outcome": "absent",
           "value": null
         }
       ],

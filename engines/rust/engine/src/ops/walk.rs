@@ -82,6 +82,7 @@ pub struct Failure {
     pub location: Option<Location>,
     pub copies: Vec<String>,
     pub msg: String,
+    pub seen: Option<(Value, Location)>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -130,6 +131,19 @@ impl Failure {
             "value": self.value,
             "locations": locations,
         })
+    }
+
+    /// The failed item as `to_json` gives it, with what the row's `failures`
+    /// also need: its text, and the item it sits in.
+    pub fn to_rich_json(&self) -> Value {
+        let mut entry = self.to_json();
+        entry["ergo/text"] = json!(self.msg);
+        if let Some((value, location)) = &self.seen {
+            let mut places = vec![location.render()];
+            places.extend(self.copies.iter().cloned());
+            entry["ergo/item"] = json!({"value": value, "locations": places});
+        }
+        entry
     }
 }
 
@@ -606,6 +620,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
             value: raw.value,
             location: Some(raw.location),
             copies: Vec::new(),
+            seen: None,
         })
         .collect();
     failures.sort_by(|a, b| a.order.cmp(&b.order));
@@ -617,6 +632,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
 pub struct Run {
     pub verdict: Verdict,
     pub failed_items: Vec<Value>,
+    pub rich: Vec<Value>,
     pub message: Option<String>,
     pub parts: Vec<String>,
 }
@@ -1108,9 +1124,45 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     value: Value::Null,
                     location: Some(item.end_location.clone()),
                     copies: Vec::new(),
+                    seen: Some((item.item.value.clone(), item.item.location.clone())),
                 })
+            } else if let Some((check, _, _)) = undecided
+                && !super::key_base::missing_keys(check, ctx).is_empty()
+                && !matches!(
+                    check
+                        .paths()
+                        .into_iter()
+                        .find_map(|p| super::key_base::of_path(p, false, &focus)),
+                    Some(super::key_base::KeyBase {
+                        base: Some((_, Cause::Unusable, _)),
+                        ..
+                    })
+                )
+            {
+                return Judged {
+                    kept: false,
+                    passed: false,
+                    decided: true,
+                    failure: None,
+                };
             } else if let Some((check, verdict, _)) = undecided {
                 let at = &focus;
+                let keyed_base = (!super::key_base::missing_keys(check, ctx).is_empty())
+                    .then(|| {
+                        check
+                            .paths()
+                            .into_iter()
+                            .find_map(|p| super::key_base::of_path(p, false, at))
+                    })
+                    .flatten()
+                    .and_then(|kb| kb.base);
+                let verdict = &match &keyed_base {
+                    Some((_, cause, _)) => Verdict {
+                        cause: *cause,
+                        inputs: verdict.inputs.clone(),
+                    },
+                    None => verdict.clone(),
+                };
                 let item_segs = focus_segs(item, check);
                 let named = named_side(check, at);
                 let (steps, outside): (Vec<Step>, bool) = match &named {
@@ -1145,7 +1197,9 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 let walked_root = super::lists::field_walk_fault(check, at)
                     .filter(|(cause, _)| *cause == verdict.cause)
                     .map(|(_, text)| text);
-                let said = if let Some(fault) = message::root_fault(check, ctx, verdict.cause) {
+                let said = if let Some((text, _, _)) = &keyed_base {
+                    message::prefixed(&walked.item_name(item_segs), text)
+                } else if let Some(fault) = message::root_fault(check, ctx, verdict.cause) {
                     fault
                 } else if let Some(text) = walked_root {
                     text
@@ -1171,6 +1225,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                         .unwrap_or(Value::Null),
                     location: read.and_then(|r| r.location),
                     copies: Vec::new(),
+                    seen: Some((item.item.value.clone(), item.item.location.clone())),
                 })
             } else if kept && !passed {
                 let off = message::off_item(&leaf_check, ctx, leaf.cause);
@@ -1200,6 +1255,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     value: item.shown(),
                     location: Some(item.end_location.clone()),
                     copies: Vec::new(),
+                    seen: Some((item.item.value.clone(), item.item.location.clone())),
                 })
             } else {
                 None
@@ -1244,6 +1300,22 @@ fn with_fields(inputs: &mut Vec<Input>, list: &str, path: &Path, ctx: &Ctx) {
     }
 }
 
+/// How reading a walked list ended, from the failure that names the list
+/// itself when it has no items.
+pub fn list_state(walked: &Walked) -> crate::path::Outcome {
+    walked
+        .failures
+        .iter()
+        .find(|f| walked.items.is_empty() && !f.item.starts_with("item "))
+        .map_or(crate::path::Outcome::Found, |f| match f.cause {
+            Cause::Absent => crate::path::Outcome::Absent,
+            Cause::Null => crate::path::Outcome::Null,
+            Cause::Unusable => crate::path::Outcome::Unusable,
+            Cause::NotAnObject => crate::path::Outcome::NotAnObject,
+            _ => crate::path::Outcome::Found,
+        })
+}
+
 fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     let outer = outer(ctx);
     let walked = self::walk(
@@ -1261,23 +1333,47 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             value: json!([]),
             locations: Vec::new(),
             part: None,
-            state: crate::path::Outcome::Found,
+            state: outcome,
             null_at: None,
+            worked: false,
         }];
         inputs.extend(outside);
         inputs.sort_by(|a, b| a.name.cmp(&b.name));
         inputs.dedup();
         with_fields(&mut inputs, &walked.name, &walk.path, ctx);
-        let cause = outcome.cause().unwrap_or(Cause::Unusable);
+        let mut cause = outcome.cause().unwrap_or(Cause::Unusable);
         let parts: Vec<String> = if walked.failures.is_empty() {
+            let keyed = super::key_base::of_path(&walk.path, true, &outer).is_some();
             let said = match cause {
                 Cause::Absent => Some(format!("{} is missing", walked.name)),
                 Cause::Null => Some(format!("{} is null", walked.name)),
+                _ if keyed => Some(String::new()),
                 _ => None,
             };
             match said {
                 Some(said) => {
-                    let mut parts = vec![said];
+                    let mut parts = match super::key_base::of_path(&walk.path, true, &outer) {
+                        Some(kb) => {
+                            let mut found = vec![kb.key.clone()];
+                            if let Some((text, base_cause, _)) = &kb.base {
+                                found.push(text.clone());
+                                cause = Cause::worst([cause, *base_cause]).unwrap_or(cause);
+                                if let Some(first) =
+                                    inputs.iter_mut().find(|i| i.name == walked.name)
+                                    && let Some(state) =
+                                        super::key_base::worse_state(first.state, *base_cause)
+                                {
+                                    first.state = state;
+                                }
+                            } else if !walk.if_any
+                                && let Some(text) = super::key_base::empty_base(&walk.path, &outer)
+                            {
+                                found.push(text);
+                            }
+                            found
+                        }
+                        None => vec![said],
+                    };
                     for root_cause in [Cause::Absent, Cause::Null, Cause::Unusable] {
                         if let Some(text) = root_alone(&walk.check, &outer, root_cause)
                             && !parts.contains(&text)
@@ -1295,6 +1391,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         return Run {
             verdict: Verdict { cause, inputs },
             failed_items: walked.failures.iter().map(Failure::to_json).collect(),
+            rich: walked.failures.iter().map(Failure::to_rich_json).collect(),
             message: Some(message::joined(parts.clone())),
             parts,
         };
@@ -1309,6 +1406,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     fails.extend(judged.iter().filter_map(|j| j.failure.as_ref()));
     let cause = cause_of(walk, &walked, &judged, &fails);
     let mut sorted_msgs: Vec<String> = Vec::new();
+    let rich: Vec<Value> = fails.iter().map(|f| f.to_rich_json()).collect();
     let failed_items = if cause == Cause::Satisfied {
         Vec::new()
     } else {
@@ -1327,8 +1425,9 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             .map(|item| item.end_location.render())
             .collect(),
         part: tag,
-        state: crate::path::Outcome::Found,
+        state: list_state(&walked),
         null_at: None,
+        worked: false,
     }];
     inputs.extend(outside);
     inputs.sort_by(|a, b| a.name.cmp(&b.name));
@@ -1344,6 +1443,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     Run {
         verdict: Verdict { cause, inputs },
         failed_items,
+        rich,
         message: (!parts.is_empty()).then(|| message::joined(parts.clone())),
         parts,
     }
@@ -1376,7 +1476,41 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
         let whose: Vec<&Check> = walk.whose.iter().collect();
         row.message = message::walked_roots_ahead(row.message.take(), &whose, &outer_ctx, &[]);
     }
+    whose_keys_first(walk, ctx, &mut row);
     row
+}
+
+fn whose_keys_first(walk: &Walk, ctx: &Ctx, row: &mut Run) {
+    let outer_ctx = outer(ctx);
+    let keys: Vec<(Cause, String)> = walk
+        .whose
+        .iter()
+        .flat_map(|check| super::key_base::missing_keys(check, &outer_ctx))
+        .collect();
+    if keys.is_empty()
+        || row.verdict.cause == Cause::Unusable && row.failed_items.is_empty()
+        || walk
+            .whose
+            .iter()
+            .any(|check| !super::key_base::unusable_keys(check, &outer_ctx).is_empty())
+    {
+        return;
+    }
+    let said = row.message.clone().unwrap_or_default();
+    let mut parts: Vec<String> = keys.iter().map(|(_, text)| text.clone()).collect();
+    parts.extend(
+        said.split("; ")
+            .filter(|p| !p.is_empty() && !keys.iter().any(|(_, t)| t == p))
+            .map(str::to_string),
+    );
+    let failed = row.verdict.cause.is_failure();
+    row.verdict.cause = Cause::worst(
+        keys.iter()
+            .map(|(cause, _)| *cause)
+            .chain(failed.then_some(row.verdict.cause)),
+    )
+    .unwrap_or(row.verdict.cause);
+    row.message = Some(message::joined(parts));
 }
 
 fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
@@ -1388,6 +1522,7 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
                 inputs: Vec::new(),
             },
             failed_items: Vec::new(),
+            rich: Vec::new(),
             message: Some(message::isnt(
                 ctx.subject_label(),
                 ctx.subject.value,

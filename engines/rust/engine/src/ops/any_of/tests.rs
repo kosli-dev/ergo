@@ -42,6 +42,7 @@ fn verdict(options: Vec<Vec<Check>>, subject: Value) -> Verdict {
     run(
         &AnyOf {
             names: Vec::new(),
+            texts: Vec::new(),
             options,
         },
         &ctx,
@@ -98,6 +99,7 @@ fn every_path_any_option_reads_is_listed_once_sorted_by_name() {
 fn it_has_no_left_path_of_its_own_and_gives_the_paths_of_all_its_checks() {
     let check = Check::AnyOf(AnyOf {
         names: Vec::new(),
+        texts: Vec::new(),
         options: vec![vec![exists("x")], vec![is("y", json!(1))]],
     });
     assert!(check.left_path().is_none());

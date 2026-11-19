@@ -186,17 +186,63 @@ With this input:
 the `$applies` rows keep `d-1` and leave `d-2` out:
 
 ```json
-{"check": "$applies", "subject": {"id": "d-1", "type": "emergency change"}, "passed": true, "cause": "satisfied",
- "inputs": [{"name": "change_type", "value": "emergency", "locations": ["/deployments/0/change_type"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/0/environment"]}], "failed_assertions": []}
-{"check": "$applies", "subject": {"id": "d-2", "type": "emergency change"}, "passed": false, "cause": "value", "message": "change_type is \"standard\"",
- "inputs": [{"name": "change_type", "value": "standard", "locations": ["/deployments/1/change_type"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/1/environment"]}],
- "failed_assertions": [{"assertion": "change_type is \"emergency\"", "cause": "value"}]}
-{"check": "$applies", "subject": {"id": "d-3", "type": "emergency change"}, "passed": false, "cause": "absent", "message": "change_type is missing",
- "inputs": [{"name": "change_type", "value": null, "locations": ["/deployments/2"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/2/environment"]}],
- "failed_assertions": [{"assertion": "change_type is \"emergency\"", "cause": "absent"}]}
+{
+  "cause": "satisfied",
+  "check": "$applies",
+  "inputs": [
+    {"locations": ["/deployments/0/change_type"], "name": "change_type", "value": "emergency"},
+    {"locations": ["/deployments/0/environment"], "name": "environment", "value": "prod"}
+  ],
+  "passed": true,
+  "subject": {"id": "d-1", "type": "emergency change"}
+}
+{
+  "cause": "value",
+  "check": "$applies",
+  "failures": [
+    {
+      "cause": "value",
+      "failures": [],
+      "inputs": [{"locations": ["/deployments/1/change_type"], "name": "change_type", "outcome": "usable", "value": "standard"}],
+      "kind": "assertion",
+      "locations": ["$policy:/subjects/emergency change/from#2"],
+      "message": "change_type is \"standard\"",
+      "name": "change_type is \"emergency\""
+    }
+  ],
+  "inputs": [
+    {"locations": ["/deployments/1/change_type"], "name": "change_type", "outcome": "usable", "value": "standard"},
+    {"locations": ["/deployments/1/environment"], "name": "environment", "outcome": "usable", "value": "prod"}
+  ],
+  "message": "change_type is \"standard\"",
+  "passed": false,
+  "subject": {"id": "d-2", "type": "emergency change"}
+}
+{
+  "cause": "absent",
+  "check": "$applies",
+  "failures": [
+    {
+      "cause": "absent",
+      "failures": [],
+      "inputs": [{"locations": ["/deployments/2"], "name": "change_type", "outcome": "absent", "value": null}],
+      "kind": "assertion",
+      "locations": ["$policy:/subjects/emergency change/from#2"],
+      "message": "change_type is missing",
+      "name": "change_type is \"emergency\""
+    }
+  ],
+  "inputs": [
+    {"locations": ["/deployments/2"], "name": "change_type", "outcome": "absent", "value": null},
+    {"locations": ["/deployments/2/environment"], "name": "environment", "outcome": "usable", "value": "prod"}
+  ],
+  "message": "change_type is missing",
+  "passed": false,
+  "subject": {"id": "d-3", "type": "emergency change"}
+}
 ```
 
-and the `$applies` entry's `expression` is the conditions as written, `environment is "prod" and change_type is "emergency"`. With several conditions, each row has `failed_assertions`, the conditions that failed in the order written and `[]` when none did, as a check written as several sentences has. `d-3` has no `change_type`, so Ergo can't tell whether it's an emergency change, and `approved` isn't met. `artifact` has no `from`, so it reads the input field `artifact`, and `signed` is met.
+and the `$applies` entry's `expression` is the conditions as written, `environment is "prod" and change_type is "emergency"`. A row that failed has `failures`, with an `assertion` entry for each condition that failed, in the order written, and its `locations` in the policy: `#2` is the second condition of the `from` line. The rows above leave out `requirement`, and the row that passed has no `failures`. `d-3` has no `change_type`, so Ergo can't tell whether it's an emergency change, and `approved` isn't met. `artifact` has no `from`, so it reads the input field `artifact`, and `signed` is met.
 
 - `named by $params.name` picks one key: `from: trail.artifacts named by $params.artifact_name`. When the param is missing, `null` or not a string, there are no subjects and `$min_subjects` fails as `absent`, `null` or `unusable`, also with `every` in front of the line. A number is not a key and never reads an item of a list, so `x named by $params.k` with `{"k": 1}` fails as `unusable`.
 - `named by each of $params.kinds` makes each key in the list a subject: `from: build.test_runs named by each of $params.kinds`. Each key is a subject, even one the object doesn't have, and the key is its id, so an `identified_by` on that subject is written wrong, with `not allowed with named by each of: the key is the id`. When the object itself is missing, `null` or not an object, a list included, each key is still a subject, but `$min_subjects` fails as `absent`, `null` or `unusable`, so the requirement is never met. A child subject whose parent isn't an object makes no subject of its keys, because nothing below that parent is read: its `$min_subjects` fails as `not_an_object`. When the list is missing, isn't a list, or holds anything but strings, there are no subjects and `$min_subjects` fails as `absent`, `null` or `unusable`. The list is read from `$params` or `$input`. A path that starts anywhere else, like `t.keys`, `keys` or `.keys`, is written wrong, with `named by each of takes a list from $params or $input, so it can't start at a field or a subject`, so a parent can't list the keys of its children and nothing is read from that path. A ref before `named by each of`, like `$params.env` in `scans named by $params.env named by each of $params.kinds`, is read first: when it's missing, `null` or not a string, `$min_subjects` fails as `absent`, `null` or `unusable`, whatever the list holds. Whether each key is still a subject then is [an open question](spec/OPEN.md#where-both-engines-differ-from-a-rule).
@@ -264,17 +310,74 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   ]}
   ```
 
-  the `$applies` rows keep `1.4.0`, which changes a file outside `docs/`, and leave the other two out. They read, and list as `failed_items`, what the same sentence does as a check:
+  the `$applies` rows keep `1.4.0`, which changes a file outside `docs/`, and leave the other two out. They read, and list in `failures`, what the same sentence does as a check:
 
   ```json
-  {"check": "$applies", "subject": {"id": "1.4.0", "type": "release"}, "passed": true, "cause": "satisfied",
-   "inputs": [{"name": "files[].path", "value": ["docs/upgrade.md", "src/api.go"], "locations": ["/releases/0/files/0/path", "/releases/0/files/1/path"]}], "failed_items": []}
-  {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value", "message": "item 1 of files: path is \"docs/upgrade.md\"",
-   "inputs": [{"name": "files[].path", "value": ["docs/upgrade.md"], "locations": ["/releases/1/files/0/path"]}],
-   "failed_items": [{"path": "files[0].path", "item": "item 1 of files", "cause": "value", "value": "docs/upgrade.md", "locations": ["/releases/1/files/0/path"]}]}
-  {"check": "$applies", "subject": {"id": "1.4.2", "type": "release"}, "passed": false, "cause": "value", "message": "files is []",
-   "inputs": [{"name": "files[].path", "value": [], "locations": []}],
-   "failed_items": [{"path": "files", "item": "files", "cause": "value", "value": [], "locations": ["/releases/2/files"]}]}
+  {
+    "cause": "satisfied",
+    "check": "$applies",
+    "inputs": [{"locations": ["/releases/0/files/0/path", "/releases/0/files/1/path"], "name": "files[].path", "value": ["docs/upgrade.md", "src/api.go"]}],
+    "passed": true,
+    "subject": {"id": "1.4.0", "type": "release"}
+  }
+  {
+    "cause": "value",
+    "check": "$applies",
+    "failures": [
+      {
+        "cause": "value",
+        "failures": [
+          {
+            "cause": "value",
+            "failures": [],
+            "inputs": [{"locations": ["/releases/1/files/0/path"], "name": "files[0].path", "outcome": "usable", "value": "docs/upgrade.md"}],
+            "kind": "item",
+            "locations": ["/releases/1/files/0"],
+            "message": "path is \"docs/upgrade.md\"",
+            "name": "item 1 of files",
+            "value": {"path": "docs/upgrade.md"}
+          }
+        ],
+        "inputs": [],
+        "kind": "assertion",
+        "locations": ["$policy:/subjects/release/from"],
+        "message": "",
+        "name": "some files.path does not match \"^docs/\""
+      }
+    ],
+    "inputs": [{"locations": ["/releases/1/files/0/path"], "name": "files[].path", "outcome": "usable", "value": ["docs/upgrade.md"]}],
+    "message": "item 1 of files: path is \"docs/upgrade.md\"",
+    "passed": false,
+    "subject": {"id": "1.4.1", "type": "release"}
+  }
+  {
+    "cause": "value",
+    "check": "$applies",
+    "failures": [
+      {
+        "cause": "value",
+        "failures": [
+          {
+            "cause": "value",
+            "failures": [],
+            "inputs": [{"locations": ["/releases/2/files"], "name": "files", "outcome": "usable", "value": []}],
+            "kind": "list",
+            "message": "files is []",
+            "name": "files"
+          }
+        ],
+        "inputs": [],
+        "kind": "assertion",
+        "locations": ["$policy:/subjects/release/from"],
+        "message": "",
+        "name": "some files.path does not match \"^docs/\""
+      }
+    ],
+    "inputs": [{"locations": [], "name": "files[].path", "outcome": "usable", "value": []}],
+    "message": "files is []",
+    "passed": false,
+    "subject": {"id": "1.4.2", "type": "release"}
+  }
   ```
 
   A release with no `files` field at all isn't out of scope: Ergo can't tell, so the row fails as `absent` (`null` and `unusable` for a `null` or a wrong type), with the input `{"name": "files.path", "value": [], "locations": []}`, and the requirement isn't met. `every files.path matches "^docs/"` keeps the releases that only change documentation, and `every files.path, if any, matches "^docs/"` keeps the ones with no files too. `some` takes no `, if any,`. A bare name after `some` or `every` is the item's, and a parent subject's name on the right is the parent. The condition can't have a `whose` of its own, and a `whose` in a check or on a `for` line takes no `some` or `every` condition.
@@ -457,9 +560,15 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   the pull requests are one list, `pr/7` and `pr/8`, and the report has these rows after `$well_formed`:
 
   ```json
-  {"check": "$min_subjects", "subject": {"type": "pull request", "id": null}, "passed": false, "cause": "absent", "message": "item 3 of artifacts: pull_requests is missing",
-   "inputs": [{"name": "in-scope pull request count", "value": 2, "locations": ["/artifacts/0/pull_requests/0", "/artifacts/0/pull_requests/1"]}],
-   "failed_items": [{"path": "artifacts[2].pull_requests", "item": "artifacts[2].pull_requests", "cause": "absent", "value": null, "locations": ["/artifacts/2"]}]}
+  {
+    "cause": "absent",
+    "check": "$min_subjects",
+    "failed_items": [{"cause": "absent", "item": "artifacts[2].pull_requests", "locations": ["/artifacts/2"], "path": "artifacts[2].pull_requests", "value": null}],
+    "inputs": [{"locations": ["/artifacts/0/pull_requests/0", "/artifacts/0/pull_requests/1"], "name": "in-scope pull request count", "value": 2}],
+    "message": "item 3 of artifacts: pull_requests is missing",
+    "passed": false,
+    "subject": {"id": null, "type": "pull request"}
+  }
   {"check": "$unique_ids",   "subject": {"type": "pull request", "id": null}, "passed": true,  "cause": "satisfied"}
   {"check": "approved",      "subject": {"type": "pull request", "id": "pr/7"}, "passed": true,  "cause": "satisfied"}
   {"check": "approved",      "subject": {"type": "pull request", "id": "pr/8"}, "passed": false, "cause": "value", "message": "approvals is 0"}
@@ -629,7 +738,7 @@ A part is a short name for its path and nothing more. `coverage.attestation_data
             {"name": "coverage.attestation_data.hunks_total", "value": null, "locations": ["/trail/compliance_status/attestations_statuses"], "part": {"name": "coverage", "id": null}}]}
 ```
 
-and written out in full, its inputs are named `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_acknowledged` and `...hunks_total`, with the same `null`. The `expression` of a check and the names in its `inputs` and `failed_items` keep the alias, so a reader sees the words the policy was written in.
+and written out in full, its inputs are named `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_acknowledged` and `...hunks_total`, with the same `null`. The `expression` of a check and the names in its `inputs` and `failures` keep the alias, so a reader sees the words the policy was written in.
 
 - A part is one line, a path, or an object with `from`, a path, and `identified_by`, a path read inside the part. The report shows it under [`parts`](#subjects-in-the-report), and tags each input read through the part with the id it leads to. A `count of` or `sum of` has the tag only when the list it counts or sums starts at the part: `count of items whose w is pa.w` counts the subject's `items`, so its number has no tag, while the entry for `pa.w`, which it reads, has.
 - A path is written as in a [from line](#from-lines): keys joined by `.`, keys in quotes, positions, and `named by` a key of `$params` or `$input`. It is a path inside the subject, so it can't start at `$params` or `$input`, and it can't have `whose`, `count of` or `named by each of`.
@@ -1240,7 +1349,7 @@ and this input:
  ]}
 ```
 
-A field that's missing fails the check as `absent`, a `null` one as `null`, and one that isn't a string, a number included, as `unusable`. The path before the field is read first, so when it's missing or can't be read, like `$params.max_days` missing from the params, the check fails as that path does, whatever the field holds. A field that can't be read never lets a check pass, `does not exist` included: `x[0] named by zz does not exist` with no `x` fails as `absent` when `zz` is missing, `null` or a number, and passes only when `zz` is text. A `null` before the field doesn't stop the path. In an `every`, `some`, `count of`, `sum of` or a `for` line, a list before the field is walked, so `every rows.w named by k is "xy"` fails as `null` when `k` is `null`. A `null` there, like `rows` being `null`, fails it as `null` whatever `k` holds, and `failed_items` names `rows`, as `every rows.w.k` does. Anywhere else, a list before the field fails the check as `unusable`, so `rows.w named by k is "xy"` does when `rows` is a list. A path that reads inside an item that isn't an object, like `w.k named by zz` with `w` a list, fails as `not_an_object` whatever `zz` holds. When nothing is read inside it, like `w named by zz` with `w` holding `3`, the field decides first, so the check fails as `absent`, `null` or `unusable` when `zz` is missing, `null` or not text, and as `not_an_object` when it is text. An alias that is a list, read by a position, like `w[0] named by zz`, is read as a list. A name from a [`for` line](#checks) hides a field with the same name. Inside a `whose` the field is the item's, as a bare key is there. In the phrase of a one-line `every` or `some` it's the subject's, whatever the path starts at, so `every xs.v equals $params.m named by k` reads the subject's `k` for every item, and when the subject has no `k` the check fails once as `absent`, with `k is missing`. A `from` line and `identified_by` can't use it, because they don't have a subject yet.
+A field that's missing fails the check as `absent`, a `null` one as `null`, and one that isn't a string, a number included, as `unusable`. The path before the field is read first, so when it's missing or can't be read, like `$params.max_days` missing from the params, the check fails as that path does, whatever the field holds. A field that can't be read never lets a check pass, `does not exist` included: `x[0] named by zz does not exist` with no `x` fails as `absent` when `zz` is missing, `null` or a number, and passes only when `zz` is text. A `null` before the field doesn't stop the path. In an `every`, `some`, `count of`, `sum of` or a `for` line, a list before the field is walked, so `every rows.w named by k is "xy"` fails as `null` when `k` is `null`. A `null` there, like `rows` being `null`, fails it as `null` whatever `k` holds, and `failures` has `rows` as a `list` entry, as `every rows.w.k` does. Anywhere else, a list before the field fails the check as `unusable`, so `rows.w named by k is "xy"` does when `rows` is a list. A path that reads inside an item that isn't an object, like `w.k named by zz` with `w` a list, fails as `not_an_object` whatever `zz` holds. When nothing is read inside it, like `w named by zz` with `w` holding `3`, the field decides first, so the check fails as `absent`, `null` or `unusable` when `zz` is missing, `null` or not text, and as `not_an_object` when it is text. An alias that is a list, read by a position, like `w[0] named by zz`, is read as a list. A name from a [`for` line](#checks) hides a field with the same name. Inside a `whose` the field is the item's, as a bare key is there. In the phrase of a one-line `every` or `some` it's the subject's, whatever the path starts at, so `every xs.v equals $params.m named by k` reads the subject's `k` for every item, and when the subject has no `k` the check fails once as `absent`, with `k is missing`. A `from` line and `identified_by` can't use it, because they don't have a subject yet.
 
 In YAML, ` #` starts a comment, so `title does not match 'WIP' #, 'DRAFT'` loses everything after `'WIP'`. YAML also won't take a plain value that starts with a quote, or that has `: ` in it. Put the whole sentence in single quotes then, doubling any single quote inside: `'"$schema" exists'`.
 
@@ -1254,29 +1363,46 @@ reviewed:
     - reviewed_at is before deployed_at
 ```
 
-The check's `expression` is `approved_by is not empty and reviewed_at is before deployed_at`, and it still has one row per deployment. That row reads every field the sentences read, and says which sentences failed, each with its own cause:
+The check's `expression` is `approved_by is not empty and reviewed_at is before deployed_at`, and it still has one row per deployment. That row reads every field the sentences read, and its `failures` has an `assertion` entry for each sentence that failed, with its own cause, the values it read and its place in the policy. The row below leaves out `requirement` and `subject`:
 
 ```json
 {
   "cause": "value",
   "check": "reviewed",
-  "failed_assertions": [
-    {"assertion": "approved_by is not empty", "cause": "value"},
-    {"assertion": "reviewed_at is before deployed_at", "cause": "value"}
+  "failures": [
+    {
+      "cause": "value",
+      "failures": [],
+      "inputs": [{"locations": ["/deployments/1/approved_by"], "name": "approved_by", "outcome": "usable", "value": ""}],
+      "kind": "assertion",
+      "locations": ["$policy:/requirements/prod_deploy/checks/reviewed/assert/0"],
+      "message": "approved_by is \"\"",
+      "name": "approved_by is not empty"
+    },
+    {
+      "cause": "value",
+      "failures": [],
+      "inputs": [
+        {"locations": ["/deployments/1/reviewed_at"], "name": "reviewed_at", "outcome": "usable", "value": "2026-10-02T11:00:00Z"},
+        {"locations": ["/deployments/1/deployed_at"], "name": "deployed_at", "outcome": "usable", "value": "2026-10-02T10:00:00Z"}
+      ],
+      "kind": "assertion",
+      "locations": ["$policy:/requirements/prod_deploy/checks/reviewed/assert/1"],
+      "message": "reviewed_at is \"2026-10-02T11:00:00Z\", and deployed_at is \"2026-10-02T10:00:00Z\"",
+      "name": "reviewed_at is before deployed_at"
+    }
   ],
   "inputs": [
-    {"locations": ["/deployments/1/approved_by"], "name": "approved_by", "value": ""},
-    {"locations": ["/deployments/1/deployed_at"], "name": "deployed_at", "value": "2026-10-02T10:00:00Z"},
-    {"locations": ["/deployments/1/reviewed_at"], "name": "reviewed_at", "value": "2026-10-02T11:00:00Z"}
+    {"locations": ["/deployments/1/approved_by"], "name": "approved_by", "outcome": "usable", "value": ""},
+    {"locations": ["/deployments/1/deployed_at"], "name": "deployed_at", "outcome": "usable", "value": "2026-10-02T10:00:00Z"},
+    {"locations": ["/deployments/1/reviewed_at"], "name": "reviewed_at", "outcome": "usable", "value": "2026-10-02T11:00:00Z"}
   ],
   "message": "approved_by is \"\"; reviewed_at is \"2026-10-02T11:00:00Z\", and deployed_at is \"2026-10-02T10:00:00Z\"",
-  "passed": false,
-  "requirement": "prod_deploy",
-  "subject": {"id": "d2", "type": "deployment"}
+  "passed": false
 }
 ```
 
-`failed_assertions` is `[]` when the check passes. The row's cause is the first, in the order of [causes](#causes), among the sentences that failed. To get a row for each sentence, write them as separate checks. A problem with one line of a list starts with its number in the `$well_formed` row, like `line 2: unclosed quote at column 6`.
+A row that passes has no `failures`. The row's cause is the first, in the order of [causes](#causes), among the sentences that failed. To get a row for each sentence, write them as separate checks. A problem with one line of a list starts with its number in the `$well_formed` row, like `line 2: unclosed quote at column 6`.
 
 A sentence has no `or`. When a check can pass in more than one way, write the ways as named options under `any_of`, each one sentence or a list of them. The check passes when every sentence of one option passes. With this input:
 
@@ -1312,21 +1438,56 @@ click passes on `declared` and prometheus-client on `known`. leftpad fails both,
 {
   "cause": "absent",
   "check": "licence_allowed",
-  "inputs": [
-    {"locations": ["$params:/allowed_licenses"], "name": "$params.allowed_licenses", "value": ["BSD-3-Clause", "Apache-2.0"]},
-    {"locations": ["$params:/known_package_licenses"], "name": "$params.known_package_licenses named by name", "value": null},
-    {"locations": ["/components/2/licenses"], "name": "licenses", "value": [{"license": {"id": "WTFPL"}}]},
-    {"locations": ["/components/2/licenses/0/license/id"], "name": "licenses[].license.id", "value": ["WTFPL"]},
-    {"locations": ["/components/2/name"], "name": "name", "value": "leftpad"}
+  "failures": [
+    {
+      "cause": "value",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [],
+          "kind": "assertion",
+          "locations": ["$policy:/requirements/licences/checks/licence_allowed/any_of/declared"],
+          "message": "item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+          "name": "some licenses.license.id is in $params.allowed_licenses"
+        }
+      ],
+      "kind": "option",
+      "locations": ["$policy:/requirements/licences/checks/licence_allowed/any_of/declared"],
+      "message": "item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+      "name": "declared"
+    },
+    {
+      "cause": "absent",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [],
+          "kind": "assertion",
+          "locations": ["$policy:/requirements/licences/checks/licence_allowed/any_of/known/0"],
+          "message": "licenses is [{\"license\": {\"id\": \"WTFPL\"}}]",
+          "name": "licenses does not exist"
+        },
+        {
+          "cause": "absent",
+          "failures": [],
+          "kind": "assertion",
+          "locations": ["$policy:/requirements/licences/checks/licence_allowed/any_of/known/1"],
+          "message": "$params.known_package_licenses named by name is missing",
+          "name": "$params.known_package_licenses named by name is in $params.allowed_licenses"
+        }
+      ],
+      "kind": "option",
+      "locations": ["$policy:/requirements/licences/checks/licence_allowed/any_of/known"],
+      "message": "licenses is [{\"license\": {\"id\": \"WTFPL\"}}], and $params.known_package_licenses named by name is missing",
+      "name": "known"
+    }
   ],
   "message": "declared: item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]; known: licenses is [{\"license\": {\"id\": \"WTFPL\"}}], and $params.known_package_licenses named by name is missing",
-  "passed": false,
-  "requirement": "licences",
-  "subject": {"id": "leftpad", "type": "component"}
+  "passed": false
 }
 ```
 
-The row reads every field the options read, once each. Its cause is the first, in the order of [causes](#causes), among the options, and an option's cause is the first among its sentences. Here `known` fails as `absent`, because the params have no licence for leftpad. An option with an `exists` sentence whose field is missing fails as `value` instead. The row has no `failed_assertions`. The check's `expression` is `one of: declared(some licenses.license.id is in $params.allowed_licenses) | known(licenses does not exist and $params.known_package_licenses named by name is in $params.allowed_licenses)`, with the options sorted by name.
+The row reads every field the options read, once each. Its cause is the first, in the order of [causes](#causes), among the options, and an option's cause is the first among its sentences. Here `known` fails as `absent`, because the params have no licence for leftpad. An option with an `exists` sentence whose field is missing fails as `value` instead. `failures` has an `option` entry for each option that failed, by name, and under it an `assertion` entry for each of its sentences that failed, so a tool can see which option failed on which value. The row above leaves out `requirement`, `subject` and its own `inputs`, which are the entries the options read, once each. The check's `expression` is `one of: declared(some licenses.license.id is in $params.allowed_licenses) | known(licenses does not exist and $params.known_package_licenses named by name is in $params.allowed_licenses)`, with the options sorted by name.
 
 An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_of` that isn't an object, an empty one, an empty option, or an option that isn't a sentence or a list of them is written wrong, with `invalid any_of`, `empty any_of`, `empty option <name>` or `invalid option <name>`. A problem with a sentence starts with its option's name, and with the line's number when the option has more than one, like `option known: line 2: doesn't parse` or `option fast: values of mixed types`.
 
@@ -1345,21 +1506,86 @@ An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_o
 {
   "cause": "absent",
   "check": "signed",
-  "failed_items": [
-    {"cause": "value", "item": "item 2 of pull_requests[0].commits", "locations": ["/releases/0/pull_requests/0/commits/1/signed"], "path": "pull_requests[0].commits[1].signed", "value": false},
-    {"cause": "absent", "item": "pull_requests[1].commits", "locations": ["/releases/0/pull_requests/1"], "path": "pull_requests[1].commits", "value": null}
+  "failures": [
+    {
+      "cause": "absent",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": ["/releases/0/pull_requests/0/commits/1/signed"],
+                  "name": "pull_requests[0].commits[1].signed",
+                  "outcome": "usable",
+                  "value": false
+                }
+              ],
+              "kind": "item",
+              "locations": ["/releases/0/pull_requests/0/commits/1"],
+              "message": "signed is false",
+              "name": "item 2 of commits",
+              "value": {"sha": "a2", "signed": false}
+            }
+          ],
+          "inputs": [],
+          "kind": "item",
+          "locations": ["/releases/0/pull_requests/0"],
+          "message": "",
+          "name": "item 1 of pull_requests",
+          "value": {
+            "approvers": [{"state": "APPROVED", "username": "bob"}],
+            "author": "ann",
+            "commits": [{"sha": "a1", "signed": true}, {"sha": "a2", "signed": false}],
+            "number": 7
+          }
+        },
+        {
+          "cause": "absent",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [{"locations": ["/releases/0/pull_requests/1"], "name": "pull_requests[1].commits", "outcome": "absent", "value": null}],
+              "kind": "list",
+              "message": "commits is missing",
+              "name": "commits"
+            }
+          ],
+          "inputs": [],
+          "kind": "item",
+          "locations": ["/releases/0/pull_requests/1"],
+          "message": "",
+          "name": "item 2 of pull_requests",
+          "value": {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob", "number": 8}
+        }
+      ],
+      "inputs": [],
+      "kind": "assertion",
+      "locations": ["$policy:/requirements/release/checks/signed"],
+      "message": "",
+      "name": "every pull_requests.commits.signed is true"
+    }
   ],
-  "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/0/commits/1/signed"], "name": "pull_requests[].commits[].signed", "value": [true, false]}],
+  "inputs": [
+    {
+      "locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/0/commits/1/signed"],
+      "name": "pull_requests[].commits[].signed",
+      "outcome": "usable",
+      "value": [true, false]
+    }
+  ],
   "message": "item 1 of pull_requests: item 2 of commits: signed is false; item 2 of pull_requests: commits is missing",
-  "passed": false,
-  "requirement": "release",
-  "subject": {"id": "r-1", "type": "release"}
+  "passed": false
 }
 ```
 
 - `inputs` names the path with `[]` after each list walked, and holds the value each item's path ended at.
-- Each entry in `failed_items` gives the field that failed as `path`, and the item it belongs to as `item`, so a tool can show the item by reading the input there. A list that's missing, `null`, not a list or empty is listed in its items' place. When a `whose` that compares two fields can't decide for an item, the entry names the field it couldn't read, or the left one when it read neither or both, like `hi` for `whose lo is at least hi` on `{"lo": 1}`, with `value` `null`. A field that's `null` counts as not read, and so does the list of a `count of` that isn't a list.
-- `distinct` after `every` or `some` drops an item whose value is the same as an earlier one's: `every distinct commits.author is "ann"` on commits by `ann`, `bob` and `bob` fails with one entry in `failed_items`, for `item 2 of commits`, whose `locations` are `/commits/1/author` and `/commits/2/author`. The row's `inputs` still list all three authors. An item a `whose` can't decide, and a value that's missing, is never dropped. A bare name on the right of the phrase is read from the subject, so it is the same for every copy: with `{"lo": 3, "items": [{"b": 5, "lo": 1}, {"b": 5, "lo": 9}]}`, `every distinct items.b is at least lo` passes, with `lo` read as the subject's 3. A `whose` reads the item before copies are dropped. A `for` line takes it too, like `for: every distinct commits.author as author`: the alias stands for each different author once, and the entry of a failed one lists every copy. `distinct` goes right after `every`, `some`, `count of` or `sum of`, and anywhere else it is written wrong with `distinct goes after every, some, count of or sum of`. It is a word of the grammar, so a field called `distinct` is written `.distinct`, a subject called `distinct` is written `"distinct"`, and a bare `distinct`, like `distinct is 1`, `x is distinct` or `from: every xs whose distinct is 1`, is written wrong with `distinct is a word of the grammar: write .distinct`. Under a `for` line that doesn't read, because it doesn't parse or is written wrong in its own words, like an alias given twice, the lines under it get only the `for` line's problem. 
+- `failures` has one `assertion` entry, named by the sentence, and under it an `item` entry for each item that failed, with `value` the item and `locations` where it sits, so a tool can show the item by reading the input there. The field that failed is in the item's `inputs`, named with its position, like `pull_requests[0].commits[1].signed`. A list inside an item sits under that item: `item 1 of pull_requests` holds `item 2 of commits`. A list that's missing, `null`, not a list or empty is a `list` entry, like `commits`, in its items' place. When a `whose` that compares two fields can't decide for an item, the item's inputs hold the field it couldn't read, or the left one when it read neither or both, like `hi` for `whose lo is at least hi` on `{"lo": 1}`, with value `null`. A field that's `null` counts as not read, and so does the list of a `count of` that isn't a list. The row above leaves out `requirement` and `subject`.
+- `distinct` after `every` or `some` drops an item whose value is the same as an earlier one's: `every distinct commits.author is "ann"` on commits by `ann`, `bob` and `bob` fails with one `item` entry, for `item 2 of commits`, whose `locations` are the two commits, `/ts/0/commits/1` and `/ts/0/commits/2` for the input `{"ts": [{"commits": [...]}]}`, and whose input `commits[1].author` has the locations of both authors. The row's `inputs` still list all three authors. An item a `whose` can't decide, and a value that's missing, is never dropped. A bare name on the right of the phrase is read from the subject, so it is the same for every copy: with `{"lo": 3, "items": [{"b": 5, "lo": 1}, {"b": 5, "lo": 9}]}`, `every distinct items.b is at least lo` passes, with `lo` read as the subject's 3. A `whose` reads the item before copies are dropped. A `for` line takes it too, like `for: every distinct commits.author as author`: the alias stands for each different author once, and the entry of a failed one lists every copy. `distinct` goes right after `every`, `some`, `count of` or `sum of`, and anywhere else it is written wrong with `distinct goes after every, some, count of or sum of`. It is a word of the grammar, so a field called `distinct` is written `.distinct`, a subject called `distinct` is written `"distinct"`, and a bare `distinct`, like `distinct is 1`, `x is distinct` or `from: every xs whose distinct is 1`, is written wrong with `distinct is a word of the grammar: write .distinct`. Under a `for` line that doesn't read, because it doesn't parse or is written wrong in its own words, like an alias given twice, the lines under it get only the `for` line's problem. 
 - An empty list fails `every` as `value`, because no commits isn't proof that every commit is signed. Write `, if any,` after the path to let empty lists pass: `every review.incidents, if any, is not empty`. A missing list still fails.
 - `whose` keeps the items that pass its conditions, read on the value the path ends at: `some pull_requests.approvers whose state is "APPROVED" exists` passes above, with `bob`'s approval. So `count of pull_requests.approvers.username whose state is "APPROVED" is 1` reads `state` on each username, and fails as `not_an_object` with `item 1 of pull_requests: item 1 of approvers: username is "bob", which isn't an object; item 2 of pull_requests: item 1 of approvers: username is "bob", which isn't an object`. To keep items by one field and check another, put them on a `for` line, below. An item a condition can't decide, because the field it reads is missing, fails the check rather than being left out.
 - In a one-line `every` or `some`, a field on the right of the phrase is the subject's, so `some approvers.timestamp is after last_commit` compares each approver's `timestamp` with the subject's `last_commit`, and so is a name written with a dot. When that field is missing, `null`, or something the phrase can't use, like text after `is at least`, the message says so once, like `last_commit is missing`, because no approver could pass. The same goes for `$params`, `$input`, an alias, a part or a parent there, and for a list they walk: with the params `{"envs": [{"name": "a"}, null]}`, `every xs.n is in $params.envs.name` fails as `unusable` with `item 2 of $params.envs is null, which isn't an object`, and names no item of `xs`. When the item's field and the field on the right have the same name, the message writes the item's path in full: `item 2 of conditions: conditions.type is "b", and type is "a"`. To compare two fields of the same item, use a `for` line, below. A `for` alias is read on the right of a `whose` too, `count of` and `sum of` included, so with `for: every groups as g`, `count of rows whose n is count of g is 1` counts the group `g`, and `.g` reads each row's own `g`. A child subject's parent works the same way: with the parent `fam`, `count of rows whose n is count of fam.z is 1` counts the parent's `z`, `count of rows whose count of fam.z is 1 is 3` counts each row's own `fam.z`, and `.fam.z` on the right reads the row's. A parent whose `z` is missing, `null` or not a list fails the check as `absent`, `null` or `unusable`.
@@ -1385,88 +1611,135 @@ reads "for every pull request, some approver approved it and isn't its author". 
 {
   "cause": "value",
   "check": "peer_approved",
-  "failed_items": [
+  "failures": [
     {
       "cause": "value",
-      "failed_assertions": [
-        {"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [
-          {"cause": "value", "inputs": [{"locations": ["/releases/0/pull_requests/1/approvers/0/state"], "name": "approver.state", "value": "COMMENTED"}], "item": "item 1 of pr.approvers"}
-        ]},
-        {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [
-          {"cause": "value", "inputs": [
-            {"locations": ["/releases/0/pull_requests/1/approvers/0/username"], "name": "approver.username", "value": "bob"},
-            {"locations": ["/releases/0/pull_requests/1/author"], "name": "pr.author", "value": "bob"}
-          ], "item": "item 1 of pr.approvers"}
-        ]}
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "inputs": [{"locations": ["/releases/0/pull_requests/1/approvers/0/state"], "name": "approver.state", "outcome": "usable", "value": "COMMENTED"}],
+              "kind": "item",
+              "locations": ["/releases/0/pull_requests/1/approvers/0"],
+              "message": "approver.state is \"COMMENTED\"",
+              "name": "item 1 of pr.approvers",
+              "value": {"state": "COMMENTED", "username": "bob"}
+            }
+          ],
+          "inputs": [],
+          "kind": "item",
+          "locations": ["/releases/0/pull_requests/1"],
+          "message": "",
+          "name": "item 2 of pull_requests",
+          "value": {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob", "number": 8}
+        }
       ],
-      "item": "item 2 of pull_requests",
-      "locations": ["/releases/0/pull_requests/1"],
-      "path": "item 2 of pull_requests",
-      "value": {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob", "number": 8}
+      "inputs": [],
+      "kind": "assertion",
+      "locations": ["$policy:/requirements/release/checks/peer_approved/assert/0"],
+      "message": "",
+      "name": "approver.state is \"APPROVED\""
+    },
+    {
+      "cause": "value",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "inputs": [
+                {"locations": ["/releases/0/pull_requests/1/approvers/0/username"], "name": "approver.username", "outcome": "usable", "value": "bob"},
+                {"locations": ["/releases/0/pull_requests/1/author"], "name": "pr.author", "outcome": "usable", "value": "bob"}
+              ],
+              "kind": "item",
+              "locations": ["/releases/0/pull_requests/1/approvers/0"],
+              "message": "approver.username is \"bob\", and pr.author is \"bob\"",
+              "name": "item 1 of pr.approvers",
+              "value": {"state": "COMMENTED", "username": "bob"}
+            }
+          ],
+          "inputs": [],
+          "kind": "item",
+          "locations": ["/releases/0/pull_requests/1"],
+          "message": "",
+          "name": "item 2 of pull_requests",
+          "value": {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob", "number": 8}
+        }
+      ],
+      "inputs": [],
+      "kind": "assertion",
+      "locations": ["$policy:/requirements/release/checks/peer_approved/assert/1"],
+      "message": "",
+      "name": "approver.username does not equal pr.author"
     }
   ],
   "inputs": [
-    {"locations": ["/releases/0/pull_requests/0/approvers/0", "/releases/0/pull_requests/1/approvers/0"], "name": "pr.approvers[]", "value": [{"state": "APPROVED", "username": "bob"}, {"state": "COMMENTED", "username": "bob"}]},
-    {"locations": ["/releases/0/pull_requests/0", "/releases/0/pull_requests/1"], "name": "pull_requests[]", "value": [
-      {"approvers": [{"state": "APPROVED", "username": "bob"}], "author": "ann", "commits": [{"sha": "a1", "signed": true}, {"sha": "a2", "signed": false}], "number": 7},
-      {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob", "number": 8}
-    ]}
+    {
+      "locations": ["/releases/0/pull_requests/0/approvers/0", "/releases/0/pull_requests/1/approvers/0"],
+      "name": "pr.approvers[]",
+      "outcome": "usable",
+      "value": [{"state": "APPROVED", "username": "bob"}, {"state": "COMMENTED", "username": "bob"}]
+    },
+    {
+      "locations": ["/releases/0/pull_requests/0", "/releases/0/pull_requests/1"],
+      "name": "pull_requests[]",
+      "outcome": "usable",
+      "value": [
+        {
+          "approvers": [{"state": "APPROVED", "username": "bob"}],
+          "author": "ann",
+          "commits": [{"sha": "a1", "signed": true}, {"sha": "a2", "signed": false}],
+          "number": 7
+        },
+        {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob", "number": 8}
+      ]
+    }
   ],
-  "message": "item 2 of pull_requests: item 1 of approvers: approver.state is \"COMMENTED\", and approver.username is \"bob\", and pr.author is \"bob\"",
-  "passed": false,
-  "requirement": "release",
-  "subject": {"id": "r-1", "type": "release"}
+  "message": "item 2 of pull_requests: item 1 of pr.approvers: approver.state is \"COMMENTED\", and approver.username is \"bob\", and pr.author is \"bob\"",
+  "passed": false
 }
 ```
 
-- `failed_items` lists the items of the first list that failed, each with what its alias stands for as its `value`. Each one has `failed_assertions`: the sentences that failed for it, each with its cause. With two items, a sentence that failed for several items of the second list has the first of their causes in the order of [causes](#causes). Pull request 8 failed because its one approver commented, and is its author.
-- With two items, a failed sentence that reads the second item's alias also has `items`: the items of the second list it failed for, in list order, each with the cause it failed with. Here `item 1 of pr.approvers` is pull request 8's first approver. With `for: some approvers as approver, every commits as commit`, an approver who approved before the last commit fails `approver.timestamp is after commit.timestamp` with `"items": [{"cause": "value", "inputs": [...], "item": "item 2 of commits"}]`, so you can see which commit came later. Each item has its own cause: a commit with no `timestamp` would be listed there with `"cause": "absent"`. A sentence that doesn't read `commit`, like `approver.username does not equal author`, has no `items`, because it fails the same way for every commit.
-- Each failed sentence has `inputs`, the values it compared, so a tool can show "1792655359 is not after 1792656245" without reading the sentence. They are the entries the sentence would have in the `inputs` of a row of its own, with the names as the sentence writes them and where each value was read in `locations`, see [where a value was read](#where-a-value-was-read). An entry of `items` has the inputs for that pair of items. A sentence with no `items` has them on the sentence, as the sentence read them on the item of the first list it belongs to. They keep the order the sentence reads them, its left side and then its right side, and a value it reads twice is listed once. Above, the second sentence read `approver.username` and `pr.author`, both for pull request 8. Every failed sentence has them, however many items fail, so a report where many items fail is longer. A read that stops early, like a commit with no `timestamp`, shows `"value": null` and the location where it stopped, and a `count of` on an empty list gives the count `0`, the list `[]` and no locations. An alias that holds a list and is read item by item on the right of `is in` and the like, as in `every rows.v is in d.name` with `d` holding `[{"name": "ann"}, {}]`, is listed as `$params.w is in d.name` lists it: `{"name": "d[].name", "value": ["ann", null]}`, with one location for each value. With this input:
+- `failures` has an `assertion` entry for each sentence that failed, with its `locations` in the policy, and under it each item of the first list it failed for, as an `item` entry with its `value`, what its alias stands for, and its `locations`, where it sits. Pull request 8 failed both sentences, because its one approver commented, and is its author, so it is under both. With two items, an item's cause is the first, in the order of [causes](#causes), among the causes of the second list's items under it. The row above leaves out `requirement` and `subject`.
+- With two items, the items of the second list that a sentence failed for sit under the first list's item, each an `item` entry named with the first item's alias, like `item 1 of pr.approvers`. With `for: some approvers as approver, every commits as commit`, `approver.timestamp is after commit.timestamp`, two approvers and a last commit that came after both approvals, the `kind`, `name` and `message` of each entry, and what is under it, are:
 
   ```json
-  {"pr": {"author": "ann",
-    "approvers": [{"state": "APPROVED", "timestamp": 1792655359, "username": "bob"}, {"state": "APPROVED", "timestamp": 1792655761, "username": "cat"}],
-    "commits": [{"sha": "a1", "timestamp": 1792590878}, {"sha": "a2", "timestamp": 1792656245}]}}
+  [{"kind":"assertion","name":"approver.timestamp is after commit.timestamp","message":"","under":[{"kind":"item","name":"item 1 of approvers","message":"","under":[{"kind":"item","name":"item 2 of commits","message":"approver.timestamp is 1792655359, and commit.timestamp is 1792656245"}]},{"kind":"item","name":"item 2 of approvers","message":"","under":[{"kind":"item","name":"item 2 of commits","message":"approver.timestamp is 1792655761, and commit.timestamp is 1792656245"}]}]}]
   ```
 
-  and `for: some approvers as approver, every commits as commit` with `approver.timestamp is after commit.timestamp`, the first entry of `failed_items` is:
+  A commit with no `timestamp` would be there with `"cause": "absent"`. A sentence that doesn't read `commit`, like `approver.state is "APPROVED"`, has the items of the first list and none of the second.
+- Each entry that read something has `inputs`, the values it compared, so a tool can show "1792655359 is not after 1792656245" without reading the sentence. They are the entries the sentence would have in the `inputs` of a row of its own, with the names as the sentence writes them, like `approver.timestamp`, and where each value was read in `locations`, see [where a value was read](#where-a-value-was-read). An item holds what the sentence read inside it, and the assertion what it read outside the items, like `$params.min`, once. They keep the order the sentence reads them, its left side and then its right side, and a value it reads twice is listed once. A sentence that works out a number, like `count of commit.files is at least 1`, has the number and then the list it counted, with the locations of that list. A part's input has its `part`.
+- An assertion has no items when no sentence was checked, like when `whose` leaves no approver, or a field a `whose` reads is missing.
+- When the second item failed before any sentence was checked, its entry sits under the first list's item, with no sentence above it. With `for: some approvers as approver, every commits whose author does not equal approver.username as commit` and a commit with no `author`, `failures` reads, by `kind`, `name` and `message`:
 
   ```json
-  {"cause": "value", "failed_assertions": [
-    {"assertion": "approver.timestamp is after commit.timestamp", "cause": "value", "items": [
-      {"cause": "value", "inputs": [
-        {"locations": ["/pr/approvers/0/timestamp"], "name": "approver.timestamp", "value": 1792655359},
-        {"locations": ["/pr/commits/1/timestamp"], "name": "commit.timestamp", "value": 1792656245}
-      ], "item": "item 2 of commits"}
-    ]}
-  ], "item": "item 1 of approvers", "locations": ["/pr/approvers/0"], "path": "item 1 of approvers", "value": {"state": "APPROVED", "timestamp": 1792655359, "username": "bob"}}
+  [{"kind":"item","name":"item 1 of approvers","message":"","under":[{"kind":"item","name":"item 2 of commits","message":"author is missing"}]},{"kind":"item","name":"item 2 of approvers","message":"","under":[{"kind":"item","name":"item 2 of commits","message":"author is missing"}]}]
   ```
 
-  A sentence that works out a number, like `count of commit.files is at least 1`, has the number and then the list it counted, with the locations of that list. A part's input has its `part`. Only the sentences of a `for` line have them: the `failed_assertions` of a check with several sentences and no `for` line have none, because its row's `inputs` already hold the values.
-- `failed_assertions` is `[]` when no sentence was checked, like when `whose` leaves no approver, or a field a `whose` reads is missing.
-- When the second item failed before any sentence was checked, the item of the first list has its own `failed_items`, saying where. With `for: some approvers as approver, every commits whose author does not equal approver.username as commit` and a commit with no `author`, `{"t": 2}`, the approver's entry has `"failed_assertions": []` and:
-
-  ```json
-  "failed_items": [{"cause": "absent", "item": "item 2 of commits", "locations": ["/releases/0/commits/1"], "path": "item 2 of commits", "value": {"t": 2}}]
-  ```
-
-  What fails the same way for every approver is listed once in the row's `failed_items` instead, in place of the approvers that failed only because of it. That's a missing `commits` list, `{"cause": "absent", "failed_assertions": [], "item": "commits", "locations": ["/releases/0"], "path": "commits", "value": null}`, or a commit that `whose kind is "code"` can't decide, because that `whose` doesn't read `approver`. An approver that's still listed has the cause of what's left under it. A list inside the first, like `pr.approvers`, is listed under each pull request, because each has its own.
+  What fails the same way for every approver sits once on the row instead, in place of the approvers that failed only because of it: a missing `commits` list is one `list` entry named `commits`, `[{"kind":"list","name":"commits","message":"commits is missing"}]`, and a commit that a `whose` that doesn't read `approver` can't decide is one `item` entry. That is the one place where an item sits directly under the row, because the walk broke before any sentence ran. An approver that's still listed has the cause of what's left under it. A list inside the first, like `pr.approvers`, is listed under each pull request, because each has its own.
 - `inputs` holds each list the `for` line walked, with its items, and every field of the subject or of a parent the sentences read, like `t.x`. It also holds what a sentence reads from `$params` or `$input` that doesn't start at an alias, as the sentence's own row would: `$params.q[]` for `every $params.q is 1`, and `$params.suffix` for `t.tags contains t.v followed by $params.suffix`. A second list that starts at the first item's alias, like `z.subs` in `every items whose k is 1 as z, every z.subs as y`, shows only the items under the first items that `whose` kept. The first list still shows every item, the ones `whose` left out too. A field read through a `for` alias, like `pr.author`, isn't listed on its own.
 - In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field with the same name, the subject's or an item's, except right after `whose`: `whose env is "prod"` always reads the item's `env`, and so does `whose count of env is 2`. Write a dot in front to read the field a name hides: `.env`.
 - Each list fails as a one-line `every` or `some` does: empty, missing, `null` or not a list, and `, if any,` lets an empty one pass. The sentences that don't read its name still run, as said below.
-- A name that doesn't depend on the item is read once, before any item: a field of the subject, a part, `$params` or `$input`, with or without a path after it, and an alias from an earlier line. When a compare or `is in` phrase reads it as a value, like `z` in `m.v is at least z`, `$params.q` in `m.v is in $params.q`, `z` in `z is 1` or `z` in `z is at least 1`, when `count of` or `sum of` reads it, like `count of z`, and when it is a `named by` key, like `z` in `m.t named by z`, a problem with it fails the check even when the list is empty, and the message names it once, with no item in front, whatever its cause. With `z` holding `"s"`, `z is 1` and `z is not 1` say `z is "s", which isn't a number`, `z is not true` says `z is "s", which isn't true or false`, and `count of z is 1` says `z is "s", which isn't a list or an object`, with `z` holding `{"a": 1}`, `count of z is 1` says `z is {"a": 1}, which isn't a list`, and with `z` holding `3`, `m.t named by z is 1` says `z is 3, which isn't text`. Each name is said once, and a sentence that reads two of them isn't said again after them: `count of zb is count of za`, with `zb` holding `"s"` and `za` holding `3`, says `za is 3, which isn't a list or an object; zb is "s", which isn't a list or an object`. The names of one sentence come worst cause first and then by name: `za is at least zb` with `za` `null` and `zb` holding `"s"` says `zb is "s", which isn't a number; za is null`, because `unusable` is worse than `null`, and the two `count of` names above tie, so `za` comes first. A value of the right type that doesn't match, like `3` in `z is 1`, is no problem with reading it, but the sentence still runs on an empty list with `, if any,` and fails with `z is 3`. On the left, this covers `is`, `equals`, `is not`, `does not equal`, the number compares (`is at least`, `is at most`, `is more than`, `is less than`), the text compares (`starts with`, `ends with`, their `does not` forms and `is alphabetically …`), the time compares (`is before`, `is after`, `is on or before`, `is on or after`) when the value isn't a time at all, and `is … within` and `is not … within`. On the right it covers the compares and `is in`. A name read any other way, like `every z` or `z exists`, is read for each item, so on an empty list the check says only `xs is []`, and with `, if any,` it's read once. A name that depends on the item, the line's own alias or a `named by` key read from the item, keeps the item in front, because it can differ for each item. With the subject `pr` from `prs`, the params `{"q": "s"}` and this input:
+- A name that doesn't depend on the item is read once, before any item: a field of the subject, a part, `$params` or `$input`, with or without a path after it, and an alias from an earlier line. When a compare or `is in` phrase reads it as a value, like `z` in `m.v is at least z`, `$params.q` in `m.v is in $params.q`, `z` in `z is 1` or `z` in `z is at least 1`, when `count of` or `sum of` reads it, like `count of z`, and when it is a `named by` key, like `z` in `m.t named by z`, a problem with it fails the check even when the list is empty, and the message names it once, with no item in front, whatever its cause. With `z` holding `"s"`, `z is 1` and `z is not 1` say `z is "s", which isn't a number`, `z is not true` says `z is "s", which isn't true or false`, and `count of z is 1` says `z is "s", which isn't a list or an object`, with `z` holding `{"a": 1}`, `count of z is 1` says `z is {"a": 1}, which isn't a list`, and with `z` holding `3`, `m.t named by z is 1` says `z is 3, which isn't text`. Each name is said once, and a sentence that reads two of them isn't said again after them: `count of zb is count of za`, with `zb` holding `"s"` and `za` holding `3`, says `za is 3, which isn't a list or an object; zb is "s", which isn't a list or an object`. The names of one sentence come worst cause first and then by name: `za is at least zb` with `za` `null` and `zb` holding `"s"` says `zb is "s", which isn't a number; za is null`, because `unusable` is worse than `null`, and the two `count of` names above tie, so `za` comes first. A value of the right type that doesn't match, like `3` in `z is 1`, is no problem with reading it, but the sentence still runs on an empty list with `, if any,` and fails with `z is 3`. On the left, this covers `is`, `equals`, `is not`, `does not equal`, the number compares (`is at least`, `is at most`, `is more than`, `is less than`), the text compares (`starts with`, `ends with`, their `does not` forms and `is alphabetically …`), the time compares (`is before`, `is after`, `is on or before`, `is on or after`) when the value isn't a time at all, and `is … within` and `is not … within`. On the right it covers the compares and `is in`. A name read any other way, like `every z` or `z exists`, is read for each item, and once when there's no item, so on an empty list with no `z`, `z exists` says `z is missing; xs is []`. A name that depends on the item, the line's own alias or a `named by` key read from the item, keeps the item in front, because it can differ for each item. With the subject `pr` from `prs`, the params `{"q": "s"}` and this input:
 
   ```json
   {"prs": [{"id": "p0", "z": "s", "xs": []}]}
   ```
 
-  `for: every xs as m` with `assert: m.v is at least $params.q` fails as `unusable` with `$params.q is "s", which isn't a number; xs is []`: the name first, then the empty list. Written `every xs, if any, as m`, it says only `$params.q is "s", which isn't a number`. With `xs` holding `[{"v": 1}, {"v": 2}]` it says the same once, and `failed_items` lists both items, each `unusable`. When an item also fails on its own, its own problems follow the names, without them: `for: every xs as m` with the sentences `m.v is 2` and `m.v is at least z`, and `z` missing, on `[{"v": 1}, {"v": 3}]` says `z is missing; item 1 of xs: m.v is 1; item 2 of xs: m.v is 3`, and the cause is the worst of them, `absent`. With `z` holding `"s"` and `xs` holding `[{"v": null}]`, it says `z is "s", which isn't a number; item 1 of xs: m.v is null` and fails as `unusable`, the worse of `unusable` and `null`. A name that is only `$params` or `$input` counts too: `for: every xs as m` with `$params is 3` and the params `null` says `$params is missing; xs is []` on `[]`. `first of` and `last of` say the empty list after a root of the wrong type too: `for: every ws as w, first of ys whose n is in $params.z sorted by n as y` with `$params.z` holding `"s"` and `ys` holding `[]` says `$params.z is "s", which isn't a list; ys is []`. A root in a `whose` on the `for` line doesn't hide what an item says on its own, whichever clause comes first: `every xs whose k is in pr.z and whose v is 1 as m` with `pr.z` holding `"s"` says `pr.z is "s", which isn't a list; item 2 of xs: v is "x", which isn't a number`. A list on a later line that doesn't depend on the item is said before the items' problems. A part or a parent's name that holds a list is walked on the right of `is in` and the other phrases that walk a list, as it is without a `for` line, in a sentence, in the line's own `whose` and in a `count of` there: with `has: {pl: c}` and the input `{"prs": [{"id": "p0", "c": [{"z": 1}, {"z": 2}], "xs": [{"v": 1}]}]}`, `for: every xs as m` with `m.v is in pl.z`, and `count of xs whose v is in pl.z is 1`, pass, and each row lists `pl[].z` holding `[1, 2]`, with the part's tag. With `c` holding `[{"z": 1}, {}]` both fail as `absent` with `item 2 of pl: z is missing`, said once. When an item of the line also fails on its own, that comes after the root: with the part `pos` at `os` holding `[{"name": "bob"}, {}]` and `ms` holding `[{"ws": [{"v": "bob", "n": 2}, {"n": 2}]}]`, `for: every ms as m, every m.ws whose v is in pos.name as w` with `w.n is 2` fails as `absent` with `item 2 of pos: name is missing; item 1 of ms: item 2 of ws: v is missing`. With params that aren't an object, like `3`, `for: every xs as m` with `m.v is at least 1` on `{"prs": [{"id": "p0", "xs": ["s", {"v": "x"}]}]}` still fails as `unusable`, where the item alone would make it `not_an_object`, and says `item 1 of xs is "s", which isn't an object; item 2 of xs: v is "x", which isn't a number`. Only `ambiguous` ranks above `unusable` there: `for: every xs as p, first of xs whose k is p.k sorted by v as m` with `m.v is 1`, params `3` and two items that tie on `v` says `item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v` and fails as `ambiguous`, and with `m.v is at least $params.n` it says `$params is 3, which isn't an object; ` before the tie.
+  `for: every xs as m` with `assert: m.v is at least $params.q` fails as `unusable` with `$params.q is "s", which isn't a number; xs is []`: the name first, then the empty list. Written `every xs, if any, as m`, it says only `$params.q is "s", which isn't a number`. With `xs` holding `[{"v": 1}, {"v": 2}]` it says the same once, on the assertion, and `failures` lists both items under it, each `unusable`. When an item also fails on its own, its own problems follow the names, without them: `for: every xs as m` with the sentences `m.v is 2` and `m.v is at least z`, and `z` missing, on `[{"v": 1}, {"v": 3}]` says `z is missing; item 1 of xs: m.v is 1; item 2 of xs: m.v is 3`, and the cause is the worst of them, `absent`. With `z` holding `"s"` and `xs` holding `[{"v": null}]`, it says `z is "s", which isn't a number; item 1 of xs: m.v is null` and fails as `unusable`, the worse of `unusable` and `null`. A name that is only `$params` or `$input` counts too: `for: every xs as m` with `$params is 3` and the params `null` says `$params is missing; xs is []` on `[]`. `first of` and `last of` say the empty list after a root of the wrong type too: `for: every ws as w, first of ys whose n is in $params.z sorted by n as y` with `$params.z` holding `"s"` and `ys` holding `[]` says `$params.z is "s", which isn't a list; ys is []`. A root in a `whose` on the `for` line doesn't hide what an item says on its own, whichever clause comes first: `every xs whose k is in pr.z and whose v is 1 as m` with `pr.z` holding `"s"` says `pr.z is "s", which isn't a list; item 2 of xs: v is "x", which isn't a number`. A list on a later line that doesn't depend on the item is said before the items' problems. A part or a parent's name that holds a list is walked on the right of `is in` and the other phrases that walk a list, as it is without a `for` line, in a sentence, in the line's own `whose` and in a `count of` there: with `has: {pl: c}` and the input `{"prs": [{"id": "p0", "c": [{"z": 1}, {"z": 2}], "xs": [{"v": 1}]}]}`, `for: every xs as m` with `m.v is in pl.z`, and `count of xs whose v is in pl.z is 1`, pass, and each row lists `pl[].z` holding `[1, 2]`, with the part's tag. With `c` holding `[{"z": 1}, {}]` both fail as `absent` with `item 2 of pl: z is missing`, said once. When an item of the line also fails on its own, that comes after the root: with the part `pos` at `os` holding `[{"name": "bob"}, {}]` and `ms` holding `[{"ws": [{"v": "bob", "n": 2}, {"n": 2}]}]`, `for: every ms as m, every m.ws whose v is in pos.name as w` with `w.n is 2` fails as `absent` with `item 2 of pos: name is missing; item 1 of ms: item 2 of ws: v is missing`. With params that aren't an object, like `3`, `for: every xs as m` with `m.v is at least 1` on `{"prs": [{"id": "p0", "xs": ["s", {"v": "x"}]}]}` still fails as `unusable`, where the item alone would make it `not_an_object`, and says `item 1 of xs is "s", which isn't an object; item 2 of xs: v is "x", which isn't a number`. Only `ambiguous` ranks above `unusable` there: `for: every xs as p, first of xs whose k is p.k sorted by v as m` with `m.v is 1`, params `3` and two items that tie on `v` says `item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v` and fails as `ambiguous`, and with `m.v is at least $params.n` it says `$params is 3, which isn't an object; ` before the tie.
 - Such a name that a phrase walks as a list, like `pos.name` in `r.v is in pos.name` or `count of rows whose v is in pos.name is 0`, fails a check that would otherwise pass when an item of it can't be read or its values can't be used, on an empty list too, and when a `whose` leaves no item. With the part `pos` holding `[{"name": "bob"}, {}]` and `rows` `[]`, `for: every rows, if any, as r` with `assert: r.v is in pos.name` fails as `absent` with `item 2 of pos: name is missing`.
 - When the list itself can't be read too, the name is said first, then the list, and the check takes the worse cause, in a `for` line and in a one-line `every`, `some`, `count of` or `sum of` alike. With no `z` in the params and `es` `null`, `every es whose v is in $params.z, if any, exists` and `count of es whose v is in $params.z is 0` fail as `absent` with `$params.z is missing; es is null`. A name on the right of the phrase that can't be used comes after the names in the `whose` and before the list, and the list's own problem isn't said when the params aren't an object.
 - An alias from an earlier line can hold something different for each item of the earlier line, so when the item is an object and what the sentence reads through the alias is missing, `null` or of the wrong type, it's named with that line's item in front and fails only that item, even when nothing is checked for it because the second list is empty with `, if any,` or its `whose` leaves nothing, and every sentence reads the second line's alias. An item that isn't an object isn't named for it, so when nothing is checked for that item, it passes. With `for: some approvers as approver, every commits, if any, as commit`, `assert: commit.author is approver.u` and `commits` holding `[]`, approvers `[{"username": "ada"}]` fail as `absent` with `item 1 of approvers: approver.u is missing`, `[{"username": "ada"}, {"username": "grace", "u": "grace"}]` pass, because grace's item passes on its own, and `["str", {"username": "b"}]` pass too, because `"str"` does.
-- When the second line's list is empty and `, if any,` lets it pass, or its `whose` leaves nothing, each item of the first line is still checked with the sentences that don't read the second line's alias, so an empty list never switches them off. The sentences that read that alias have nothing to check and are left out. With `for: some approvers as ap, every commits, if any, as c`, `assert: ap.state is "APPROVED"`, approvers `[{"u": "ada"}, {"u": "g", "state": "REJECTED"}]` and `commits` holding `[]`, the check fails as `absent` with `item 1 of approvers: ap.state is missing; item 2 of approvers: ap.state is "REJECTED"`, and the same with `every approvers as ap`. `failed_items` lists each approver with that sentence, as it would with commits. With `assert: c.author is ap.u` it passes.
+- When the second line's list is empty and `, if any,` lets it pass, or its `whose` leaves nothing, each item of the first line is still checked with the sentences that don't read the second line's alias, so an empty list never switches them off. The sentences that read that alias have nothing to check and are left out. With `for: some approvers as ap, every commits, if any, as c`, `assert: ap.state is "APPROVED"`, approvers `[{"u": "ada"}, {"u": "g", "state": "REJECTED"}]` and `commits` holding `[]`, the check fails as `absent` with `item 1 of approvers: ap.state is missing; item 2 of approvers: ap.state is "REJECTED"`, and the same with `every approvers as ap`. `failures` lists each approver under that sentence, as it would with commits. With `assert: c.author is ap.u` it passes.
 - The same goes for the first line. When its list is empty and `, if any,` lets it pass, or its `whose` leaves nothing, the check reads as a `for` line with only the second line, and only the sentences that don't read the first line's alias. With `for: every commits, if any, as c, some approvers as ap`, the same `assert`, approvers and `commits`, it fails as `absent` with `item 1 of approvers: state is missing; item 2 of approvers: state is "REJECTED"`, as `for: some approvers as ap` does. The second line still needs its list, so approvers `[]` fail as `value` with `approvers is []`, unless every sentence reads `c`, like `c.author is ap.u`, and nothing is left to check, or the second line reads the first line's alias, like `every c.files as f`, and is left out too.
-- With nothing left to walk, like `for: every xs, if any, as m` on an empty `xs`, the sentences that don't read `m` run once, and the message names what they read with no item in front. `assert: z is 1` with `z` holding `3` and `xs` holding `[]` fails as `value` with `z is 3`, and `failed_items` is `[]`. `m.v is 1` has nothing to check and is left out.
+- With nothing left to walk, like `for: every xs, if any, as m` on an empty `xs`, the sentences that don't read `m` run once, and the message names what they read with no item in front. `assert: z is 1` with `z` holding `3` and `xs` holding `[]` fails as `value` with `z is 3`, and its assertion has no items. `m.v is 1` has nothing to check and is left out.
+- A sentence that reads no name from the `for` line runs once whatever happens to the lists, and is said first, in the order the sentences are written, before what the walk broke. With `z` holding `2`, `for: every xs as x` with `assert: [x is 1, z is 3]` fails with `z is 2; xs is missing` when there's no `xs`, `z is 2; xs is null`, and `z is 2; xs is []` on an empty list. `failures` has an entry for `z is 3`, with the message `z is 2`, beside the entry for `xs`. `x is 1` isn't run, because there is no `x`. A sentence that reads the first line's name but not the second's runs the same way for each item of the first line whose second list fails.
+- A `named by` key on the `for` line that can't be read is said once, on the row: with no `k` in the params, `for: every o named by $params.k as x` with `assert: [x is 1, z is 3]` and `z` holding `2` says `z is 2; $params.k is missing`. The row's `inputs` hold `$params.k` with outcome `absent`, and only `z is 3` has an entry in `failures`. When `o` fails too, whatever the key would be, it comes after the key, and the worse cause wins: with `o` holding `"s"` the check says `z is 2; $params.k is missing; o is "s", which isn't a list or an object` and fails as `unusable`.
 - Two items at most.
 - `named by` an alias from the `for` line reads the key its item holds. With `for: every personas_dispatched as persona`, `persona_blob_shas named by persona exists` reads `persona_blob_shas.security`, then `persona_blob_shas.style`, and so on. An item that's `null` fails as `null`, and any other item that isn't a string, a number included, as `unusable`, since it can't be a key. `m.k named by m.k is 1` on `{"prs": [{"id": "p0", "xs": [null, {"k": "a"}]}]}` says `item 1 of xs: m is null; item 2 of xs: m is {"k": "a"}, which isn't text`. The row's inputs show `persona_blob_shas` itself.
 
@@ -1502,31 +1775,58 @@ picks `a1`, the commit with the latest `timestamp`, wherever it is in the list, 
 {
   "cause": "value",
   "check": "not_last_author",
-  "failed_items": [
+  "failures": [
     {
       "cause": "value",
-      "failed_assertions": [
-        {"assertion": "approver.username does not equal last_commit.author_username", "cause": "value", "items": [
-          {"cause": "value", "inputs": [
-            {"locations": ["/pull_requests/0/approvers/0/username"], "name": "approver.username", "value": "ada"},
-            {"locations": ["/pull_requests/0/commits/0/author_username"], "name": "last_commit.author_username", "value": "ada"}
-          ], "item": "item 1 of approvers"}
-        ]}
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "inputs": [
+                {"locations": ["/pull_requests/0/approvers/0/username"], "name": "approver.username", "outcome": "usable", "value": "ada"},
+                {
+                  "locations": ["/pull_requests/0/commits/0/author_username"],
+                  "name": "last_commit.author_username",
+                  "outcome": "usable",
+                  "value": "ada"
+                }
+              ],
+              "kind": "item",
+              "locations": ["/pull_requests/0/approvers/0"],
+              "message": "approver.username is \"ada\", and last_commit.author_username is \"ada\"",
+              "name": "item 1 of approvers",
+              "value": {"username": "ada"}
+            }
+          ],
+          "inputs": [],
+          "kind": "item",
+          "locations": ["/pull_requests/0/commits/0"],
+          "message": "",
+          "name": "item 1 of commits",
+          "value": {"author_username": "ada", "sha": "a1", "timestamp": 1760000200}
+        }
       ],
-      "item": "item 1 of commits",
-      "locations": ["/pull_requests/0/commits/0"],
-      "path": "item 1 of commits",
-      "value": {"author_username": "ada", "sha": "a1", "timestamp": 1760000200}
+      "inputs": [],
+      "kind": "assertion",
+      "locations": ["$policy:/requirements/review/checks/not_last_author/assert"],
+      "message": "",
+      "name": "approver.username does not equal last_commit.author_username"
     }
   ],
   "inputs": [
-    {"locations": ["/pull_requests/0/approvers/0"], "name": "approvers[]", "value": [{"username": "ada"}]},
-    {"locations": ["/pull_requests/0/commits/0"], "name": "item 1 of commits", "value": {"author_username": "ada", "sha": "a1", "timestamp": 1760000200}}
+    {"locations": ["/pull_requests/0/approvers/0"], "name": "approvers[]", "outcome": "usable", "value": [{"username": "ada"}]},
+    {
+      "locations": ["/pull_requests/0/commits/0"],
+      "name": "item 1 of commits",
+      "outcome": "usable",
+      "value": {"author_username": "ada", "sha": "a1", "timestamp": 1760000200}
+    }
   ],
   "message": "item 1 of commits: item 1 of approvers: approver.username is \"ada\", and last_commit.author_username is \"ada\"",
-  "passed": false,
-  "requirement": "review",
-  "subject": {"id": 7, "type": "pull_request"}
+  "passed": false
 }
 ```
 
@@ -1535,10 +1835,10 @@ picks `a1`, the commit with the latest `timestamp`, wherever it is in the list, 
 - A `whose` goes before `sorted by`, and keeps the items to sort: `last of approvers whose state is "APPROVED" sorted by timestamp as approval` is the latest approval. An item the `whose` can't decide fails the check with its cause.
 - `sorted by` sorts numbers, and [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339) times by the moment they name, so `2026-10-02T01:00:00+02:00` comes before `2026-10-02T00:00:00Z`. Dates like `2026-10-02` are sorted by day. An item whose field is missing, `null` or anything else fails the check as `absent`, `null` or `unusable`, without picking, since the order can't be known. When the fields mix numbers, times and dates, the numbers are kept and the rest fail as `unusable`, and with times and dates the dates fail.
 - `sorted by name alphabetically` sorts strings instead, code point by code point, so `"Zoe"` comes before `"adam"`. Every field has to be a string. There's no word for the reverse order: `last of` and `item 2 from last of` count from the end.
-- When another item has the same value as the one picked, nothing is picked and the check fails as `ambiguous`, listing the items that tie. With both commits at `1760000200` above, `failed_items` holds `item 1 of commits` and `item 2 of commits`, each with the `timestamp` as `value`. A tie elsewhere in the list doesn't matter.
+- When another item has the same value as the one picked, nothing is picked and the check fails as `ambiguous`, listing the items that tie. With both commits at `1760000200` above, `failures` holds `item 1 of commits` and `item 2 of commits`, each an `item` entry with the commit as `value` and the `timestamp` as an input, and the message `item 1 and item 2 of commits tie on timestamp`. A tie elsewhere in the list doesn't matter.
 - A position past the end of the list, or an empty list, fails as `absent`.
 - `sorted by` reads a field of the item, so it can't start with `$params` or `$input`. A field with the same name as a name from the `for` line needs a dot in front, `sorted by .c`. It can't go after `every` or `some`, and `, if any,` can't go with a position.
-- A picked second item can read the first item's name in its `whose`, and is picked again for each item of the first list: `for: every xs as p, first of ys whose k is p.k as q` gives each `p` the first `y` with the same `k`. `inputs` lists each item picked, like `item 2 of ys`. A first item for which nothing is picked isn't listed in `failed_items`, and a `ys` that can't be walked is listed once.
+- A picked second item can read the first item's name in its `whose`, and is picked again for each item of the first list: `for: every xs as p, first of ys whose k is p.k as q` gives each `p` the first `y` with the same `k`. `inputs` lists each item picked, like `item 2 of ys`. A first item for which nothing is picked isn't listed in `failures`, and a `ys` that can't be walked is listed once.
 - A field of the picked item is read through its name, `last_commit.author_username`. In a sentence, `last of commits.author_username` would be the last of a list at `commits.author_username`.
 
 `count of`, `sum of` and `plus` work out a number to compare. With this input:
@@ -1738,9 +2038,36 @@ The subject's name, as the requirement's `subject` gives it, means the subject i
 The name is also the path after `every`, `some`, `count of` and `sum of`, so a subject that is a list can be checked item by item. With the subject `tags`, `from: every releases.tags` and the input `{"releases": {"tags": [["a", "b"], [1, "x"]]}}`, `every tags is a string` passes the first tag list and fails the second, with the row:
 
 ```json
-{"check": "c", "subject": {"id": [1, "x"], "type": "tags"}, "passed": false, "cause": "value", "message": "item 1 of tags is 1",
- "failed_items": [{"cause": "value", "item": "item 1 of tags", "path": "item 1 of tags", "value": 1, "locations": ["/releases/tags/1/0"]}],
- "inputs": [{"name": "tags[]", "value": [1, "x"], "locations": ["/releases/tags/1/0", "/releases/tags/1/1"]}], "requirement": "r"}
+{
+  "cause": "value",
+  "check": "c",
+  "failures": [
+    {
+      "cause": "value",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [],
+          "inputs": [],
+          "kind": "item",
+          "locations": ["/releases/tags/1/0"],
+          "message": "item 1 of tags is 1",
+          "name": "item 1 of tags",
+          "value": 1
+        }
+      ],
+      "inputs": [],
+      "kind": "assertion",
+      "locations": ["$policy:/requirements/r/checks/c"],
+      "message": "",
+      "name": "every tags is a string"
+    }
+  ],
+  "inputs": [{"locations": ["/releases/tags/1/0", "/releases/tags/1/1"], "name": "tags[]", "outcome": "usable", "value": [1, "x"]}],
+  "message": "item 1 of tags is 1",
+  "passed": false,
+  "subject": {"id": [1, "x"], "type": "tags"}
+}
 ```
 
 A position is written in words, as for a field. With the input `{"releases": {"tags": [["a", "b"], [1, "x"], []]}}` and the same `from`, `first of tags is "a"` gives:
@@ -1787,9 +2114,36 @@ requirements:
 the pipeline is one subject, a list of two stages, and the rows are:
 
 ```json
-{"check": "owners", "subject": {"id": [{"owner": "ana", "stage": "build"}, {"owner": "bo", "stage": "test"}], "type": "pipeline"}, "passed": false, "cause": "value", "message": "item 2 of pipeline: owner is \"bo\", and $params.allowed is [\"ana\"]",
- "failed_items": [{"cause": "value", "item": "item 2 of pipeline", "path": "pipeline[1].owner", "value": "bo", "locations": ["/pipelines/0/1/owner"]}],
- "inputs": [{"name": "pipeline[].owner", "value": ["ana", "bo"], "locations": ["/pipelines/0/0/owner", "/pipelines/0/1/owner"]}], "requirement": "owned"}
+{
+  "cause": "value",
+  "check": "owners",
+  "failures": [
+    {
+      "cause": "value",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [],
+          "inputs": [{"locations": ["/pipelines/0/1/owner"], "name": "pipeline[1].owner", "outcome": "usable", "value": "bo"}],
+          "kind": "item",
+          "locations": ["/pipelines/0/1"],
+          "message": "owner is \"bo\", and $params.allowed is [\"ana\"]",
+          "name": "item 2 of pipeline",
+          "value": {"owner": "bo", "stage": "test"}
+        }
+      ],
+      "inputs": [{"locations": ["$params:/allowed"], "name": "$params.allowed", "outcome": "usable", "value": ["ana"]}],
+      "kind": "assertion",
+      "locations": ["$policy:/requirements/owned/checks/owners"],
+      "message": "",
+      "name": "every owner is in $params.allowed"
+    }
+  ],
+  "inputs": [{"locations": ["/pipelines/0/0/owner", "/pipelines/0/1/owner"], "name": "pipeline[].owner", "outcome": "usable", "value": ["ana", "bo"]}],
+  "message": "item 2 of pipeline: owner is \"bo\", and $params.allowed is [\"ana\"]",
+  "passed": false,
+  "subject": {"id": [{"owner": "ana", "stage": "build"}, {"owner": "bo", "stage": "test"}], "type": "pipeline"}
+}
 {"check": "plain", "subject": {"id": [{"owner": "ana", "stage": "build"}, {"owner": "bo", "stage": "test"}], "type": "pipeline"}, "passed": false, "cause": "not_an_object", "message": "pipeline is [{\"owner\": \"ana\", \"stage\": \"build\"}, {\"owner\": \"bo\", \"stage\": \"test\"}], which isn't an object",
  "inputs": [{"name": "owner", "value": null, "locations": ["/pipelines/0"]}], "requirement": "owned"}
 {"check": "stages", "subject": {"id": [{"owner": "ana", "stage": "build"}, {"owner": "bo", "stage": "test"}], "type": "pipeline"}, "passed": true, "cause": "satisfied",
@@ -1952,7 +2306,7 @@ Several of these rules depend on how a number was written, not only on its value
 }
 ```
 
-Passing and failing rows have the same fields, and a failing row also has a [`message`](#messages). A row of a check with `every`, `some` or a `for` line also has `failed_items`, and so does the `$min_subjects` row of a subject whose `from` line has [`every`](#from-lines). So does an `$applies` row of a subject whose `from` line has one `some` or `every` condition, and one with several conditions has `failed_assertions`, like a check written as several sentences. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
+Passing and failing rows have the same fields, and a failing row also has a [`message`](#messages). A failed row also has `failures`, with one entry for each part that failed, as [Finding the evidence for a failed row](#finding-the-evidence-for-a-failed-row) shows, and each of its inputs that reads a path has an `outcome`. The `$min_subjects` row of a subject whose `from` line has [`every`](#from-lines) has `failed_items` instead of `failures` for now. The rows in the examples of this page leave out `failures` and the `outcome` of inputs when the example isn't about them. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
 
 ### Messages
 
@@ -1967,7 +2321,7 @@ A failed row has a `message`: one line of plain text that says what Ergo found, 
 | `not_an_object` | the subject, by its name                    | `deployment is "str", which isn't an object` |
 | `ambiguous`     | the items that tie, and the key they tie on | `item 1 and item 2 of commits tie on ts`     |
 
-Where a row has no name for the subject, the message says `the subject`. A number Ergo works out is named after the words that asked for it, like `count of l is 5`. How values are printed:
+When a sentence can't read more than one name from outside its items, a field of the subject, `$params`, `$input`, a part or a key after `named by`, it says each of them, the worst cause first and then by name, and then the list it walks, then the items in list order. With `x` `null` and no `y`, `x is at least y` says `y is missing, and x is null`. With no `k` in the params and `xs` holding `[{"v": 1}, {"v": 1, "m": null}]`, `every xs whose v is m named by $params.k exists` says `$params.k is missing; item 1 of xs: m is missing; item 2 of xs: m is null`: the key once, then each item whose `m` can't take a key. Where a row has no name for the subject, the message says `the subject`. A number Ergo works out is named after the words that asked for it, like `count of l is 5`. How values are printed:
 
 - Text is in quotes. Text over 60 characters keeps the first 60 and ends with `…"`.
 - A list over 3 items shows the first 3 and then `and N more`, like `l is ["a", "b", "c", and 2 more]`.
@@ -2008,6 +2362,20 @@ $input.m is null; item 1 of xs is null, which isn't an object; item 2 of xs: key
 
 Other sentences that read such a root, like one with a second `whose`, still say it in each item.
 
+A path can break in more than one place, and then each problem is said. When a `named by` key from `$params` or `$input` can't be read, the value before it is read too, and if it is missing, `null` or can't take a key, that is said after the key. The row takes the worst cause, and the assertion's `inputs` list the key and that value, each with its own `outcome`. With no `k` in the params, `k is m named by $params.k` and this input:
+
+```json
+{"things": [{"id": "a", "k": 1, "m": "s"}]}
+```
+
+the row fails as `unusable` with:
+
+```text
+$params.k is missing; m is "s", which isn't an object
+```
+
+Where the path is walked, as in `every`, `count of` or a `for` line, the value can be a list too, so `count of o named by $params.k is 1` with `o` holding `"s"` says `$params.k is missing; o is "s", which isn't a list or an object`.
+
 An alias or a part is named as the policy calls it, never with a `$` before it: `item 1 of z: k is 1`, or `item 2 of lst: x is 2, and cov.x is 1` for a part on the right of an `every`. Names the policy writes with a `$`, like `$params.limit`, keep it. A value that spells an alias, like `"$z: x"`, prints as the input had it. A `count of`, a `sum of` or a `whose` that reads an item that isn't an object names it. With the check `count of commits whose signed is true is 3` and this input:
 
 ```json
@@ -2022,11 +2390,13 @@ item 1 of commits is null, which isn't an object; item 3 of commits is 5, which 
 
 A check written as several sentences gives the message of each sentence that failed, joined with `; `, like `x is 4; y is missing`. In an `any_of`, each option's message starts with its name, like `one: x is 4; two: y is missing`.
 
+A clause that an earlier sentence already gave isn't said again. With `assert: [expires_at exists, expires_at is after as_of]` on a subject that has neither, the message is `expires_at is missing; as_of is missing`, and each sentence's entry in `failures` still has its whole message.
+
 The `$applies` row of a subject that is out of scope says what the condition found, like `env is "staging"`.
 
 ### Where a value was read
 
-Every entry in a row's `inputs`, in a check's `$refs` and in `failed_items` has `locations`: where Ergo read its value, so a tool can point at the spot in the input. A location is a [JSON Pointer](https://www.rfc-editor.org/rfc/rfc6901) from the root of the input, like `/deployments/3/approved_by`, and list positions count from 0. With the policy `region is in $params.regions` as the check `region` of `deployment`, the params `{"regions": ["eu-west-1"]}` and this input:
+Every entry in a row's `inputs`, in a check's `$refs` and in `failures` has `locations`: where Ergo read its value, so a tool can point at the spot in the input. A location is a [JSON Pointer](https://www.rfc-editor.org/rfc/rfc6901) from the root of the input, like `/deployments/3/approved_by`, and list positions count from 0. With the policy `region is in $params.regions` as the check `region` of `deployment`, the params `{"regions": ["eu-west-1"]}` and this input:
 
 ```json
 {"deployments": [{"id": "d-1", "region": "us-east-1"}, {"id": "d-2"}]}
@@ -2035,20 +2405,173 @@ Every entry in a row's `inputs`, in a check's `$refs` and in `failed_items` has 
 the two rows are:
 
 ```json
-{"check": "region", "subject": {"id": "d-1", "type": "deployment"}, "passed": false, "cause": "value", "message": "region is \"us-east-1\", and $params.regions is [\"eu-west-1\"]",
- "inputs": [{"name": "region", "value": "us-east-1", "locations": ["/deployments/0/region"]}, {"name": "$params.regions", "value": ["eu-west-1"], "locations": ["$params:/regions"]}]}
-{"check": "region", "subject": {"id": "d-2", "type": "deployment"}, "passed": false, "cause": "absent", "message": "region is missing",
- "inputs": [{"name": "region", "value": null, "locations": ["/deployments/1"]}, {"name": "$params.regions", "value": ["eu-west-1"], "locations": ["$params:/regions"]}]}
+{
+  "cause": "value",
+  "check": "region",
+  "failures": [
+    {
+      "cause": "value",
+      "failures": [],
+      "inputs": [
+        {"locations": ["/deployments/0/region"], "name": "region", "outcome": "usable", "value": "us-east-1"},
+        {"locations": ["$params:/regions"], "name": "$params.regions", "outcome": "usable", "value": ["eu-west-1"]}
+      ],
+      "kind": "assertion",
+      "locations": ["$policy:/requirements/r/checks/region"],
+      "message": "region is \"us-east-1\", and $params.regions is [\"eu-west-1\"]",
+      "name": "region is in $params.regions"
+    }
+  ],
+  "inputs": [
+    {"locations": ["/deployments/0/region"], "name": "region", "outcome": "usable", "value": "us-east-1"},
+    {"locations": ["$params:/regions"], "name": "$params.regions", "outcome": "usable", "value": ["eu-west-1"]}
+  ],
+  "message": "region is \"us-east-1\", and $params.regions is [\"eu-west-1\"]",
+  "passed": false,
+  "subject": {"id": "d-1", "type": "deployment"}
+}
+{
+  "cause": "absent",
+  "check": "region",
+  "failures": [
+    {
+      "cause": "absent",
+      "failures": [],
+      "inputs": [
+        {"locations": ["/deployments/1"], "name": "region", "outcome": "absent", "value": null},
+        {"locations": ["$params:/regions"], "name": "$params.regions", "outcome": "usable", "value": ["eu-west-1"]}
+      ],
+      "kind": "assertion",
+      "locations": ["$policy:/requirements/r/checks/region"],
+      "message": "region is missing",
+      "name": "region is in $params.regions"
+    }
+  ],
+  "inputs": [
+    {"locations": ["/deployments/1"], "name": "region", "outcome": "absent", "value": null},
+    {"locations": ["$params:/regions"], "name": "$params.regions", "outcome": "usable", "value": ["eu-west-1"]}
+  ],
+  "message": "region is missing",
+  "passed": false,
+  "subject": {"id": "d-2", "type": "deployment"}
+}
 ```
 
-and the check's `$refs` entry is `{"name": "$params.regions", "value": ["eu-west-1"], "locations": ["$params:/regions"]}`.
+and the check's `$refs` entry is `{"locations": ["$params:/regions"], "name": "$params.regions", "outcome": "usable", "value": ["eu-west-1"]}`. The rows leave out `requirement`.
 
 - A value read from the params has `$params:` in front of a pointer from the root of the params, as `$refs` shows.
 - A read that stops early points at the last value it reached. `d-2` has no `region`, so its location is `/deployments/1`, the deployment that should have held it. A pointer never leads to a value Ergo didn't read.
 - An entry that holds one value for each item of a list, like the `inputs` of an `every`, has one location for each, in the same order. An entry that holds a number Ergo worked out, like `count of findings`, lists the locations of what it was worked out from.
-- A failed item points at where its `value` was read, in the `failed_items` of an `$applies` row as in those of a check. The `failed_assertions` of an `$applies` row or of a check without a `for` line hold no values, so they have no locations. Those of a `for` line have `inputs`, with locations of their own.
+- An `item` in `failures` points at where it sits, with every copy for `distinct`, in an `$applies` row as in a check. Its inputs have locations of their own. An `option` or an `assertion` points into the policy, `$policy:` and a pointer from the root of the policy, like `$policy:/requirements/fresh/checks/expires/any_of/expires/1`, with `#N` after it when one string holds several sentences. A location that starts with `$params:` or `$policy:` is not a value from the input.
 - The entries of `$well_formed` are about how the policy is written, not about the input, so their `locations` are `[]`. So is a list that's missing, where there was nothing to read.
 - Two reads with the same name and value are one entry only when their locations match too. A parent's `b.x` and a child's own `.b.x` can print the same and be read from different places, so they stay two entries.
+
+### Finding the evidence for a failed row
+
+A failed row says why in two places: its `message`, for a person, and its `failures`, for a tool that builds audit evidence. To find the evidence for a failed row, read `failures` from the entry down:
+
+1. Each entry is a part that failed: an `option` of an `any_of`, an `assertion` (a sentence), an `item` of a list that was walked, or a `list` that couldn't be walked. The entries under it are what failed inside it, and an entry with `failures` `[]` is a place where the check really failed. For now, a list walked inside an `any_of` option or an `assert` list has no `item` entries under its assertion, so its items show only in the message ([#688](https://github.com/kosli-dev/ergo/issues/688)).
+2. An entry's `inputs` are what that part read, each with its `name`, `value`, `locations` and `outcome`. `locations` are where, as [Where a value was read](#where-a-value-was-read) says, and `outcome` says which input to blame: `absent` and `null` are evidence that isn't there, `unusable` is a value of the wrong kind for the check, and `usable` is a value that was fine.
+3. An `item` has `value`, the item, and `locations`, where it sits in the input.
+4. Each input sits on the entry that read it: a name from outside the items, like `$params.min`, on the `assertion`, once, what was read inside an item on that `item`, and a list's own read on its `list` entry. On a `for` line, what the line reads itself, like a key after `named by` in its `whose`, is in the row's own `inputs`. A `count of` or `sum of` whose list can't be walked, like `count of o is 1` with `o` holding `"s"`, has a `list` entry `o` under its assertion, with the input `o` and the `outcome` `unusable`.
+5. A location that starts with `/` points into the input. One that starts with `$params:` points into the params, and one that starts with `$policy:` into the policy, at the option or the sentence. Neither is a value from the input.
+
+With this policy:
+
+```yaml
+ergo_spec: v0.7-dev
+subjects:
+  grant:
+    from: grants
+    identified_by: id
+requirements:
+  fresh:
+    subject: grant
+    checks:
+      expires:
+        description: The grant expires, or an approved exception covers it
+        any_of:
+          expires:
+            - expires_at exists
+            - expires_at is after $input.as_of
+          approved exception:
+            - exception.approved_by exists
+```
+
+and this input:
+
+```json
+{"as_of": "2026-11-05T00:00:00Z", "grants": [{"id": "payments.approve", "granted_at": "2026-10-01T00:00:00Z"}]}
+```
+
+the row of `payments.approve` for `expires` is below. It leaves out `requirement`, `subject` and the row's `message`, which is `approved exception: exception.approved_by is missing; expires: expires_at is missing`, but every entry keeps its own `message`:
+
+```json
+{
+  "cause": "value",
+  "check": "expires",
+  "failures": [
+    {
+      "cause": "value",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [],
+          "inputs": [{"locations": ["/grants/0"], "name": "exception.approved_by", "outcome": "absent", "value": null}],
+          "kind": "assertion",
+          "locations": ["$policy:/requirements/fresh/checks/expires/any_of/approved exception/0"],
+          "message": "exception.approved_by is missing",
+          "name": "exception.approved_by exists"
+        }
+      ],
+      "inputs": [],
+      "kind": "option",
+      "locations": ["$policy:/requirements/fresh/checks/expires/any_of/approved exception"],
+      "message": "exception.approved_by is missing",
+      "name": "approved exception"
+    },
+    {
+      "cause": "value",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [],
+          "inputs": [{"locations": ["/grants/0"], "name": "expires_at", "outcome": "absent", "value": null}],
+          "kind": "assertion",
+          "locations": ["$policy:/requirements/fresh/checks/expires/any_of/expires/0"],
+          "message": "expires_at is missing",
+          "name": "expires_at exists"
+        },
+        {
+          "cause": "absent",
+          "failures": [],
+          "inputs": [
+            {"locations": ["/grants/0"], "name": "expires_at", "outcome": "absent", "value": null},
+            {"locations": ["/as_of"], "name": "$input.as_of", "outcome": "usable", "value": "2026-11-05T00:00:00Z"}
+          ],
+          "kind": "assertion",
+          "locations": ["$policy:/requirements/fresh/checks/expires/any_of/expires/1"],
+          "message": "expires_at is missing",
+          "name": "expires_at is after $input.as_of"
+        }
+      ],
+      "inputs": [],
+      "kind": "option",
+      "locations": ["$policy:/requirements/fresh/checks/expires/any_of/expires"],
+      "message": "expires_at is missing",
+      "name": "expires"
+    }
+  ],
+  "inputs": [
+    {"locations": ["/as_of"], "name": "$input.as_of", "outcome": "usable", "value": "2026-11-05T00:00:00Z"},
+    {"locations": ["/grants/0"], "name": "exception.approved_by", "outcome": "absent", "value": null},
+    {"locations": ["/grants/0"], "name": "expires_at", "outcome": "absent", "value": null}
+  ],
+  "passed": false
+}
+```
+
+Its `failures` has one `option` entry for each option, and each has an `assertion` entry for every sentence that failed. Each entry's `message` is what the row's message says about that part, without the option's name in front, so the two sentences of `expires` both say `expires_at is missing`, and the row says it once. The `expires` option failed because `expires_at` is `absent` (`outcome`) on the grant at `/grants/0`, and the `approved exception` option because `exception.approved_by` is. `$input.as_of` is `usable`: it read fine, and the check couldn't use it only because the other side was missing. `$policy:/requirements/fresh/checks/expires/any_of/expires/1` is the second sentence of the `expires` option, not a value from the input. The row's own `inputs` list what all the options read, once each.
 
 ### Subjects in the report
 
@@ -2255,7 +2778,7 @@ Their descriptions are plain sentences, like your own checks': `The requirement 
 
 A subject that fails `$applies` gets no other rows, since it was never checked. But its `$applies` row stays, so you can see what was left out and why.
 
-An `$applies` row has the fields the row of a check would have if its conditions were the assertions of that check. One `some` or `every` condition gives `failed_items`, which is `[]` when it passes. Two or more conditions give `failed_assertions`, the conditions that failed in the order written with their own causes, and `[]` when they all pass, but no `failed_items`. A single condition that isn't a `some` or an `every`, like `environment is "prod"`, adds no field, as a plain check doesn't. An entry of `failed_assertions` can have a cause the row doesn't: when a `present` condition rules the subject out, the row's cause is `value` and the entry of another condition can be `absent`.
+An `$applies` row has the fields the row of a check would have if its conditions were the assertions of that check. Its `failures` has an `assertion` entry for each condition that failed, in the order written with their own causes, and the items of a `some` or `every` condition under it, and a row that passes has none. An entry of `failures` can have a cause the row doesn't: when a `present` condition rules the subject out, the row's cause is `value` and the entry of another condition can be `absent`.
 
 A subject is only out of scope when Ergo read a condition's fields and the values didn't match, so the row's cause is `value`. When a condition fails because a field it reads is missing, `null` or can't be found, Ergo can't tell whether the subject is in scope. Its `$applies` row then fails with that cause, the requirement isn't met, and the row shows up in the violations. This holds with `min_subjects: 0` too, so a missing field can't quietly make a requirement pass.
 
@@ -2324,7 +2847,7 @@ The violations are the rows of the report that are real problems, each with its 
 ]
 ```
 
-A violation of a check with `every`, `some` or a `for` line, or of the `$min_subjects` row of a subject read with `every`, keeps its row's `failed_items`, and one of a check written as several sentences its `failed_assertions`. A violation that's an `$applies` row keeps the `failed_items` or `failed_assertions` of its row too.
+A violation keeps its row's `failures`, and one of the `$min_subjects` row of a subject read with `every` its `failed_items`. A violation that's an `$applies` row keeps the `failures` of its row too.
 
 It leaves out:
 

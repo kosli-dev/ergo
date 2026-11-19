@@ -109,7 +109,7 @@ _for_why(first, item, e, names, wh, failure) := object.union(failure, {"why": []
 		fe := _focus_of(e, c)
 		cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
 		not cause in _not_failing_causes
-		said := _message(c, fe.iv, cause)
+		said := _m_whose_said_in(item, names, c, fe.iv, cause)
 		roots := _m_keyed_roots(object.get(names, "ergo/subject", null), c, cause)
 	] with input as {"ergo/names": names}
 	ms := _for_own_first(first, pairs)
@@ -126,7 +126,7 @@ _for_own_why(true, item, e, names) if {
 	cause := _for_focus_cause(c, e) with input as {"ergo/names": names}
 	not cause in _not_failing_causes
 	roots := _m_keyed_roots(object.get(names, "ergo/subject", null), c, cause) with input as {"ergo/names": names}
-	_m_own_said(_message(c, fe.iv, cause), roots) with input as {"ergo/names": names}
+	_m_own_said(_m_whose_said_in(item, names, c, fe.iv, cause), roots) with input as {"ergo/names": names}
 }
 
 _for_own_why_of(true, e, own) := {"why": [_m_why_text(_m_item_name(e.i, set()), own[0])]}
@@ -160,7 +160,7 @@ _for_own_texts(item, e, names) := [t |
 	own in _failed_read_states
 	subj := object.get(names, "ergo/subject", null)
 	roots := {piece | some r in array.concat(array.concat(_for_root_why(c, _m_undecided(own), subj), _m_keyed_off(subj, c, own)), _m_cond_root_texts(subj, c)); some piece in split(r, "; ")} with input as {"ergo/names": names}
-	said := _message(c, fe.iv, own) with input as {"ergo/names": names}
+	said := _m_whose_said_in(item, names, c, fe.iv, own) with input as {"ergo/names": names}
 	parts := [y | some z in split(said, "; "); some y in split(z, ", and "); not y in roots; not regex.match(`^and [0-9]+ more$`, y)]
 	parts != []
 	t := _m_aliased(concat(", and ", parts))
@@ -169,13 +169,23 @@ _for_own_texts(item, e, names) := [t |
 _m_whose_why(first, f) := _for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
 	wo := f.whose_of
 	_for_root_fails(wo[0], wo[1], wo[2])
+} else := _for_why(first, wo[0], wo[1], wo[2], wo[3], f) if {
+	wo := f.whose_of
+	_for_own_texts(wo[0], wo[1], wo[2]) != []
 } else := f
 
 _m_inner_text(check, f) := _m_inner_text_of(check, _m_whose_why(false, f))
 
 _m_inner_text_of(check, f) := [_m_why_text(_m_for_item_name(check, f.path), f.own[0])] if count(object.get(f, "own", [])) > 0
 
-else := _m_root_why(f)
+else := ts if {
+	ts := _m_root_why(f)
+	ts != []
+} else := [concat("", [_m_for_item_name(check, f.path), ": ", substring(w, indexof(w, ": ") + 2, -1)]) |
+	count(object.get(f, "rest", [])) == 0
+	some w in object.get(f, "why", [])
+	contains(w, ": ")
+]
 
 _m_inner_free(f) := _m_inner_free_of(_m_whose_why(false, f))
 
@@ -227,6 +237,10 @@ _for_message(check, subj, r) := _m_joined(_m_for_empty(object.union(check, {"ite
 }
 
 _m_for_empty(check, subj, cause) := cs if {
+	ls := [t | some item in check.items; some t in _m_key_list_texts(subj, item.path, object.get(item, "if_any", false) == true)]
+	ls != []
+	cs := _once(array.concat([t | some item in check.items; some t in _m_key_texts(item.path)], ls))
+} else := cs if {
 	cause in _no_value_states
 	cs := _once([c | some item in check.items; some c in _m_key_states(subj, _m_for_item(item), cause)])
 	cs != []
@@ -282,9 +296,30 @@ _m_list_found(subj, path) := [_m_is(_input_name(p), _value_at(subj, p))] if {
 
 _for_message(check, _, r) := _m_for_joined(_for_ents(check, r)) if r.failed != []
 
+_for_key_in_items(ks, ents) if {
+	some e in ents
+	some k in ks
+	contains(e.t, concat("", [": ", k]))
+}
+
+_for_whose_key_faults(check) := _m_root_sorted(_once([_m_isnt(_ref_label(seg.ref), _ref_read(seg.ref), "text") |
+	some item in check.items
+	some c in object.get(item, "whose", [])
+	some [p, _] in _key_base_reads(c)
+	some seg in p
+	_ref_step_flaw(seg) == "unusable"
+]))
+
 _for_message_parts(check, subj, r) := _once([e.t | some e in _for_ents(check, r)]) if r.failed != []
 
 else := split(_for_message(check, subj, r), "; ")
+
+_for_key_once(check, r) := [k | some k in ks; not _m_said_in(k, object.get(r, "root_msgs", object.get(r, "other_roots", [])))] if {
+	r.failed != []
+	ks := _for_whose_key_faults(check)
+	ks != []
+	not _for_key_in_items(ks, _for_ents(check, r))
+} else := []
 
 _for_ents(check, r) := array.concat(
 	[{"i": i, "t": t, "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) == true; some j, p in _m_for_part(check, r.failed, i, f); some t in _m_for_unled(said, p)],
@@ -351,17 +386,42 @@ _m_for_unled(said, p) := [t] if {
 	i > 0
 } else := [p]
 
-_m_for_joined(ents) := concat("; ", _once([e.t | some e in ents])) if count(_once([e.t | some e in ents; e.x == false])) <= 3
+_m_for_joined(ents) := concat("; ", _once([e.t | some e in ents])) if count(ents) <= 3
+
+_m_for_joined(ents) := concat("; ", _once([e.t | some e in ents])) if {
+	count(ents) > 3
+	count(_m_for_counted(ents)) <= 3
+}
 
 _m_for_joined(ents) := concat("; ", array.concat(_once([e.t | some e in ents; _m_kept(e, shown, ents)]), [concat("", ["and ", _literal_text(count(counted) - 3), " more"])])) if {
-	counted := _once([e.t | some e in ents; e.x == false])
+	count(ents) > 3
+	counted := _m_for_counted(ents)
 	count(counted) > 3
 	shown := array.slice(counted, 0, 3)
 }
 
+_m_for_counted(ents) := _once([_m_item_lead(e.t) | some e in ents; e.x == false; startswith(e.t, "item ")])
+
+_m_item_lead(t) := concat(": ", [_m_item_head(p) | some i, p in ps; i < n]) if {
+	ps := split(t, ": ")
+	n := count([i | some i, _ in ps; _m_items_up_to(ps, i)])
+}
+
+_m_items_up_to(ps, i) if {
+	every j in numbers.range(0, i) {
+		startswith(ps[j], "item ")
+	}
+}
+
+_m_item_head(p) := substring(p, 0, o + s) if {
+	o := indexof(p, " of ") + 4
+	s := indexof(substring(p, o, -1), " ")
+	s >= 0
+} else := p
+
 _m_kept(e, shown, _) if {
 	e.x == false
-	e.t in shown
+	_m_kept_text(e.t, shown)
 }
 
 _m_kept(e, shown, ents) if {
@@ -369,7 +429,14 @@ _m_kept(e, shown, ents) if {
 	some o in ents
 	o.i == e.i
 	o.x == false
-	o.t in shown
+	_m_kept_text(o.t, shown)
+}
+
+_m_kept_text(t, shown) if not _m_cut_item(t, shown)
+
+_m_cut_item(t, shown) if {
+	startswith(t, "item ")
+	not _m_item_lead(t) in shown
 }
 
 _m_for_part(_, _, _, f) := _m_for_fail(_m_with_why(f)) if f.cause != "ambiguous"
@@ -411,7 +478,7 @@ _m_for_fail(f) := [_m_isnt(object.get(f, "bare", object.get(f, "said", f.item)),
 	not is_object(object.get(f, "raw", f.value))
 }
 
-_m_for_fail(f) := [_m_under(object.get(f, "said", f.item), _m_group_text(g)) | some g in _m_for_groups(f)] if {
+_m_for_fail(f) := array.concat([_m_under(object.get(f, "said", f.item), _m_group_text(g)) | some g in _m_for_groups(f)], [_m_free_text(f, x, t) | some x in object.get(f, "failed_items", []); some t in _m_inner_fail(x)]) if {
 	not "msg" in object.keys(f)
 	not _m_bare_item(f)
 	f.failed_assertions != []
@@ -505,7 +572,7 @@ _m_after_lead(lead, x) := substring(x, count(prefix), -1) if {
 
 _m_group_text(g) := g[0] if count(g) == 1
 
-else := concat(", and ", _m_first_marked(array.concat([g[0]], [_m_after_lead(_m_lead_of(g[0]), x) | some x in array.slice(g, 1, count(g))])))
+else := concat(", and ", _m_said_new(_m_first_marked(array.concat([g[0]], [_m_after_lead(_m_lead_of(g[0]), x) | some x in array.slice(g, 1, count(g))]))))
 
 _m_for_fail(f) := [_m_free_text(f, x, t) | some x in f.failed_items; some t in _m_inner_fail(x)] if {
 	not "msg" in object.keys(f)
@@ -609,6 +676,14 @@ _m_walk_leaf(e, leaf, cause, roots) := t if {
 	leaf != null
 	off := _m_keyed_off(object.get(input, ["ergo/names", "ergo/subject"], null), leaf, cause)
 	off != []
+} else := _m_leaf_in(e.i, concat("; ", bs), roots) if {
+	leaf != null
+	bs := _m_cond_base_texts(e.iv, leaf)
+	bs != []
+	not _key_item_unclean(e)
+} else := _m_leaf_in(e.i, _m_unclean_said(leaf, e.iv, cause), roots) if {
+	leaf != null
+	_key_item_unclean(e)
 } else := _m_leaf_in(e.i, _message(leaf, e.iv, cause), roots) if leaf != null
 
 else := ""
@@ -768,7 +843,7 @@ _m_from_message(_, _, true, _) := {}
 
 _m_from_message(doc, req, false, cause) := {"message": m} if {
 	_from_unreadable(req)
-	ms := _m_from_refs(req, cause)
+	ms := array.concat(_m_from_refs(req, cause), [_m_key_list_text(_m_from_item_name(req, f.prefix), f) | some f in _key_base_flaws(doc, _from_path(req), "list")])
 	count(ms) > 0
 	m := _m_joined(ms)
 } else := {"message": m} if {
@@ -870,16 +945,26 @@ _m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(c
 	row.cause == "missing"
 }
 
-_m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(check, subj, row.cause))}) if {
+_m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line_sorted(check, subj, row.cause))}) if {
 	row.passed == false
 	row.cause != "missing"
+	row.cause != "unusable"
+}
+
+_m_filter(check, subj, row) := object.union(object.union(row, {"message": _m_joined(_m_line_sorted(check, subj, row.cause))}), _m_unusable_marks(check, subj, row)) if {
+	row.passed == false
+	row.cause == "unusable"
 }
 
 _m_filter_walk(_, _, true, _, _) := {}
 
-_m_filter_walk(_, _, false, _, w) := {"message": _m_joined(w.root_msgs)} if "root_msgs" in object.keys(w)
+_m_filter_walk(_, _, false, _, w) := {"message": _m_joined(w.root_msgs), "ergo/own": w.root_msgs, "ergo/texts": []} if "root_msgs" in object.keys(w)
 
-_m_filter_walk(check, subj, false, cause, w) := {"message": _m_joined(_walk_parts(check, subj, {"cause": cause}, w))} if not "root_msgs" in object.keys(w)
+_m_filter_walk(check, subj, false, cause, w) := {"message": _m_joined(parts), "ergo/own": [p | some p in parts; not p in items], "ergo/texts": items} if {
+	not "root_msgs" in object.keys(w)
+	parts := _walk_parts(check, subj, {"cause": cause}, w)
+	items := _walk_item_texts(parts, w)
+}
 
 _m_applies(_, _, true) := {}
 
@@ -887,3 +972,269 @@ _m_applies(evals, req, false) := {"message": concat("; ", ms)} if {
 	ms := _once([evals[n].message | some n in _applies_to_names(req); not evals[n].passed])
 	ms != []
 } else := {"message": concat("", [_text(object.get(req, "subject", null)), " doesn't match"])}
+
+_for_said(raw) := object.union(object.remove(raw, ["ergo/for_raw"]), {"ergo/for_texts": _for_texts(s.check, s.subj, s.r, s.once, s.line)}) if s := raw["ergo/for_raw"]
+
+else := raw
+
+_for_texts(check, subj, r, once, line) := {
+	"items": items,
+	"said": [concat("; ", array.concat(_for_flaw_said(check, i, flaw), _for_grouped(check, _uncovered(array.concat([m | some m in roots; i in owners[m]], object.get(frees, a, [])))))) | some i, a in check.assertions],
+	"walk": array.concat(array.concat([["list", _for_list_label(check, m), m] | flaw == []; some m in line], [["list", _for_list_label(check, ""), concat("; ", _for_grouped(check, unowned))] | unowned != []]), seconds),
+	"free": [object.remove(l, ["msg", "own_msg"]) | some l in object.get(r, "free_lines", [])],
+	"flawed": flaw != [],
+} if {
+	flaw := _for_flaw_line(check, line)
+	said := _m_for_said(check) | _m_for_tally_said(check)
+	rs := object.get(r, "root_msgs", object.get(r, "other_roots", []))
+	second := {m | once != []; some x in _for_second_roots(check, _for_names); some m in x.ms}
+	skip := _for_once_skip(check, once)
+	free_as := {a | some i, a in check.assertions; not _for_reads_an_alias(check, check.checks[i])}
+	items := [_for_item_texts(check, r.failed, k, skip, said, once, free_as) | some k, _ in r.failed]
+	roots := _once(array.concat([m | once != []; some m in rs; not m in second], [t | some x in items; some t in x.roots]))
+	frees := _for_free_said(r, rs, once, free_as)
+	owners := {m: _for_root_owner(check, subj, m, _for_free_said(r, [], once, free_as)) | some m in roots}
+	unowned := _uncovered([m | some m in roots; -1 in owners[m]])
+	seconds := [["item", _m_lead_of(m), _m_after_lead(_m_lead_of(m), m)] | once != []; some m in rs; m in second]
+}
+
+_for_flaw_line(check, line) := line if {
+	line != []
+	_unreadable_input
+	not _m_reads_params(check.items)
+} else := []
+
+_for_flaw_said(_, _, []) := []
+
+_for_flaw_said(check, i, flaw) := flaw if {
+	flaw != []
+	_m_reads_params(check.checks[i])
+} else := flaw if {
+	flaw != []
+	not _m_reads_params(check.checks)
+} else := []
+
+_for_grouped(check, ts) := _m_tally_grouped(check, ts) if count(ts) > 3
+
+else := ts
+
+_uncovered([]) := []
+
+_uncovered([t]) := [t]
+
+_uncovered(ts) := [t | some k, t in ts; not _covered(t, array.slice(ts, 0, k))] if count(ts) > 1
+
+_covered(t, earlier) if {
+	seen := {z | some e in earlier; some x in split(e, "; "); some z in split(x, ", and ")}
+	every x in split(t, "; ") {
+		every z in split(x, ", and ") {
+			z in seen
+		}
+	}
+}
+
+_for_once_skip(_, []) := []
+
+_for_once_skip(check, once) := array.concat(once, [m | some x in _for_second_roots(check, _for_names); some m in x.raw]) if once != []
+
+_for_list_label(check, m) := name if {
+	count(check.items) == 2
+	name := _input_name(check.items[1].path)
+	startswith(m, concat("", [name, " "]))
+} else := _input_name(check.items[0].path)
+
+_for_root_owner(check, subj, m, frees) := free | {i | some i, _ in check.assertions; not i in free; _for_root_of(check, subj, i, m)} if {
+	free := {i | some i, a in check.assertions; _for_free_root(m, frees[a])}
+	count(free) > 0
+} else := {-1} if {
+	some it in check.items
+	count(object.get(it, "whose", [])) > 0
+	_for_root_of(object.union(check, {"checks": [], "assertions": []}), subj, -1, m)
+} else := {0} if count(check.checks) == 1
+
+else := owners if {
+	owners := {i | some i, _ in check.checks; _for_root_of(check, subj, i, m)}
+	count(owners) > 0
+} else := {-1}
+
+_for_free_root(m, ts) if {
+	every p in split(m, "; ") {
+		p in ts
+	}
+}
+
+_for_root_of(check, subj, -1, m) if {
+	every p in split(m, "; ") {
+		p in {x | some t in _walk_root_msgs(check, subj); some x in array.concat([t], split(t, "; "))}
+	}
+}
+
+_for_root_of(check, subj, i, m) if {
+	i >= 0
+	c := check.checks[i]
+	one := object.union(check, {"items": [object.remove(it, ["whose"]) | some it in check.items], "checks": [c], "assertions": [check.assertions[i]]})
+	texts := {p | some t in array.concat(_walk_root_msgs(one, subj), [x | some x in (_m_for_said(c) | _m_for_tally_said(c))]); some p in array.concat([t], split(t, "; "))}
+	every p in split(m, "; ") {
+		p in texts
+	}
+}
+
+_for_free_said(_, _, [], _) := {}
+
+_for_free_said(r, rs, once, free_as) := {a: _once(ts) |
+	some a in free_as
+	ts := array.concat(
+		[t |
+			some [l, f] in array.slice([[l, f] | some f in r.failed; some l in object.get(f, "failed_assertions", []); l.assertion == a], 0, 1)
+			some m in _m_line_msg(l, f)
+			some p in split(m, "; ")
+			t := _m_unskipped(p, _m_root_skip(rs))
+			t != ""
+		],
+		[t |
+			some l in object.get(r, "free_lines", [])
+			l.assertion == a
+			some m in l.msg
+			some t in split(m, "; ")
+		],
+	)
+	ts != []
+} if once != []
+
+_for_item_texts(check, failed, k, skip, said, once, free_as) := {"lines": lines, "roots": [t | some l in lines; some t in l.roots], "walk": [], "inner": _for_line_inner_texts(failed[k])} if {
+	f := failed[k]
+	f.cause != "ambiguous"
+	not _for_hoisted(f)
+	not _for_said_why(f)
+	not _m_bare_item(f)
+	f.failed_assertions != []
+	lines := [_for_line_texts(f, l, said, skip, free_as) | some l in f.failed_assertions]
+} else := {"walk": [t | some t in ts; not t in said; _for_own_text(t, once, f)], "inner": _for_inner_texts(f), "roots": [t | some t in ts; t in said]} if {
+	f := failed[k]
+	fs := [_for_skipping(g, skip) | some g in failed]
+	ts := [t | some p in _m_for_part(check, fs, k, _for_hoisted_or(fs[k], f)); some t in _m_for_unled(said, p)]
+}
+
+_for_skipping(f, []) := f
+
+_for_skipping(f, skip) := object.union(f, {"skip": skip}) if skip != []
+
+_for_hoisted(f) if f.hoisted == true
+
+_for_said_why(f) if _ = f.msg
+
+_for_said_why(f) if {
+	_ = f.whose_of
+	_ = _m_with_why(f).msg
+}
+
+_for_own_text(_, _, f) if _for_hoisted(f)
+
+_for_own_text(t, once, _) if not t in once
+
+_for_hoisted_or(g, f) := f if _for_hoisted(f)
+
+else := g
+
+_for_inner_texts(f) := [[_m_unled(name, _m_free_text(f, x, t)) | some t in _m_inner_fail(x)] | some x in f.failed_items] if {
+	f.cause != "ambiguous"
+	not _for_said_why(f)
+	not _m_bare_item(f)
+	f.failed_assertions == []
+	count(object.get(f, "failed_items", [])) > 0
+	name := object.get(f, "said", f.item)
+} else := []
+
+_for_line_inner_texts(f) := [[_m_unled(name, _m_free_text(f, x, t)) | some t in _m_inner_fail(x)] | some x in f.failed_items] if {
+	count(object.get(f, "failed_items", [])) > 0
+	name := object.get(f, "said", f.item)
+} else := []
+
+_for_cut(said, q) := _m_for_unled(said, concat("", ["item \u0003: ", q]))
+
+_for_unsaid(said, q) := [q] if count(said) == 0
+
+else := [y | some x in _for_cut(said, q); not x in said; y := trim_prefix(x, "item \u0003: "); y != ""]
+
+_for_said_in(said, q) := [] if count(said) == 0
+
+else := [x | some x in _for_cut(said, q); x in said]
+
+_for_line_texts(f, l, said, skip, free_as) := {"m": "", "xs": [], "roots": []} if l.assertion in free_as
+
+else := {
+	"m": "",
+	"xs": [_m_and_joined([_m_after_lead(_m_lead_of(y), y) | some q in _for_line_pieces(_m_line_text(x, _m_pair_owns(f, x.item)), skip); some y in _for_unsaid(said, q)]) | some x in l.items],
+	"roots": [y | some x in l.items; some q in _for_line_pieces(_m_line_text(x, _m_pair_owns(f, x.item)), skip); some y in _for_said_in(said, q)],
+} if {
+	_ = l.items
+}
+
+else := {
+	"m": _for_rendered(object.get(f, "said", f.item), [y | some q in qs; some y in _for_unsaid(said, q)]),
+	"xs": [],
+	"roots": [y | some q in qs; some y in _for_said_in(said, q)],
+} if {
+	qs := _for_line_pieces(_m_line_msg(l, f), skip)
+}
+
+_for_line_pieces(ps, []) := [p | some p in ps; p != ""]
+
+_for_line_pieces(ps, skip) := [q | some p in ps; q := _m_unskipped(p, skip); q != ""] if skip != []
+
+_for_rendered(_, []) := ""
+
+_for_rendered(_, [q]) := q if not startswith(q, "\u0001")
+
+_for_rendered(name, qs) := concat("; ", [_m_unled(name, _m_under(name, _m_group_text(g))) | some g in _m_groups(_once(qs), false)]) if {
+	qs != []
+	not _for_plain_one(qs)
+}
+
+_for_plain_one([q]) if not startswith(q, "\u0001")
+
+_m_and_joined(xs) := concat(", and ", xs)
+
+_m_unled(name, t) := substring(t, count(name) + 2, -1) if startswith(t, concat("", [name, ": "]))
+
+else := t
+
+_m_whose_said_in(spec, names, c, iv, cause) := _m_unclean_said(c, iv, cause) if {
+	count(_key_item_flaws({"whose": [c]})) > 0
+	_for_list_unclean(spec, object.get(names, "ergo/subject", null), c)
+} else := _m_whose_said(c, iv, cause)
+
+_for_list_unclean(spec, subj, c) if {
+	xs := _value_at(subj, spec.path)
+	is_array(xs)
+	some x in xs
+	not _key_items_clean({"items": [{"iv": x}]}, [c])
+}
+
+_key_item_unclean(e) if object.get(e, "ergo/unclean", false) == true
+
+_m_whose_said(c, item, cause) := concat("; ", _m_cond_base_texts(item, c)) if {
+	count(_key_item_flaws({"whose": [c]})) > 0
+	_key_items_clean({"items": [{"iv": item}]}, [c])
+} else := _message(c, item, cause)
+
+_m_unclean_said(c, item, cause) := concat("; ", ps) if {
+	cause in _value_fault_causes
+	ps := _once([x |
+		some [p, _] in _m_key_paths(c)
+		some x in _m_null_base_pair(item, p)
+	])
+	ps != []
+} else := concat("; ", bs) if {
+	_m_message(_m_with_sides(_m_walked(c, item)), item, cause) == _m_fallback(c)
+	bs := _m_cond_base_texts(item, c)
+	bs != []
+} else := _m_message(_m_with_sides(_m_walked(c, item)), item, cause)
+
+_m_null_base_pair(subj, p) := [concat("", [_input_name(array.slice(p, 0, j)), " is null"]), _m_key_text(subj, p[i])] if {
+	_key_step_later(p)
+	i := min({k | some k, step in p; _m_key_text(subj, step)})
+	i > 0
+	j := min({m | some m in numbers.range(1, i); _resolved(subj, array.slice(p, 0, m)) == null})
+	_input_name(array.slice(p, 0, j)) != "$params"
+}

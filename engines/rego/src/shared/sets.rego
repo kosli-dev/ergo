@@ -122,7 +122,7 @@ _assertion_phrase_keys := ["terms", "phrase"]
 
 _term_mark_keys := ["dot", "own"]
 
-_row_extra_keys := ["root_msgs", "other_roots", "natural"]
+_row_extra_keys := ["root_msgs", "other_roots", "natural", "unfreed"]
 
 _failed_internal_keys := ["msg", "said", "raw", "bare", "hoisted", "whose_of"]
 

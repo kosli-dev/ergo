@@ -2,6 +2,7 @@ use crate::cause::Cause;
 use crate::checks::{CheckRead, Plan, read_checks};
 use crate::ops::walk;
 use crate::ops::{self, Check, Input, Verdict};
+use crate::parts::{self, Failure, Part};
 use crate::path::{self, Ctx, Located, Location, Outcome, Path, Start, Step};
 use crate::policy::{Policy, Requirement, SubjectName};
 use crate::reading::{Filter, Lowered, Reading, Relation, Source};
@@ -1174,6 +1175,19 @@ fn unread_ref_cause(env: &Env, source: &Source, anc: &[Anc]) -> Option<Cause> {
     }
 }
 
+fn from_base(env: &Env, source: &Source, anc: &[Anc]) -> Option<(String, Cause)> {
+    let (Source::Root { path, .. } | Source::Child { path, .. }) = source;
+    let ctx = context(env, input_root(env), anc);
+    let (text, cause) = ops::key_base::from_base(path, &ctx)?;
+    let mut text = text.strip_prefix("$input.").unwrap_or(&text).to_string();
+    if let (Source::Child { .. }, Some(parent)) = (source, anc.last())
+        && let Some(rest) = text.strip_prefix(&format!("{}.", parent.name))
+    {
+        text = rest.to_string();
+    }
+    Some((text, cause))
+}
+
 fn read_entries<'a>(
     env: &Env<'a>,
     empty: &'a Value,
@@ -1181,7 +1195,8 @@ fn read_entries<'a>(
     anc: &[Anc<'a>],
 ) -> Read<'a> {
     if let Some(cause) = unread_ref_cause(env, &lowered.source, anc) {
-        return Read::Failed(cause);
+        let base = from_base(env, &lowered.source, anc).map(|(_, c)| c);
+        return Read::Failed(Cause::worst([cause].into_iter().chain(base)).unwrap_or(cause));
     }
     match &lowered.source {
         Source::Root {
@@ -1661,6 +1676,7 @@ struct Applied {
     failed_assertions: Option<Value>,
     failed_items: Option<Value>,
     message: Option<String>,
+    parts: Vec<(usize, Part)>,
 }
 
 fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
@@ -1670,13 +1686,18 @@ fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
 
 fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let mut failed_items = None;
+    let mut rich: Vec<Value> = Vec::new();
+    let mut pieces: Option<Vec<String>> = None;
     let mut said: Vec<String> = Vec::new();
+    let mut texts: Vec<String> = Vec::new();
     let verdicts: Vec<(&Filter, Verdict)> = filters
         .iter()
         .map(|filter| {
             let ran = ops::run_full(&filter.check, ctx);
             let mut verdict = ran.verdict;
             failed_items = ran.failed_items.map(Value::Array);
+            rich = ran.rich;
+            pieces = ran.parts;
             let mut own = ran.message;
             if unreadable {
                 let keeps_own = verdict.cause.is_failure()
@@ -1688,8 +1709,10 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                     own = None;
                 }
             }
-            if !verdict.passed() {
-                said.push(own.unwrap_or_else(|| {
+            if verdict.passed() {
+                texts.push(String::new());
+            } else {
+                let text = own.unwrap_or_else(|| {
                     if matches!(verdict.cause, Cause::Absent | Cause::Null) {
                         let mut unlabelled = ctx.clone();
                         unlabelled.label = None;
@@ -1697,7 +1720,23 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                     } else {
                         ops::message::message(&filter.check, ctx, &verdict)
                     }
-                }));
+                });
+                let text = if text == ops::message::FALLBACK {
+                    format!("{} is false", filter.text)
+                } else if unreadable {
+                    text
+                } else {
+                    ops::key_base::rewrite(
+                        &filter.check,
+                        ctx,
+                        &mut verdict.cause,
+                        &mut verdict.inputs,
+                        text.clone(),
+                    )
+                    .unwrap_or(text)
+                };
+                texts.push(text.clone());
+                said.push(text);
             }
             (filter, verdict)
         })
@@ -1726,12 +1765,10 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                 .collect(),
         )
     });
-    let inputs = merged_inputs(
-        verdicts
-            .iter()
-            .flat_map(|(_, v)| v.inputs.iter().cloned())
-            .collect(),
-    );
+    let read: Vec<Input> = verdicts
+        .iter()
+        .flat_map(|(_, v)| v.inputs.iter().cloned())
+        .collect();
     let mut once: Vec<String> = Vec::new();
     for text in said {
         ops::push_new(&mut once, text);
@@ -1743,17 +1780,83 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     } else {
         Some(once.join("; "))
     };
+    let checks: Vec<&Check> = filters.iter().map(|f| &f.check).collect();
+    let inputs = if matched {
+        merged_inputs(read)
+    } else {
+        outcomes(&read, message.as_deref().unwrap_or_default(), true, &checks)
+    };
+    let failed_items = if filters.len() == 1 {
+        failed_items
+    } else {
+        None
+    };
+    let parts: Vec<(usize, Part)> = if matched {
+        Vec::new()
+    } else if filters.len() > 1 {
+        verdicts
+            .iter()
+            .zip(&texts)
+            .enumerate()
+            .filter(|(_, ((_, v), _))| !v.passed())
+            .map(|(k, ((f, v), text))| {
+                (
+                    k,
+                    Part {
+                        name: f.text.clone(),
+                        cause: v.cause,
+                        inputs: outcomes(&v.inputs, text, false, &[&f.check]),
+                        failures: Vec::new(),
+                        message: text.clone(),
+                    },
+                )
+            })
+            .collect()
+    } else {
+        let (filter, verdict) = &verdicts[0];
+        let text = message.clone().unwrap_or_default();
+        let part = match (&filter.check, &failed_items) {
+            (Check::Walk(walk), Some(Value::Array(failed))) => walk_part(
+                &filter.text,
+                verdict.cause,
+                &inputs,
+                &text,
+                failed,
+                &rich,
+                pieces.as_deref(),
+                walk,
+                ctx,
+                false,
+            ),
+            _ => Part {
+                name: filter.text.clone(),
+                cause: verdict.cause,
+                inputs: inputs.clone(),
+                failures: Vec::new(),
+                message: text,
+            },
+        };
+        vec![(0, part)]
+    };
+    let mut inputs = inputs;
+    let mut parts = parts;
+    if !matched {
+        let unfit = unfit_names(&checks, ctx);
+        if !unfit.is_empty() {
+            mark_unfit(&mut inputs, &unfit);
+            for (_, part) in &mut parts {
+                mark_unfit(&mut part.inputs, &unfit);
+            }
+        }
+    }
     Applied {
         matched,
         message,
         cause,
         inputs,
         failed_assertions,
-        failed_items: if filters.len() == 1 {
-            failed_items
-        } else {
-            None
-        },
+        failed_items,
+        parts,
     }
 }
 
@@ -1878,6 +1981,34 @@ fn applies_row(env: &Env, judged: &Judged, applied: &Applied, anc: &[Anc]) -> Ro
     row.failed_assertions = applied.failed_assertions.clone();
     row.failed_items = applied.failed_items.clone();
     row.message = applied.message.clone();
+    if !applied.matched {
+        let filters: Vec<&Filter> = env
+            .reading
+            .lowered(env.subject)
+            .map(|lowered| lowered.filters.iter().collect())
+            .unwrap_or_default();
+        let place = |k: usize| {
+            let owner = filters.get(k).map_or(env.subject, |f| f.owner.as_str());
+            let base = parts::joined("$policy:", &["subjects", owner, "from"]);
+            let own: Vec<usize> = (0..filters.len())
+                .filter(|j| filters[*j].owner == owner)
+                .collect();
+            match own.iter().position(|j| *j == k) {
+                Some(at) if own.len() > 1 => format!("{base}#{}", at + 1),
+                _ => base,
+            }
+        };
+        row.failures = Some(parts::to_json(
+            &applied
+                .parts
+                .iter()
+                .map(|(k, part)| Failure::Assertion {
+                    part: part.clone(),
+                    locations: vec![place(*k)],
+                })
+                .collect::<Vec<_>>(),
+        ));
+    }
     with_in(row, anc)
 }
 
@@ -1902,7 +2033,12 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
         Read::Entries { entries, broken } => (entries, broken),
         Read::Failed(cause) => {
             let mut level = failed_level(env, anc, cause, true);
-            if let Some(said) = from_message(env, empty, lowered, anc, cause) {
+            if let Some(mut said) = from_message(env, empty, lowered, anc, cause) {
+                if let Some((text, _)) = from_base(env, &lowered.source, anc)
+                    && !said.split("; ").any(|p| p == text)
+                {
+                    said = format!("{said}; {text}");
+                }
                 for row in &mut level.min_subjects {
                     row.message = Some(said.clone());
                 }
@@ -2056,7 +2192,7 @@ fn check_rows<'a>(
         .filter(|(name, _)| !name.starts_with('$'))
         .filter_map(|(name, read)| {
             read.plan.as_ref().map(|plan| {
-                let mut row = check_row(env, name, plan, &ctx, judged, anc);
+                let (mut row, ran) = check_row(env, name, plan, &ctx, judged, anc);
                 if row.message.as_deref() == Some(ops::message::FALLBACK) {
                     let named = (row.cause == Cause::Unusable)
                         .then(|| {
@@ -2068,6 +2204,7 @@ fn check_rows<'a>(
                     row.message =
                         Some(named.unwrap_or_else(|| format!("{} is false", read.expression)));
                 }
+                with_failures(env, name, &read.expression, plan, &mut row, &ran, &ctx);
                 row
             })
         })
@@ -2107,7 +2244,545 @@ fn default_message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
     }
 }
 
-fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc: &[Anc]) -> Row {
+struct RanItems {
+    rich: Vec<Value>,
+    pieces: Option<Vec<String>>,
+    checks: Vec<Check>,
+    verdicts: Vec<Verdict>,
+    said: Vec<Option<String>>,
+    item_by_item: bool,
+}
+
+fn outcomes(inputs: &[Input], message: &str, merged: bool, checks: &[&Check]) -> Vec<Value> {
+    let sides: Vec<String> = checks
+        .iter()
+        .flat_map(|check| ops::message::side_names(check))
+        .collect();
+    let inputs = if merged {
+        merge_inputs(inputs.to_vec())
+    } else {
+        inputs.to_vec()
+    };
+    let mut kept: Vec<Value> = Vec::new();
+    for input in &inputs {
+        ops::push_new(&mut kept, parts::with_outcome(input, message, &sides));
+    }
+    kept
+}
+
+fn key_ref_entries(paths: &[&Path], ctx: &Ctx, inputs: &[Value]) -> Vec<Value> {
+    let mut found: Vec<Value> = Vec::new();
+    for path in paths {
+        for reference in path::step_refs(path) {
+            let read = ops::read_path(&reference, ctx);
+            let Some(mut input) = read.inputs.into_iter().next() else {
+                continue;
+            };
+            if input.state == Outcome::Found && !input.value.is_string() {
+                input.state = Outcome::Unusable;
+            }
+            if !matches!(
+                input.state,
+                Outcome::Absent | Outcome::Null | Outcome::Unusable
+            ) || inputs
+                .iter()
+                .any(|i| i.get("name").and_then(Value::as_str) == Some(&input.name))
+            {
+                continue;
+            }
+            ops::push_new(&mut found, parts::with_outcome(&input, "", &[]));
+        }
+    }
+    found.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
+    found
+}
+
+/// The `$params` and `$input` paths among `paths` that can't be read, or that
+/// `check` can't use, as entries of an assertion's `inputs`.
+pub(crate) fn root_inputs(paths: &[&Path], check: &Check, ctx: &Ctx) -> Vec<Value> {
+    let mut out: Vec<Value> = Vec::new();
+    for path in paths {
+        if !matches!(path.start, Start::Params | Start::Input)
+            || path
+                .steps
+                .iter()
+                .any(|s| matches!(s, Step::Ref(_) | Step::Field(_)))
+        {
+            continue;
+        }
+        let Some(input) = ops::read_path(path, ctx).inputs.into_iter().next() else {
+            continue;
+        };
+        let mut entry = parts::with_outcome(&input, "", &[]);
+        match input.state {
+            Outcome::Found if crate::checks::ref_unfit(&[check], path, &input.value, ctx) => {
+                entry["outcome"] = json!("unusable");
+            }
+            Outcome::Found => continue,
+            Outcome::NotAnObject if path.start == Start::Params => {
+                entry["outcome"] = json!("unusable");
+            }
+            _ => {}
+        }
+        ops::push_new(&mut out, entry);
+    }
+    out
+}
+
+fn walk_base(walk: &ops::walk::Walk, ctx: &Ctx, said: &mut Vec<String>) -> Vec<Failure> {
+    let Some((text, cause, input)) =
+        ops::key_base::for_list(&walk.path, walk.if_any, ctx).and_then(|k| k.base)
+    else {
+        return Vec::new();
+    };
+    said.retain(|s| *s != text);
+    vec![Failure::List(Part {
+        name: input.name.clone(),
+        cause,
+        inputs: vec![parts::with_outcome(&input, &text, &[])],
+        failures: Vec::new(),
+        message: text,
+    })]
+}
+
+fn push_params_refs(check: &Check, ctx: &Ctx, inputs: &[Value], keys: &mut Vec<Value>) {
+    for reference in check.refs() {
+        if reference.start != Start::Params {
+            continue;
+        }
+        let name = crate::name::name(&reference);
+        if inputs
+            .iter()
+            .chain(keys.iter())
+            .any(|i| i.get("name").and_then(Value::as_str) == Some(name.as_str()))
+        {
+            continue;
+        }
+        let Some(input) = ops::read_path(&reference, ctx).inputs.into_iter().next() else {
+            continue;
+        };
+        let mut entry = parts::with_outcome(&input, "", &[]);
+        if input.state == Outcome::Found
+            && crate::checks::ref_unfit(&[check], &reference, &input.value, ctx)
+        {
+            entry["outcome"] = json!("unusable");
+        }
+        keys.push(entry);
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn walk_part(
+    name: &str,
+    cause: Cause,
+    inputs: &[Value],
+    message: &str,
+    failed: &[Value],
+    rich: &[Value],
+    pieces: Option<&[String]>,
+    walk: &ops::walk::Walk,
+    ctx: &Ctx,
+    roots: bool,
+) -> Part {
+    let check = Check::Walk(Box::new(walk.clone()));
+    let mut keys = key_ref_entries(&ops::key_base::every_path(&check), ctx, inputs);
+    push_params_refs(&check, ctx, inputs, &mut keys);
+    let root_paths = if roots {
+        walk.check.paths()
+    } else {
+        Vec::new()
+    };
+    for entry in root_inputs(&root_paths, &check, ctx) {
+        let name = entry
+            .get("name")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        if !inputs
+            .iter()
+            .chain(&keys)
+            .any(|i| i.get("name").and_then(Value::as_str) == Some(name))
+        {
+            keys.push(entry);
+        }
+    }
+    if let Some(pieces) = pieces.filter(|p| p.len() != failed.len()) {
+        let capped = message
+            .split("; ")
+            .any(|piece| ops::message::cap_note(piece).is_some());
+        let mut said: Vec<String> = Vec::new();
+        if capped {
+            for piece in pieces {
+                ops::push_new(&mut said, piece.clone());
+            }
+        } else {
+            for piece in message.split("; ").filter(|p| !p.is_empty()) {
+                ops::push_new(&mut said, piece.to_string());
+            }
+        }
+        let lists: Vec<String> = failed
+            .iter()
+            .map(|f| parts::list_base(f.get("item").and_then(Value::as_str).unwrap_or("")))
+            .collect();
+        let failures = walk_base(walk, ctx, &mut said);
+        return Part {
+            name: name.to_string(),
+            cause,
+            inputs: inputs
+                .iter()
+                .filter(|i| {
+                    !parts::item_input(i.get("name").and_then(Value::as_str).unwrap_or(""), &lists)
+                })
+                .cloned()
+                .chain(keys)
+                .collect(),
+            failures,
+            message: said.join("; "),
+        };
+    }
+    let failed: Vec<Value> = failed
+        .iter()
+        .map(|plain| {
+            rich.iter()
+                .find(|r| parts::same_failed(r, plain))
+                .cloned()
+                .unwrap_or_else(|| plain.clone())
+        })
+        .collect();
+    let walked = parts::walk_entries(&failed);
+    let lists: Vec<String> = failed
+        .iter()
+        .map(|f| parts::list_base(f.get("item").and_then(Value::as_str).unwrap_or("")))
+        .collect();
+    let mut said: Vec<String> = Vec::new();
+    for piece in message.split("; ") {
+        if !piece.is_empty()
+            && !walked.texts.iter().any(|t| t == piece)
+            && ops::message::cap_note(piece).is_none()
+        {
+            ops::push_new(&mut said, piece.to_string());
+        }
+    }
+    for root in &walked.roots {
+        ops::push_new(&mut said, root.clone());
+    }
+    let mut failures = parts::nest(walked.entries, ctx.input);
+    failures.splice(0..0, walk_base(walk, ctx, &mut said));
+    Part {
+        name: name.to_string(),
+        cause,
+        inputs: inputs
+            .iter()
+            .filter(|i| {
+                !parts::item_input(i.get("name").and_then(Value::as_str).unwrap_or(""), &lists)
+            })
+            .cloned()
+            .chain(keys)
+            .collect(),
+        failures,
+        message: said.join("; "),
+    }
+}
+
+fn unfit_names(checks: &[&Check], ctx: &Ctx) -> Vec<(String, Value)> {
+    let mut out: Vec<(String, Value)> = Vec::new();
+    for check in checks {
+        let mut refs = check.refs();
+        let mut paths = ops::key_base::every_path(check);
+        if let Check::For(line) = check {
+            for sentence in &line.sentences {
+                paths.extend(ops::key_base::every_path(&sentence.check));
+            }
+            for whose in line.items.iter().flat_map(|item| item.whose.iter()) {
+                paths.extend(ops::key_base::every_path(whose));
+            }
+        }
+        for path in paths {
+            if matches!(path.start, Start::Params | Start::Input) && !refs.contains(path) {
+                refs.push(path.clone());
+            }
+        }
+        for reference in refs {
+            let read = path::read(&reference, ctx);
+            if let (Outcome::Found, Some(value)) = (read.outcome, read.value)
+                && crate::checks::ref_unfit(&[check], &reference, value, ctx)
+            {
+                ops::push_new(&mut out, (crate::name::name(&reference), value.clone()));
+            }
+        }
+    }
+    out
+}
+
+fn mark_unfit(inputs: &mut [Value], unfit: &[(String, Value)]) {
+    for input in inputs {
+        let name = input
+            .get("name")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        let value = input.get("value").cloned().unwrap_or(Value::Null);
+        if input.get("outcome").and_then(Value::as_str) == Some("usable")
+            && unfit.iter().any(|(n, v)| n == name && *v == value)
+        {
+            input["outcome"] = json!("unusable");
+        }
+    }
+}
+
+fn mark_unfit_entries(entries: &mut [Value], unfit: &[(String, Value)]) {
+    for entry in entries {
+        if let Some(Value::Array(inputs)) = entry.get_mut("inputs") {
+            mark_unfit(inputs, unfit);
+        }
+        if let Some(Value::Array(kids)) = entry.get_mut("failures") {
+            mark_unfit_entries(kids, unfit);
+        }
+    }
+}
+
+fn with_failures(
+    env: &Env,
+    name: &str,
+    expression: &str,
+    plan: &Plan,
+    row: &mut Row,
+    ran: &RanItems,
+    ctx: &Ctx,
+) {
+    if row.passed() {
+        return;
+    }
+    let by_item;
+    let ctx = if ran.item_by_item && !ctx.item_by_item {
+        by_item = ctx.item_by_item();
+        &by_item
+    } else {
+        ctx
+    };
+    let message = row.message.clone().unwrap_or_default();
+    let read: Vec<Input> = ran
+        .verdicts
+        .iter()
+        .flat_map(|v| v.inputs.iter().cloned())
+        .collect();
+    let all: Vec<&Check> = ran.checks.iter().collect();
+    row.inputs = outcomes(&read, &message, plan.all_of, &all);
+    if matches!(ran.checks.first(), Some(Check::For(_))) {
+        let worked: Vec<&str> = read
+            .iter()
+            .filter(|i| i.worked && !i.value.is_null())
+            .map(|i| i.name.as_str())
+            .collect();
+        for input in &mut row.inputs {
+            if input.get("outcome").is_none()
+                && input
+                    .get("name")
+                    .and_then(Value::as_str)
+                    .is_some_and(|n| worked.contains(&n))
+            {
+                input["outcome"] = json!("usable");
+            }
+        }
+    }
+    let written = env
+        .requirement
+        .checks
+        .get(name)
+        .map(|c| c.written.clone())
+        .unwrap_or(Value::Null);
+    let at = |option: Option<&str>, count: usize| {
+        parts::assertion_locations(env.requirement_name, name, &written, option, count)
+    };
+    let failures: Option<Vec<Failure>> = if plan.all_of {
+        let places = at(None, plan.items.len());
+        Some(
+            plan.items
+                .iter()
+                .enumerate()
+                .zip(ran.checks.iter().zip(&ran.verdicts).zip(&ran.said))
+                .filter(|(_, ((_, v), _))| !v.passed())
+                .map(|((k, item), ((check, v), own))| {
+                    let said = own
+                        .clone()
+                        .unwrap_or_else(|| default_message(check, ctx, v));
+                    Failure::Assertion {
+                        part: Part {
+                            name: item.text.clone(),
+                            cause: v.cause,
+                            inputs: {
+                                let mut inputs = outcomes(&v.inputs, &said, false, &[check]);
+                                let extra =
+                                    ops::key_base::entry_inputs(check, ctx, v.cause, &inputs);
+                                inputs.extend(extra);
+                                inputs
+                            },
+                            failures: Vec::new(),
+                            message: said,
+                        },
+                        locations: places.get(k).cloned().into_iter().collect(),
+                    }
+                })
+                .collect(),
+        )
+    } else {
+        match ran.checks.first() {
+            Some(Check::AnyOf(any)) => Some(
+                ops::any_of::option_runs(any, ctx)
+                    .into_iter()
+                    .filter(|option| option.cause != Cause::Satisfied)
+                    .map(|option| {
+                        let places = at(Some(&option.name), option.count);
+                        let mut once: Vec<String> = Vec::new();
+                        let said: Vec<String> = option
+                            .lines
+                            .iter()
+                            .map(|line| ops::message::unsaid(&line.said, &mut once))
+                            .filter(|line| !line.is_empty())
+                            .collect();
+                        Failure::Option {
+                            part: Part {
+                                name: option.name.clone(),
+                                cause: option.cause,
+                                inputs: Vec::new(),
+                                failures: option
+                                    .lines
+                                    .iter()
+                                    .map(|line| Failure::Assertion {
+                                        part: Part {
+                                            name: line.text.clone(),
+                                            cause: line.cause,
+                                            inputs: {
+                                                let mut inputs = outcomes(
+                                                    &line.inputs,
+                                                    &line.said,
+                                                    false,
+                                                    &[&line.check],
+                                                );
+                                                if matches!(line.check, Check::Walk(_)) {
+                                                    let mut refs = Vec::new();
+                                                    push_params_refs(
+                                                        &line.check,
+                                                        ctx,
+                                                        &inputs,
+                                                        &mut refs,
+                                                    );
+                                                    inputs.extend(refs);
+                                                }
+                                                inputs
+                                            },
+                                            failures: Vec::new(),
+                                            message: line.said.clone(),
+                                        },
+                                        locations: places
+                                            .get(line.at)
+                                            .cloned()
+                                            .into_iter()
+                                            .collect(),
+                                    })
+                                    .collect(),
+                                message: said.join(", and "),
+                            },
+                            locations: vec![parts::joined(
+                                "$policy:",
+                                &[
+                                    "requirements",
+                                    env.requirement_name,
+                                    "checks",
+                                    name,
+                                    "any_of",
+                                    &option.name,
+                                ],
+                            )],
+                        }
+                    })
+                    .collect(),
+            ),
+            Some(Check::Walk(walk)) => {
+                let failed: Vec<Value> = row
+                    .failed_items
+                    .as_ref()
+                    .and_then(Value::as_array)
+                    .cloned()
+                    .unwrap_or_default();
+                Some(vec![Failure::Assertion {
+                    part: walk_part(
+                        expression,
+                        row.cause,
+                        &row.inputs,
+                        &message,
+                        &failed,
+                        &ran.rich,
+                        ran.pieces.as_deref(),
+                        walk,
+                        ctx,
+                        true,
+                    ),
+                    locations: at(None, 1),
+                }])
+            }
+            Some(Check::For(line)) => {
+                let failed: Vec<Value> = row
+                    .failed_items
+                    .as_ref()
+                    .and_then(Value::as_array)
+                    .cloned()
+                    .unwrap_or_default();
+                Some(crate::for_parts::for_failures(
+                    line,
+                    row.cause,
+                    &row.inputs,
+                    &message,
+                    &failed,
+                    &at(None, line.sentences.len()),
+                    ctx,
+                ))
+            }
+            Some(check) => Some(vec![Failure::Assertion {
+                part: Part {
+                    name: expression.to_string(),
+                    cause: row.cause,
+                    inputs: {
+                        let mut inputs = row.inputs.clone();
+                        let extra = ops::key_base::entry_inputs(check, ctx, row.cause, &inputs);
+                        inputs.extend(extra);
+                        if let Check::Tally(tally) = check
+                            && matches!(row.cause, Cause::Absent | Cause::Null)
+                            && row.inputs.iter().any(|i| {
+                                i.get("name").and_then(Value::as_str).is_some_and(|n| {
+                                    n.starts_with("count of ") || n.starts_with("sum of ")
+                                })
+                            })
+                        {
+                            let more = key_ref_entries(&tally.counted_paths(), ctx, &inputs);
+                            inputs.extend(more);
+                        }
+                        inputs
+                    },
+                    failures: Vec::new(),
+                    message: message.clone(),
+                },
+                locations: at(None, 1),
+            }]),
+            None => None,
+        }
+    };
+    row.failures = failures.map(|f| parts::to_json(&f));
+    let unfit = unfit_names(&all, ctx);
+    if !unfit.is_empty() {
+        mark_unfit(&mut row.inputs, &unfit);
+        if let Some(Value::Array(entries)) = &mut row.failures {
+            mark_unfit_entries(entries, &unfit);
+        }
+    }
+}
+
+fn check_row(
+    env: &Env,
+    name: &str,
+    plan: &Plan,
+    ctx: &Ctx,
+    judged: &Judged,
+    anc: &[Anc],
+) -> (Row, RanItems) {
     let by_item;
     let ctx = if !ctx.item_by_item && plan.items.iter().any(|item| item.check.reads_by_item()) {
         by_item = ctx.item_by_item();
@@ -2116,6 +2791,8 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
         ctx
     };
     let mut failed_items = None;
+    let mut rich: Vec<Value> = Vec::new();
+    let mut pieces: Option<Vec<String>> = None;
     let mut said: Vec<Option<String>> = Vec::new();
     let checks: Vec<Check> = plan
         .items
@@ -2130,6 +2807,8 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
         .map(|check| {
             let ran = walked_roots_run(check, ctx);
             failed_items = ran.failed_items.map(Value::Array);
+            rich = ran.rich;
+            pieces = ran.parts;
             let mut verdict = ran.verdict;
             let mut own = ran.message;
             if env.unreadable.is_empty()
@@ -2143,6 +2822,20 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             {
                 verdict.cause = cause;
                 own = Some(text);
+            }
+            if env.unreadable.is_empty() && !verdict.passed() {
+                let said = own
+                    .clone()
+                    .unwrap_or_else(|| default_message(check, ctx, &verdict));
+                if let Some(text) = ops::key_base::rewrite(
+                    check,
+                    ctx,
+                    &mut verdict.cause,
+                    &mut verdict.inputs,
+                    said,
+                ) {
+                    own = Some(text);
+                }
             }
             if !env.unreadable.is_empty() && verdict.cause != Cause::Ambiguous {
                 verdict.cause = Cause::Unusable;
@@ -2178,10 +2871,12 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
                 None => default_message(check, ctx, v),
             })
             .collect();
-        let mut once: Vec<String> = Vec::new();
-        for text in messages {
-            ops::push_new(&mut once, text);
-        }
+        let mut said: Vec<String> = Vec::new();
+        let once: Vec<String> = messages
+            .iter()
+            .map(|text| ops::message::unsaid(text, &mut said))
+            .filter(|text| !text.is_empty())
+            .collect();
         row.message = Some(once.join("; "));
     }
     if plan.items.len() == 1 {
@@ -2197,7 +2892,17 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
                 .collect(),
         ));
     }
-    with_in(row, anc)
+    (
+        with_in(row, anc),
+        RanItems {
+            rich,
+            pieces,
+            checks,
+            verdicts,
+            said,
+            item_by_item: ctx.item_by_item,
+        },
+    )
 }
 
 fn every_subject(env: &Env) -> bool {

@@ -2,6 +2,7 @@ pub mod any_of;
 pub mod compare;
 pub mod equals;
 pub mod for_line;
+pub mod key_base;
 pub mod keyed_roots;
 pub mod kinds;
 pub mod list_start;
@@ -39,6 +40,7 @@ pub struct Input {
     pub part: Option<Part>,
     pub state: Outcome,
     pub null_at: Option<String>,
+    pub worked: bool,
 }
 
 impl Input {
@@ -93,6 +95,7 @@ pub fn read_path(path: &Path, ctx: &Ctx) -> ReadPath {
         part: path::part_tag(path, ctx).map(|(name, id)| Part { name, id }),
         state: read.outcome,
         null_at: null_step_name(path, ctx),
+        worked: false,
     }];
     inputs.extend(field_inputs(path, ctx));
     ReadPath {
@@ -134,6 +137,7 @@ pub fn field_inputs(path: &Path, ctx: &Ctx) -> Vec<Input> {
                     part: None,
                     state: found.outcome,
                     null_at: None,
+                    worked: false,
                 })
             }
             _ => None,
@@ -470,6 +474,7 @@ fn named_prefixes(paths: Vec<&Path>) -> Vec<(Path, bool)> {
 pub struct Ran {
     pub verdict: Verdict,
     pub failed_items: Option<Vec<Value>>,
+    pub rich: Vec<Value>,
     pub message: Option<String>,
     pub parts: Option<Vec<String>>,
 }
@@ -499,6 +504,7 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
             Ran {
                 verdict: run.verdict,
                 failed_items: Some(run.failed_items),
+                rich: run.rich,
                 message: run.message,
                 parts: Some(run.parts),
             }
@@ -508,6 +514,7 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
             Ran {
                 verdict: run.verdict,
                 failed_items: Some(run.failed_items),
+                rich: Vec::new(),
                 message: run.message,
                 parts: None,
             }
@@ -515,6 +522,7 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
         other => Ran {
             verdict: run(other, ctx),
             failed_items: None,
+            rich: Vec::new(),
             message: None,
             parts: None,
         },

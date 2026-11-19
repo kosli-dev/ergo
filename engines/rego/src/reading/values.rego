@@ -102,29 +102,28 @@ _builtin(path) if {
 
 _start_of(subj, path) := subj if not _named(path)
 
-_start_of(_, path) := data.ergo_document if path[0] == "$$input"
+else := data.ergo_document if path[0] == "$$input"
 
-_start_of(_, path) := data.ergo_document if path[0] == "$$input[]"
+else := data.ergo_document if path[0] == "$$input[]"
 
-_start_of(_, path) := data.ergo_params if path[0] in _params_starts
+else := data.ergo_params if path[0] in _params_starts
 
-_start_of(_, path) := input["ergo/names"][substring(path[0], 1, -1)] if {
-	_named(path)
+else := input["ergo/names"][substring(path[0], 1, -1)] if {
 	not _builtin(path)
 	not _part_start(path)
 }
 
-_start_of(subj, path) := subj if {
+else := subj if {
 	_subject_part(path)
 	_part_of(path).old == false
 }
 
-_start_of(_, path) := input["ergo/names"]["ergo/subject"] if {
+else := input["ergo/names"]["ergo/subject"] if {
 	_subject_part(path)
 	_part_of(path).old == true
 }
 
-_start_of(_, path) := input["ergo/names"][_part_of(path).of] if {
+else := input["ergo/names"][_part_of(path).of] if {
 	_part_start(path)
 	not _subject_part(path)
 }
@@ -179,21 +178,20 @@ _row_input(at) := {"ergo/names": {"$at": {"names": _parent_ats, "subject": at}}}
 
 _start_at(path) := _subject_at if not _named(path)
 
-_start_at(path) := "" if path[0] == "$$input"
+else := "" if path[0] == "$$input"
 
-_start_at(path) := "" if path[0] == "$$input[]"
+else := "" if path[0] == "$$input[]"
 
-_start_at(path) := "$params:" if path[0] in _params_starts
+else := "$params:" if path[0] in _params_starts
 
-_start_at(path) := _name_at(substring(path[0], 1, -1)) if {
-	_named(path)
+else := _name_at(substring(path[0], 1, -1)) if {
 	not _builtin(path)
 	not _part_start(path)
 }
 
-_start_at(path) := _subject_at if _subject_part(path)
+else := _subject_at if _subject_part(path)
 
-_start_at(path) := _name_at(_part_of(path).of) if {
+else := _name_at(_part_of(path).of) if {
 	_part_start(path)
 	not _subject_part(path)
 }
@@ -232,7 +230,7 @@ _starts_group(sorted, j) if {
 	sorted[j][0] != sorted[j - 1][0]
 }
 
-_number_input(name, value, inputs) := {"name": name, "value": value, "locations": _first_seen([l | some i in inputs; some l in i.locations])}
+_number_input(name, value, inputs) := {"name": name, "value": value, "locations": _first_seen([l | some i in inputs; some l in i.locations]), "ergo/worked": true}
 
 _locations_of(subj, path) := [at] if at := _at(subj, path)
 
@@ -250,9 +248,31 @@ _at(subj, path) := _joined(_subject_at, keys) if {
 	start := _start_of(subj, path)
 }
 
-_path_input(subj, path) := {"name": _input_name(path), "value": _value_at(subj, path), "locations": [at]} if at := _at(subj, path)
+_path_input(subj, path) := _read_outcome(subj, path, {"name": _input_name(path), "value": _value_at(subj, path), "locations": [at]}) if at := _at(subj, path)
 
-else := {"name": _input_name(path), "value": _value_at(subj, path), "locations": []}
+else := _read_outcome(subj, path, {"name": _input_name(path), "value": _value_at(subj, path), "locations": []})
+
+_read_outcome(subj, path, i) := object.union(i, {"ergo/outcome": _outcome_word(_input_state(subj, path))}) if i.value == null
+
+else := i
+
+_input_state(subj, path) := _input_state_of(path, _read_state(subj, path), _key_base_causes(subj, path, "object"))
+
+_input_state_of(path, state, bases) := state if state == "not_an_object"
+
+else := s if {
+	s := _worst_of({_ref_step_state(path)} | bases)
+} else := _ref_state(path) if {
+	path[0] in _params_starts
+	_params_not_given(path)
+	data.ergo_params != null
+} else := state
+
+_ref_step_state(path) := _worst_of({_ref_step_flaw(x) | some x in path; _is_ref(x)})
+
+_outcome_word("value") := "usable"
+
+_outcome_word(s) := s if s != "value"
 
 _input_name(path) := _path_name(path) if not _has_parents
 
@@ -278,7 +298,17 @@ _dot_kept(path) if {
 	_ := _parent_names[path[0].literal]
 }
 
-_merged_inputs(inputs) := [object.union(_with_part({"name": t[0], "value": t[1]}, t[2]), {"locations": t[3]}) | some t in sort({[i.name, i.value, object.get(i, "part", null), i.locations] | some i in inputs})]
+_merged_inputs(inputs) := [object.union(_with_part({"name": t[0], "value": t[1]}, t[2]), {"locations": t[3]}) | some t in sort({[i.name, i.value, object.get(i, "part", null), i.locations] | some i in inputs})] if not _some_stashed(inputs)
+
+else := [object.union(object.union(_with_part({"name": t[0], "value": t[1]}, t[2]), {"locations": t[3]}), t[4]) | some t in sort({[i.name, i.value, object.get(i, "part", null), i.locations, object.filter(i, _input_stash_keys)] | some i in inputs})]
+
+_some_stashed(inputs) if {
+	some i in inputs
+	some k in _input_stash_keys
+	_ = i[k]
+}
+
+_input_stash_keys := {"ergo/outcome", "ergo/worked"}
 
 _with_part(entry, null) := entry
 

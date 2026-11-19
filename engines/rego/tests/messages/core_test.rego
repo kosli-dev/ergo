@@ -24,7 +24,7 @@ test_message_a_check_whose_path_is_not_a_path_has_only_its_refs_as_sides if {
 
 test_a_null_before_an_unreadable_key_is_read_from_the_sides_a_check_already_carries if {
 	check := {"$sides": [["s", {"named_by_field": "p"}]], "op": "present", "path": ["other"]}
-	ergo._m_null_key_parts({"s": null, "p": null}, check) == ["s is null", "p is null"]
+	ergo._m_null_key_parts({"s": null, "p": null}, check) == ["p is null", "s is null"]
 }
 
 test_message_of_an_unusable_check_with_nothing_to_blame_repeats_its_expression if {

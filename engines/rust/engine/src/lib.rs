@@ -28,10 +28,12 @@
 
 mod cause;
 mod checks;
+mod for_parts;
 mod lower;
 mod name;
 mod names;
 mod ops;
+mod parts;
 mod path;
 mod policy;
 mod reading;

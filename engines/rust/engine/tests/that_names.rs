@@ -64,8 +64,8 @@ fn a_subject_named_like_a_field_its_whose_reads_lists_the_field_and_the_item_apa
     assert_eq!(
         row["inputs"],
         json!([
-            {"name": ".x", "value": null, "locations": ["/ws/0"]},
-            {"name": "x", "value": null, "locations": ["/ws/0"]}
+            {"name": ".x", "value": null, "locations": ["/ws/0"], "outcome": "not_an_object"},
+            {"name": "x", "value": null, "locations": ["/ws/0"], "outcome": "null"}
         ])
     );
 }

@@ -16,6 +16,7 @@ _run(doc, policy, rd, params) := r if {
 		with data.ergo_reading as false
 		with data.ergo_policy_problems as _policy_problems_of(policy, rd)
 		with data.ergo_document as doc
+		with data.ergo_written as raw
 		with data.ergo_params as params
 		with data.ergo_subjects as rd.subjects
 		with data.ergo_resolved as rd.resolved
