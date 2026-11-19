@@ -647,6 +647,13 @@ pub fn first_list_name(walk: &Walk, ctx: &Ctx) -> Option<String> {
         .map(|(base, _)| base.to_string())
 }
 
+/// The names a walk's own list read goes by in the row's inputs, like
+/// `xs[].v` and `xs.v` for `every xs.v is 1`.
+pub fn walked_names(walk: &Walk, ctx: &Ctx) -> Vec<String> {
+    let walked = self::walk(&walk.path, &outer(ctx), Options::default());
+    vec![walked.name, name::name(&walk.path)]
+}
+
 fn outer<'a>(ctx: &Ctx<'a>) -> Ctx<'a> {
     let mut outer = ctx.clone();
     outer.aliases.insert(OUTER.to_string(), ctx.subject.clone());

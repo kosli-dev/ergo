@@ -2552,6 +2552,8 @@ fn walk_part(
     roots: bool,
 ) -> Part {
     let check = Check::Walk(Box::new(walk.clone()));
+    let own = ops::walk::walked_names(walk, ctx);
+    let keyed = !crate::path::step_refs(&walk.path).is_empty();
     let mut keys = key_ref_entries(&ops::key_base::every_path(&check), ctx, inputs);
     push_params_refs(&check, ctx, inputs, &mut keys);
     let root_paths = if roots {
@@ -2598,7 +2600,8 @@ fn walk_part(
             inputs: inputs
                 .iter()
                 .filter(|i| {
-                    !parts::item_input(i.get("name").and_then(Value::as_str).unwrap_or(""), &lists)
+                    let n = i.get("name").and_then(Value::as_str).unwrap_or("");
+                    !parts::item_input(n, &lists) && ((failures.is_empty() && !keyed) || !own.iter().any(|o| o == n))
                 })
                 .cloned()
                 .chain(keys)
@@ -2642,7 +2645,8 @@ fn walk_part(
         inputs: inputs
             .iter()
             .filter(|i| {
-                !parts::item_input(i.get("name").and_then(Value::as_str).unwrap_or(""), &lists)
+                let n = i.get("name").and_then(Value::as_str).unwrap_or("");
+                !parts::item_input(n, &lists) && ((failures.is_empty() && !keyed) || !own.iter().any(|o| o == n))
             })
             .cloned()
             .chain(keys)
