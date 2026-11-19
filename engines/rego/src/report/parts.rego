@@ -657,12 +657,13 @@ _walk_assertion_entry(row, at, where, ins) := _policy_entry(
 	row.cause,
 	_once(array.concat(array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists); not _walked_path_read(i, wname)], _key_flaw_entries(where.check.path)), _walk_cond_ref_entries(_walk_cond_refs(where.check), row.inputs)), _walk_param_entries(where.check, row.inputs))),
 	array.concat(entries, flaws),
-	_tally_rest(concat("; ", [m | some m in _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts))); not m in {e.message | some e in _key_list_parts(row, at)}]), {e.name | some e in flaws}),
+	_tally_rest(concat("; ", [m | some m in _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts))); not m in {e.message | some e in kls}]), {e.name | some e in flaws}),
 	[_assertion_at(where, null, 0)],
 ) if {
 	texts := object.get(row, "ergo/texts", [])
 	lists := {_list_base(f.item) | some f in row.failed_items}
-	entries := array.concat(_walk_entries(row, _item_owned(row, texts), at), _key_list_parts(row, at))
+	kls := _key_list_parts(row, at)
+	entries := array.concat(_walk_entries(row, _item_owned(row, texts), at), kls)
 	wname := _m_aliased(_walked_name(where.check.path))
 	flaws := _walk_flaw_lists(row, at, where.check, entries)
 }
