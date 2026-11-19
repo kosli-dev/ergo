@@ -28,7 +28,7 @@ _tally_outcomes(ins, row, check) := [_tally_outcome(i, said) | some i in ins] if
 	check.op != "for"
 	lists := _tally_list_names(check)
 	count(lists) > 0
-	said := {_m_clause_name(c): _clause_cause(c) | some c in _tally_clauses(row.message); _m_clause_name(c) in lists}
+	said := {_list_clause_name(c): _clause_cause(c) | some c in _tally_clauses(row.message); _list_clause_name(c) in lists}
 } else := ins
 
 _tally_outcome(i, said) := object.union(i, {"outcome": said[i.name]}) if _ = said[i.name]
@@ -392,7 +392,7 @@ _row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.ex
 	not _all_of_run(where.check)
 	not _any_of_run(where.check)
 	not where.check.op == "for"
-	lists := _tally_list_names(where.check)
+	lists := _tally_list_names(where.check) | _tally_keyed_list_names(where.check, object.get(row, "ergo/subj", null))
 	ls := _plain_tally_lists(row, at, lists, ins, where.check)
 	names := {e.name | some e in ls}
 	items := _tally_item_parts_of(row, where.check, at)
@@ -468,7 +468,7 @@ _tally_rest_of(m, names, texts) := _tally_rest(m, names) if count(texts) == 0
 else := concat("; ", [c |
 	some p in _m_top_split(m, "; ")
 	not p in texts
-	c := concat(", and ", [q | some q in _m_top_split(p, ", and "); not q in texts; not _m_clause_name(q) in names; not _and_more(q)])
+	c := concat(", and ", [q | some q in _m_top_split(p, ", and "); not q in texts; not _list_clause_name(q) in names; not _and_more(q)])
 	c != ""
 ])
 
@@ -521,7 +521,7 @@ _tally_clauses(m) := ps if {
 
 _tally_rest(m, names) := m if count(names) == 0
 
-else := concat(sep, [c | some c in cs; not _m_clause_name(c) in names]) if {
+else := concat(sep, [c | some c in cs; not _list_clause_name(c) in names]) if {
 	cs := _tally_clauses(m)
 	sep := _tally_sep(m, cs)
 }
@@ -548,10 +548,27 @@ _tally_list_entries(row, at, lists, ins) := [] if count(lists) == 0
 
 else := [_entry("list", n, cause, _tally_list_read(n, cause, row, ins, at), [], c) |
 	some c in _tally_clauses(row.message)
-	n := _m_clause_name(c)
+	n := _list_clause_name(c)
 	n in lists
 	cause := _clause_cause(c)
 ]
+
+_list_clause_name(c) := substring(c, 0, indexof(c, " can't be read: ")) if contains(c, " can't be read: ")
+
+else := _m_clause_name(c)
+
+_tally_keyed_list_names(check, subj) := {_m_aliased(_input_name(array.concat(array.slice(p, 0, i), [k]))) |
+	some side in _m_tally_parts(check)
+	p := side[_basic_form(side)]
+	is_array(p)
+	some i, seg in p
+	i > 0
+	is_object(seg)
+	every s in array.slice(p, 0, i) {
+		is_string(s)
+	}
+	k := _m_step_key(subj, seg)
+}
 
 _clause_cause(c) := "absent" if endswith(c, " is missing")
 
@@ -565,11 +582,32 @@ _clause_cause(c) := "unusable" if {
 _tally_list_read(n, cause, row, ins, at) := [object.union(x, {"outcome": cause}) | some x in _key_base_entries(object.get(row, "ergo/key_bases", []), at); x.name == n] if {
 	some b in object.get(row, "ergo/key_bases", [])
 	b.input.name == n
-} else := [object.union(object.remove(x, _input_stash_keys), {"outcome": cause}) | some x in _anchored_all([_path_input(row["ergo/subj"], p)], at)] if {
+} else := [object.union(object.remove(x, _input_stash_keys), {"outcome": cause, "value": _list_stop_value(row["ergo/subj"], p, cause, x.value)}) | some x in _anchored_all([_path_input(row["ergo/subj"], p)], at)] if {
 	ps := _tally_list_paths(object.get(row, "ergo/check", null), n)
 	count(ps) > 0
-	p := ps[0]
+	p := ps[count(ps) - 1]
+} else := [object.union(object.remove(x, _input_stash_keys), {"outcome": cause}) | some x in _anchored_all([_path_input(row["ergo/subj"], p)], at)] if {
+	some p in _tally_keyed_list_paths(object.get(row, "ergo/check", null), row["ergo/subj"], n)
 } else := [object.union(x, {"outcome": cause}) | some x in ins; x.name == n]
+
+_list_stop_value(subj, p, cause, v) := vs[count(vs) - 1] if {
+	cause == "unusable"
+	v == null
+	vs := [x | some i in numbers.range(1, count(p) - 1); x := _value_at(subj, array.slice(p, 0, i)); x != null]
+	count(vs) > 0
+} else := v
+
+_tally_keyed_list_paths(check, subj, n) := [q |
+	some side in _m_tally_parts(check)
+	p := side[_basic_form(side)]
+	is_array(p)
+	some i, seg in p
+	i > 0
+	is_object(seg)
+	k := _m_step_key(subj, seg)
+	q := array.concat(array.slice(p, 0, i), [k])
+	_m_aliased(_input_name(q)) == n
+]
 
 _tally_list_paths(c, n) := [q |
 	some side in _m_tally_parts(c)
@@ -608,7 +646,7 @@ _tallied_entry(e, c, o, at, where, row) := object.union(e, {"inputs": x.inputs, 
 	count(_m_tally_parts(c)) > 0
 	subj := row["ergo/subj"]
 	mc := _sub_mcheck(where, c, row)
-	lists := _tally_list_names(c)
+	lists := _tally_list_names(c) | _tally_keyed_list_names(c, subj)
 	ls := _tally_list_entries({"message": e.message, "ergo/key_bases": object.get(o, "key_bases", []), "ergo/subj": subj, "ergo/req": row["ergo/req"], "ergo/check": mc}, at, lists, e.inputs)
 	names := {x.name | some x in ls}
 	items := _tally_item_parts(mc, subj, o.cause, at, e.message)

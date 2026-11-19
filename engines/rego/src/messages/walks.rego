@@ -588,7 +588,15 @@ _m_own_clauses(c, item, cause) := _once([_m_state_clause(s) |
 	some s in _m_sources(item, c)
 	s.state == cause
 	not _reads_unreadable_ref(c, s.side)
+	not _m_keyed_from_root(s.side)
 ])
+
+_m_keyed_from_root(p) if {
+	is_array(p)
+	some step in p
+	_field_step(step)
+	_from_root(step)
+}
 
 _m_list_read_first(c) if {
 	_list_cmp(c)
