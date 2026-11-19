@@ -35,7 +35,23 @@ Branch `row-parts-688-rego2`, on top of `row-parts-688-rego`. Not finished: a fr
 - A `count of` whose list is read through a `named by` key or a part gets its `list` entry (`_tally_keyed_list_names`, `_list_clause_name`), read where it stopped (`_list_stop_value`).
 - B9 for every phrase: `is`, `equals`, `is in` and `contains` with a root that can't be read judge each item again with the root replaced by the item's own value (`_root_stand_in`), and a count says only the first condition an item can't decide (`_m_undecided_before`). Not when the list itself can't be read.
 - D2: `from: $input` with an input that can't be read puts `$input` on the `$min_subjects` row's inputs.
-- Cases moved to the decided shape (Rego was right, Rust-filled rows stale), all in `known-failures.txt`.
+- A root of a `for` line's sentence that is said once is no longer said again under each item, with an `and N more` of its own (`_for_led_more`, `_for_led_once`, `_for_deduped`).
+- C7 on `for` lines (first and second list): an `item` or `list` entry takes the worst of its own failed reads and of the entries under it when that is no worse than the cause it had (`_own_caused`). It never raises a cause, and it leaves an entry whose message has more than one clause, because such an entry can say a problem none of its inputs holds (the list beside a root).
+- A walk on a `for` line keeps only the reads through an alias on the `for` item; a root like `$input.q` stays on the assertion (B1, `for.failure_inputs`).
+- Cases moved to the decided shape (Rego was right, Rust-filled rows stale), all in `known-failures.txt`: C5 `list` entries under a `for` item, decision 3 item entries, D8 `failures: []` in violations, D2 `$input` reads, D11 key first, B3 a null part read where it stopped.
+- `--timeout 120s` is `240s` in AGENTS.md, `.github/checks.sh`, `.github/compiled-tests.sh`, `.github/wasm-tests.sh` and `.github/workflows/test.yml`.
+
+Spec cases failing in the Rego engine at the end: 121 (messages 38, sentences 16, for 15, derived 14, list_items 12, walks 10, subject_name 5, list_starts 4, distinct 4, subjects 1, row_parts 1, in 1); 69 of them are in `known-failures.txt`.
+
+What is left, by rule (the biggest first):
+- A root on the right of the phrase (`every es.v is in $params.z`) that is missing or `null` is hidden when the walked list can't be read (messages, 6 cases, D4). `_rooted_row` isn't the path these take; a branch there broke three other cases, so it was taken out.
+- A part that is a list read in a `whose` (`pl.z`, an item of `pl` not an object) doesn't raise the row to `unusable` and its input stays `usable` (messages, 3 cases, D4).
+- Params that aren't an object still make checks that don't read them `unusable` (messages, 2 cases, D6), and `count of $params[0]` with `[]` says `item 1 of $params is missing` (unit test and a `for` case).
+- C7's second plain bug: a `for` line's `whose` roots sit in a `list` entry for the list, not on the row's inputs (for and messages "two roots in one relative clause").
+- B9 on a `for` line's `plain` rows (`every ws.n whose v is in pos.name is 2`, C3): the items after the root are still missing (4 for cases).
+- D10 rows not filled in (derived, listed above by the third builder) and the two-list `count of`/`sum of` message (row_parts).
+- The distinct case "a phrase that also reads a bare name" in a multi-sentence check gives an item entry for a root the subject holds (4 cases).
+- list_items/list_starts: a list in the middle of a name read on the right of a phrase, and a named by key from an input that is a list (12 + 4 cases), not looked at.
 
 Gaps found:
 - `count of rs whose zz is in $input.k is 1` with `$input.k` `null` and items without `zz`: the message says the root and both items, but the row's cause stays `null`, not `absent` (the count's cause is worked out in `checks/` and can't call the B9 judging in `lines/` without a backward call).
