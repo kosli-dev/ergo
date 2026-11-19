@@ -264,7 +264,6 @@ for / params that are text are named before a tie on a for line that reads them 
 for / params that are text leave a tie on a for line ambiguous when the check doesn't read them / the tied items are named and the cause is ambiguous
 for / params that are true leave a tie on a for line ambiguous when the check doesn't read them / the tied items are named and the cause is ambiguous
 for / some on a position of the params, with params as a number / fails as unusable and names the params and what they are
-for / some on a position of the params, with params as null / fails as absent and says the params are missing
 for / the failed items of a list beside the first keep the values only on the sentences / a list that can't be walked is listed once with no sentences, and the item that failed a sentence has its values
 for / the latest commit picked on a for line / fails as ambiguous when another item ties with the one picked, and names every tied item
 in / a count of or a sum of that is on both sides of a comparison is named once when its list is missing or null / says the list is missing once
@@ -416,8 +415,6 @@ messages / a parent's part read in a whose on a plain check, next to a list that
 messages / a parent's part read in a whose, on a for line and in a count of / names a part of the wrong type once with no item
 messages / a parent's part read in a whose, on an empty list / fails when the part is of the wrong type
 messages / a part that is a list, read in a whose beside a list that can't be read, is said first and then the list, and the row takes the part's cause when it is the worst / a list that is empty
-messages / a part that is a list, read in a whose beside a list that can't be read, is said first and then the list, and the row takes the part's cause when it is the worst / a list that is missing
-messages / a part that is a list, read in a whose beside a list that can't be read, is said first and then the list, and the row takes the part's cause when it is the worst / a list that is null
 messages / a position and a key after a null / names the null step, then a key that is missing, null or not text, and none when it is text
 messages / a position and a key of the input on the right of is in, with the input as a list / fails as unusable and says the right side isn't a list
 messages / a problem is said where its path starts / a param is said once with no item, and a field of an earlier line's alias is said under each item it is about
@@ -426,7 +423,6 @@ messages / a root and the list it is read beside that both can't be read are bot
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root that is null and a list that is text fail as unusable
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / an empty list is said only where it fails on its own
 messages / a root in a count of beside a list that is missing, when the params aren't an object / says the params, or the root, once, and then the list, and a check that doesn't read the params fails with the worst cause of what it says
-messages / a root in a whose beside an empty list, when the params aren't an object / says the root, and then the empty list where it fails, and a check that doesn't read the params fails with the worst cause of what it says
 messages / a root in a whose that is missing, beside a list in a list whose inner lists can't be read, is said first and then each item / an inner list that is null and one that is missing
 messages / a root name after is in inside a relative clause that isn't a list, on a list with items / names the root once, with no item, on a for line too
 messages / a root name after is in inside a relative clause that isn't a list, on an empty list / fails as unusable and names the root, because the list it looks in is read before any item, then the empty list
@@ -440,8 +436,6 @@ messages / a root on the right of the phrase and a root in a whose, both missing
 messages / a root on the right of the phrase and a root in a whose, both null, beside a list that is null, are all said, then the list / both params and the list null
 messages / a root on the right of the phrase of the wrong type, beside a list that can't be read, is said first and then the list / a list that is missing
 messages / a root on the right of the phrase of the wrong type, beside a list that can't be read, is said first and then the list / a list that is text
-messages / a root on the right of the phrase that is missing, beside a list that can't be read, is said first and then the list, with the worst cause / a list that is missing
-messages / a root on the right of the phrase that is missing, beside a list that can't be read, is said first and then the list, with the worst cause / a list that is null
 messages / a root that reads the alias of the first item of a for line, in the second item / fails before any item of the second list, naming each first item, on an empty list too
 messages / a subject read at the position of a list of the input / names the list when it is missing
 messages / a subject read at the position of a list of the input / says what the list is when it isn't a list or an object
@@ -584,13 +578,11 @@ subject_name / a count of a field named like the subject, written with a dot / a
 subject_name / a count whose reads a field named like the subject and a part / an item that isn't an object is named with the dot of the field the whose reads
 subject_name / a field after the subject name inside a whose of a check reads the subject / a field or a position after the subject on the right of a whose reads the subject's field
 subject_name / a from line whose that counts a quoted word of the syntax named like the subject counts the item's own field / the count of the item's own item field decides
-subject_name / a from line whose that walks a field named like the subject walks the item's own field / the item's own rel list decides, and its items are named with the dot
 subject_name / a sort key named like a grandparent subject sorts by the item's field, not by the grandparent / a field that isn't a number, a time or a date fails as unusable, named with its dot
 subject_name / a sort key named like a parent subject sorts by the item's field, not by the parent / an item without the field fails as absent, named with its dot
 subject_name / a subject name as the value after a count of and as a term of plus / the subject is read on the right side, a list is counted and a string is unusable
 subject_name / count of and sum of on a subject that is a list / the list is counted and summed
 subject_name / every on a position of region / names the item and the list it came from
-subject_name / every on a quoted subject name that is a word of the syntax names the subject in its message / a subject that isn't a list is named item, and so are the items of one that is
 subject_name / the subject name is read in every position of a one-line check on a list subject / a list subject is walked, counted and summed as a field that holds the list would be
 subjects / $input, a named by key and a parent each count as a name, and a leading dot doesn't / needs every to read a list after $input or a named by key, and a line with a leading dot is one name
 subjects / a $min_subjects row counting subjects / lists no location when it counts no subject
@@ -647,7 +639,6 @@ subjects / a child subject with named by, under a parent that isn't an object / 
 subjects / a child subject with named by, under a parent that isn't an object / fails min_subjects as not_an_object when the parent is null
 subjects / a child subject with whose, under a parent that isn't an object / fails min_subjects as not_an_object when the parent is a string
 subjects / a child subject with whose, under a parent that isn't an object / fails min_subjects as not_an_object when the parent is null
-subjects / a condition with some after another condition / joins the conditions with and in the expression, and keeps a subject that passes both
 subjects / a from line named by each of params that are a list, read through a position and a key / the ref of $min_subjects and $unique_ids points at the item of the params where the read stopped
 subjects / a from line that is $input[0], over a list input / fails min_subjects when the input is an empty list
 subjects / a from line that is $input[0].y, over a list input / fails min_subjects when the input is an empty list
