@@ -141,7 +141,7 @@ _for_assertion_base(row, at, where, t, i, a) := _policy_entry(
 	_worst_or_value(causes),
 	_once(array.concat(
 		array.concat(
-			[x | some [_, _, l] in lines; some x in _with_outcomes(object.get(l, "inputs", [])); not _alias_named(x.name, aliases)],
+			[x | some [_, _, l] in lines; some x in _with_outcomes(object.get(l, "inputs", [])); not _alias_named(x.name, aliases); not _sentence_walked_read(x, where.check.checks[i])],
 			[x | some l in t.free; l.assertion == a; some x in _with_outcomes(_anchored_inputs(l.inputs, at))],
 		),
 		[x | lines == []; not a in {l.assertion | some l in t.free}; some x in _with_outcomes(row.inputs); _for_sentence_read(x.name, where.check.checks[i]); not _alias_named(x.name, aliases)],
@@ -481,6 +481,29 @@ _tally_own_read(i, c, _, items) if {
 	_m_aliased(i.name) == concat("", [_m_aliased(_input_name(p)), "[]"])
 }
 
+_sentence_walked_read(x, c) if {
+	_walks(c)
+	c.op != "for"
+	_walked_path_read(x, _m_aliased(_walked_name(c.path)))
+}
+
+_sentence_walked_read(x, c) if {
+	contains(x.name, "[]")
+	some side in _m_tally_parts(c)
+	p := side[_basic_form(side)]
+	is_array(p)
+	_walked_path_read(x, _m_aliased(_input_name(p)))
+}
+
+_tally_own_read(i, c, _, _) if {
+	contains(i.name, " named by ")
+	i.value == []
+	some side in _m_tally_parts(c)
+	p := side[_basic_form(side)]
+	is_array(p)
+	_m_aliased(i.name) == _m_aliased(_input_name(p))
+}
+
 _tally_own_read(i, c, names, _) if {
 	names != set()
 	i.value == []
@@ -633,15 +656,43 @@ _walk_assertion_entry(row, at, where, ins) := _policy_entry(
 	where.check.expression,
 	row.cause,
 	_once(array.concat(array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists); not _walked_path_read(i, wname)], _key_flaw_entries(where.check.path)), _walk_cond_ref_entries(_walk_cond_refs(where.check), row.inputs)), _walk_param_entries(where.check, row.inputs))),
-	entries,
-	concat("; ", [m | some m in _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts))); not m in {e.message | some e in _key_list_parts(row, at)}]),
+	array.concat(entries, flaws),
+	_tally_rest(concat("; ", [m | some m in _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts))); not m in {e.message | some e in _key_list_parts(row, at)}]), {e.name | some e in flaws}),
 	[_assertion_at(where, null, 0)],
 ) if {
 	texts := object.get(row, "ergo/texts", [])
 	lists := {_list_base(f.item) | some f in row.failed_items}
 	entries := array.concat(_walk_entries(row, _item_owned(row, texts), at), _key_list_parts(row, at))
 	wname := _m_aliased(_walked_name(where.check.path))
+	flaws := _walk_flaw_lists(row, at, where.check, entries)
 }
+
+_walk_flaw_lists(row, at, check, []) := [_entry("list", n, cause, [object.union(object.remove(x, _input_stash_keys), {"value": _flaw_list_value(cause, x.value), "outcome": _key_list_outcome(cause)}) | some x in _anchored_all([_path_input(subj, p)], at)], [], c) |
+	some c in _tally_clauses(row.message)
+	n := _m_clause_name(c)
+	some k in numbers.range(1, count(check.path))
+	p := array.slice(check.path, 0, k)
+	every seg in p {
+		is_string(seg)
+	}
+	_m_aliased(_input_name(p)) == n
+	cause := _walk_clause_cause(c)
+] if {
+	is_array(check.path)
+	subj := row["ergo/subj"]
+}
+
+_walk_flaw_lists(_, _, _, entries) := [] if entries != []
+
+_walk_clause_cause(c) := "value" if {
+	not endswith(c, " is missing")
+	not endswith(c, " is null")
+	not contains(c, ", which isn't ")
+} else := _clause_cause(c)
+
+_flaw_list_value(cause, _) := null if cause in _no_value_states
+
+_flaw_list_value(cause, v) := v if not cause in _no_value_states
 
 _walked_name(path) := _input_name(path) if is_array(path)
 
