@@ -55,3 +55,15 @@ The same script also finds these, outside the review's list and not looked at he
 `spec/semantics.md` (`message.items`) now says B9 holds after `is`, `is not`, `is one of`, `is in` and the phrases that order numbers or times, and that `starts with`, `matches` and `contains` say only the root for now. `spec/OPEN.md` lists what is left for #700 under "Left for a later PR": those three phrases, the root from `$params` missing from the assertion's inputs, the Rust engine's missing B9 after `is`, `is not`, `is one of` and `is in`, and the `null` root after `is in` or `is one of` that fails a `count of` as `null` and an `every` as `absent`. `REFERENCE.md` makes no claim about B9 for a given phrase, so it is unchanged.
 
 The review's table has the `is in` row with `{"l": 3}` the wrong way round. Run again on this branch, `count of xs whose v is in $params.l is 1` with `xs` `[{"v": 1}, {}]` and `l` `3` gives `$params.l is 3, which isn't a list; item 2 of xs: v is missing` in `ergo.rego` and only `$params.l is 3, which isn't a list` in the Rust engine, in the `every` and `some` forms too. So `ergo.rego` already builds B9 for `is in` with a root of the wrong kind, and only the Rust engine is left for it.
+
+## Unit tests added
+
+Beside the rules they test: `_root_stand_in` (two tests, in `tests/lines/roots_test.rego`), `_m_list_leads` (`tests/messages/for_lines_test.rego`), `_for_deduped` (`tests/lines/for_lines_test.rego`), `_m_record_shown` and the three tests for finding 1 (`tests/messages/walks_test.rego`), the one item entry per item (`tests/report/parts_test.rego`), `_m_unkeyed_said` (`tests/messages/core_test.rego`) and `_fl_note_clauses` (`tests/lines/from_lines_test.rego`). Each test written after its rule was checked by breaking the rule, seeing the test fail and putting the rule back.
+
+## Checks run
+
+- Every spec case whose policy holds `count of` or `sum of` (782 cases, the only ones the changed rules reach), and the 54 with two conditions in a `whose`: all pass.
+- `tests/walks_test.rego`, `tests/count_and_sum_test.rego` and every unit test folder: all pass.
+- `cargo test -p ergo-policy-engine --test cases` and `cargo test -p ergo-policy-sentences`, native: pass. `validate.py`: no row missing or different.
+- `opa check --strict` (twice), `opa fmt --list`, `regal lint`, `check_rules.py`, `rego-layers.py`, `spec-placeholder.sh`: clean.
+- Not run: the full `opa test` suite, coverage, `spec-schemas.py`, `check_grammar.py`, the Wasm runs and `spec/sweep.py`.
