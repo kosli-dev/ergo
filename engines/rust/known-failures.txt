@@ -2,7 +2,11 @@ any_of / any_of with a ref to a param of the wrong type / fails the row as unusa
 compare / $refs list a path that walks a list once, as is in lists it, whatever walks it / lists the values each walk read, where it read them, and no entry for the path as written
 compare / $refs list a path that walks a list once, as is in lists it, whatever walks it / lists what the walk read when an item of the input has no x
 compare / $refs list each $params or $input path a check reads, when the paths hold the wrong type / lists what each path read, and the checks fail as before
+compare / a check whose sides can't be read in different ways, with a named by key from $input.k / the key is a number and k missing
+compare / a check whose sides can't be read in different ways, with a named by key from $input.k / the key is missing and k missing
 compare / a check whose sides can't be read in different ways, with a named by key from $input.k / the key is null and k missing
+compare / a check whose sides can't be read in different ways, with a named by key from $params.k, the key is a number and k missing / the key is a number and k missing
+compare / a check whose sides can't be read in different ways, with a named by key from $params.k, the key is missing and k missing / the key is missing and k missing
 compare / a check whose sides can't be read in different ways, with a named by key from $params.k, the key is null and k missing / the key is null and k missing
 compare / a for line whose sentence can't be read in different ways, with a named by key from $input, the key is a number / the key is a number
 compare / a for line whose sentence can't be read in different ways, with a named by key from $input, the key is missing / the key is missing

@@ -26,7 +26,7 @@ Each version says whether reports changed, so that anyone who only stores report
 
 - A position at the start of a walk that isn't there, or doesn't hold a list, is a `list` entry named as the message names it, like `item 1 of region` for `every first of region is 1`, on a plain check and on a `for` line, where it was an `item` entry ([row.parts](semantics.md#what-a-row-shows)). Reports change in `failures` for such checks.
 
-- A missing key no longer hides a missing value on the other side of a `plus`: with no `k` in the input or the subject, `m named by $input.k plus 1 is k` says `$input.k is missing, and k is missing`, where it said only `$input.k is missing` ([problems.all_said](semantics.md#which-problems-a-message-says)). A key of the wrong type does the same. Reports change for such checks.
+- A missing key no longer hides a missing value on the other side of a `plus`, a plain compare, a `count of` or a `sum of`: with no `k` in the input or the subject, `m named by $input.k plus 1 is k` and `k is m named by $input.k` say `$input.k is missing, and k is missing`, and `count of zzs is m named by $input.k` with no `zzs` says `$input.k is missing, and zzs is missing`, where they said only `$input.k is missing` ([problems.all_said](semantics.md#which-problems-a-message-says)). A key of the wrong type does the same. Reports change for such checks.
 
 - A root read through a list takes the worst outcome of its items: `pos[].name` with an item that has no `name` has the outcome `absent`, where it had `usable` (`inputs` in [row.parts](semantics.md#what-a-row-shows)). Reports change in `inputs` for such checks.
 

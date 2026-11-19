@@ -14950,7 +14950,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/k_is_m"
                 ],
-                "message": "$input.k is missing",
+                "message": "$input.k is missing, and k is missing",
                 "name": "k equals m named by $input.k"
               }
             ],
@@ -14972,7 +14972,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is missing",
+            "message": "$input.k is missing, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15090,7 +15090,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/m_is_k"
                 ],
-                "message": "$input.k is missing",
+                "message": "$input.k is missing, and k is missing",
                 "name": "m named by $input.k equals k"
               }
             ],
@@ -15112,7 +15112,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is missing",
+            "message": "$input.k is missing, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15157,7 +15157,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/zz_is_m"
                 ],
-                "message": "$input.k is missing",
+                "message": "$input.k is missing, and zz.y is missing",
                 "name": "zz.y equals m named by $input.k"
               }
             ],
@@ -15179,7 +15179,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is missing",
+            "message": "$input.k is missing, and zz.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15558,7 +15558,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/k_is_m"
                 ],
-                "message": "$input.k is 3, which isn't text",
+                "message": "$input.k is 3, which isn't text, and k is missing",
                 "name": "k equals m named by $input.k"
               }
             ],
@@ -15580,7 +15580,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15698,7 +15698,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/m_is_k"
                 ],
-                "message": "$input.k is 3, which isn't text",
+                "message": "$input.k is 3, which isn't text, and k is missing",
                 "name": "m named by $input.k equals k"
               }
             ],
@@ -15720,7 +15720,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15765,7 +15765,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/zz_is_m"
                 ],
-                "message": "$input.k is 3, which isn't text",
+                "message": "$input.k is 3, which isn't text, and zz.y is missing",
                 "name": "zz.y equals m named by $input.k"
               }
             ],
@@ -15787,7 +15787,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text, and zz.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15868,7 +15868,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/k_is_m"
                 ],
-                "message": "$params.k is missing",
+                "message": "$params.k is missing, and k is missing",
                 "name": "k equals m named by $params.k"
               }
             ],
@@ -15890,7 +15890,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is missing",
+            "message": "$params.k is missing, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16008,7 +16008,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/m_is_k"
                 ],
-                "message": "$params.k is missing",
+                "message": "$params.k is missing, and k is missing",
                 "name": "m named by $params.k equals k"
               }
             ],
@@ -16030,7 +16030,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is missing",
+            "message": "$params.k is missing, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16075,7 +16075,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/zz_is_m"
                 ],
-                "message": "$params.k is missing",
+                "message": "$params.k is missing, and zz.y is missing",
                 "name": "zz.y equals m named by $params.k"
               }
             ],
@@ -16097,7 +16097,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is missing",
+            "message": "$params.k is missing, and zz.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16490,7 +16490,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/k_is_m"
                 ],
-                "message": "$params.k is 3, which isn't text",
+                "message": "$params.k is 3, which isn't text, and k is missing",
                 "name": "k equals m named by $params.k"
               }
             ],
@@ -16512,7 +16512,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is 3, which isn't text",
+            "message": "$params.k is 3, which isn't text, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16630,7 +16630,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/m_is_k"
                 ],
-                "message": "$params.k is 3, which isn't text",
+                "message": "$params.k is 3, which isn't text, and k is missing",
                 "name": "m named by $params.k equals k"
               }
             ],
@@ -16652,7 +16652,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is 3, which isn't text",
+            "message": "$params.k is 3, which isn't text, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16697,7 +16697,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/zz_is_m"
                 ],
-                "message": "$params.k is 3, which isn't text",
+                "message": "$params.k is 3, which isn't text, and zz.y is missing",
                 "name": "zz.y equals m named by $params.k"
               }
             ],
@@ -16719,7 +16719,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is 3, which isn't text",
+            "message": "$params.k is 3, which isn't text, and zz.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
