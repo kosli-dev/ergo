@@ -29,6 +29,13 @@ Branch `row-parts-688-rego2`, on top of `row-parts-688-rego`. Not finished: a fr
 - A `sum of` in an `$applies` row drops its walked read, as the check row does (decision 2).
 - 13 of the 15 unit tests moved to the decided shapes; REFERENCE.md's `$min_subjects` and `any_of` examples are the engine's output.
 
+## Checks run by the third builder
+
+- Full `opa test`: 58 fail and 4 error. The 4 errors are the compiled `walks` and `messages` spec tests hitting the 120 s timeout under the full parallel run; alone they pass in 80 to 90 s. The failures are the 2 unit tests below and the spec topics that hold the 160 failing cases.
+- Pass: strict `opa eval` (`true`), the three `opa check`, `opa fmt`, `regal lint`, `check_rules.py`, `spec-schemas.py` (3580 cases, 0 problems), `check_grammar.py` (0 disagreements), `sentences_corpus.py`, `rego-layers.py`, `rego-folders.sh`, `no-inline-tests.sh`, `spec-placeholder.sh`.
+- Wasm budgets (budget part of `.github/wasm-js.cjs` only): 28.4 MB (29), 19.4 (20), 44.4 (45), 112.8 (118), 51.4 (52).
+- Not run: the coverage list, `spec/sweep.py` (no Rust engine of this branch to compare with), the Rust tests (no `ergo-rust` Docker image here), `.github/wasm-tests.sh`.
+
 ## Left (third builder, 2026-11-19)
 
 Spec cases: 160 fail in the Rego engine (by a script that skips the cases with long numbers), 88 of them also in `engines/rust/known-failures.txt`. The list is at the end of this file.
