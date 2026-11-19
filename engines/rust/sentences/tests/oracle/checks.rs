@@ -10329,6 +10329,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every es whose v is m named by $params.k exists",
+        "every es whose v equals m named by $params.k exists",
+        &[],
+        &[],
+    ),
+    (
+        "every es whose v is m named by $params.k, if any, exists",
+        "every es whose v equals m named by $params.k, if any, exists",
+        &[],
+        &[],
+    ),
     ("id is \"x\"", "id is \"x\"", &[], &[]),
     ("sum of xs.v is 0", "sum of xs.v is 0", &[], &[]),
     ("x is \"w\"", "x is \"w\"", &[], &[]),

@@ -45086,5 +45086,2567 @@
           ]
         }
       ]
-    }
+    },
+  {
+    "description": "a named by key from the params or the input that is missing, beside a list that fails, is said first, then the list, with the worst cause",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"every": "every es whose v is m named by $params.k exists", "some": "some es whose v is m named by $input.k exists", "if_any": "every es whose v is m named by $params.k, if any, exists", "option": {"any_of": {"a": "some es whose v is m named by $params.k exists", "b": "ok is true"}}, "for": {"for": "every ws as w", "assert": "every es whose v is m named by $params.k, if any, exists"}}}}},
+    "cases": [
+      {
+        "description": "with the list missing too, both are said, the key first",
+        "rules": [
+          "walk.flaws",
+          "problems.all_said"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "ok": false,
+              "m": {
+                "a": 1
+              },
+              "ws": [
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "absent",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/every"
+                ],
+                "message": "$params.k is missing",
+                "name": "every es whose v equals m named by $params.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$params.k is missing; es is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "for",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "absent",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$params.k is missing; es is missing",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$params.k is missing; es is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "absent",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/if_any"
+                ],
+                "message": "$params.k is missing",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$params.k is missing; es is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "option",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": []
+                      },
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/a"
+                    ],
+                    "message": "$params.k is missing; es is missing",
+                    "name": "some es whose v equals m named by $params.k exists"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/a"
+                ],
+                "message": "$params.k is missing; es is missing",
+                "name": "a"
+              },
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ok"
+                        ],
+                        "name": "ok",
+                        "outcome": "usable",
+                        "value": false
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/b"
+                    ],
+                    "message": "ok is false",
+                    "name": "ok is true"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/b"
+                ],
+                "message": "ok is false",
+                "name": "b"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ok"
+                ],
+                "name": "ok",
+                "outcome": "usable",
+                "value": false
+              }
+            ],
+            "message": "a: $params.k is missing; es is missing; b: ok is false",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "absent",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/some"
+                ],
+                "message": "$input.k is missing",
+                "name": "some es whose v equals m named by $input.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$input.k is missing; es is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with the list null, the row fails as absent, the worse of the two",
+        "rules": [
+          "walk.flaws",
+          "problems.all_said"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "ok": false,
+              "m": {
+                "a": 1
+              },
+              "ws": [
+                {}
+              ],
+              "es": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/every"
+                ],
+                "message": "$params.k is missing",
+                "name": "every es whose v equals m named by $params.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$params.k is missing; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "for",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$params.k is missing; es is null",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$params.k is missing; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/if_any"
+                ],
+                "message": "$params.k is missing",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$params.k is missing; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "option",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": []
+                      },
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/a"
+                    ],
+                    "message": "$params.k is missing; es is null",
+                    "name": "some es whose v equals m named by $params.k exists"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/a"
+                ],
+                "message": "$params.k is missing; es is null",
+                "name": "a"
+              },
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ok"
+                        ],
+                        "name": "ok",
+                        "outcome": "usable",
+                        "value": false
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/b"
+                    ],
+                    "message": "ok is false",
+                    "name": "ok is true"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/b"
+                ],
+                "message": "ok is false",
+                "name": "b"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ok"
+                ],
+                "name": "ok",
+                "outcome": "usable",
+                "value": false
+              }
+            ],
+            "message": "a: $params.k is missing; es is null; b: ok is false",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/some"
+                ],
+                "message": "$input.k is missing",
+                "name": "some es whose v equals m named by $input.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$input.k is missing; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a named by key from the params or the input that is null, beside a list that fails, is said first, then the list",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"every": "every es whose v is m named by $params.k exists", "some": "some es whose v is m named by $input.k exists", "if_any": "every es whose v is m named by $params.k, if any, exists", "option": {"any_of": {"a": "some es whose v is m named by $params.k exists", "b": "ok is true"}}, "for": {"for": "every ws as w", "assert": "every es whose v is m named by $params.k, if any, exists"}}}}},
+    "params": {"k": null},
+    "cases": [
+      {
+        "description": "with the list null too, both are said and the row fails as null",
+        "rules": [
+          "walk.flaws",
+          "problems.all_said"
+        ],
+        "input": {
+          "k": null,
+          "things": [
+            {
+              "id": "t1",
+              "ok": false,
+              "m": {
+                "a": 1
+              },
+              "ws": [
+                {}
+              ],
+              "es": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/every"
+                ],
+                "message": "$params.k is null",
+                "name": "every es whose v equals m named by $params.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$params.k is null; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "for",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$params.k is null; es is null",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$params.k is null; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/if_any"
+                ],
+                "message": "$params.k is null",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$params.k is null; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "option",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": []
+                      },
+                      {
+                        "locations": [
+                          "$params:/k"
+                        ],
+                        "name": "$params.k",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/a"
+                    ],
+                    "message": "$params.k is null; es is null",
+                    "name": "some es whose v equals m named by $params.k exists"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/a"
+                ],
+                "message": "$params.k is null; es is null",
+                "name": "a"
+              },
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ok"
+                        ],
+                        "name": "ok",
+                        "outcome": "usable",
+                        "value": false
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/b"
+                    ],
+                    "message": "ok is false",
+                    "name": "ok is true"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/b"
+                ],
+                "message": "ok is false",
+                "name": "b"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ok"
+                ],
+                "name": "ok",
+                "outcome": "usable",
+                "value": false
+              }
+            ],
+            "message": "a: $params.k is null; es is null; b: ok is false",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/some"
+                ],
+                "message": "$input.k is null",
+                "name": "some es whose v equals m named by $input.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$input.k is null; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a named by key from the params or the input that isn't text, beside a list that fails, is said first, then the list, and the row fails as unusable",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"every": "every es whose v is m named by $params.k exists", "some": "some es whose v is m named by $input.k exists", "if_any": "every es whose v is m named by $params.k, if any, exists", "option": {"any_of": {"a": "some es whose v is m named by $params.k exists", "b": "ok is true"}}, "for": {"for": "every ws as w", "assert": "every es whose v is m named by $params.k, if any, exists"}}}}},
+    "params": {"k": 3},
+    "cases": [
+      {
+        "description": "with the list missing, the key is said first and the row fails as unusable, not absent",
+        "rules": [
+          "walk.flaws",
+          "problems.all_said"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": "t1",
+              "ok": false,
+              "m": {
+                "a": 1
+              },
+              "ws": [
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "absent",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/every"
+                ],
+                "message": "$params.k is 3, which isn't text",
+                "name": "every es whose v equals m named by $params.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "for",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "absent",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$params.k is 3, which isn't text; es is missing",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "absent",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/if_any"
+                ],
+                "message": "$params.k is 3, which isn't text",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "option",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": []
+                      },
+                      {
+                        "locations": [
+                          "$params:/k"
+                        ],
+                        "name": "$params.k",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/a"
+                    ],
+                    "message": "$params.k is 3, which isn't text; es is missing",
+                    "name": "some es whose v equals m named by $params.k exists"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/a"
+                ],
+                "message": "$params.k is 3, which isn't text; es is missing",
+                "name": "a"
+              },
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ok"
+                        ],
+                        "name": "ok",
+                        "outcome": "usable",
+                        "value": false
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/b"
+                    ],
+                    "message": "ok is false",
+                    "name": "ok is true"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/b"
+                ],
+                "message": "ok is false",
+                "name": "b"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ok"
+                ],
+                "name": "ok",
+                "outcome": "usable",
+                "value": false
+              }
+            ],
+            "message": "a: $params.k is 3, which isn't text; es is missing; b: ok is false",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "absent",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/some"
+                ],
+                "message": "$input.k is 3, which isn't text",
+                "name": "some es whose v equals m named by $input.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "absent",
+                "value": []
+              }
+            ],
+            "message": "$input.k is 3, which isn't text; es is missing",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with the list null, the key is said first and the row fails as unusable, not null",
+        "rules": [
+          "walk.flaws",
+          "problems.all_said"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": "t1",
+              "ok": false,
+              "m": {
+                "a": 1
+              },
+              "ws": [
+                {}
+              ],
+              "es": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/every"
+                ],
+                "message": "$params.k is 3, which isn't text",
+                "name": "every es whose v equals m named by $params.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "for",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$params.k is 3, which isn't text; es is null",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/if_any"
+                ],
+                "message": "$params.k is 3, which isn't text",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "option",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": []
+                      },
+                      {
+                        "locations": [
+                          "$params:/k"
+                        ],
+                        "name": "$params.k",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/a"
+                    ],
+                    "message": "$params.k is 3, which isn't text; es is null",
+                    "name": "some es whose v equals m named by $params.k exists"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/a"
+                ],
+                "message": "$params.k is 3, which isn't text; es is null",
+                "name": "a"
+              },
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ok"
+                        ],
+                        "name": "ok",
+                        "outcome": "usable",
+                        "value": false
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/b"
+                    ],
+                    "message": "ok is false",
+                    "name": "ok is true"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/b"
+                ],
+                "message": "ok is false",
+                "name": "b"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ok"
+                ],
+                "name": "ok",
+                "outcome": "usable",
+                "value": false
+              }
+            ],
+            "message": "a: $params.k is 3, which isn't text; es is null; b: ok is false",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is null",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "null",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/some"
+                ],
+                "message": "$input.k is 3, which isn't text",
+                "name": "some es whose v equals m named by $input.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "null",
+                "value": []
+              }
+            ],
+            "message": "$input.k is 3, which isn't text; es is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with the list text, both are said",
+        "rules": [
+          "walk.flaws",
+          "problems.all_said"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": "t1",
+              "ok": false,
+              "m": {
+                "a": 1
+              },
+              "ws": [
+                {}
+              ],
+              "es": "s"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is \"s\", which isn't a list or an object",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "unusable",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/every"
+                ],
+                "message": "$params.k is 3, which isn't text",
+                "name": "every es whose v equals m named by $params.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "unusable",
+                "value": []
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "for",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "unusable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$params.k is 3, which isn't text; es is \"s\", which isn't a list or an object",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "unusable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is \"s\", which isn't a list or an object",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "unusable",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/if_any"
+                ],
+                "message": "$params.k is 3, which isn't text",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "unusable",
+                "value": []
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "option",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "es",
+                        "outcome": "unusable",
+                        "value": []
+                      },
+                      {
+                        "locations": [
+                          "$params:/k"
+                        ],
+                        "name": "$params.k",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/a"
+                    ],
+                    "message": "$params.k is 3, which isn't text; es is \"s\", which isn't a list or an object",
+                    "name": "some es whose v equals m named by $params.k exists"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/a"
+                ],
+                "message": "$params.k is 3, which isn't text; es is \"s\", which isn't a list or an object",
+                "name": "a"
+              },
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ok"
+                        ],
+                        "name": "ok",
+                        "outcome": "usable",
+                        "value": false
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/b"
+                    ],
+                    "message": "ok is false",
+                    "name": "ok is true"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/b"
+                ],
+                "message": "ok is false",
+                "name": "b"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "unusable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ok"
+                ],
+                "name": "ok",
+                "outcome": "usable",
+                "value": false
+              }
+            ],
+            "message": "a: $params.k is 3, which isn't text; es is \"s\", which isn't a list or an object; b: ok is false",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is \"s\", which isn't a list or an object",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es",
+                    "outcome": "unusable",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/some"
+                ],
+                "message": "$input.k is 3, which isn't text",
+                "name": "some es whose v equals m named by $input.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es",
+                "outcome": "unusable",
+                "value": []
+              }
+            ],
+            "message": "$input.k is 3, which isn't text; es is \"s\", which isn't a list or an object",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with the list empty, an every or some without if any says the key, then the empty list",
+        "rules": [
+          "walk.flaws",
+          "problems.all_said"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": "t1",
+              "ok": false,
+              "m": {
+                "a": 1
+              },
+              "ws": [
+                {}
+              ],
+              "es": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is []",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/every"
+                ],
+                "message": "$params.k is 3, which isn't text",
+                "name": "every es whose v equals m named by $params.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$params.k is 3, which isn't text; es is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "for",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/for/assert"
+                ],
+                "message": "$params.k is 3, which isn't text",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "outcome": "usable",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "message": "$params.k is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "if_any",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "es[]",
+                    "outcome": "usable",
+                    "value": []
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/if_any"
+                ],
+                "message": "$params.k is 3, which isn't text",
+                "name": "every es whose v equals m named by $params.k, if any, exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$params.k is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "option",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [],
+                        "name": "es[]",
+                        "outcome": "usable",
+                        "value": []
+                      },
+                      {
+                        "locations": [
+                          "$params:/k"
+                        ],
+                        "name": "$params.k",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/a"
+                    ],
+                    "message": "$params.k is 3, which isn't text; es is []",
+                    "name": "some es whose v equals m named by $params.k exists"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/a"
+                ],
+                "message": "$params.k is 3, which isn't text; es is []",
+                "name": "a"
+              },
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ok"
+                        ],
+                        "name": "ok",
+                        "outcome": "usable",
+                        "value": false
+                      }
+                    ],
+                    "kind": "assertion",
+                    "locations": [
+                      "$policy:/requirements/s/checks/option/any_of/b"
+                    ],
+                    "message": "ok is false",
+                    "name": "ok is true"
+                  }
+                ],
+                "inputs": [],
+                "kind": "option",
+                "locations": [
+                  "$policy:/requirements/s/checks/option/any_of/b"
+                ],
+                "message": "ok is false",
+                "name": "b"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ok"
+                ],
+                "name": "ok",
+                "outcome": "usable",
+                "value": false
+              }
+            ],
+            "message": "a: $params.k is 3, which isn't text; es is []; b: ok is false",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "some",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is []",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/some"
+                ],
+                "message": "$input.k is 3, which isn't text",
+                "name": "some es whose v equals m named by $input.k exists"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": []
+              }
+            ],
+            "message": "$input.k is 3, which isn't text; es is []",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  }
 ]
