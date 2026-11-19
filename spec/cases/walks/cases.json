@@ -34619,7 +34619,7 @@
                           "/things/0/es/0/zz"
                         ],
                         "name": "es[0].zz",
-                        "outcome": "unusable",
+                        "outcome": "usable",
                         "value": 2
                       },
                       {
@@ -34654,7 +34654,7 @@
                           "/things/0/es/1/zz"
                         ],
                         "name": "es[1].zz",
-                        "outcome": "unusable",
+                        "outcome": "usable",
                         "value": 2
                       },
                       {
@@ -34719,7 +34719,7 @@
                           "/things/0/es/3/zz"
                         ],
                         "name": "es[3].zz",
-                        "outcome": "unusable",
+                        "outcome": "usable",
                         "value": 2
                       },
                       {

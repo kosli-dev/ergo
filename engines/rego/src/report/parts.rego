@@ -1300,10 +1300,15 @@ _tally_item_entry(e, cause, text, side, w, roots) := object.union(
 	{"value": e.iv, "locations": [_item_at(w, e)]},
 )
 
-_tally_item_reads(e, cause, side, w, text) := [{"name": _input_name(e.c), "value": _walk_value(e.v, e, w), "locations": [_item_read_at(w, e, e.r)], "outcome": _tally_read_outcome(e.iv, e.r, cause)}] if {
+_tally_item_reads(e, cause, side, w, text) := [{"name": _input_name(array.concat(e.c, ps[0])), "value": null, "locations": [_item_read_at(w, e, e.r)], "outcome": "not_an_object"}] if {
 	e.r != []
-	_ = side
-	_ = text
+	not _read_state(e.iv, e.r) in {"absent", "unusable"}
+	not is_object(e.v)
+	ps := _once([p | some c in object.get(side, "whose", []); some x in _walk_sides_paths(c); is_array(x[0]); some p in _tally_item_paths(x[0]); p != []; every step in p { is_string(step) }])
+	ps != []
+	_ = [cause, text]
+} else := [{"name": _input_name(e.c), "value": _walk_value(e.v, e, w), "locations": [_item_read_at(w, e, e.r)], "outcome": _tally_read_outcome(e.iv, e.r, cause)}] if {
+	e.r != []
 }
 
 else := [{"name": _input_name(array.concat(e.i, p)), "value": _tally_read_value(e.iv, p), "locations": [_item_read_at(w, e, p)], "outcome": _tally_read_outcome(e.iv, p, _tally_said_cause(cause, ps, p, text))} |

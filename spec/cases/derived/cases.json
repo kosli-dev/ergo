@@ -24980,17 +24980,25 @@
                           "/things/0/xs/0/tags"
                         ],
                         "name": "xs[0].tags",
-                        "outcome": "absent",
+                        "outcome": "usable",
                         "value": [
                           "x"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/0"
+                        ],
+                        "name": "xs[0].key",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "$input.m is null; key is missing",
+                    "message": "key is missing",
                     "name": "item 1 of xs",
                     "value": {
                       "tags": [
@@ -25021,7 +25029,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$input.m is null; item 1 of xs: key is missing",
+                "message": "$input.m is null",
                 "name": "count of xs whose tags contains $input.m named by key is 1"
               }
             ],
@@ -25122,48 +25130,28 @@
                           "/things/0/xs/0/tags"
                         ],
                         "name": "xs[0].tags",
-                        "outcome": "null",
+                        "outcome": "usable",
                         "value": [
                           "x"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/0/key"
+                        ],
+                        "name": "xs[0].key",
+                        "outcome": "null",
+                        "value": null
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "$input.m is null; key is null",
+                    "message": "key is null",
                     "name": "item 1 of xs",
                     "value": {
                       "key": null,
-                      "tags": [
-                        "x"
-                      ]
-                    }
-                  },
-                  {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/xs/1/tags"
-                        ],
-                        "name": "xs[1].tags",
-                        "outcome": "null",
-                        "value": [
-                          "x"
-                        ]
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/xs/1"
-                    ],
-                    "message": "$input.m is null",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "key": "a",
                       "tags": [
                         "x"
                       ]
@@ -25192,7 +25180,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$input.m is null; item 1 of xs: key is null",
+                "message": "$input.m is null",
                 "name": "count of xs whose tags contains $input.m named by key is 1"
               }
             ],
@@ -25420,47 +25408,27 @@
                           "/arts/0/xs/0/tags"
                         ],
                         "name": "xs[0].tags",
-                        "outcome": "absent",
+                        "outcome": "usable",
                         "value": [
                           "x"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/arts/0/xs/0"
+                        ],
+                        "name": "xs[0].key",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/arts/0/xs/0"
                     ],
-                    "message": "art.m is null; key is missing",
+                    "message": "key is missing",
                     "name": "item 1 of xs",
                     "value": {
-                      "tags": [
-                        "x"
-                      ]
-                    }
-                  },
-                  {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/arts/0/xs/1/tags"
-                        ],
-                        "name": "xs[1].tags",
-                        "outcome": "null",
-                        "value": [
-                          "x"
-                        ]
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/arts/0/xs/1"
-                    ],
-                    "message": "art.m is null",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "key": "a",
                       "tags": [
                         "x"
                       ]
@@ -25489,7 +25457,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "art.m is null; item 1 of xs: key is missing",
+                "message": "art.m is null",
                 "name": "count of xs whose tags contains art.m named by key is 1"
               }
             ],
@@ -26169,47 +26137,27 @@
                           "/arts/0/ws/0/xs/0/tags"
                         ],
                         "name": "xs[0].tags",
-                        "outcome": "absent",
+                        "outcome": "usable",
                         "value": [
                           "x"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/arts/0/ws/0/xs/0"
+                        ],
+                        "name": "xs[0].key",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/arts/0/ws/0/xs/0"
                     ],
-                    "message": "art.m is null; key is missing",
+                    "message": "key is missing",
                     "name": "item 1 of xs",
                     "value": {
-                      "tags": [
-                        "x"
-                      ]
-                    }
-                  },
-                  {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/arts/0/ws/0/xs/1/tags"
-                        ],
-                        "name": "xs[1].tags",
-                        "outcome": "null",
-                        "value": [
-                          "x"
-                        ]
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/arts/0/ws/0/xs/1"
-                    ],
-                    "message": "art.m is null",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "key": "a",
                       "tags": [
                         "x"
                       ]
@@ -26238,7 +26186,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "art.m is null; item 1 of xs: key is missing",
+                "message": "art.m is null",
                 "name": "count of xs whose tags contains art.m named by key is 1"
               }
             ],
@@ -30830,7 +30778,7 @@
                 "cause": "not_an_object",
                 "failures": [
                   {
-                    "cause": "null",
+                    "cause": "not_an_object",
                     "failures": [],
                     "inputs": [
                       {
@@ -30838,7 +30786,15 @@
                           "/things/0/xs/0"
                         ],
                         "name": "xs[0].tags",
-                        "outcome": "null",
+                        "outcome": "not_an_object",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/0"
+                        ],
+                        "name": "xs[0].key",
+                        "outcome": "not_an_object",
                         "value": null
                       }
                     ],
@@ -30846,40 +30802,12 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "cov is null; the subject is null, which isn't an object",
+                    "message": "item 1 of xs is null, which isn't an object",
                     "name": "item 1 of xs",
                     "value": null
                   },
                   {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/xs/1/tags"
-                        ],
-                        "name": "xs[1].tags",
-                        "outcome": "null",
-                        "value": [
-                          "x"
-                        ]
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/xs/1"
-                    ],
-                    "message": "cov is null",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "key": "a",
-                      "tags": [
-                        "x"
-                      ]
-                    }
-                  },
-                  {
-                    "cause": "null",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -30887,17 +30815,25 @@
                           "/things/0/xs/2/tags"
                         ],
                         "name": "xs[2].tags",
-                        "outcome": "null",
+                        "outcome": "usable",
                         "value": [
                           "x"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/2"
+                        ],
+                        "name": "xs[2].key",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/2"
                     ],
-                    "message": "cov is null; key is missing",
+                    "message": "key is missing",
                     "name": "item 3 of xs",
                     "value": {
                       "tags": [
@@ -30933,7 +30869,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "cov is null; item 1 of xs is null, which isn't an object; item 3 of xs: key is missing",
+                "message": "cov is null",
                 "name": "count of xs whose tags contains cov.m named by key is 1"
               }
             ],
@@ -31033,6 +30969,35 @@
                 "cause": "not_an_object",
                 "failures": [
                   {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0"
+                        ],
+                        "name": "xs[0].tags",
+                        "outcome": "not_an_object",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/0"
+                        ],
+                        "name": "xs[0].key",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "message": "item 1 of xs is null, which isn't an object",
+                    "name": "item 1 of xs",
+                    "value": null
+                  },
+                  {
                     "cause": "absent",
                     "failures": [],
                     "inputs": [
@@ -31041,10 +31006,18 @@
                           "/things/0/xs/2/tags"
                         ],
                         "name": "xs[2].tags",
-                        "outcome": "absent",
+                        "outcome": "usable",
                         "value": [
                           "x"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/2"
+                        ],
+                        "name": "xs[2].key",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -31087,7 +31060,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "cov is missing; item 1 of xs is null, which isn't an object",
+                "message": "cov is missing",
                 "name": "count of xs whose tags contains cov.m named by key is 1"
               }
             ],
@@ -31215,7 +31188,7 @@
                 "cause": "not_an_object",
                 "failures": [
                   {
-                    "cause": "null",
+                    "cause": "not_an_object",
                     "failures": [],
                     "inputs": [
                       {
@@ -31223,7 +31196,15 @@
                           "/things/0/xs/0"
                         ],
                         "name": "xs[0].tags",
-                        "outcome": "null",
+                        "outcome": "not_an_object",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/0"
+                        ],
+                        "name": "xs[0].key",
+                        "outcome": "not_an_object",
                         "value": null
                       }
                     ],
@@ -31231,40 +31212,12 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "cov is null; the subject is null, which isn't an object",
+                    "message": "item 1 of xs is null, which isn't an object",
                     "name": "item 1 of xs",
                     "value": null
                   },
                   {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/xs/1/tags"
-                        ],
-                        "name": "xs[1].tags",
-                        "outcome": "null",
-                        "value": [
-                          "x"
-                        ]
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/xs/1"
-                    ],
-                    "message": "cov is null",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "key": "a",
-                      "tags": [
-                        "x"
-                      ]
-                    }
-                  },
-                  {
-                    "cause": "null",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -31272,17 +31225,25 @@
                           "/things/0/xs/2/tags"
                         ],
                         "name": "xs[2].tags",
-                        "outcome": "null",
+                        "outcome": "usable",
                         "value": [
                           "x"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/2"
+                        ],
+                        "name": "xs[2].key",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/2"
                     ],
-                    "message": "cov is null; key is missing",
+                    "message": "key is missing",
                     "name": "item 3 of xs",
                     "value": {
                       "tags": [
@@ -31318,7 +31279,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "cov is null; item 1 of xs is null, which isn't an object; item 3 of xs: key is missing",
+                "message": "cov is null",
                 "name": "count of xs whose tags contains cov.m named by key is 1"
               }
             ],
@@ -31419,7 +31380,7 @@
                 "cause": "not_an_object",
                 "failures": [
                   {
-                    "cause": "null",
+                    "cause": "not_an_object",
                     "failures": [],
                     "inputs": [
                       {
@@ -31427,7 +31388,15 @@
                           "/things/0/xs/0"
                         ],
                         "name": "xs[0].tags",
-                        "outcome": "null",
+                        "outcome": "not_an_object",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/0"
+                        ],
+                        "name": "xs[0].key",
+                        "outcome": "not_an_object",
                         "value": null
                       }
                     ],
@@ -31435,40 +31404,12 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "cov is null; the subject is null, which isn't an object",
+                    "message": "item 1 of xs is null, which isn't an object",
                     "name": "item 1 of xs",
                     "value": null
                   },
                   {
-                    "cause": "null",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/things/0/xs/1/tags"
-                        ],
-                        "name": "xs[1].tags",
-                        "outcome": "null",
-                        "value": [
-                          "x"
-                        ]
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/things/0/xs/1"
-                    ],
-                    "message": "cov is null",
-                    "name": "item 2 of xs",
-                    "value": {
-                      "key": "a",
-                      "tags": [
-                        "x"
-                      ]
-                    }
-                  },
-                  {
-                    "cause": "null",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -31476,17 +31417,25 @@
                           "/things/0/xs/2/tags"
                         ],
                         "name": "xs[2].tags",
-                        "outcome": "null",
+                        "outcome": "usable",
                         "value": [
                           "x"
                         ]
+                      },
+                      {
+                        "locations": [
+                          "/things/0/xs/2"
+                        ],
+                        "name": "xs[2].key",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/2"
                     ],
-                    "message": "cov is null; key is missing",
+                    "message": "key is missing",
                     "name": "item 3 of xs",
                     "value": {
                       "tags": [
@@ -31522,7 +31471,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "cov is null; item 1 of xs is null, which isn't an object; item 3 of xs: key is missing",
+                "message": "cov is null",
                 "name": "count of xs whose tags contains cov.m named by key is 1"
               }
             ],
