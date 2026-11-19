@@ -37,7 +37,29 @@ else := i
 
 _for_texted(row) if _ = row["ergo/for_texts"]
 
-_for_failures(row, at, where, t) := _for_failures_of(row, at, where, t, array.concat([x[1] | some x in _for_key_flaws(where.check); not _key_said_in_item(row, x[1])], [e.message | some e in _key_list_parts(row, at)]))
+_for_failures(row, at, where, t) := [_own_caused(e) | some e in _for_failures_raw(row, at, where, t)]
+
+_own_caused(e) := _with_own_cause(e, [_own_caused_2(k) | some k in e.failures])
+
+_own_caused_2(e) := _with_own_cause(e, [_own_caused_3(k) | some k in e.failures])
+
+_own_caused_3(e) := _with_own_cause(e, [_with_own_cause(k, k.failures) | some k in e.failures])
+
+_with_own_cause(e, kids) := object.union(e, {"failures": kids, "cause": c}) if {
+	e.kind in {"item", "list"}
+	own := {_cause_of_outcome(i.outcome) | some i in e.inputs; not object.get(i, "outcome", "usable") in {"usable", "value"}} | {k.cause | some k in kids}
+	own != set()
+	c := _worst_of(own)
+	_worst_of({c, e.cause}) == e.cause
+	not contains(e.message, ", and ")
+	not contains(e.message, "; ")
+} else := object.union(e, {"failures": kids})
+
+_cause_of_outcome("missing") := "absent"
+
+_cause_of_outcome(o) := o if o != "missing"
+
+_for_failures_raw(row, at, where, t) := _for_failures_of(row, at, where, t, array.concat([x[1] | some x in _for_key_flaws(where.check); not _key_said_in_item(row, x[1])], [e.message | some e in _key_list_parts(row, at)]))
 
 _key_said_in_item(row, k) if contains(row.message, concat("", [": ", k]))
 
@@ -205,7 +227,7 @@ _for_second_of(row, where, i, f, y, text, at) := object.union(e, object.filter(y
 	e := _for_sentence_part(row, where, i, y.item, y.cause, _with_outcomes(y.inputs), text, at, bound)
 } else := object.union(_entry(_walk_kind(y.item), y.item, y.cause, _with_outcomes(y.inputs), [], text), object.filter(y, {"value", "locations"}))
 
-_for_sentence_part(row, where, i, name, cause, ins, text, at, bound) := _entry("item", name, cause, w.inputs, w.failures, "") if {
+_for_sentence_part(row, where, i, name, cause, ins, text, at, bound) := _entry("item", name, cause, [y | some y in w.inputs; _alias_named(y.name, {it.as | some it in where.check.items})], w.failures, "") if {
 	c := where.check.checks[i]
 	_walks(c)
 	c.op != "for"

@@ -26932,7 +26932,30 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rows"
+                            ],
+                            "name": "rows",
+                            "outcome": "usable",
+                            "value": [
+                              {
+                                "n": 1,
+                                "z": 2
+                              }
+                            ]
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                        "name": "rows"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -26947,7 +26970,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "v": 5,
@@ -26963,19 +26986,6 @@
                     "name": "$input.q",
                     "outcome": "usable",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "z": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -27092,7 +27102,30 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rows"
+                            ],
+                            "name": "rows",
+                            "outcome": "usable",
+                            "value": [
+                              {
+                                "n": 1,
+                                "z": 2
+                              }
+                            ]
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                        "name": "rows"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -27107,7 +27140,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "v": 5,
@@ -27123,19 +27156,6 @@
                     "name": "$input.q",
                     "outcome": "usable",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "z": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -27252,7 +27272,30 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rows"
+                            ],
+                            "name": "rows",
+                            "outcome": "usable",
+                            "value": [
+                              {
+                                "n": 1,
+                                "z": 2
+                              }
+                            ]
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                        "name": "rows"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -27267,7 +27310,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "v": 5,
@@ -27283,19 +27326,6 @@
                     "name": "$input.k",
                     "outcome": "usable",
                     "value": 100
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "z": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -27412,7 +27442,30 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rows"
+                            ],
+                            "name": "rows",
+                            "outcome": "usable",
+                            "value": [
+                              {
+                                "n": 1,
+                                "z": 2
+                              }
+                            ]
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                        "name": "rows"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -27427,7 +27480,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "v": 5,
@@ -27443,19 +27496,6 @@
                     "name": "$input.q",
                     "outcome": "usable",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "z": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -27772,19 +27812,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/ts/0/kids/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "z": 2
-                      }
-                    ]
-                  },
                   {
                     "locations": [
                       "/ts/0/x"

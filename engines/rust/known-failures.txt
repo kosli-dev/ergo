@@ -193,8 +193,13 @@ for / a second for item picking from a list read through the first alias, which 
 for / a second for item that picks with sorted by, under a first item that sorts by another key / names the second item's key when its items tie
 for / a second for list whose whose reads a root through the first alias that can't be read, and a field its items lack, says the root for each item of the first list, then each item of the second / w.z isn't a number and no item of ys has u
 for / a second item whose path is named by a param / fails the first list's item with the ref's cause
+for / a some walk on a for line whose whose reads $input / lists the alias first, then what the whose reads
 for / a sum of a key of the params, with params as a list / fails as unusable and names the params and what they are
+for / a walk on a for line of a child subject whose whose reads the parent / lists the alias first, then the parent's field
+for / a walk on a for line whose assertion reads $input and whose whose reads the alias / lists the alias first, then $input
 for / a walk on a for line whose path is named with a character that sorts before $ / lists the alias first, then the walked path, with no whose
+for / a walk on a for line whose whose reads $input after the item's alias / lists the alias first, then what the whose reads
+for / a walk on a for line whose whose reads $input on its left / lists the alias first, then what the whose reads
 for / a whose on the second for item that reads $params text after is in says the root once, with no item of its list / fails as unusable with the root once
 for / a whose on the second for item that reads $params text after is in says the root once, with no item of its list / fails as unusable with the root once and then the item that can't be read on its own
 for / a whose on the second for item that reads a $params object after is in says the root once, with no item of its list / fails as unusable with the root once
