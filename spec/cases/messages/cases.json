@@ -11316,30 +11316,35 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/things/0/d/items/0"
-                    ],
-                    "name": "lst[]",
-                    "outcome": "usable",
-                    "part": {
-                      "id": null,
-                      "name": "lst"
-                    },
-                    "value": [
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
                       {
-                        "x": 1
+                        "locations": [
+                          "/things/0/d/items"
+                        ],
+                        "name": "lst",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "x": 1
+                          }
+                        ]
                       }
-                    ]
+                    ],
+                    "kind": "list",
+                    "message": "lst is [{\"x\": 1}]",
+                    "name": "lst"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/d/assert"
                 ],
-                "message": "lst is [{\"x\": 1}]",
+                "message": "",
                 "name": "every lst whose x is 9 exists"
               }
             ],
@@ -12590,7 +12595,7 @@
                     }
                   },
                   {
-                    "cause": "absent",
+                    "cause": "null",
                     "failures": [],
                     "inputs": [
                       {
@@ -15403,21 +15408,6 @@
             "check": "for",
             "failures": [
               {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "pr.z is \"s\", which isn't a list",
-                "name": "xs"
-              },
-              {
                 "cause": "value",
                 "failures": [],
                 "inputs": [
@@ -15441,6 +15431,14 @@
                 "name": "xs[]",
                 "outcome": "usable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "/prs/0/z"
+                ],
+                "name": "pr.z",
+                "outcome": "unusable",
+                "value": "s"
               }
             ],
             "message": "pr.z is \"s\", which isn't a list; xs is []",
@@ -15522,6 +15520,14 @@
                     "locations": [],
                     "name": "count of xs whose v is in $params.q",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/q"
+                    ],
+                    "name": "$params.q",
+                    "outcome": "unusable",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -16018,30 +16024,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/prs/0/xs/0",
-                      "/prs/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "aa": 1,
-                        "b": "s"
-                      },
-                      {}
-                    ]
-                  }
-                ],
-                "kind": "list",
-                "message": "$params.q is missing; pr.z is missing",
-                "name": "xs"
-              },
-              {
-                "cause": "absent",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
                       "/prs/0/xs/1"
                     ],
                     "name": "xs[1].aa",
@@ -16081,6 +16063,22 @@
                   },
                   {}
                 ]
+              },
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "outcome": "absent",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0"
+                ],
+                "name": "pr.z",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "$params.q is missing; pr.z is missing; item 2 of xs: aa is missing",
@@ -17720,33 +17718,7 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failures": [
-              {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/prs/0/xs/0",
-                      "/prs/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      },
-                      {
-                        "v": 2
-                      }
-                    ]
-                  }
-                ],
-                "kind": "list",
-                "message": "pr.z is \"s\", which isn't a list",
-                "name": "xs"
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -17763,6 +17735,14 @@
                     "v": 2
                   }
                 ]
+              },
+              {
+                "locations": [
+                  "/prs/0/z"
+                ],
+                "name": "pr.z",
+                "outcome": "unusable",
+                "value": "s"
               }
             ],
             "message": "pr.z is \"s\", which isn't a list",
@@ -18118,31 +18098,7 @@
             "check": "for",
             "failures": [
               {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/prs/0/xs/0",
-                      "/prs/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1,
-                        "w": 1
-                      },
-                      {}
-                    ]
-                  }
-                ],
-                "kind": "list",
-                "message": "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list",
-                "name": "xs"
-              },
-              {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -18186,6 +18142,22 @@
                   },
                   {}
                 ]
+              },
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": "s"
+              },
+              {
+                "locations": [
+                  "/prs/0/l"
+                ],
+                "name": "pr.l",
+                "outcome": "unusable",
+                "value": 3
               }
             ],
             "message": "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list; item 2 of xs: v is missing",
@@ -18311,6 +18283,14 @@
                     "name": "pr.l",
                     "outcome": "unusable",
                     "value": {}
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -18412,21 +18392,6 @@
             "check": "for",
             "failures": [
               {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "$params.l is \"s\", which isn't a list; pr.l is {}, which isn't a list",
-                "name": "xs"
-              },
-              {
                 "cause": "value",
                 "failures": [],
                 "inputs": [
@@ -18450,6 +18415,22 @@
                 "name": "xs[]",
                 "outcome": "usable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "unusable",
+                "value": "s"
+              },
+              {
+                "locations": [
+                  "/prs/0/l"
+                ],
+                "name": "pr.l",
+                "outcome": "unusable",
+                "value": {}
               }
             ],
             "message": "$params.l is \"s\", which isn't a list; pr.l is {}, which isn't a list; xs is []",
@@ -18569,6 +18550,14 @@
                     "name": "pr.l",
                     "outcome": "unusable",
                     "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -18670,21 +18659,6 @@
             "check": "for",
             "failures": [
               {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": []
-                  }
-                ],
-                "kind": "list",
-                "message": "pr.l is \"s\", which isn't a list; $params.l is null",
-                "name": "xs"
-              },
-              {
                 "cause": "value",
                 "failures": [],
                 "inputs": [
@@ -18708,6 +18682,22 @@
                 "name": "xs[]",
                 "outcome": "usable",
                 "value": []
+              },
+              {
+                "locations": [
+                  "/prs/0/l"
+                ],
+                "name": "pr.l",
+                "outcome": "unusable",
+                "value": "s"
+              },
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "pr.l is \"s\", which isn't a list; $params.l is null; xs is []",
@@ -18993,28 +18983,7 @@
             "check": "for",
             "failures": [
               {
-                "cause": "unusable",
-                "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      }
-                    ]
-                  }
-                ],
-                "kind": "list",
-                "message": "pr.l is \"s\", which isn't a list; $params.l is null",
-                "name": "xs"
-              },
-              {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -19049,6 +19018,22 @@
                     "v": 1
                   }
                 ]
+              },
+              {
+                "locations": [
+                  "/prs/0/l"
+                ],
+                "name": "pr.l",
+                "outcome": "unusable",
+                "value": "s"
+              },
+              {
+                "locations": [
+                  "$params:/l"
+                ],
+                "name": "$params.l",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "pr.l is \"s\", which isn't a list; $params.l is null; item 1 of xs: w is missing",
@@ -37836,23 +37821,35 @@
         "input": {"ts": [{"id": "a", "p": {}}]},
         "results": [
           {
-            "cause": "unusable",
+            "cause": "absent",
             "check": "count",
             "failures": [
               {
-                "cause": "unusable",
-                "failures": [],
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of es whose v is in $input.z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -37892,7 +37889,7 @@
                 "value": null
               }
             ],
-            "message": "$input.z is missing",
+            "message": "$input.z is missing; es is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -37909,7 +37906,25 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -37917,10 +37932,12 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "absent",
-                    "value": []
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.z",
+                    "outcome": "unusable",
+                    "value": null
                   },
                   {
                     "locations": [
@@ -37974,7 +37991,7 @@
                 "value": null
               }
             ],
-            "message": "$params is 3, which isn't an object",
+            "message": "$params is 3, which isn't an object; es is missing",
             "passed": false,
             "requirement": "r",
             "subject": {

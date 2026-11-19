@@ -97019,7 +97019,34 @@
       "failures": [
         {
           "cause": "value",
-          "failures": [],
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/xs"
+                  ],
+                  "name": "xs",
+                  "outcome": "usable",
+                  "value": [
+                    {
+                      "m": {
+                        "w": 2,
+                        "z": 1
+                      },
+                      "pr": "z",
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "list",
+              "message": "xs is [{\"m\": {\"w\": 2, \"z\": 1}, \"pr\": \"z\", \"v\": 1}]",
+              "name": "xs"
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -97036,30 +97063,13 @@
               "name": "k",
               "outcome": "usable",
               "value": "w"
-            },
-            {
-              "locations": [
-                "/prs/0/xs/0"
-              ],
-              "name": "xs[]",
-              "outcome": "usable",
-              "value": [
-                {
-                  "m": {
-                    "w": 2,
-                    "z": 1
-                  },
-                  "pr": "z",
-                  "v": 1
-                }
-              ]
             }
           ],
           "kind": "assertion",
           "locations": [
             "$policy:/requirements/r/checks/every"
           ],
-          "message": "xs is [{\"m\": {\"w\": 2, \"z\": 1}, \"pr\": \"z\", \"v\": 1}]",
+          "message": "",
           "name": "every xs whose v equals $params.m named by pr.k exists"
         }
       ],

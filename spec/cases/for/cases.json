@@ -71131,14 +71131,14 @@
             }
           },
           {
-            "cause": "absent",
+            "cause": "unusable",
             "check": "plain",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "unusable",
                 "failures": [
                   {
-                    "cause": "absent",
+                    "cause": "unusable",
                     "failures": [],
                     "inputs": [
                       {
@@ -71146,7 +71146,7 @@
                           "/cs/0/ws/0/n"
                         ],
                         "name": "ws[0].n.v",
-                        "outcome": "absent",
+                        "outcome": "unusable",
                         "value": null
                       }
                     ],
@@ -71154,7 +71154,7 @@
                     "locations": [
                       "/cs/0/ws/0"
                     ],
-                    "message": "item 2 of pos: name is missing",
+                    "message": "n is 2, which isn't an object",
                     "name": "item 1 of ws",
                     "value": {
                       "n": 2,
@@ -71162,7 +71162,7 @@
                     }
                   },
                   {
-                    "cause": "absent",
+                    "cause": "unusable",
                     "failures": [],
                     "inputs": [
                       {
@@ -71170,7 +71170,7 @@
                           "/cs/0/ws/1/n"
                         ],
                         "name": "ws[1].n.v",
-                        "outcome": "absent",
+                        "outcome": "unusable",
                         "value": null
                       }
                     ],
@@ -71178,7 +71178,7 @@
                     "locations": [
                       "/cs/0/ws/1"
                     ],
-                    "message": "item 2 of pos: name is missing",
+                    "message": "n is 2, which isn't an object",
                     "name": "item 2 of ws",
                     "value": {
                       "n": 2
@@ -71207,7 +71207,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/plain"
                 ],
-                "message": "",
+                "message": "item 2 of pos: name is missing",
                 "name": "every ws.n whose v is in pos.name is 2"
               }
             ],
@@ -71241,7 +71241,7 @@
                 ]
               }
             ],
-            "message": "item 2 of pos: name is missing",
+            "message": "item 2 of pos: name is missing; item 1 of ws: n is 2, which isn't an object; item 2 of ws: n is 2, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -71484,7 +71484,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -71556,7 +71556,55 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ws/0/n"
+                        ],
+                        "name": "ws[0].n.v",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/ws/0"
+                    ],
+                    "message": "n is 2, which isn't an object",
+                    "name": "item 1 of ws",
+                    "value": {
+                      "n": 2,
+                      "v": "bob"
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ws/1/n"
+                        ],
+                        "name": "ws[1].n.v",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/ws/1"
+                    ],
+                    "message": "n is 2, which isn't an object",
+                    "name": "item 2 of ws",
+                    "value": {
+                      "n": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -71613,7 +71661,7 @@
                 ]
               }
             ],
-            "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
+            "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value; item 1 of ws: n is 2, which isn't an object; item 2 of ws: n is 2, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -71673,7 +71721,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -71900,12 +71948,60 @@
             }
           },
           {
-            "cause": "null",
+            "cause": "unusable",
             "check": "plain",
             "failures": [
               {
-                "cause": "null",
-                "failures": [],
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ws/0/n"
+                        ],
+                        "name": "ws[0].n.v",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/ws/0"
+                    ],
+                    "message": "n is 2, which isn't an object",
+                    "name": "item 1 of ws",
+                    "value": {
+                      "n": 2,
+                      "v": "bob"
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ws/1/n"
+                        ],
+                        "name": "ws[1].n.v",
+                        "outcome": "unusable",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/ws/1"
+                    ],
+                    "message": "n is 2, which isn't an object",
+                    "name": "item 2 of ws",
+                    "value": {
+                      "n": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -71954,7 +72050,7 @@
                 ]
               }
             ],
-            "message": "pos is null",
+            "message": "pos is null; item 1 of ws: n is 2, which isn't an object; item 2 of ws: n is 2, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -72234,7 +72330,7 @@
                 "cause": "not_an_object",
                 "failures": [
                   {
-                    "cause": "absent",
+                    "cause": "unusable",
                     "failures": [],
                     "inputs": [
                       {
@@ -72242,7 +72338,7 @@
                           "/cs/0/ws/0/n"
                         ],
                         "name": "ws[0].n.v",
-                        "outcome": "absent",
+                        "outcome": "unusable",
                         "value": null
                       }
                     ],
@@ -72250,7 +72346,7 @@
                     "locations": [
                       "/cs/0/ws/0"
                     ],
-                    "message": "item 2 of pos: name is missing",
+                    "message": "n is 2, which isn't an object",
                     "name": "item 1 of ws",
                     "value": {
                       "n": 2,
@@ -72301,7 +72397,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/plain"
                 ],
-                "message": "",
+                "message": "item 2 of pos: name is missing",
                 "name": "every ws.n whose v is in pos.name is 2"
               }
             ],
@@ -72335,7 +72431,7 @@
                 ]
               }
             ],
-            "message": "item 2 of pos: name is missing; item 2 of ws is null, which isn't an object",
+            "message": "item 2 of pos: name is missing; item 1 of ws: n is 2, which isn't an object; item 2 of ws is null, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -73114,7 +73210,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -73314,7 +73410,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -74236,7 +74332,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -74320,7 +74416,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -74425,7 +74521,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -74570,7 +74666,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -74981,7 +75077,29 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs"
+                        ],
+                        "name": "xs",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "v": 1
+                          }
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "xs is [{\"v\": 1}]",
+                    "name": "xs"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -74992,25 +75110,13 @@
                       "name": "pl"
                     },
                     "value": []
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_exists/assert"
                 ],
-                "message": "xs is [{\"v\": 1}]",
+                "message": "",
                 "name": "some xs whose v is in pl.z exists"
               }
             ],
@@ -102071,7 +102177,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -102377,7 +102483,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -102690,7 +102796,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -103013,7 +103119,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -103310,7 +103416,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -103592,7 +103698,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -103745,10 +103851,10 @@
                 "name": "y.n exists"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -103771,7 +103877,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -103860,10 +103966,10 @@
                 "name": "y.n exists"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -103886,7 +103992,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {

@@ -3648,21 +3648,31 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/releases/0/approvers/0"
-                    ],
-                    "name": "approvers[]",
-                    "outcome": "usable",
-                    "value": [
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
                       {
-                        "state": "CHANGES",
-                        "username": "ann"
+                        "locations": [
+                          "/releases/0/approvers"
+                        ],
+                        "name": "approvers",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "state": "CHANGES",
+                            "username": "ann"
+                          }
+                        ]
                       }
-                    ]
-                  },
+                    ],
+                    "kind": "list",
+                    "message": "approvers is [{\"state\": \"CHANGES\", \"username\": \"ann\"}]",
+                    "name": "approvers"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:/staff"
@@ -3685,7 +3695,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "approvers is [{\"state\": \"CHANGES\", \"username\": \"ann\"}]",
+                "message": "",
                 "name": "some approvers whose state is \"APPROVED\" is in $params.staff"
               }
             ],
@@ -4374,21 +4384,31 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/releases/0/approvers/0"
-                    ],
-                    "name": "approvers[]",
-                    "outcome": "usable",
-                    "value": [
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
                       {
-                        "state": "CHANGES",
-                        "username": "ann"
+                        "locations": [
+                          "/releases/0/approvers"
+                        ],
+                        "name": "approvers",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "state": "CHANGES",
+                            "username": "ann"
+                          }
+                        ]
                       }
-                    ]
-                  },
+                    ],
+                    "kind": "list",
+                    "message": "approvers is [{\"state\": \"CHANGES\", \"username\": \"ann\"}]",
+                    "name": "approvers"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:/staff"
@@ -4411,7 +4431,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "approvers is [{\"state\": \"CHANGES\", \"username\": \"ann\"}]",
+                "message": "",
                 "name": "every approvers whose state is \"APPROVED\" is in $params.staff"
               }
             ],

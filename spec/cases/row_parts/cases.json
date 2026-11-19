@@ -14693,5 +14693,289 @@
         ]
       }
     ]
+  },
+  {
+    "description": "two sentences on a for line that walk different lists under the item say the items of each list in list order, and the lists in the order of the sentences",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "for": {
+              "assert": [
+                "every x.ys.n is 1",
+                "every x.zs.n is 1"
+              ],
+              "for": "every xs as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "the items of the first sentence's list come first, even when an item of the second list sits at an earlier position",
+        "rules": ["message.join", "message.items", "problems.item_order", "row.parts", "for.failed_items", "for.failure_inputs"],
+        "input": {"things": [{"id": "t", "xs": [{"ys": [{"n": 1}, {"n": 2}, {"n": 3}], "zs": [{"n": 4}]}, {"ys": [{"n": 1}], "zs": [{}]}]}]},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "for",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/xs/0/ys/1/n"
+                            ],
+                            "name": "x.ys[1].n",
+                            "outcome": "usable",
+                            "value": 2
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/xs/0/ys/1"
+                        ],
+                        "message": "n is 2",
+                        "name": "item 2 of x.ys",
+                        "value": {
+                          "n": 2
+                        }
+                      },
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/xs/0/ys/2/n"
+                            ],
+                            "name": "x.ys[2].n",
+                            "outcome": "usable",
+                            "value": 3
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/xs/0/ys/2"
+                        ],
+                        "message": "n is 3",
+                        "name": "item 3 of x.ys",
+                        "value": {
+                          "n": 3
+                        }
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "ys": [
+                        {
+                          "n": 1
+                        },
+                        {
+                          "n": 2
+                        },
+                        {
+                          "n": 3
+                        }
+                      ],
+                      "zs": [
+                        {
+                          "n": 4
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for/assert/0"
+                ],
+                "message": "",
+                "name": "every x.ys.n is 1"
+              },
+              {
+                "cause": "absent",
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/xs/0/zs/0/n"
+                            ],
+                            "name": "x.zs[0].n",
+                            "outcome": "usable",
+                            "value": 4
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/xs/0/zs/0"
+                        ],
+                        "message": "n is 4",
+                        "name": "item 1 of x.zs",
+                        "value": {
+                          "n": 4
+                        }
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "ys": [
+                        {
+                          "n": 1
+                        },
+                        {
+                          "n": 2
+                        },
+                        {
+                          "n": 3
+                        }
+                      ],
+                      "zs": [
+                        {
+                          "n": 4
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/xs/1/zs/0"
+                            ],
+                            "name": "x.zs[0].n",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/xs/1/zs/0"
+                        ],
+                        "message": "n is missing",
+                        "name": "item 1 of x.zs",
+                        "value": {}
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/xs/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "ys": [
+                        {
+                          "n": 1
+                        }
+                      ],
+                      "zs": [
+                        {}
+                      ]
+                    }
+                  }
+                ],
+                "inputs": [],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/r/checks/for/assert/1"
+                ],
+                "message": "",
+                "name": "every x.zs.n is 1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "ys": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      },
+                      {
+                        "n": 3
+                      }
+                    ],
+                    "zs": [
+                      {
+                        "n": 4
+                      }
+                    ]
+                  },
+                  {
+                    "ys": [
+                      {
+                        "n": 1
+                      }
+                    ],
+                    "zs": [
+                      {}
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs: item 2 of x.ys: n is 2; item 1 of xs: item 3 of x.ys: n is 3; item 1 of xs: item 1 of x.zs: n is 4; and 1 more",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
