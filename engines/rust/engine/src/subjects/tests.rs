@@ -1614,9 +1614,7 @@ fn a_count_whose_whose_reads_params_that_are_a_list_names_them_not_the_digits() 
             json!({"things": [{"id": "t"}]}),
             json!([3])
         ),
-        json!(
-            "$params is [3], which isn't an object; item 1 of $params is 3, which isn't an object"
-        )
+        json!("$params is [3], which isn't an object")
     );
 }
 

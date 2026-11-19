@@ -1272,7 +1272,14 @@ pub fn with_all_items(check: &Tally, ctx: &Ctx, cause: Cause, message: String) -
     {
         parts.insert(0, params);
     }
-    parts.extend(items);
+    for item in items {
+        if !parts
+            .iter()
+            .any(|part| part.split(", and ").any(|p| p == item))
+        {
+            parts.push(item);
+        }
+    }
     super::message::joined(parts)
 }
 
@@ -1750,10 +1757,12 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Option<Strin
                 found.push((c, text));
             }
         }
-        let keep =
-            |at: &usize, c: &Cause| *c == cause || always.contains(at) || items_at.contains_key(at);
+        let own_read = |text: &str| !text.contains('$') && !text.contains(" named by ");
+        let keep = |at: &usize, c: &Cause, text: &str| {
+            *c == cause || always.contains(at) || items_at.contains_key(at) && own_read(text)
+        };
         let mut order: Vec<usize> = (0..found.len())
-            .filter(|at| keep(at, &found[*at].0))
+            .filter(|at| keep(at, &found[*at].0, &found[*at].1))
             .collect();
         order.sort_by_key(|at| (items_at.contains_key(at), items_at.get(at).cloned(), *at));
         let mut records: std::collections::BTreeMap<usize, Value> = records.into_iter().collect();
