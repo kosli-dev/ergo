@@ -2173,7 +2173,52 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/kids/1"
+                        ],
+                        "name": "kids[1].n",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/kids/1"
+                    ],
+                    "message": "n is missing",
+                    "name": "item 2 of kids",
+                    "value": {}
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/kids/2/n"
+                        ],
+                        "name": "kids[2].n",
+                        "outcome": "unusable",
+                        "value": "x"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/kids/2"
+                    ],
+                    "message": "n is \"x\", which isn't a number",
+                    "name": "item 3 of kids",
+                    "value": {
+                      "n": "x"
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -2207,7 +2252,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 3 of kids: n is \"x\", which isn't a number",
+                "message": "",
                 "name": "sum of kids.n plus age is 100"
               }
             ],
@@ -2254,7 +2299,7 @@
                 "value": 5
               }
             ],
-            "message": "item 3 of kids: n is \"x\", which isn't a number",
+            "message": "item 2 of kids: n is missing; item 3 of kids: n is \"x\", which isn't a number",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3994,7 +4039,25 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/reports"
+                        ],
+                        "name": "cov",
+                        "outcome": "unusable",
+                        "value": "none"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "cov can't be read: reports is \"none\", which isn't a list or an object",
+                    "name": "cov"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -4010,7 +4073,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "cov can't be read: reports is \"none\", which isn't a list or an object",
+                "message": "",
                 "name": "count of cov.files is 1"
               }
             ],
@@ -4405,24 +4468,38 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/cs/0/r: s/0/ok"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/cs/0/r: s/0/ok"
+                            ],
+                            "name": "c.\"r: s\"[0].ok",
+                            "outcome": "usable",
+                            "value": false
+                          }
                         ],
-                        "name": "c.\"r: s\"[].ok",
-                        "outcome": "usable",
-                        "value": [
-                          false
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/cs/0/r: s/0"
+                        ],
+                        "message": "ok is false",
+                        "name": "item 1 of c.\"r: s\"",
+                        "value": {
+                          "n": 2,
+                          "ok": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/cs/0"
                     ],
-                    "message": "item 1 of c.\"r: s\": ok is false",
+                    "message": "",
                     "name": "item 1 of cs",
                     "value": {
                       "r: s": [
@@ -4447,24 +4524,38 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/cs/0/r: s/0/n"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/cs/0/r: s/0/n"
+                            ],
+                            "name": "c.\"r: s\"[0].n",
+                            "outcome": "usable",
+                            "value": 2
+                          }
                         ],
-                        "name": "c.\"r: s\"[].n",
-                        "outcome": "usable",
-                        "value": [
-                          2
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/cs/0/r: s/0"
+                        ],
+                        "message": "n is 2",
+                        "name": "item 1 of c.\"r: s\"",
+                        "value": {
+                          "n": 2,
+                          "ok": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/cs/0"
                     ],
-                    "message": "item 1 of c.\"r: s\": n is 2",
+                    "message": "",
                     "name": "item 1 of cs",
                     "value": {
                       "r: s": [
@@ -4925,26 +5016,37 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/cs/0/reviews/0/ok",
-                          "/things/0/cs/0/reviews/1/ok"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/cs/0/reviews/1/ok"
+                            ],
+                            "name": "c.reviews[1].ok",
+                            "outcome": "usable",
+                            "value": false
+                          }
                         ],
-                        "name": "c.reviews[].ok",
-                        "outcome": "usable",
-                        "value": [
-                          true,
-                          false
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/cs/0/reviews/1"
+                        ],
+                        "message": "ok is false",
+                        "name": "item 2 of c.reviews",
+                        "value": {
+                          "ok": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/cs/0"
                     ],
-                    "message": "item 2 of c.reviews: ok is false",
+                    "message": "",
                     "name": "item 1 of cs",
                     "value": {
                       "a": 2,
@@ -5729,24 +5831,37 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/cs/0/reviews/0/ok"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/cs/0/reviews/0/ok"
+                            ],
+                            "name": "c.reviews[0].ok",
+                            "outcome": "usable",
+                            "value": false
+                          }
                         ],
-                        "name": "c.reviews[].ok",
-                        "outcome": "usable",
-                        "value": [
-                          false
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/cs/0/reviews/0"
+                        ],
+                        "message": "ok is false",
+                        "name": "item 1 of c.reviews",
+                        "value": {
+                          "ok": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/cs/0"
                     ],
-                    "message": "item 1 of c.reviews: ok is false",
+                    "message": "",
                     "name": "item 1 of cs",
                     "value": {
                       "a": 2,
@@ -5759,26 +5874,37 @@
                   },
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/cs/2/reviews/0/ok",
-                          "/things/0/cs/2/reviews/1/ok"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/cs/2/reviews/1/ok"
+                            ],
+                            "name": "c.reviews[1].ok",
+                            "outcome": "usable",
+                            "value": false
+                          }
                         ],
-                        "name": "c.reviews[].ok",
-                        "outcome": "usable",
-                        "value": [
-                          true,
-                          false
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/cs/2/reviews/1"
+                        ],
+                        "message": "ok is false",
+                        "name": "item 2 of c.reviews",
+                        "value": {
+                          "ok": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/cs/2"
                     ],
-                    "message": "item 2 of c.reviews: ok is false",
+                    "message": "",
                     "name": "item 3 of cs",
                     "value": {
                       "a": 3,
@@ -5937,24 +6063,37 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/cs/0/reviews/0/ok"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/cs/0/reviews/0/ok"
+                            ],
+                            "name": "c.reviews[0].ok",
+                            "outcome": "usable",
+                            "value": false
+                          }
                         ],
-                        "name": "c.reviews[].ok",
-                        "outcome": "usable",
-                        "value": [
-                          false
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/cs/0/reviews/0"
+                        ],
+                        "message": "ok is false",
+                        "name": "item 1 of c.reviews",
+                        "value": {
+                          "ok": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/cs/0"
                     ],
-                    "message": "item 1 of c.reviews: ok is false",
+                    "message": "",
                     "name": "item 1 of cs",
                     "value": {
                       "a": 2,
@@ -5967,24 +6106,37 @@
                   },
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/cs/1/reviews/0/ok"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/cs/1/reviews/0/ok"
+                            ],
+                            "name": "c.reviews[0].ok",
+                            "outcome": "usable",
+                            "value": false
+                          }
                         ],
-                        "name": "c.reviews[].ok",
-                        "outcome": "usable",
-                        "value": [
-                          false
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/cs/1/reviews/0"
+                        ],
+                        "message": "ok is false",
+                        "name": "item 1 of c.reviews",
+                        "value": {
+                          "ok": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/cs/1"
                     ],
-                    "message": "item 1 of c.reviews: ok is false",
+                    "message": "",
                     "name": "item 2 of cs",
                     "value": {
                       "a": 3,
@@ -5997,24 +6149,37 @@
                   },
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/cs/2/reviews/0/ok"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/cs/2/reviews/0/ok"
+                            ],
+                            "name": "c.reviews[0].ok",
+                            "outcome": "usable",
+                            "value": false
+                          }
                         ],
-                        "name": "c.reviews[].ok",
-                        "outcome": "usable",
-                        "value": [
-                          false
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/cs/2/reviews/0"
+                        ],
+                        "message": "ok is false",
+                        "name": "item 1 of c.reviews",
+                        "value": {
+                          "ok": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/cs/2"
                     ],
-                    "message": "item 1 of c.reviews: ok is false",
+                    "message": "",
                     "name": "item 3 of cs",
                     "value": {
                       "a": 4,
@@ -6027,24 +6192,37 @@
                   },
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/cs/3/reviews/0/ok"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/cs/3/reviews/0/ok"
+                            ],
+                            "name": "c.reviews[0].ok",
+                            "outcome": "usable",
+                            "value": false
+                          }
                         ],
-                        "name": "c.reviews[].ok",
-                        "outcome": "usable",
-                        "value": [
-                          false
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/cs/3/reviews/0"
+                        ],
+                        "message": "ok is false",
+                        "name": "item 1 of c.reviews",
+                        "value": {
+                          "ok": false
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/cs/3"
                     ],
-                    "message": "item 1 of c.reviews: ok is false",
+                    "message": "",
                     "name": "item 4 of cs",
                     "value": {
                       "a": 5,
@@ -6838,7 +7016,50 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/commits/0"
+                        ],
+                        "name": "commits[0].signed",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/commits/0"
+                    ],
+                    "message": "item 1 of commits is null, which isn't an object",
+                    "name": "item 1 of commits",
+                    "value": null
+                  },
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/commits/2"
+                        ],
+                        "name": "commits[2].signed",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/commits/2"
+                    ],
+                    "message": "item 3 of commits is 5, which isn't an object",
+                    "name": "item 3 of commits",
+                    "value": 5
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -6854,7 +7075,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of commits is null, which isn't an object; item 3 of commits is 5, which isn't an object",
+                "message": "",
                 "name": "count of commits whose signed is true is 3"
               }
             ],
@@ -6912,7 +7133,50 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/commits/1"
+                        ],
+                        "name": "commits[1].n",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/commits/1"
+                    ],
+                    "message": "item 2 of commits is \"s\", which isn't an object",
+                    "name": "item 2 of commits",
+                    "value": "s"
+                  },
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/commits/2"
+                        ],
+                        "name": "commits[2].n",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/commits/2"
+                    ],
+                    "message": "item 3 of commits is null, which isn't an object",
+                    "name": "item 3 of commits",
+                    "value": null
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -6928,7 +7192,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 2 of commits is \"s\", which isn't an object; item 3 of commits is null, which isn't an object",
+                "message": "",
                 "name": "sum of commits.n is 5"
               }
             ],
@@ -6984,7 +7248,61 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/zs/0"
+                        ],
+                        "name": "zs[0].k",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/zs/0"
+                    ],
+                    "message": "item 1 of zs is [{\"k\": 1}, {\"k\": 2}], which isn't an object",
+                    "name": "item 1 of zs",
+                    "value": [
+                      {
+                        "k": 1
+                      },
+                      {
+                        "k": 2
+                      }
+                    ]
+                  },
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/zs/1"
+                        ],
+                        "name": "zs[1].k",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/zs/1"
+                    ],
+                    "message": "item 2 of zs is [{\"k\": 3}], which isn't an object",
+                    "name": "item 2 of zs",
+                    "value": [
+                      {
+                        "k": 3
+                      }
+                    ]
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -6999,7 +7317,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of zs is [{\"k\": 1}, {\"k\": 2}], which isn't an object; item 2 of zs is [{\"k\": 3}], which isn't an object",
+                "message": "",
                 "name": "count of zs whose count of k is 2 is 5"
               }
             ],
@@ -7063,7 +7381,50 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/d/items/0"
+                        ],
+                        "name": "lst[0].x",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/d/items/0"
+                    ],
+                    "message": "item 1 of lst is null, which isn't an object",
+                    "name": "item 1 of lst",
+                    "value": null
+                  },
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/d/items/1"
+                        ],
+                        "name": "lst[1].x",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/d/items/1"
+                    ],
+                    "message": "item 2 of lst is 5, which isn't an object",
+                    "name": "item 2 of lst",
+                    "value": 5
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -7083,7 +7444,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of lst is null, which isn't an object; item 2 of lst is 5, which isn't an object",
+                "message": "",
                 "name": "count of lst whose x is 5 is 2"
               }
             ],
@@ -8254,25 +8615,52 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [
+                          {
+                            "cause": "unusable",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/things/0/ws/0/0/a"
+                                ],
+                                "name": "w[0].a",
+                                "outcome": "unusable",
+                                "value": 1
+                              }
+                            ],
+                            "kind": "list",
+                            "message": ".a is 1, which isn't a list or an object",
+                            "name": "a"
+                          }
+                        ],
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "message": "",
+                        "name": "item 1 of w",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [],
                         "name": "count of w[0] named by zz",
                         "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "w[0] named by zz",
-                        "outcome": "usable",
-                        "value": []
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ws/0"
                     ],
-                    "message": "item 1 of w: .a is 1, which isn't a list or an object",
+                    "message": "",
                     "name": "item 1 of ws",
                     "value": [
                       {
@@ -8712,7 +9100,25 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/x/k"
+                        ],
+                        "name": "x.k",
+                        "outcome": "unusable",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "x.k is 1, which isn't a list or an object",
+                    "name": "x.k"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -8732,7 +9138,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x.k is 1, which isn't a list or an object",
+                "message": "",
                 "name": "count of x named by zz is 1"
               }
             ],
@@ -8778,7 +9184,25 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/x/k"
+                        ],
+                        "name": "x.k",
+                        "outcome": "unusable",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "x.k is 5, which isn't a list or an object",
+                    "name": "x.k"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -8798,7 +9222,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "x.k is 5, which isn't a list or an object",
+                "message": "",
                 "name": "count of x named by zz is 1"
               }
             ],
@@ -8853,25 +9277,37 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/k"
+                            ],
+                            "name": "w.k",
+                            "outcome": "unusable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "w.k is 1, which isn't a list or an object",
+                        "name": "w.k"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [],
                         "name": "count of w named by zz",
                         "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "w named by zz",
-                        "outcome": "usable",
-                        "value": []
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ws/0"
                     ],
-                    "message": "w.k is 1, which isn't a list or an object",
+                    "message": "",
                     "name": "item 1 of ws",
                     "value": {
                       "k": 1
@@ -8948,26 +9384,60 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/zs/0/0/k",
-                          "/things/0/zs/0/1/k"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/zs/0/0/k"
+                            ],
+                            "name": "z[0].k",
+                            "outcome": "usable",
+                            "value": 1
+                          }
                         ],
-                        "name": "z[].k",
-                        "outcome": "usable",
-                        "value": [
-                          1,
-                          2
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/0/0"
+                        ],
+                        "message": "k is 1",
+                        "name": "item 1 of z",
+                        "value": {
+                          "k": 1
+                        }
+                      },
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/zs/0/1/k"
+                            ],
+                            "name": "z[1].k",
+                            "outcome": "usable",
+                            "value": 2
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/0/1"
+                        ],
+                        "message": "k is 2",
+                        "name": "item 2 of z",
+                        "value": {
+                          "k": 2
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/zs/0"
                     ],
-                    "message": "item 1 of z: k is 1; item 2 of z: k is 2",
+                    "message": "",
                     "name": "item 1 of zs",
                     "value": [
                       {
@@ -8980,24 +9450,37 @@
                   },
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/zs/1/0/k"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/zs/1/0/k"
+                            ],
+                            "name": "z[0].k",
+                            "outcome": "usable",
+                            "value": 3
+                          }
                         ],
-                        "name": "z[].k",
-                        "outcome": "usable",
-                        "value": [
-                          3
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/1/0"
+                        ],
+                        "message": "k is 3",
+                        "name": "item 1 of z",
+                        "value": {
+                          "k": 3
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/zs/1"
                     ],
-                    "message": "item 1 of z: k is 3",
+                    "message": "",
                     "name": "item 2 of zs",
                     "value": [
                       {
@@ -9504,24 +9987,37 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/zs/0/0/k"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/zs/0/0/k"
+                            ],
+                            "name": "z[0].k",
+                            "outcome": "unusable",
+                            "value": "$z: x"
+                          }
                         ],
-                        "name": "z[].k",
-                        "outcome": "usable",
-                        "value": [
-                          "$z: x"
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/0/0"
+                        ],
+                        "message": "k is \"$z: x\", which isn't a number",
+                        "name": "item 1 of z",
+                        "value": {
+                          "k": "$z: x"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/zs/0"
                     ],
-                    "message": "item 1 of z: k is \"$z: x\", which isn't a number",
+                    "message": "",
                     "name": "item 1 of zs",
                     "value": [
                       {
@@ -9654,24 +10150,37 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/zs/0/0/k"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/zs/0/0/k"
+                            ],
+                            "name": "z[0].k",
+                            "outcome": "unusable",
+                            "value": "$z "
+                          }
                         ],
-                        "name": "z[].k",
-                        "outcome": "usable",
-                        "value": [
-                          "$z "
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/0/0"
+                        ],
+                        "message": "k is \"$z \", which isn't a number",
+                        "name": "item 1 of z",
+                        "value": {
+                          "k": "$z "
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/zs/0"
                     ],
-                    "message": "item 1 of z: k is \"$z \", which isn't a number",
+                    "message": "",
                     "name": "item 1 of zs",
                     "value": [
                       {
@@ -9729,24 +10238,37 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/zs/0/0/k"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/zs/0/0/k"
+                            ],
+                            "name": "z[0].k",
+                            "outcome": "unusable",
+                            "value": "cost $z, ok"
+                          }
                         ],
-                        "name": "z[].k",
-                        "outcome": "usable",
-                        "value": [
-                          "cost $z, ok"
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/0/0"
+                        ],
+                        "message": "k is \"cost $z, ok\", which isn't a number",
+                        "name": "item 1 of z",
+                        "value": {
+                          "k": "cost $z, ok"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/zs/0"
                     ],
-                    "message": "item 1 of z: k is \"cost $z, ok\", which isn't a number",
+                    "message": "",
                     "name": "item 1 of zs",
                     "value": [
                       {
@@ -9804,24 +10326,37 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/zs/0/0/k"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/zs/0/0/k"
+                            ],
+                            "name": "z[0].k",
+                            "outcome": "unusable",
+                            "value": "$z.x"
+                          }
                         ],
-                        "name": "z[].k",
-                        "outcome": "usable",
-                        "value": [
-                          "$z.x"
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/0/0"
+                        ],
+                        "message": "k is \"$z.x\", which isn't a number",
+                        "name": "item 1 of z",
+                        "value": {
+                          "k": "$z.x"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/zs/0"
                     ],
-                    "message": "item 1 of z: k is \"$z.x\", which isn't a number",
+                    "message": "",
                     "name": "item 1 of zs",
                     "value": [
                       {
@@ -9879,26 +10414,41 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/zs/0/0/k"
-                        ],
-                        "name": "z[].k",
-                        "outcome": "usable",
-                        "value": [
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
                           {
+                            "locations": [
+                              "/things/0/zs/0/0/k"
+                            ],
+                            "name": "z[0].k",
+                            "outcome": "unusable",
+                            "value": {
+                              "a": "$z: b"
+                            }
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/0/0"
+                        ],
+                        "message": "k is {\"a\": \"$z: b\"}, which isn't a number",
+                        "name": "item 1 of z",
+                        "value": {
+                          "k": {
                             "a": "$z: b"
                           }
-                        ]
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/zs/0"
                     ],
-                    "message": "item 1 of z: k is {\"a\": \"$z: b\"}, which isn't a number",
+                    "message": "",
                     "name": "item 1 of zs",
                     "value": [
                       {
@@ -9960,26 +10510,41 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/zs/0/0/k"
-                        ],
-                        "name": "z[].k",
-                        "outcome": "usable",
-                        "value": [
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
                           {
+                            "locations": [
+                              "/things/0/zs/0/0/k"
+                            ],
+                            "name": "z[0].k",
+                            "outcome": "unusable",
+                            "value": {
+                              "$z ": 1
+                            }
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/0/0"
+                        ],
+                        "message": "k is {\"$z \": 1}, which isn't a number",
+                        "name": "item 1 of z",
+                        "value": {
+                          "k": {
                             "$z ": 1
                           }
-                        ]
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/zs/0"
                     ],
-                    "message": "item 1 of z: k is {\"$z \": 1}, which isn't a number",
+                    "message": "",
                     "name": "item 1 of zs",
                     "value": [
                       {
@@ -10130,24 +10695,37 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/zs/0/0/k"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/zs/0/0/k"
+                            ],
+                            "name": "applies[0].k",
+                            "outcome": "unusable",
+                            "value": "$applies: $applies;"
+                          }
                         ],
-                        "name": "applies[].k",
-                        "outcome": "usable",
-                        "value": [
-                          "$applies: $applies;"
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/0/0"
+                        ],
+                        "message": "k is \"$applies: $applies;\", which isn't a number",
+                        "name": "item 1 of applies",
+                        "value": {
+                          "k": "$applies: $applies;"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/zs/0"
                     ],
-                    "message": "item 1 of applies: k is \"$applies: $applies;\", which isn't a number",
+                    "message": "",
                     "name": "item 1 of zs",
                     "value": [
                       {
@@ -11807,26 +12385,58 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/items/0/lo"
+                            ],
+                            "name": "w.items[0].lo",
+                            "outcome": "usable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
-                          "/things/0/ws/0/items/0/lo",
+                          "/things/0/ws/0/items/0"
+                        ],
+                        "message": "lo is 1",
+                        "name": "item 1 of w.items",
+                        "value": {
+                          "lo": 1
+                        }
+                      },
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/items/1"
+                            ],
+                            "name": "w.items[1].lo",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
                           "/things/0/ws/0/items/1"
                         ],
-                        "name": "w.items[].lo",
-                        "outcome": "usable",
-                        "value": [
-                          1,
-                          null
-                        ]
+                        "message": "item 2 of w.items is null, which isn't an object",
+                        "name": "item 2 of w.items",
+                        "value": null
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/ws/0"
                     ],
-                    "message": "item 1 of w.items: lo is 1; item 2 of w.items is null, which isn't an object",
+                    "message": "",
                     "name": "item 1 of ws",
                     "value": {
                       "items": [
@@ -11917,29 +12527,35 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/items/1"
+                            ],
+                            "name": "w.items[1].lo",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
-                          "/things/0/ws/0/items/0",
                           "/things/0/ws/0/items/1"
                         ],
-                        "name": "w.items[]",
-                        "outcome": "usable",
-                        "value": [
-                          {
-                            "lo": 1,
-                            "status": "no"
-                          },
-                          4
-                        ]
+                        "message": "item 2 of w.items is 4, which isn't an object",
+                        "name": "item 2 of w.items",
+                        "value": 4
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/ws/0"
                     ],
-                    "message": "item 2 of w.items is 4, which isn't an object",
+                    "message": "",
                     "name": "item 1 of ws",
                     "value": {
                       "items": [
@@ -12352,24 +12968,37 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/ws/0/items/0/lo"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ws/0/items/0/lo"
+                            ],
+                            "name": "w.items[0].lo",
+                            "outcome": "usable",
+                            "value": 2
+                          }
                         ],
-                        "name": "w.items[].lo",
-                        "outcome": "usable",
-                        "value": [
-                          2
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/items/0"
+                        ],
+                        "message": "lo is 2",
+                        "name": "item 1 of w.items",
+                        "value": {
+                          "lo": 2
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/ws/0"
                     ],
-                    "message": "item 1 of w.items: lo is 2",
+                    "message": "",
                     "name": "item 1 of ws",
                     "value": {
                       "items": [
@@ -12439,33 +13068,35 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/ws/0/items/0",
-                          "/things/0/ws/0/items/1",
-                          "/things/0/ws/0/items/2"
-                        ],
-                        "name": "w.items[]",
-                        "outcome": "usable",
-                        "value": [
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
                           {
-                            "lo": 1,
-                            "status": "no"
-                          },
-                          null,
-                          {
-                            "lo": 2
+                            "locations": [
+                              "/things/0/ws/0/items/1"
+                            ],
+                            "name": "w.items[1].lo",
+                            "outcome": "not_an_object",
+                            "value": null
                           }
-                        ]
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/ws/0/items/1"
+                        ],
+                        "message": "item 2 of w.items is null, which isn't an object",
+                        "name": "item 2 of w.items",
+                        "value": null
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/ws/0"
                     ],
-                    "message": "item 2 of w.items is null, which isn't an object",
+                    "message": "",
                     "name": "item 1 of ws",
                     "value": {
                       "items": [
@@ -13434,6 +14065,14 @@
                 "locations": [],
                 "name": "in-scope t count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "item 2 of $input.things",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 2 of things is missing",
@@ -13459,6 +14098,14 @@
                 "locations": [],
                 "name": "in-scope t count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 2 of $input.things",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "things is missing",
@@ -13484,6 +14131,14 @@
                 "locations": [],
                 "name": "in-scope t count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "item 2 of $input.things",
+                "outcome": "unusable",
+                "value": null
               }
             ],
             "message": "things is 5, which isn't a list or an object",
@@ -13584,6 +14239,14 @@
                 "locations": [],
                 "name": "in-scope t count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "item 1 of $input.things",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of things is missing",
@@ -13609,6 +14272,14 @@
                 "locations": [],
                 "name": "in-scope t count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 1 of $input.things",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "things is missing",
@@ -13640,6 +14311,14 @@
                 "locations": [],
                 "name": "in-scope w count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "t.ws",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "ws is missing",
@@ -13670,6 +14349,14 @@
                 "locations": [],
                 "name": "in-scope w count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0/ws"
+                ],
+                "name": "t.ws",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "ws is null",
@@ -13788,6 +14475,14 @@
                 "locations": [],
                 "name": "in-scope w count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0/ws"
+                ],
+                "name": "item 1 of t.ws",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of ws is missing",
@@ -13819,6 +14514,14 @@
                 "locations": [],
                 "name": "in-scope w count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "item 1 of t.ws",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "ws is missing",
@@ -13849,6 +14552,14 @@
                 "locations": [],
                 "name": "in-scope w count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0/ws"
+                ],
+                "name": "item 1 of t.ws",
+                "outcome": "unusable",
+                "value": null
               }
             ],
             "message": "ws is \"s\", which isn't a list or an object",
@@ -13886,6 +14597,14 @@
                 "locations": [],
                 "name": "in-scope w count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0/ws"
+                ],
+                "name": "item 2 of t.ws",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 2 of ws is missing",
@@ -13921,6 +14640,14 @@
                 "locations": [],
                 "name": "in-scope w count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "item 2 of t.ws",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "ws is missing",
@@ -13957,6 +14684,14 @@
                 "locations": [],
                 "name": "in-scope g count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "w.kids",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "kids is missing",
@@ -13995,6 +14730,14 @@
                 "locations": [],
                 "name": "in-scope g count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0/kids"
+                ],
+                "name": "w.kids",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "kids is null",
@@ -14140,6 +14883,14 @@
                 "locations": [],
                 "name": "in-scope g count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "w.meta.owner",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "meta is missing",
@@ -14178,6 +14929,14 @@
                 "locations": [],
                 "name": "in-scope g count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0/meta"
+                ],
+                "name": "w.meta.owner",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "meta.owner is missing",
@@ -14218,6 +14977,14 @@
                 "locations": [],
                 "name": "in-scope g count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0/meta"
+                ],
+                "name": "w.meta.owner",
+                "outcome": "unusable",
+                "value": null
               }
             ],
             "message": "meta is 5, which isn't a list or an object",
@@ -14344,6 +15111,14 @@
                 "locations": [],
                 "name": "in-scope t count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "things named by $params.k",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "things.b is missing",

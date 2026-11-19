@@ -9303,24 +9303,35 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/trail/artifacts/0/releases/0/files/1/tags/0"
+                            ],
+                            "name": "f.tags[0]",
+                            "outcome": "usable",
+                            "value": "bob"
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
                           "/trail/artifacts/0/releases/0/files/1/tags/0"
                         ],
-                        "name": "f.tags[]",
-                        "outcome": "usable",
-                        "value": [
-                          "bob"
-                        ]
+                        "message": "item 1 of f.tags is \"bob\", and artifact.owner is \"ann\"",
+                        "name": "item 1 of f.tags",
+                        "value": "bob"
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/trail/artifacts/0/releases/0/files/1"
                     ],
-                    "message": "item 1 of f.tags is \"bob\", and artifact.owner is \"ann\"",
+                    "message": "",
                     "name": "item 2 of files",
                     "value": {
                       "tags": [
@@ -27921,7 +27932,35 @@
               "failures": [
                 {
                   "cause": "absent",
-                  "failures": [],
+                  "failures": [
+                    {
+                      "cause": "absent",
+                      "failures": [],
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/es/0/v/m"
+                          ],
+                          "name": "es[0].v.m named by $params.k",
+                          "outcome": "absent",
+                          "value": null
+                        }
+                      ],
+                      "kind": "item",
+                      "locations": [
+                        "/things/0/es/0"
+                      ],
+                      "message": "v: $params.k is missing",
+                      "name": "item 1 of es",
+                      "value": {
+                        "v": {
+                          "m": {
+                            "a": 1
+                          }
+                        }
+                      }
+                    }
+                  ],
                   "inputs": [
                     {
                       "locations": [
@@ -27970,7 +28009,7 @@
                   ]
                 }
               ],
-              "message": "$params.k is missing",
+              "message": "$params.k is missing; item 1 of es: v: $params.k is missing",
               "passed": false,
               "requirement": "s",
               "subject": {
@@ -28259,7 +28298,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "item 2 of $input.os is null, which isn't an object; $params.z is missing",
+                  "message": "$params.z is missing; item 2 of $input.os is null, which isn't an object",
                   "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1"
                 }
               ],
@@ -28297,7 +28336,7 @@
                   ]
                 }
               ],
-              "message": "item 2 of $input.os is null, which isn't an object; $params.z is missing",
+              "message": "$params.z is missing; item 2 of $input.os is null, which isn't an object",
               "passed": false,
               "requirement": "s",
               "subject": {
@@ -28480,7 +28519,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "item 2 of $input.os: name is missing; $params.z is null",
+                  "message": "$params.z is null; item 2 of $input.os: name is missing",
                   "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1"
                 }
               ],
@@ -28518,7 +28557,7 @@
                   ]
                 }
               ],
-              "message": "item 2 of $input.os: name is missing; $params.z is null",
+              "message": "$params.z is null; item 2 of $input.os: name is missing",
               "passed": false,
               "requirement": "s",
               "subject": {
@@ -29119,7 +29158,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -29133,7 +29194,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "item 1 of es is \"s\", which isn't an object",
+                "message": "",
                 "name": "count of es.v that equals m named by $params.k is 0"
               }
             ],

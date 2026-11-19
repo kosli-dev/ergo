@@ -2,8 +2,6 @@ any_of / any_of with a ref to a param of the wrong type / fails the row as unusa
 compare / $refs list each $params or $input path a check reads, when the paths hold the wrong type / lists what each path read, and the checks fail as before
 compare / $refs list a path that walks a list once, as is in lists it, whatever walks it / lists the values each walk read, where it read them, and no entry for the path as written
 compare / $refs list a path that walks a list once, as is in lists it, whatever walks it / lists what the walk read when an item of the input has no x
-compare / $refs list a path whose walk fails on an item that isn't an object with what the walk read / lists the value read and the item the walk stopped at
-compare / $refs list the path before named by, with its whole value / lists the path before named by with its whole value, where it was read, and the rows don't change
 compare / a check whose sides can't be read in different ways, with a named by key from $input.k / the key is null and k missing
 compare / a check whose sides can't be read in different ways, with a named by key from $params.k, the key is null and k missing / the key is null and k missing
 compare / a for line whose sentence can't be read in different ways, with a named by key from $input, the key is missing / the key is missing
@@ -13,88 +11,35 @@ contains / excludes values read through a ref that holds values of mixed types /
 contains / a followed by that reads a piece from $params / the row lists the piece and the check's $refs lists it too, and a piece that is missing, null or isn't text fails the check
 derived / count of a list / fails as unusable when the list is a string
 derived / count of a list / fails as unusable when the list is an object
-derived / count of a list with whose / fails as unusable when an item's field has another type than the value
-derived / count of a list with whose / fails as absent when an item cannot be decided because the field is missing
-derived / count of a list with whose / fails as null when an item cannot be decided because the field is null
-derived / count of two lists / fails as absent when one inner list is missing
-derived / count of two lists / fails as null when one inner list is null
-derived / count of two lists / fails as unusable when one inner list is a string
-derived / sum of a field / fails as absent when an item has no such field, with null for it in the list
-derived / sum of a field / fails as null when a value is null
-derived / sum of a field / fails as unusable when a value is text, even a number written as text
-derived / sum of a field / fails as unusable when a value is a boolean
-derived / sum of a field / the worst cause wins when several values fail: unusable before absent before null
-derived / sum within a distance / fails as unusable when a value is text
 derived / sum within a distance of a field / the worse cause wins when both sides fail: absent before null
 derived / two paths on the left / fails as absent before null
 derived / a path plus a count on the left / fails as unusable when the path is text and the list is null
 derived / a count on the left and a field on the right / fails as the worse cause when both sides fail
-derived / a sum is at least a number / fails as unusable when a value is text
-derived / a count in the whose of an every / fails as value when whose leaves no item
-derived / a count under a for line reading the line's name / fails as absent when a pull request has no reviews field
-derived / a count under a for line reading the line's name / fails as null when the reviews are null
-derived / a count under a for line reading the line's name / fails as unusable when the reviews are not a list
 derived / count of a params value that is not a list / fails as unusable
 derived / a count with is between / fails as unusable when the list is a string
-derived / a sum with is between / fails as unusable when a value is text
-derived / count of on subjects and items that aren't objects / an item that isn't an object fails as not_an_object, and a null value counts
 derived / days elapsed that cannot be read / fails as absent when one side is missing and the other null
 derived / days elapsed in the whose of an every / fails as value when whose leaves no item
-derived / days elapsed in the whose of a count / fails as absent when an item cannot be decided because its end is missing
-derived / a count in the whose of a count / fails as absent when an item's list is missing, so the item cannot be decided
-derived / count of a field over a null item / a null item fails as not_an_object
-derived / sum of a field over a null item / a null item fails as not_an_object
-derived / count of a list with whose, over items it cannot decide / fails as null when an item has a null k
-derived / count of a list with whose, over items it cannot decide / fails as absent when an item has no k
-derived / count of a list with whose, over items it cannot decide / fails as null when an item has a null k and another has no k
 derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is missing
 derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is null
 derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is a number
-derived / a count whose whose reads a named by key from $input.k that is null / the key is null
 derived / a count whose whose reads a named by key from $input.k that is missing / the key is missing
-derived / a count whose whose reads a named by key from $input.k that isn't text / the key is a number
 derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names the item's own field before the root that isn't an object
 derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names the item's own field before the root that is text
-derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a missing key inside the item
-derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a null key inside the item
-derived / a count whose whose reads a field of the subject with a named by key from the item, a null root next to the key / names the null field of the subject and then the missing key inside the item
 derived / a count with whose or that reads a named by key from $input that isn't text before the list, whether the list is empty, missing, null or not a list / the list is text
-derived / a count whose whose reads a field of the parent with a named by key from the item, a null root next to the key / names the null field of the parent and then the missing key inside the item
-derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is missing and the first item is null
-derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is null and the first item's key isn't text
-derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / a root further back is null and the items have no key
 derived / an every whose whose reads a field of the subject through a key the item holds says the field once and first / the field is null and the first item is null
 derived / a count or every whose whose reads a root outside the item through a key the item holds says the root and then the list's own problem / the root is null and the list is a number
 derived / a count or every whose whose reads a root outside the item through a key the item holds says the root and then the list's own problem / the root is null and the list is text
 derived / a count or every whose whose reads a root outside the item through a key the item holds says the root and then the list's own problem / the root is null and the list is an object
-derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags and v are of the wrong kind
-derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags mix kinds, so the count says what it says when the root reads
-derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is missing and five items aren't objects, so the message stops after three problems
-derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and the item's key and field print with a semicolon and a comma
 derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is 3 and four items each have a problem, so the last one is counted
-derived / a count whose whose reads a root outside the item through a key the item holds and another root from the params says the other root as before / the root is missing and the param is missing
 derived / a count whose whose reads a root outside the item through a key the item holds and reads params that aren't an object says the params / the root is null, the first item is null and the second item's key isn't text
-derived / a count, some or every over a list reached through a list, whose whose reads a root with a named by key from the item, names each item as before / names each item whose field isn't an object when the root is null
-derived / a count whose whose reads a part of the subject with a named by key from the item says the part once, first / names a null part, not the path past it
-derived / a count whose whose reads a part of the subject with a named by key from the item says the part once, first / names a missing part, not the path past it
-derived / a count whose whose reads a part of the subject that is a path, with a named by key from the item, says the part once, first / names the part when the end of its path is null
-derived / a count whose whose reads a part of the subject that is a path, with a named by key from the item, says the part once, first / names the part when the start of its path is null
 derived / an every or some whose whose reads a part of the subject with a named by key from the item says the part once, first / the part is null and the first item is null
 distinct / a grandchild of a subject read with every distinct / its rows list the location under every copy of the grandparent
 distinct / every distinct with conditions / copies a condition can't decide fail one $applies row with every copy's location
 distinct / a child of a subject read with every distinct / the child's rows list the location under every copy of the parent
-distinct / count of distinct / a missing author fails as absent
-distinct / count of distinct / an item that isn't an object fails as not_an_object
-distinct / count of distinct with a whose / an item the whose can't decide fails the check
-distinct / sum of distinct / a null amount fails as null
 distinct / every and some distinct / copies that fail are one entry of failed_items with the location of every copy
 distinct / every and some distinct / copies that pass pass
 distinct / a value that holds a key called locations / only the locations of the row are listed for every copy, never the value
 distinct / locations read through the subject and read from the input / a read through the subject lists every copy, and a path from the input lists only the location it names
-distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 / it reads the subject's lo, so it reads whatever the dropped copy's lo is: higher
-distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 / it reads the subject's lo, so it reads whatever the dropped copy's lo is: missing
-distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 / it reads the subject's lo, so it reads whatever the dropped copy's lo is: null
-distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 / it reads the subject's lo, so it reads whatever the dropped copy's lo is: text
 distinct / distinct with a list read through an alias or a part / the list is outside the item, so it reads even when copies differ in their own ok
 distinct / distinct with a list read on a parent subject / it reads, in a check and in the from line
 distinct / distinct with a list that is the subject / the subject's name reads the subject, outside the item, so it reads
@@ -104,7 +49,6 @@ for / a second item whose path is named by a param / fails the first list's item
 for / a name whose path goes on past its list / a missing title fails its pull request as absent, without checking the sentence
 for / the latest commit picked on a for line / fails as ambiguous when another item ties with the one picked, and names every tied item
 for / a list beside the first with a broken list inside it / the broken list is listed once, and an approver that also failed a sentence keeps its own cause
-for / a walk that starts at a for alias holding null / fails as null, as a walk from a field holding null does
 for / a for line whose second item is read from the first / points a failed item at the value it read, and the alias m at the meta it stands for
 for / a for line that starts with some passes when one of its items passes, whatever item comes after it / fails when the approver who approved has an empty list of commits to go with it
 for / a for line whose first item has no whose, over a list where one value is missing / shows nothing of the second item under the value that's missing, and fails as absent
@@ -128,7 +72,6 @@ for / a count of a key of the params, with params as a number / fails as unusabl
 for / a count of a key of the params, with params as text / fails as unusable and names the params and what they are
 for / a count of a key of the params, with params as true / fails as unusable and names the params and what they are
 for / a count of a key of the params, with params as false / fails as unusable and names the params and what they are
-for / a count of a key of the params, with params as an empty list / fails as unusable and names the params and what they are
 for / every on a key of the params, with params as a number / fails as unusable and names the params and what they are
 for / every on a key of the params, with params as text / fails as unusable and names the params and what they are
 for / every on a key of the params, with params as true / fails as unusable and names the params and what they are
@@ -245,7 +188,6 @@ for / a count of or a sum of in a whose on a for line reads its list before any 
 for / a for line's own whose lists a list it walks, as a check without a for line does / an item without the name is listed as null
 for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails each approver that didn't approve when there are no commits, and skips the sentences that read commit
 for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails an approver whose subs can't be counted when there are no commits
-for / a for line runs the sentences that don't read the alias of an empty first list it tolerates, for each item of the second list / fails each approver that didn't approve when the whose of the first line leaves no commit
 for / a for line with one item runs the sentences that don't read its alias on an empty list it tolerates / fails each sentence that doesn't read commit when there are no commits, names what it read once with no item, and skips the sentences that read commit
 for / a for line with one item runs the sentences that don't read its alias on an empty list it tolerates / fails as null when a field a sentence reads is null and there are no commits
 for / an alias that a pick on an empty list leaves without a value, read on a later line / names the alias as the policy writes it, with no $
@@ -301,7 +243,6 @@ in / every phrase that takes a list, with a ref on the right side that starts at
 in / every phrase that takes a list, with a ref on the right side that starts at an input that is a list / fails every phrase that reads a missing value as absent, and is one of passes when every item has its value
 in / a ref in a whose of a from line that starts at an input that is a list / walks the items of the input to decide which subjects are in scope
 in / a ref in a whose of a from line that starts at an input that is a list / can't decide the scope of any subject when an item has no value
-in / a named by step whose key is read from an input that is a list / reads one key and doesn't walk the items, so it can't read one from a list, and fails min_subjects as not_an_object
 in / a ref that walks, read by a whose inside count of and sum of / fails as unusable when what it counts isn't a list, though an item of the list on the right has no value, because unusable comes first
 in / a leading dot on a right side only keeps its dot in a name when a part, an alias or a parent has that name / names the path without the dot when nothing has its name
 in / count of and sum of read the field named like a part and list it with the dot / lists the field with the dot and the part without it, and names the item of the part
@@ -318,29 +259,22 @@ list_items / an alias that is a list is read item by item on the right of a list
 list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that / an item that isn't an object fails as unusable
 list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that / an empty alias fails as value
 list_items / a list in the middle of a name on the right of a list phrase after every is read item by item / an item with no field fails as absent, and one that isn't an object as unusable
-list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / each item's value is listed with its location, and a part keeps its tag
-list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / an item with no name is listed as null, at the item
-list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / an item whose name is null is listed as null, at the name
 list_items / a name read from outside the item and walked on the right of is in is said once, with no item / a list of names of more than one kind fails as unusable and is said once
 list_items / a name read from outside the item and walked on the right of is in is said once, with no item / items that aren't objects fail as unusable and are said once
 list_items / a name of a subject that is a list, walked on the right of is in, is said once / names of more than one kind fail as unusable and are said once, beside an item's own problem
 list_items / a part that holds a list, walked after matches in a whose, is said once / values that aren't patterns fail as unusable and are said once
 list_items / a part that holds a list, walked after matches in a whose, is said once / items that aren't objects fail as unusable and are said once
 list_items / a parent's part that holds a list, walked after matches in a whose, is said once / values that aren't patterns fail as unusable and are said once
-list_items / a name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it / a text value among numbers, and a number among patterns
-list_items / a parent's name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it / a text value among numbers, and a number among patterns
 list_items / two names read from outside the item in a whose, each with items that can't be used, are each named once, worst cause first and then by name / both hold more than one kind of value
 list_items / two names read from outside the item in a whose, each with items that can't be used, are each named once, worst cause first and then by name / an item of the part has no name
 list_items / two names read from outside the item in a whose, one with an item without the name, are each named once, worst cause first and then by name / the part holds more than one kind of value
 list_items / two names read from outside the item in a whose, one with an item without the name, are each named once, worst cause first and then by name / an item of the part has no name too
 list_items / a missing $params name and a walked part in one whose are each named, with the $params name first only in a count / the part holds more than one kind of value
 list_items / a missing $params name and a walked part in one whose are each named, with the $params name first only in a count / an item of the part has no name
-list_items / a count of or a sum of inside a whose reads its path as it does on its own / an empty list adds nothing
 list_items / a count of a part inside a whose on a subject that is a list reads the part before any item / a subject item without the part fails as absent, said once with no item of rows in front
 list_items / a count of a part inside a whose on a subject that is a list reads the part before any item / fails the same on empty lists of rows
 list_items / a count of a part inside a whose on a subject that is a list reads the part before any item / a null item in the part fails as not_an_object and names it, not the subject
 list_items / a second for item that starts at an alias holding a list reads each item of it / an empty alias fails as value, and an item that isn't an object as not_an_object
-list_items / a path from $input with named by on an input that is a list / fails as not_an_object and names the input once
 list_items / a list input that count of reads, or a one-line every or some, with a named by key that can't be read, missing / count of walks the input, so the $params key decides, and count of a path keyed by $input.k and a one-line every or some with a key from $input fail as not_an_object and say once that the input isn't an object
 list_items / a list input that count of reads, or a one-line every or some, with a named by key that can't be read, null / count of walks the input, so the $params key decides, and count of a path keyed by $input.k and a one-line every or some with a key from $input fail as not_an_object and say once that the input isn't an object
 list_items / a list input that count of reads, or a one-line every or some, with a named by key that can't be read, a number / count of walks the input, so the $params key decides, and count of a path keyed by $input.k and a one-line every or some with a key from $input fail as not_an_object and say once that the input isn't an object
@@ -350,7 +284,6 @@ list_items / a named by key read from an input that is a list, in a count of, a 
 list_items / a named by key read from an input that is a list, in a count of, a sum of, a whose, a that, a one-line every or some, a for line, an any_of, a child subject and a from line / the key is a number: every check that reads the key fails as not_an_object and says once that the input isn't an object, and so do the $applies rows and the $min_subjects row of the from line that reads it
 list_items / a named by key read from an input that is a list, in a count of or a sum of with whose, that or plus, when the params aren't an object / say once that the input isn't an object, then once that the params aren't, and nothing about the items
 list_items / a named by key read from an input that is a list, in a one-line every and on a for line, when the params aren't an object / say only that the params aren't an object
-list_items / a for line over items that aren't objects, with a sum of or a count of whose named by key is read from the params and isn't text, on an input that is an object / say the key isn't text, and then the item that isn't an object
 list_items / a for line and a one-line every beside a check with a named by key that can't be read, missing, on an input that is a list / the plain check and the every and for line that read a key from $input fail as not_an_object, and the for lines that read a key from $params fail as before
 list_items / a for line and a one-line every beside a check with a named by key that can't be read, null, on an input that is a list / the plain check and the every and for line that read a key from $input fail as not_an_object, and the for lines that read a key from $params fail as before
 list_items / a for line and a one-line every beside a check with a named by key that can't be read, a number, on an input that is a list / the plain check and the every and for line that read a key from $input fail as not_an_object, and the for lines that read a key from $params fail as before
@@ -374,74 +307,27 @@ list_starts / a name that walks a subject that is a list, read on the right of a
 list_starts / a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it / an item that is null is listed as null, at the item, and fails as unusable
 list_starts / a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it / an item that is a number is listed as null, at the item, and fails as unusable
 list_starts / a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it / an item that is a list isn't read into, is listed as null, at the item, and fails as unusable
-list_starts / a name in a whose is read from the row, so a bad list of the same name on the subject isn't blamed / a row with no field of that name fails as absent, naming the row's field and not the subject's
-list_starts / a name in a whose is read from the row, so a bad list of the same name on the subject isn't blamed / a row whose field is null fails as null, naming the row's field and not the subject's
-messages / a sum of or a count of beside a plus names what it couldn't read / an item of the summed list that isn't a number is named by its position
 messages / a sum of or a count of beside a plus names what it couldn't read / a summed list that is an object says it isn't a list or an object
 messages / a count of beside a plus names the list that isn't a list / a counted list that is an object says it isn't a list
-messages / a count of over a part that can't be reached / the part is named once
-messages / a one-list for line over a key that holds a colon / two sentences that walk the same list give one part
-messages / a one-list for line with a sentence that walks a list and one that doesn't / the sentence that doesn't walk gets its own part
 messages / two worked-out values that can't be used / the values are joined with a comma and and
-messages / a one-list for line whose items fail a sentence that walks and one that doesn't / the part of a sentence that doesn't walk goes with its item and isn't counted
-messages / a one-list for line whose items fail a sentence that walks and one that doesn't / and N more counts the items that aren't shown
-messages / a count of a list that holds items that aren't objects / an item that isn't an object is named with its value
-messages / a sum of a list that holds items that aren't objects / an item that isn't an object is named with its value
-messages / a count of a list of lists with a whose that counts / a list is named as an item that isn't an object
-messages / a count of a part's list that holds items that aren't objects / the items are named after the part
 messages / does not exist on a path whose key from a field can't be read fails, whether or not the path before it is there / the field is missing and x is null
 messages / does not exist on a path whose key from a field can't be read fails, whether or not the path before it is there / the field is a list and x is null
 messages / does not exist on a for alias read by a position and a key from a field fails when the key can't be read / the field is a number and the alias is an empty list
 messages / a count of a list in a list names each item of the inner list by it / an item of the inner list that isn't an object
 messages / a count of a list in a list names each item of the inner list by it / an inner list in the inner list
 messages / a count of a list in a list in a list names the inner lists by it / both inner lists are named it, as no step sits between the positions
-messages / a count of a list in a list item of a for alias / the key read from the field names the value
 messages / a count of a path with a key from a field names the value once whatever the field holds / the key field is missing
 messages / a count of a path with a key from a field names the value once whatever the field holds / the key field is null
 messages / a count of a path with a key from a field names the value once whatever the field holds / the key field isn't text
 messages / a count of a list in a list, read by a position and a key from a field, names the list that isn't an object / the inner item is named it, as a list of the subject is
 messages / a count of a list in a list, read by a position and a key from a field, names the list that isn't an object / the same with the key field missing
-messages / a count of a path with a key from a field names the value once / a value that isn't a list or an object is named after the key it was read at
-messages / a count of a path with a key from a field names the value once / a number is named the same way
-messages / a count of a path with a key from a field, in a for line, names the value once / a value that isn't a list or an object is named after the key it was read at
-messages / a for line over two lists / the inner items are named without a dollar sign before the alias
-messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a colon is printed as the input had it
 messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a semicolon is printed as the input had it
-messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a space is printed as the input had it
-messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a comma is printed as the input had it
-messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a dot is printed as the input had it
-messages / a for line over a list of lists whose values spell the alias / an object that holds the alias in a value is printed as the input had it
-messages / a for line over a list of lists whose values spell the alias / an object that holds the alias in a key is printed as the input had it
-messages / a for line over a list of lists whose values spell the alias / a list that holds the alias in its items is printed as the input had it
-messages / a for line whose alias is named applies and whose value spells it / a value that holds the alias is printed as the input had it
 messages / a whose that leaves no item of a part prints the part's list / the part's list is printed
-messages / a for item that is an object, with a list under it that holds an item that isn't one / the item that isn't an object is the one in the inner list
-messages / a for item that is an object, with a whose over a list that holds an item that isn't one / the item that isn't an object is the one in the inner list
-messages / a for item read with a walk of a list under it / the item's names drop their alias
-messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then the inner items
 messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then each item in turn
 messages / a for line over two lists, with a sentence that walks a list of the subject / names each item of the subject's list once, with no item of the for line in front, because the sentence doesn't read the for line's items
 messages / a for line over two lists, with a walk under the first item before a sentence on the second / the parts follow the items, not the sentences
 messages / a for line over two lists, with a sentence on the second item before a walk under the first / the parts follow the items, not the sentences
 messages / a for line whose sentence compares with a param that isn't a list / names the param, then the list that is missing
-messages / a subject read at the position of a list of the input / says which item of the list is missing
-messages / a subject read at the position of a list of the input / names the list when it is missing
-messages / a subject read at the position of a list of the input / says what the list is when it isn't a list or an object
-messages / a subject read from the first item of a list of the input / says the first item is missing when the list is empty
-messages / a subject read from the first item of a list of the input / says the list is missing
-messages / a child subject read from a field of its parent / names the field without the parent when it is missing
-messages / a child subject read from a field of its parent / names the field without the parent when it is null
-messages / a child subject read from the first item of a field of its parent / says the first item of the field is missing when the list is empty
-messages / a child subject read from the first item of a field of its parent / names the field when it is missing
-messages / a child subject read from the first item of a field of its parent / says what the field is when it isn't a list or an object
-messages / a child subject read from the item at a position of a field of its parent / names the item when the list is too short
-messages / a child subject read from the item at a position of a field of its parent / names the field when it is missing
-messages / a child of a child subject read from a field of its parent / names the field of the nearest parent when it is missing
-messages / a child of a child subject read from a field of its parent / names the field of the nearest parent when it is null
-messages / a child subject read from a path of two keys under its parent / names the first key that is missing
-messages / a child subject read from a path of two keys under its parent / names the key that is missing under an object
-messages / a child subject read from a path of two keys under its parent / says what the first key holds when it isn't an object
-messages / a subject read from a key named by a param that the object lacks / names the key the object lacks
 messages / contains with text on the left and a key of a number in the input on the right / fails as unusable and names the left side first, then the input
 messages / a count of a field in a position of a field that holds objects / fails as unusable and names the item once
 messages / a count of a key in a position of the input that holds objects / fails as unusable and names the item once
@@ -482,7 +368,6 @@ messages / a parent's part read in a that on a for line / names a part of the wr
 messages / a parent's part read in a whose, on an empty list / fails when the part is of the wrong type
 messages / a problem is said where its path starts / a param is said once with no item, and a field of an earlier line's alias is said under each item it is about
 messages / nothing hides a problem / the roots come first and then the list's own problem
-messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root that is missing and a list that is null fail as absent
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root of the wrong type and a list that is missing fail as unusable
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root that is null and a list that is text fail as unusable
 messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / an empty list is said only where it fails on its own
@@ -517,28 +402,10 @@ parts / a child subject that reads its own field named like its parent's part, w
 parts / a child subject with no part of its own, reading a field named like its parent's part / prints no dot, because a bare name in the child doesn't read the parent's part
 parts / a part's alias on the right of a whose, with a part that is missing, null or not a list / fails closed for each thing, and never reads the items' own field instead
 parts / a param on the right side of a whose with plus / reads the param, and not the item's own field of the same name
-parts / a count of or sum of a parent's part on the right side of a whose, alone and in a plus / counts the parent's part, not the parent's field of the same name, so a part with too many items fails
 parts / a parent's name on the right side of a count of or sum of in a whose / fails as unusable when the parent's field is text
 parts / a part or the subject's name in a count of after that, over items that aren't objects / fails as unusable when the part's list is text
 present / exists with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
-requirements / subjects from a list / fails min_subjects as absent when the list is missing
-requirements / subjects from a list / fails min_subjects as null when the list is null
-requirements / subjects from a list with min_subjects 0 / still fails min_subjects as absent when the list is missing
-requirements / the whole input as the subject / fails min_subjects as null on a null input
-requirements / a from line that is named by a key of a param / names the whole line in both expressions
-requirements / a from line that is named by a param and then picks a position / names the whole line in both expressions
-requirements / a position on the whole input when it is a list / ends absent when the list is empty
-requirements / a position on the whole input when it is a list / names the position from $input in the expression
-requirements / an index past the end of the whole input when it is a list / ends absent
-requirements / first of the whole input when it is a list / ends absent when the list is empty
-requirements / a field of the whole input when it is a list / ends unusable and names the list to read with every, because a key needs an object
-requirements / a child subject of the whole input when it is a list / reads the child under each item, though the items aren't all of one type
-requirements / require some on a child subject with a parent that has no child / fails the parent's own $min_subjects row with the default min_subjects
-requirements / require some on a child subject with min_subjects 0 / fails the parent whose list is missing on its $min_subjects row
-requirements / require some on a child subject with min_subjects 0 / fails the parent whose list is null on its $min_subjects row
-requirements / require some on a child subject with min_subjects 3 / keeps a parent's own $min_subjects violation, and leaves out its failing pull request, when another of its pull requests passes
 row_parts / a count of and a sum of on a for line name the items they can't read under the item of the for line / items named through the alias, an inner list that is missing, a sentence that doesn't read the alias, and a second list
-row_parts / a list walked by a sentence on a for line with two lists sits under the item of the second list, named with its alias / an inner item that is missing a field, an inner list that is null, and an inner item that isn't an object
 row_parts / an every or a some that asks whether a field exists gives a missing field the outcome absent, as every other check does / an item without the field gives its input the outcome absent, and one whose field is null the outcome null
 row_parts / an every or a some that asks whether a field exists gives a missing field the outcome absent, as every other check does / a some with no item that has the field, beside an item that isn't an object
 row_parts / two sentences on a for line that walk the same list under the item say its items in list order, and a check with several sentences keeps their order / two sentences that walk the same inner list say its items in list order on a for line, and in the order of the sentences outside one
@@ -552,10 +419,7 @@ sentences / does not start with and does not end with / fail as unusable on numb
 sentences / followed by after the phrases that take text / fail as absent or null
 sentences / followed by with a piece that can't be read after contains / name the piece, and the left side only when it isn't a list of text
 sentences / a count of a list of another kind is not between two numbers / fails as unusable when the field isn't a list
-sentences / a sum of is not between two numbers / fails as unusable on a value that isn't a number
-sentences / a sum of is not between two numbers / fails as absent or null when a value or the list is missing or null
 sentences / an elapsed time is not between two numbers / fails as unusable on times of two kinds or on text that isn't a time
-sentences / a sum of is not a value within a number / fails as unusable, absent or null like the sum does
 sentences / an elapsed time is not a value within a number / fails as unusable, absent or null like the elapsed time does
 sentences / count of is not a value within a number / fails as unusable when the field isn't a list
 sentences / a count of, a sum of and a plus read with named by a field / lists the field right after the list or the path it names, before the other side, on either side, and fails as the field says
@@ -570,7 +434,6 @@ sentences / the path before a named by field that can't be read, in a count, a s
 sentences / the path before a named by field that can't be read, in a count, a sum, a plus, an elapsed time, a some and a for line / ends unusable when the path goes through a string, whatever the field holds
 sentences / a for line over items that aren't objects, with a named by field / fails as not_an_object on the item, whether the field it reads is good, null, missing or a number, and names a field it can't read first
 sentences / a for line that walks a path with a named by field / fails as the field says when it's missing, null or not a string, and lists the field
-sentences / a for line item that reads a null before a named by field / fails as null whatever the field holds, and failed_items names the null, as the item does without the field, whether it reads the first alias or not
 sentences / a for alias that holds anything but a string, after named by / fails as null when it holds null and as unusable otherwise, in an assertion, in a second item and in a one-line every or some, a number never read as a position, and the failed item shows what it held
 sentences / a key from $params that isn't a string, after named by / a number, a boolean, an object or a list fails as unusable, null as null and a missing key as absent, in a comparison, an every, a count, a followed by piece, brackets and a for line, and a number never reads a list position, so m named by $params.k1 with m [5, 1] fails and doesn't read 1; a string key reads an object and fails as unusable on a list
 sentences / a key from $input that isn't a string, after named by / a number key fails as unusable and never reads a list position, so m with [5, 1] and k 1 fails and doesn't read 1
@@ -586,13 +449,8 @@ sentences / a key from $params that is an object, after named by / fails as unus
 sentences / a key from $params that is a list, after named by / fails as unusable in an every, a count, a followed by piece, brackets and a for line
 sentences / a key from $params that is null, after named by / fails as null in an every, a count, a followed by piece, brackets and a for line
 sentences / a key the params don't have, after named by / fails as absent in an every, a count, a followed by piece, brackets and a for line
-sentences / the examples the rules for where a name resolves were decided on / each check reads its names where the rules say, on the pull request of the decision
-sentences / the examples the rules for where a name resolves were decided on / a focus that is missing fails as absent, and one that is null as not_an_object, naming the item and the value
-sentences / a focus a path couldn't reach, and a focus read by that / that reads each b, and a path that stops before the focus fails as it does
 sentences / a field missing on the focus while its item has it / reads the focus, so the field is missing and the item's own field is never read
-sentences / the subject's field read by name inside a relative clause, when it isn't usable / fails as unusable when the field's type differs
 sentences / naming the items of a for line whose path goes past the list / names the item of the list, then the rest of the path after a colon, and the item itself when it is the focus
-sentences / a count whose focus is missing for one item and null for another / names every item that failed, whatever its cause
 sentences / a named by on the right of every that can't be read / names the key that is null, as the plain check does, when m is null too
 sentences / a name from a root on the right of every that no item can use / says the name's problem once, with no item, and a problem of the pair stays with its item
 sentences / a named by key on the right of every, after a part, a parent, an alias, $params or $input / fails as absent once, naming the key, when the subject has no such key, whatever the items hold
@@ -616,90 +474,24 @@ subject_name / a subject name as the value after a count of and as a term of plu
 subject_name / a field after the subject name inside a whose of a check reads the subject / a field or a position after the subject on the right of a whose reads the subject's field
 subject_name / the subject name is read in every position of a one-line check on a list subject / a list subject is walked, counted and summed as a field that holds the list would be
 subject_name / a count of a field named like the subject, written with a dot / a field that isn't a list or an object is said once, as the walk says it
-subject_name / a count whose reads a field named like the subject and a part / an item that isn't an object is named with the dot of the field the whose reads
-subject_name / a count of a field named like the subject inside a count whose names the field with its dot / an item with no s is named item 3 of ys, and its field .s
 subject_name / a sort key named like a parent subject sorts by the item's field, not by the parent / an item without the field fails as absent, named with its dot
 subject_name / a sort key named like a grandparent subject sorts by the item's field, not by the grandparent / a field that isn't a number, a time or a date fails as unusable, named with its dot
 subject_name / a from line whose that counts a quoted word of the syntax named like the subject counts the item's own field / the count of the item's own item field decides
 subject_name / every on a quoted subject name that is a word of the syntax names the subject in its message / a subject that isn't a list is named item, and so are the items of one that is
 subject_name / a from line whose that walks a field named like the subject walks the item's own field / the item's own rel list decides, and its items are named with the dot
-subject_name / a count whose reads a field named like a subject with "a<b" with its dot / the field the whose reads is named with its dot
-subject_name / a count whose reads a field named like a subject with "a\"b" with its dot / the field the whose reads is named with its dot
-subject_name / a count whose reads a field named like a subject with "a\\b" with its dot / the field the whose reads is named with its dot
 subjects / a condition with some after another condition / joins the conditions with and in the expression, and keeps a subject that passes both
-subjects / a from line with named by each of a list that holds a key that isn't a string / fails min_subjects as unusable when the object is null too
-subjects / a from line with a ref step that can't be used before named by each of / fails min_subjects as unusable, so a check that passes on a missing field can't meet the requirement
-subjects / a subject with nothing under it / fails $min_subjects as absent when the input has no such field
 subjects / a subject that narrows a parent read with every, over a list that can't be walked / fails min_subjects as unusable when a name read as a list isn't one in every item, and still checks the value
 subjects / a subject that narrows a parent read with every, over a list that can't be walked, with min_subjects 0 / fails min_subjects as unusable when a name read as a list isn't one in every item, and still checks the value
 subjects / a whose filter with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
-subjects / a child subject whose parent isn't an object / fails min_subjects as not_an_object when the parent is a string, even with min_subjects 0
-subjects / a child subject whose parent isn't an object / fails min_subjects as not_an_object when the parent is a number, even with min_subjects 0
-subjects / a child subject whose parent isn't an object / fails min_subjects as not_an_object when the parent is a list, even with min_subjects 0
-subjects / a child subject whose parent isn't an object / fails min_subjects as not_an_object when the parent is a boolean, even with min_subjects 0
-subjects / a child subject whose parent isn't an object / fails min_subjects as not_an_object when the parent is null, even with min_subjects 0
-subjects / a child subject whose parent isn't an object / still fails min_subjects as absent when the parent is an object without the field
-subjects / a child subject whose parent isn't an object / still fails min_subjects as null when the field is null
-subjects / a child subject whose from starts with a position, under a parent that isn't an object / fails min_subjects as unusable when the parent is a string, because a position reads it as a list
-subjects / a child subject whose from starts with a position, under a parent that isn't an object / fails min_subjects as absent when the parent is null, because a position reads it as a list
-subjects / a child subject whose from is p[0], a position after its parent's name and nothing more / fails min_subjects as unusable when the parent is an object, because a position reads it as a list and never drops it
-subjects / a child subject whose from is p[0], a position after its parent's name and nothing more / fails min_subjects as absent when the parent is an empty list
-subjects / a child subject whose from is p[1], a position after its parent's name and nothing more / fails min_subjects as unusable when the parent is an object, because a position reads it as a list and never drops it
-subjects / a child subject whose from is p[1], a position after its parent's name and nothing more / fails min_subjects as absent when the parent list is too short
-subjects / a child subject whose from is first of p, a position after its parent's name and nothing more / fails min_subjects as unusable when the parent is an object, because a position reads it as a list and never drops it
-subjects / a child subject whose from is first of p, a position after its parent's name and nothing more / fails min_subjects as absent when the parent is an empty list
-subjects / a child subject whose from is item 2 of p, a position after its parent's name and nothing more / fails min_subjects as unusable when the parent is an object, because a position reads it as a list and never drops it
-subjects / a child subject whose from is item 2 of p, a position after its parent's name and nothing more / fails min_subjects as absent when the parent list is too short
-subjects / a child subject whose from is p[0], under a parent listed by named by each of / reads the position of a parent that is there and fails min_subjects as absent for a parent the object lacks
-subjects / a child subject whose from is first of p, under a parent listed by named by each of / reads the position of a parent that is there and fails min_subjects as absent for a parent the object lacks
-subjects / a from line that is $input[0], over a list input / fails min_subjects when the input is an empty list
-subjects / a from line that is first of $input, over a list input / fails min_subjects when the input is an empty list
-subjects / a from line that is item 2 of $input, over a list input / fails min_subjects when the input is an empty list
 subjects / a from line that is $input[0].y, over a list input / fails min_subjects when the input is an empty list
 subjects / a child subject whose from starts with a position / fails min_subjects as absent when the parent is an empty list
 subjects / a child subject whose from starts with a position / fails min_subjects as absent when the parent is null
 subjects / a child subject whose from starts with a position / fails min_subjects as unusable when the parent is a string
-subjects / a grandchild subject whose parent isn't an object / fails min_subjects as not_an_object under a parent that is a string or null, with every ancestor under in
-subjects / a child subject with whose, under a parent that isn't an object / fails min_subjects as not_an_object when the parent is a string
-subjects / a child subject with whose, under a parent that isn't an object / fails min_subjects as not_an_object when the parent is null
-subjects / a child subject with named by, under a parent that isn't an object / fails min_subjects as not_an_object when the parent is a string
-subjects / a child subject with named by, under a parent that isn't an object / fails min_subjects as not_an_object when the parent is null
-subjects / a child subject with named by each of, under a parent that isn't an object / fails min_subjects as not_an_object when the parent is a string
-subjects / a child subject with named by each of, under a parent that isn't an object / fails min_subjects as not_an_object when the parent is null
-subjects / a child subject of a subject that narrows another, with a parent that isn't an object / fails min_subjects as not_an_object when the narrowed parent is a string
-subjects / a child subject of a from line with named by each of, with a parent that isn't an object / fails min_subjects as not_an_object under each parent, even with min_subjects 0, and gives no subject, though the parents aren't all of one type
-subjects / a child subject of a from line with a path and named by each of, with a parent that isn't an object / fails min_subjects as not_an_object under each parent, even with min_subjects 0, and gives no subject, though the parents aren't all of one type
-subjects / a from line with named by each of, when a ref before the list can't be read / the path is read before the list, so a ref in it that is missing, null or not a string decides the cause, absent, null or unusable, even with min_subjects 0 and whatever the list holds, and only a string ref leaves the cause to the list: a missing list gives absent, a null one null, a number unusable, and a list of strings makes each key a subject
-subjects / a from line whose key from $params isn't a string / gives no subjects and fails min_subjects as unusable for a boolean, an object or a list, as null for null and as absent for a key the params don't have, after named by and in brackets
-subjects / a from line whose key from $input isn't a string / gives no subjects and fails min_subjects as unusable for a number or an object, as null for null and as absent for a key the input doesn't have, after named by and in brackets, and a string key reads that list
-subjects / a from line that reads the params, things named by $params.env named by each of $params.ks, with params as a number / makes no subjects and fails $min_subjects as unusable, naming the params
-subjects / a from line that reads the params, things named by $params.env, with params as a number / makes no subjects and fails $min_subjects as unusable, naming the params
-subjects / a from line that reads the params, things named by $params.env, with params as null / fails $min_subjects as absent and says the param is missing
-subjects / a from line that reads the params, every things named by $params.env, with params as a number / makes no subjects and fails $min_subjects as unusable, naming the params
-subjects / a from line with more than one name that meets a list without every / fails min_subjects as unusable when the list is in the middle, and names the list and the fix
-subjects / a from line with more than one name that meets a list without every / fails min_subjects as absent when a name along it is missing
-subjects / a from line with more than one name that meets a list without every / fails min_subjects as null when a name along it is null
-subjects / a from line with more than one name that meets a list without every / fails min_subjects as unusable when a name along it holds text
 subjects / a position isn't a name and never meets a list / needs every for a list reached through a position, gives one item read through two positions, and every fails on that item
-subjects / a from line with one name, with and without every / fails min_subjects as null either way when the name is null
-subjects / a child subject read with every / fails min_subjects on the row of a parent whose list is missing, null or not a list
-subjects / a child subject read with every / fails min_subjects as not_an_object under a parent that is text or null
 subjects / a list directly inside a list / is one subject, every doesn't read into it, and a parent that is a list is read with every
-subjects / a child subject of a from line with named by each of, under parents that are text / fails min_subjects as not_an_object under each parent, even with min_subjects 0, and gives no subject
 subjects / every in a from line that meets text where it needs an object / fails min_subjects as unusable, names the value where the read stopped as a check does, and lists each place
-subjects / a child subject under a parent line that mixes types / is read under each parent, and only the parent's own min_subjects row fails for the mix
 subjects / a from line with a position whose items mix types / names the items by the path as written
 subjects / a from line that starts at a list input read through a position, whose items mix types / names the items from $input
-subjects / a child subject with a path and named by each of, under a parent that is a list / fails min_subjects as not_an_object and says to make each item a subject
-subjects / a from line whose named by key from $params is missing and whose value before the key can't take a key / says the key and then the value before it that is missing
-subjects / a from line whose named by key from $params is missing and whose value before the key can't take a key / says the key and then the value before it that is null
-subjects / a from line whose named by key from $params is missing and whose value before the key can't take a key / says the key and then the value before it that is text
-subjects / a from line whose named by key from $params is null and whose value before the key can't take a key / says the key and then the value before it that is missing
-subjects / a from line whose named by key from $params is null and whose value before the key can't take a key / says the key and then the value before it that is null
-subjects / a from line whose named by key from $params is null and whose value before the key can't take a key / says the key and then the value before it that is text
-subjects / a from line whose named by key from $params isn't text and whose value before the key can't take a key / says the key and then the value before it that is missing
-subjects / a from line whose named by key from $params isn't text and whose value before the key can't take a key / says the key and then the value before it that is null
-subjects / a from line whose named by key from $params isn't text and whose value before the key can't take a key / says the key and then the value before it that is text
 that / a for line with that and whose gives the same cause in either order / an item that isn't an object is not_an_object, with that first
 that / a for line with that and whose gives the same cause in either order, with whose first / an item that isn't an object is not_an_object, with whose first
 that / that after whose on a from line, with a subject called "my w": the inputs sort by name / the item that isn't text, the one that isn't an object, and the subject named my w in the row
@@ -709,7 +501,6 @@ that / a name after that on a for line, read on each item / names a name of each
 that / a name after that on a for line, read on each item / names an item that isn't an object with no colon
 walks / whose under some / fails as value with no failed items when whose keeps nothing
 walks / whose under every / fails as value with no failed items when whose leaves no items
-walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
 walks / a walk through a for name, read from a parent on its right side / fails as absent for a name the parent doesn't have
 walks / a walk through a for name, read from a parent on its right side / fails as null for a name that is null
 walks / a walk through a for name, read from a parent on its right side / fails as unusable for a value that can't be compared
@@ -762,14 +553,10 @@ walks / a whose key from $params that is missing, beside conditions on the same 
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / the focus holds m
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / the focus has no m, and the item has one
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / one focus has no m and another holds null
-walks / a that clause whose key from $params is missing reads the value before the key on the focus / the focus holds m
 walks / a that clause whose key from $params is missing reads the value before the key on the focus / the focus has no m
-walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name / an item of $input.os is null and $params.z is missing
-walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name, with a null param / an item of $input.os has no name and $params.z is null
 walks / a for line whose whose reads a named by key from $params that isn't text says only the items whose own value can't take the key, the last one fine / an item without m before an item whose m is an object
 walks / a that key that can't be read, on a list item that isn't an object, names the item and never a field under it / the key is null and the item is text
 walks / a that key that can't be read, on a list item that isn't an object, names the item and never a field under it / the key is null and the items are an object whose focus isn't an object and text
-walks / a that key that isn't text, on a list item that isn't an object, names the item and never a field under it / the item is text
 walks / a that key that isn't text, on a list item that isn't an object, names the item and never a field under it / the focus is an object, so only the key is said
 walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / five items without m show three and count two more
 walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / four items without m show three and count one more

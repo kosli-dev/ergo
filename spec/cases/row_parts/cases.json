@@ -7948,35 +7948,26 @@
                     "failures": [
                       {
                         "cause": "absent",
-                        "failures": [
+                        "failures": [],
+                        "inputs": [
                           {
-                            "cause": "absent",
-                            "failures": [],
-                            "inputs": [
-                              {
-                                "locations": [
-                                  "/things/0/ws/0/xs/0/ys/1"
-                                ],
-                                "name": "x.ys[1].n",
-                                "outcome": "absent",
-                                "value": null
-                              }
-                            ],
-                            "kind": "item",
                             "locations": [
+                              "/things/0/ws/0/xs/0/ys/0/n",
                               "/things/0/ws/0/xs/0/ys/1"
                             ],
-                            "message": "n is missing",
-                            "name": "item 2 of x.ys",
-                            "value": {}
+                            "name": "x.ys[].n",
+                            "outcome": "usable",
+                            "value": [
+                              1,
+                              null
+                            ]
                           }
                         ],
-                        "inputs": [],
                         "kind": "item",
                         "locations": [
                           "/things/0/ws/0/xs/0"
                         ],
-                        "message": "",
+                        "message": "item 2 of x.ys: n is missing",
                         "name": "item 1 of w.xs",
                         "value": {
                           "ys": [
@@ -7989,31 +7980,20 @@
                       },
                       {
                         "cause": "null",
-                        "failures": [
+                        "failures": [],
+                        "inputs": [
                           {
-                            "cause": "null",
-                            "failures": [],
-                            "inputs": [
-                              {
-                                "locations": [
-                                  "/things/0/ws/0/xs/1/ys"
-                                ],
-                                "name": "x.ys",
-                                "outcome": "null",
-                                "value": null
-                              }
-                            ],
-                            "kind": "list",
-                            "message": "x.ys is null",
-                            "name": "x.ys"
+                            "locations": [],
+                            "name": "x.ys.n",
+                            "outcome": "null",
+                            "value": []
                           }
                         ],
-                        "inputs": [],
                         "kind": "item",
                         "locations": [
                           "/things/0/ws/0/xs/1"
                         ],
-                        "message": "",
+                        "message": "x.ys is null",
                         "name": "item 2 of w.xs",
                         "value": {
                           "ys": null
@@ -8055,35 +8035,24 @@
                     "failures": [
                       {
                         "cause": "not_an_object",
-                        "failures": [
+                        "failures": [],
+                        "inputs": [
                           {
-                            "cause": "not_an_object",
-                            "failures": [],
-                            "inputs": [
-                              {
-                                "locations": [
-                                  "/things/0/ws/1/xs/0/ys/0"
-                                ],
-                                "name": "x.ys[0].n",
-                                "outcome": "not_an_object",
-                                "value": null
-                              }
-                            ],
-                            "kind": "item",
                             "locations": [
                               "/things/0/ws/1/xs/0/ys/0"
                             ],
-                            "message": "item 1 of x.ys is 3, which isn't an object",
-                            "name": "item 1 of x.ys",
-                            "value": 3
+                            "name": "x.ys[].n",
+                            "outcome": "usable",
+                            "value": [
+                              null
+                            ]
                           }
                         ],
-                        "inputs": [],
                         "kind": "item",
                         "locations": [
                           "/things/0/ws/1/xs/0"
                         ],
-                        "message": "",
+                        "message": "item 1 of x.ys is 3, which isn't an object",
                         "name": "item 1 of w.xs",
                         "value": {
                           "ys": [

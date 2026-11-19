@@ -114,6 +114,25 @@ fn without_roots(message: &str, roots: &[String], moved: &mut Vec<String>) -> St
         .join("; ")
 }
 
+fn said_by(entry: &Failure, lead: &[String], out: &mut Vec<String>) {
+    let part = entry.part();
+    let mut here = lead.to_vec();
+    if let Failure::Item { .. } = entry {
+        here.push(part.name.clone());
+    }
+    if !part.message.is_empty() {
+        let mut names = here.clone();
+        if matches!(entry, Failure::Item { .. }) && part.message.starts_with(&part.name) {
+            names.pop();
+        }
+        names.push(part.message.clone());
+        out.push(names.join(": "));
+    }
+    for kid in &part.failures {
+        said_by(kid, &here, out);
+    }
+}
+
 fn walked_under(
     line: &For,
     sentence: &Check,
@@ -590,7 +609,24 @@ pub fn for_failures(
                 if frees[i].is_none() {
                     let nested = walked_under(line, &sentence.check, f, &l, &aliases, ctx);
                     let made = line_item(f, &l, &aliases, &roots, &mut moved);
-                    if let Some(entry) = nested.filter(|_| made.is_some()).or(made) {
+                    let same = |n: &Failure| {
+                        made.as_ref().is_some_and(|m| {
+                            let mut said: Vec<String> = Vec::new();
+                            for kid in &n.part().failures {
+                                said_by(kid, &[], &mut said);
+                            }
+                            let mut want: Vec<String> = m
+                                .part()
+                                .message
+                                .split("; ")
+                                .filter(|p| !p.is_empty() && ops::message::cap_note(p).is_none())
+                                .map(str::to_string)
+                                .collect();
+                            want.dedup();
+                            !want.is_empty() && want.iter().all(|w| said.contains(w))
+                        })
+                    };
+                    if let Some(entry) = nested.filter(same).or(made) {
                         items.push(entry);
                     }
                 }

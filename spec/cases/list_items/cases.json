@@ -2397,7 +2397,32 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/objs/0/rows/0/v"
+                        ],
+                        "name": "rows[0].v",
+                        "outcome": "absent",
+                        "value": "bob"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/objs/0/rows/0"
+                    ],
+                    "message": "os.name is missing",
+                    "name": "item 1 of rows",
+                    "value": {
+                      "n": 2,
+                      "v": "bob"
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -2411,7 +2436,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/whose_dot"
                 ],
-                "message": "item 1 of rows: os.name is missing",
+                "message": "",
                 "name": "count of rows whose v is in os.name is 1"
               }
             ],
@@ -3282,7 +3307,32 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/objs/0/rows/0/v"
+                        ],
+                        "name": "rows[0].v",
+                        "outcome": "absent",
+                        "value": "ann"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/objs/0/rows/0"
+                    ],
+                    "message": "os.name is missing",
+                    "name": "item 1 of rows",
+                    "value": {
+                      "n": 2,
+                      "v": "ann"
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -3296,7 +3346,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/whose_dot"
                 ],
-                "message": "item 1 of rows: os.name is missing",
+                "message": "",
                 "name": "count of rows whose v is in os.name is 1"
               }
             ],
@@ -4207,7 +4257,32 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/objs/0/rows/0/v"
+                        ],
+                        "name": "rows[0].v",
+                        "outcome": "absent",
+                        "value": "ann"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/objs/0/rows/0"
+                    ],
+                    "message": "os.name is missing",
+                    "name": "item 1 of rows",
+                    "value": {
+                      "n": 2,
+                      "v": "ann"
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -4221,7 +4296,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/whose_dot"
                 ],
-                "message": "item 1 of rows: os.name is missing",
+                "message": "",
                 "name": "count of rows whose v is in os.name is 1"
               }
             ],
@@ -9473,7 +9548,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/rows/1/v"
+                        ],
+                        "name": "rows[1].v",
+                        "outcome": "unusable",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/rows/1"
+                    ],
+                    "message": "v is 5, which isn't text",
+                    "name": "item 2 of rows",
+                    "value": {
+                      "v": 5
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9504,7 +9603,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 2 of rows: v is 5, which isn't text",
+                "message": "",
                 "name": "count of rows whose v matches pos.p is 1"
               }
             ],
@@ -9805,7 +9904,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/kids/0/rows/1/v"
+                        ],
+                        "name": "rows[1].v",
+                        "outcome": "unusable",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/kids/0/rows/1"
+                    ],
+                    "message": "v is 5, which isn't text",
+                    "name": "item 2 of rows",
+                    "value": {
+                      "v": 5
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9832,7 +9955,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 2 of rows: v is 5, which isn't text",
+                "message": "",
                 "name": "count of rows whose v matches c.os.p is 1"
               }
             ],
@@ -10125,7 +10248,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/kids/0/rows/1/v"
+                        ],
+                        "name": "rows[1].v",
+                        "outcome": "unusable",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/kids/0/rows/1"
+                    ],
+                    "message": "v is 5, which isn't text",
+                    "name": "item 2 of rows",
+                    "value": {
+                      "v": 5
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10156,7 +10303,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/part_count"
                 ],
-                "message": "item 2 of rows: v is 5, which isn't text",
+                "message": "",
                 "name": "count of rows whose v matches c.pos.p is 1"
               }
             ],
@@ -13226,30 +13373,7 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [
-                  {
-                    "cause": "value",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/objs/0/rows"
-                        ],
-                        "name": "rows",
-                        "outcome": "usable",
-                        "value": [
-                          {
-                            "n": 2,
-                            "v": "bob"
-                          }
-                        ]
-                      }
-                    ],
-                    "kind": "list",
-                    "message": "rows is [{\"n\": 2, \"v\": \"bob\"}]",
-                    "name": "rows"
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [],
@@ -13262,7 +13386,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/sum"
                 ],
-                "message": "",
+                "message": "rows is [{\"n\": 2, \"v\": \"bob\"}]",
                 "name": "every rows whose n equals sum of $input.lst.k exists"
               }
             ],
@@ -17161,7 +17285,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/whose"
                 ],
-                "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"key\": \"x\", \"m\": {\"x\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object",
+                "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"key\": \"x\", \"m\": {\"x\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object; item 1 of tags is \"a\", which isn't an object",
                 "name": "count of tags whose $input.k is in tags is 1"
               }
             ],
@@ -17192,7 +17316,7 @@
                 "value": null
               }
             ],
-            "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"key\": \"x\", \"m\": {\"x\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object",
+            "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"key\": \"x\", \"m\": {\"x\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object; item 1 of tags is \"a\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -31190,25 +31314,37 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/xs/0"
+                            ],
+                            "name": "x.m named by $params.k",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "x is 1, which isn't an object",
+                        "name": "x.m named by $params.k"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [],
                         "name": "count of x.m named by $params.k",
                         "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "x.m named by $params.k",
-                        "outcome": "unusable",
-                        "value": []
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "x is 1, which isn't an object",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": 1
                   }
@@ -31218,7 +31354,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/for_count/assert"
                 ],
-                "message": "$params.k is 3, which isn't text",
+                "message": "$params.k is 3, which isn't text; item 1 of xs: x is 1, which isn't an object",
                 "name": "count of x.m named by $params.k is 1"
               }
             ],
@@ -31251,25 +31387,37 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/xs/0"
+                            ],
+                            "name": "x.m named by $params.k",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "x is 1, which isn't an object",
+                        "name": "x.m named by $params.k"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [],
                         "name": "sum of x.m named by $params.k",
                         "value": null
-                      },
-                      {
-                        "locations": [],
-                        "name": "x.m named by $params.k",
-                        "outcome": "unusable",
-                        "value": []
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "x is 1, which isn't an object",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": 1
                   }
@@ -31279,7 +31427,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/for_sum/assert"
                 ],
-                "message": "$params.k is 3, which isn't text",
+                "message": "$params.k is 3, which isn't text; item 1 of xs: x is 1, which isn't an object",
                 "name": "sum of x.m named by $params.k is 1"
               }
             ],

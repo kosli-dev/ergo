@@ -9811,7 +9811,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/0/ys/0/thing"
+                        ],
+                        "name": "ys[0].thing",
+                        "outcome": "unusable",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/0/ys/0"
+                    ],
+                    "message": ".thing is 1, which isn't an object",
+                    "name": "item 1 of ys",
+                    "value": {
+                      "thing": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9839,7 +9863,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 1 of ys: .thing is 1, which isn't an object",
+                "message": "",
                 "name": "count of ys whose thing equals p is 1"
               }
             ],
@@ -10039,7 +10063,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/2"
+                        ],
+                        "name": "ys[2].s",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/2"
+                    ],
+                    "message": ".s is missing",
+                    "name": "item 3 of ys",
+                    "value": {
+                      "k": 3
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10055,7 +10103,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 3 of ys: .s is missing",
+                "message": "",
                 "name": "count of ys whose count of s is 1 is 1"
               }
             ],
@@ -10111,7 +10159,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/2"
+                        ],
+                        "name": "item 1 of ys[2].s",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/2"
+                    ],
+                    "message": "item 1 of .s is missing",
+                    "name": "item 3 of ys",
+                    "value": {
+                      "k": 3
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10127,7 +10199,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/d"
                 ],
-                "message": "item 3 of ys: item 1 of .s is missing",
+                "message": "",
                 "name": "count of ys whose item 1 of s is 1 is 1"
               }
             ],
@@ -13822,7 +13894,54 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].\"a<b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "message": ".\"a<b\" is missing",
+                    "name": "item 1 of ys",
+                    "value": {
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].\"a<b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "message": ".\"a<b\" is missing",
+                    "name": "item 2 of ys",
+                    "value": {
+                      "v": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -13837,7 +13956,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 1 of ys: .\"a<b\" is missing; item 2 of ys: .\"a<b\" is missing",
+                "message": "",
                 "name": "count of ys whose \"a<b\" is 1 is 1"
               }
             ],
@@ -13948,7 +14067,54 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].\"a\\\"b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "message": ".\"a\\\"b\" is missing",
+                    "name": "item 1 of ys",
+                    "value": {
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].\"a\\\"b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "message": ".\"a\\\"b\" is missing",
+                    "name": "item 2 of ys",
+                    "value": {
+                      "v": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -13963,7 +14129,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 1 of ys: .\"a\\\"b\" is missing; item 2 of ys: .\"a\\\"b\" is missing",
+                "message": "",
                 "name": "count of ys whose \"a\\\"b\" is 1 is 1"
               }
             ],
@@ -14074,7 +14240,54 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].\"a\\\\b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "message": ".\"a\\\\b\" is missing",
+                    "name": "item 1 of ys",
+                    "value": {
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].\"a\\\\b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "message": ".\"a\\\\b\" is missing",
+                    "name": "item 2 of ys",
+                    "value": {
+                      "v": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -14089,7 +14302,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 1 of ys: .\"a\\\\b\" is missing; item 2 of ys: .\"a\\\\b\" is missing",
+                "message": "",
                 "name": "count of ys whose \"a\\\\b\" is 1 is 1"
               }
             ],

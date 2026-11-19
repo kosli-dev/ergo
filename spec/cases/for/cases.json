@@ -38278,25 +38278,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "$params:"
-                        ],
-                        "name": "$params",
-                        "outcome": "unusable",
-                        "value": []
-                      }
-                    ],
-                    "kind": "list",
-                    "message": "$params is [], which isn't an object",
-                    "name": "$params"
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [],
@@ -38308,7 +38290,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "",
+                "message": "$params is [], which isn't an object",
                 "name": "count of $params.a is 1"
               }
             ],
@@ -90305,7 +90287,7 @@
               {
                 "locations": [],
                 "name": "commit.files",
-                "outcome": "usable",
+                "outcome": "absent",
                 "value": []
               },
               {

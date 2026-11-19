@@ -6713,6 +6713,14 @@
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.k",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "in-scope thing count is 0",

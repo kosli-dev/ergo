@@ -10259,7 +10259,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rows/0/v"
+                        ],
+                        "name": "rows[0].v",
+                        "outcome": "absent",
+                        "value": "a"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rows/0"
+                    ],
+                    "message": "os.name is missing",
+                    "name": "item 1 of rows",
+                    "value": {
+                      "v": "a"
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10273,7 +10297,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 1 of rows: os.name is missing",
+                "message": "",
                 "name": "count of rows whose v is in os.name is 1"
               }
             ],
@@ -10319,7 +10343,32 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rows/0/v"
+                        ],
+                        "name": "rows[0].v",
+                        "outcome": "null",
+                        "value": "a"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rows/0"
+                    ],
+                    "message": "os is null",
+                    "name": "item 1 of rows",
+                    "value": {
+                      "os": null,
+                      "v": "a"
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10333,7 +10382,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 1 of rows: os is null",
+                "message": "",
                 "name": "count of rows whose v is in os.name is 1"
               }
             ],

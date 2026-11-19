@@ -240,6 +240,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "t",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "t is missing",
@@ -265,6 +273,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/t"
+                ],
+                "name": "t",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "t is null",
@@ -533,6 +549,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "t",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "t is missing",
@@ -664,6 +688,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$input is null",
@@ -1621,6 +1653,16 @@
                 "locations": [],
                 "name": "in-scope s count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": {
+                  "x": "a"
+                }
               }
             ],
             "message": "$params.k is {\"x\": \"a\"}, which isn't text",
@@ -1693,6 +1735,16 @@
                 "locations": [],
                 "name": "in-scope s count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": [
+                  "a"
+                ]
               }
             ],
             "message": "$params.k is [\"a\"], which isn't text",
@@ -2333,6 +2385,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 1 of $input",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of $input is missing",
@@ -2375,6 +2435,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 1 of $input",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of $input is missing",
@@ -2414,6 +2482,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 1 of $input",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of $input is missing",
@@ -2444,6 +2520,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 6 of $input",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 6 of $input is missing",
@@ -3236,6 +3320,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 1 of $input",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of $input is missing",
@@ -3284,6 +3376,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "commits",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "$input is a list: write every $input.commits to read each item",
@@ -3631,6 +3731,14 @@
                 "locations": [],
                 "name": "in-scope q count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/1"
+                ],
+                "name": "p.commits",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "p is 5, which isn't an object",
@@ -13615,7 +13723,7 @@
             "check": "$min_subjects",
             "description": "The in-scope pull request count is at least 1",
             "expression": "count(matching(every commit.pull_requests)) >= 1",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -14261,15 +14369,23 @@
             "check": "$min_subjects",
             "description": "The pull request list can be read",
             "expression": "every commit.pull_requests can be read",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "pull_requests",
-                "locations": [
-                  "/commits/1"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/commits/1"
+                    ],
+                    "name": "pull_requests",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "pull_requests",
-                "value": null
+                "kind": "list",
+                "message": "pull_requests is missing",
+                "name": "pull_requests"
               }
             ],
             "inputs": [
@@ -14277,6 +14393,14 @@
                 "locations": [],
                 "name": "in-scope pull request count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/commits/1"
+                ],
+                "name": "pull_requests",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "pull_requests is missing",
@@ -14458,15 +14582,23 @@
             "check": "$min_subjects",
             "description": "The pull request list can be read",
             "expression": "every commit.pull_requests can be read",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "pull_requests",
-                "locations": [
-                  "/commits/1/pull_requests"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/commits/1/pull_requests"
+                    ],
+                    "name": "pull_requests",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "pull_requests",
-                "value": null
+                "kind": "list",
+                "message": "pull_requests is null",
+                "name": "pull_requests"
               }
             ],
             "inputs": [
@@ -14474,6 +14606,14 @@
                 "locations": [],
                 "name": "in-scope pull request count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/commits/1/pull_requests"
+                ],
+                "name": "pull_requests",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "pull_requests is null",
@@ -14642,7 +14782,7 @@
             "check": "$min_subjects",
             "description": "The in-scope pull request count is at least 3",
             "expression": "count(matching(every commit.pull_requests)) >= 3",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [
