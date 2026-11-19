@@ -320,6 +320,13 @@ _for_message_parts(check, subj, r) := _once([e.t | some e in _for_ents(check, r)
 
 else := split(_for_message(check, subj, r), "; ")
 
+_for_key_once(check, r) := [k | some k in ks; not _m_said_in(k, object.get(r, "root_msgs", object.get(r, "other_roots", [])))] if {
+	r.failed != []
+	ks := _for_whose_key_faults(check)
+	ks != []
+	not _for_key_in_items(ks, _for_ents(check, r))
+} else := []
+
 _for_ents(check, r) := array.concat(
 	[{"i": i, "t": t, "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) == true; some j, p in _m_for_part(check, r.failed, i, f); some t in _m_for_unled(said, p)],
 	[{"i": i, "t": t, "x": _m_extra_part(f, j)} | some i, f in r.failed; object.get(f, "hoisted", false) != true; some j, p in _m_for_part(check, r.failed, i, f); some t in _m_for_unled(said, p)],

@@ -208,7 +208,7 @@ _for_second_roots(check, subj) := [{"i": e.i, "fl": fl, "ms": ms, "raw": [_m_ali
 _for_row_message(check, subj, r) := {"message": _m_joined(array.concat(_m_tally_grouped(check, once), parts)), "once": once, "line": [t | r.failed == []; some t in parts]} if {
 	rs := object.get(r, "root_msgs", object.get(r, "other_roots", []))
 	second := {m | some x in _for_second_roots(check, subj); some m in x.ms}
-	once := _once(array.concat(array.concat(array.concat([m | some m in rs; not m in second], [t | some p in _for_free_texts(check, r); t := _m_unskipped(p, _m_root_skip(rs)); t != ""]), _for_hoisted_texts(check, r)), [m | some m in rs; m in second]))
+	once := _once(array.concat(array.concat(array.concat(array.concat(_for_key_once(check, r), [m | some m in rs; not m in second]), [t | some p in _for_free_texts(check, r); t := _m_unskipped(p, _m_root_skip(rs)); t != ""]), _for_hoisted_texts(check, r)), [m | some m in rs; m in second]))
 	once != []
 	parts := [t | some t in _for_item_parts(check, subj, r, once); t != ""; not t in once]
 } else := {"message": m, "once": [], "line": [m | r.failed == []]} if m := _for_message(check, subj, r)

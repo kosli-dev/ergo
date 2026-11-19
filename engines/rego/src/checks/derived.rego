@@ -333,8 +333,6 @@ _tally_judgement(side, e, flaws) := {"kept": kept, "read": read, "states": (unde
 
 _tally_focus_cause(c, e, flaw) := _tally_cond_cause(c, e.iv, flaw) if e.r == []
 
-else := _tally_cond_cause(c, e.v, flaw) if flaw != ""
-
 else := _focus_lost_state(e) if _focus_lost(e, c)
 
 else := _tally_cond_cause(c, e.v, flaw)

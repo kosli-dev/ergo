@@ -325,7 +325,7 @@ _entry(kind, name, cause, inputs, failures, message) := {
 
 _policy_entry(kind, name, cause, inputs, failures, message, locations) := object.union(_entry(kind, name, cause, inputs, failures, message), {"locations": locations})
 
-_row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, [i | some i in _with_key_bases(array.concat(ins, _check_key_ref_entries(where.check, ins, row.cause)), object.get(row, "ergo/key_bases", []), at); not i.name in names; not _item_input(i, lists)], ls, _tally_rest(row.message, names), [_assertion_at(where, null, 0)])] if {
+_row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, [i | some i in _with_key_bases(array.concat(ins, _check_key_ref_entries(where.check, ins, row.cause, row.message)), object.get(row, "ergo/key_bases", []), at); not i.name in names; not _item_input(i, lists)], ls, _tally_rest(row.message, names), [_assertion_at(where, null, 0)])] if {
 	not _walks(where.check)
 	not _all_of_run(where.check)
 	not _any_of_run(where.check)
@@ -393,7 +393,7 @@ _row_failures(row, at, where, _) := [_tallied_entry(
 		"assertion",
 		fa.assertion,
 		fa.cause,
-		_sentence_inputs(where.check.checks[fa.at], fa, at),
+		_sentence_inputs(where.check.checks[fa.at], fa, at, row["ergo/texts"][k]),
 		[],
 		row["ergo/texts"][k],
 		[_assertion_at(where, null, fa.at)],
@@ -434,7 +434,7 @@ _option_assertion(row, at, where, nm, i) := _tallied_entry(
 		"assertion",
 		where.check.assertions[i],
 		row["ergo/outs"][i].cause,
-		_sentence_inputs(where.check.checks[i], row["ergo/outs"][i], at),
+		_sentence_inputs(where.check.checks[i], row["ergo/outs"][i], at, row["ergo/texts"][i]),
 		[],
 		row["ergo/texts"][i],
 		[_assertion_at(where, nm, count([j | some j, n in array.slice(where.check.option_of, 0, i); n == nm]))],
@@ -462,7 +462,13 @@ _walk_param_entries(check, inputs) := [x |
 	not x.name in {i.name | some i in inputs}
 ]
 
-_check_key_ref_entries(check, inputs, cause) := [x |
+_check_key_ref_entries(check, inputs, cause, said) := _check_key_refs(check, inputs) if {
+	cause in _value_fault_causes
+} else := [x | some x in _check_key_refs(check, inputs); contains(said, _for_key_text(x, x.outcome))] if {
+	cause == "not_an_object"
+} else := []
+
+_check_key_refs(check, inputs) := [x |
 	some x in _key_flaw_entries(_once([seg |
 		walk(check, [_, p])
 		is_array(p)
@@ -473,17 +479,15 @@ _check_key_ref_entries(check, inputs, cause) := [x |
 		_is_ref(seg)
 	]))
 	not x.name in {i.name | some i in inputs}
-] if {
-	cause in _value_fault_causes
-} else := []
+]
 
 _key_base_entries(bases, at) := _anchored_all([object.union(object.remove(x.input, _input_stash_keys), {"outcome": _key_list_outcome(x.cause)}) | some x in bases], at)
 
-_sentence_inputs(c, o, at) := _with_key_bases(array.concat(array.concat(_with_outcomes(_anchored_inputs(o.inputs, at)), _sentence_ref_entries(c, o.inputs)), _sentence_key_entries(c, o)), o.key_bases, at)
+_sentence_inputs(c, o, at, said) := _with_key_bases(array.concat(array.concat(_with_outcomes(_anchored_inputs(o.inputs, at)), _sentence_ref_entries(c, o.inputs)), _sentence_key_entries(c, o, said)), o.key_bases, at)
 
 _with_key_bases(ins, bases, at) := array.concat(ins, [x | some x in _key_base_entries(bases, at); not x.name in {i.name | some i in ins}])
 
-_sentence_key_entries(c, o) := _check_key_ref_entries(c, o.inputs, o.cause) if not _walks(c)
+_sentence_key_entries(c, o, said) := _check_key_ref_entries(c, o.inputs, o.cause, said) if not _walks(c)
 
 else := []
 

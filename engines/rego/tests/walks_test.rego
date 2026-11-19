@@ -2166,8 +2166,8 @@ _key_rows(checks, subject, params) := {r.check: [r.cause, r.message] |
 
 test_a_that_key_that_cant_be_read_on_an_item_that_isnt_an_object_names_the_item_and_never_a_field_under_it if {
 	checks := {"every": "every es.v that is m named by $params.k exists", "count": "count of es.v that is m named by $params.k is 0"}
-	_key_rows(checks, {"es": ["s"]}, {"k": null}) == {"every": ["not_an_object", "$params.k is null; item 1 of es is \"s\", which isn't an object"], "count": ["absent", "item 1 of es is \"s\", which isn't an object"]}
-	_key_rows(checks, {"es": ["s"]}, {"k": 3}) == {"every": ["not_an_object", "item 1 of es is \"s\", which isn't an object"], "count": ["unusable", "item 1 of es is \"s\", which isn't an object"]}
+	_key_rows(checks, {"es": ["s"]}, {"k": null}) == {"every": ["not_an_object", "$params.k is null; item 1 of es is \"s\", which isn't an object"], "count": ["not_an_object", "$params.k is null; item 1 of es is \"s\", which isn't an object"]}
+	_key_rows(checks, {"es": ["s"]}, {"k": 3}) == {"every": ["not_an_object", "item 1 of es is \"s\", which isn't an object"], "count": ["not_an_object", "item 1 of es is \"s\", which isn't an object"]}
 	_key_rows(checks, {"es": [{"v": {"m": {"a": 1}}}]}, {"k": 3}) == {"every": ["unusable", "$params.k is 3, which isn't text"], "count": ["unusable", "$params.k is 3, which isn't text"]}
 }
 
@@ -2177,6 +2177,29 @@ test_a_whose_key_said_before_the_items_is_not_one_of_the_three_items_the_message
 	five := {"es": [{"zz": 2}, {"zz": 2}, {"zz": 2}, {"zz": 2}, {"zz": 2}]}
 	_key_rows(checks, five, {"k": 3}) == {c: ["unusable", concat("", ["$params.k is 3, which isn't text; ", shown])] | some c in ["every", "for"]}
 	_key_rows(checks, five, {}) == {c: ["absent", concat("", ["$params.k is missing; ", shown])] | some c in ["every", "for"]}
+}
+
+test_a_whose_key_that_cant_be_read_is_said_when_its_walk_sits_beside_another_sentence_or_option if {
+	checks := {
+		"assert": {"assert": ["every es whose zz is m named by $params.k exists", "ys exists"]},
+		"option": {"any_of": {"a": ["some es whose zz is m named by $params.k exists"], "b": ["ys exists"]}},
+		"for": {"for": "every es whose zz is m named by $params.k as e", "assert": ["e.v exists", "z is 1"]},
+	}
+	_key_rows(checks, {"z": 2}, {}) == {
+		"assert": ["absent", "$params.k is missing; es is missing; ys is missing"],
+		"option": ["absent", "a: $params.k is missing; es is missing; b: ys is missing"],
+		"for": ["absent", "$params.k is missing; z is 2; es is missing"],
+	}
+	_key_rows(checks, {"z": 2, "es": []}, {"k": 3}) == {
+		"assert": ["unusable", "$params.k is 3, which isn't text; es is []; ys is missing"],
+		"option": ["unusable", "a: $params.k is 3, which isn't text; es is []; b: ys is missing"],
+		"for": ["unusable", "$params.k is 3, which isn't text; z is 2; es is []"],
+	}
+	_key_rows(checks, {"z": 2, "es": [{"zz": 2, "m": {"a": 1}, "v": 1}]}, {"k": 3}) == {
+		"assert": ["unusable", "$params.k is 3, which isn't text; ys is missing"],
+		"option": ["unusable", "a: $params.k is 3, which isn't text; b: ys is missing"],
+		"for": ["unusable", "$params.k is 3, which isn't text; z is 2"],
+	}
 }
 
 test_a_whose_key_that_isnt_text_is_said_before_a_list_that_cant_be_walked_and_the_row_takes_its_cause if {

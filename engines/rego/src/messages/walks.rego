@@ -490,7 +490,7 @@ _m_tally_walked_side(subj, side) := array.concat(
 	roots := _dotted_roots([side[f]])
 	fs := array.concat(w.fails, _walk_stop(w))
 	said := array.concat(
-		[[_m_key_root_state(side, m), m] | some m in sort([m | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); _m_ref_first(m)])],
+		[[_m_key_root_state_in(side, m, w), m] | some m in sort([m | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); _m_ref_first(m)])],
 		[["root", m] | some c in side.whose; some m in array.concat(_m_root_texts_all(subj, c), _m_tally_walked(c, w)); not _m_ref_first(m)],
 	)
 }
@@ -574,6 +574,12 @@ _m_ref_first(m) if {
 	some word in [" is missing", " is null"]
 	endswith(m, word)
 }
+
+_m_key_root_state_in(side, m, w) := "root" if {
+	some c in side.whose
+	some e in w.items
+	_focus_lost(e, c)
+} else := _m_key_root_state(side, m)
 
 _m_key_root_state(side, m) := s if {
 	some c in side.whose
@@ -781,7 +787,7 @@ _m_sentence(c, subj, cause) := _m_walk_sentence(c, subj, cause, _walk_row(c, sub
 
 _m_walk_sentence(c, subj, cause, r) := r.root_msgs if "root_msgs" in object.keys(r)
 
-else := _walk_parts(c, subj, {"cause": cause}, r)
+else := _walk_roots_sorted(_parts_ahead(_walk_parts(c, subj, {"cause": cause}, r), r), c)
 
 _m_own_msg(check, c, m, [read, subj, cause]) := object.union(_m_own_part(check, c, m, count(read) == 1), {"read": _m_marked(read, _m_unusable_names_of(c, subj, cause))})
 
