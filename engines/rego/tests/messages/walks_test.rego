@@ -59,6 +59,16 @@ test_an_item_names_every_condition_of_its_whose_it_cant_decide_and_not_only_the_
 	"item 1 of es: $params.j is 3, which isn't text" in said
 }
 
+test_a_count_shows_every_item_it_cant_read_whatever_its_cause_but_not_a_root_or_a_params_item_of_another_cause if {
+	item := {"item": {"i": ["xs", 0]}}
+	ergo._m_record_shown(["absent", "item 1 of xs: v is missing", item], "unusable")
+	ergo._m_record_shown(["not_an_object", "item 1 of xs is 3, which isn't an object", item], "absent")
+	ergo._m_record_shown(["unusable", "item 1 of xs: v is \"a\", which isn't a number", item], "unusable")
+	not ergo._m_record_shown(["value", "item 1 of xs: v is 2", item], "absent")
+	not ergo._m_record_shown(["absent", "x is missing"], "unusable")
+	not ergo._m_record_shown(["absent", "item 1 of $params.l: v is missing", {"item": {"i": ["$$params", "l", 0]}}], "unusable")
+}
+
 test_an_item_names_the_conditions_it_cant_decide_in_the_order_the_sentence_reads_them if {
 	side := _count_of_es([
 		{"op": "compare", "cmp": "eq", "left": ["w"], "right": {"literal": 1}},

@@ -63,3 +63,8 @@ test_a_ref_that_is_not_a_list_names_the_kind_of_list_the_phrase_needs if {
 	ergo._m_leaf_needs({"op": "includes", "values": {"ref": ["$$params", "q"]}}, []) == "a list with at least one value"
 	ergo._m_leaf_needs({"op": "matches", "patterns": {"ref": ["$$params", "q"]}}, "s") == "a list"
 }
+
+test_message_groups_items_by_their_list_in_the_order_the_lists_come_and_then_by_item_number if {
+	leads := ["item 10 of xs", "item 1 of ys", "item 2 of xs", "item 10 of xs", ""]
+	ergo._m_list_leads(leads) == ["item 2 of xs", "item 10 of xs", "item 1 of ys", ""]
+}

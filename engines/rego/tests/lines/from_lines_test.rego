@@ -19,3 +19,11 @@ test_a_check_with_a_for_key_and_no_op_is_a_for_check if {
 	ergo._for_check({"op": "for"})
 	not ergo._for_check({"op": "all_of"})
 }
+
+test_a_from_line_note_about_mixed_types_says_one_clause_per_item_so_each_item_entry_gets_its_own if {
+	req := {"subject": "s", "from": ["things"]}
+	mixed := {"types": [["text", ["things", 0], "a"], ["a number", ["things", 1], 1]], "plain": true}
+	ergo._fl_note_clauses(req, mixed) == ["item 1 of things is text", "item 2 of things is a number"]
+	beside := {"list": {"c": ["things", 0, "xs"]}, "other": {"c": ["things", 1, "xs"], "v": 3}}
+	ergo._fl_note_clauses(req, beside) == ["item 1 of things: xs is a list", "item 2 of things: xs is a number"]
+}

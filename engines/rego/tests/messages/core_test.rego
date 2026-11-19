@@ -47,3 +47,11 @@ test_message_of_exists_on_a_null_field_says_it_is_null_whatever_cause_the_line_h
 	check := {"$sides": [["x"]], "op": "present", "path": ["x"], "expression": "x exists"}
 	ergo._m_message(check, {"x": null}, "absent") == "x is null"
 }
+
+test_a_row_says_what_else_it_cant_read_beside_a_key_it_cant_read if {
+	check := {"op": "compare", "cmp": "eq", "left": ["k"], "right": ["m", {"ref": ["$$params", "k"]}], "expression": "k is m named by $params.k"}
+	row := object.union(check, {"ergo/row": true})
+	ergo._m_unkeyed_said({}, row, "absent") == ["k is missing"] with data.ergo_params as {}
+	ergo._m_message(row, {}, "absent") == "$params.k is missing, and k is missing" with data.ergo_params as {}
+	ergo._m_unkeyed_said({}, check, "absent") == [] with data.ergo_params as {}
+}
