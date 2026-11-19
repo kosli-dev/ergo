@@ -9757,7 +9757,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": ".kid is 1, which isn't a list or an object",
+                "message": "",
                 "name": "count of .kid is 1"
               }
             ],
@@ -9827,7 +9827,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": ".kid is missing",
+                "message": "",
                 "name": "count of .kid is 1"
               }
             ],

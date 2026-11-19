@@ -9,6 +9,31 @@ Scripts edit only the `results` of the cases they change and keep the rest of ea
 - B3: the `list` entry of a `count of` or `sum of` holds the list's own read, with its value and where the read stopped, taken from the same list walked by `every`. Done by hand where `main`'s `every` gives no `list` entry either (`$params` that isn't an object, `zz` holding `"str"` with a bad key, an `$applies` row, and `for` case 322's second list).
 - B5 and B6: the walked path is no longer an input of an assertion, in every form. Where the list itself failed and had no `list` entry, one is added (B7 and its neighbours), with the read taken from `<list> exists` on `main`.
 - Left as `main` has them, and listed in the report: a list problem hidden by another root (15 rows, like messages case 145, which pins it), a whole-list value clause like `approvers is [...]` from an `every … whose` that picks nothing (12 rows), and walked items said in the message with no `item` entries, which are D3 or D1 shapes (9 rows).
+- An assertion that got a `list` entry no longer repeats the list's clause in its own `message` (96 entries).
+- B9: messages cases 104/0, 111/0, 112/1 and derived 92/0 now say the root and then the items, with `item` entries and the root on the assertion's inputs (`$params` roots added where `main` left them off). New group in `row_parts` with 5 cases (`$input.min` `"s"`, `null` and missing, beside items missing, `null`, of the wrong kind and not objects), for `count of`, `sum of … that`, `every … whose` and `some … whose`.
+- B11(c): no existing case had it. New group in `row_parts`, 2 cases.
+- B8: new group in `row_parts`, 2 cases, a `for` line and a plain `assert` list side by side.
+- B10: 103 passed `$min_subjects` rows lose `failed_items: []`, 42 failed ones get `failures: []`, and 29 failed ones get `list` and `item` entries made from their `failed_items`. 23 rows keep `failed_items` (see gaps). `spec/report/schema.json` drops `failed_items`.
+- B12, B2, B3, B5, B6, B8, B9, B10: spec text in `row.parts`, `message.items`, `message.join`, `for.failed_items`, `subjects.*`, `violations`, `syntax.md` names. OPEN.md: the B5 and B9 lines and the old `$min_subjects` lines are gone, one line for the 23 rows is added. CHANGELOG: six lines.
+- REFERENCE.md: three prose lines reworded (option message, `$min_subjects` `failures`, violations). Two JSON examples still show the old shape and need output from the engines: the `failed_items` row near line 566 and the option `message`s in "Finding the evidence for a failed row".
+
+### Count
+
+`diffmain.py` (in the session scratchpad) loads every case file at 500ea825 and on this branch, matches cases by group and case description, and compares `results`: 510 existing cases change, 27 `row_parts` cases are new. 86 of the 510 change only by B2 or by losing a passed row's `failed_items`. Only 4 change a row's message or cause, the B9 ones above.
+
+### Not done
+
+- The existing cases the first round listed for decisions 1 and 3 (a walk on a `for` line, the items of a `count of` or `sum of`) still have `main`'s shape. `main` gives these shapes nowhere, so they can't be copied, and they need the engine or hand work one by one.
+
+### Gaps found (undecided)
+
+1. `$min_subjects` rows whose message says one clause about several items (`subjects.one_type`, `subjects.every.same`) and `from` lines that read a missing position (`item 1 of $input is missing`): which entry holds which clause. 23 rows keep `failed_items`.
+2. B9 when `$params` itself isn't an object: derived case 105 and messages case 145 pin "say only the params". Does B9 add the items there?
+3. B9 for `every ws.n whose v is in pos.name is 2` (for case 261): the `whose` reads `v` on a number, so what each item says isn't clear. Left as `main`.
+4. A list problem hidden by a root on the other side of a comparison: `count of zzs is m named by $input.k` with no `zzs` and no key says only `$input.k is missing` (derived 90), and `count of es whose v is in $input.z is 0` with no `es` (messages 145). `problems.all_said` says both, but messages 145 pins one.
+5. `every … whose` that picks nothing and fails says `approvers is [...]`: is that a `list` entry (12 rows)?
+6. B8 when two sentences walk different lists under one item (`x.ys` and `x.zs`): which order.
+7. A for-line item's cause takes the row's worst cause, not its own (messages 112/1 `for`: `item 1 of xs` is `unusable` with only an `absent` input).
 
 ## First round
 

@@ -576,7 +576,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 
   - Unlike a [child subject](#from-lines), these pull requests don't belong to an artifact. Their rows have no `in`, they're counted once, and their ids must be unique across all of them. A check can't read the artifact.
   - An empty list, like `sha-2`'s, adds nothing and fails nothing.
-  - A list that's missing, like `sha-3`'s, or `null` fails `$min_subjects` with the worst cause found, even with `min_subjects: 0`. The row's `failed_items` says where, and the pull requests that could be read are still checked. So does a path with no list along it: `every deps` on `{"deps": {"id": 1}}` fails with `deps is {"id": 1}, which isn't a list`.
+  - A list that's missing, like `sha-3`'s, or `null` fails `$min_subjects` with the worst cause found, even with `min_subjects: 0`. The row's `failures` says where, and the pull requests that could be read are still checked. So does a path with no list along it: `every deps` on `{"deps": {"id": 1}}` fails with `deps is {"id": 1}, which isn't a list`.
   - A value at the end can be an object, text, a number or true or false: `every builds.version` on `{"builds": [{"version": "1.0"}, {"version": "1.1"}]}` gives `"1.0"` and `"1.1"`.
   - A name `every` reads as a list in one item must be a list in all of them. `every builds.tags` on `{"builds": [{"tags": ["a", "b"]}, {"tags": "c"}]}` gives `a`, `b` and `c`, and `$min_subjects` fails as `unusable` with `tags is a list in item 1 of builds but "c" in item 2`, and lists `builds[0].tags` and `builds[1].tags` in `failed_items`. A policy that expects both shapes can say so with a subject for each, like `listed build` with `from: build whose tags is a list` and `tag` with `from: every "listed build".tags`.
   - A list directly inside a list is an item like any other, and `every` doesn't read into it. With `{"batches": [[{"owner": {"name": "ann"}}], [{"owner": {"name": "cy"}}]]}`, `every batches` gives two subjects, each a list, and `every batches.owner` fails as `not_an_object`, because a list has no `owner`. A subject for each level, `batch` and `every batch.owner`, reads the owners. Text, a number or true or false where a name is read fails as `unusable` instead, with the message a check gives: `every builds.version.x` on `{"builds": [{"version": "1.0"}]}` says `item 1 of builds: version is "1.0", which isn't an object`.
@@ -2470,7 +2470,7 @@ and the check's `$refs` entry is `{"locations": ["$params:/regions"], "name": "$
 
 A failed row says why in two places: its `message`, for a person, and its `failures`, for a tool that builds audit evidence. To find the evidence for a failed row, read `failures` from the entry down:
 
-1. Each entry is a part that failed: an `option` of an `any_of`, an `assertion` (a sentence), an `item` of a list that was walked, or a `list` that couldn't be walked. The entries under it are what failed inside it, and an entry with `failures` `[]` is a place where the check really failed. For now, a list walked inside an `any_of` option or an `assert` list has no `item` entries under its assertion, so its items show only in the message ([#688](https://github.com/kosli-dev/ergo/issues/688)).
+1. Each entry is a part that failed: an `option` of an `any_of`, an `assertion` (a sentence), an `item` of a list that was walked, or a `list` that couldn't be walked. The entries under it are what failed inside it, and an entry with `failures` `[]` is a place where the check really failed. An entry whose text all comes from the entries under it, like an option, has the `message` `""`.
 2. An entry's `inputs` are what that part read, each with its `name`, `value`, `locations` and `outcome`. `locations` are where, as [Where a value was read](#where-a-value-was-read) says, and `outcome` says which input to blame: `absent` and `null` are evidence that isn't there, `unusable` is a value of the wrong kind for the check, and `usable` is a value that was fine.
 3. An `item` has `value`, the item, and `locations`, where it sits in the input.
 4. Each input sits on the entry that read it: a name from outside the items, like `$params.min`, on the `assertion`, once, what was read inside an item on that `item`, and a list's own read on its `list` entry. On a `for` line, what the line reads itself, like a key after `named by` in its `whose`, is in the row's own `inputs`. A `count of` or `sum of` whose list can't be walked, like `count of o is 1` with `o` holding `"s"`, has a `list` entry `o` under its assertion, with the input `o` and the `outcome` `unusable`.
@@ -2847,7 +2847,7 @@ The violations are the rows of the report that are real problems, each with its 
 ]
 ```
 
-A violation keeps its row's `failures`, and one of the `$min_subjects` row of a subject read with `every` its `failed_items`. A violation that's an `$applies` row keeps the `failures` of its row too.
+A violation keeps its row's `failures`, the `$min_subjects` row of a subject read with `every` included. A violation that's an `$applies` row keeps the `failures` of its row too.
 
 It leaves out:
 
