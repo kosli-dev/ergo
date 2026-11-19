@@ -294,13 +294,7 @@ _m_list_found(subj, path) := [_m_is(_input_name(p), _value_at(subj, p))] if {
 	p := array.slice(path, 0, i)
 } else := []
 
-_for_message(check, _, r) := concat("; ", array.concat(ks, [_m_for_joined(ents)])) if {
-	r.failed != []
-	ks := _for_whose_key_faults(check)
-	ks != []
-	ents := _for_ents(check, r)
-	not _for_key_in_items(ks, ents)
-} else := _m_for_joined(_for_ents(check, r)) if r.failed != []
+_for_message(check, _, r) := _m_for_joined(_for_ents(check, r)) if r.failed != []
 
 _for_key_in_items(ks, ents) if {
 	some e in ents
