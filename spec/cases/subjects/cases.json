@@ -5420,6 +5420,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6114,6 +6115,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6157,6 +6159,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6225,6 +6228,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6268,6 +6272,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6338,6 +6343,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6383,6 +6389,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6453,6 +6460,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6499,6 +6507,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6572,6 +6581,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6645,6 +6655,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6908,6 +6919,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -6964,6 +6976,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -7023,6 +7036,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -7078,6 +7092,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -7133,6 +7148,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -7220,6 +7236,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -7255,6 +7272,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -7324,6 +7342,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -7387,6 +7406,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -7448,6 +7468,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -7510,6 +7531,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -7587,6 +7609,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -8001,6 +8024,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -8117,6 +8141,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -8320,6 +8345,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -8408,6 +8434,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -8483,6 +8510,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -8555,6 +8583,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -9971,6 +10000,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -20543,6 +20573,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -22801,6 +22832,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -22848,6 +22880,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -22897,6 +22930,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -22946,6 +22980,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -22993,6 +23028,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -23041,6 +23077,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -23090,6 +23127,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -23252,6 +23290,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -23299,6 +23338,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -23369,6 +23409,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -23497,6 +23538,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -23567,6 +23609,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -23699,6 +23742,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -23773,6 +23817,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -23901,6 +23946,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -23971,6 +24017,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -24103,6 +24150,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -24207,6 +24255,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -24331,6 +24380,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -24557,6 +24607,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -24673,6 +24724,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -24789,6 +24841,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -25646,6 +25699,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -25676,6 +25730,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -25751,6 +25806,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -25798,6 +25854,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -25875,6 +25932,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -25922,6 +25980,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26000,6 +26059,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26047,6 +26107,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26127,6 +26188,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26549,6 +26611,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26570,6 +26633,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26599,6 +26663,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26620,6 +26685,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26643,6 +26709,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26709,6 +26776,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26778,6 +26846,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26847,6 +26916,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26925,6 +26995,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26954,6 +27025,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26983,6 +27055,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -27012,6 +27085,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -27043,6 +27117,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -27092,6 +27167,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -27218,6 +27294,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -27242,6 +27319,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -27583,6 +27661,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -28721,6 +28800,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -28894,6 +28974,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -29067,6 +29148,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -29460,6 +29542,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -29606,6 +29689,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -29627,6 +29711,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -29768,6 +29853,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -29789,6 +29875,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -29930,6 +30017,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -29951,6 +30039,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30095,6 +30184,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30116,6 +30206,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30557,6 +30648,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30583,6 +30675,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30609,6 +30702,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30635,6 +30729,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30661,6 +30756,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30687,6 +30783,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30713,6 +30810,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30739,6 +30837,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30765,6 +30864,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30791,6 +30891,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30817,6 +30918,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30843,6 +30945,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30869,6 +30972,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30897,6 +31001,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30925,6 +31030,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30953,6 +31059,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30981,6 +31088,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -31001,6 +31109,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31027,6 +31136,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31053,6 +31163,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31275,6 +31386,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31301,6 +31413,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31329,6 +31442,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31355,6 +31469,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31381,6 +31496,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31409,6 +31525,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31435,6 +31552,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31463,6 +31581,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31489,6 +31608,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31515,6 +31635,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31693,6 +31814,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31719,6 +31841,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31745,6 +31868,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31771,6 +31895,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31818,6 +31943,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31844,6 +31970,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31870,6 +31997,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -31896,6 +32024,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -32675,6 +32804,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -32735,6 +32865,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -32795,6 +32926,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -32855,6 +32987,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -32917,6 +33050,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -32981,6 +33115,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33045,6 +33180,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33109,6 +33245,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33169,6 +33306,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33221,6 +33359,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33274,6 +33413,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33334,6 +33474,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33396,6 +33537,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33460,6 +33602,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33522,6 +33665,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33588,6 +33732,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33652,6 +33797,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33714,6 +33860,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33785,6 +33932,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33856,6 +34004,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33990,6 +34139,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -34063,6 +34213,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -34322,6 +34473,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -34395,6 +34547,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -34468,6 +34621,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -34695,6 +34849,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -34713,6 +34868,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -35101,6 +35257,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -35925,6 +36082,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -36330,6 +36488,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -37429,6 +37588,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -37450,6 +37610,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -37865,6 +38026,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -37894,6 +38056,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -38269,6 +38432,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -38844,6 +39008,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -38876,6 +39041,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -39736,6 +39902,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -39757,6 +39924,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -40482,6 +40650,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -40503,6 +40672,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -40524,6 +40694,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -40553,6 +40724,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -41117,6 +41289,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -41972,6 +42145,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -42507,6 +42681,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -42557,6 +42732,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -42582,6 +42758,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -42607,6 +42784,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -42728,6 +42906,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -42759,6 +42938,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -42790,6 +42970,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -43423,6 +43604,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -43737,6 +43919,7 @@
             {
               "cause": "absent",
               "check": "$min_subjects",
+              "failures": [],
               "inputs": [
                 {
                   "locations": [],
@@ -43774,6 +43957,7 @@
             {
               "cause": "absent",
               "check": "$min_subjects",
+              "failures": [],
               "inputs": [
                 {
                   "locations": [],
@@ -43811,6 +43995,7 @@
             {
               "cause": "unusable",
               "check": "$min_subjects",
+              "failures": [],
               "inputs": [
                 {
                   "locations": [],
@@ -43871,6 +44056,7 @@
             {
               "cause": "absent",
               "check": "$min_subjects",
+              "failures": [],
               "inputs": [
                 {
                   "locations": [],
@@ -43908,6 +44094,7 @@
             {
               "cause": "null",
               "check": "$min_subjects",
+              "failures": [],
               "inputs": [
                 {
                   "locations": [],
@@ -43945,6 +44132,7 @@
             {
               "cause": "unusable",
               "check": "$min_subjects",
+              "failures": [],
               "inputs": [
                 {
                   "locations": [],
@@ -44005,6 +44193,7 @@
             {
               "cause": "unusable",
               "check": "$min_subjects",
+              "failures": [],
               "inputs": [
                 {
                   "locations": [],
@@ -44042,6 +44231,7 @@
             {
               "cause": "unusable",
               "check": "$min_subjects",
+              "failures": [],
               "inputs": [
                 {
                   "locations": [],
@@ -44079,6 +44269,7 @@
             {
               "cause": "unusable",
               "check": "$min_subjects",
+              "failures": [],
               "inputs": [
                 {
                   "locations": [],
