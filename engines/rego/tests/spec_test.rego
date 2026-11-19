@@ -467,13 +467,29 @@ test_the_for_cases_pass_compiled_part_19_of_20 if _differences_compiled("for", _
 
 test_the_for_cases_pass_compiled_part_20_of_20 if _differences_compiled("for", _case_part("for", 19, 20)) == set()
 
-test_the_walks_cases_pass_part_1_of_2 if _part_passes("walks", 0, 2)
+test_the_walks_cases_pass_part_1_of_6 if _case_part_passes("walks", 0, 6)
 
-test_the_walks_cases_pass_part_2_of_2 if _part_passes("walks", 1, 2)
+test_the_walks_cases_pass_compiled_part_1_of_6 if _differences_compiled("walks", _case_part("walks", 0, 6)) == set()
 
-test_the_walks_cases_pass_compiled_part_1_of_2 if _differences_compiled("walks", _part("walks", 0, 2)) == set()
+test_the_walks_cases_pass_part_2_of_6 if _case_part_passes("walks", 1, 6)
 
-test_the_walks_cases_pass_compiled_part_2_of_2 if _differences_compiled("walks", _part("walks", 1, 2)) == set()
+test_the_walks_cases_pass_compiled_part_2_of_6 if _differences_compiled("walks", _case_part("walks", 1, 6)) == set()
+
+test_the_walks_cases_pass_part_3_of_6 if _case_part_passes("walks", 2, 6)
+
+test_the_walks_cases_pass_compiled_part_3_of_6 if _differences_compiled("walks", _case_part("walks", 2, 6)) == set()
+
+test_the_walks_cases_pass_part_4_of_6 if _case_part_passes("walks", 3, 6)
+
+test_the_walks_cases_pass_compiled_part_4_of_6 if _differences_compiled("walks", _case_part("walks", 3, 6)) == set()
+
+test_the_walks_cases_pass_part_5_of_6 if _case_part_passes("walks", 4, 6)
+
+test_the_walks_cases_pass_compiled_part_5_of_6 if _differences_compiled("walks", _case_part("walks", 4, 6)) == set()
+
+test_the_walks_cases_pass_part_6_of_6 if _case_part_passes("walks", 5, 6)
+
+test_the_walks_cases_pass_compiled_part_6_of_6 if _differences_compiled("walks", _case_part("walks", 5, 6)) == set()
 
 test_a_case_with_the_wrong_rows_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
