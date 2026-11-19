@@ -2615,7 +2615,8 @@ fn walk_part(
                 .iter()
                 .filter(|i| {
                     let n = i.get("name").and_then(Value::as_str).unwrap_or("");
-                    !parts::item_input(n, &lists) && ((failures.is_empty() && !keyed) || !own.iter().any(|o| o == n))
+                    !parts::item_input(n, &lists)
+                        && ((failures.is_empty() && !keyed) || !own.iter().any(|o| o == n))
                 })
                 .cloned()
                 .chain(keys)
@@ -2660,7 +2661,8 @@ fn walk_part(
             .iter()
             .filter(|i| {
                 let n = i.get("name").and_then(Value::as_str).unwrap_or("");
-                !parts::item_input(n, &lists) && ((failures.is_empty() && !keyed) || !own.iter().any(|o| o == n))
+                !parts::item_input(n, &lists)
+                    && ((failures.is_empty() && !keyed) || !own.iter().any(|o| o == n))
             })
             .cloned()
             .chain(keys)

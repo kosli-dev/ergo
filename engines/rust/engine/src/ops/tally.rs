@@ -1241,7 +1241,12 @@ pub fn with_all_items(check: &Tally, ctx: &Ctx, cause: Cause, message: String) -
         .counted_lists(ctx, cause)
         .into_iter()
         .flat_map(|(_, rich)| rich)
-        .filter_map(|record| record.get("ergo/text").and_then(Value::as_str).map(str::to_string))
+        .filter_map(|record| {
+            record
+                .get("ergo/text")
+                .and_then(Value::as_str)
+                .map(str::to_string)
+        })
         .collect();
     if items.is_empty() {
         return message;
@@ -1256,6 +1261,17 @@ pub fn with_all_items(check: &Tally, ctx: &Ctx, cause: Cause, message: String) -
         })
         .map(str::to_string)
         .collect();
+    let from_params = check
+        .counted_paths()
+        .iter()
+        .any(|path| path.start == path::Start::Params && path.steps.is_empty());
+    if from_params
+        && let Some(params) =
+            super::message::params_that_arent_an_object(&Check::Tally(check.clone()), ctx)
+        && !parts.contains(&params)
+    {
+        parts.insert(0, params);
+    }
     parts.extend(items);
     super::message::joined(parts)
 }
@@ -1328,9 +1344,7 @@ impl Tally {
 /// replaced by a value of the kind it needs, so that what an item reads can
 /// be checked on its own when a root can't be read.
 pub fn without_roots(check: &Check) -> Option<Check> {
-    let root = |side: &compare::Side| {
-        matches!(side, compare::Side::Path(p) if matches!(p.start, path::Start::Params | path::Start::Input))
-    };
+    let root = |side: &compare::Side| matches!(side, compare::Side::Path(p) if matches!(p.start, path::Start::Params | path::Start::Input));
     let fill = |side: &compare::Side, value: &Value| {
         if root(side) {
             compare::Side::Value(value.clone())
@@ -1633,7 +1647,8 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Option<Strin
                                     read.location.map(|l| l.render()),
                                 )
                             });
-                            if let Some((read_name, value, location)) = read.filter(|_| own(&text)) {
+                            if let Some((read_name, value, location)) = read.filter(|_| own(&text))
+                            {
                                 items_at.insert(found.len(), item.item_segs.clone());
                                 records.push((
                                     found.len(),
@@ -1730,22 +1745,13 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Option<Strin
                 items_at.insert(found.len(), item.item_segs.clone());
                 records.push((
                     found.len(),
-                    rich_item(
-                        &listed,
-                        end_name,
-                        c,
-                        value,
-                        end_at,
-                        seen(),
-                        &text,
-                    ),
+                    rich_item(&listed, end_name, c, value, end_at, seen(), &text),
                 ));
                 found.push((c, text));
             }
         }
-        let keep = |at: &usize, c: &Cause| {
-            *c == cause || always.contains(at) || items_at.contains_key(at)
-        };
+        let keep =
+            |at: &usize, c: &Cause| *c == cause || always.contains(at) || items_at.contains_key(at);
         let mut order: Vec<usize> = (0..found.len())
             .filter(|at| keep(at, &found[*at].0))
             .collect();

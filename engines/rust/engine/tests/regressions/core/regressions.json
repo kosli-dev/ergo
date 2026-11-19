@@ -1911,6 +1911,17 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": [
+                "k1",
+                "k1"
+              ]
             }
           ],
           "message": "$params.key is [\"k1\", \"k1\"], which isn't text",
@@ -2077,6 +2088,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": []
             }
           ],
           "message": "$params.key is [], which isn't text",
@@ -2249,6 +2268,16 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": [
+                "k1"
+              ]
             }
           ],
           "message": "$params.key is [\"k1\"], which isn't text",
@@ -2424,6 +2453,17 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": [
+                "k1",
+                "zz"
+              ]
             }
           ],
           "message": "$params.key is [\"k1\", \"zz\"], which isn't text",
@@ -2588,6 +2628,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.key",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.key is missing",
@@ -2754,6 +2802,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "null",
+              "value": null
             }
           ],
           "message": "$params.key is null",
@@ -2918,6 +2974,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.key",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.key is missing",
@@ -3090,6 +3154,16 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": {
+                "a": 1
+              }
             }
           ],
           "message": "$params.key is {\"a\": 1}, which isn't text",
@@ -3886,6 +3960,16 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "/sel"
+              ],
+              "name": "$input.sel",
+              "outcome": "unusable",
+              "value": [
+                "a"
+              ]
             }
           ],
           "message": "$input.sel is [\"a\"], which isn't text",
@@ -4247,6 +4331,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "zz",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.keys is true, which isn't a list of text",
@@ -4426,6 +4518,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "zz",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.keys is missing",
@@ -4607,6 +4707,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "zz",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.keys is null",
@@ -4786,6 +4894,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "zz",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.keys is missing",
@@ -4967,6 +5083,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "zz",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.keys is 3, which isn't a list of text",
@@ -5154,6 +5278,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "zz",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.keys is {\"a\": 1}, which isn't a list of text",
@@ -5335,6 +5467,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "zz",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.keys is \"k1\", which isn't a list of text",
@@ -5516,6 +5656,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": true
             }
           ],
           "message": "$params.key is true, which isn't text",
@@ -5703,6 +5851,16 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": [
+                "k1"
+              ]
             }
           ],
           "message": "$params.key is [\"k1\"], which isn't text",
@@ -5890,6 +6048,16 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": [
+                1
+              ]
             }
           ],
           "message": "$params.key is [1], which isn't text",
@@ -6069,6 +6237,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.key",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.key is missing",
@@ -6250,6 +6426,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "null",
+              "value": null
             }
           ],
           "message": "$params.key is null",
@@ -6429,6 +6613,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.key",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.key is missing",
@@ -6610,6 +6802,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": 3
             }
           ],
           "message": "$params.key is 3, which isn't text",
@@ -6797,6 +6997,16 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": {
+                "a": 1
+              }
             }
           ],
           "message": "$params.key is {\"a\": 1}, which isn't text",
@@ -6978,6 +7188,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "/m/k1"
+              ],
+              "name": "m named by $params.key.k",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "m.k1.k is missing",
@@ -7159,6 +7377,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": true
             }
           ],
           "message": "$params.key is true, which isn't text; zz is missing",
@@ -7346,6 +7572,16 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": [
+                "k1"
+              ]
             }
           ],
           "message": "$params.key is [\"k1\"], which isn't text; zz is missing",
@@ -7533,6 +7769,16 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": [
+                1
+              ]
             }
           ],
           "message": "$params.key is [1], which isn't text; zz is missing",
@@ -7712,6 +7958,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.key",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.key is missing; zz is missing",
@@ -7893,6 +8147,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "null",
+              "value": null
             }
           ],
           "message": "$params.key is null; zz is missing",
@@ -8072,6 +8334,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.key",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.key is missing; zz is missing",
@@ -8253,6 +8523,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": 3
             }
           ],
           "message": "$params.key is 3, which isn't text; zz is missing",
@@ -8440,6 +8718,16 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": {
+                "a": 1
+              }
             }
           ],
           "message": "$params.key is {\"a\": 1}, which isn't text; zz is missing",
@@ -8621,6 +8909,14 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "zz named by $params.key",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "zz is missing",
@@ -8816,6 +9112,16 @@
               "locations": [],
               "name": "in-scope d count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/key"
+              ],
+              "name": "$params.key",
+              "outcome": "unusable",
+              "value": [
+                "a"
+              ]
             }
           ],
           "message": "$params.key is [\"a\"], which isn't text",
@@ -9848,7 +10154,6 @@
         {
           "cause": "satisfied",
           "check": "$min_subjects",
-          "failed_items": [],
           "inputs": [
             {
               "locations": [
@@ -17821,6 +18126,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text",
@@ -18024,6 +18337,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text",
@@ -18227,6 +18548,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.nope",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.nope is missing",
@@ -19235,6 +19564,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text",
@@ -19424,6 +19761,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text",
@@ -19613,6 +19958,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.nope",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.nope is missing",
@@ -20550,6 +20903,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text",
@@ -20744,6 +21105,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.nope",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.nope is missing",
@@ -21623,6 +21992,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text",
@@ -21803,6 +22180,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.nope",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.nope is missing",
@@ -22363,6 +22748,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text",
@@ -22893,6 +23286,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text",
@@ -23484,6 +23885,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; $params.k is [\"a\", 1], which isn't a list of text",
@@ -23687,6 +24096,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; $params.k is [\"a\", 1], which isn't a list of text",
@@ -23890,6 +24307,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.nope",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.nope is missing",
@@ -24451,6 +24876,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; $params.k is [\"a\", 1], which isn't a list of text",
@@ -24640,6 +25073,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; $params.k is [\"a\", 1], which isn't a list of text",
@@ -24829,6 +25270,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.nope",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.nope is missing",
@@ -25393,6 +25842,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text",
@@ -25927,6 +26384,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text",
@@ -26509,6 +26974,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; $params.k is [null], which isn't a list of text",
@@ -26709,6 +27182,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; $params.k is [null], which isn't a list of text",
@@ -26909,6 +27390,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.nope",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.nope is missing",
@@ -27461,6 +27950,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; $params.k is [null], which isn't a list of text",
@@ -27647,6 +28144,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; $params.k is [null], which isn't a list of text",
@@ -27833,6 +28338,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.nope",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.nope is missing",
@@ -28587,6 +29100,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; $params.k is \"a\", which isn't a list of text",
@@ -28780,6 +29301,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.nope",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.nope is missing",
@@ -29131,6 +29660,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; $params.k is \"a\", which isn't a list of text",
@@ -29310,6 +29847,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.nope",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.nope is missing",
@@ -31902,6 +32447,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "scans",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.k is [\"a\", 1], which isn't a list of text",
@@ -32101,6 +32654,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "/scans"
+              ],
+              "name": "scans named by $params.env",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.k is [\"a\", 1], which isn't a list of text",
@@ -32273,6 +32834,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "scans",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.k is [\"a\", 1], which isn't a list of text",
@@ -32458,6 +33027,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "/scans"
+              ],
+              "name": "scans named by $params.env",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.k is [\"a\", 1], which isn't a list of text",
@@ -32629,6 +33206,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "scans",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.k is [null], which isn't a list of text",
@@ -32825,6 +33410,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "/scans"
+              ],
+              "name": "scans named by $params.env",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.k is [null], which isn't a list of text",
@@ -32994,6 +33587,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "scans",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.k is [null], which isn't a list of text",
@@ -33176,6 +33777,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "/scans"
+              ],
+              "name": "scans named by $params.env",
+              "outcome": "absent",
+              "value": null
             }
           ],
           "message": "$params.k is [null], which isn't a list of text",
@@ -35828,6 +36437,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; scans is 5, which isn't a list or an object",
@@ -36027,6 +36644,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; scans is 5, which isn't a list or an object",
@@ -36219,6 +36844,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; scans is 5, which isn't a list or an object",
@@ -36404,6 +37037,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; scans is 5, which isn't a list or an object",
@@ -36589,6 +37230,14 @@
               "locations": [],
               "name": "in-scope only count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; scans is 5, which isn't a list or an object",
@@ -36772,6 +37421,14 @@
               "locations": [],
               "name": "in-scope scan count",
               "value": 0
+            },
+            {
+              "locations": [
+                "$params:/env"
+              ],
+              "name": "$params.env",
+              "outcome": "unusable",
+              "value": 5
             }
           ],
           "message": "$params.env is 5, which isn't text; scans is 5, which isn't a list or an object",
@@ -39840,25 +40497,37 @@
           "failures": [
             {
               "cause": "absent",
-              "failures": [],
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/items/1"
+                      ],
+                      "name": "l",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "list",
+                  "message": "l is missing",
+                  "name": "l"
+                }
+              ],
               "inputs": [
                 {
                   "locations": [],
                   "name": "count of l",
                   "value": null
-                },
-                {
-                  "locations": [],
-                  "name": "l",
-                  "outcome": "absent",
-                  "value": []
                 }
               ],
               "kind": "assertion",
               "locations": [
                 "$policy:/requirements/r/checks/a"
               ],
-              "message": "l is missing",
+              "message": "",
               "name": "count of l is 2"
             }
           ],
@@ -39892,25 +40561,37 @@
           "failures": [
             {
               "cause": "absent",
-              "failures": [],
+              "failures": [
+                {
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/items/1"
+                      ],
+                      "name": "l",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "list",
+                  "message": "l is missing",
+                  "name": "l"
+                }
+              ],
               "inputs": [
                 {
                   "locations": [],
                   "name": "sum of l",
                   "value": null
-                },
-                {
-                  "locations": [],
-                  "name": "l",
-                  "outcome": "absent",
-                  "value": []
                 }
               ],
               "kind": "assertion",
               "locations": [
                 "$policy:/requirements/r/checks/b"
               ],
-              "message": "l is missing",
+              "message": "",
               "name": "sum of l is at least 3.5"
             }
           ],
@@ -42745,7 +43426,7 @@
         {
           "cause": "unusable",
           "check": "$min_subjects",
-          "failed_items": [],
+          "failures": [],
           "inputs": [
             {
               "locations": [],
@@ -42760,6 +43441,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 0",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -42819,6 +43501,7 @@
               "value": 1
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -42863,6 +43546,7 @@
               "value": 2
             }
           ],
+          "message": "x is 1 is false",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -43197,7 +43881,7 @@
         {
           "cause": "unusable",
           "check": "$min_subjects",
-          "failed_items": [],
+          "failures": [],
           "inputs": [
             {
               "locations": [
@@ -43475,7 +44159,7 @@
         {
           "cause": "unusable",
           "check": "$min_subjects",
-          "failed_items": [],
+          "failures": [],
           "inputs": [
             {
               "locations": [],
@@ -43490,6 +44174,7 @@
               ]
             }
           ],
+          "message": "in-scope d count is 0",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -44316,8 +45001,17 @@
               "value": [
                 "not an object"
               ]
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "nolist",
+              "outcome": "absent",
+              "value": null
             }
           ],
+          "message": "nolist is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -46480,16 +47174,6 @@
               "inputs": [
                 {
                   "locations": [
-                    "/items/0/c/0/v"
-                  ],
-                  "name": "c[].v",
-                  "outcome": "usable",
-                  "value": [
-                    1
-                  ]
-                },
-                {
-                  "locations": [
                     "$params:"
                   ],
                   "name": "$params.k",
@@ -46533,16 +47217,6 @@
               "cause": "unusable",
               "failures": [],
               "inputs": [
-                {
-                  "locations": [
-                    "/items/1/c/0/v"
-                  ],
-                  "name": "c[].v",
-                  "outcome": "usable",
-                  "value": [
-                    2
-                  ]
-                },
                 {
                   "locations": [
                     "$params:"
@@ -47000,32 +47674,70 @@
         {
           "cause": "unusable",
           "check": "$min_subjects",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "item": "item 1 of g",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/0"
+                  ],
+                  "name": "g[0]",
+                  "outcome": "usable",
+                  "value": "s"
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/0"
               ],
-              "path": "item 1 of g",
+              "message": "item 1 of g is text",
+              "name": "item 1 of g",
               "value": "s"
             },
             {
               "cause": "unusable",
-              "item": "item 2 of g",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/1"
+                  ],
+                  "name": "g[1]",
+                  "outcome": "usable",
+                  "value": 1
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/1"
               ],
-              "path": "item 2 of g",
+              "message": "item 2 of g is a number",
+              "name": "item 2 of g",
               "value": 1
             },
             {
               "cause": "unusable",
-              "item": "item 4 of g",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/3"
+                  ],
+                  "name": "g[3]",
+                  "outcome": "usable",
+                  "value": [
+                    1
+                  ]
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/3"
               ],
-              "path": "item 4 of g",
+              "message": "item 4 of g is a list",
+              "name": "item 4 of g",
               "value": [
                 1
               ]
@@ -47381,7 +48093,6 @@
         {
           "cause": "satisfied",
           "check": "$min_subjects",
-          "failed_items": [],
           "inputs": [
             {
               "locations": [
@@ -47599,41 +48310,91 @@
         {
           "cause": "not_an_object",
           "check": "$min_subjects",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "item": "item 1 of g",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/0"
+                  ],
+                  "name": "g[0]",
+                  "outcome": "unusable",
+                  "value": "s"
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/0"
               ],
-              "path": "item 1 of g",
+              "message": "item 1 of g is \"s\", which isn't an object",
+              "name": "item 1 of g",
               "value": "s"
             },
             {
               "cause": "unusable",
-              "item": "item 2 of g",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/1"
+                  ],
+                  "name": "g[1]",
+                  "outcome": "unusable",
+                  "value": 1
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/1"
               ],
-              "path": "item 2 of g",
+              "message": "item 2 of g is 1, which isn't an object",
+              "name": "item 2 of g",
               "value": 1
             },
             {
               "cause": "absent",
-              "item": "g[2].i",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/2"
+                  ],
+                  "name": "g[2].i",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/2"
               ],
-              "path": "g[2].i",
+              "message": "i is missing",
+              "name": "item 3 of g",
               "value": null
             },
             {
               "cause": "not_an_object",
-              "item": "item 4 of g",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/3"
+                  ],
+                  "name": "g[3]",
+                  "outcome": "not_an_object",
+                  "value": [
+                    1
+                  ]
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/3"
               ],
-              "path": "item 4 of g",
+              "message": "item 4 of g is [1], which isn't an object",
+              "name": "item 4 of g",
               "value": [
                 1
               ]
@@ -47646,7 +48407,7 @@
               "value": 0
             }
           ],
-          "message": "item 1 of g is \"s\", which isn't an object; item 2 of g is 1, which isn't an object; item 3 of g: i is missing; and 1 more",
+          "message": "item 1 of g is \"s\", which isn't an object; item 2 of g is 1, which isn't an object; item 3 of g: i is missing; item 4 of g is [1], which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -47812,41 +48573,91 @@
         {
           "cause": "not_an_object",
           "check": "$min_subjects",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "item": "item 1 of g",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/0"
+                  ],
+                  "name": "g[0]",
+                  "outcome": "unusable",
+                  "value": "s"
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/0"
               ],
-              "path": "item 1 of g",
+              "message": "item 1 of g is \"s\", which isn't an object",
+              "name": "item 1 of g",
               "value": "s"
             },
             {
               "cause": "unusable",
-              "item": "item 2 of g",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/1"
+                  ],
+                  "name": "g[1]",
+                  "outcome": "unusable",
+                  "value": 1
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/1"
               ],
-              "path": "item 2 of g",
+              "message": "item 2 of g is 1, which isn't an object",
+              "name": "item 2 of g",
               "value": 1
             },
             {
               "cause": "absent",
-              "item": "g[2].i",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/2"
+                  ],
+                  "name": "g[2].i",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/2"
               ],
-              "path": "g[2].i",
+              "message": "i is missing",
+              "name": "item 3 of g",
               "value": null
             },
             {
               "cause": "not_an_object",
-              "item": "item 4 of g",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/3"
+                  ],
+                  "name": "g[3]",
+                  "outcome": "not_an_object",
+                  "value": [
+                    1
+                  ]
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/3"
               ],
-              "path": "item 4 of g",
+              "message": "item 4 of g is [1], which isn't an object",
+              "name": "item 4 of g",
               "value": [
                 1
               ]
@@ -47859,7 +48670,7 @@
               "value": 0
             }
           ],
-          "message": "item 1 of g is \"s\", which isn't an object; item 2 of g is 1, which isn't an object; item 3 of g: i is missing; and 1 more",
+          "message": "item 1 of g is \"s\", which isn't an object; item 2 of g is 1, which isn't an object; item 3 of g: i is missing; item 4 of g is [1], which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -47999,14 +48810,26 @@
         {
           "cause": "unusable",
           "check": "$min_subjects",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "item": "item 2 of g",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/1"
+                  ],
+                  "name": "g[1]",
+                  "outcome": "unusable",
+                  "value": "s"
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/1"
               ],
-              "path": "item 2 of g",
+              "message": "item 2 of g is \"s\", which isn't an object",
+              "name": "item 2 of g",
               "value": "s"
             }
           ],
@@ -48177,7 +49000,6 @@
         {
           "cause": "satisfied",
           "check": "$min_subjects",
-          "failed_items": [],
           "inputs": [
             {
               "locations": [
@@ -48363,7 +49185,6 @@
         {
           "cause": "satisfied",
           "check": "$min_subjects",
-          "failed_items": [],
           "inputs": [
             {
               "locations": [
@@ -48557,14 +49378,26 @@
         {
           "cause": "unusable",
           "check": "$min_subjects",
-          "failed_items": [
+          "failures": [
             {
               "cause": "unusable",
-              "item": "item 1 of g",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/g/0"
+                  ],
+                  "name": "g[0]",
+                  "outcome": "unusable",
+                  "value": "s"
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/g/0"
               ],
-              "path": "item 1 of g",
+              "message": "item 1 of g is \"s\", which isn't an object",
+              "name": "item 1 of g",
               "value": "s"
             }
           ],
@@ -48745,15 +49578,30 @@
         {
           "cause": "absent",
           "check": "$min_subjects",
-          "failed_items": [
+          "failures": [
             {
               "cause": "absent",
-              "item": "items[1].y",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/items/1"
+                  ],
+                  "name": "items[1].y",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "item",
               "locations": [
                 "/items/1"
               ],
-              "path": "items[1].y",
-              "value": null
+              "message": "y is missing",
+              "name": "item 2 of items",
+              "value": {
+                "id": "b",
+                "x": 2
+              }
             }
           ],
           "inputs": [
@@ -48974,7 +49822,6 @@
         {
           "cause": "satisfied",
           "check": "$min_subjects",
-          "failed_items": [],
           "inputs": [
             {
               "locations": [
@@ -52889,8 +53736,17 @@
               "locations": [],
               "name": "in-scope whose count",
               "value": 0
+            },
+            {
+              "locations": [
+                ""
+              ],
+              "name": "whose",
+              "outcome": "absent",
+              "value": null
             }
           ],
+          "message": ".whose is missing",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -53805,18 +54661,6 @@
                   ],
                   "name": "sum of items.x",
                   "value": null
-                },
-                {
-                  "locations": [
-                    "/things/0/items/0/x",
-                    "/things/0/items/1/x"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    1e-70000,
-                    1e-70000
-                  ]
                 }
               ],
               "kind": "assertion",
@@ -53849,6 +54693,7 @@
               ]
             }
           ],
+          "message": "sum of items.x needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -54034,18 +54879,6 @@
                   ],
                   "name": "sum of items.x",
                   "value": null
-                },
-                {
-                  "locations": [
-                    "/things/0/items/0/x",
-                    "/things/0/items/1/x"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    100000000000000000000,
-                    1000000000000000
-                  ]
                 }
               ],
               "kind": "assertion",
@@ -54078,6 +54911,7 @@
               ]
             }
           ],
+          "message": "sum of items.x needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -54263,18 +55097,6 @@
                   ],
                   "name": "sum of items.x",
                   "value": null
-                },
-                {
-                  "locations": [
-                    "/things/0/items/0/x",
-                    "/things/0/items/1/x"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    -0.000001,
-                    0.1234567890123456
-                  ]
                 }
               ],
               "kind": "assertion",
@@ -54307,6 +55129,7 @@
               ]
             }
           ],
+          "message": "sum of items.x needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -54504,18 +55327,6 @@
                 },
                 {
                   "locations": [
-                    "/things/0/items/0/x",
-                    "/things/0/items/1/x"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    1e-70000,
-                    1e-70000
-                  ]
-                },
-                {
-                  "locations": [
                     "/things/0/fa"
                   ],
                   "name": "fa",
@@ -54570,6 +55381,7 @@
               "value": 1e-70000
             }
           ],
+          "message": "sum of items.x plus fa needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -54767,18 +55579,6 @@
                 },
                 {
                   "locations": [
-                    "/things/0/items/0/x",
-                    "/things/0/items/1/x"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    100000000000000000000,
-                    0.000000000000001
-                  ]
-                },
-                {
-                  "locations": [
                     "/things/0/fa"
                   ],
                   "name": "fa",
@@ -54833,6 +55633,7 @@
               "value": 100000000000000000000
             }
           ],
+          "message": "sum of items.x plus fa needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -55030,18 +55831,6 @@
                 },
                 {
                   "locations": [
-                    "/things/0/items/0/x",
-                    "/things/0/items/1/x"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    -0.000001,
-                    0.1234567890123456
-                  ]
-                },
-                {
-                  "locations": [
                     "/things/0/fa"
                   ],
                   "name": "fa",
@@ -55096,6 +55885,7 @@
               "value": -0.000001
             }
           ],
+          "message": "sum of items.x plus fa needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -55298,31 +56088,6 @@
                   ],
                   "name": "count of items",
                   "value": 2
-                },
-                {
-                  "locations": [
-                    "/things/0/items/0",
-                    "/things/0/items/1"
-                  ],
-                  "name": "items[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "vals": [
-                        1e-70000,
-                        1e-70000
-                      ],
-                      "x": 1e-70000,
-                      "y": 1e-70000
-                    },
-                    {
-                      "vals": [
-                        1e-70000
-                      ],
-                      "x": 1e-70000,
-                      "y": 1e-70000
-                    }
-                  ]
                 }
               ],
               "kind": "assertion",
@@ -55385,6 +56150,7 @@
               ]
             }
           ],
+          "message": "fa plus count of items needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -55587,31 +56353,6 @@
                   ],
                   "name": "count of items",
                   "value": 2
-                },
-                {
-                  "locations": [
-                    "/things/0/items/0",
-                    "/things/0/items/1"
-                  ],
-                  "name": "items[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "vals": [
-                        0.0000000000000001,
-                        -999999999999999
-                      ],
-                      "x": 0.0000000000000001,
-                      "y": -999999999999999
-                    },
-                    {
-                      "vals": [
-                        0.0000000000000001
-                      ],
-                      "x": -999999999999999,
-                      "y": 0.0000000000000001
-                    }
-                  ]
                 }
               ],
               "kind": "assertion",
@@ -55674,6 +56415,7 @@
               ]
             }
           ],
+          "message": "fa plus count of items needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -55876,31 +56618,6 @@
                   ],
                   "name": "count of items",
                   "value": 2
-                },
-                {
-                  "locations": [
-                    "/things/0/items/0",
-                    "/things/0/items/1"
-                  ],
-                  "name": "items[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "vals": [
-                        0.1234567890123456,
-                        -0.000001
-                      ],
-                      "x": 0.1234567890123456,
-                      "y": -0.000001
-                    },
-                    {
-                      "vals": [
-                        0.1234567890123456
-                      ],
-                      "x": -0.000001,
-                      "y": 0.1234567890123456
-                    }
-                  ]
                 }
               ],
               "kind": "assertion",
@@ -55963,6 +56680,7 @@
               ]
             }
           ],
+          "message": "fa plus count of items needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -56976,18 +57694,6 @@
                 },
                 {
                   "locations": [
-                    "/things/0/items/0/x",
-                    "/things/0/items/1/x"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    1e-70000,
-                    1e-70000
-                  ]
-                },
-                {
-                  "locations": [
                     "/things/0/s1",
                     "/things/0/s2"
                   ],
@@ -57075,6 +57781,7 @@
               "value": 0.123456
             }
           ],
+          "message": "sum of items.x plus seconds elapsed from s1 to s2 needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -57273,18 +57980,6 @@
                 },
                 {
                   "locations": [
-                    "/things/0/items/0/x",
-                    "/things/0/items/1/x"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    100,
-                    1234567890123456
-                  ]
-                },
-                {
-                  "locations": [
                     "/things/0/s1",
                     "/things/0/s2"
                   ],
@@ -57372,6 +58067,7 @@
               "value": 0.123456
             }
           ],
+          "message": "sum of items.x plus seconds elapsed from s1 to s2 needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -57570,18 +58266,6 @@
                 },
                 {
                   "locations": [
-                    "/things/0/items/0/x",
-                    "/things/0/items/1/x"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    -0.000001,
-                    0.1234567890123456
-                  ]
-                },
-                {
-                  "locations": [
                     "/things/0/s1",
                     "/things/0/s2"
                   ],
@@ -57669,6 +58353,7 @@
               "value": 0.123456
             }
           ],
+          "message": "sum of items.x plus seconds elapsed from s1 to s2 needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -58578,31 +59263,6 @@
                 },
                 {
                   "locations": [
-                    "/things/0/items/0",
-                    "/things/0/items/1"
-                  ],
-                  "name": "items[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "vals": [
-                        1e-70000,
-                        1e-70000
-                      ],
-                      "x": 1e-70000,
-                      "y": 1e-70000
-                    },
-                    {
-                      "vals": [
-                        1e-70000
-                      ],
-                      "x": 1e-70000,
-                      "y": 1e-70000
-                    }
-                  ]
-                },
-                {
-                  "locations": [
                     "/things/0/fa"
                   ],
                   "name": "fa",
@@ -58687,6 +59347,7 @@
               "value": 1e-70000
             }
           ],
+          "message": "count of items plus fa plus fb needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -58885,31 +59546,6 @@
                 },
                 {
                   "locations": [
-                    "/things/0/items/0",
-                    "/things/0/items/1"
-                  ],
-                  "name": "items[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "vals": [
-                        100000000000000000000,
-                        0.0000000000000001
-                      ],
-                      "x": 100000000000000000000,
-                      "y": 0.0000000000000001
-                    },
-                    {
-                      "vals": [
-                        100000000000000000000
-                      ],
-                      "x": 0.0000000000000001,
-                      "y": 100000000000000000000
-                    }
-                  ]
-                },
-                {
-                  "locations": [
                     "/things/0/fa"
                   ],
                   "name": "fa",
@@ -58994,6 +59630,7 @@
               "value": 0.0000000000000001
             }
           ],
+          "message": "count of items plus fa plus fb needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -59192,31 +59829,6 @@
                 },
                 {
                   "locations": [
-                    "/things/0/items/0",
-                    "/things/0/items/1"
-                  ],
-                  "name": "items[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "vals": [
-                        -0.000001,
-                        0.1234567890123456
-                      ],
-                      "x": -0.000001,
-                      "y": 0.1234567890123456
-                    },
-                    {
-                      "vals": [
-                        -0.000001
-                      ],
-                      "x": 0.1234567890123456,
-                      "y": -0.000001
-                    }
-                  ]
-                },
-                {
-                  "locations": [
                     "/things/0/fa"
                   ],
                   "name": "fa",
@@ -59301,6 +59913,7 @@
               "value": 0.1234567890123456
             }
           ],
+          "message": "count of items plus fa plus fb needs more than 15 digits",
           "passed": false,
           "requirement": "r",
           "subject": {

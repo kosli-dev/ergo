@@ -616,7 +616,7 @@
         {
           "cause": "value",
           "check": "$min_subjects",
-          "failed_items": [],
+          "failures": [],
           "inputs": [
             {
               "locations": [],
@@ -678,14 +678,26 @@
           "failures": [
             {
               "cause": "absent",
-              "failures": [],
-              "inputs": [
+              "failures": [
                 {
-                  "locations": [],
-                  "name": ".kid.arr",
-                  "outcome": "absent",
-                  "value": []
-                },
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/kids/0/things/0"
+                      ],
+                      "name": ".kid",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "list",
+                  "message": ".kid is missing",
+                  "name": ".kid"
+                }
+              ],
+              "inputs": [
                 {
                   "locations": [],
                   "name": "count of .kid.arr",
@@ -696,7 +708,7 @@
               "locations": [
                 "$policy:/subjects/thing/from"
               ],
-              "message": ".kid is missing",
+              "message": "",
               "name": "count of .kid.arr is 1"
             }
           ],
@@ -730,14 +742,26 @@
           "failures": [
             {
               "cause": "absent",
-              "failures": [],
-              "inputs": [
+              "failures": [
                 {
-                  "locations": [],
-                  "name": ".kid.arr",
-                  "outcome": "absent",
-                  "value": []
-                },
+                  "cause": "absent",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/kids/0/things/1"
+                      ],
+                      "name": ".kid",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
+                  "kind": "list",
+                  "message": ".kid is missing",
+                  "name": ".kid"
+                }
+              ],
+              "inputs": [
                 {
                   "locations": [],
                   "name": "count of .kid.arr",
@@ -748,7 +772,7 @@
               "locations": [
                 "$policy:/subjects/thing/from"
               ],
-              "message": ".kid is missing",
+              "message": "",
               "name": "count of .kid.arr is 1"
             }
           ],
@@ -4789,7 +4813,6 @@
         {
           "cause": "satisfied",
           "check": "$min_subjects",
-          "failed_items": [],
           "inputs": [
             {
               "locations": [
@@ -4902,18 +4925,6 @@
                   ],
                   "name": "count of kid.arr",
                   "value": 2
-                },
-                {
-                  "locations": [
-                    "/kids/0/arr/0",
-                    "/kids/0/arr/1"
-                  ],
-                  "name": "kid.arr[]",
-                  "outcome": "usable",
-                  "value": [
-                    1,
-                    2
-                  ]
                 },
                 {
                   "locations": [
@@ -5425,24 +5436,6 @@
                   ],
                   "name": "count of items",
                   "value": 2
-                },
-                {
-                  "locations": [
-                    "/things/0/items/0",
-                    "/things/0/items/1"
-                  ],
-                  "name": "items[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "k": "a",
-                      "x": 1
-                    },
-                    {
-                      "k": "b",
-                      "x": 2
-                    }
-                  ]
                 }
               ],
               "kind": "assertion",
@@ -5542,19 +5535,6 @@
                   ],
                   "name": "count of items",
                   "value": 1
-                },
-                {
-                  "locations": [
-                    "/things/1/items/0"
-                  ],
-                  "name": "items[]",
-                  "outcome": "usable",
-                  "value": [
-                    {
-                      "k": "a",
-                      "x": 5
-                    }
-                  ]
                 }
               ],
               "kind": "assertion",
@@ -5643,12 +5623,6 @@
                   "locations": [],
                   "name": "count of items",
                   "value": 0
-                },
-                {
-                  "locations": [],
-                  "name": "items[]",
-                  "outcome": "usable",
-                  "value": []
                 }
               ],
               "kind": "assertion",
@@ -7663,12 +7637,6 @@
               "cause": "value",
               "failures": [],
               "inputs": [
-                {
-                  "locations": [],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": []
-                },
                 {
                   "locations": [
                     "/things/2/n"
@@ -11421,16 +11389,6 @@
                   ],
                   "name": "sum of items.x",
                   "value": null
-                },
-                {
-                  "locations": [
-                    "/things/0/items/0/x"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    1e+1000000000000
-                  ]
                 }
               ],
               "kind": "assertion",
@@ -11460,6 +11418,7 @@
               ]
             }
           ],
+          "message": "sum of items.x needs more than 15 digits",
           "passed": false,
           "requirement": "r1",
           "subject": {
@@ -11630,16 +11589,6 @@
                   ],
                   "name": "sum of items.x",
                   "value": null
-                },
-                {
-                  "locations": [
-                    "/things/0/items/0/x"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    1e-70000
-                  ]
                 }
               ],
               "kind": "assertion",
@@ -11669,6 +11618,7 @@
               ]
             }
           ],
+          "message": "sum of items.x needs more than 15 digits",
           "passed": false,
           "requirement": "r1",
           "subject": {

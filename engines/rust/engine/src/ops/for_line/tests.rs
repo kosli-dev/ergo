@@ -1313,7 +1313,10 @@ fn a_missing_param_in_an_inner_whose_is_named_once_with_no_item() {
         json!("every w.items whose lo is at least $params.p exists"),
         json!({"ws": [{"items": [{"hi": 2}, {"lo": 5}]}]}),
     );
-    assert_eq!(found["message"], "$params.p is missing");
+    assert_eq!(
+        found["message"],
+        "$params.p is missing; item 1 of ws: item 1 of w.items: lo is missing"
+    );
 }
 
 #[test]

@@ -326,7 +326,7 @@ fn every_reads_one_flat_list_from_every_list_along_the_path() {
         json!({"arts": [{"prs": [{"url": "a"}, {"url": "b"}]}, {"prs": []}, {"prs": [{"url": "c"}]}]}),
     );
     let min = &rows(&r, "$min_subjects")[0];
-    assert_eq!(min["failed_items"], json!([]));
+    assert!(min.get("failed_items").is_none() && min.get("failures").is_none());
     assert_eq!(
         input_of(min, 0)["locations"],
         json!(["/arts/0/prs/0", "/arts/0/prs/1", "/arts/2/prs/0"])
@@ -343,7 +343,7 @@ fn every_over_only_empty_lists_finds_none_without_failing_anything() {
     );
     let min = &rows(&r, "$min_subjects")[0];
     assert_eq!(min["cause"], json!("value"));
-    assert_eq!(min["failed_items"], json!([]));
+    assert_eq!(min["failures"], json!([]));
 }
 
 #[test]
@@ -354,20 +354,29 @@ fn every_lists_each_place_it_broke_with_the_worst_cause_and_keeps_the_subjects_i
     );
     let min = &rows(&r, "$min_subjects")[0];
     assert_eq!(min["cause"], json!("unusable"));
+    let named: Vec<(&str, &str)> = min["failures"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|e| (e["name"].as_str().unwrap(), e["message"].as_str().unwrap()))
+        .collect();
     assert_eq!(
-        min["failed_items"],
-        json!([
-            {"path": "arts[0].prs", "item": "arts[0].prs", "cause": "unusable", "value": [{"u": 1}], "locations": ["/arts/0/prs"]},
-            {"path": "item 1 of arts[0].prs", "item": "item 1 of arts[0].prs", "cause": "unusable", "value": {"u": 1}, "locations": ["/arts/0/prs/0"]},
-            {"path": "arts[1].prs", "item": "arts[1].prs", "cause": "absent", "value": null, "locations": ["/arts/1"]},
-            {"path": "arts[2].prs", "item": "arts[2].prs", "cause": "null", "value": null, "locations": ["/arts/2/prs"]},
-            {"path": "arts[3].prs", "item": "arts[3].prs", "cause": "unusable", "value": "none", "locations": ["/arts/3/prs"]}
-        ])
+        named,
+        [
+            ("item 1 of arts", "prs is a list"),
+            ("item 2 of arts", "prs is missing"),
+            ("item 3 of arts", "prs is null"),
+            ("item 4 of arts", "prs is text"),
+        ]
+    );
+    assert_eq!(
+        min["failures"][0]["failures"][0]["message"],
+        json!("item 1 of prs is an object")
     );
     assert_eq!(
         min["message"],
         json!(
-            "item 2 of arts: prs is missing; item 3 of arts: prs is null; prs is a list in item 1 of arts but \"none\" in item 4; and 1 more"
+            "item 2 of arts: prs is missing; item 3 of arts: prs is null; item 1 of arts: prs is a list, item 4 of arts: prs is text; item 1 of arts: item 1 of prs is an object"
         )
     );
     assert_eq!(input_of(min, 0)["value"], json!(2));
@@ -380,17 +389,17 @@ fn every_names_a_broken_walk_from_a_list_input_from_dollar_input() {
         json!([{"commits": [{"x": 1}]}, {"commits": null}]),
     );
     let min = &rows(&r, "$min_subjects")[0];
+    assert_eq!(min["failures"][0]["name"], json!("item 2 of $input"));
     assert_eq!(
-        min["failed_items"],
-        json!([{"path": "$input[1].commits", "item": "$input[1].commits", "cause": "null", "value": null, "locations": ["/1/commits"]}])
+        min["failures"][0]["inputs"],
+        json!([{"name": "$input[1].commits", "value": null, "locations": ["/1/commits"], "outcome": "null"}])
     );
     let r = run(
         json!({"thing": {"from": "every $input[1].commits"}}),
         json!([{"commits": []}, 5]),
     );
     let min = &rows(&r, "$min_subjects")[0];
-    assert_eq!(min["failed_items"][0]["path"], json!("item 2 of $input"));
-    assert_eq!(min["failed_items"][0]["item"], json!("item 2 of $input"));
+    assert_eq!(min["failures"][0]["name"], json!("item 2 of $input"));
 }
 
 #[test]
@@ -398,8 +407,8 @@ fn every_dollar_input_names_an_input_that_is_not_a_list_dollar_input() {
     let r = run(json!({"thing": {"from": "every $input"}}), json!({"x": 1}));
     let min = &rows(&r, "$min_subjects")[0];
     assert_eq!(
-        min["failed_items"],
-        json!([{"path": "$input", "item": "$input", "cause": "unusable", "value": {"x": 1}, "locations": [""]}])
+        min["failures"],
+        json!([{"kind": "list", "name": "$input", "cause": "unusable", "message": "$input is {\"x\": 1}, which isn't a list", "failures": [], "inputs": [{"name": "$input", "value": {"x": 1}, "locations": [""], "outcome": "unusable"}]}])
     );
 }
 
@@ -442,10 +451,9 @@ fn every_with_no_list_along_the_path_fails_unusable_at_the_value_it_ends_at() {
     );
     let min = &rows(&r, "$min_subjects")[0];
     assert_eq!(min["cause"], json!("unusable"));
-    assert_eq!(
-        min["failed_items"],
-        json!([{"path": "arts.prs", "item": "arts.prs", "cause": "unusable", "value": {"u": 1}, "locations": ["/arts/prs"]}])
-    );
+    assert_eq!(min["failures"][0]["kind"], json!("list"));
+    assert_eq!(min["failures"][0]["name"], json!("arts.prs"));
+    assert_eq!(min["failures"][0]["inputs"][0]["value"], json!({"u": 1}));
     assert_eq!(input_of(min, 0)["value"], json!(0));
 }
 
@@ -464,7 +472,8 @@ fn every_whose_named_by_reads_a_param_that_is_missing_keeps_the_requirement_and_
         );
         let min = &rows(&r, "$min_subjects")[0];
         assert_eq!(min["cause"], json!(cause));
-        assert_eq!(min["failed_items"], json!([]));
+        assert_eq!(min["failures"], json!([]));
+        assert_eq!(min["inputs"][1]["name"], json!("$params.k"));
         assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
     }
 }
@@ -556,7 +565,7 @@ fn every_takes_a_list_of_scalars_as_subjects() {
         json!({"xs": ["a", "b"]}),
     );
     assert_eq!(r["requirements"]["s"]["subjects"]["total"], json!(2));
-    assert_eq!(rows(&r, "$min_subjects")[0]["failed_items"], json!([]));
+    assert!(rows(&r, "$min_subjects")[0].get("failures").is_none());
 }
 
 fn chain() -> Value {
@@ -1605,7 +1614,9 @@ fn a_count_whose_whose_reads_params_that_are_a_list_names_them_not_the_digits() 
             json!({"things": [{"id": "t"}]}),
             json!([3])
         ),
-        json!("$params is [3], which isn't an object")
+        json!(
+            "$params is [3], which isn't an object; item 1 of $params is 3, which isn't an object"
+        )
     );
 }
 

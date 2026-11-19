@@ -892,7 +892,10 @@ fn side_read<'a>(
     first.map(|(path, read)| (path, read, true))
 }
 
-pub(super) fn named_side<'a>(check: &'a Check, ctx: &Ctx<'a>) -> Option<(&'a Path, path::Read<'a>)> {
+pub(super) fn named_side<'a>(
+    check: &'a Check,
+    ctx: &Ctx<'a>,
+) -> Option<(&'a Path, path::Read<'a>)> {
     let sides = check.sides();
     let mut sides = sides.iter().map(|paths| side_read(paths, ctx));
     let left = sides.next().flatten();
