@@ -356,30 +356,231 @@ _well_formed_row_of(req, req_name) := row if {
 	}
 }
 
-_min_subjects_row(doc, req, req_name, matching, at) := _m_from_row(doc, req, object.union(
-	{
-		"requirement": req_name,
-		"subject": _req_subject_ref(req),
-		"check": "$min_subjects",
-		"inputs": array.concat([{"name": _subject_count_name(req), "value": matching, "locations": at}], data.ergo_unreadable),
-		"passed": _enough_subjects(doc, req, matching),
-		"cause": _min_subjects_cause(doc, req, matching),
-	},
-	_every_failed_items(doc, req),
-))
+_min_subjects_row(doc, req, req_name, matching, at) := _ms_parted(doc, req, _m_from_row(doc, req, {
+	"requirement": req_name,
+	"subject": _req_subject_ref(req),
+	"check": "$min_subjects",
+	"inputs": array.concat([{"name": _subject_count_name(req), "value": matching, "locations": at}], data.ergo_unreadable),
+	"passed": _enough_subjects(doc, req, matching),
+	"cause": _min_subjects_cause(doc, req, matching),
+}))
 
 _m_from_row(doc, req, row) := object.union(row, _m_from_message(doc, req, row.passed, row.cause))
 
-_every_failed_items(doc, req) := {"failed_items": _fl_items(req, _fl_failed(doc, req))} if {
+_ms_parted(_, _, row) := row if row.passed == true
+
+_ms_parted(doc, req, row) := object.union(row, {
+	"inputs": _once(array.concat(array.concat(row.inputs, _ms_key_reads(req)), array.concat([x | some e in es; e.kind == "list"; some x in e.inputs], _ms_path_reads(doc, req)))),
+	"failures": es,
+}) if {
+	row.passed == false
+	es := _ms_entries(doc, req)
+}
+
+_ms_target_cause(doc, req) := c if {
+	c := _target_cause(doc, req)
+} else := c if {
+	_keys_step(req)
+	c := _target_state(doc, req)
+	c != "value"
+}
+
+_ms_rooted(req, name, p) := replace(name, "the subject", _m_from_root(req)) if contains(name, "the subject")
+
+else := concat("", [_m_from_root(req), " named by ", _ref_label(p[0].ref)]) if {
+	_chained(req)
+	name == ""
+	count(p) == 1
+	_is_ref(p[0])
+} else := concat("", [m[1], _m_from_root(req), ".", m[2]]) if {
+	_chained(req)
+	m := regex.find_all_string_submatch_n(`^(item [0-9]+ of )(.*)$`, name, 1)[0]
+} else := concat(".", [_m_from_root(req), name]) if _chained(req)
+
+else := name
+
+_ms_key_reads(req) := _key_flaw_entries(p) if {
+	p := _from_path(req)
+	is_array(p)
+} else := []
+
+_ms_path_reads(doc, req) := [object.union(object.remove(i, _input_stash_keys), {"name": _ms_rooted(req, i.name, p), "outcome": object.get(i, "ergo/outcome", _key_list_outcome(c)), "locations": [replace(l, "~~", _doc_at) | some l in i.locations]})] if {
+	not _every_from(req)
+	not _fl_plain_typed(doc, req)
+	c := _ms_target_cause(doc, req)
+	p := _from_path(req)
+	p != []
+	_key_flaw_entries(p) == []
+	i := _path_input(doc, p)
+} else := []
+
+_ms_entries(doc, req) := [_entry("list", _m_from_root(req), row_cause, [{"name": _ms_read_name(req, _from_keys(req)), "value": null, "locations": [_doc_at], "outcome": _key_list_outcome(row_cause)}], [], text)] if {
+	_every_from(req)
+	_chained(req)
+	_starts_at_position(req)
+	_fl_parent_unread(doc, req)
+	_from_well_formed(req)
+	not _from_unreadable(req)
+	row_cause := _target_cause(doc, req)
+	text := _m_from_message(doc, req, false, row_cause).message
+} else := _ms_tree(req, doc, _ms_places(doc, req, w), _from_keys(req)) if {
 	_every_from(req)
 	not _fl_parent_unread(doc, req)
 	_from_well_formed(req)
 	not _from_unreadable(req)
-} else := {"failed_items": []} if _every_from(req)
+	w := _fl_broken(doc, _from_keys(req))
+} else := _ms_tree(req, doc, _ms_note_places(req, n), _from_keys(req)) if {
+	not _every_from(req)
+	n := _fl_plain_typed(doc, req)
+} else := []
 
-else := {"failed_items": _fl_items(req, _fl_plain_typed(doc, req).items)} if _fl_plain_typed(doc, req)
+_ms_flat(req, doc, p, keys) := {"levels": [], "entry": object.union(_entry("item", _fl_type_name(req, {"plain": true}, p.c), p.cause, [_ms_item_read(req, p, keys)], [], p.text), {"value": p.value, "locations": [p.at]}), "key": [1, [x | some x in p.c; is_number(x)], 1]} if p.plain
 
-else := {}
+_ms_places(doc, req, w) := array.concat(
+	[{"c": f.path, "at": f.at, "cause": f.cause, "value": f.value, "text": _fl_fail_text(req, f), "note": false, "plain": false} | some p in sort({f.path | some f in w.fails}); some f in w.fails; f.path == p],
+	[x | some n in w.notes; some x in _ms_note_places(req, n)],
+)
+
+_ms_note_places(req, n) := [{"c": it.path, "at": it.at, "cause": "unusable", "value": it.value, "text": t, "note": true, "plain": object.get(n, "plain", false)} |
+	some k, it in n.items
+	t := _fl_note_clauses(req, n)[k]
+]
+
+_ms_walked(c, keys, i) if {
+	is_number(c[i])
+	s := count([x | some x in array.slice(c, 0, i); is_string(x)])
+	cs := [j | some j, x in c; is_string(x)]
+	ks := [j | some j, x in keys; is_string(x)]
+	seg := _ms_seg_start(cs, s)
+	kseg := _ms_seg_start(ks, s)
+	kend := _ms_seg_end(ks, s, count(keys))
+	i - seg >= kend - kseg
+}
+
+_ms_seg_start(_, 0) := 0
+
+_ms_seg_start(starts, s) := starts[s - 1] + 1 if s > 0
+
+_ms_seg_end(starts, s, n) := starts[s] if s < count(starts)
+
+else := n
+
+_ms_level_name(req, c, prev, i) := concat(": ", array.slice(segs, count(before), count(segs))) if {
+	segs := split(_m_from_item_name(req, array.slice(c, 0, i + 1)), ": ")
+	before := _ms_before_segs(req, c, prev)
+}
+
+_ms_before_segs(_, _, -1) := []
+
+_ms_before_segs(req, c, prev) := split(_m_from_item_name(req, array.slice(c, 0, prev + 1)), ": ") if prev >= 0
+
+_ms_read_name(req, path) := _rooted_steps_name(path, _m_from_root(req)) if path != []
+
+else := _m_from_root(req)
+
+_ms_flat(req, doc, p, keys) := {"levels": [], "entry": _entry("list", _m_from_item_name(req, p.c), p.cause, [{"name": _ms_list_name(req, p.c, keys), "value": _ms_list_value(p, keys), "locations": [p.at], "outcome": _key_list_outcome(p.cause)}], [], p.text), "key": [0, [], 0]} if {
+	not p.plain
+	ws := [i | some i, _ in p.c; _ms_walked(p.c, keys, i)]
+	ws == []
+}
+
+_ms_flat(req, doc, p, keys) := {"levels": [_ms_level(req, doc, p.c, ws, j) | some j, _ in ws; j < count(ws) - 1], "entry": e, "key": [1, [x | some x in p.c; is_number(x)], 1]} if {
+	not p.plain
+	ws := [i | some i, _ in p.c; _ms_walked(p.c, keys, i)]
+	ws != []
+	i := ws[count(ws) - 1]
+	name := _ms_level_name(req, p.c, _ms_prev(ws, count(ws) - 1), i)
+	outer := [_ms_level_name(req, p.c, _ms_prev(ws, j), ws[j]) | some j, _ in ws; j < count(ws) - 1]
+	e := _ms_item_entry(req, doc, p, i, name, outer, keys)
+}
+
+_ms_prev(_, 0) := -1
+
+_ms_prev(ws, j) := ws[j - 1] if j > 0
+
+_ms_level(req, doc, c, ws, j) := {"name": _ms_level_name(req, c, _ms_prev(ws, j), ws[j]), "value": _tally_read_value(doc, array.slice(c, 0, ws[j] + 1)), "locations": [_pointer(_doc_at, doc, array.slice(c, 0, ws[j] + 1))]}
+
+_ms_item_entry(req, doc, p, i, name, outer, keys) := object.union(_entry("item", name, p.cause, [_ms_item_read(req, p, keys)], [], _ms_text_after(p.text, outer, name, true)), {"value": p.value, "locations": [p.at]}) if i == count(p.c) - 1
+
+else := object.union(_entry("item", name, p.cause, [_ms_item_read(req, p, keys)], [], _ms_text_after(p.text, outer, name, false)), {"value": _tally_read_value(doc, array.slice(p.c, 0, i + 1)), "locations": [_pointer(_doc_at, doc, array.slice(p.c, 0, i + 1))]})
+
+_ms_item_read(req, p, keys) := {"name": _ms_read_name(req, array.concat(p.c, [k])), "value": null, "locations": [p.at], "outcome": "not_an_object"} if {
+	not p.note
+	_ms_walked(p.c, keys, count(p.c) - 1)
+	ks := [x | some x in keys; is_string(x)]
+	k := ks[count([x | some x in p.c; is_string(x)])]
+} else := {"name": _ms_read_name(req, p.c), "value": p.value, "locations": [p.at], "outcome": _ms_read_outcome(p)}
+
+_ms_read_outcome(p) := "usable" if p.note
+
+else := _key_list_outcome(p.cause)
+
+_ms_list_name(req, c, keys) := _ms_read_name(req, keys) if is_number(c[count(c) - 1])
+
+else := _ms_read_name(req, c)
+
+_ms_list_value(p, keys) := p.value if p.c == keys
+
+else := null
+
+_ms_text_after(text, outer, name, own) := _ms_cut(_ms_cut(text, concat("", [concat(": ", outer), ": "])), concat("", [name, ": "])) if not own
+
+else := _ms_cut(text, concat("", [concat(": ", outer), ": "]))
+
+_ms_cut(text, p) := substring(text, count(p), -1) if {
+	p != ": "
+	startswith(text, p)
+} else := text
+
+_ms_tree(req, doc, places, keys) := _ms_group([x | some t in sort([[f.key[0], f.key[1], k] | some k, f in flat]); x := flat[t[2]]]) if {
+	flat := [_ms_flat(req, doc, p, keys) | some p in places]
+}
+
+_ms_group(fs) := [_ms_node(fs, k) | some k, f in fs; _ms_first(fs, k)]
+
+_ms_head(f) := f.levels[0].name if count(f.levels) > 0
+
+else := f.entry.name
+
+_ms_first(fs, k) if not _ms_head(fs[k]) in [_ms_head(g) | some g in array.slice(fs, 0, k)]
+
+_ms_node(fs, k) := _ms_join(own, kids, lv) if {
+	h := _ms_head(fs[k])
+	same := [f | some f in fs; _ms_head(f) == h]
+	own := [f.entry | some f in same; count(f.levels) == 0]
+	kids := [{"levels": array.slice(f.levels, 1, count(f.levels)), "entry": f.entry, "key": f.key} | some f in same; count(f.levels) > 0]
+	lv := [f.levels[0] | some f in same; count(f.levels) > 0]
+}
+
+_ms_join(own, kids, lv) := object.union(own[0], {
+	"cause": _worst_or_value({e.cause | some e in own} | {e.cause | some e in under}),
+	"inputs": _once([i | some e in own; some i in e.inputs]),
+	"message": concat(", ", _once([e.message | some e in own; e.message != ""])),
+	"failures": under,
+}) if {
+	count(own) > 0
+	under := _ms_group2(kids)
+} else := {"kind": "item", "name": lv[0].name, "cause": _worst_or_value({e.cause | some e in under}), "inputs": [], "failures": under, "message": "", "value": lv[0].value, "locations": lv[0].locations} if {
+	under := _ms_group2(kids)
+}
+
+_ms_group2(fs) := [_ms_node2(fs, k) | some k, f in fs; _ms_first(fs, k)]
+
+_ms_node2(fs, k) := _ms_join2(own, [f.levels[0] | some f in same; count(f.levels) > 0], [f.entry | some f in same; count(f.levels) > 0]) if {
+	h := _ms_head(fs[k])
+	same := [f | some f in fs; _ms_head(f) == h]
+	own := [f.entry | some f in same; count(f.levels) == 0]
+}
+
+_ms_join2(own, lv, deeper) := object.union(own[0], {
+	"cause": _worst_or_value({e.cause | some e in own} | {e.cause | some e in deeper}),
+	"inputs": _once([i | some e in own; some i in e.inputs]),
+	"message": concat(", ", _once([e.message | some e in own; e.message != ""])),
+	"failures": deeper,
+}) if {
+	count(own) > 0
+	_ = lv
+} else := {"kind": "item", "name": lv[0].name, "cause": _worst_or_value({e.cause | some e in deeper}), "inputs": [], "failures": deeper, "message": "", "value": lv[0].value, "locations": lv[0].locations}
 
 default _enough_subjects(_, _, _) := false
 

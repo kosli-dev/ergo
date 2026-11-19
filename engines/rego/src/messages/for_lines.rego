@@ -856,15 +856,22 @@ _m_from_message(doc, req, false, cause) := {"message": m} if {
 } else := {"message": m} if {
 	_every_from(req)
 	w := _fl_broken(doc, _from_keys(req))
-	ms := array.concat([_fl_fail_text(req, f) | some p in sort({f.path | some f in w.fails}); some f in w.fails; f.path == p], [_fl_note_text(req, n) | some n in w.notes])
+	ms := array.concat([_fl_fail_text(req, f) | some p in sort({f.path | some f in w.fails}); some f in w.fails; f.path == p], _fl_notes_once([_fl_note_text(req, n) | some n in w.notes]))
 	count(ms) > 0
-	m := _m_joined(ms)
+	m := concat("; ", _once(ms))
 } else := {"message": m} if {
 	not _every_from(req)
 	fails := _every_walk(doc, _from_keys(req)).fails
 	count(fails) > 0
 	m := _m_joined([_m_named_fail(object.union(f, {"path": _m_from_item_name(req, f.path)})) | some p in sort({f.path | some f in fails}); some f in fails; f.path == p])
 } else := {}
+
+_fl_notes_once(ts) := [t |
+	some k, x in ts
+	before := {c | some j, y in ts; j < k; some c in split(y, ", ")}
+	t := concat(", ", [c | some c in split(x, ", "); not c in before])
+	t != ""
+]
 
 _m_from_root(req) := data.ergo_subject_sentences.chains[req.subject] if _chained(req)
 
