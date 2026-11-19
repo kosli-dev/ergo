@@ -296,14 +296,29 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of releases.tags",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/tags/0"
+                    ],
+                    "name": "releases.tags[0]",
+                    "outcome": "usable",
+                    "value": [
+                      "v1",
+                      "latest"
+                    ]
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/releases/tags/0"
                 ],
-                "path": "item 1 of releases.tags",
+                "message": "item 1 of releases.tags is a list",
+                "name": "item 1 of releases.tags",
                 "value": [
                   "v1",
                   "latest"
@@ -311,11 +326,23 @@
               },
               {
                 "cause": "unusable",
-                "item": "item 3 of releases.tags",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/tags/2"
+                    ],
+                    "name": "releases.tags[2]",
+                    "outcome": "usable",
+                    "value": "broken"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/releases/tags/2"
                 ],
-                "path": "item 3 of releases.tags",
+                "message": "item 3 of releases.tags is text",
+                "name": "item 3 of releases.tags",
                 "value": "broken"
               }
             ],

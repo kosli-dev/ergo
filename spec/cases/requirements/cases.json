@@ -1774,39 +1774,86 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "$input[0].commits",
-                "locations": [
-                  "/0/commits"
-                ],
-                "path": "$input[0].commits",
-                "value": [
+                "failures": [
                   {
-                    "x": 1
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/0/commits/0"
+                        ],
+                        "name": "$input[0].commits[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "x": 1
+                        }
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/0/commits/0"
+                    ],
+                    "message": "item 1 of commits is an object",
+                    "name": "item 1 of commits",
+                    "value": {
+                      "x": 1
+                    }
                   }
-                ]
-              },
-              {
-                "cause": "unusable",
-                "item": "item 1 of $input[0].commits",
-                "locations": [
-                  "/0/commits/0"
                 ],
-                "path": "item 1 of $input[0].commits",
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/commits"
+                    ],
+                    "name": "$input[0].commits",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "x": 1
+                      }
+                    ]
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/0"
+                ],
+                "message": "commits is a list",
+                "name": "item 1 of $input",
                 "value": {
-                  "x": 1
+                  "commits": [
+                    {
+                      "x": 1
+                    }
+                  ]
                 }
               },
               {
                 "cause": "unusable",
-                "item": "$input[1].commits",
-                "locations": [
-                  "/1/commits"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/1/commits"
+                    ],
+                    "name": "$input[1].commits",
+                    "outcome": "usable",
+                    "value": 5
+                  }
                 ],
-                "path": "$input[1].commits",
-                "value": 5
+                "kind": "item",
+                "locations": [
+                  "/1"
+                ],
+                "message": "commits is a number",
+                "name": "item 2 of $input",
+                "value": {
+                  "commits": 5
+                }
               }
             ],
             "inputs": [
@@ -1819,7 +1866,7 @@
                 "value": 2
               }
             ],
-            "message": "commits is a list in item 1 of $input but 5 in item 2; item 1 of $input: item 1 of commits is an object, item 2 of $input: commits is a number",
+            "message": "item 1 of $input: commits is a list, item 2 of $input: commits is a number; item 1 of $input: item 1 of commits is an object, item 2 of $input: commits is a number",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1988,39 +2035,86 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "$input[0].commits",
-                "locations": [
-                  "/0/commits"
-                ],
-                "path": "$input[0].commits",
-                "value": [
+                "failures": [
                   {
-                    "x": 1
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/0/commits/0"
+                        ],
+                        "name": "$input[0].commits[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "x": 1
+                        }
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/0/commits/0"
+                    ],
+                    "message": "item 1 of commits is an object",
+                    "name": "item 1 of commits",
+                    "value": {
+                      "x": 1
+                    }
                   }
-                ]
-              },
-              {
-                "cause": "unusable",
-                "item": "item 1 of $input[0].commits",
-                "locations": [
-                  "/0/commits/0"
                 ],
-                "path": "item 1 of $input[0].commits",
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/commits"
+                    ],
+                    "name": "$input[0].commits",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "x": 1
+                      }
+                    ]
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/0"
+                ],
+                "message": "commits is a list",
+                "name": "item 1 of $input",
                 "value": {
-                  "x": 1
+                  "commits": [
+                    {
+                      "x": 1
+                    }
+                  ]
                 }
               },
               {
                 "cause": "unusable",
-                "item": "$input[1].commits",
-                "locations": [
-                  "/1/commits"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/1/commits"
+                    ],
+                    "name": "$input[1].commits",
+                    "outcome": "usable",
+                    "value": 5
+                  }
                 ],
-                "path": "$input[1].commits",
-                "value": 5
+                "kind": "item",
+                "locations": [
+                  "/1"
+                ],
+                "message": "commits is a number",
+                "name": "item 2 of $input",
+                "value": {
+                  "commits": 5
+                }
               }
             ],
             "inputs": [
@@ -2033,7 +2127,7 @@
                 "value": 2
               }
             ],
-            "message": "commits is a list in item 1 of $input but 5 in item 2; item 1 of $input: item 1 of commits is an object, item 2 of $input: commits is a number",
+            "message": "item 1 of $input: commits is a list, item 2 of $input: commits is a number; item 1 of $input: item 1 of commits is an object, item 2 of $input: commits is a number",
             "passed": false,
             "requirement": "s",
             "subject": {

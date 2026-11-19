@@ -11781,14 +11781,30 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0"
+                    ],
+                    "name": "xs[0]",
+                    "outcome": "usable",
+                    "value": {
+                      "first": 1,
+                      "item": 1,
+                      "k": 1
+                    }
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is an object",
+                "name": "item 1 of xs",
                 "value": {
                   "first": 1,
                   "item": 1,
@@ -11797,11 +11813,23 @@
               },
               {
                 "cause": "unusable",
-                "item": "item 4 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/3"
+                    ],
+                    "name": "xs[3]",
+                    "outcome": "usable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/3"
                 ],
-                "path": "item 4 of xs",
+                "message": "item 4 of xs is text",
+                "name": "item 4 of xs",
                 "value": "a"
               }
             ],
@@ -12044,14 +12072,30 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0"
+                    ],
+                    "name": "xs[0]",
+                    "outcome": "usable",
+                    "value": {
+                      "first": 1,
+                      "item": 1,
+                      "k": 1
+                    }
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is an object",
+                "name": "item 1 of xs",
                 "value": {
                   "first": 1,
                   "item": 1,
@@ -12060,11 +12104,23 @@
               },
               {
                 "cause": "unusable",
-                "item": "item 4 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/3"
+                    ],
+                    "name": "xs[3]",
+                    "outcome": "usable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/3"
                 ],
-                "path": "item 4 of xs",
+                "message": "item 4 of xs is text",
+                "name": "item 4 of xs",
                 "value": "a"
               }
             ],
@@ -12806,14 +12862,31 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0"
+                    ],
+                    "name": "xs[0]",
+                    "outcome": "usable",
+                    "value": {
+                      "item": [
+                        1
+                      ],
+                      "k": 1
+                    }
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is an object",
+                "name": "item 1 of xs",
                 "value": {
                   "item": [
                     1
@@ -12823,11 +12896,23 @@
               },
               {
                 "cause": "unusable",
-                "item": "item 4 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/3"
+                    ],
+                    "name": "xs[3]",
+                    "outcome": "usable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/3"
                 ],
-                "path": "item 4 of xs",
+                "message": "item 4 of xs is text",
+                "name": "item 4 of xs",
                 "value": "a"
               }
             ],
@@ -13104,23 +13189,49 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0"
+                    ],
+                    "name": "xs[0]",
+                    "outcome": "usable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is text",
+                "name": "item 1 of xs",
                 "value": "a"
               },
               {
                 "cause": "unusable",
-                "item": "item 2 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/1"
+                    ],
+                    "name": "xs[1]",
+                    "outcome": "usable",
+                    "value": [
+                      1
+                    ]
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/1"
                 ],
-                "path": "item 2 of xs",
+                "message": "item 2 of xs is a list",
+                "name": "item 2 of xs",
                 "value": [
                   1
                 ]

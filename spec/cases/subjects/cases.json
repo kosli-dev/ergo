@@ -13233,59 +13233,134 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "artifacts[0].pull_requests",
-                "locations": [
-                  "/artifacts/0/pull_requests"
-                ],
-                "path": "artifacts[0].pull_requests",
-                "value": [
+                "failures": [
                   {
-                    "approvals": 2,
-                    "url": "pr/7"
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/artifacts/0/pull_requests/0"
+                        ],
+                        "name": "artifacts[0].pull_requests[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "approvals": 2,
+                          "url": "pr/7"
+                        }
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/artifacts/0/pull_requests/0"
+                    ],
+                    "message": "item 1 of pull_requests is an object",
+                    "name": "item 1 of pull_requests",
+                    "value": {
+                      "approvals": 2,
+                      "url": "pr/7"
+                    }
                   }
-                ]
-              },
-              {
-                "cause": "unusable",
-                "item": "item 1 of artifacts[0].pull_requests",
-                "locations": [
-                  "/artifacts/0/pull_requests/0"
                 ],
-                "path": "item 1 of artifacts[0].pull_requests",
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/0/pull_requests"
+                    ],
+                    "name": "artifacts[0].pull_requests",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "approvals": 2,
+                        "url": "pr/7"
+                      }
+                    ]
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "message": "pull_requests is a list",
+                "name": "item 1 of artifacts",
                 "value": {
-                  "approvals": 2,
-                  "url": "pr/7"
+                  "pull_requests": [
+                    {
+                      "approvals": 2,
+                      "url": "pr/7"
+                    }
+                  ]
                 }
               },
               {
                 "cause": "absent",
-                "item": "artifacts[1].pull_requests",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/1"
+                    ],
+                    "name": "artifacts[1].pull_requests",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/artifacts/1"
                 ],
-                "path": "artifacts[1].pull_requests",
-                "value": null
+                "message": "pull_requests is missing",
+                "name": "item 2 of artifacts",
+                "value": {}
               },
               {
                 "cause": "null",
-                "item": "artifacts[2].pull_requests",
-                "locations": [
-                  "/artifacts/2/pull_requests"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/2/pull_requests"
+                    ],
+                    "name": "artifacts[2].pull_requests",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "artifacts[2].pull_requests",
-                "value": null
+                "kind": "item",
+                "locations": [
+                  "/artifacts/2"
+                ],
+                "message": "pull_requests is null",
+                "name": "item 3 of artifacts",
+                "value": {
+                  "pull_requests": null
+                }
               },
               {
                 "cause": "unusable",
-                "item": "artifacts[3].pull_requests",
-                "locations": [
-                  "/artifacts/3/pull_requests"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/3/pull_requests"
+                    ],
+                    "name": "artifacts[3].pull_requests",
+                    "outcome": "usable",
+                    "value": "none"
+                  }
                 ],
-                "path": "artifacts[3].pull_requests",
-                "value": "none"
+                "kind": "item",
+                "locations": [
+                  "/artifacts/3"
+                ],
+                "message": "pull_requests is text",
+                "name": "item 4 of artifacts",
+                "value": {
+                  "pull_requests": "none"
+                }
               }
             ],
             "inputs": [
@@ -13298,7 +13373,7 @@
                 "value": 2
               }
             ],
-            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; pull_requests is a list in item 1 of artifacts but \"none\" in item 4; item 1 of artifacts: item 1 of pull_requests is an object, item 4 of artifacts: pull_requests is text",
+            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; item 1 of artifacts: pull_requests is a list, item 4 of artifacts: pull_requests is text; item 1 of artifacts: item 1 of pull_requests is an object, item 4 of artifacts: pull_requests is text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -14030,40 +14105,89 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "artifacts[0].releases",
-                "locations": [
-                  "/artifacts/0/releases"
-                ],
-                "path": "artifacts[0].releases",
-                "value": 5
-              },
-              {
-                "cause": "unusable",
-                "item": "artifacts[1].releases",
-                "locations": [
-                  "/artifacts/1/releases"
-                ],
-                "path": "artifacts[1].releases",
-                "value": [
+                "failures": [],
+                "inputs": [
                   {
-                    "id": "r1",
-                    "n": 1
+                    "locations": [
+                      "/artifacts/0/releases"
+                    ],
+                    "name": "artifacts[0].releases",
+                    "outcome": "usable",
+                    "value": 5
                   }
-                ]
+                ],
+                "kind": "item",
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "message": "releases is a number",
+                "name": "item 1 of artifacts",
+                "value": {
+                  "releases": 5
+                }
               },
               {
                 "cause": "unusable",
-                "item": "item 1 of artifacts[1].releases",
-                "locations": [
-                  "/artifacts/1/releases/0"
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/artifacts/1/releases/0"
+                        ],
+                        "name": "artifacts[1].releases[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "id": "r1",
+                          "n": 1
+                        }
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/artifacts/1/releases/0"
+                    ],
+                    "message": "item 1 of releases is an object",
+                    "name": "item 1 of releases",
+                    "value": {
+                      "id": "r1",
+                      "n": 1
+                    }
+                  }
                 ],
-                "path": "item 1 of artifacts[1].releases",
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/1/releases"
+                    ],
+                    "name": "artifacts[1].releases",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "id": "r1",
+                        "n": 1
+                      }
+                    ]
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/artifacts/1"
+                ],
+                "message": "releases is a list",
+                "name": "item 2 of artifacts",
                 "value": {
-                  "id": "r1",
-                  "n": 1
+                  "releases": [
+                    {
+                      "id": "r1",
+                      "n": 1
+                    }
+                  ]
                 }
               }
             ],
@@ -14076,7 +14200,7 @@
                 "value": 1
               }
             ],
-            "message": "releases is a list in item 2 of artifacts but 5 in item 1; item 1 of artifacts: releases is a number, item 2 of artifacts: item 1 of releases is an object",
+            "message": "item 1 of artifacts: releases is a number, item 2 of artifacts: releases is a list; item 1 of artifacts: releases is a number, item 2 of artifacts: item 1 of releases is an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -14223,40 +14347,89 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "artifacts[0].releases",
-                "locations": [
-                  "/artifacts/0/releases"
-                ],
-                "path": "artifacts[0].releases",
-                "value": 5
-              },
-              {
-                "cause": "unusable",
-                "item": "artifacts[1].releases",
-                "locations": [
-                  "/artifacts/1/releases"
-                ],
-                "path": "artifacts[1].releases",
-                "value": [
+                "failures": [],
+                "inputs": [
                   {
-                    "id": "r1",
-                    "n": 1
+                    "locations": [
+                      "/artifacts/0/releases"
+                    ],
+                    "name": "artifacts[0].releases",
+                    "outcome": "usable",
+                    "value": 5
                   }
-                ]
+                ],
+                "kind": "item",
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "message": "releases is a number",
+                "name": "item 1 of artifacts",
+                "value": {
+                  "releases": 5
+                }
               },
               {
                 "cause": "unusable",
-                "item": "item 1 of artifacts[1].releases",
-                "locations": [
-                  "/artifacts/1/releases/0"
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/artifacts/1/releases/0"
+                        ],
+                        "name": "artifacts[1].releases[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "id": "r1",
+                          "n": 1
+                        }
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/artifacts/1/releases/0"
+                    ],
+                    "message": "item 1 of releases is an object",
+                    "name": "item 1 of releases",
+                    "value": {
+                      "id": "r1",
+                      "n": 1
+                    }
+                  }
                 ],
-                "path": "item 1 of artifacts[1].releases",
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/1/releases"
+                    ],
+                    "name": "artifacts[1].releases",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "id": "r1",
+                        "n": 1
+                      }
+                    ]
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/artifacts/1"
+                ],
+                "message": "releases is a list",
+                "name": "item 2 of artifacts",
                 "value": {
-                  "id": "r1",
-                  "n": 1
+                  "releases": [
+                    {
+                      "id": "r1",
+                      "n": 1
+                    }
+                  ]
                 }
               }
             ],
@@ -14269,7 +14442,7 @@
                 "value": 1
               }
             ],
-            "message": "releases is a list in item 2 of artifacts but 5 in item 1; item 1 of artifacts: releases is a number, item 2 of artifacts: item 1 of releases is an object",
+            "message": "item 1 of artifacts: releases is a number, item 2 of artifacts: releases is a list; item 1 of artifacts: releases is a number, item 2 of artifacts: item 1 of releases is an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20564,59 +20737,134 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "artifacts[0].pull_requests",
-                "locations": [
-                  "/artifacts/0/pull_requests"
-                ],
-                "path": "artifacts[0].pull_requests",
-                "value": [
+                "failures": [
                   {
-                    "approvals": 2,
-                    "url": "pr/7"
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/artifacts/0/pull_requests/0"
+                        ],
+                        "name": "artifacts[0].pull_requests[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "approvals": 2,
+                          "url": "pr/7"
+                        }
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/artifacts/0/pull_requests/0"
+                    ],
+                    "message": "item 1 of pull_requests is an object",
+                    "name": "item 1 of pull_requests",
+                    "value": {
+                      "approvals": 2,
+                      "url": "pr/7"
+                    }
                   }
-                ]
-              },
-              {
-                "cause": "unusable",
-                "item": "item 1 of artifacts[0].pull_requests",
-                "locations": [
-                  "/artifacts/0/pull_requests/0"
                 ],
-                "path": "item 1 of artifacts[0].pull_requests",
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/0/pull_requests"
+                    ],
+                    "name": "artifacts[0].pull_requests",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "approvals": 2,
+                        "url": "pr/7"
+                      }
+                    ]
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "message": "pull_requests is a list",
+                "name": "item 1 of artifacts",
                 "value": {
-                  "approvals": 2,
-                  "url": "pr/7"
+                  "pull_requests": [
+                    {
+                      "approvals": 2,
+                      "url": "pr/7"
+                    }
+                  ]
                 }
               },
               {
                 "cause": "absent",
-                "item": "artifacts[1].pull_requests",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/1"
+                    ],
+                    "name": "artifacts[1].pull_requests",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/artifacts/1"
                 ],
-                "path": "artifacts[1].pull_requests",
-                "value": null
+                "message": "pull_requests is missing",
+                "name": "item 2 of artifacts",
+                "value": {}
               },
               {
                 "cause": "null",
-                "item": "artifacts[2].pull_requests",
-                "locations": [
-                  "/artifacts/2/pull_requests"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/2/pull_requests"
+                    ],
+                    "name": "artifacts[2].pull_requests",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "artifacts[2].pull_requests",
-                "value": null
+                "kind": "item",
+                "locations": [
+                  "/artifacts/2"
+                ],
+                "message": "pull_requests is null",
+                "name": "item 3 of artifacts",
+                "value": {
+                  "pull_requests": null
+                }
               },
               {
                 "cause": "unusable",
-                "item": "artifacts[3].pull_requests",
-                "locations": [
-                  "/artifacts/3/pull_requests"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/3/pull_requests"
+                    ],
+                    "name": "artifacts[3].pull_requests",
+                    "outcome": "usable",
+                    "value": "none"
+                  }
                 ],
-                "path": "artifacts[3].pull_requests",
-                "value": "none"
+                "kind": "item",
+                "locations": [
+                  "/artifacts/3"
+                ],
+                "message": "pull_requests is text",
+                "name": "item 4 of artifacts",
+                "value": {
+                  "pull_requests": "none"
+                }
               }
             ],
             "inputs": [
@@ -20629,7 +20877,7 @@
                 "value": 2
               }
             ],
-            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; pull_requests is a list in item 1 of artifacts but \"none\" in item 4; item 1 of artifacts: item 1 of pull_requests is an object, item 4 of artifacts: pull_requests is text",
+            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; item 1 of artifacts: pull_requests is a list, item 4 of artifacts: pull_requests is text; item 1 of artifacts: item 1 of pull_requests is an object, item 4 of artifacts: pull_requests is text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24254,22 +24502,20 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of $input",
-                "locations": [
-                  ""
-                ],
-                "path": "item 1 of $input",
-                "value": null
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope k count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input[0].y",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of $input is missing",
@@ -24495,22 +24741,20 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of artifact",
-                "locations": [
-                  "/artifacts/0"
-                ],
-                "path": "item 1 of artifact",
-                "value": null
-              }
-            ],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope k count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "artifact[0].c",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of artifact is missing",
@@ -33773,17 +34017,25 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of builds[0].tests",
-                "locations": [
-                  "/builds/0/tests/0"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/0/tests/0"
+                    ],
+                    "name": "builds[0].tests[0]",
+                    "outcome": "unusable",
+                    "value": {
+                      "id": "t1"
+                    }
+                  }
                 ],
-                "path": "item 1 of builds[0].tests",
-                "value": {
-                  "id": "t1"
-                }
+                "kind": "list",
+                "message": "item 1 of builds: item 1 of tests is {\"id\": \"t1\"}, which isn't a list",
+                "name": "item 1 of builds: item 1 of tests"
               }
             ],
             "inputs": [
@@ -35416,23 +35668,49 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of tags",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/tags/0"
+                    ],
+                    "name": "tags[0]",
+                    "outcome": "usable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/tags/0"
                 ],
-                "path": "item 1 of tags",
+                "message": "item 1 of tags is text",
+                "name": "item 1 of tags",
                 "value": "a"
               },
               {
                 "cause": "unusable",
-                "item": "item 2 of tags",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/tags/1"
+                    ],
+                    "name": "tags[1]",
+                    "outcome": "usable",
+                    "value": {
+                      "x": 1
+                    }
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/tags/1"
                 ],
-                "path": "item 2 of tags",
+                "message": "item 2 of tags is an object",
+                "name": "item 2 of tags",
                 "value": {
                   "x": 1
                 }
@@ -35459,25 +35737,55 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "builds[0].version",
-                "locations": [
-                  "/builds/0/version"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/0/version"
+                    ],
+                    "name": "builds[0].version",
+                    "outcome": "usable",
+                    "value": "1.0"
+                  }
                 ],
-                "path": "builds[0].version",
-                "value": "1.0"
+                "kind": "item",
+                "locations": [
+                  "/builds/0"
+                ],
+                "message": "version is text",
+                "name": "item 1 of builds",
+                "value": {
+                  "version": "1.0"
+                }
               },
               {
                 "cause": "unusable",
-                "item": "builds[1].version",
-                "locations": [
-                  "/builds/1/version"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/1/version"
+                    ],
+                    "name": "builds[1].version",
+                    "outcome": "usable",
+                    "value": {
+                      "v": 1
+                    }
+                  }
                 ],
-                "path": "builds[1].version",
+                "kind": "item",
+                "locations": [
+                  "/builds/1"
+                ],
+                "message": "version is an object",
+                "name": "item 2 of builds",
                 "value": {
-                  "v": 1
+                  "version": {
+                    "v": 1
+                  }
                 }
               }
             ],
@@ -37853,27 +38161,58 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "builds[0].tags",
-                "locations": [
-                  "/builds/0/tags"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/0/tags"
+                    ],
+                    "name": "builds[0].tags",
+                    "outcome": "usable",
+                    "value": [
+                      "a",
+                      "b"
+                    ]
+                  }
                 ],
-                "path": "builds[0].tags",
-                "value": [
-                  "a",
-                  "b"
-                ]
+                "kind": "item",
+                "locations": [
+                  "/builds/0"
+                ],
+                "message": "tags is a list",
+                "name": "item 1 of builds",
+                "value": {
+                  "tags": [
+                    "a",
+                    "b"
+                  ]
+                }
               },
               {
                 "cause": "unusable",
-                "item": "builds[1].tags",
-                "locations": [
-                  "/builds/1/tags"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/1/tags"
+                    ],
+                    "name": "builds[1].tags",
+                    "outcome": "usable",
+                    "value": "c"
+                  }
                 ],
-                "path": "builds[1].tags",
-                "value": "c"
+                "kind": "item",
+                "locations": [
+                  "/builds/1"
+                ],
+                "message": "tags is text",
+                "name": "item 2 of builds",
+                "value": {
+                  "tags": "c"
+                }
               }
             ],
             "inputs": [
@@ -37887,7 +38226,7 @@
                 "value": 3
               }
             ],
-            "message": "tags is a list in item 1 of builds but \"c\" in item 2",
+            "message": "item 1 of builds: tags is a list, item 2 of builds: tags is text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -38818,26 +39157,96 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "xs[0].ys[0].tags",
-                "locations": [
-                  "/xs/0/ys/0/tags"
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/0/ys/0/tags"
+                        ],
+                        "name": "xs[0].ys[0].tags",
+                        "outcome": "usable",
+                        "value": [
+                          "a"
+                        ]
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/0/ys/0"
+                    ],
+                    "message": "tags is a list",
+                    "name": "item 1 of ys",
+                    "value": {
+                      "tags": [
+                        "a"
+                      ]
+                    }
+                  }
                 ],
-                "path": "xs[0].ys[0].tags",
-                "value": [
-                  "a"
-                ]
+                "inputs": [],
+                "kind": "item",
+                "locations": [
+                  "/xs/0"
+                ],
+                "message": "",
+                "name": "item 1 of xs",
+                "value": {
+                  "ys": [
+                    {
+                      "tags": [
+                        "a"
+                      ]
+                    }
+                  ]
+                }
               },
               {
                 "cause": "unusable",
-                "item": "xs[1].ys[0].tags",
-                "locations": [
-                  "/xs/1/ys/0/tags"
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/1/ys/0/tags"
+                        ],
+                        "name": "xs[1].ys[0].tags",
+                        "outcome": "usable",
+                        "value": "c"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/1/ys/0"
+                    ],
+                    "message": "tags is text",
+                    "name": "item 1 of ys",
+                    "value": {
+                      "tags": "c"
+                    }
+                  }
                 ],
-                "path": "xs[1].ys[0].tags",
-                "value": "c"
+                "inputs": [],
+                "kind": "item",
+                "locations": [
+                  "/xs/1"
+                ],
+                "message": "",
+                "name": "item 2 of xs",
+                "value": {
+                  "ys": [
+                    {
+                      "tags": "c"
+                    }
+                  ]
+                }
               }
             ],
             "inputs": [
@@ -38850,7 +39259,7 @@
                 "value": 2
               }
             ],
-            "message": "tags is a list in item 1 of xs: item 1 of ys but \"c\" in item 2 of xs: item 1 of ys",
+            "message": "item 1 of xs: item 1 of ys: tags is a list, item 2 of xs: item 1 of ys: tags is text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -39615,14 +40024,30 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of ds",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/0"
+                    ],
+                    "name": "ds[0]",
+                    "outcome": "usable",
+                    "value": {
+                      "m": {
+                        "up": false
+                      }
+                    }
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/ds/0"
                 ],
-                "path": "item 1 of ds",
+                "message": "item 1 of ds is an object",
+                "name": "item 1 of ds",
                 "value": {
                   "m": {
                     "up": false
@@ -39631,11 +40056,23 @@
               },
               {
                 "cause": "unusable",
-                "item": "item 2 of ds",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ds/1"
+                    ],
+                    "name": "ds[1]",
+                    "outcome": "usable",
+                    "value": "x"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/ds/1"
                 ],
-                "path": "item 2 of ds",
+                "message": "item 2 of ds is text",
+                "name": "item 2 of ds",
                 "value": "x"
               }
             ],
@@ -40184,40 +40621,89 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "builds[0].tags",
-                "locations": [
-                  "/builds/0/tags"
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/builds/0/tags/0"
+                        ],
+                        "name": "builds[0].tags[0]",
+                        "outcome": "usable",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/builds/0/tags/0"
+                    ],
+                    "message": "item 1 of tags is a number",
+                    "name": "item 1 of tags",
+                    "value": 1
+                  }
                 ],
-                "path": "builds[0].tags",
-                "value": [
-                  1,
-                  2
-                ]
-              },
-              {
-                "cause": "unusable",
-                "item": "item 1 of builds[0].tags",
-                "locations": [
-                  "/builds/0/tags/0"
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/0/tags"
+                    ],
+                    "name": "builds[0].tags",
+                    "outcome": "usable",
+                    "value": [
+                      1,
+                      2
+                    ]
+                  }
                 ],
-                "path": "item 1 of builds[0].tags",
-                "value": 1
-              },
-              {
-                "cause": "unusable",
-                "item": "builds[1].tags",
+                "kind": "item",
                 "locations": [
-                  "/builds/1/tags"
+                  "/builds/0"
                 ],
-                "path": "builds[1].tags",
+                "message": "tags is a list",
+                "name": "item 1 of builds",
                 "value": {
-                  "k": [
+                  "tags": [
                     1,
                     2
                   ]
+                }
+              },
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/1/tags"
+                    ],
+                    "name": "builds[1].tags",
+                    "outcome": "usable",
+                    "value": {
+                      "k": [
+                        1,
+                        2
+                      ]
+                    }
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/builds/1"
+                ],
+                "message": "tags is an object",
+                "name": "item 2 of builds",
+                "value": {
+                  "tags": {
+                    "k": [
+                      1,
+                      2
+                    ]
+                  }
                 }
               }
             ],
@@ -40232,7 +40718,7 @@
                 "value": 3
               }
             ],
-            "message": "tags is a list in item 1 of builds but {\"k\": [1, 2]} in item 2; item 1 of builds: item 1 of tags is a number, item 2 of builds: tags is an object",
+            "message": "item 1 of builds: tags is a list, item 2 of builds: tags is an object; item 1 of builds: item 1 of tags is a number, item 2 of builds: tags is an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -40473,23 +40959,49 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of xs[0]",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0/0"
+                    ],
+                    "name": "xs[0][0]",
+                    "outcome": "usable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0/0"
                 ],
-                "path": "item 1 of xs[0]",
+                "message": "item 1 of xs[0] is text",
+                "name": "item 1 of xs[0]",
                 "value": "a"
               },
               {
                 "cause": "unusable",
-                "item": "item 2 of xs[0]",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0/1"
+                    ],
+                    "name": "xs[0][1]",
+                    "outcome": "usable",
+                    "value": {
+                      "k": 1
+                    }
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0/1"
                 ],
-                "path": "item 2 of xs[0]",
+                "message": "item 2 of xs[0] is an object",
+                "name": "item 2 of xs[0]",
                 "value": {
                   "k": 1
                 }
@@ -40516,23 +41028,47 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of ys[0]",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ys/0/0"
+                    ],
+                    "name": "ys[0][0]",
+                    "outcome": "usable",
+                    "value": 1
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/ys/0/0"
                 ],
-                "path": "item 1 of ys[0]",
+                "message": "item 1 of ys[0] is a number",
+                "name": "item 1 of ys[0]",
                 "value": 1
               },
               {
                 "cause": "unusable",
-                "item": "item 2 of ys[0]",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ys/0/1"
+                    ],
+                    "name": "ys[0][1]",
+                    "outcome": "usable",
+                    "value": "b"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/ys/0/1"
                 ],
-                "path": "item 2 of ys[0]",
+                "message": "item 2 of ys[0] is text",
+                "name": "item 2 of ys[0]",
                 "value": "b"
               }
             ],
@@ -40676,23 +41212,49 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of $input[0]",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/0"
+                    ],
+                    "name": "$input[0][0]",
+                    "outcome": "usable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/0/0"
                 ],
-                "path": "item 1 of $input[0]",
+                "message": "item 1 of $input[0] is text",
+                "name": "item 1 of $input[0]",
                 "value": "a"
               },
               {
                 "cause": "unusable",
-                "item": "item 2 of $input[0]",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/1"
+                    ],
+                    "name": "$input[0][1]",
+                    "outcome": "usable",
+                    "value": {
+                      "k": 1
+                    }
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/0/1"
                 ],
-                "path": "item 2 of $input[0]",
+                "message": "item 2 of $input[0] is an object",
+                "name": "item 2 of $input[0]",
                 "value": {
                   "k": 1
                 }
