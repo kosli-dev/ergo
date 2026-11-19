@@ -369,9 +369,9 @@ _m_message(check, subj, "value") := m if {
 
 _m_message(check, subj, cause) := m if {
 	cause in _no_value_states
-	clauses := _m_key_states(subj, check, cause)
-	count(clauses) > 0
-	m := concat(", and ", clauses)
+	keys := _m_key_states(subj, check, cause)
+	count(keys) > 0
+	m := concat(", and ", _once(array.concat(keys, _m_unkeyed_said(subj, check, cause))))
 } else := m if {
 	cause in _no_value_states
 	clauses := _once(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check)], _m_tallies(subj, check, cause)))
@@ -388,8 +388,42 @@ _m_params_beside_input(check) := array.concat([_m_isnt("$input", data.ergo_docum
 	_m_params_unread(check)
 } else := []
 
+_m_unkeyed_said(subj, check, cause) := [] if {
+	object.get(check, "ergo/row", false) != true
+} else := array.concat(
+	[_m_state_clause(s) | some s in _m_sources(subj, check); _m_side_said(s, cause, check); not _m_keyed_unread(subj, s.side)],
+	[c |
+		some side in _m_tally_parts(check)
+		not _m_keyed_unread(subj, side[_basic_form(side)])
+		cs := [x[1] | some x in _m_tally_said(subj, side, cause)]
+		count(cs) > 0
+		c := _m_joined(cs)
+	],
+)
+
+_m_keyed_unread(subj, side) if {
+	is_array(side)
+	some step in side
+	_m_key_state(subj, step) in _no_value_states
+}
+
+_m_keyed_unread(subj, side) if {
+	is_array(side)
+	some step in side
+	_m_key_fault(subj, step)
+}
+
+_m_unusable_beside_keys(subj, check) := [] if {
+	_m_key_faults(subj, check) == []
+} else := [_m_state_clause(s) |
+	some s in _m_sources(subj, check)
+	s.state in _no_value_states
+	_m_side_said(s, "unusable", check)
+	not _m_keyed_unread(subj, s.side)
+]
+
 _m_message(check, subj, "unusable") := m if {
-	clauses := _once(array.concat(array.concat(_m_unusable_before_faults(subj, check), _m_faults(subj, check)), _m_unusable_after_faults(subj, check)))
+	clauses := _once(array.concat(array.concat(array.concat(_m_unusable_before_faults(subj, check), _m_faults(subj, check)), _m_unusable_after_faults(subj, check)), _m_unusable_beside_keys(subj, check)))
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := m if {

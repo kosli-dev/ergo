@@ -22896,7 +22896,7 @@
                     "locations": [
                       "/things/0/rs/0"
                     ],
-                    "message": "$input.k is 3, which isn't text, and v is \"a\", which isn't an object",
+                    "message": "v is \"a\", which isn't an object",
                     "name": "item 1 of rs",
                     "value": {
                       "v": "a"
@@ -22927,7 +22927,7 @@
                     "locations": [
                       "/things/0/rs/1"
                     ],
-                    "message": "$input.k is 3, which isn't text, and v is 4, which isn't an object",
+                    "message": "v is 4, which isn't an object",
                     "name": "item 2 of rs",
                     "value": {
                       "v": 4
@@ -22956,7 +22956,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/whose_unusable"
                 ],
-                "message": "",
+                "message": "$input.k is 3, which isn't text",
                 "name": "count of rs whose v.y equals m named by $input.k is 1"
               }
             ],
@@ -22986,7 +22986,7 @@
                 ]
               }
             ],
-            "message": "item 1 of rs: $input.k is 3, which isn't text, and v is \"a\", which isn't an object; item 2 of rs: $input.k is 3, which isn't text, and v is 4, which isn't an object",
+            "message": "$input.k is 3, which isn't text; item 1 of rs: v is \"a\", which isn't an object; item 2 of rs: v is 4, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
