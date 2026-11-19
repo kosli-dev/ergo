@@ -43,7 +43,7 @@ Not filled in, because the engine still differs from them for another reason (mo
 
 `spec/sweep.py` with the Docker `--rust` command, default limit (468 cells sampled from 4588, 12 per shape and key), once on `main` (500ea825) and once on this branch. Rego is the same on both. 329 cells differ on `main`, 387 here. Comparing the Rust reports of the two runs cell by cell: 300 rows change, 262 only in `failures` or `inputs` and 38 in their message (none in their cause). The 38:
 
-- C4, a list said after a root that `main` hid (`$input.k is true, which isn't text, and es is missing`, `a: $params.k is missing; es is null; b: id is "t"`): 13 cells in `sum-of-named-by`, `sum-of-phrase`, `count-of-whose-two-keys`, `any-of-count` and `applies-count-is`.
+- C4, a list said after a root that `main` hid (`$input.k is true, which isn't text, and es is missing`, `a: $params.k is missing; es is null; b: id is "t"`): 18 cells in `sum-of-named-by`, `sum-of-phrase`, `count-of-whose-two-keys`, `any-of-count` and `applies-count-is`.
 - Roots before the list instead of after (`$input.k is [], which isn't text; es is "s", which isn't a list or an object`, `$params.k is null; es is null`): 10 cells in `count-of-whose-two-keys`, `count-of-that` and `any-of-count`.
 - `main`'s fallback text (`count of es.v that equals m named by $input.k is 0 is false`, `sum of es.v equals m named by $input.k is false`, `... needs more than 15 digits`) replaced by the list's problem (`es is null`, `es is missing`): 10 cells in `count-of-that`, `sum-of-phrase` and `applies-count-is`, with `k` missing, `null` or `"a"`. With `k` missing or `null` the branch says only the list, not the key: C4 says the key first; this is a gap left in the Rust engine.
 
