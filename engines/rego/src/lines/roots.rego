@@ -536,7 +536,17 @@ _leaf_root_msgs(check, flaw) := [m] if {
 	is_string(m)
 }
 
-_rooted_row(check, subj, r) := object.union(object.remove(_rooted_main(check, subj, r), ["other_roots"]), {"cause": _worst_of({flaw, r.cause}), "root_msgs": _with_roots(_walk_parts(check, subj, r, r), ms)}) if {
+_rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {"cause": _worst_of({flaw, a.cause}), "inputs": r.inputs, "failed": a.failed, "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [p | some p in ps; not p in ms]}) if {
+	check.op != "for"
+	not _walk_keyed(check)
+	_items_judged_alone(subj, check)
+	flaw := _walk_root_flaw(check, subj)
+	flaw != ""
+	ms := _walk_root_msgs(check, subj)
+	ms != []
+	a := _alone_read(check, subj)
+	ps := _walk_parts(check, subj, a, a)
+} else := object.union(object.remove(_rooted_main(check, subj, r), ["other_roots"]), {"cause": _worst_of({flaw, r.cause}), "root_msgs": _with_roots(_walk_parts(check, subj, r, r), ms)}) if {
 	check.op != "for"
 	_walk_list_fails(r)
 	not _walk_keyed(check)
@@ -605,4 +615,39 @@ _item_keyed(p) if {
 	some step in p
 	_field_step(step)
 	not _from_root(step)
+}
+
+_items_judged_alone(subj, side) if {
+	some c in object.get(side, "whose", [])
+	_root_read_flaw(subj, c) != ""
+	_root_stand_in(c) != c
+}
+
+_whose_alone(subj, side) := object.union(side, {"whose": [_root_stand_in(c) | some c in side.whose]}) if _items_judged_alone(subj, side)
+
+else := side
+
+_root_stand_in(c) := object.union(c, {f: {"literal": _stand_in_value[c.op]}}) if {
+	c.op in {"compare", "compare_time"}
+	c.cmp in {"gt", "gte", "lt", "lte"}
+	some f in _compare_side_list
+	is_array(c[f])
+	_walk_outside(c[f])
+	some g in _compare_side_list
+	g != f
+	is_array(c[g])
+	not _walk_outside(c[g])
+} else := c
+
+_stand_in_value := {"compare": 0, "compare_time": "1970-01-01T00:00:00Z"}
+
+_alone_read(check, subj) := object.union(a, {
+	"cause": _worst_of({f.cause | some f in failed}),
+	"failed": failed,
+	"fails": [f | some f in object.get(a, "fails", []); f.cause in _failed_read_states],
+	"empty": false,
+}) if {
+	a := _walk_read_row(object.union(_whose_alone(subj, check), {"op": "every"}), subj)
+	failed := [f | some f in a.failed; f.cause in _failed_read_states]
+	failed != []
 }

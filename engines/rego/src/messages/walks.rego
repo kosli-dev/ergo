@@ -424,6 +424,7 @@ _m_tally_dropped(subj, side, cause, x) if {
 	roots := {m | some c in object.get(side, "whose", []); _root_read_flaw(subj, c) == cause; some m in array.concat(_m_root_texts(subj, c, cause), _m_walked_tally_texts(subj, _walked_tallies(c), cause))}
 	roots != set()
 	not x[1] in roots
+	not _items_judged_alone(subj, side)
 	x in _m_tally_items(subj, side)
 }
 
@@ -525,10 +526,11 @@ _m_positions(path) := [x | some x in path; is_number(x)]
 
 _m_tally_items(subj, side) := [x[2] | some x in _m_tally_items_at(subj, side)]
 
-_m_tally_items_at(subj, side) := [[_m_positions(e.i), 1, array.concat(x, [{"item": e}])] | some e in w.items; some x in array.concat(_m_whose_undecided(subj, side, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
+_m_tally_items_at(subj, side) := [[_m_positions(e.i), 1, array.concat(x, [{"item": e}])] | some e in w.items; some x in array.concat(_m_whose_undecided(subj, alone, e, flaws, roots), [y | _tally_judge(side, e, flaws, w, long).read; some y in _m_tally_item(f, e, roots)])] if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
-	flaws := [_cond_flaw(c) | some c in side.whose]
+	alone := _whose_alone(subj, side)
+	flaws := [_cond_flaw(c) | some c in alone.whose]
 	roots := _dotted_roots([side[f]])
 	long := _long_text(json.marshal([e.iv | some e in w.items]))
 }

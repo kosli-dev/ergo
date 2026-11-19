@@ -243,10 +243,11 @@ _check_outcome(check, subj, _) := object.union(
 
 _m_walk_outcome(_, _, r) := {} if r.cause == "satisfied"
 
-_m_walk_outcome(check, _, r) := {"message": _m_joined(ms), "ergo/own": ms, "ergo/texts": []} if {
+_m_walk_outcome(check, _, r) := {"message": _m_joined(ms), "ergo/own": [m | some m in ms; not m in items], "ergo/texts": items} if {
 	r.cause != "satisfied"
 	"root_msgs" in object.keys(r)
 	ms := _walk_roots_sorted(r.root_msgs, check)
+	items := object.get(r, "ergo/alone_items", [])
 }
 
 _m_walk_outcome(check, subj, r) := {"message": _m_joined(ps), "ergo/own": [p | some p in ps; not p in items], "ergo/texts": items} if {

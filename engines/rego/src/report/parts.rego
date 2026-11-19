@@ -444,9 +444,11 @@ _tally_item_texts(c, subj, cause, m) := {_m_aliased(r[1]) |
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
 	rs := _m_tally_said(subj, side, cause)
-	some r in rs
-	count(r) == 3
-	not _tally_root_said(r, rs)
+	some r0 in rs
+	count(r0) == 3
+	not _tally_root_said(r0, rs)
+	r := _tally_unrooted(r0, m)
+	r != null
 	_tally_record_listed(r[2])
 	_tally_said_in(_m_aliased(r[1]), m)
 }
@@ -1236,12 +1238,47 @@ _tally_item_parts(c, subj, cause, at, m) := _nested_items([x |
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	roots := _dotted_roots([side[f]])
 	rs := _m_tally_said(subj, side, cause)
-	some r in rs
-	count(r) == 3
-	not _tally_root_said(r, rs)
+	some r0 in rs
+	count(r0) == 3
+	not _tally_root_said(r0, rs)
+	r := _tally_unrooted(r0, m)
+	r != null
 	_tally_said_in(_m_aliased(r[1]), m)
 	x := _tally_record_entry(r, side, w, roots, at)
 ])
+
+_tally_unrooted(r, m) := _tally_kept(r, lead, ps, [p | some p in ps; not p in tops]) if {
+	head := _m_lead_of(r[1])
+	head != ""
+	lead := concat("", [head, ": "])
+	startswith(r[1], lead)
+	ps := _m_top_split(substring(r[1], count(lead), -1), "; ")
+	tops := {t | some t in _m_top_split(m, "; ")}
+} else := r
+
+_tally_kept(r, lead, ps, kept) := r if count(kept) == count(ps)
+
+else := null if kept == []
+
+else := [_worst_of({_tally_clause_cause(c, r[0]) | some c in kept}), concat("", [lead, concat("; ", kept)]), r[2]]
+
+_tally_clause_cause(c, state) := _tally_word_cause(c, _tally_record_cause(state))
+
+_tally_word_cause(c, _) := "absent" if endswith(c, " is missing")
+
+_tally_word_cause(c, _) := "null" if endswith(c, " is null")
+
+_tally_word_cause(c, cause) := cause if {
+	not endswith(c, " is missing")
+	not endswith(c, " is null")
+	not cause in {"absent", "null"}
+}
+
+_tally_word_cause(c, cause) := "unusable" if {
+	not endswith(c, " is missing")
+	not endswith(c, " is null")
+	cause in {"absent", "null"}
+}
 
 _tally_record_entry([state, text, src], side, w, roots, at) := _tally_leveled(_tally_item_entry(e, _tally_record_cause(state), text, side, w, roots), e.i, w, at) if {
 	e := src.item
@@ -1259,21 +1296,30 @@ _tally_record_cause(state) := substring(state, 6, -1) if startswith(state, "focu
 else := state
 
 _tally_item_entry(e, cause, text, side, w, roots) := object.union(
-	_entry("item", _m_item_name(e.i, roots), cause, _tally_item_reads(e, cause, side, w), [], text),
+	_entry("item", _m_item_name(e.i, roots), cause, _tally_item_reads(e, cause, side, w, text), [], text),
 	{"value": e.iv, "locations": [_item_at(w, e)]},
 )
 
-_tally_item_reads(e, cause, side, w) := [{"name": _input_name(e.c), "value": _walk_value(e.v, e, w), "locations": [_item_read_at(w, e, e.r)], "outcome": _tally_read_outcome(e.iv, e.r, cause)}] if {
+_tally_item_reads(e, cause, side, w, text) := [{"name": _input_name(e.c), "value": _walk_value(e.v, e, w), "locations": [_item_read_at(w, e, e.r)], "outcome": _tally_read_outcome(e.iv, e.r, cause)}] if {
 	e.r != []
 	_ = side
+	_ = text
 }
 
-else := [{"name": _input_name(array.concat(e.i, p)), "value": _tally_read_value(e.iv, p), "locations": [_item_read_at(w, e, p)], "outcome": _tally_read_outcome(e.iv, p, cause)} |
+else := [{"name": _input_name(array.concat(e.i, p)), "value": _tally_read_value(e.iv, p), "locations": [_item_read_at(w, e, p)], "outcome": _tally_read_outcome(e.iv, p, _tally_said_cause(cause, ps, p, text))} |
 	some p in ps
 ] if {
-	ps := _once([x[0] | some c in object.get(side, "whose", []); some x in _walk_sides_paths(c); is_array(x[0]); not _walk_outside(x[0])])
+	ps := _once([p | some c in object.get(side, "whose", []); some x in _walk_sides_paths(c); is_array(x[0]); some p in _tally_item_paths(x[0])])
 	ps != []
 } else := [{"name": _item_input_name(e.i), "value": e.iv, "locations": [_item_read_at(w, e, [])], "outcome": _tally_read_outcome(e.iv, [], cause)}]
+
+_tally_item_paths(p) := array.concat([p | not _walk_outside(p)], [[_fk(seg)] | some seg in p; _item_key_step(seg)])
+
+_item_key_step(seg) if {
+	is_object(seg)
+	object.keys(seg) == {"named_by_field"}
+	not _from_root(seg)
+}
 
 _tally_read_value(v, p) := null if _probe(v, p) == _absent
 
@@ -1283,6 +1329,20 @@ _tally_read_outcome(v, p, cause) := _outcome_word(s) if {
 	s := _read_state(v, p)
 	s != "value"
 } else := _tally_value_outcome(cause)
+
+_tally_said_cause(cause, ps, p, text) := cause if {
+	count(ps) == 1
+	_ = p
+	_ = text
+}
+
+else := cause if {
+	cause == "unusable"
+	some c in _m_top_split(text, "; ")
+	some d in _m_top_split(c, ", and ")
+	_m_isnt_clause(d)
+	_m_clause_name(_m_after_lead(_m_lead_of(d), d)) == _input_name(p)
+} else := "usable"
 
 _tally_value_outcome("unusable") := "unusable"
 

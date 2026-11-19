@@ -32220,7 +32220,29 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/arts/0/xs/0/ys/1"
+                        ],
+                        "name": "item 2 of ys",
+                        "outcome": "unusable",
+                        "value": "b"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/arts/0/xs/0/ys/1"
+                    ],
+                    "message": "item 2 of ys is \"b\", which isn't a number",
+                    "name": "item 2 of ys",
+                    "value": "b"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -32285,7 +32307,7 @@
                 "value": "s"
               }
             ],
-            "message": "art.cov.z is \"s\", which isn't a number",
+            "message": "art.cov.z is \"s\", which isn't a number; item 2 of ys is \"b\", which isn't a number",
             "passed": false,
             "requirement": "r",
             "subject": {
