@@ -38811,7 +38811,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_count/assert/0"
                 ],
-                "message": "",
+                "message": "$params.k is null",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               },
               {
@@ -38856,7 +38856,7 @@
                 "value": null
               }
             ],
-            "message": "es is missing; ys is missing",
+            "message": "$params.k is null; es is missing; ys is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -38995,7 +38995,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_that/assert/0"
                 ],
-                "message": "",
+                "message": "$params.k is null",
                 "name": "count of es.v that equals m named by $params.k is 0"
               },
               {
@@ -39040,7 +39040,7 @@
                 "value": null
               }
             ],
-            "message": "es is missing; ys is missing",
+            "message": "$params.k is null; es is missing; ys is missing",
             "passed": false,
             "requirement": "s",
             "subject": {

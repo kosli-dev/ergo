@@ -899,18 +899,19 @@ _whose_missing_row(check) := _whose_key_row(_whose_key_doc, {}, check)
 
 _whose_number_row(check) := _whose_key_row(object.union(_whose_key_doc, {"k": 3}), {"k": 3}, check)
 
-test_a_whose_value_from_the_input_that_is_null_is_named_beside_worse_items_but_a_key_is_not if {
+test_a_whose_value_or_key_from_outside_that_is_null_is_named_beside_worse_items if {
 	_whose_null_row("count of rs whose zz is $input.k is 1") == [["absent", "$input.k is null; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
-	_whose_null_row("count of rs whose zz is m named by $input.k is 1") == [["absent", "item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
-	_whose_null_row("count of rs whose zz is m named by $params.k is 1") == [["absent", "item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
+	_whose_null_row("count of rs whose zz is m named by $input.k is 1") == [["absent", "$input.k is null; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
+	_whose_null_row("count of rs whose zz is m named by $params.k is 1") == [["absent", "$params.k is null; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
 	_whose_null_row("count of rs whose v is m named by $input.k is 1") == [["absent", "$input.k is null; item 1 of rs: m is missing; item 2 of rs: m is missing"]]
 }
 
-test_a_whose_item_that_isnt_an_object_beside_a_key_that_is_missing_or_null_fails_as_not_an_object if {
+test_a_whose_item_that_isnt_an_object_beside_a_key_that_is_missing_or_null_fails_as_not_an_object_after_the_key if {
 	doc := {"things": [{"id": "t", "m": {"a": "a"}, "rs": ["a", {"v": 1}]}]}
-	every k in [{}, {"k": null}] {
-		_whose_key_row(object.union(doc, k), {}, "count of rs whose zz is m named by $input.k is 1") == [["not_an_object", "item 1 of rs is \"a\", which isn't an object; item 2 of rs: zz is missing"]]
-		_whose_key_row(object.union(doc, k), {}, "count of rs whose v.y is m named by $input.k is 1") == [["not_an_object", "item 1 of rs is \"a\", which isn't an object; item 2 of rs: v is 1, which isn't an object"]]
+	every pair in [[{}, "$input.k is missing"], [{"k": null}, "$input.k is null"]] {
+		[k, said] := pair
+		_whose_key_row(object.union(doc, k), {}, "count of rs whose zz is m named by $input.k is 1") == [["not_an_object", concat("; ", [said, "item 1 of rs is \"a\", which isn't an object", "item 2 of rs: zz is missing"])]]
+		_whose_key_row(object.union(doc, k), {}, "count of rs whose v.y is m named by $input.k is 1") == [["not_an_object", concat("; ", [said, "item 1 of rs is \"a\", which isn't an object", "item 2 of rs: v is 1, which isn't an object"])]]
 	}
 }
 
@@ -932,15 +933,15 @@ test_a_whose_list_with_a_key_that_cant_be_read_is_read_before_any_item_so_the_ke
 	_whose_missing_row("count of rs whose zz is in m named by $params.k is 1") == [["absent", "$params.k is missing"]]
 }
 
-test_a_whose_key_that_is_missing_decides_even_beside_worse_items if {
+test_a_whose_key_that_is_missing_is_said_once_before_each_items_own_problem if {
 	every check in [
 		"count of rs whose zz is m named by $input.k is 1",
 		"count of rs whose zz is $input.m named by $input.k is 1",
 	] {
-		_whose_missing_row(check) == [["absent", "$input.k is missing"]]
+		_whose_missing_row(check) == [["absent", "$input.k is missing; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
 	}
 	_whose_missing_row("count of rs whose v is m named by $input.k is 1") == [["absent", "$input.k is missing; item 1 of rs: m is missing; item 2 of rs: m is missing"]]
-	_whose_missing_row("count of rs whose zz is m named by $params.k is 1") == [["absent", "$params.k is missing"]]
+	_whose_missing_row("count of rs whose zz is m named by $params.k is 1") == [["absent", "$params.k is missing; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
 }
 
 test_a_whose_key_that_isnt_text_fails_each_item_as_unusable if {

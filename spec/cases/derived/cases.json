@@ -22945,7 +22945,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/whose_missing"
                 ],
-                "message": "",
+                "message": "$input.k is null",
                 "name": "count of rs whose zz equals m named by $input.k is 1"
               }
             ],
@@ -22975,7 +22975,7 @@
                 ]
               }
             ],
-            "message": "item 1 of rs: zz is missing; item 2 of rs: zz is missing",
+            "message": "$input.k is null; item 1 of rs: zz is missing; item 2 of rs: zz is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -23043,13 +23043,21 @@
                     ],
                     "name": "count of ns whose zz equals m named by $input.k",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "/k"
+                    ],
+                    "name": "$input.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/whose_not_object"
                 ],
-                "message": "",
+                "message": "$input.k is null",
                 "name": "count of ns whose zz equals m named by $input.k is 1"
               }
             ],
@@ -23077,7 +23085,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ns is \"a\", which isn't an object; item 2 of ns: zz is missing",
+            "message": "$input.k is null; item 1 of ns is \"a\", which isn't an object; item 2 of ns: zz is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -23285,7 +23293,52 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ns/0"
+                        ],
+                        "name": "ns[0].zz",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ns/0"
+                    ],
+                    "message": "item 1 of ns is \"a\", which isn't an object",
+                    "name": "item 1 of ns",
+                    "value": "a"
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ns/1"
+                        ],
+                        "name": "ns[1].zz",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ns/1"
+                    ],
+                    "message": "zz is missing",
+                    "name": "item 2 of ns",
+                    "value": {
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -23294,13 +23347,21 @@
                     ],
                     "name": "count of ns whose zz equals m named by $input.k",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/whose_not_object"
                 ],
-                "message": "item 1 of ns is \"a\", which isn't an object",
+                "message": "$input.k is missing",
                 "name": "count of ns whose zz equals m named by $input.k is 1"
               }
             ],
@@ -23328,7 +23389,7 @@
                 ]
               }
             ],
-            "message": "item 1 of ns is \"a\", which isn't an object",
+            "message": "$input.k is missing; item 1 of ns is \"a\", which isn't an object; item 2 of ns: zz is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
