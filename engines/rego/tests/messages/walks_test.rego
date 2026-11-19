@@ -42,3 +42,19 @@ test_message_names_an_item_by_the_part_of_the_subject_it_goes_through if {
 	ergo._m_off_item_path(["xs", marker])
 	not ergo._m_off_item_path(["xs", "z"])
 }
+
+_count_of_es(whose) := {"count_of": ["es"], "text": "count of es", "whose": whose}
+
+test_an_item_names_every_condition_of_its_whose_it_cant_decide_and_not_only_the_first if {
+	plain := _count_of_es([
+		{"op": "compare", "cmp": "eq", "left": ["v"], "right": {"literal": 1}},
+		{"op": "compare", "cmp": "eq", "left": ["w"], "right": {"literal": 1}},
+	])
+	[x[1] | some x in ergo._m_tally_items({"es": [{}]}, plain)] == ["item 1 of es: v is missing", "item 1 of es: w is missing"]
+	keyed := _count_of_es([
+		{"op": "compare", "cmp": "eq", "left": ["zz"], "right": ["m", {"ref": ["$$params", "k"]}]},
+		{"op": "compare", "cmp": "eq", "left": ["v"], "right": ["m", {"ref": ["$$params", "j"]}]},
+	])
+	said := [x[1] | some x in ergo._m_tally_items({"es": [{"zz": 2, "v": 2}]}, keyed)] with data.ergo_params as {"k": "a", "j": 3}
+	"item 1 of es: $params.j is 3, which isn't text" in said
+}
