@@ -9561,31 +9561,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/rows/1/v"
-                        ],
-                        "name": "rows[1].v",
-                        "outcome": "unusable",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/cs/0/rows/1"
-                    ],
-                    "message": "v is 5, which isn't text",
-                    "name": "item 2 of rows",
-                    "value": {
-                      "v": 5
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -9616,7 +9592,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "",
+                "message": "item 2 of rows: v is 5, which isn't text",
                 "name": "count of rows whose v matches pos.p is 1"
               }
             ],
@@ -9917,31 +9893,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/kids/0/rows/1/v"
-                        ],
-                        "name": "rows[1].v",
-                        "outcome": "unusable",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/cs/0/kids/0/rows/1"
-                    ],
-                    "message": "v is 5, which isn't text",
-                    "name": "item 2 of rows",
-                    "value": {
-                      "v": 5
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -9968,7 +9920,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "",
+                "message": "item 2 of rows: v is 5, which isn't text",
                 "name": "count of rows whose v matches c.os.p is 1"
               }
             ],
@@ -10261,31 +10213,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/kids/0/rows/1/v"
-                        ],
-                        "name": "rows[1].v",
-                        "outcome": "unusable",
-                        "value": 5
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/cs/0/kids/0/rows/1"
-                    ],
-                    "message": "v is 5, which isn't text",
-                    "name": "item 2 of rows",
-                    "value": {
-                      "v": 5
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -10316,7 +10244,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/part_count"
                 ],
-                "message": "",
+                "message": "item 2 of rows: v is 5, which isn't text",
                 "name": "count of rows whose v matches c.pos.p is 1"
               }
             ],
@@ -17299,7 +17227,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/0/tags/0"
+                        ],
+                        "name": "tags[0].tags",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/0/tags/0"
+                    ],
+                    "message": "item 1 of tags is \"a\", which isn't an object",
+                    "name": "item 1 of tags",
+                    "value": "a"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -17321,7 +17271,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/whose"
                 ],
-                "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"key\": \"x\", \"m\": {\"x\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object; item 1 of tags is \"a\", which isn't an object",
+                "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"key\": \"x\", \"m\": {\"x\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object",
                 "name": "count of tags whose $input.k is in tags is 1"
               }
             ],
@@ -24335,6 +24285,14 @@
                 "locations": [],
                 "name": "in-scope f count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.k",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "in-scope f count is 0",
@@ -25779,6 +25737,14 @@
                 "locations": [],
                 "name": "in-scope f count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.k",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "in-scope f count is 0",
@@ -27223,6 +27189,14 @@
                 "locations": [],
                 "name": "in-scope f count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.k",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "in-scope f count is 0",
@@ -28667,6 +28641,14 @@
                 "locations": [],
                 "name": "in-scope f count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.k",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "in-scope f count is 0",
@@ -31358,37 +31340,25 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [
-                      {
-                        "cause": "unusable",
-                        "failures": [],
-                        "inputs": [
-                          {
-                            "locations": [
-                              "/things/0/xs/0"
-                            ],
-                            "name": "x.m named by $params.k",
-                            "outcome": "unusable",
-                            "value": null
-                          }
-                        ],
-                        "kind": "list",
-                        "message": "x is 1, which isn't an object",
-                        "name": "x.m named by $params.k"
-                      }
-                    ],
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [],
                         "name": "count of x.m named by $params.k",
                         "value": null
+                      },
+                      {
+                        "locations": [],
+                        "name": "x.m named by $params.k",
+                        "outcome": "unusable",
+                        "value": []
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "",
+                    "message": "x is 1, which isn't an object",
                     "name": "item 1 of xs",
                     "value": 1
                   }
@@ -31398,7 +31368,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/for_count/assert"
                 ],
-                "message": "$params.k is 3, which isn't text; item 1 of xs: x is 1, which isn't an object",
+                "message": "$params.k is 3, which isn't text",
                 "name": "count of x.m named by $params.k is 1"
               }
             ],
@@ -31431,37 +31401,25 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [
-                      {
-                        "cause": "unusable",
-                        "failures": [],
-                        "inputs": [
-                          {
-                            "locations": [
-                              "/things/0/xs/0"
-                            ],
-                            "name": "x.m named by $params.k",
-                            "outcome": "unusable",
-                            "value": null
-                          }
-                        ],
-                        "kind": "list",
-                        "message": "x is 1, which isn't an object",
-                        "name": "x.m named by $params.k"
-                      }
-                    ],
+                    "failures": [],
                     "inputs": [
                       {
                         "locations": [],
                         "name": "sum of x.m named by $params.k",
                         "value": null
+                      },
+                      {
+                        "locations": [],
+                        "name": "x.m named by $params.k",
+                        "outcome": "unusable",
+                        "value": []
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "",
+                    "message": "x is 1, which isn't an object",
                     "name": "item 1 of xs",
                     "value": 1
                   }
@@ -31471,7 +31429,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/for_sum/assert"
                 ],
-                "message": "$params.k is 3, which isn't text; item 1 of xs: x is 1, which isn't an object",
+                "message": "$params.k is 3, which isn't text",
                 "name": "sum of x.m named by $params.k is 1"
               }
             ],
@@ -36715,7 +36673,7 @@
                     "locations": [
                       "$policy:/requirements/r/checks/c/any_of/plain"
                     ],
-                    "message": "t is [{\"name\": \"a\"}, {\"name\": \"b\"}], which isn't an object",
+                    "message": "the subject is [{\"name\": \"a\"}, {\"name\": \"b\"}], which isn't an object",
                     "name": "every name equals other"
                   }
                 ],
@@ -36732,37 +36690,13 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [
-                      {
-                        "cause": "value",
-                        "failures": [],
-                        "inputs": [
-                          {
-                            "locations": [
-                              "/things/1/1/name"
-                            ],
-                            "name": "t[1].name",
-                            "outcome": "usable",
-                            "value": "b"
-                          }
-                        ],
-                        "kind": "item",
-                        "locations": [
-                          "/things/1/1"
-                        ],
-                        "message": "name is \"b\"",
-                        "name": "item 2 of t",
-                        "value": {
-                          "name": "b"
-                        }
-                      }
-                    ],
+                    "failures": [],
                     "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/r/checks/c/any_of/read"
                     ],
-                    "message": "",
+                    "message": "the subject is [{\"name\": \"a\"}, {\"name\": \"b\"}], which isn't an object",
                     "name": "every name is \"a\""
                   }
                 ],

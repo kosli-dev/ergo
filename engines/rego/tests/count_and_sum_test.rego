@@ -849,8 +849,8 @@ test_a_count_or_a_sum_on_both_sides_is_said_once_when_its_list_is_missing_or_nul
 	_dot_plain_rows("sum of xs.n is more than sum of xs.n", {"repos": [{"id": "r", "xs": null}]})[0].message == "xs is null"
 }
 
-test_a_count_of_a_position_in_params_that_are_an_empty_list_names_the_params if {
-	params_key_messages.g == "$params is [], which isn't an object" with data.params as []
+test_a_count_of_a_position_in_params_that_are_an_empty_list_names_the_missing_item if {
+	params_key_messages.g == "item 1 of $params is missing" with data.params as []
 }
 
 test_null_params_fail_a_walk_or_a_count_as_absent_like_a_plain_path if {

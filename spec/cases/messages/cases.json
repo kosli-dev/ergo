@@ -5783,7 +5783,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "p is \"x\", which isn't a list or an object, and item 1 of q: n is \"y\", which isn't a number",
+                "message": "",
                 "name": "sum of p.n plus sum of q.n is 100"
               }
             ],
@@ -13369,35 +13369,33 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [
+                    "failures": [],
+                    "inputs": [
                       {
-                        "cause": "not_an_object",
-                        "failures": [],
-                        "inputs": [
-                          {
-                            "locations": [
-                              "/things/0/ws/0/items/1"
-                            ],
-                            "name": "w.items[1].lo",
-                            "outcome": "not_an_object",
-                            "value": null
-                          }
-                        ],
-                        "kind": "item",
                         "locations": [
-                          "/things/0/ws/0/items/1"
+                          "/things/0/ws/0/items/0",
+                          "/things/0/ws/0/items/1",
+                          "/things/0/ws/0/items/2"
                         ],
-                        "message": "item 2 of w.items is null, which isn't an object",
-                        "name": "item 2 of w.items",
-                        "value": null
+                        "name": "w.items[]",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "lo": 1,
+                            "status": "no"
+                          },
+                          null,
+                          {
+                            "lo": 2
+                          }
+                        ]
                       }
                     ],
-                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/ws/0"
                     ],
-                    "message": "",
+                    "message": "item 2 of w.items is null, which isn't an object",
                     "name": "item 1 of ws",
                     "value": {
                       "items": [
@@ -16586,6 +16584,21 @@
             "check": "for",
             "failures": [
               {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [],
+                    "name": "xs[]",
+                    "outcome": "usable",
+                    "value": []
+                  }
+                ],
+                "kind": "list",
+                "message": "pr.z is \"s\", which isn't a list",
+                "name": "xs"
+              },
+              {
                 "cause": "value",
                 "failures": [],
                 "inputs": [
@@ -16609,14 +16622,6 @@
                 "name": "xs[]",
                 "outcome": "usable",
                 "value": []
-              },
-              {
-                "locations": [
-                  "/prs/0/z"
-                ],
-                "name": "pr.z",
-                "outcome": "unusable",
-                "value": "s"
               }
             ],
             "message": "pr.z is \"s\", which isn't a list; xs is []",
@@ -16698,14 +16703,6 @@
                     "locations": [],
                     "name": "count of xs whose v is in $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:/q"
-                    ],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -17018,6 +17015,14 @@
                         "name": "xs[1].aa",
                         "outcome": "absent",
                         "value": null
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/1"
+                        ],
+                        "name": "xs[1].b",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -17043,14 +17048,6 @@
                       "/prs/0"
                     ],
                     "name": "pr.z",
-                    "outcome": "absent",
-                    "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:"
-                    ],
-                    "name": "$params.q",
                     "outcome": "absent",
                     "value": null
                   }
@@ -17139,14 +17136,6 @@
                       "/prs/0"
                     ],
                     "name": "pr.z",
-                    "outcome": "absent",
-                    "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:"
-                    ],
-                    "name": "$params.q",
                     "outcome": "absent",
                     "value": null
                   }
@@ -18904,7 +18893,33 @@
           {
             "cause": "unusable",
             "check": "for",
-            "failures": [],
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/xs/0",
+                      "/prs/0/xs/1"
+                    ],
+                    "name": "xs[]",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "v": 1
+                      },
+                      {
+                        "v": 2
+                      }
+                    ]
+                  }
+                ],
+                "kind": "list",
+                "message": "pr.z is \"s\", which isn't a list",
+                "name": "xs"
+              }
+            ],
             "inputs": [
               {
                 "locations": [
@@ -18921,14 +18936,6 @@
                     "v": 2
                   }
                 ]
-              },
-              {
-                "locations": [
-                  "/prs/0/z"
-                ],
-                "name": "pr.z",
-                "outcome": "unusable",
-                "value": "s"
               }
             ],
             "message": "pr.z is \"s\", which isn't a list",
@@ -19105,6 +19112,14 @@
                         "name": "xs[1].v",
                         "outcome": "absent",
                         "value": null
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/1"
+                        ],
+                        "name": "xs[1].w",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -19132,14 +19147,6 @@
                     "name": "pr.l",
                     "outcome": "unusable",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "$params:/l"
-                    ],
-                    "name": "$params.l",
-                    "outcome": "unusable",
-                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -19477,14 +19484,6 @@
                     "name": "pr.l",
                     "outcome": "unusable",
                     "value": {}
-                  },
-                  {
-                    "locations": [
-                      "$params:/l"
-                    ],
-                    "name": "$params.l",
-                    "outcome": "unusable",
-                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -19743,14 +19742,6 @@
                     "name": "pr.l",
                     "outcome": "unusable",
                     "value": "s"
-                  },
-                  {
-                    "locations": [
-                      "$params:/l"
-                    ],
-                    "name": "$params.l",
-                    "outcome": "null",
-                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -19995,6 +19986,14 @@
                     "inputs": [
                       {
                         "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "xs[0].v",
+                        "outcome": "usable",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
                           "/prs/0/xs/0"
                         ],
                         "name": "xs[0].w",
@@ -20028,14 +20027,6 @@
                     "name": "pr.l",
                     "outcome": "unusable",
                     "value": "s"
-                  },
-                  {
-                    "locations": [
-                      "$params:/l"
-                    ],
-                    "name": "$params.l",
-                    "outcome": "null",
-                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -29628,15 +29619,9 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [
-                          "/arts/0/c"
-                        ],
+                        "locations": [],
                         "name": "art.cov.z",
-                        "outcome": "null",
-                        "part": {
-                          "id": null,
-                          "name": "art.cov"
-                        },
+                        "outcome": "absent",
                         "value": null
                       }
                     ],
@@ -29644,7 +29629,7 @@
                     "locations": [
                       "$policy:/requirements/r/checks/every/any_of/a"
                     ],
-                    "message": "art.cov is null",
+                    "message": "art.cov.z is missing",
                     "name": "every ys whose n is at least art.cov.z, if any, exists"
                   }
                 ],
@@ -29758,15 +29743,9 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [
-                          "/arts/0/c"
-                        ],
+                        "locations": [],
                         "name": "art.cov.z",
-                        "outcome": "null",
-                        "part": {
-                          "id": null,
-                          "name": "art.cov"
-                        },
+                        "outcome": "absent",
                         "value": null
                       }
                     ],
@@ -29774,7 +29753,7 @@
                     "locations": [
                       "$policy:/requirements/r/checks/some/any_of/a"
                     ],
-                    "message": "art.cov is null",
+                    "message": "art.cov.z is missing",
                     "name": "some ys whose n is at least art.cov.z exists"
                   }
                 ],
@@ -29895,15 +29874,9 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [
-                          "/arts/0"
-                        ],
+                        "locations": [],
                         "name": "art.cov.z",
                         "outcome": "absent",
-                        "part": {
-                          "id": null,
-                          "name": "art.cov"
-                        },
                         "value": null
                       }
                     ],
@@ -30027,15 +30000,9 @@
                     ],
                     "inputs": [
                       {
-                        "locations": [
-                          "/arts/0"
-                        ],
+                        "locations": [],
                         "name": "art.cov.z",
                         "outcome": "absent",
-                        "part": {
-                          "id": null,
-                          "name": "art.cov"
-                        },
                         "value": null
                       }
                     ],
@@ -35171,14 +35138,7 @@
                     "value": {}
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/alias/assert"
@@ -35495,10 +35455,6 @@
                         ],
                         "name": "pl.z",
                         "outcome": "absent",
-                        "part": {
-                          "id": null,
-                          "name": "pl"
-                        },
                         "value": null
                       }
                     ],
@@ -39033,11 +38989,11 @@
         "input": {"ts": [{"id": "a", "p": {}}]},
         "results": [
           {
-            "cause": "absent",
+            "cause": "unusable",
             "check": "count",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "unusable",
                 "failures": [
                   {
                     "cause": "absent",
@@ -39147,14 +39103,6 @@
                     "locations": [
                       "$params:"
                     ],
-                    "name": "$params.z",
-                    "outcome": "unusable",
-                    "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:"
-                    ],
                     "name": "0 plus $params.q",
                     "value": null
                   },
@@ -39233,11 +39181,11 @@
         "input": {"ts": [{"id": "a", "p": {}, "es": []}]},
         "results": [
           {
-            "cause": "absent",
+            "cause": "unusable",
             "check": "count",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "unusable",
                 "failures": [],
                 "inputs": [
                   {
@@ -39296,30 +39244,12 @@
             }
           },
           {
-            "cause": "absent",
+            "cause": "unusable",
             "check": "every",
             "failures": [
               {
-                "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "value",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/ts/0/es"
-                        ],
-                        "name": "es",
-                        "outcome": "usable",
-                        "value": []
-                      }
-                    ],
-                    "kind": "list",
-                    "message": "es is []",
-                    "name": "es"
-                  }
-                ],
+                "cause": "unusable",
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -39354,7 +39284,7 @@
                 "value": []
               }
             ],
-            "message": "$input.z is missing; es is []",
+            "message": "$input.z is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -39377,14 +39307,6 @@
                   {
                     "locations": [],
                     "name": "count of es whose v is in $params.z",
-                    "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:"
-                    ],
-                    "name": "$params.z",
-                    "outcome": "unusable",
                     "value": null
                   },
                   {
@@ -39452,30 +39374,12 @@
             }
           },
           {
-            "cause": "absent",
+            "cause": "unusable",
             "check": "some",
             "failures": [
               {
-                "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "value",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/ts/0/es"
-                        ],
-                        "name": "es",
-                        "outcome": "usable",
-                        "value": []
-                      }
-                    ],
-                    "kind": "list",
-                    "message": "es is []",
-                    "name": "es"
-                  }
-                ],
+                "cause": "unusable",
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -39518,7 +39422,7 @@
                 "value": null
               }
             ],
-            "message": "pl.z is missing; es is []",
+            "message": "pl.z is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -40062,11 +39966,11 @@
         "input": {"ts": [{"id": "a", "p": [1]}]},
         "results": [
           {
-            "cause": "unusable",
+            "cause": "absent",
             "check": "every",
             "failures": [
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [
                   {
                     "cause": "absent",
@@ -40092,7 +39996,7 @@
                       "/ts/0/p/0"
                     ],
                     "name": "pl[].z",
-                    "outcome": "unusable",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -40122,7 +40026,7 @@
                   "/ts/0/p/0"
                 ],
                 "name": "pl[].z",
-                "outcome": "unusable",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -40146,11 +40050,11 @@
             }
           },
           {
-            "cause": "unusable",
+            "cause": "absent",
             "check": "some",
             "failures": [
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [
                   {
                     "cause": "absent",
@@ -40176,7 +40080,7 @@
                       "/ts/0/p/0"
                     ],
                     "name": "pl[].z",
-                    "outcome": "unusable",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -40206,7 +40110,7 @@
                   "/ts/0/p/0"
                 ],
                 "name": "pl[].z",
-                "outcome": "unusable",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -40237,11 +40141,11 @@
         "input": {"ts": [{"id": "a", "p": [1], "es": null}]},
         "results": [
           {
-            "cause": "unusable",
+            "cause": "null",
             "check": "every",
             "failures": [
               {
-                "cause": "unusable",
+                "cause": "null",
                 "failures": [
                   {
                     "cause": "null",
@@ -40267,7 +40171,7 @@
                       "/ts/0/p/0"
                     ],
                     "name": "pl[].z",
-                    "outcome": "unusable",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -40297,7 +40201,7 @@
                   "/ts/0/p/0"
                 ],
                 "name": "pl[].z",
-                "outcome": "unusable",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -40322,11 +40226,11 @@
             }
           },
           {
-            "cause": "unusable",
+            "cause": "null",
             "check": "some",
             "failures": [
               {
-                "cause": "unusable",
+                "cause": "null",
                 "failures": [
                   {
                     "cause": "null",
@@ -40352,7 +40256,7 @@
                       "/ts/0/p/0"
                     ],
                     "name": "pl[].z",
-                    "outcome": "unusable",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -40382,7 +40286,7 @@
                   "/ts/0/p/0"
                 ],
                 "name": "pl[].z",
-                "outcome": "unusable",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -40414,11 +40318,11 @@
         "input": {"ts": [{"id": "a", "p": [1], "es": []}]},
         "results": [
           {
-            "cause": "unusable",
+            "cause": "value",
             "check": "every",
             "failures": [
               {
-                "cause": "unusable",
+                "cause": "value",
                 "failures": [
                   {
                     "cause": "value",
@@ -40444,7 +40348,7 @@
                       "/ts/0/p/0"
                     ],
                     "name": "pl[].z",
-                    "outcome": "unusable",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -40458,7 +40362,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/every"
                 ],
-                "message": "item 1 of pl is 1, which isn't an object",
+                "message": "",
                 "name": "every es whose v is in pl.z exists"
               }
             ],
@@ -40474,7 +40378,7 @@
                   "/ts/0/p/0"
                 ],
                 "name": "pl[].z",
-                "outcome": "unusable",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -40484,7 +40388,7 @@
                 ]
               }
             ],
-            "message": "item 1 of pl is 1, which isn't an object; es is []",
+            "message": "es is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -40499,11 +40403,11 @@
             }
           },
           {
-            "cause": "unusable",
+            "cause": "value",
             "check": "some",
             "failures": [
               {
-                "cause": "unusable",
+                "cause": "value",
                 "failures": [
                   {
                     "cause": "value",
@@ -40529,7 +40433,7 @@
                       "/ts/0/p/0"
                     ],
                     "name": "pl[].z",
-                    "outcome": "unusable",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pl"
@@ -40543,7 +40447,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/some"
                 ],
-                "message": "item 1 of pl is 1, which isn't an object",
+                "message": "",
                 "name": "some es whose v is in pl.z exists"
               }
             ],
@@ -40559,7 +40463,7 @@
                   "/ts/0/p/0"
                 ],
                 "name": "pl[].z",
-                "outcome": "unusable",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pl"
@@ -40569,7 +40473,7 @@
                 ]
               }
             ],
-            "message": "item 1 of pl is 1, which isn't an object; es is []",
+            "message": "es is []",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -40966,32 +40870,23 @@
                 "cause": "absent",
                 "failures": [
                   {
-                    "cause": "null",
-                    "failures": [
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
                       {
-                        "cause": "null",
-                        "failures": [],
-                        "inputs": [
-                          {
-                            "locations": [
-                              "/ts/0/gs/0/es"
-                            ],
-                            "name": "gs[0].es",
-                            "outcome": "null",
-                            "value": null
-                          }
+                        "locations": [
+                          "/ts/0/gs/0/es"
                         ],
-                        "kind": "list",
-                        "message": "es is null",
-                        "name": "es"
+                        "name": "gs[0].es.v",
+                        "outcome": "not_an_object",
+                        "value": null
                       }
                     ],
-                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/ts/0/gs/0"
                     ],
-                    "message": "",
+                    "message": "es is null, which isn't an object",
                     "name": "item 1 of gs",
                     "value": {
                       "es": null
@@ -40999,31 +40894,22 @@
                   },
                   {
                     "cause": "absent",
-                    "failures": [
+                    "failures": [],
+                    "inputs": [
                       {
-                        "cause": "absent",
-                        "failures": [],
-                        "inputs": [
-                          {
-                            "locations": [
-                              "/ts/0/gs/1"
-                            ],
-                            "name": "gs[1].es",
-                            "outcome": "absent",
-                            "value": null
-                          }
+                        "locations": [
+                          "/ts/0/gs/1"
                         ],
-                        "kind": "list",
-                        "message": "es is missing",
-                        "name": "es"
+                        "name": "gs[1].es",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
-                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/ts/0/gs/1"
                     ],
-                    "message": "",
+                    "message": "es is missing",
                     "name": "item 2 of gs",
                     "value": {}
                   }
@@ -41035,14 +40921,6 @@
                       "/ts/0/gs/1"
                     ],
                     "name": "count of gs.es whose v is in $params.z",
-                    "value": null
-                  },
-                  {
-                    "locations": [
-                      "$params:"
-                    ],
-                    "name": "$params.z",
-                    "outcome": "absent",
                     "value": null
                   }
                 ],
@@ -41076,7 +40954,7 @@
                 ]
               }
             ],
-            "message": "$params.z is missing; item 1 of gs: es is null; item 2 of gs: es is missing",
+            "message": "$params.z is missing; item 1 of gs: es is null, which isn't an object; item 2 of gs: es is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -41093,39 +40971,30 @@
             }
           },
           {
-            "cause": "absent",
+            "cause": "not_an_object",
             "check": "every",
             "failures": [
               {
-                "cause": "absent",
+                "cause": "not_an_object",
                 "failures": [
                   {
-                    "cause": "null",
-                    "failures": [
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
                       {
-                        "cause": "null",
-                        "failures": [],
-                        "inputs": [
-                          {
-                            "locations": [
-                              "/ts/0/gs/0/es"
-                            ],
-                            "name": "gs[0].es",
-                            "outcome": "null",
-                            "value": null
-                          }
+                        "locations": [
+                          "/ts/0/gs/0/es"
                         ],
-                        "kind": "list",
-                        "message": "es is null",
-                        "name": "es"
+                        "name": "gs[0].es.v",
+                        "outcome": "not_an_object",
+                        "value": null
                       }
                     ],
-                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/ts/0/gs/0"
                     ],
-                    "message": "",
+                    "message": "es is null, which isn't an object",
                     "name": "item 1 of gs",
                     "value": {
                       "es": null
@@ -41133,31 +41002,22 @@
                   },
                   {
                     "cause": "absent",
-                    "failures": [
+                    "failures": [],
+                    "inputs": [
                       {
-                        "cause": "absent",
-                        "failures": [],
-                        "inputs": [
-                          {
-                            "locations": [
-                              "/ts/0/gs/1"
-                            ],
-                            "name": "gs[1].es",
-                            "outcome": "absent",
-                            "value": null
-                          }
+                        "locations": [
+                          "/ts/0/gs/1"
                         ],
-                        "kind": "list",
-                        "message": "es is missing",
-                        "name": "es"
+                        "name": "gs[1].es",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
-                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/ts/0/gs/1"
                     ],
-                    "message": "",
+                    "message": "es is missing",
                     "name": "item 2 of gs",
                     "value": {}
                   }
@@ -41194,7 +41054,7 @@
                 ]
               }
             ],
-            "message": "$params.z is missing; item 1 of gs: es is null; item 2 of gs: es is missing",
+            "message": "$params.z is missing; item 1 of gs: es is null, which isn't an object; item 2 of gs: es is missing",
             "passed": false,
             "requirement": "r",
             "subject": {

@@ -17116,7 +17116,7 @@
                 "cause": "value",
                 "failures": [
                   {
-                    "cause": "value",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -17124,7 +17124,7 @@
                           "/things/0/commits/0/author"
                         ],
                         "name": "commits[0].author",
-                        "outcome": "usable",
+                        "outcome": "absent",
                         "value": "grace"
                       }
                     ],
@@ -17132,7 +17132,7 @@
                     "locations": [
                       "/things/0/commits/0"
                     ],
-                    "message": "author is \"grace\", and approver is \"grace\"",
+                    "message": ".approver is missing",
                     "name": "item 1 of commits",
                     "value": {
                       "approver": "ada",
@@ -17145,7 +17145,7 @@
                     "locations": [
                       "/things/0/approver"
                     ],
-                    "name": "approver",
+                    "name": ".approver",
                     "outcome": "usable",
                     "value": "grace"
                   }
@@ -34600,12 +34600,6 @@
                     "cause": "unusable",
                     "failures": [],
                     "inputs": [
-                      {
-                        "locations": [],
-                        "name": "licenses.license.id",
-                        "outcome": "absent",
-                        "value": []
-                      },
                       {
                         "locations": [
                           "$params:/allowed_licenses"
@@ -77986,7 +77980,7 @@
               {
                 "locations": [],
                 "name": "r.a.xs named by p",
-                "outcome": "null",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -78155,7 +78149,7 @@
               {
                 "locations": [],
                 "name": "r.a.xs.k",
-                "outcome": "null",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -78397,7 +78391,7 @@
               {
                 "locations": [],
                 "name": "r.a.xs.k",
-                "outcome": "null",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -78639,7 +78633,7 @@
               {
                 "locations": [],
                 "name": "r.a.xs.k",
-                "outcome": "null",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -78887,7 +78881,7 @@
               {
                 "locations": [],
                 "name": "r.a.xs.k",
-                "outcome": "null",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -88036,7 +88030,1396 @@
       }
     ]
   },
-  {"description": "the examples the rules for where a name resolves were decided on", "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"username_in_focus": "count of approvers.username whose state is \"APPROVED\" is 1", "approvers_in_focus": "count of approvers whose state is \"APPROVED\" is 1", "right_side_from_the_subject": "every approvers.username does not equal author", "count_right_side": "count of approvers is at least min_approvals", "two_fields_of_an_item_after_every": "every approvers.approved_at is after assigned_at", "two_fields_of_an_item_in_a_whose": "count of deployments whose finished_at is after started_at is 1", "subject_field_in_a_clause": "count of approvers whose username does not equal pr.author is 1", "bare_name_in_a_clause": "count of approvers whose username does not equal author is 1", "whole_subject": "pr is an object", "two_clauses_and_a_new_assertion": "count of approvers whose state is \"APPROVED\" and whose username does not equal pr.author is at least 1 and author is \"ann\""}}}}, "cases": [{"description": "each check reads its names where the rules say, on the pull request of the decision", "rules": ["sentence.resolve.root", "sentence.resolve.focus", "sentence.resolve.clause", "sentence.path.subject.step", "sentence.assert.and", "walk.items", "tally.whose", "message.items"], "input": {"prs": [{"id": "p1", "author": "ann", "min_approvals": 2, "approvers": [{"username": "bob", "state": "APPROVED", "assigned_at": "2026-01-02T00:00:00Z", "approved_at": "2026-01-03T00:00:00Z"}, {"username": "ann", "state": "APPROVED", "assigned_at": "2026-01-04T00:00:00Z", "approved_at": "2026-01-03T00:00:00Z"}], "deployments": [{"started_at": "2026-01-02T00:00:00Z", "finished_at": "2026-01-03T00:00:00Z"}, {"started_at": "2026-01-05T00:00:00Z", "finished_at": "2026-01-04T00:00:00Z"}]}]}, "results": [{"cause": "value", "check": "approvers_in_focus", "failures": [{"cause": "value", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose state is \"APPROVED\"", "value": 2}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/approvers_in_focus"], "message": "count of approvers whose state is \"APPROVED\" is 2", "name": "count of approvers whose state is \"APPROVED\" is 1"}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose state is \"APPROVED\"", "value": 2}, {"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "approvers[]", "outcome": "usable", "value": [{"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-02T00:00:00Z", "state": "APPROVED", "username": "bob"}, {"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-04T00:00:00Z", "state": "APPROVED", "username": "ann"}]}], "message": "count of approvers whose state is \"APPROVED\" is 2", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pr"}}, {"cause": "absent", "check": "bare_name_in_a_clause", "failures": [{"cause": "absent", "failures": [{"cause": "absent", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/0"], "name": "approvers[0].author", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/0"], "message": "author is missing", "name": "item 1 of approvers", "value": {"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-02T00:00:00Z", "state": "APPROVED", "username": "bob"}}, {"cause": "absent", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/1"], "name": "approvers[1].author", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/1"], "message": "author is missing", "name": "item 2 of approvers", "value": {"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-04T00:00:00Z", "state": "APPROVED", "username": "ann"}}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose username does not equal author", "value": null}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/bare_name_in_a_clause"], "message": "", "name": "count of approvers whose username does not equal author is 1"}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose username does not equal author", "value": null}, {"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "approvers[]", "outcome": "usable", "value": [{"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-02T00:00:00Z", "state": "APPROVED", "username": "bob"}, {"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-04T00:00:00Z", "state": "APPROVED", "username": "ann"}]}], "message": "item 1 of approvers: author is missing; item 2 of approvers: author is missing", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pr"}}, {"cause": "satisfied", "check": "count_right_side", "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers", "value": 2}, {"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "approvers[]", "value": [{"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-02T00:00:00Z", "state": "APPROVED", "username": "bob"}, {"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-04T00:00:00Z", "state": "APPROVED", "username": "ann"}]}, {"locations": ["/prs/0/min_approvals"], "name": "min_approvals", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": "p1", "type": "pr"}}, {"cause": "value", "check": "right_side_from_the_subject", "failures": [{"cause": "value", "failures": [{"cause": "value", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/1/username"], "name": "approvers[1].username", "outcome": "usable", "value": "ann"}], "kind": "item", "locations": ["/prs/0/approvers/1"], "message": "username is \"ann\", and author is \"ann\"", "name": "item 2 of approvers", "value": {"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-04T00:00:00Z", "state": "APPROVED", "username": "ann"}}], "inputs": [{"locations": ["/prs/0/author"], "name": "author", "outcome": "usable", "value": "ann"}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/right_side_from_the_subject"], "message": "", "name": "every approvers.username does not equal author"}], "inputs": [{"locations": ["/prs/0/approvers/0/username", "/prs/0/approvers/1/username"], "name": "approvers[].username", "outcome": "usable", "value": ["bob", "ann"]}, {"locations": ["/prs/0/author"], "name": "author", "outcome": "usable", "value": "ann"}], "message": "item 2 of approvers: username is \"ann\", and author is \"ann\"", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pr"}}, {"cause": "satisfied", "check": "subject_field_in_a_clause", "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose username does not equal pr.author", "value": 1}, {"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "approvers[]", "value": [{"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-02T00:00:00Z", "state": "APPROVED", "username": "bob"}, {"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-04T00:00:00Z", "state": "APPROVED", "username": "ann"}]}, {"locations": ["/prs/0/author"], "name": "pr.author", "value": "ann"}], "passed": true, "requirement": "r", "subject": {"id": "p1", "type": "pr"}}, {"cause": "satisfied", "check": "two_clauses_and_a_new_assertion", "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "approvers[]", "value": [{"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-02T00:00:00Z", "state": "APPROVED", "username": "bob"}, {"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-04T00:00:00Z", "state": "APPROVED", "username": "ann"}]}, {"locations": ["/prs/0/author"], "name": "author", "value": "ann"}, {"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose state is \"APPROVED\" and whose username does not equal pr.author", "value": 1}, {"locations": ["/prs/0/author"], "name": "pr.author", "value": "ann"}], "passed": true, "requirement": "r", "subject": {"id": "p1", "type": "pr"}}, {"cause": "absent", "check": "two_fields_of_an_item_after_every", "failures": [{"cause": "absent", "failures": [], "inputs": [{"locations": ["/prs/0"], "name": "assigned_at", "outcome": "absent", "value": null}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/two_fields_of_an_item_after_every"], "message": "assigned_at is missing", "name": "every approvers.approved_at is after assigned_at"}], "inputs": [{"locations": ["/prs/0/approvers/0/approved_at", "/prs/0/approvers/1/approved_at"], "name": "approvers[].approved_at", "outcome": "usable", "value": ["2026-01-03T00:00:00Z", "2026-01-03T00:00:00Z"]}, {"locations": ["/prs/0"], "name": "assigned_at", "outcome": "absent", "value": null}], "message": "assigned_at is missing", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pr"}}, {"cause": "satisfied", "check": "two_fields_of_an_item_in_a_whose", "inputs": [{"locations": ["/prs/0/deployments/0", "/prs/0/deployments/1"], "name": "count of deployments whose finished_at is after started_at", "value": 1}, {"locations": ["/prs/0/deployments/0", "/prs/0/deployments/1"], "name": "deployments[]", "value": [{"finished_at": "2026-01-03T00:00:00Z", "started_at": "2026-01-02T00:00:00Z"}, {"finished_at": "2026-01-04T00:00:00Z", "started_at": "2026-01-05T00:00:00Z"}]}], "passed": true, "requirement": "r", "subject": {"id": "p1", "type": "pr"}}, {"cause": "not_an_object", "check": "username_in_focus", "failures": [{"cause": "not_an_object", "failures": [{"cause": "not_an_object", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/0/username"], "name": "approvers[0].username.state", "outcome": "not_an_object", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/0"], "message": "username is \"bob\", which isn't an object", "name": "item 1 of approvers", "value": {"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-02T00:00:00Z", "state": "APPROVED", "username": "bob"}}, {"cause": "not_an_object", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/1/username"], "name": "approvers[1].username.state", "outcome": "not_an_object", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/1"], "message": "username is \"ann\", which isn't an object", "name": "item 2 of approvers", "value": {"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-04T00:00:00Z", "state": "APPROVED", "username": "ann"}}], "inputs": [{"locations": ["/prs/0/approvers/0/username", "/prs/0/approvers/1/username"], "name": "count of approvers.username whose state is \"APPROVED\"", "value": null}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/username_in_focus"], "message": "", "name": "count of approvers.username whose state is \"APPROVED\" is 1"}], "inputs": [{"locations": ["/prs/0/approvers/0/username", "/prs/0/approvers/1/username"], "name": "count of approvers.username whose state is \"APPROVED\"", "value": null}, {"locations": ["/prs/0/approvers/0/username", "/prs/0/approvers/1/username"], "name": "approvers[].username", "outcome": "usable", "value": ["bob", "ann"]}], "message": "item 1 of approvers: username is \"bob\", which isn't an object; item 2 of approvers: username is \"ann\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pr"}}, {"cause": "satisfied", "check": "whole_subject", "inputs": [{"locations": ["/prs/0"], "name": "pr", "value": {"approvers": [{"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-02T00:00:00Z", "state": "APPROVED", "username": "bob"}, {"approved_at": "2026-01-03T00:00:00Z", "assigned_at": "2026-01-04T00:00:00Z", "state": "APPROVED", "username": "ann"}], "author": "ann", "deployments": [{"finished_at": "2026-01-03T00:00:00Z", "started_at": "2026-01-02T00:00:00Z"}, {"finished_at": "2026-01-04T00:00:00Z", "started_at": "2026-01-05T00:00:00Z"}], "id": "p1", "min_approvals": 2}}], "passed": true, "requirement": "r", "subject": {"id": "p1", "type": "pr"}}]}, {"description": "a focus that is missing fails as absent, and one that is null as not_an_object, naming the item and the value", "rules": ["sentence.resolve.focus", "walk.items", "tally.whose", "message.items", "path.not_an_object"], "input": {"prs": [{"id": "p2", "author": "ann", "min_approvals": 1, "approvers": [{"state": "APPROVED"}, {"username": null, "state": "APPROVED"}], "deployments": []}]}, "results": [{"cause": "value", "check": "approvers_in_focus", "failures": [{"cause": "value", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose state is \"APPROVED\"", "value": 2}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/approvers_in_focus"], "message": "count of approvers whose state is \"APPROVED\" is 2", "name": "count of approvers whose state is \"APPROVED\" is 1"}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose state is \"APPROVED\"", "value": 2}, {"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "approvers[]", "outcome": "usable", "value": [{"state": "APPROVED"}, {"state": "APPROVED", "username": null}]}], "message": "count of approvers whose state is \"APPROVED\" is 2", "passed": false, "requirement": "r", "subject": {"id": "p2", "type": "pr"}}, {"cause": "absent", "check": "bare_name_in_a_clause", "failures": [{"cause": "absent", "failures": [{"cause": "absent", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/0"], "name": "approvers[0].username", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/0"], "message": "username is missing, and author is missing", "name": "item 1 of approvers", "value": {"state": "APPROVED"}}, {"cause": "absent", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/1/username"], "name": "approvers[1].username", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/1"], "message": "author is missing", "name": "item 2 of approvers", "value": {"state": "APPROVED", "username": null}}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose username does not equal author", "value": null}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/bare_name_in_a_clause"], "message": "", "name": "count of approvers whose username does not equal author is 1"}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose username does not equal author", "value": null}, {"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "approvers[]", "outcome": "usable", "value": [{"state": "APPROVED"}, {"state": "APPROVED", "username": null}]}], "message": "item 1 of approvers: username is missing, and author is missing; item 2 of approvers: author is missing", "passed": false, "requirement": "r", "subject": {"id": "p2", "type": "pr"}}, {"cause": "satisfied", "check": "count_right_side", "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers", "value": 2}, {"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "approvers[]", "value": [{"state": "APPROVED"}, {"state": "APPROVED", "username": null}]}, {"locations": ["/prs/0/min_approvals"], "name": "min_approvals", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "p2", "type": "pr"}}, {"cause": "absent", "check": "right_side_from_the_subject", "failures": [{"cause": "absent", "failures": [{"cause": "absent", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/0"], "name": "approvers[0].username", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/0"], "message": "username is missing", "name": "item 1 of approvers", "value": {"state": "APPROVED"}}, {"cause": "null", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/1/username"], "name": "approvers[1].username", "outcome": "null", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/1"], "message": "username is null", "name": "item 2 of approvers", "value": {"state": "APPROVED", "username": null}}], "inputs": [{"locations": ["/prs/0/author"], "name": "author", "outcome": "usable", "value": "ann"}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/right_side_from_the_subject"], "message": "", "name": "every approvers.username does not equal author"}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1/username"], "name": "approvers[].username", "outcome": "usable", "value": [null, null]}, {"locations": ["/prs/0/author"], "name": "author", "outcome": "usable", "value": "ann"}], "message": "item 1 of approvers: username is missing; item 2 of approvers: username is null", "passed": false, "requirement": "r", "subject": {"id": "p2", "type": "pr"}}, {"cause": "absent", "check": "subject_field_in_a_clause", "failures": [{"cause": "absent", "failures": [{"cause": "absent", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/0"], "name": "approvers[0].username", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/0"], "message": "username is missing", "name": "item 1 of approvers", "value": {"state": "APPROVED"}}, {"cause": "null", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/1/username"], "name": "approvers[1].username", "outcome": "null", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/1"], "message": "username is null", "name": "item 2 of approvers", "value": {"state": "APPROVED", "username": null}}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose username does not equal pr.author", "value": null}, {"locations": ["/prs/0/author"], "name": "pr.author", "outcome": "usable", "value": "ann"}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/subject_field_in_a_clause"], "message": "", "name": "count of approvers whose username does not equal pr.author is 1"}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose username does not equal pr.author", "value": null}, {"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "approvers[]", "outcome": "usable", "value": [{"state": "APPROVED"}, {"state": "APPROVED", "username": null}]}, {"locations": ["/prs/0/author"], "name": "pr.author", "outcome": "usable", "value": "ann"}], "message": "item 1 of approvers: username is missing; item 2 of approvers: username is null", "passed": false, "requirement": "r", "subject": {"id": "p2", "type": "pr"}}, {"cause": "absent", "check": "two_clauses_and_a_new_assertion", "failures": [{"cause": "absent", "failures": [{"cause": "absent", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/0"], "name": "approvers[0].username", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/0"], "message": "username is missing", "name": "item 1 of approvers", "value": {"state": "APPROVED"}}, {"cause": "null", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/1/username"], "name": "approvers[1].username", "outcome": "null", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/1"], "message": "username is null", "name": "item 2 of approvers", "value": {"state": "APPROVED", "username": null}}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose state is \"APPROVED\" and whose username does not equal pr.author", "value": null}, {"locations": ["/prs/0/author"], "name": "pr.author", "outcome": "usable", "value": "ann"}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/two_clauses_and_a_new_assertion#1"], "message": "", "name": "count of approvers whose state is \"APPROVED\" and whose username does not equal pr.author is at least 1"}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "approvers[]", "outcome": "usable", "value": [{"state": "APPROVED"}, {"state": "APPROVED", "username": null}]}, {"locations": ["/prs/0/author"], "name": "author", "outcome": "usable", "value": "ann"}, {"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "count of approvers whose state is \"APPROVED\" and whose username does not equal pr.author", "value": null}, {"locations": ["/prs/0/author"], "name": "pr.author", "outcome": "usable", "value": "ann"}], "message": "item 1 of approvers: username is missing; item 2 of approvers: username is null", "passed": false, "requirement": "r", "subject": {"id": "p2", "type": "pr"}}, {"cause": "absent", "check": "two_fields_of_an_item_after_every", "failures": [{"cause": "absent", "failures": [], "inputs": [{"locations": ["/prs/0"], "name": "assigned_at", "outcome": "absent", "value": null}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/two_fields_of_an_item_after_every"], "message": "assigned_at is missing", "name": "every approvers.approved_at is after assigned_at"}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1"], "name": "approvers[].approved_at", "outcome": "usable", "value": [null, null]}, {"locations": ["/prs/0"], "name": "assigned_at", "outcome": "absent", "value": null}], "message": "assigned_at is missing", "passed": false, "requirement": "r", "subject": {"id": "p2", "type": "pr"}}, {"cause": "value", "check": "two_fields_of_an_item_in_a_whose", "failures": [{"cause": "value", "failures": [], "inputs": [{"locations": [], "name": "count of deployments whose finished_at is after started_at", "value": 0}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/two_fields_of_an_item_in_a_whose"], "message": "count of deployments whose finished_at is after started_at is 0", "name": "count of deployments whose finished_at is after started_at is 1"}], "inputs": [{"locations": [], "name": "count of deployments whose finished_at is after started_at", "value": 0}, {"locations": [], "name": "deployments[]", "outcome": "usable", "value": []}], "message": "count of deployments whose finished_at is after started_at is 0", "passed": false, "requirement": "r", "subject": {"id": "p2", "type": "pr"}}, {"cause": "not_an_object", "check": "username_in_focus", "failures": [{"cause": "not_an_object", "failures": [{"cause": "absent", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/0"], "name": "approvers[0].username", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/0"], "message": "username is missing", "name": "item 1 of approvers", "value": {"state": "APPROVED"}}, {"cause": "not_an_object", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/1/username"], "name": "approvers[1].username.state", "outcome": "not_an_object", "value": null}], "kind": "item", "locations": ["/prs/0/approvers/1"], "message": "username is null, which isn't an object", "name": "item 2 of approvers", "value": {"state": "APPROVED", "username": null}}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1/username"], "name": "count of approvers.username whose state is \"APPROVED\"", "value": null}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/username_in_focus"], "message": "", "name": "count of approvers.username whose state is \"APPROVED\" is 1"}], "inputs": [{"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1/username"], "name": "count of approvers.username whose state is \"APPROVED\"", "value": null}, {"locations": ["/prs/0/approvers/0", "/prs/0/approvers/1/username"], "name": "approvers[].username", "outcome": "usable", "value": [null, null]}], "message": "item 1 of approvers: username is missing; item 2 of approvers: username is null, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "p2", "type": "pr"}}, {"cause": "satisfied", "check": "whole_subject", "inputs": [{"locations": ["/prs/0"], "name": "pr", "value": {"approvers": [{"state": "APPROVED"}, {"state": "APPROVED", "username": null}], "author": "ann", "deployments": [], "id": "p2", "min_approvals": 1}}], "passed": true, "requirement": "r", "subject": {"id": "p2", "type": "pr"}}]}]},
+  {"description": "the examples the rules for where a name resolves were decided on", "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"username_in_focus": "count of approvers.username whose state is \"APPROVED\" is 1", "approvers_in_focus": "count of approvers whose state is \"APPROVED\" is 1", "right_side_from_the_subject": "every approvers.username does not equal author", "count_right_side": "count of approvers is at least min_approvals", "two_fields_of_an_item_after_every": "every approvers.approved_at is after assigned_at", "two_fields_of_an_item_in_a_whose": "count of deployments whose finished_at is after started_at is 1", "subject_field_in_a_clause": "count of approvers whose username does not equal pr.author is 1", "bare_name_in_a_clause": "count of approvers whose username does not equal author is 1", "whole_subject": "pr is an object", "two_clauses_and_a_new_assertion": "count of approvers whose state is \"APPROVED\" and whose username does not equal pr.author is at least 1 and author is \"ann\""}}}}, "cases": [{"description": "each check reads its names where the rules say, on the pull request of the decision", "rules": ["sentence.resolve.root", "sentence.resolve.focus", "sentence.resolve.clause", "sentence.path.subject.step", "sentence.assert.and", "walk.items", "tally.whose", "message.items"], "input": {"prs": [{"id": "p1", "author": "ann", "min_approvals": 2, "approvers": [{"username": "bob", "state": "APPROVED", "assigned_at": "2026-01-02T00:00:00Z", "approved_at": "2026-01-03T00:00:00Z"}, {"username": "ann", "state": "APPROVED", "assigned_at": "2026-01-04T00:00:00Z", "approved_at": "2026-01-03T00:00:00Z"}], "deployments": [{"started_at": "2026-01-02T00:00:00Z", "finished_at": "2026-01-03T00:00:00Z"}, {"started_at": "2026-01-05T00:00:00Z", "finished_at": "2026-01-04T00:00:00Z"}]}]}, "results": [
+    {
+      "cause": "value",
+      "check": "approvers_in_focus",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/approvers/0",
+                "/prs/0/approvers/1"
+              ],
+              "name": "count of approvers whose state is \"APPROVED\"",
+              "value": 2
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/approvers_in_focus"
+          ],
+          "message": "count of approvers whose state is \"APPROVED\" is 2",
+          "name": "count of approvers whose state is \"APPROVED\" is 1"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "count of approvers whose state is \"APPROVED\"",
+          "value": 2
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "approvers[]",
+          "outcome": "usable",
+          "value": [
+            {
+              "approved_at": "2026-01-03T00:00:00Z",
+              "assigned_at": "2026-01-02T00:00:00Z",
+              "state": "APPROVED",
+              "username": "bob"
+            },
+            {
+              "approved_at": "2026-01-03T00:00:00Z",
+              "assigned_at": "2026-01-04T00:00:00Z",
+              "state": "APPROVED",
+              "username": "ann"
+            }
+          ]
+        }
+      ],
+      "message": "count of approvers whose state is \"APPROVED\" is 2",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p1",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "bare_name_in_a_clause",
+      "failures": [
+        {
+          "cause": "absent",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/0/username"
+                  ],
+                  "name": "approvers[0].username",
+                  "outcome": "usable",
+                  "value": "bob"
+                },
+                {
+                  "locations": [
+                    "/prs/0/approvers/0"
+                  ],
+                  "name": "approvers[0].author",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/0"
+              ],
+              "message": "author is missing",
+              "name": "item 1 of approvers",
+              "value": {
+                "approved_at": "2026-01-03T00:00:00Z",
+                "assigned_at": "2026-01-02T00:00:00Z",
+                "state": "APPROVED",
+                "username": "bob"
+              }
+            },
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/1/username"
+                  ],
+                  "name": "approvers[1].username",
+                  "outcome": "usable",
+                  "value": "ann"
+                },
+                {
+                  "locations": [
+                    "/prs/0/approvers/1"
+                  ],
+                  "name": "approvers[1].author",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/1"
+              ],
+              "message": "author is missing",
+              "name": "item 2 of approvers",
+              "value": {
+                "approved_at": "2026-01-03T00:00:00Z",
+                "assigned_at": "2026-01-04T00:00:00Z",
+                "state": "APPROVED",
+                "username": "ann"
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/approvers/0",
+                "/prs/0/approvers/1"
+              ],
+              "name": "count of approvers whose username does not equal author",
+              "value": null
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/bare_name_in_a_clause"
+          ],
+          "message": "",
+          "name": "count of approvers whose username does not equal author is 1"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "count of approvers whose username does not equal author",
+          "value": null
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "approvers[]",
+          "outcome": "usable",
+          "value": [
+            {
+              "approved_at": "2026-01-03T00:00:00Z",
+              "assigned_at": "2026-01-02T00:00:00Z",
+              "state": "APPROVED",
+              "username": "bob"
+            },
+            {
+              "approved_at": "2026-01-03T00:00:00Z",
+              "assigned_at": "2026-01-04T00:00:00Z",
+              "state": "APPROVED",
+              "username": "ann"
+            }
+          ]
+        }
+      ],
+      "message": "item 1 of approvers: author is missing; item 2 of approvers: author is missing",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p1",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "count_right_side",
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "count of approvers",
+          "value": 2
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "approvers[]",
+          "value": [
+            {
+              "approved_at": "2026-01-03T00:00:00Z",
+              "assigned_at": "2026-01-02T00:00:00Z",
+              "state": "APPROVED",
+              "username": "bob"
+            },
+            {
+              "approved_at": "2026-01-03T00:00:00Z",
+              "assigned_at": "2026-01-04T00:00:00Z",
+              "state": "APPROVED",
+              "username": "ann"
+            }
+          ]
+        },
+        {
+          "locations": [
+            "/prs/0/min_approvals"
+          ],
+          "name": "min_approvals",
+          "value": 2
+        }
+      ],
+      "passed": true,
+      "requirement": "r",
+      "subject": {
+        "id": "p1",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "value",
+      "check": "right_side_from_the_subject",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/1/username"
+                  ],
+                  "name": "approvers[1].username",
+                  "outcome": "usable",
+                  "value": "ann"
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/1"
+              ],
+              "message": "username is \"ann\", and author is \"ann\"",
+              "name": "item 2 of approvers",
+              "value": {
+                "approved_at": "2026-01-03T00:00:00Z",
+                "assigned_at": "2026-01-04T00:00:00Z",
+                "state": "APPROVED",
+                "username": "ann"
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/author"
+              ],
+              "name": "author",
+              "outcome": "usable",
+              "value": "ann"
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/right_side_from_the_subject"
+          ],
+          "message": "",
+          "name": "every approvers.username does not equal author"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0/username",
+            "/prs/0/approvers/1/username"
+          ],
+          "name": "approvers[].username",
+          "outcome": "usable",
+          "value": [
+            "bob",
+            "ann"
+          ]
+        },
+        {
+          "locations": [
+            "/prs/0/author"
+          ],
+          "name": "author",
+          "outcome": "usable",
+          "value": "ann"
+        }
+      ],
+      "message": "item 2 of approvers: username is \"ann\", and author is \"ann\"",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p1",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "subject_field_in_a_clause",
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "count of approvers whose username does not equal pr.author",
+          "value": 1
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "approvers[]",
+          "value": [
+            {
+              "approved_at": "2026-01-03T00:00:00Z",
+              "assigned_at": "2026-01-02T00:00:00Z",
+              "state": "APPROVED",
+              "username": "bob"
+            },
+            {
+              "approved_at": "2026-01-03T00:00:00Z",
+              "assigned_at": "2026-01-04T00:00:00Z",
+              "state": "APPROVED",
+              "username": "ann"
+            }
+          ]
+        },
+        {
+          "locations": [
+            "/prs/0/author"
+          ],
+          "name": "pr.author",
+          "value": "ann"
+        }
+      ],
+      "passed": true,
+      "requirement": "r",
+      "subject": {
+        "id": "p1",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "two_clauses_and_a_new_assertion",
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "approvers[]",
+          "value": [
+            {
+              "approved_at": "2026-01-03T00:00:00Z",
+              "assigned_at": "2026-01-02T00:00:00Z",
+              "state": "APPROVED",
+              "username": "bob"
+            },
+            {
+              "approved_at": "2026-01-03T00:00:00Z",
+              "assigned_at": "2026-01-04T00:00:00Z",
+              "state": "APPROVED",
+              "username": "ann"
+            }
+          ]
+        },
+        {
+          "locations": [
+            "/prs/0/author"
+          ],
+          "name": "author",
+          "value": "ann"
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "count of approvers whose state is \"APPROVED\" and whose username does not equal pr.author",
+          "value": 1
+        },
+        {
+          "locations": [
+            "/prs/0/author"
+          ],
+          "name": "pr.author",
+          "value": "ann"
+        }
+      ],
+      "passed": true,
+      "requirement": "r",
+      "subject": {
+        "id": "p1",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "two_fields_of_an_item_after_every",
+      "failures": [
+        {
+          "cause": "absent",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0"
+              ],
+              "name": "assigned_at",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/two_fields_of_an_item_after_every"
+          ],
+          "message": "assigned_at is missing",
+          "name": "every approvers.approved_at is after assigned_at"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0/approved_at",
+            "/prs/0/approvers/1/approved_at"
+          ],
+          "name": "approvers[].approved_at",
+          "outcome": "usable",
+          "value": [
+            "2026-01-03T00:00:00Z",
+            "2026-01-03T00:00:00Z"
+          ]
+        },
+        {
+          "locations": [
+            "/prs/0"
+          ],
+          "name": "assigned_at",
+          "outcome": "absent",
+          "value": null
+        }
+      ],
+      "message": "assigned_at is missing",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p1",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "two_fields_of_an_item_in_a_whose",
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/deployments/0",
+            "/prs/0/deployments/1"
+          ],
+          "name": "count of deployments whose finished_at is after started_at",
+          "value": 1
+        },
+        {
+          "locations": [
+            "/prs/0/deployments/0",
+            "/prs/0/deployments/1"
+          ],
+          "name": "deployments[]",
+          "value": [
+            {
+              "finished_at": "2026-01-03T00:00:00Z",
+              "started_at": "2026-01-02T00:00:00Z"
+            },
+            {
+              "finished_at": "2026-01-04T00:00:00Z",
+              "started_at": "2026-01-05T00:00:00Z"
+            }
+          ]
+        }
+      ],
+      "passed": true,
+      "requirement": "r",
+      "subject": {
+        "id": "p1",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "not_an_object",
+      "check": "username_in_focus",
+      "failures": [
+        {
+          "cause": "not_an_object",
+          "failures": [
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/0/username"
+                  ],
+                  "name": "approvers[0].username.state",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/0"
+              ],
+              "message": "username is \"bob\", which isn't an object",
+              "name": "item 1 of approvers",
+              "value": {
+                "approved_at": "2026-01-03T00:00:00Z",
+                "assigned_at": "2026-01-02T00:00:00Z",
+                "state": "APPROVED",
+                "username": "bob"
+              }
+            },
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/1/username"
+                  ],
+                  "name": "approvers[1].username.state",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/1"
+              ],
+              "message": "username is \"ann\", which isn't an object",
+              "name": "item 2 of approvers",
+              "value": {
+                "approved_at": "2026-01-03T00:00:00Z",
+                "assigned_at": "2026-01-04T00:00:00Z",
+                "state": "APPROVED",
+                "username": "ann"
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/approvers/0/username",
+                "/prs/0/approvers/1/username"
+              ],
+              "name": "count of approvers.username whose state is \"APPROVED\"",
+              "value": null
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/username_in_focus"
+          ],
+          "message": "",
+          "name": "count of approvers.username whose state is \"APPROVED\" is 1"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0/username",
+            "/prs/0/approvers/1/username"
+          ],
+          "name": "count of approvers.username whose state is \"APPROVED\"",
+          "value": null
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0/username",
+            "/prs/0/approvers/1/username"
+          ],
+          "name": "approvers[].username",
+          "outcome": "usable",
+          "value": [
+            "bob",
+            "ann"
+          ]
+        }
+      ],
+      "message": "item 1 of approvers: username is \"bob\", which isn't an object; item 2 of approvers: username is \"ann\", which isn't an object",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p1",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "whole_subject",
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0"
+          ],
+          "name": "pr",
+          "value": {
+            "approvers": [
+              {
+                "approved_at": "2026-01-03T00:00:00Z",
+                "assigned_at": "2026-01-02T00:00:00Z",
+                "state": "APPROVED",
+                "username": "bob"
+              },
+              {
+                "approved_at": "2026-01-03T00:00:00Z",
+                "assigned_at": "2026-01-04T00:00:00Z",
+                "state": "APPROVED",
+                "username": "ann"
+              }
+            ],
+            "author": "ann",
+            "deployments": [
+              {
+                "finished_at": "2026-01-03T00:00:00Z",
+                "started_at": "2026-01-02T00:00:00Z"
+              },
+              {
+                "finished_at": "2026-01-04T00:00:00Z",
+                "started_at": "2026-01-05T00:00:00Z"
+              }
+            ],
+            "id": "p1",
+            "min_approvals": 2
+          }
+        }
+      ],
+      "passed": true,
+      "requirement": "r",
+      "subject": {
+        "id": "p1",
+        "type": "pr"
+      }
+    }
+  ]}, {"description": "a focus that is missing fails as absent, and one that is null as not_an_object, naming the item and the value", "rules": ["sentence.resolve.focus", "walk.items", "tally.whose", "message.items", "path.not_an_object"], "input": {"prs": [{"id": "p2", "author": "ann", "min_approvals": 1, "approvers": [{"state": "APPROVED"}, {"username": null, "state": "APPROVED"}], "deployments": []}]}, "results": [
+    {
+      "cause": "value",
+      "check": "approvers_in_focus",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/approvers/0",
+                "/prs/0/approvers/1"
+              ],
+              "name": "count of approvers whose state is \"APPROVED\"",
+              "value": 2
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/approvers_in_focus"
+          ],
+          "message": "count of approvers whose state is \"APPROVED\" is 2",
+          "name": "count of approvers whose state is \"APPROVED\" is 1"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "count of approvers whose state is \"APPROVED\"",
+          "value": 2
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "approvers[]",
+          "outcome": "usable",
+          "value": [
+            {
+              "state": "APPROVED"
+            },
+            {
+              "state": "APPROVED",
+              "username": null
+            }
+          ]
+        }
+      ],
+      "message": "count of approvers whose state is \"APPROVED\" is 2",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p2",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "bare_name_in_a_clause",
+      "failures": [
+        {
+          "cause": "absent",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/0"
+                  ],
+                  "name": "approvers[0].username",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/0"
+              ],
+              "message": "username is missing, and author is missing",
+              "name": "item 1 of approvers",
+              "value": {
+                "state": "APPROVED"
+              }
+            },
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/1/username"
+                  ],
+                  "name": "approvers[1].username",
+                  "outcome": "null",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/1"
+              ],
+              "message": "author is missing",
+              "name": "item 2 of approvers",
+              "value": {
+                "state": "APPROVED",
+                "username": null
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/approvers/0",
+                "/prs/0/approvers/1"
+              ],
+              "name": "count of approvers whose username does not equal author",
+              "value": null
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/bare_name_in_a_clause"
+          ],
+          "message": "",
+          "name": "count of approvers whose username does not equal author is 1"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "count of approvers whose username does not equal author",
+          "value": null
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "approvers[]",
+          "outcome": "usable",
+          "value": [
+            {
+              "state": "APPROVED"
+            },
+            {
+              "state": "APPROVED",
+              "username": null
+            }
+          ]
+        }
+      ],
+      "message": "item 1 of approvers: username is missing, and author is missing; item 2 of approvers: author is missing",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p2",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "count_right_side",
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "count of approvers",
+          "value": 2
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "approvers[]",
+          "value": [
+            {
+              "state": "APPROVED"
+            },
+            {
+              "state": "APPROVED",
+              "username": null
+            }
+          ]
+        },
+        {
+          "locations": [
+            "/prs/0/min_approvals"
+          ],
+          "name": "min_approvals",
+          "value": 1
+        }
+      ],
+      "passed": true,
+      "requirement": "r",
+      "subject": {
+        "id": "p2",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "right_side_from_the_subject",
+      "failures": [
+        {
+          "cause": "absent",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/0"
+                  ],
+                  "name": "approvers[0].username",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/0"
+              ],
+              "message": "username is missing",
+              "name": "item 1 of approvers",
+              "value": {
+                "state": "APPROVED"
+              }
+            },
+            {
+              "cause": "null",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/1/username"
+                  ],
+                  "name": "approvers[1].username",
+                  "outcome": "null",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/1"
+              ],
+              "message": "username is null",
+              "name": "item 2 of approvers",
+              "value": {
+                "state": "APPROVED",
+                "username": null
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/author"
+              ],
+              "name": "author",
+              "outcome": "usable",
+              "value": "ann"
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/right_side_from_the_subject"
+          ],
+          "message": "",
+          "name": "every approvers.username does not equal author"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1/username"
+          ],
+          "name": "approvers[].username",
+          "outcome": "usable",
+          "value": [
+            null,
+            null
+          ]
+        },
+        {
+          "locations": [
+            "/prs/0/author"
+          ],
+          "name": "author",
+          "outcome": "usable",
+          "value": "ann"
+        }
+      ],
+      "message": "item 1 of approvers: username is missing; item 2 of approvers: username is null",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p2",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "subject_field_in_a_clause",
+      "failures": [
+        {
+          "cause": "absent",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/approvers/0",
+                "/prs/0/approvers/1"
+              ],
+              "name": "count of approvers whose username does not equal pr.author",
+              "value": null
+            },
+            {
+              "locations": [
+                "/prs/0/author"
+              ],
+              "name": "pr.author",
+              "outcome": "usable",
+              "value": "ann"
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/subject_field_in_a_clause"
+          ],
+          "message": "item 1 of approvers: username is missing; item 2 of approvers: username is null",
+          "name": "count of approvers whose username does not equal pr.author is 1"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "count of approvers whose username does not equal pr.author",
+          "value": null
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "approvers[]",
+          "outcome": "usable",
+          "value": [
+            {
+              "state": "APPROVED"
+            },
+            {
+              "state": "APPROVED",
+              "username": null
+            }
+          ]
+        },
+        {
+          "locations": [
+            "/prs/0/author"
+          ],
+          "name": "pr.author",
+          "outcome": "usable",
+          "value": "ann"
+        }
+      ],
+      "message": "item 1 of approvers: username is missing; item 2 of approvers: username is null",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p2",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "two_clauses_and_a_new_assertion",
+      "failures": [
+        {
+          "cause": "absent",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/approvers/0",
+                "/prs/0/approvers/1"
+              ],
+              "name": "count of approvers whose state is \"APPROVED\" and whose username does not equal pr.author",
+              "value": null
+            },
+            {
+              "locations": [
+                "/prs/0/author"
+              ],
+              "name": "pr.author",
+              "outcome": "usable",
+              "value": "ann"
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/two_clauses_and_a_new_assertion#1"
+          ],
+          "message": "item 1 of approvers: username is missing; item 2 of approvers: username is null",
+          "name": "count of approvers whose state is \"APPROVED\" and whose username does not equal pr.author is at least 1"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "approvers[]",
+          "outcome": "usable",
+          "value": [
+            {
+              "state": "APPROVED"
+            },
+            {
+              "state": "APPROVED",
+              "username": null
+            }
+          ]
+        },
+        {
+          "locations": [
+            "/prs/0/author"
+          ],
+          "name": "author",
+          "outcome": "usable",
+          "value": "ann"
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "count of approvers whose state is \"APPROVED\" and whose username does not equal pr.author",
+          "value": null
+        },
+        {
+          "locations": [
+            "/prs/0/author"
+          ],
+          "name": "pr.author",
+          "outcome": "usable",
+          "value": "ann"
+        }
+      ],
+      "message": "item 1 of approvers: username is missing; item 2 of approvers: username is null",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p2",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "two_fields_of_an_item_after_every",
+      "failures": [
+        {
+          "cause": "absent",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0"
+              ],
+              "name": "assigned_at",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/two_fields_of_an_item_after_every"
+          ],
+          "message": "assigned_at is missing",
+          "name": "every approvers.approved_at is after assigned_at"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1"
+          ],
+          "name": "approvers[].approved_at",
+          "outcome": "usable",
+          "value": [
+            null,
+            null
+          ]
+        },
+        {
+          "locations": [
+            "/prs/0"
+          ],
+          "name": "assigned_at",
+          "outcome": "absent",
+          "value": null
+        }
+      ],
+      "message": "assigned_at is missing",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p2",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "value",
+      "check": "two_fields_of_an_item_in_a_whose",
+      "failures": [
+        {
+          "cause": "value",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count of deployments whose finished_at is after started_at",
+              "value": 0
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/two_fields_of_an_item_in_a_whose"
+          ],
+          "message": "count of deployments whose finished_at is after started_at is 0",
+          "name": "count of deployments whose finished_at is after started_at is 1"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [],
+          "name": "count of deployments whose finished_at is after started_at",
+          "value": 0
+        },
+        {
+          "locations": [],
+          "name": "deployments[]",
+          "outcome": "usable",
+          "value": []
+        }
+      ],
+      "message": "count of deployments whose finished_at is after started_at is 0",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p2",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "not_an_object",
+      "check": "username_in_focus",
+      "failures": [
+        {
+          "cause": "not_an_object",
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/0"
+                  ],
+                  "name": "approvers[0].username",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/0"
+              ],
+              "message": "username is missing",
+              "name": "item 1 of approvers",
+              "value": {
+                "state": "APPROVED"
+              }
+            },
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/1/username"
+                  ],
+                  "name": "approvers[1].username.state",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/1"
+              ],
+              "message": "username is null, which isn't an object",
+              "name": "item 2 of approvers",
+              "value": {
+                "state": "APPROVED",
+                "username": null
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/approvers/0",
+                "/prs/0/approvers/1/username"
+              ],
+              "name": "count of approvers.username whose state is \"APPROVED\"",
+              "value": null
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/username_in_focus"
+          ],
+          "message": "",
+          "name": "count of approvers.username whose state is \"APPROVED\" is 1"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1/username"
+          ],
+          "name": "count of approvers.username whose state is \"APPROVED\"",
+          "value": null
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0",
+            "/prs/0/approvers/1/username"
+          ],
+          "name": "approvers[].username",
+          "outcome": "usable",
+          "value": [
+            null,
+            null
+          ]
+        }
+      ],
+      "message": "item 1 of approvers: username is missing; item 2 of approvers: username is null, which isn't an object",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p2",
+        "type": "pr"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "whole_subject",
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0"
+          ],
+          "name": "pr",
+          "value": {
+            "approvers": [
+              {
+                "state": "APPROVED"
+              },
+              {
+                "state": "APPROVED",
+                "username": null
+              }
+            ],
+            "author": "ann",
+            "deployments": [],
+            "id": "p2",
+            "min_approvals": 1
+          }
+        }
+      ],
+      "passed": true,
+      "requirement": "r",
+      "subject": {
+        "id": "p2",
+        "type": "pr"
+      }
+    }
+  ]}]},
   {"description": "a focus a path couldn't reach, and a focus read by that", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"unreached": "count of xs.meta.b whose k is 1 is 1", "that": "count of xs.b that is 5 is 1", "some_that": "some xs.b that is at least 6 is 6"}}}}, "cases": [{"description": "that reads each b, and a path that stops before the focus fails as it does", "rules": ["sentence.resolve.focus", "sentence.condition.word", "tally.whose", "walk.items"], "input": {"things": [{"id": "t1", "xs": [{"b": 5, "meta": "x"}, {"b": 6, "meta": {"b": {"k": 1}}}]}]}, "results": [{"cause": "satisfied", "check": "some_that", "inputs": [{"locations": ["/things/0/xs/0/b", "/things/0/xs/1/b"], "name": "xs[].b", "value": [5, 6]}], "passed": true, "requirement": "r", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "that", "inputs": [{"locations": ["/things/0/xs/0/b", "/things/0/xs/1/b"], "name": "count of xs.b that is 5", "value": 1}, {"locations": ["/things/0/xs/0/b", "/things/0/xs/1/b"], "name": "xs[].b", "value": [5, 6]}], "passed": true, "requirement": "r", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "unreached", "failures": [{"cause": "unusable", "failures": [{"cause": "unusable", "failures": [], "inputs": [{"locations": ["/things/0/xs/0/meta"], "name": "xs[0].meta.b", "outcome": "unusable", "value": null}], "kind": "item", "locations": ["/things/0/xs/0"], "message": "meta is \"x\", which isn't an object", "name": "item 1 of xs", "value": {"b": 5, "meta": "x"}}], "inputs": [{"locations": ["/things/0/xs/0/meta", "/things/0/xs/1/meta/b"], "name": "count of xs.meta.b whose k is 1", "value": null}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/unreached"], "message": "", "name": "count of xs.meta.b whose k is 1 is 1"}], "inputs": [{"locations": ["/things/0/xs/0/meta", "/things/0/xs/1/meta/b"], "name": "count of xs.meta.b whose k is 1", "value": null}, {"locations": ["/things/0/xs/0/meta", "/things/0/xs/1/meta/b"], "name": "xs[].meta.b", "outcome": "usable", "value": [null, {"k": 1}]}], "message": "item 1 of xs: meta is \"x\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "thing"}}]}]},
   {"description": "the subject's name followed by a step, inside and outside a relative clause", "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"outside": {"subject": "pr", "checks": {"c": "pr.author is \"ann\""}}, "after_every": {"subject": "pr", "checks": {"c": "every approvers.username does not equal pr.author"}}, "in_an_option": {"subject": "pr", "checks": {"c": {"any_of": {"inside": "count of approvers whose username does not equal pr.author is 1", "plain": "author is \"zed\""}}}}, "outside_in_an_option": {"subject": "pr", "checks": {"c": {"any_of": {"outside": "pr.author is \"ann\"", "plain": "author is \"ann\""}}}}}}, "cases": [{"description": "is written wrong outside a relative clause, in an option too, and reads the subject's field inside one", "rules": ["sentence.path.subject.step", "sentence.resolve.clause", "sentence.any_of", "any_of.pass", "written_wrong.row"], "input": {"prs": [{"id": "p1", "author": "ann", "min_approvals": 2, "approvers": [{"username": "bob", "state": "APPROVED", "assigned_at": "2026-01-02T00:00:00Z", "approved_at": "2026-01-03T00:00:00Z"}, {"username": "ann", "state": "APPROVED", "assigned_at": "2026-01-04T00:00:00Z", "approved_at": "2026-01-03T00:00:00Z"}], "deployments": [{"started_at": "2026-01-02T00:00:00Z", "finished_at": "2026-01-03T00:00:00Z"}, {"started_at": "2026-01-05T00:00:00Z", "finished_at": "2026-01-04T00:00:00Z"}]}]}, "results": [
     {
@@ -89970,7 +91353,77 @@
         "type": "pr"
       }
     }
-  ]}, {"description": "fails as unusable when the field's type differs", "rules": ["sentence.path.subject.step", "sentence.resolve.clause"], "input": {"prs": [{"id": "p", "author": 5, "approvers": [{"username": "bob"}]}]}, "results": [{"cause": "unusable", "check": "c", "failures": [{"cause": "unusable", "failures": [{"cause": "unusable", "failures": [], "inputs": [{"locations": ["/prs/0/approvers/0/username"], "name": "approvers[0].username", "outcome": "unusable", "value": "bob"}], "kind": "item", "locations": ["/prs/0/approvers/0"], "message": "username is \"bob\", which isn't a number", "name": "item 1 of approvers", "value": {"username": "bob"}}], "inputs": [{"locations": ["/prs/0/approvers/0"], "name": "count of approvers whose username does not equal pr.author", "value": null}, {"locations": ["/prs/0/author"], "name": "pr.author", "outcome": "usable", "value": 5}], "kind": "assertion", "locations": ["$policy:/requirements/r/checks/c"], "message": "", "name": "count of approvers whose username does not equal pr.author is 1"}], "inputs": [{"locations": ["/prs/0/approvers/0"], "name": "count of approvers whose username does not equal pr.author", "value": null}, {"locations": ["/prs/0/approvers/0"], "name": "approvers[]", "outcome": "usable", "value": [{"username": "bob"}]}, {"locations": ["/prs/0/author"], "name": "pr.author", "outcome": "usable", "value": 5}], "message": "item 1 of approvers: username is \"bob\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}}]}]},
+  ]}, {"description": "fails as unusable when the field's type differs", "rules": ["sentence.path.subject.step", "sentence.resolve.clause"], "input": {"prs": [{"id": "p", "author": 5, "approvers": [{"username": "bob"}]}]}, "results": [
+    {
+      "cause": "unusable",
+      "check": "c",
+      "failures": [
+        {
+          "cause": "unusable",
+          "failures": [],
+          "inputs": [
+            {
+              "locations": [
+                "/prs/0/approvers/0"
+              ],
+              "name": "count of approvers whose username does not equal pr.author",
+              "value": null
+            },
+            {
+              "locations": [
+                "/prs/0/author"
+              ],
+              "name": "pr.author",
+              "outcome": "usable",
+              "value": 5
+            }
+          ],
+          "kind": "assertion",
+          "locations": [
+            "$policy:/requirements/r/checks/c"
+          ],
+          "message": "item 1 of approvers: username is \"bob\", which isn't a number",
+          "name": "count of approvers whose username does not equal pr.author is 1"
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/prs/0/approvers/0"
+          ],
+          "name": "count of approvers whose username does not equal pr.author",
+          "value": null
+        },
+        {
+          "locations": [
+            "/prs/0/approvers/0"
+          ],
+          "name": "approvers[]",
+          "outcome": "usable",
+          "value": [
+            {
+              "username": "bob"
+            }
+          ]
+        },
+        {
+          "locations": [
+            "/prs/0/author"
+          ],
+          "name": "pr.author",
+          "outcome": "usable",
+          "value": 5
+        }
+      ],
+      "message": "item 1 of approvers: username is \"bob\", which isn't a number",
+      "passed": false,
+      "requirement": "r",
+      "subject": {
+        "id": "p",
+        "type": "pr"
+      }
+    }
+  ]}]},
   {"description": "naming the items of a for line whose path goes past the list", "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "min_subjects": 0, "checks": {"one": {"for": "every ys.z whose q is 1 as z", "assert": "z.q is 1"}, "two": {"for": "every xs as x, every x.ys.z whose q is 1 as z", "assert": "z.q is 1"}, "item": {"for": "every ws whose q is 1 as w", "assert": "w.q is 1"}}}}}, "cases": [{"description": "names the item of the list, then the rest of the path after a colon, and the item itself when it is the focus", "rules": ["message.items", "sentence.resolve.focus", "for.walk", "for.second_failures"], "input": {"prs": [{"id": "p", "ys": [{"z": {"q": 1}}, {"z": "s"}, {"z": null}, {}], "xs": [{"ys": [{"k": 1, "z": {"q": 1}}, {"k": 2, "z": "s"}]}, {"ys": [{"k": 3, "z": null}, {"k": 4}]}], "ws": [{"q": 1}, "s", null]}]}, "results": [
     {
       "cause": "not_an_object",
@@ -101923,7 +103376,16 @@
         {
           "cause": "absent",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.q",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
           "kind": "assertion",
           "locations": [
             "$policy:/subjects/pr/from"
@@ -101955,7 +103417,16 @@
         {
           "cause": "absent",
           "failures": [],
-          "inputs": [],
+          "inputs": [
+            {
+              "locations": [
+                "$params:"
+              ],
+              "name": "$params.q",
+              "outcome": "absent",
+              "value": null
+            }
+          ],
           "kind": "assertion",
           "locations": [
             "$policy:/subjects/pr/from"

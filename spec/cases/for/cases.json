@@ -18229,24 +18229,35 @@
                     "failures": [
                       {
                         "cause": "value",
-                        "failures": [],
-                        "inputs": [
+                        "failures": [
                           {
+                            "cause": "value",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/things/0/deep/0/subs/1/leaves/0"
+                                ],
+                                "name": "y.leaves[0]",
+                                "outcome": "usable",
+                                "value": 9
+                              }
+                            ],
+                            "kind": "item",
                             "locations": [
                               "/things/0/deep/0/subs/1/leaves/0"
                             ],
-                            "name": "y.leaves[]",
-                            "outcome": "usable",
-                            "value": [
-                              9
-                            ]
+                            "message": "item 1 of y.leaves is 9",
+                            "name": "item 1 of y.leaves",
+                            "value": 9
                           }
                         ],
+                        "inputs": [],
                         "kind": "item",
                         "locations": [
                           "/things/0/deep/0/subs/1"
                         ],
-                        "message": "item 1 of y.leaves is 9",
+                        "message": "",
                         "name": "item 2 of z.subs",
                         "value": {
                           "leaves": [
@@ -39566,7 +39577,25 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is 3, which isn't a list",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -39579,7 +39608,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is 3, which isn't a list",
+                "message": "",
                 "name": "every item 1 of $params is 1"
               }
             ],
@@ -39621,21 +39650,21 @@
                 "cause": "unusable",
                 "failures": [
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
                         "locations": [
                           "$params:"
                         ],
-                        "name": "$params",
-                        "outcome": "unusable",
-                        "value": []
+                        "name": "item 1 of $params",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "list",
-                    "message": "$params is [], which isn't an object",
-                    "name": "$params"
+                    "message": "item 1 of $params is missing",
+                    "name": "item 1 of $params"
                   }
                 ],
                 "inputs": [
@@ -39672,7 +39701,7 @@
                 "value": []
               }
             ],
-            "message": "$params is [], which isn't an object",
+            "message": "item 1 of $params is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -55527,23 +55556,6 @@
                     "inputs": [
                       {
                         "locations": [
-                          "/prs/0/zb"
-                        ],
-                        "name": "zb",
-                        "outcome": "unusable",
-                        "value": "s"
-                      }
-                    ],
-                    "kind": "list",
-                    "message": "zb is \"s\", which isn't a list or an object",
-                    "name": "zb"
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
                           "/prs/0/za"
                         ],
                         "name": "za",
@@ -55554,6 +55566,23 @@
                     "kind": "list",
                     "message": "za is 3, which isn't a list or an object",
                     "name": "za"
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/zb"
+                        ],
+                        "name": "zb",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zb is \"s\", which isn't a list or an object",
+                    "name": "zb"
                   }
                 ],
                 "inputs": [
@@ -55637,23 +55666,6 @@
                     "inputs": [
                       {
                         "locations": [
-                          "/prs/0/zb"
-                        ],
-                        "name": "zb",
-                        "outcome": "unusable",
-                        "value": "s"
-                      }
-                    ],
-                    "kind": "list",
-                    "message": "zb is \"s\", which isn't a list or an object",
-                    "name": "zb"
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
                           "/prs/0/za"
                         ],
                         "name": "za",
@@ -55664,6 +55676,23 @@
                     "kind": "list",
                     "message": "za is 3, which isn't a list or an object",
                     "name": "za"
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/zb"
+                        ],
+                        "name": "zb",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zb is \"s\", which isn't a list or an object",
+                    "name": "zb"
                   }
                 ],
                 "inputs": [
@@ -55754,23 +55783,6 @@
                     "inputs": [
                       {
                         "locations": [
-                          "/prs/0/zb"
-                        ],
-                        "name": "zb",
-                        "outcome": "unusable",
-                        "value": "s"
-                      }
-                    ],
-                    "kind": "list",
-                    "message": "zb is \"s\", which isn't a list or an object",
-                    "name": "zb"
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
                           "/prs/0/za"
                         ],
                         "name": "za",
@@ -55781,6 +55793,23 @@
                     "kind": "list",
                     "message": "za is 3, which isn't a list or an object",
                     "name": "za"
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/zb"
+                        ],
+                        "name": "zb",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zb is \"s\", which isn't a list or an object",
+                    "name": "zb"
                   }
                 ],
                 "inputs": [
@@ -55871,23 +55900,6 @@
                     "inputs": [
                       {
                         "locations": [
-                          "/prs/0/zb"
-                        ],
-                        "name": "zb",
-                        "outcome": "unusable",
-                        "value": "s"
-                      }
-                    ],
-                    "kind": "list",
-                    "message": "zb is \"s\", which isn't a list or an object",
-                    "name": "zb"
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
                           "/prs/0/za"
                         ],
                         "name": "za",
@@ -55898,6 +55910,23 @@
                     "kind": "list",
                     "message": "za is 3, which isn't a list or an object",
                     "name": "za"
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/zb"
+                        ],
+                        "name": "zb",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zb is \"s\", which isn't a list or an object",
+                    "name": "zb"
                   }
                 ],
                 "inputs": [
@@ -57666,7 +57695,31 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ts/0"
+                            ],
+                            "name": "\u0002ok",
+                            "outcome": "unusable",
+                            "value": {
+                              "fs": [
+                                {
+                                  "k": 1
+                                }
+                              ]
+                            }
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "ok is {\"fs\": [{\"k\": 1}]}, which isn't a list",
+                        "name": "ok"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -57681,23 +57734,13 @@
                             }
                           ]
                         }
-                      },
-                      {
-                        "locations": [
-                          "/things/0/ts/0/fs/0/k"
-                        ],
-                        "name": "ok.fs[].k",
-                        "outcome": "usable",
-                        "value": [
-                          1
-                        ]
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ts/0"
                     ],
-                    "message": "ok is {\"fs\": [{\"k\": 1}]}, which isn't a list",
+                    "message": "",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -75236,46 +75279,22 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [
-                  {
-                    "cause": "value",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/prs/0/xs"
-                        ],
-                        "name": "xs",
-                        "outcome": "usable",
-                        "value": [
-                          {
-                            "v": 1
-                          }
-                        ]
-                      }
-                    ],
-                    "kind": "list",
-                    "message": "xs is [{\"v\": 1}]",
-                    "name": "xs"
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "pl[].z",
-                    "outcome": "usable",
-                    "part": {
-                      "id": null,
-                      "name": "pl"
-                    },
-                    "value": []
+                    "locations": [
+                      "/prs/0/c"
+                    ],
+                    "name": "pl.z",
+                    "outcome": "unusable",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_exists/assert"
                 ],
-                "message": "",
+                "message": "pl is [], which isn't an object",
                 "name": "some xs whose v is in pl.z exists"
               }
             ],
@@ -90452,7 +90471,7 @@
               {
                 "locations": [],
                 "name": "commit.files",
-                "outcome": "absent",
+                "outcome": "usable",
                 "value": []
               },
               {
@@ -97766,20 +97785,7 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "$params:/os/0/name",
-                      "$params:/os/1"
-                    ],
-                    "name": "$params.os[].name",
-                    "outcome": "usable",
-                    "value": [
-                      "bob",
-                      null
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every/assert"
@@ -97943,20 +97949,7 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "$params:/os/0/name",
-                      "$params:/os/1"
-                    ],
-                    "name": "$params.os[].name",
-                    "outcome": "unusable",
-                    "value": [
-                      "bob",
-                      null
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every/assert"

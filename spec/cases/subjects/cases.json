@@ -26722,14 +26722,6 @@
                 "locations": [],
                 "name": "in-scope k count",
                 "value": 0
-              },
-              {
-                "locations": [
-                  "/artifacts/1"
-                ],
-                "name": "artifact",
-                "outcome": "null",
-                "value": null
               }
             ],
             "message": "artifact is null",

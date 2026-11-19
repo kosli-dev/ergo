@@ -9837,37 +9837,25 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/kids/0/kid"
-                        ],
-                        "name": ".kid",
-                        "outcome": "unusable",
-                        "value": 1
-                      }
-                    ],
-                    "kind": "list",
-                    "message": ".kid is 1, which isn't a list or an object",
-                    "name": ".kid"
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of .kid",
                     "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": ".kid",
+                    "outcome": "unusable",
+                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "",
+                "message": ".kid is 1, which isn't a list or an object",
                 "name": "count of .kid is 1"
               }
             ],
@@ -9907,37 +9895,25 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [
-                  {
-                    "cause": "absent",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/kids/0"
-                        ],
-                        "name": ".kid",
-                        "outcome": "absent",
-                        "value": null
-                      }
-                    ],
-                    "kind": "list",
-                    "message": ".kid is missing",
-                    "name": ".kid"
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of .kid",
                     "value": null
+                  },
+                  {
+                    "locations": [],
+                    "name": ".kid",
+                    "outcome": "absent",
+                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "",
+                "message": ".kid is missing",
                 "name": "count of .kid is 1"
               }
             ],
@@ -9983,31 +9959,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/xs/0/ys/0/thing"
-                        ],
-                        "name": "ys[0].thing",
-                        "outcome": "unusable",
-                        "value": 1
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/xs/0/ys/0"
-                    ],
-                    "message": ".thing is 1, which isn't an object",
-                    "name": "item 1 of ys",
-                    "value": {
-                      "thing": 1
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -10035,7 +9987,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "",
+                "message": "item 1 of ys: .thing is 1, which isn't an object",
                 "name": "count of ys whose thing equals p is 1"
               }
             ],

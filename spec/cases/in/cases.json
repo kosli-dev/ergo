@@ -12546,6 +12546,22 @@
                     ],
                     "name": "count of .lock.pkgs",
                     "value": 3
+                  },
+                  {
+                    "locations": [
+                      "/repos/0/lock/pkgs/0",
+                      "/repos/0/lock/pkgs/1",
+                      "/repos/0/lock/pkgs/2"
+                    ],
+                    "name": ".lock.pkgs[]",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "n": 1
+                      },
+                      {},
+                      "t"
+                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -12597,7 +12613,50 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/repos/0/lock/pkgs/1"
+                        ],
+                        "name": "lock.pkgs[1].n",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/lock/pkgs/1"
+                    ],
+                    "message": "n is missing",
+                    "name": "item 2 of .lock.pkgs",
+                    "value": {}
+                  },
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/repos/0/lock/pkgs/2"
+                        ],
+                        "name": "lock.pkgs[2].n",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/lock/pkgs/2"
+                    ],
+                    "message": "item 3 of .lock.pkgs is \"t\", which isn't an object",
+                    "name": "item 3 of .lock.pkgs",
+                    "value": "t"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -12627,7 +12686,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/sum"
                 ],
-                "message": "item 3 of .lock.pkgs is \"t\", which isn't an object",
+                "message": "",
                 "name": "sum of .lock.pkgs.n is 1"
               }
             ],
@@ -12656,7 +12715,7 @@
                 ]
               }
             ],
-            "message": "item 3 of .lock.pkgs is \"t\", which isn't an object",
+            "message": "item 2 of .lock.pkgs: n is missing; item 3 of .lock.pkgs is \"t\", which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
