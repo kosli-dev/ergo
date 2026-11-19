@@ -435,7 +435,7 @@ _row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.ex
 	not _all_of_run(where.check)
 	not _any_of_run(where.check)
 	not where.check.op == "for"
-	lists := _tally_list_names(where.check) | _tally_keyed_list_names(where.check, object.get(row, "ergo/subj", null))
+	lists := (_tally_list_names(where.check) | _tally_keyed_list_names(where.check, object.get(row, "ergo/subj", null))) | _tally_unkeyed_list_names(where.check, object.get(row, "ergo/subj", null))
 	ls := _plain_tally_lists(row, at, lists, ins, where.check)
 	names := {e.name | some e in ls}
 	items := _tally_item_parts_of(row, where.check, at)
@@ -631,6 +631,8 @@ _tally_list_read(n, cause, row, ins, at) := [object.union(x, {"outcome": cause})
 	p := ps[count(ps) - 1]
 } else := [object.union(object.remove(x, _input_stash_keys), {"outcome": cause}) | some x in _anchored_all([_path_input(row["ergo/subj"], p)], at)] if {
 	some p in _tally_keyed_list_paths(object.get(row, "ergo/check", null), row["ergo/subj"], n)
+} else := [object.union(object.remove(x, _input_stash_keys), {"outcome": cause, "value": null}) | some x in _anchored_all([_path_input(row["ergo/subj"], p)], at)] if {
+	some p in _tally_unkeyed_list_paths(object.get(row, "ergo/check", null), row["ergo/subj"], n)
 } else := [object.union(x, {"outcome": cause}) | some x in ins; x.name == n]
 
 _list_stop_value(subj, p, cause, v) := vs[count(vs) - 1] if {
@@ -651,6 +653,30 @@ _tally_keyed_list_paths(check, subj, n) := [q |
 	q := array.concat(array.slice(p, 0, i), [k])
 	_m_aliased(_input_name(q)) == n
 ]
+
+_tally_unkeyed_list_names(check, subj) := {_m_aliased(_input_name(p)) |
+	some side in _m_tally_parts(check)
+	p := side[_basic_form(side)]
+	_tally_unkeyed_field(p, subj)
+}
+
+_tally_unkeyed_list_paths(check, subj, n) := [p |
+	some side in _m_tally_parts(check)
+	p := side[_basic_form(side)]
+	_tally_unkeyed_field(p, subj)
+	_m_aliased(_input_name(p)) == n
+]
+
+_tally_unkeyed_field(p, subj) if {
+	is_array(p)
+	some i, seg in p
+	i > 0
+	_field_step(seg)
+	every s in array.slice(p, 0, i) {
+		is_string(s)
+	}
+	not _m_step_key(subj, seg)
+}
 
 _tally_list_paths(c, n) := [q |
 	some side in _m_tally_parts(c)
@@ -756,7 +782,7 @@ _walk_flaw_lists(row, at, check, entries) := [_entry("list", n, cause, [object.u
 	some k in numbers.range(1, count(check.path))
 	p := array.slice(check.path, 0, k)
 	every seg in p {
-		is_string(seg)
+		_plain_or_field_step(seg)
 	}
 	_m_aliased(_input_name(p)) == n
 	cause := _walk_clause_cause(c)
@@ -765,6 +791,10 @@ _walk_flaw_lists(row, at, check, entries) := [_entry("list", n, cause, [object.u
 	is_array(check.path)
 	subj := _flaw_list_subject(row, check.path)
 } else := []
+
+_plain_or_field_step(seg) if is_string(seg)
+
+_plain_or_field_step(seg) if _field_step(seg)
 
 _flaw_list_subject(row, path) := row["ergo/subj"] if _ = path
 

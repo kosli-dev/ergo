@@ -291,6 +291,13 @@ _reads_items_later(check) if {
 	object.get(check, "whose", []) != []
 }
 
+_reads_items_later(check) if {
+	check.op in _walk_ops
+	is_array(check.path)
+	some seg in check.path
+	_field_step(seg)
+}
+
 _anchored_failed(f, at) := object.union(_anchored_all([f], at)[0], object.union(_anchored_inner(f, at), _anchored_lines(f, at)))
 
 _anchored_inner(f, at) := {"failed_items": _anchored_all(f.failed_items, at)} if "failed_items" in object.keys(f)
