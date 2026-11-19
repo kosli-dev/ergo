@@ -38278,7 +38278,25 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is [], which isn't an object",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -38290,7 +38308,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is [], which isn't an object",
+                "message": "",
                 "name": "count of $params.a is 1"
               }
             ],

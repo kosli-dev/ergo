@@ -9431,7 +9431,30 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/fams/0/kids/0/items"
+                        ],
+                        "name": "items",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "lo": 2,
+                            "status": "ok"
+                          }
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9457,7 +9480,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                "message": "",
                 "name": "every items whose lo is at least count of fam.pr.xs exists"
               }
             ],
@@ -9512,7 +9535,30 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/fams/0/kids/0/items"
+                        ],
+                        "name": "items",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "lo": 2,
+                            "status": "ok"
+                          }
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9538,7 +9584,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/d"
                 ],
-                "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                "message": "",
                 "name": "every items whose lo is at least 1 plus count of fam.pr.xs exists"
               }
             ],
@@ -9593,7 +9639,30 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/fams/0/kids/0/items"
+                        ],
+                        "name": "items",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "lo": 2,
+                            "status": "ok"
+                          }
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9619,7 +9688,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/e"
                 ],
-                "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                "message": "",
                 "name": "every items whose lo is at least sum of fam.pr.xs exists"
               }
             ],

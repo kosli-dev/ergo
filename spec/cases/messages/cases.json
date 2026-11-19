@@ -5733,6 +5733,29 @@
                     "kind": "list",
                     "message": "p is \"x\", which isn't a list or an object",
                     "name": "p"
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/q/0/n"
+                        ],
+                        "name": "q[0].n",
+                        "outcome": "unusable",
+                        "value": "y"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/q/0"
+                    ],
+                    "message": "n is \"y\", which isn't a number",
+                    "name": "item 1 of q",
+                    "value": {
+                      "n": "y"
+                    }
                   }
                 ],
                 "inputs": [
@@ -5760,7 +5783,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of q: n is \"y\", which isn't a number",
+                "message": "p is \"x\", which isn't a list or an object, and item 1 of q: n is \"y\", which isn't a number",
                 "name": "sum of p.n plus sum of q.n is 100"
               }
             ],

@@ -14,7 +14,7 @@ derived / count of a list / fails as unusable when the list is an object
 derived / sum within a distance of a field / the worse cause wins when both sides fail: absent before null
 derived / two paths on the left / fails as absent before null
 derived / a path plus a count on the left / fails as unusable when the path is text and the list is null
-derived / a count on the left and a field on the right / fails as the worse cause when both sides fail
+derived / a count in the whose of an every / fails as value when whose leaves no item
 derived / count of a params value that is not a list / fails as unusable
 derived / a count with is between / fails as unusable when the list is a string
 derived / days elapsed that cannot be read / fails as absent when one side is missing and the other null
@@ -72,6 +72,7 @@ for / a count of a key of the params, with params as a number / fails as unusabl
 for / a count of a key of the params, with params as text / fails as unusable and names the params and what they are
 for / a count of a key of the params, with params as true / fails as unusable and names the params and what they are
 for / a count of a key of the params, with params as false / fails as unusable and names the params and what they are
+for / a count of a key of the params, with params as an empty list / fails as unusable and names the params and what they are
 for / every on a key of the params, with params as a number / fails as unusable and names the params and what they are
 for / every on a key of the params, with params as text / fails as unusable and names the params and what they are
 for / every on a key of the params, with params as true / fails as unusable and names the params and what they are
@@ -271,6 +272,7 @@ list_items / two names read from outside the item in a whose, one with an item w
 list_items / two names read from outside the item in a whose, one with an item without the name, are each named once, worst cause first and then by name / an item of the part has no name too
 list_items / a missing $params name and a walked part in one whose are each named, with the $params name first only in a count / the part holds more than one kind of value
 list_items / a missing $params name and a walked part in one whose are each named, with the $params name first only in a count / an item of the part has no name
+list_items / a count of or a sum of inside a whose reads its path as it does on its own / an empty list adds nothing
 list_items / a count of a part inside a whose on a subject that is a list reads the part before any item / a subject item without the part fails as absent, said once with no item of rows in front
 list_items / a count of a part inside a whose on a subject that is a list reads the part before any item / fails the same on empty lists of rows
 list_items / a count of a part inside a whose on a subject that is a list reads the part before any item / a null item in the part fails as not_an_object and names it, not the subject
@@ -309,7 +311,6 @@ list_starts / a name that walks a subject that is a list, read on the right of a
 list_starts / a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it / an item that is a list isn't read into, is listed as null, at the item, and fails as unusable
 messages / a sum of or a count of beside a plus names what it couldn't read / a summed list that is an object says it isn't a list or an object
 messages / a count of beside a plus names the list that isn't a list / a counted list that is an object says it isn't a list
-messages / two worked-out values that can't be used / the values are joined with a comma and and
 messages / does not exist on a path whose key from a field can't be read fails, whether or not the path before it is there / the field is missing and x is null
 messages / does not exist on a path whose key from a field can't be read fails, whether or not the path before it is there / the field is a list and x is null
 messages / does not exist on a for alias read by a position and a key from a field fails when the key can't be read / the field is a number and the alias is an empty list
@@ -402,10 +403,12 @@ parts / a child subject that reads its own field named like its parent's part, w
 parts / a child subject with no part of its own, reading a field named like its parent's part / prints no dot, because a bare name in the child doesn't read the parent's part
 parts / a part's alias on the right of a whose, with a part that is missing, null or not a list / fails closed for each thing, and never reads the items' own field instead
 parts / a param on the right side of a whose with plus / reads the param, and not the item's own field of the same name
+parts / a count of or sum of a parent's part on the right side of a whose, alone and in a plus / counts the parent's part, not the parent's field of the same name, so a part with too many items fails
 parts / a parent's name on the right side of a count of or sum of in a whose / fails as unusable when the parent's field is text
 parts / a part or the subject's name in a count of after that, over items that aren't objects / fails as unusable when the part's list is text
 present / exists with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
 row_parts / a count of and a sum of on a for line name the items they can't read under the item of the for line / items named through the alias, an inner list that is missing, a sentence that doesn't read the alias, and a second list
+row_parts / a list walked by a sentence on a for line with two lists sits under the item of the second list, named with its alias / an inner item that is missing a field, an inner list that is null, and an inner item that isn't an object
 row_parts / an every or a some that asks whether a field exists gives a missing field the outcome absent, as every other check does / an item without the field gives its input the outcome absent, and one whose field is null the outcome null
 row_parts / an every or a some that asks whether a field exists gives a missing field the outcome absent, as every other check does / a some with no item that has the field, beside an item that isn't an object
 row_parts / two sentences on a for line that walk the same list under the item say its items in list order, and a check with several sentences keeps their order / two sentences that walk the same inner list say its items in list order on a for line, and in the order of the sentences outside one

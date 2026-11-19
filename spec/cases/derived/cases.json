@@ -7904,7 +7904,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "limit is null",
+                "message": "limit is null, and findings is missing",
                 "name": "count of findings equals limit"
               }
             ],
@@ -9388,13 +9388,40 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/pull_requests"
+                        ],
+                        "name": "pull_requests",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "reviews": [
+                              {
+                                "by": "a"
+                              }
+                            ],
+                            "title": "x"
+                          }
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "pull_requests is [{\"reviews\": [{\"by\": \"a\"}], \"title\": \"x\"}]",
+                    "name": "pull_requests"
+                  }
+                ],
                 "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "pull_requests is [{\"reviews\": [{\"by\": \"a\"}], \"title\": \"x\"}]",
+                "message": "",
                 "name": "every pull_requests whose count of reviews is at least 2 exists"
               }
             ],

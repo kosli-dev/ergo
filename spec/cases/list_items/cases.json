@@ -13373,7 +13373,30 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/objs/0/rows"
+                        ],
+                        "name": "rows",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "n": 2,
+                            "v": "bob"
+                          }
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "rows is [{\"n\": 2, \"v\": \"bob\"}]",
+                    "name": "rows"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -13386,7 +13409,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/sum"
                 ],
-                "message": "rows is [{\"n\": 2, \"v\": \"bob\"}]",
+                "message": "",
                 "name": "every rows whose n equals sum of $input.lst.k exists"
               }
             ],
