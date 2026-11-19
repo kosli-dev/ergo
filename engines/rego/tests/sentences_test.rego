@@ -6,9 +6,9 @@ import rego.v1
 test_from_every_input_on_a_list_makes_each_item_a_subject_and_prints_every if {
 	req := {"s": object.union(min_subjects_req(1).s, {"from": "every $input"})}
 	rep := report([{"id": "a"}, {"id": "b"}], req)
-	[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations, r.failed_items] | some r in rows_for(rep, "s", "$min_subjects")] == [[true, "satisfied", 2, ["/0", "/1"], []]]
+	[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations, object.get(r, "failures", null)] | some r in rows_for(rep, "s", "$min_subjects")] == [[true, "satisfied", 2, ["/0", "/1"], null]]
 	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(every $input)) >= 1"
-	[[r.passed, r.cause, r.inputs[0].value, r.failed_items] | some r in rows_for(report([], req), "s", "$min_subjects")] == [[false, "value", 0, []]]
+	[[r.passed, r.cause, r.inputs[0].value, r.failures] | some r in rows_for(report([], req), "s", "$min_subjects")] == [[false, "value", 0, []]]
 }
 
 test_a_policy_ergo_spec_description_and_meta_are_kept_when_it_is_rewritten_as_sentences if {
@@ -243,7 +243,16 @@ test_every_and_some_joined_with_and_give_one_row_with_the_failed_sentences if {
 	r := ergo.report(doc, _sentence_policy({"c": "n is 1 and every xs.v is 1 and some xs.v is 2"}), {})
 	[[row.cause, row.failures, row.inputs] | some row in r.results; row.check == "c"] == [[
 		"value",
-		[_assertion("every xs.v is 1", "value", ["$policy:/requirements/s/checks/c#2"], [_seen("xs[].v", [1, 2], ["/things/0/xs/0/v", "/things/0/xs/1/v"], "usable")], "item 2 of xs: v is 2", [])],
+		[_assertion("every xs.v is 1", "value", ["$policy:/requirements/s/checks/c#2"], [], "", [{
+			"cause": "value",
+			"failures": [],
+			"inputs": [_seen("xs[1].v", 2, ["/things/0/xs/1/v"], "usable")],
+			"kind": "item",
+			"locations": ["/things/0/xs/1"],
+			"message": "v is 2",
+			"name": "item 2 of xs",
+			"value": {"v": 2},
+		}])],
 		[_seen("n", 1, ["/things/0/n"], "usable"), _seen("xs[].v", [1, 2], ["/things/0/xs/0/v", "/things/0/xs/1/v"], "usable")],
 	]]
 }

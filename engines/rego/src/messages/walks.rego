@@ -428,7 +428,10 @@ _m_record_shown(x, cause) if _m_tally_shown(x[0], cause)
 _m_record_shown(x, _) if {
 	count(x) == 3
 	x[0] in _failed_read_states
+	not _m_params_item(x[2])
 }
+
+_m_params_item(src) if src.item.i[0] in _params_starts
 
 _m_tally_dropped(subj, side, cause, x) if {
 	roots := {m | some c in object.get(side, "whose", []); _root_read_flaw(subj, c) == cause; not _m_key_flawed(c); some m in array.concat(_m_root_texts(subj, c, cause), _m_walked_tally_texts(subj, _walked_tallies(c), cause))}

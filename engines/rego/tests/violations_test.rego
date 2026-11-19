@@ -333,13 +333,13 @@ test_assertions_joined_with_and_or_listed_under_assert_give_one_row_that_names_t
 test_an_applies_row_that_fails_with_a_cause_other_than_value_is_a_violation_with_the_failed_items_or_assertions if {
 	some_rep := _from_report(_releases, {"release": {"from": `releases whose some files.path does not match "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
 	some_violations := {v.subject.id: object.filter(v, ["failures"]) | some v in ergo.violations(some_rep); v.check == "$applies"}
-	some_violations.unset == {"failures": [_assertion("some files.path does not match \"^docs/\"", "absent", ["$policy:/subjects/release/from"], [_seen("files.path", [], [], "absent")], "", [_list("files", "absent", [_seen("files", null, ["/releases/3"], "absent")], "files is missing")])]}
+	some_violations.unset == {"failures": [_assertion("some files.path does not match \"^docs/\"", "absent", ["$policy:/subjects/release/from"], [], "", [_list("files", "absent", [_seen("files", null, ["/releases/3"], "absent")], "files is missing")])]}
 	some_violations.null.failures[0].failures[0].cause == "null"
 	not "mixed" in object.keys(some_violations)
 	not "docs" in object.keys(some_violations)
 	many_rep := _from_report(_releases, {"release": {"from": `releases whose ticket is "ok" and whose every files.path matches "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
 	many_violations := {v.subject.id: object.filter(v, ["failures"]) | some v in ergo.violations(many_rep); v.check == "$applies"}
-	many_violations.unset == {"failures": [_assertion(`every files.path matches "^docs/"`, "absent", ["$policy:/subjects/release/from#2"], [_seen("files.path", [], [], "absent")], "files is missing", [])]}
+	many_violations.unset == {"failures": [_assertion(`every files.path matches "^docs/"`, "absent", ["$policy:/subjects/release/from#2"], [], "", [_list("files", "absent", [_seen("files", null, ["/releases/3"], "absent")], "files is missing")])]}
 	not "mixed" in object.keys(many_violations)
 }
 

@@ -909,8 +909,8 @@ test_a_whose_value_from_the_input_that_is_null_is_named_beside_worse_items_but_a
 test_a_whose_item_that_isnt_an_object_beside_a_key_that_is_missing_or_null_fails_as_not_an_object if {
 	doc := {"things": [{"id": "t", "m": {"a": "a"}, "rs": ["a", {"v": 1}]}]}
 	every k in [{}, {"k": null}] {
-		_whose_key_row(object.union(doc, k), {}, "count of rs whose zz is m named by $input.k is 1") == [["not_an_object", "item 1 of rs is \"a\", which isn't an object"]]
-		_whose_key_row(object.union(doc, k), {}, "count of rs whose v.y is m named by $input.k is 1") == [["not_an_object", "item 1 of rs is \"a\", which isn't an object"]]
+		_whose_key_row(object.union(doc, k), {}, "count of rs whose zz is m named by $input.k is 1") == [["not_an_object", "item 1 of rs is \"a\", which isn't an object; item 2 of rs: zz is missing"]]
+		_whose_key_row(object.union(doc, k), {}, "count of rs whose v.y is m named by $input.k is 1") == [["not_an_object", "item 1 of rs is \"a\", which isn't an object; item 2 of rs: v is 1, which isn't an object"]]
 	}
 }
 
