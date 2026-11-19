@@ -1,5 +1,286 @@
 # #688 step 1: cases and spec text
 
+## Third round (C1-C8)
+
+The scripts edit only the `results` of the cases they change, as before. The 23 rows that failed `spec/report/schema.json` now pass: a small jsonschema script over every row of every case (the row part of the schema, with `{{spec}}` filled in) finds none that fail. `.github/spec-schemas.py` wasn't run, because it builds a report with the engine for every case.
+
+- C1 and C8: the 23 `$min_subjects` rows that kept `failed_items` now have `failures` (requirements 9/1, 10/1, subject_name 78, 79, 81, 82, subjects 74/3, 80, 81, 144, 164/1, 166/1, 232, 237, 241, 245, 248, 251, 253, 254, that 1). Each item a `subjects.one_type` or `subjects.every.same` clause names is an `item` entry with its own clause and the value it read as its input, with `outcome` `usable` (C8 says `usable` for `$input[1].commits` and "like the one_type items"; ties use `usable` the same way). An item that is itself the value keeps its name in its message (`item 1 of xs is an object`, input `xs[0]`). The 9 `every.same` rows get the C8 message, in list order. An inner item, like `item 1 of commits`, is an entry under its item. subjects 164/1 and 166/1 get the path read (`$input[0].y`, `artifact[0].c`) on the row's `inputs` after the count, with `absent`, and `failures` `[]`.
+- C2 and C4: derived 90 (cases 0 and 2, `count_is` and `sum_is`), derived 105, messages 145 and messages 146 say the root, then the list or each item, with a `list` entry or `item` entries, and the missing `$params` roots on the assertion. messages 146 is the second half of the OPEN.md line C2 removes (`every`/`some` with `es` `[]` and the params `3`), so it changes too. Its case description and the matching line in `engines/rust/known-failures.txt` changed, and so did messages 145's description.
+- C3: for 261 `plain`, all four cases.
+- C5: 12 rows (derived 33/1, 71/2, for 264/1 `some_exists`, list_items 15/1, messages 70/0, parts 20/0, 21/0 three checks, sentences 296/1, walks 7/2, 8/4).
+- C6: new group at the end of `row_parts`, one case.
+- C7: the 21 entries whose cause was worse than their own problems now take their own (for 261-263, 306-312, messages 79/1, 111/0, 112/1). The `for` rows of messages 103, 104, 110, 111 and 112 lose the `list` entry `xs` that held the roots, and the roots go on the row's `inputs`, copied from the same case's other rows. Three count rows of that family also get the `$params` root that was missing from the assertion (messages 103/0 `params`, 111/1 and 112/0 `count`).
+- Spec text: `row.parts` (C5, C7), `message.items` (C2, C3), `tally.walk` (C4), `message.join` (C6), `subjects.one_type`, `subjects.failed_items`, `subjects.every.same`, `subjects.every.broken`, `subjects.every.child` (C1, C8). OPEN.md: the `$min_subjects` line and C2's line are gone, and the `pull_requests` quote follows C8. REFERENCE.md: three prose sentences about `failed_items` and `every.same`. CHANGELOG: five lines, and two old sentences about `failed_items` gone.
+
+### Count
+
+`diffmain.py 61f3758c` (in the session scratchpad: loads every case file at the second round's last commit and on this branch, matches cases by group and case description, compares `results`): 55 existing cases change and 3 are new. 21 of the 55 are C1/C8 (23 rows), 34 are C2-C7. Two of the 3 new ones are messages 145 and 146 under their new descriptions, and the third is the C6 case.
+
+### Gaps found (undecided)
+
+1. `item 2 of $input` in requirements 9/10 gets one entry, but the C8 message says `item 2 of $input: commits is a number` twice (once per rule), and the message's order is by rule, not by item. So the row message can't be built from the entries in tree order.
+2. subjects 232, `every builds[0].tests[0]` where `tests[0]` is an object: I made it a `list` entry named `item 1 of builds: item 1 of tests`, as the message names it. It could also be the line's own read on the row's `inputs`, like C1's missing position.
+3. C1's "a `from` line's own path read sits on the row's inputs" may apply to from-line keys that can't be read (subjects 22-28), to lines without `every` (subjects 21/1 `artifacts.web is missing`) and to positions on a `null` or text parent (subjects 166/2, 166/3, whose cause `absent` OPEN.md already flags). Not changed.
+4. The C7 root rule applies to about 50 more `for` groups (listed below), where a `list` entry holds a `whose` root's clause while the list reads fine. Their roots' values, outcomes and locations need the engine, so they are left.
+5. OPEN.md lines that C4 and B9 may settle, left as they are: "An empty `first of` or `last of` list after a missing root", "A part that is a list, read in a `whose` beside a list that can't be read" (cause rank), "The items of a list inside a list, beside a root", and the other way round, "A root on the right of the phrase beside a list that can't be read" (the list hides the root) and "A root on the right of the phrase that is missing or `null`, beside a root in a `whose`" (a root hides a root).
+6. derived 90 `plus_left` and `plus_right` with no key say only `$input.k is missing`, hiding `k is missing`, which the null-key case says. A root hiding a root on the other side, not a list, so C4 doesn't cover it.
+7. for 261 `plain`: the root `pos[].name` keeps `outcome` `usable` on the assertion and the row, as it had, though `item 2 of pos` has no `name`.
+8. messages 145 and 146 `count`, `every`, `some`: `main` fails them as `unusable` though every problem they say is `absent` or `value`. I set the worst of what they say (`absent`), by C7 and `problems.all_said`.
+
+### Changes the report
+
+- A `$min_subjects` row whose message names items by type or by list kind has an `item` entry per item, and a `from` line's missing position is on the row's `inputs`.
+- `every.same` says the kind in each item: `item 1 of builds: tags is a list, item 2 of builds: tags is text`.
+- A root that can't be read no longer hides a list that can't be read (and `$params` that isn't an object no longer hides the items or the list), and the cause is the worst of what is said.
+- An `every … whose` that picks nothing has a `list` entry.
+- An entry keeps its own cause; a `for` line's `whose` roots move from a `list` entry to the row's `inputs`.
+
+## Cases still in main's shape, for the Rust builder
+
+Found by `scan_left.py` in the session scratchpad, which looks for these shapes in the expected rows, so it may miss a case or name one too many. One line per group and shape, with the number of cases. D1 is decision 1 (a walk on a `for` line), D3 is decision 3 (the items of a `count of` or `sum of`), and C7 is the `for` line's `whose` root held in a `list` entry. REFERENCE.md still has two JSON examples in the old shape: the `failed_items` row near "A list that's missing, like `sha-3`'s" and the option `message`s in "Finding the evidence for a failed row". Both need engine output.
+- compare / $refs list a path whose walk fails on an item that isn't an object with what the walk read (D3: count of or sum of with items said in its message and no item entries): 1 case
+- deep_walks / ten steps after count of, starting at a for alias (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- deep_walks / ten steps after every, one of them a position (D1: an item whose message names inner items, with no entries for them): 1 case
+- derived / count of a list with whose (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- derived / count of two lists (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- derived / sum of a field (D3: count of or sum of with items said in its message and no item entries): 5 cases
+- derived / sum within a distance (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / a sum is at least a number (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / a count under a for line reading the line's name (D1: an item holding a walked path like x.ys[].n as its input): 2 cases
+- derived / a sum with is between (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / count of on subjects and items that aren't objects (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / days elapsed in the whose of a count (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / a count in the whose of a count (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / count of a field over a null item (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / sum of a field over a null item (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / count of a list with whose, over items it cannot decide (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- derived / a count whose whose reads a named by key from $input.k that is null (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / a count whose whose reads a named by key from $input.k that is missing (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / a count whose whose reads a named by key from $input.k that isn't text (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them (D3: count of or sum of with items said in its message and no item entries): 4 cases
+- derived / a count whose whose reads a field of the subject with a named by key from the item, a null root next to the key (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / a count whose whose reads a field of the parent with a named by key from the item, a null root next to the key (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems (D3: count of or sum of with items said in its message and no item entries): 5 cases
+- derived / a count, some or every over a list reached through a list, whose whose reads a root with a named by key from the item, names each item as before (D3: count of or sum of with items said in its message and no item entries): 1 case
+- derived / a count whose whose reads a part of the subject with a named by key from the item says the part once, first (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- derived / a count whose whose reads a part of the subject that is a path, with a named by key from the item, says the part once, first (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- distinct / count of distinct (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- distinct / count of distinct with a whose (D3: count of or sum of with items said in its message and no item entries): 1 case
+- distinct / sum of distinct (D3: count of or sum of with items said in its message and no item entries): 1 case
+- distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 (D1: an item whose message names inner items, with no entries for them): 4 cases
+- distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 (D1: an item holding a walked path like x.ys[].n as its input): 4 cases
+- distinct / distinct with a list read through an alias or a part (D1: an item whose message names inner items, with no entries for them): 1 case
+- distinct / distinct with a list read through an alias or a part (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- for / a whose that reads a $params list that isn't a list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- for / a position at the start of a path that starts at a for alias holding a list (D1: an item whose message names inner items, with no entries for them): 1 case
+- for / every over the subs of the first item that whose kept, with every leaf checked (D1: an item whose message names inner items, with no entries for them): 1 case
+- for / every over the subs of the first item that whose kept, with every leaf checked (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- for / a failed sentence that counts through an alias lists the count and what it counted (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- for / a for line that reads its alias as a list (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- for / a for line that reads a position of a field of its alias (D1: an item whose message names inner items, with no entries for them): 1 case
+- for / a for line whose sentence reads the same value twice (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- for / a failed sentence on a for line lists its inputs in the order of its kind (D1: an item whose message names inner items, with no entries for them): 1 case
+- for / a failed sentence on a for line lists its inputs in the order of its kind (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- for / a walk on a for line whose path is named with a character that sorts before $ (D1: an item whose message names inner items, with no entries for them): 1 case
+- for / a for alias that is a list, read by a position and then by a key: w[0].a does not exist (D1: an item whose message names inner items, with no entries for them): 2 cases
+- for / a for alias read by a position and then by a key from a field: w[0] named by zz is 1 (D1: an item whose message names inner items, with no entries for them): 1 case
+- for / a for alias read by a position and then by a key from a field: w[0] named by zz does not exist (D1: an item whose message names inner items, with no entries for them): 1 case
+- for / a for alias read by a position, then a key, then a key from a field: w[0].a named by zz exists (D1: an item whose message names inner items, with no entries for them): 4 cases
+- for / a count of a field in a position of the params (D3: count of or sum of with items said in its message and no item entries): 1 case
+- for / a for alias that is a list, read by a position and then by a key: w[0].a does not exist, with true at the position (D1: an item whose message names inner items, with no entries for them): 1 case
+- for / a for line over $input whose sentence reads a list on the right, as in MI-18.11 (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- for / a for line that reads an alias and a path through it (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- for / a root in a for line's relative clause doesn't hide an item's own problem (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- for / a root in one of two relative clauses, in either order (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- for / a part that holds a list is walked by a whose in `count of m.ys whose v is in pl.z is 0` (D1: an item holding a walked path like x.ys[].n as its input): 2 cases
+- for / a count of on a for line walks a list in the middle of a part, a parent or $input (D3: count of or sum of with items said in its message and no item entries): 1 case
+- for / a part that holds a list is walked on the right of is in on a for line (C7: a list entry on a for row that holds a root's clause while the list reads fine): 4 cases
+- for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item (C7: a list entry on a for row that holds a root's clause while the list reads fine): 5 cases
+- for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item (D1: an item whose message names inner items, with no entries for them): 3 cases
+- for / a name read from outside the item and walked on a for line is said once, before what each item says on its own (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read (C7: a list entry on a for row that holds a root's clause while the list reads fine): 3 cases
+- for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read (D1: an item whose message names inner items, with no entries for them): 3 cases
+- for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root (C7: a list entry on a for row that holds a root's clause while the list reads fine): 4 cases
+- for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root (D1: an item whose message names inner items, with no entries for them): 2 cases
+- for / an item's own problem on a for line is said after a $params or $input root of its whose that can't be read (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- for / an item's own problem on a for line is said after a $params or $input root of its whose that can't be read (D1: an item whose message names inner items, with no entries for them): 2 cases
+- for / an item's own problem on a for line is said after a parent's root of its whose that can't be read (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- for / an item's own problem on a for line is said after a parent's root of its whose that can't be read (D1: an item whose message names inner items, with no entries for them): 1 case
+- for / a part that holds a list is walked in the whose of a for line and in a whose under it (C7: a list entry on a for row that holds a root's clause while the list reads fine): 3 cases
+- for / a part of a subject that is a list is walked in the whose of a count of on a for line (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- for / a count of a part of a subject that is a list, in a for line's own whose, is said once (D1: an item whose message names inner items, with no entries for them): 3 cases
+- for / and N more counts each problem of a part of a subject that is a list once (D1: an item whose message names inner items, with no entries for them): 1 case
+- for / and N more counts each problem of a part of a subject that is a list once (D3: count of or sum of with items said in its message and no item entries): 1 case
+- for / a parent's part that holds a list is walked in the whose of a for line (C7: a list entry on a for row that holds a root's clause while the list reads fine): 3 cases
+- for / a count of or a sum of in a whose on a for line reads its list before any item, so a list it can't read fails the check on an empty list too (C7: a list entry on a for row that holds a root's clause while the list reads fine): 6 cases
+- for / a count of or a sum of in a whose on a for line reads its list before any item, so a list it can't read fails the check on an empty list too (D3: count of or sum of with items said in its message and no item entries): 4 cases
+- for / a for line's own whose lists a list it walks, as a check without a for line does (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- for / a for line's own whose that sums a list read from outside the item says an item it can't add once (C7: a list entry on a for row that holds a root's clause while the list reads fine): 5 cases
+- for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- for / an alias that a pick on an empty list leaves without a value, read on a later line (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- for / a part that a for line walks as a list fails it on an empty list when an item of it can't be read (C7: a list entry on a for row that holds a root's clause while the list reads fine): 3 cases
+- for / a parent's part that a for line's sentence walks fails it on an empty list when an item of it can't be read (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- for / an alias of an earlier line that walks a list fails a second line on an empty list when an item of it can't be read (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- for / a whose on the second for item that reads a root says the root once, with no item of its list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 4 cases
+- for / a whose on the second for item that reads a root says the root once, with no item of its list, with some (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- for / a first of on the second for item whose whose reads a root says the root once, with no item of its list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- for / first of a list whose whose reads $params, with $params.k missing (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- for / a whose on the second for item that reads a root and the first item's alias says the root once and the alias for each item (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- for / a whose on the second for item that reads $params text after is in says the root once, with no item of its list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- for / a whose on the second for item that reads a $params object after is in says the root once, with no item of its list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- for / a whose on the second for item with every that reads $input after is in says the root once, with no item of its list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- for / a whose on the second for item with some that reads $input after is in says the root once, with no item of its list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- for / a whose on the second for item with first of that reads $input after is in says the root once, with no item of its list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- for / a whose on the second for item with last of that reads $input after is in says the root once, with no item of its list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- for / a second for list whose whose reads a root from the params that can't be read, and a field its items lack, says the root once, then each item, wherever the root is in the whose (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- for / first of and last of an empty second for list whose whose reads params that are text, not a list, say the params, then the empty list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- for / first of and last of an empty second for list whose whose reads params that are an object, not a list, say the params, then the empty list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- in / a ref that walks, read by a whose inside count of and sum of (D3: count of or sum of with items said in its message and no item entries): 1 case
+- in / a path that walks on the right of a for line (D1: an item whose message names inner items, with no entries for them): 1 case
+- in / a leading dot on the right of a for line (D1: an item whose message names inner items, with no entries for them): 1 case
+- in / a leading dot on the right of a for line keeps its dot when an item of the field is not an object (D1: an item whose message names inner items, with no entries for them): 1 case
+- in / count of and sum of read the field named like a part and list it with the dot (D3: count of or sum of with items said in its message and no item entries): 1 case
+- list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that (D1: an item whose message names inner items, with no entries for them): 3 cases
+- list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that (D1: an item holding a walked path like x.ys[].n as its input): 4 cases
+- list_items / a list in the middle of a name on the right of a list phrase after every is read item by item (D1: an item whose message names inner items, with no entries for them): 1 case
+- list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it (D1: an item whose message names inner items, with no entries for them): 2 cases
+- list_items / a parent's name with a list in the middle, read on the right of a list phrase, is listed as a plain check lists it (D1: an item whose message names inner items, with no entries for them): 5 cases
+- list_items / a name read from outside the item and walked on the right of is in is said once, with no item (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- list_items / a name read from outside the item and walked on the right of is in is said once, with no item (D1: an item whose message names inner items, with no entries for them): 3 cases
+- list_items / a name of a subject that is a list, walked on the right of is in, is said once (D1: an item whose message names inner items, with no entries for them): 3 cases
+- list_items / a part that holds a list, walked after matches in a whose, is said once (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- list_items / a part that holds a list, walked after matches in a whose, is said once (D1: an item whose message names inner items, with no entries for them): 3 cases
+- list_items / a parent's part that holds a list, walked after matches in a whose, is said once (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- list_items / a name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it (D3: count of or sum of with items said in its message and no item entries): 1 case
+- list_items / a parent's name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it (D3: count of or sum of with items said in its message and no item entries): 1 case
+- list_items / two names read from outside the item in a whose, each with items that can't be used, are each named once, worst cause first and then by name (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- list_items / two names read from outside the item in a whose, each with items that can't be used, are each named once, worst cause first and then by name (D3: count of or sum of with items said in its message and no item entries): 1 case
+- list_items / two names read from outside the item in a whose, one with an item without the name, are each named once, worst cause first and then by name (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- list_items / two names read from outside the item in a whose, one with an item without the name, are each named once, worst cause first and then by name (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- list_items / a missing $params name and a walked part in one whose are each named, with the $params name first only in a count (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- list_items / a missing $params name and a walked part in one whose are each named, with the $params name first only in a count (D3: count of or sum of with items said in its message and no item entries): 1 case
+- list_items / a part whose own path has a list in the middle, read on the right of a list phrase, is named from the subject (D3: count of or sum of with items said in its message and no item entries): 1 case
+- list_items / a part whose own path has a list in the middle, read on the right of a list phrase, is named from the subject (D1: an item whose message names inner items, with no entries for them): 1 case
+- list_items / a name read both item by item and as one value in one check is listed for each read (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- list_items / a count of inside a whose reads its list before any item, so a list it can't read fails the check on an empty list too (D3: count of or sum of with items said in its message and no item entries): 4 cases
+- list_items / a count of $params inside a whose reads its list before any item, with an item without the name (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- list_items / a count of a parent's list inside a whose reads it before any item (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- list_items / a count of a part inside a whose on a subject that is a list reads the part before any item (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- list_items / a named by key read from an input that is a list, in the second list of a for line and in the whose of a for line (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- list_items / a named by key read from an input that is a list, in a one-line every and on a for line, when the params aren't an object (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- list_items / a part read inside a whose on a subject that is a list, missing, null or not an object (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- list_items / a part at the start of a path on a subject that is a list, missing, null or not an object (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- list_starts / every, some, count of and sum of walk a subject that is a list (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- list_starts / a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it (D1: an item whose message names inner items, with no entries for them): 5 cases
+- list_starts / a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it (D3: count of or sum of with items said in its message and no item entries): 5 cases
+- list_starts / a name in a whose is read from the row, so a bad list of the same name on the subject isn't blamed (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- messages / a sum of or a count of beside a plus names what it couldn't read (D3: count of or sum of with items said in its message and no item entries): 1 case
+- messages / a one-list for line over a key that holds a colon (D1: an item whose message names inner items, with no entries for them): 1 case
+- messages / a one-list for line over a key that holds a colon (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- messages / a one-list for line with a sentence that walks a list and one that doesn't (D1: an item whose message names inner items, with no entries for them): 1 case
+- messages / a one-list for line with a sentence that walks a list and one that doesn't (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- messages / a one-list for line whose items fail a sentence that walks and one that doesn't (D1: an item whose message names inner items, with no entries for them): 2 cases
+- messages / a one-list for line whose items fail a sentence that walks and one that doesn't (D1: an item holding a walked path like x.ys[].n as its input): 2 cases
+- messages / a count of a list that holds items that aren't objects (D3: count of or sum of with items said in its message and no item entries): 1 case
+- messages / a sum of a list that holds items that aren't objects (D3: count of or sum of with items said in its message and no item entries): 1 case
+- messages / a count of a list of lists with a whose that counts (D3: count of or sum of with items said in its message and no item entries): 1 case
+- messages / a count of a part's list that holds items that aren't objects (D3: count of or sum of with items said in its message and no item entries): 1 case
+- messages / a count of a list in a list names each item of the inner list by it (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- messages / a count of a list in a list in a list names the inner lists by it (D3: count of or sum of with items said in its message and no item entries): 1 case
+- messages / a count of a list in a list item of a for alias (D1: an item whose message names inner items, with no entries for them): 1 case
+- messages / a count of a list in a list, read by a position and a key from a field, names the list that isn't an object (D3: count of or sum of with items said in its message and no item entries): 1 case
+- messages / a for line over two lists (D1: an item whose message names inner items, with no entries for them): 1 case
+- messages / a for line over two lists (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- messages / a for line over a list of lists whose values spell the alias (D1: an item whose message names inner items, with no entries for them): 8 cases
+- messages / a for line over a list of lists whose values spell the alias (D1: an item holding a walked path like x.ys[].n as its input): 8 cases
+- messages / a for line whose alias is named applies and whose value spells it (D1: an item whose message names inner items, with no entries for them): 1 case
+- messages / a for line whose alias is named applies and whose value spells it (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- messages / a for alias read in a whose keeps its name (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- messages / a for item that is an object, with a list under it that holds an item that isn't one (D1: an item whose message names inner items, with no entries for them): 1 case
+- messages / a for item that is an object, with a list under it that holds an item that isn't one (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- messages / a for item that is an object, with a whose over a list that holds an item that isn't one (D1: an item whose message names inner items, with no entries for them): 1 case
+- messages / a for item that is an object, with a whose over a list that holds an item that isn't one (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- messages / a for item read with a walk of a list under it (D1: an item whose message names inner items, with no entries for them): 1 case
+- messages / a for item read with a walk of a list under it (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- messages / a for item with a whose that reads a part over items that aren't all objects (D1: an item whose message names inner items, with no entries for them): 2 cases
+- messages / a for item with a whose that reads a part over items that aren't all objects (D1: an item holding a walked path like x.ys[].n as its input): 2 cases
+- messages / a for line over two lists, with a walk under the first item before a sentence on the second (D1: an item whose message names inner items, with no entries for them): 1 case
+- messages / a for line over two lists, with a walk under the first item before a sentence on the second (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- messages / a for line over two lists, with a sentence on the second item before a walk under the first (D1: an item whose message names inner items, with no entries for them): 1 case
+- messages / a for line over two lists, with a sentence on the second item before a walk under the first (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- messages / a count of a field in a position of a field that holds objects (D3: count of or sum of with items said in its message and no item entries): 1 case
+- messages / a count of a key in a position of the input that holds objects (D3: count of or sum of with items said in its message and no item entries): 1 case
+- messages / a root of a for line, said once (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- messages / a root of a for line and a root that reads the alias in one message (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- messages / a root of a for line with if any, on an empty list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- messages / a parent's part read in a whose, on a for line and in a count of (C7: a list entry on a for row that holds a root's clause while the list reads fine): 3 cases
+- messages / a parent's part read in a that on a for line (C7: a list entry on a for row that holds a root's clause while the list reads fine): 3 cases
+- messages / a parent's part read in a whose, on an empty list (C7: a list entry on a for row that holds a root's clause while the list reads fine): 4 cases
+- messages / two roots in a whose that fail in different ways, beside a list that can be read, take the worst cause (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- messages / a count of or a sum of with more than three items it can't read says the first three and then and N more, last (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- parts / a part's alias on the right of a whose, with a part that is missing, null or not a list (D1: an item whose message names inner items, with no entries for them): 1 case
+- parts / a part's alias on the right side of a whose, with and without plus (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- parts / a for alias and the input on the right side of a whose with plus (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- parts / a parent's name or a for alias in a count of after that, over items that aren't objects (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- sentences / a for alias inside an item's scope (D1: an item whose message names inner items, with no entries for them): 1 case
+- sentences / a for alias on the right of a whose, with items that have a field of the same name (D1: an item whose message names inner items, with no entries for them): 1 case
+- sentences / a for alias on the right of a whose, with an alias that is null, text or an object (D1: an item whose message names inner items, with no entries for them): 1 case
+- sentences / a sum of is not between two numbers (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- sentences / a sum of is not a value within a number (D3: count of or sum of with items said in its message and no item entries): 1 case
+- sentences / a for line that walks a path with a named by field (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- sentences / the examples the rules for where a name resolves were decided on (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- sentences / a focus a path couldn't reach, and a focus read by that (D3: count of or sum of with items said in its message and no item entries): 1 case
+- sentences / a field missing on the focus while its item has it (D3: count of or sum of with items said in its message and no item entries): 1 case
+- sentences / the subject's name named by a key, inside and outside a relative clause (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- sentences / the subject's field read by name inside a relative clause, when it isn't usable (D3: count of or sum of with items said in its message and no item entries): 1 case
+- sentences / a count whose focus is missing for one item and null for another (D3: count of or sum of with items said in its message and no item entries): 1 case
+- sentences / the subject named by a key of each item, inside a relative clause (D3: count of or sum of with items said in its message and no item entries): 4 cases
+- sentences / a list of the params on the right of every, with an item that isn't an object (D1: an item whose message names inner items, with no entries for them): 1 case
+- sentences / a list of the params on the right of every, with an item that has no value (D1: an item whose message names inner items, with no entries for them): 1 case
+- sentences / a position after the subject's name inside a relative clause (D3: count of or sum of with items said in its message and no item entries): 1 case
+- sentences / a sum of whose that or whose reads a named by key against the focus (D3: count of or sum of with items said in its message and no item entries): 1 case
+- sentences / a root name inside a relative clause, read up front (C7: a list entry on a for row that holds a root's clause while the list reads fine): 2 cases
+- sentences / a root name of the wrong type inside a relative clause (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- sentences / a root name of the wrong type on the left of a compare inside a relative clause (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- sentences / a second for item whose whose takes its key from the subject (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- sentences / a list of the params on the right of every with many items that can't be read (D1: an item whose message names inner items, with no entries for them): 1 case
+- sentences / a second for item whose whose has a root problem, on a row that fails for another reason too (C7: a list entry on a for row that holds a root's clause while the list reads fine): 1 case
+- subject_name / count of and sum of on a subject that is a list (D3: count of or sum of with items said in its message and no item entries): 1 case
+- subject_name / a check that reads plain, on a plain value, a list and a from line that keeps lists (D3: count of or sum of with items said in its message and no item entries): 1 case
+- subject_name / a field after the subject name inside a whose of a check reads the subject (D3: count of or sum of with items said in its message and no item entries): 1 case
+- subject_name / a count whose reads a field named like the subject and a part (D3: count of or sum of with items said in its message and no item entries): 1 case
+- subject_name / a count of a field named like the subject inside a count whose names the field with its dot (D3: count of or sum of with items said in its message and no item entries): 1 case
+- subject_name / a count whose reads a field named like a subject with "a<b" with its dot (D3: count of or sum of with items said in its message and no item entries): 1 case
+- subject_name / a count whose reads a field named like a subject with "a\"b" with its dot (D3: count of or sum of with items said in its message and no item entries): 1 case
+- subject_name / a count whose reads a field named like a subject with "a\\b" with its dot (D3: count of or sum of with items said in its message and no item entries): 1 case
+- walks / a for line with a walk next to a parent (D1: an item whose message names inner items, with no entries for them): 1 case
+- walks / a for line with a walk next to a parent (D1: an item holding a walked path like x.ys[].n as its input): 1 case
+- walks / a part that a phrase walks as a list fails a check on an empty list when an item of it can't be read (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- walks / a parent's part that a phrase walks fails a check on an empty list when an item of it can't be read (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- walks / a one-line walk whose whose reads a named by key from $params that is missing says the key once and each item's own problem (D3: count of or sum of with items said in its message and no item entries): 1 case
+- walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front (D3: count of or sum of with items said in its message and no item entries): 1 case
+- walks / a whose key from $params that is missing, beside conditions on the same items that read $params and $input (D3: count of or sum of with items said in its message and no item entries): 1 case
+- walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- walks / a that clause whose key from $params is missing reads the value before the key on the focus (D3: count of or sum of with items said in its message and no item entries): 1 case
+- walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name (D3: count of or sum of with items said in its message and no item entries): 1 case
+- walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name (D1: an item whose message names inner items, with no entries for them): 1 case
+- walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name, with a null param (D3: count of or sum of with items said in its message and no item entries): 1 case
+- walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name, with a null param (D1: an item whose message names inner items, with no entries for them): 1 case
+- walks / a that key that can't be read, on a list item that isn't an object, names the item and never a field under it (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- walks / a that key that isn't text, on a list item that isn't an object, names the item and never a field under it (D3: count of or sum of with items said in its message and no item entries): 1 case
+- walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows (D3: count of or sum of with items said in its message and no item entries): 3 cases
+- walks / a whose key from $params that is missing, said once before the items, doesn't count as one of the three items the message shows (D3: count of or sum of with items said in its message and no item entries): 1 case
+- walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- walks / a whose key from $params that is null, beside items that fail on their own fields, says the key once and each item's own problem (D3: count of or sum of with items said in its message and no item entries): 2 cases
+- walks / a whose key from $params that is missing, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said (D3: count of or sum of with items said in its message and no item entries): 1 case
+- walks / a whose key from $params that is null, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said (D3: count of or sum of with items said in its message and no item entries): 1 case
+- walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said (D3: count of or sum of with items said in its message and no item entries): 2 cases
+
 ## Second round (settled points B1-B12)
 
 Scripts edit only the `results` of the cases they change and keep the rest of each file as written. Done so far, on the existing cases:
@@ -25,7 +306,7 @@ Scripts edit only the `results` of the cases they change and keep the rest of ea
 
 - The existing cases the first round listed for decisions 1 and 3 (a walk on a `for` line, the items of a `count of` or `sum of`) still have `main`'s shape. `main` gives these shapes nowhere, so they can't be copied, and they need the engine or hand work one by one.
 
-### Gaps found (undecided)
+### Gaps found (settled as C1-C8, done in the third round)
 
 1. `$min_subjects` rows whose message says one clause about several items (`subjects.one_type`, `subjects.every.same`) and `from` lines that read a missing position (`item 1 of $input is missing`): which entry holds which clause. 23 rows keep `failed_items`.
 2. B9 when `$params` itself isn't an object: derived case 105 and messages case 145 pin "say only the params". Does B9 add the items there?
@@ -57,210 +338,3 @@ Scripts edit only the `results` of the cases they change and keep the rest of ea
 10. `$min_subjects` (decision 12): OPEN.md says it waits for #688, but the #688 design talk doesn't cover it. I wrote no case for it.
 11. Bugs on `main` outside the decisions, which the cases avoid: `every xs.ys.v exists` with an outer item `3` says `item 3 of xs: ys is null, which isn't a list`. `every x.ys.n is at least x.min` with neither field says only `x.ys is missing`. `every xs.v exists` gives a missing `v` the outcome `null`.
 12. A sentence on a `for` line that doesn't read the alias and walks a list (`count of xs whose k is 1 is 3`) gets its items under its own assertion (decision 2). Decision 15 said `failures` `[]` for such sentences, but it was written about sentences that have no items.
-
-## Existing cases whose report changes
-
-Found by scanning the expected rows for the shapes above, not by running an engine, so the list may miss a case or name one too many. 202 cases: D1 is a walk on a `for` line, D2 is a sentence placed somewhere other than alone, and D3 is the items of a `count of` or `sum of`.
-
-- compare / $refs list a path whose walk fails on an item that isn't an object with what the walk read / lists the value read and the item the walk stopped at (D2 walk items (option), D3 count/sum)
-- derived / count of a list with whose / fails as unusable when an item's field has another type than the value (D3 count/sum)
-- derived / count of a list with whose / fails as absent when an item cannot be decided because the field is missing (D3 count/sum)
-- derived / count of a list with whose / fails as null when an item cannot be decided because the field is null (D3 count/sum)
-- derived / count of two lists / fails as absent when one inner list is missing (D3 count/sum)
-- derived / count of two lists / fails as null when one inner list is null (D3 count/sum)
-- derived / count of two lists / fails as unusable when one inner list is a string (D3 count/sum)
-- derived / sum of a field / fails as absent when an item has no such field, with null for it in the list (D3 count/sum)
-- derived / sum of a field / fails as null when a value is null (D3 count/sum)
-- derived / sum of a field / fails as unusable when a value is text, even a number written as text (D3 count/sum)
-- derived / sum of a field / fails as unusable when a value is a boolean (D3 count/sum)
-- derived / sum of a field / the worst cause wins when several values fail: unusable before absent before null (D3 count/sum)
-- derived / sum within a distance / fails as unusable when a value is text (D3 count/sum)
-- derived / a sum is at least a number / fails as unusable when a value is text (D3 count/sum)
-- derived / a count under a for line reading the line's name / fails as absent when a pull request has no reviews field (D1 for-line item (count/sum))
-- derived / a count under a for line reading the line's name / fails as null when the reviews are null (D1 for-line item (count/sum))
-- derived / a count under a for line reading the line's name / fails as unusable when the reviews are not a list (D1 for-line item (count/sum))
-- derived / a sum with is between / fails as unusable when a value is text (D3 count/sum)
-- derived / count of on subjects and items that aren't objects / an item that isn't an object fails as not_an_object, and a null value counts (D3 count/sum)
-- derived / days elapsed in the whose of a count / fails as absent when an item cannot be decided because its end is missing (D3 count/sum)
-- derived / a count in the whose of a count / fails as absent when an item's list is missing, so the item cannot be decided (D3 count/sum)
-- derived / count of a field over a null item / a null item fails as not_an_object (D3 count/sum)
-- derived / sum of a field over a null item / a null item fails as not_an_object (D3 count/sum)
-- derived / count of a list with whose, over items it cannot decide / fails as null when an item has a null k (D3 count/sum)
-- derived / count of a list with whose, over items it cannot decide / fails as absent when an item has no k (D3 count/sum)
-- derived / count of a list with whose, over items it cannot decide / fails as null when an item has a null k and another has no k (D3 count/sum)
-- derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is missing (D3 count/sum)
-- derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is null (D3 count/sum)
-- derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is a number (D3 count/sum)
-- derived / a count whose whose reads a named by key from $input.k that is null / the key is null (D3 count/sum)
-- derived / a count whose whose reads a named by key from $input.k that is missing / the key is missing (D3 count/sum)
-- derived / a count whose whose reads a named by key from $input.k that isn't text / the key is a number (D3 count/sum)
-- derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names the item's own field before the root that isn't an object (D3 count/sum)
-- derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names the item's own field before the root that is text (D3 count/sum)
-- derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a missing key inside the item (D3 count/sum)
-- derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a null key inside the item (D3 count/sum)
-- derived / a count whose whose reads a field of the subject with a named by key from the item, a null root next to the key / names the null field of the subject and then the missing key inside the item (D3 count/sum)
-- derived / a count whose whose reads a field of the parent with a named by key from the item, a null root next to the key / names the null field of the parent and then the missing key inside the item (D3 count/sum)
-- derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is missing and the first item is null (D3 count/sum)
-- derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is null and the first item's key isn't text (D3 count/sum)
-- derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / a root further back is null and the items have no key (D3 count/sum)
-- derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags and v are of the wrong kind (D3 count/sum)
-- derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags mix kinds, so the count says what it says when the root reads (D3 count/sum)
-- derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is missing and five items aren't objects, so the message stops after three problems (D3 count/sum)
-- derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and the item's key and field print with a semicolon and a comma (D3 count/sum)
-- derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is 3 and four items each have a problem, so the last one is counted (D3 count/sum)
-- derived / a count, some or every over a list reached through a list, whose whose reads a root with a named by key from the item, names each item as before / names each item whose field isn't an object when the root is null (D3 count/sum)
-- derived / a count whose whose reads a part of the subject with a named by key from the item says the part once, first / names a null part, not the path past it (D3 count/sum)
-- derived / a count whose whose reads a part of the subject with a named by key from the item says the part once, first / names a missing part, not the path past it (D3 count/sum)
-- derived / a count whose whose reads a part of the subject that is a path, with a named by key from the item, says the part once, first / names the part when the end of its path is null (D3 count/sum)
-- derived / a count whose whose reads a part of the subject that is a path, with a named by key from the item, says the part once, first / names the part when the start of its path is null (D3 count/sum)
-- distinct / count of distinct / a missing author fails as absent (D3 count/sum)
-- distinct / count of distinct / an item that isn't an object fails as not_an_object (D3 count/sum)
-- distinct / count of distinct with a whose / an item the whose can't decide fails the check (D3 count/sum)
-- distinct / sum of distinct / a null amount fails as null (D3 count/sum)
-- distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 / it reads the subject's lo, so it reads whatever the dropped copy's lo is: higher (D1 for-line item)
-- distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 / it reads the subject's lo, so it reads whatever the dropped copy's lo is: missing (D1 for-line item)
-- distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 / it reads the subject's lo, so it reads whatever the dropped copy's lo is: null (D1 for-line item)
-- distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 / it reads the subject's lo, so it reads whatever the dropped copy's lo is: text (D1 for-line item)
-- distinct / distinct with a list read through an alias or a part / the list is outside the item, so it reads even when copies differ in their own ok (D1 for-line item)
-- for / a walk that starts at a for alias holding null / fails as null, as a walk from a field holding null does (D1 for-line item)
-- for / a failed sentence on a for line lists its inputs in the order of its kind / a walk lists what starts at an alias first, both in name order, and a comparison or a count lists its left side and then its right side (D1 for-line item)
-- for / a walk on a for line whose path is named with a character that sorts before $ / lists the alias first, then the walked path, with no whose (D1 for-line item)
-- for / a for line with if any whose sentence reads a subject field as is, count of, sum of or a named by key / fails on an empty list when the field is missing, and names it once (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence reads a subject field as is, count of, sum of or a named by key / fails on an empty list when the field is null, and names it once (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence reads a subject field as is, count of, sum of or a named by key / fails on an empty list when the field is text where a number or a list is read, and passes where the field is a key (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence reads a subject field as is, count of, sum of or a named by key / fails on an empty list when the field is a number where a list or a key is read, and where it is compared with 1, because a sentence that doesn't read the alias still runs (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence reads a subject field as is, count of, sum of or a named by key / fails on an empty list when the field is an object, and says what it says with items (D2/D3 for-line sentence not reading alias)
-- for / a for line whose sentence reads a subject field as is, count of, sum of or a named by key, with items / names a missing field once, with no item in front (D2/D3 for-line sentence not reading alias)
-- for / a for line whose sentence reads a subject field as is, count of, sum of or a named by key, with items / names a field of the wrong type once, with no item in front, and lists every item that failed (D2/D3 for-line sentence not reading alias)
-- for / a for line whose sentence reads a subject field as is, count of, sum of or a named by key, with items / names a field that is an object once, with no item in front (D2/D3 for-line sentence not reading alias)
-- for / a for line whose sentence reads a subject field as is, count of, sum of or a named by key, with items / names the field first and then the empty list, with the worse cause (D2/D3 for-line sentence not reading alias)
-- for / a for line whose sentence reads a subject field as is, count of, sum of or a named by key, with items / names a field that is an object first and then the empty list (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence reads a part, $params or $input of the wrong type as is, count of or sum of / fails on an empty list, and names each root once (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence reads a part, $params or $input of the wrong type as is, count of or sum of / fails on an empty list when the part's field is null or $input's is missing, and names each once (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence reads a part, $params or $input of the wrong type as is, count of or sum of / fails on an empty list when the part's field or $input's is an object (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence counts a list along a path of subject fields / names the first step that can't be read (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence counts a list along a path of subject fields / names a missing step (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence counts a list along a path of subject fields / names an object at the end of the path, with or without a whose (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence counts an object read from $params or from an alias of an earlier line / fails on an empty list, as it does with items (D2/D3 for-line sentence not reading alias)
-- for / a for line with if any whose sentence counts an object read from $params or from an alias of an earlier line / with items (D2/D3 for-line sentence not reading alias)
-- for / a for line whose sentence counts two subject fields that can't be counted / names each field once, and not again after them, with items (D2/D3 for-line sentence not reading alias)
-- for / a for line whose sentence counts two subject fields that can't be counted / names each field once on an empty list (D2/D3 for-line sentence not reading alias)
-- for / a for line that reads an alias and a path through it / lists the alias paths first and then the other names, in a failed assertion (D1 for-line item)
-- for / a count of on a for line walks a list in the middle of a part, a parent or $input / an item without the name fails as absent (D2/D3 for-line sentence not reading alias)
-- for / a count of on a for line walks a list in the middle of a part, a parent or $input / a null part fails as null, and a missing $input list as absent (D2/D3 for-line sentence not reading alias)
-- for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails an approver that is null or a number when there are no commits (D1 for-line item (count/sum))
-- for / a for line runs the sentences that don't read the alias of an empty list it tolerates, for each item of the list before it / fails an approver whose subs can't be counted when there are no commits (D1 for-line item (count/sum))
-- for / a for line with one item runs the sentences that don't read its alias on an empty list it tolerates / fails as null when a field a sentence reads is null and there are no commits (D2/D3 for-line sentence not reading alias)
-- for / an every on a for line that walks a $params list / the row lists the $params list it walked, as the every does on its own (D2/D3 for-line sentence not reading alias)
-- for / an every or some on a for line that walks a $params list that is missing, null or not a list / the check fails with the list's cause, and the row lists the $params list with no items (D2/D3 for-line sentence not reading alias)
-- list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that / an item with no field fails as absent (D1 for-line item, D1 for-line item (count/sum))
-- list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that / an item whose field is null fails as null (D1 for-line item, D1 for-line item (count/sum))
-- list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that / an item that isn't an object fails as unusable (D1 for-line item, D1 for-line item (count/sum))
-- list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that / an empty alias fails as value (D1 for-line item)
-- list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / each item's value is listed with its location, and a part keeps its tag (D3 count/sum)
-- list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / an item with no name is listed as null, at the item (D3 count/sum)
-- list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / an item whose name is null is listed as null, at the name (D3 count/sum)
-- list_items / a name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it / a text value among numbers, and a number among patterns (D3 count/sum)
-- list_items / a parent's name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it / a text value among numbers, and a number among patterns (D3 count/sum)
-- list_starts / a name in a whose is read from the row, so a bad list of the same name on the subject isn't blamed / a row with no field of that name fails as absent, naming the row's field and not the subject's (D3 count/sum)
-- list_starts / a name in a whose is read from the row, so a bad list of the same name on the subject isn't blamed / a row whose field is null fails as null, naming the row's field and not the subject's (D3 count/sum)
-- messages / a sum of or a count of beside a plus names what it couldn't read / an item of the summed list that isn't a number is named by its position (D3 count/sum)
-- messages / a one-list for line over a key that holds a colon / two sentences that walk the same list give one part (D1 for-line item)
-- messages / a one-list for line with a sentence that walks a list and one that doesn't / the sentence that doesn't walk gets its own part (D1 for-line item)
-- messages / an any_of with an every over items that fail differently / each option gives its failed items (D2 walk items (option))
-- messages / a one-list for line whose items fail a sentence that walks and one that doesn't / the part of a sentence that doesn't walk goes with its item and isn't counted (D1 for-line item)
-- messages / a one-list for line whose items fail a sentence that walks and one that doesn't / and N more counts the items that aren't shown (D1 for-line item)
-- messages / a count of a list that holds items that aren't objects / an item that isn't an object is named with its value (D3 count/sum)
-- messages / a sum of a list that holds items that aren't objects / an item that isn't an object is named with its value (D3 count/sum)
-- messages / a count of a list of lists with a whose that counts / a list is named as an item that isn't an object (D3 count/sum)
-- messages / a count of a part's list that holds items that aren't objects / the items are named after the part (D3 count/sum)
-- messages / a for line over two lists / the inner items are named without a dollar sign before the alias (D1 for-line item)
-- messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a colon is printed as the input had it (D1 for-line item)
-- messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a semicolon is printed as the input had it (D1 for-line item)
-- messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a space is printed as the input had it (D1 for-line item)
-- messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a comma is printed as the input had it (D1 for-line item)
-- messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a dot is printed as the input had it (D1 for-line item)
-- messages / a for line over a list of lists whose values spell the alias / an object that holds the alias in a value is printed as the input had it (D1 for-line item)
-- messages / a for line over a list of lists whose values spell the alias / an object that holds the alias in a key is printed as the input had it (D1 for-line item)
-- messages / a for line over a list of lists whose values spell the alias / a list that holds the alias in its items is printed as the input had it (D1 for-line item)
-- messages / a for line whose alias is named applies and whose value spells it / a value that holds the alias is printed as the input had it (D1 for-line item)
-- messages / a for alias read in a whose keeps its name / the alias is named with its field (D1 for-line item)
-- messages / a for item that is an object, with a list under it that holds an item that isn't one / the item that isn't an object is the one in the inner list (D1 for-line item)
-- messages / a for item that is an object, with a whose over a list that holds an item that isn't one / the item that isn't an object is the one in the inner list (D1 for-line item)
-- messages / a for item read with a walk of a list under it / the item's names drop their alias (D1 for-line item)
-- messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then the inner items (D1 for-line item)
-- messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then each item in turn (D1 for-line item)
-- messages / a for line over two lists, with a sentence that walks a list of the subject / names each item of the subject's list once, with no item of the for line in front, because the sentence doesn't read the for line's items (D2/D3 for-line sentence not reading alias)
-- messages / a for line over two lists, with a walk under the first item before a sentence on the second / the parts follow the items, not the sentences (D1 for-line item)
-- messages / a for line over two lists, with a sentence on the second item before a walk under the first / the parts follow the items, not the sentences (D1 for-line item)
-- messages / a count of a key in a position of the input that holds objects / fails as unusable and names the item once (D3 count/sum)
-- messages / a for alias after is in that isn't a list, missing or null, on an empty list / names the alias's field, with the item of the for line in front (D1 for-line item)
-- messages / a for alias after is in that isn't a list, missing or null, on an empty list / says the alias's field is missing, then the list, in the item (D1 for-line item)
-- messages / a for alias after is in that isn't a list, missing or null, on an empty list / says the alias's field is null, then the list, in the item (D1 for-line item)
-- messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that is null, then the list that is missing (D2 walk list (option))
-- messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that is missing, then the list that is null (D2 walk list (option))
-- messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that has the wrong type, then the list that is text (D2 walk list (option))
-- messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root that is missing and a list that is null fail as absent (D1 for-line item, D2 walk list (option))
-- messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root of the wrong type and a list that is missing fail as unusable (D1 for-line item, D2 walk list (option))
-- messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root that is null and a list that is text fail as unusable (D1 for-line item, D2 walk list (option))
-- messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / an empty list is said only where it fails on its own (D1 for-line item, D2 walk list (option))
-- messages / a count of or a sum of with more than three items it can't read says the first three and then and N more, last / four items without v (D3 count/sum, D3 count/sum (not alone))
-- messages / a count of or a sum of with more than three items it can't read says the first three and then and N more, last / five items without v (D3 count/sum, D3 count/sum (not alone))
-- parts / a for alias and the input on the right side of a whose with plus / reads the alias and the input, and not the item's own field of the same name (D1 for-line item)
-- parts / a parent's name or a for alias in a count of after that, over items that aren't objects / fails as absent when the parent or the alias has no such list (D1 for-line item (count/sum))
-- sentences / a for alias inside an item's scope / an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters (D2/D3 for-line sentence not reading alias)
-- sentences / a for alias on the right of a whose, with items that have a field of the same name / reads the alias on the right, in every, some, count of and sum of, and the item's field on the left and after a dot (D2/D3 for-line sentence not reading alias)
-- sentences / an any_of of sentences / passes when every sentence of one option passes, and fails with the first cause among its options (D2 walk items (option))
-- sentences / an any_of of sentences that walk, count and ask whether a field exists / takes each sentence's own cause, and an option whose field is missing fails as value (D2 walk items (option))
-- sentences / a sum of is not between two numbers / fails as unusable on a value that isn't a number (D3 count/sum)
-- sentences / a sum of is not between two numbers / fails as absent or null when a value or the list is missing or null (D3 count/sum)
-- sentences / a sum of is not a value within a number / fails as unusable, absent or null like the sum does (D3 count/sum)
-- sentences / the examples the rules for where a name resolves were decided on / each check reads its names where the rules say, on the pull request of the decision (D3 count/sum)
-- sentences / the examples the rules for where a name resolves were decided on / a focus that is missing fails as absent, and one that is null as not_an_object, naming the item and the value (D3 count/sum)
-- sentences / a focus a path couldn't reach, and a focus read by that / that reads each b, and a path that stops before the focus fails as it does (D3 count/sum)
-- sentences / a field missing on the focus while its item has it / reads the focus, so the field is missing and the item's own field is never read (D3 count/sum)
-- sentences / the subject's name named by a key, inside and outside a relative clause / reads each approver's k inside, and is written wrong outside (D3 count/sum)
-- sentences / the subject's name named by a key, inside and outside a relative clause / an approver without k fails as absent, whatever the subject's k (D3 count/sum)
-- sentences / the subject's field read by name inside a relative clause, when it isn't usable / fails as unusable when the field's type differs (D3 count/sum)
-- sentences / a count whose focus is missing for one item and null for another / names every item that failed, whatever its cause (D3 count/sum)
-- sentences / the subject named by a key of each item, inside a relative clause / names the item whose key names a field the subject doesn't have (D3 count/sum)
-- sentences / the subject named by a key of each item, inside a relative clause / names the item that has no key (D3 count/sum)
-- sentences / the subject named by a key of each item, inside a relative clause / names the item whose key is null (D3 count/sum)
-- sentences / the subject named by a key of each item, inside a relative clause / names the item whose key isn't text (D3 count/sum)
-- sentences / a sum of whose that or whose reads a named by key against the focus / is written wrong naming the key, and a key from the subject or a count of is fine (D3 count/sum)
-- sentences / a name in a for line that can't be read, after a list that is empty / names the name that can't be read, not the empty list (D1 for-line item)
-- subject_name / count of and sum of on a subject that is a list / the list is counted and summed (D3 count/sum)
-- subject_name / a count whose reads a field named like the subject and a part / an item that isn't an object is named with the dot of the field the whose reads (D3 count/sum)
-- subject_name / a count of a field named like the subject inside a count whose names the field with its dot / an item with no s is named item 3 of ys, and its field .s (D3 count/sum)
-- subject_name / a count whose reads a field named like a subject with "a<b" with its dot / the field the whose reads is named with its dot (D3 count/sum)
-- subject_name / a count whose reads a field named like a subject with "a\"b" with its dot / the field the whose reads is named with its dot (D3 count/sum)
-- subject_name / a count whose reads a field named like a subject with "a\\b" with its dot / the field the whose reads is named with its dot (D3 count/sum)
-- walks / every and some joined with and to a plain sentence / lists both in the order written, and the row takes the first cause in order (D2 walk items (multi))
-- walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value (D1 for-line item)
-- walks / a one-line walk whose whose reads a named by key from $params that is missing says the key once and each item's own problem / an item without m and an item whose m is null (D3 count/sum)
-- walks / a one-line walk whose whose reads a named by key from $params that isn't text says the key once, with no item in front / two items without m (D3 count/sum)
-- walks / a whose key from $params that is missing, beside conditions on the same items that read $params and $input / an item without m, beside conditions that read $params and $input fine (D3 count/sum)
-- walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / the focus has no m, and the item has one (D3 count/sum)
-- walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / one focus has no m and another holds null (D3 count/sum)
-- walks / a that clause whose key from $params is missing reads the value before the key on the focus / the focus has no m (D3 count/sum)
-- walks / a that key that can't be read, on a list item that isn't an object, names the item and never a field under it / the key is null and the item is text (D3 count/sum)
-- walks / a that key that can't be read, on a list item that isn't an object, names the item and never a field under it / the key is null and the items are an object whose focus isn't an object and text (D3 count/sum)
-- walks / a that key that isn't text, on a list item that isn't an object, names the item and never a field under it / the item is text (D3 count/sum)
-- walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / five items without m show three and count two more (D3 count/sum, D3 count/sum (not alone))
-- walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / four items without m show three and count one more (D3 count/sum, D3 count/sum (not alone))
-- walks / a whose key from $params that isn't text, said once before the items, doesn't count as one of the three items the message shows / three items without m show all three (D3 count/sum, D3 count/sum (not alone))
-- walks / a whose key from $params that is missing, said once before the items, doesn't count as one of the three items the message shows / five items without m show three and count two more (D3 count/sum, D3 count/sum (not alone))
-- walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / two items without zz or m say the key in each item (D3 count/sum)
-- walks / a whose key from $params that isn't text, beside items that fail on their own fields, says the key in each item / five mixed items say the key in each item and the item that isn't an object (D3 count/sum)
-- walks / a whose key from $params that is null, beside items that fail on their own fields, says the key once and each item's own problem / an item without zz and an item whose m is null (D3 count/sum)
-- walks / a whose key from $params that is null, beside items that fail on their own fields, says the key once and each item's own problem / five mixed items (D3 count/sum)
-- walks / a whose key from $params that is missing, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is missing (D2 walk list (multi), D2 walk list (option))
-- walks / a whose key from $params that is missing, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is empty (D2 walk list (multi), D2 walk list (option))
-- walks / a whose key from $params that is missing, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds text (D2 walk items (multi), D2 walk items (option), D3 count/sum (not alone))
-- walks / a whose key from $params that is null, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is missing (D2 walk list (multi), D2 walk list (option))
-- walks / a whose key from $params that is null, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is empty (D2 walk list (multi), D2 walk list (option))
-- walks / a whose key from $params that is null, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds text (D2 walk items (multi), D2 walk items (option), D3 count/sum (not alone))
-- walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds an item the whose leaves out (D3 count/sum (not alone))
-- walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is missing (D2 walk list (multi), D2 walk list (option))
-- walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is empty (D2 walk list (multi), D2 walk list (option))
-- walks / a whose key from $params that isn't text, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds text (D2 walk items (multi), D2 walk items (option), D3 count/sum (not alone))
