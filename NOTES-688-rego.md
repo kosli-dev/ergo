@@ -29,6 +29,19 @@ Branch `row-parts-688-rego2`, on top of `row-parts-688-rego`. Not finished: a fr
 - A `sum of` in an `$applies` row drops its walked read, as the check row does (decision 2).
 - 13 of the 15 unit tests moved to the decided shapes; REFERENCE.md's `$min_subjects` and `any_of` examples are the engine's output.
 
+## Fourth builder, branch `row-parts-688-rego4` (in progress)
+
+- D11: a `named by` key from outside the items is said once before every item, whatever the items' causes (`_m_key_root_state_in` only hides a missing or `null` key beside another key that isn't text, which the walks group "two named by keys on an empty list" still pins: decision-silent, see below). An item says only its own paths (`_m_own_clauses`), and an `is in` whose list goes through an unreadable key still says only the key (`_m_list_read_first`). `tally.whose` and `path.ref_step` reworded, spec changelog line added, two cases and three unit tests moved.
+- A `count of` whose list is read through a `named by` key or a part gets its `list` entry (`_tally_keyed_list_names`, `_list_clause_name`), read where it stopped (`_list_stop_value`).
+- B9 for every phrase: `is`, `equals`, `is in` and `contains` with a root that can't be read judge each item again with the root replaced by the item's own value (`_root_stand_in`), and a count says only the first condition an item can't decide (`_m_undecided_before`). Not when the list itself can't be read.
+- D2: `from: $input` with an input that can't be read puts `$input` on the `$min_subjects` row's inputs.
+- Cases moved to the decided shape (Rego was right, Rust-filled rows stale), all in `known-failures.txt`.
+
+Gaps found:
+- `count of rs whose zz is in $input.k is 1` with `$input.k` `null` and items without `zz`: the message says the root and both items, but the row's cause stays `null`, not `absent` (the count's cause is worked out in `checks/` and can't call the B9 judging in `lines/` without a backward call).
+- An item of `count of xs whose v equals pr named by k` whose key names a field the subject lacks (`pr named by k is missing`) gets an entry whose inputs are all `usable`: the read that failed (`pr.z`) has no input. How to name it isn't decided (D9/D10 cover a key read inside the item, not a base read outside through the item's key). Cases "the subject named by a key of each item ... names the item whose key names a field the subject doesn't have" and "the subject's name named by a key ... reads each approver's k inside" stay failing.
+- Decision-silent: "an every, a some, a for item or a count whose whose reads two named by keys on an empty list ... one key is missing and the other isn't text" says only the key that isn't text. D11 says a key is always said, but it speaks of items, not of a second key that fails worse.
+
 ## Checks run by the third builder
 
 - Full `opa test`: 58 fail and 4 error. The 4 errors are the compiled `walks` and `messages` spec tests hitting the 120 s timeout under the full parallel run; alone they pass in 80 to 90 s. The failures are the 2 unit tests below and the spec topics that hold the 160 failing cases.
