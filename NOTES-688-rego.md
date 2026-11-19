@@ -18,6 +18,12 @@ Branch `row-parts-688-rego2`, on top of `row-parts-688-rego`. Not finished: a fr
 - Whole-value items of a `sum of` get their own read as input (`_item_input_name`).
 - `opa check --strict` errors left by the first builder (unused arguments in `requirements.rego`) are fixed.
 
+## Done (third builder, branch `row-parts-688-rego3`)
+
+- D10: an item of a `count of`/`sum of` lists the `named by` key it reads from the item (`xs[0].key`), and an item's text drops a root clause the row already says once (`_tally_unrooted`). Each read of a multi-read item gets its own outcome (`_tally_said_cause`). A focus that isn't an object is named by the path read into it (`xs[0].v.tags`, `not_an_object`), as the walk names it.
+- B9 for `count of`, `sum of`, `every` and `some`: when a root of an order or time comparison in a `whose` can't be read, each item is judged again with the root replaced by a number or a time (`_root_stand_in`, `_whose_alone`, `_alone_read` in `lines/roots.rego`), and the items it can't read are said after the root and get entries (`ergo/alone_items`).
+- The first Wasm budget is 29 MB, as decided.
+
 ## Left (2026-11-19, second builder stopped near its token cap)
 
 Spec cases: 178 fail in the Rego engine, 92 of them also in `engines/rust/known-failures.txt`, 86 only in Rego. The list is at the end of this file. 59 cases still in main's shape were filled in from the Rego engine where its rows follow decisions 1-3, B6 and C2 (commit "spec: fill in from the Rego engine ..."). Cases where Rego gives fewer entries than the case, a different `kind`, or a different entry `cause` were left alone.
