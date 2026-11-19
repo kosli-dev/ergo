@@ -210,8 +210,23 @@ _for_row_message(check, subj, r) := {"message": _m_joined(array.concat(_m_tally_
 	second := {m | some x in _for_second_roots(check, subj); some m in x.ms}
 	once := _once(array.concat(array.concat(array.concat(array.concat(_for_key_once(check, r), [m | some m in rs; not m in second]), [t | some p in _for_free_texts(check, r); t := _m_unskipped(p, _m_root_skip(rs)); t != ""]), _for_hoisted_texts(check, r)), [m | some m in rs; m in second]))
 	once != []
-	parts := [t | some t in _for_item_parts(check, subj, r, once); t != ""; not t in once]
+	parts := [t | some t in _for_item_parts(check, subj, r, once); t != ""; not t in once; not _for_led_more(t); not _for_led_once(t, once)]
 } else := {"message": m, "once": [], "line": [m | r.failed == []]} if m := _for_message(check, subj, r)
+
+_for_deduped(m) := concat("; ", [c | some c in cs; not _for_led_more(c); not _for_led_once(c, cs)]) if {
+	cs := _m_top_split(m, "; ")
+	some c in cs
+	_for_led_once(c, cs)
+} else := m
+
+_for_led_once(t, once) if {
+	startswith(t, "item ")
+	some o in once
+	startswith(o, "item ")
+	endswith(t, concat("", [": ", o]))
+}
+
+_for_led_more(t) if regex.match(`^item [^;]*: and [0-9]+ more$`, t)
 
 _m_root_skip(rs) := [x | some m in rs; some x in split(m, "; ")] if _walk_roots_on
 

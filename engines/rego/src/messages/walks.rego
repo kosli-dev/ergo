@@ -116,10 +116,15 @@ _or_blank(null) := ""
 
 _or_blank(t) := t if t != null
 
-_messaged(raw, check, _, subj) := _keyed_rooted(_for_said(raw), check, subj) if {
+_messaged(raw, check, _, subj) := _for_once_said(_keyed_rooted(_for_said(raw), check, subj), check) if {
 	raw.passed == false
 	"message" in object.keys(raw)
 }
+
+_for_once_said(o, check) := object.union(o, {"message": _for_deduped(o.message)}) if {
+	check.op == "for"
+	is_string(o.message)
+} else := o
 
 _row_message(check, subj, raw) := _m_row_text(check, subj, raw.cause) if {
 	not _all_of_run(check)
