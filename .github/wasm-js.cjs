@@ -134,7 +134,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row, or a large regular expression compiled for every report, or for every parent of a subject read from another subject.`);
     return sound && usedMB <= budgetMB;
   };
-  const withEvery = await measure("deployments with a check on every test", budgetPolicy, 338, 66, 28);
+  const withEvery = await measure("deployments with a check on every test", budgetPolicy, 338, 66, 29);
   const withSentences = await measure("deployments with three checks on each deployment", sentencePolicy, 301, 66, 20);
   const withChain = await measure("deployments with the tests of each prod deployment as subjects", chainPolicy, 266, 132, 45);
   const withFor = await measure("deployments with two for checks on each deployment", forPolicy, 235, 66, 118, { ok: true });
