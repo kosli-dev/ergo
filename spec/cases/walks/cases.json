@@ -28298,7 +28298,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "$params.z is missing; item 2 of $input.os is null, which isn't an object",
+                  "message": "item 2 of $input.os is null, which isn't an object; $params.z is missing",
                   "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1"
                 }
               ],
@@ -28336,7 +28336,7 @@
                   ]
                 }
               ],
-              "message": "$params.z is missing; item 2 of $input.os is null, which isn't an object",
+              "message": "item 2 of $input.os is null, which isn't an object; $params.z is missing",
               "passed": false,
               "requirement": "s",
               "subject": {
@@ -28519,7 +28519,7 @@
                   "locations": [
                     "$policy:/requirements/s/checks/count"
                   ],
-                  "message": "$params.z is null; item 2 of $input.os: name is missing",
+                  "message": "item 2 of $input.os: name is missing; $params.z is null",
                   "name": "count of xs whose v is in $input.os.name and whose w is at least $params.z is 1"
                 }
               ],
@@ -28557,7 +28557,7 @@
                   ]
                 }
               ],
-              "message": "$params.z is null; item 2 of $input.os: name is missing",
+              "message": "item 2 of $input.os: name is missing; $params.z is null",
               "passed": false,
               "requirement": "s",
               "subject": {

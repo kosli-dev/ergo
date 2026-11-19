@@ -703,7 +703,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/0/1"
+                        ],
+                        "name": "t[1].name",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/0/1"
+                    ],
+                    "message": "item 2 of t is 3, which isn't an object",
+                    "name": "item 2 of t",
+                    "value": 3
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -733,7 +755,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/count"
                 ],
-                "message": "item 2 of t is 3, which isn't an object",
+                "message": "",
                 "name": "count of name is 2"
               }
             ],
@@ -1026,7 +1048,52 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/0/1"
+                        ],
+                        "name": "t[1].n",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/0/1"
+                    ],
+                    "message": "item 2 of t is 3, which isn't an object",
+                    "name": "item 2 of t",
+                    "value": 3
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/0/2"
+                        ],
+                        "name": "t[2].n",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/0/2"
+                    ],
+                    "message": "n is missing",
+                    "name": "item 3 of t",
+                    "value": {
+                      "name": "a"
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -1056,7 +1123,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/sum"
                 ],
-                "message": "item 2 of t is 3, which isn't an object",
+                "message": "",
                 "name": "sum of n is 3"
               }
             ],
@@ -1085,7 +1152,7 @@
                 ]
               }
             ],
-            "message": "item 2 of t is 3, which isn't an object",
+            "message": "item 2 of t is 3, which isn't an object; item 3 of t: n is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8477,7 +8544,38 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [
+                      {
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/teams/0/1"
+                            ],
+                            "name": "t[1].rows",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "rows is missing",
+                        "name": "rows"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/teams/0/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of t",
+                    "value": null
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -8554,7 +8652,7 @@
                 ]
               }
             ],
-            "message": "item 2 of t is null, which isn't an object",
+            "message": "item 2 of t is null, which isn't an object; item 2 of t: rows is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -9204,7 +9302,38 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/teams/0/1"
+                            ],
+                            "name": "t[1].rows",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "rows is null, which isn't a list",
+                        "name": "rows"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/teams/0/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of t",
+                    "value": 3
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9243,7 +9372,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/whose_part"
                 ],
-                "message": "item 2 of t: rows is null, which isn't a list; item 2 of t is 3, which isn't an object",
+                "message": "item 2 of t is 3, which isn't an object",
                 "name": "count of rows whose v is in pl.z is 2"
               }
             ],
@@ -9281,7 +9410,7 @@
                 ]
               }
             ],
-            "message": "item 2 of t: rows is null, which isn't a list; item 2 of t is 3, which isn't an object",
+            "message": "item 2 of t is 3, which isn't an object; item 2 of t: rows is null, which isn't a list",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -9971,7 +10100,42 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/teams/0/1"
+                            ],
+                            "name": "t[1].rows",
+                            "outcome": "unusable",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "rows is null, which isn't a list",
+                        "name": "rows"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "/teams/0/1"
+                    ],
+                    "message": "",
+                    "name": "item 2 of t",
+                    "value": [
+                      {
+                        "name": "bob"
+                      }
+                    ]
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10010,7 +10174,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/whose_part"
                 ],
-                "message": "item 2 of t: rows is null, which isn't a list; item 2 of t is [{\"name\": \"bob\"}], which isn't an object",
+                "message": "item 2 of t is [{\"name\": \"bob\"}], which isn't an object",
                 "name": "count of rows whose v is in pl.z is 2"
               }
             ],
@@ -10048,7 +10212,7 @@
                 ]
               }
             ],
-            "message": "item 2 of t: rows is null, which isn't a list; item 2 of t is [{\"name\": \"bob\"}], which isn't an object",
+            "message": "item 2 of t is [{\"name\": \"bob\"}], which isn't an object; item 2 of t: rows is null, which isn't a list",
             "passed": false,
             "requirement": "r",
             "subject": {

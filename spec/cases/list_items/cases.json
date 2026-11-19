@@ -2396,8 +2396,16 @@
                           "/objs/0/rows/0/v"
                         ],
                         "name": "rows[0].v",
-                        "outcome": "absent",
+                        "outcome": "usable",
                         "value": "bob"
+                      },
+                      {
+                        "locations": [
+                          "/objs/0/rows/0"
+                        ],
+                        "name": "rows[0].os.name",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -3306,8 +3314,16 @@
                           "/objs/0/rows/0/v"
                         ],
                         "name": "rows[0].v",
-                        "outcome": "absent",
+                        "outcome": "usable",
                         "value": "ann"
+                      },
+                      {
+                        "locations": [
+                          "/objs/0/rows/0"
+                        ],
+                        "name": "rows[0].os.name",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",
@@ -4256,8 +4272,16 @@
                           "/objs/0/rows/0/v"
                         ],
                         "name": "rows[0].v",
-                        "outcome": "absent",
+                        "outcome": "usable",
                         "value": "ann"
+                      },
+                      {
+                        "locations": [
+                          "/objs/0/rows/0"
+                        ],
+                        "name": "rows[0].os.name",
+                        "outcome": "absent",
+                        "value": null
                       }
                     ],
                     "kind": "item",

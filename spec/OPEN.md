@@ -140,6 +140,20 @@ These shapes break one of the rules under [Which problems a message says](semant
 - **`inputs` of a `sum of … plus` on a `for` line.** `for: every rs as r` with `sum of xs.n plus $params.q named by $input.k is 1`, the params `3` and `xs` holding `[{"n": 1}, 1, null]`: `inputs` has a `sum of xs.n` row with the value `null` in `ergo.rego` and not in Rust, on an input that is an object or a list. The messages agree.
 - **The name of an item's field on a `for` line.** `for: every xs as x` with `x.tags contains $input.m named by x.key`: `ergo.rego` says `x.tags is {"a": ["x"]}, which isn't a list` and Rust says `tags is {"a": ["x"]}, which isn't a list`.
 
+## Differs from the decisions
+
+The rules in `semantics.md` say what was decided. These shapes don't follow it yet.
+
+### Left for a later PR
+
+The cases below pin what `ergo.rego` gives today, not the decided shape, and the Rust engine lists them in `known-failures.txt`. A later PR moves them to the decided shape in both engines.
+
+- **A `list` entry for a position or a first item that can't be read (#688 D2, plain bugs (a) and (b)).** A walk over `xs[0].ys`, a `for` line over a position, and `every first of region` give an `item` entry, or a `from` line names its read without `$input`, where D2 says a `list` entry named as written. Cases: `messages` "a subject read at the position of a list of the input" (3 cases) and "a subject read from the first item of a list of the input" (2), `sentences` "list positions with more than 15 digits", `subject_name` "every on a position of region" and "the subject name is read in every position of a one-line check on a list subject".
+- **A list in the middle of a name, or a subject that is a list, read on the right of a phrase (#688 decisions 1 and 3).** A `count of rows whose v is in pos.name` lists `rows[0].os.name` beside `rows[0].v`, and on a subject that is a list an item that isn't an object also says that a field under it is missing or `null`. Cases: `list_items` "a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it" (3), `list_starts` "a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it" (3).
+- **A root on the right of the phrase beside a list that can't be read (#688 D4, C4).** `every es.v, if any, is in $params.z` with no `z` and no `es` says only `es is missing`, and a root of the wrong kind hides the list. Cases: `messages` "a root on the right of the phrase that is missing, …" (2), "a root on the right of the phrase of the wrong type, …" (2), "a root on the right of the phrase and a root in a whose, both missing, …" and "… both null, …".
+- **The roots of a `for` line's `whose` (#688 C7, second bug).** They sit in a `list` entry for the list, and not on the row's inputs. Cases: the `for` rows of `messages` "two roots in one relative clause that can't be read", "two roots after is in that aren't lists, in one relative clause" (2) and "two roots in one relative clause that fail in different ways" (2).
+- **The items a `whose` can't read after a root, on a one-line walk of a `for` case (#688 B9, C3).** `every ws.n whose v is in pos.name is 2` with an item of `pos` without `name` says only the root. Cases: the `plain` rows of `for` "an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root" (4).
+
 ## Rules without cases
 
 Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and the Rego tests in `engines/rego/tests` test it instead. `report.hash` waits for the question about hashing numbers above. `report.keys` is about how the report is written out, and a case compares a report as values, where the order of keys doesn't count. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.

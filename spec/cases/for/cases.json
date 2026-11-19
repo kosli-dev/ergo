@@ -71334,14 +71334,14 @@
             }
           },
           {
-            "cause": "unusable",
+            "cause": "absent",
             "check": "plain",
             "failures": [
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -71349,7 +71349,7 @@
                           "/cs/0/ws/0/n"
                         ],
                         "name": "ws[0].n.v",
-                        "outcome": "unusable",
+                        "outcome": "absent",
                         "value": null
                       }
                     ],
@@ -71357,7 +71357,7 @@
                     "locations": [
                       "/cs/0/ws/0"
                     ],
-                    "message": "n is 2, which isn't an object",
+                    "message": "item 2 of pos: name is missing",
                     "name": "item 1 of ws",
                     "value": {
                       "n": 2,
@@ -71365,7 +71365,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -71373,7 +71373,7 @@
                           "/cs/0/ws/1/n"
                         ],
                         "name": "ws[1].n.v",
-                        "outcome": "unusable",
+                        "outcome": "absent",
                         "value": null
                       }
                     ],
@@ -71381,7 +71381,7 @@
                     "locations": [
                       "/cs/0/ws/1"
                     ],
-                    "message": "n is 2, which isn't an object",
+                    "message": "item 2 of pos: name is missing",
                     "name": "item 2 of ws",
                     "value": {
                       "n": 2
@@ -71395,7 +71395,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "absent",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -71410,7 +71410,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/plain"
                 ],
-                "message": "item 2 of pos: name is missing",
+                "message": "",
                 "name": "every ws.n whose v is in pos.name is 2"
               }
             ],
@@ -71421,7 +71421,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "absent",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -71444,7 +71444,7 @@
                 ]
               }
             ],
-            "message": "item 2 of pos: name is missing; item 1 of ws: n is 2, which isn't an object; item 2 of ws: n is 2, which isn't an object",
+            "message": "item 2 of pos: name is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -71759,55 +71759,7 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/ws/0/n"
-                        ],
-                        "name": "ws[0].n.v",
-                        "outcome": "unusable",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/cs/0/ws/0"
-                    ],
-                    "message": "n is 2, which isn't an object",
-                    "name": "item 1 of ws",
-                    "value": {
-                      "n": 2,
-                      "v": "bob"
-                    }
-                  },
-                  {
-                    "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/cs/0/ws/1/n"
-                        ],
-                        "name": "ws[1].n.v",
-                        "outcome": "unusable",
-                        "value": null
-                      }
-                    ],
-                    "kind": "item",
-                    "locations": [
-                      "/cs/0/ws/1"
-                    ],
-                    "message": "n is 2, which isn't an object",
-                    "name": "item 2 of ws",
-                    "value": {
-                      "n": 2
-                    }
-                  }
-                ],
+                "failures": [],
                 "inputs": [
                   {
                     "locations": [
@@ -71864,7 +71816,7 @@
                 ]
               }
             ],
-            "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value; item 1 of ws: n is 2, which isn't an object; item 2 of ws: n is 2, which isn't an object",
+            "message": "pos[].name is [\"bob\", 3], which isn't a list of one kind of value",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -72151,14 +72103,14 @@
             }
           },
           {
-            "cause": "unusable",
+            "cause": "not_an_object",
             "check": "plain",
             "failures": [
               {
-                "cause": "unusable",
+                "cause": "not_an_object",
                 "failures": [
                   {
-                    "cause": "unusable",
+                    "cause": "not_an_object",
                     "failures": [],
                     "inputs": [
                       {
@@ -72166,7 +72118,7 @@
                           "/cs/0/ws/0/n"
                         ],
                         "name": "ws[0].n.v",
-                        "outcome": "unusable",
+                        "outcome": "not_an_object",
                         "value": null
                       }
                     ],
@@ -72182,7 +72134,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "not_an_object",
                     "failures": [],
                     "inputs": [
                       {
@@ -72190,7 +72142,7 @@
                           "/cs/0/ws/1/n"
                         ],
                         "name": "ws[1].n.v",
-                        "outcome": "unusable",
+                        "outcome": "not_an_object",
                         "value": null
                       }
                     ],
@@ -72533,7 +72485,7 @@
                 "cause": "not_an_object",
                 "failures": [
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -72541,7 +72493,7 @@
                           "/cs/0/ws/0/n"
                         ],
                         "name": "ws[0].n.v",
-                        "outcome": "unusable",
+                        "outcome": "absent",
                         "value": null
                       }
                     ],
@@ -72549,7 +72501,7 @@
                     "locations": [
                       "/cs/0/ws/0"
                     ],
-                    "message": "n is 2, which isn't an object",
+                    "message": "item 2 of pos: name is missing",
                     "name": "item 1 of ws",
                     "value": {
                       "n": 2,
@@ -72585,7 +72537,7 @@
                       "/cs/0/os/1"
                     ],
                     "name": "pos[].name",
-                    "outcome": "absent",
+                    "outcome": "usable",
                     "part": {
                       "id": null,
                       "name": "pos"
@@ -72600,7 +72552,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/plain"
                 ],
-                "message": "item 2 of pos: name is missing",
+                "message": "",
                 "name": "every ws.n whose v is in pos.name is 2"
               }
             ],
@@ -72611,7 +72563,7 @@
                   "/cs/0/os/1"
                 ],
                 "name": "pos[].name",
-                "outcome": "absent",
+                "outcome": "usable",
                 "part": {
                   "id": null,
                   "name": "pos"
@@ -72634,7 +72586,7 @@
                 ]
               }
             ],
-            "message": "item 2 of pos: name is missing; item 1 of ws: n is 2, which isn't an object; item 2 of ws is null, which isn't an object",
+            "message": "item 2 of pos: name is missing; item 2 of ws is null, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {

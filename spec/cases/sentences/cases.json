@@ -103617,19 +103617,14 @@
         {
           "cause": "absent",
           "failures": [],
-          "inputs": [
-            {
-              "locations": [
-                "/things/0/kids"
-              ],
-              "name": "kids[1234567890123456]",
-              "outcome": "absent",
-              "value": null
-            }
+          "inputs": [],
+          "kind": "item",
+          "locations": [
+            "/things/0/kids"
           ],
-          "kind": "list",
           "message": "item 1234567890123457 of kids is missing",
-          "name": "item 1234567890123457 of kids"
+          "name": "item 1234567890123457 of kids",
+          "value": null
         }
       ],
       "inputs": [
