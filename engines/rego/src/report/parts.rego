@@ -212,17 +212,38 @@ _alias_name_start(name, a) if startswith(name, concat("", [a, "."]))
 
 _alias_name_start(name, a) if startswith(name, concat("", [a, "["]))
 
+_for_bindable(v, _, _) if is_object(v)
+
+_for_bindable(v, c, a) if {
+	is_array(v)
+	_for_walks_alias(c, a)
+}
+
+_for_walks_alias(c, a) if {
+	_walks(c)
+	c.path[0] == concat("", ["$", a])
+}
+
+_for_walks_alias(c, a) if {
+	some k in ["left", "right"]
+	side := object.get(c, k, null)
+	is_object(side)
+	p := side[_basic_form(side)]
+	is_array(p)
+	p[0] == concat("", ["$", a])
+}
+
 _for_item_of(row, where, i, f, l, x, aliases, at) := _leveled_by(object.union(e, {"value": f.value, "locations": f.locations}), object.get(f, "ergo/levels", []), at) if {
 	count(where.check.items) == 1
-	is_object(f.value)
+	_for_bindable(f.value, where.check.checks[i], where.check.items[0].as)
 	bound := _bound(_for_names, where.check.items[0].as, f.value, f.locations[0])
 	e := _for_sentence_part(row, where, i, f.item, l.cause, [y | some y in _with_outcomes(object.get(l, "inputs", [])); _alias_named(y.name, aliases)], x.m, at, bound)
 } else := _for_item_entry(f, l, x, aliases, at, row, where, i)
 
 _for_second_of(row, where, i, f, y, text, at) := object.union(e, object.filter(y, {"value", "locations"})) if {
 	count(where.check.items) == 2
-	is_object(f.value)
-	is_object(y.value)
+	_for_bindable(f.value, where.check.checks[i], where.check.items[0].as)
+	_for_bindable(y.value, where.check.checks[i], where.check.items[1].as)
 	bound := _bound(_bound(_for_names, where.check.items[0].as, f.value, f.locations[0]), where.check.items[1].as, y.value, y.locations[0])
 	e := _for_sentence_part(row, where, i, y.item, y.cause, _with_outcomes(y.inputs), text, at, bound)
 } else := object.union(_entry(_walk_kind(y.item), y.item, y.cause, _with_outcomes(y.inputs), [], text), object.filter(y, {"value", "locations"}))

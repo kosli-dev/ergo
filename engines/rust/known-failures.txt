@@ -204,6 +204,7 @@ for / a walk on a for line whose assertion reads $input and whose whose reads th
 for / a walk on a for line whose path is named with a character that sorts before $ / lists the alias first, then the walked path, with no whose
 for / a walk on a for line whose whose reads $input after the item's alias / lists the alias first, then what the whose reads
 for / a walk on a for line whose whose reads $input on its left / lists the alias first, then what the whose reads
+for / a walk over the second item of a for line whose whose reads $input / lists the alias first in the inputs of each second item
 for / a whose on the second for item that reads $params text after is in says the root once, with no item of its list / fails as unusable with the root once
 for / a whose on the second for item that reads $params text after is in says the root once, with no item of its list / fails as unusable with the root once and then the item that can't be read on its own
 for / a whose on the second for item that reads a $params object after is in says the root once, with no item of its list / fails as unusable with the root once
@@ -352,6 +353,7 @@ messages / a clause that an earlier sentence of the row already gave / is left o
 messages / a count of a field in a position of a field that holds objects / fails as unusable and names the item once
 messages / a count of a key in a position of the input that holds objects / fails as unusable and names the item once
 messages / a count of a list in a list in a list names the inner lists by it / both inner lists are named it, as no step sits between the positions
+messages / a count of a list in a list item of a for alias / the key read from the field names the value
 messages / a count of a list in a list names each item of the inner list by it / an inner list in the inner list
 messages / a count of a list in a list names each item of the inner list by it / an item of the inner list that isn't an object
 messages / a count of a list in a list, read by a position and a key from a field, names the list that isn't an object / the inner item is named it, as a list of the subject is
@@ -367,6 +369,7 @@ messages / a for alias after is in that isn't a list, missing or null, on an emp
 messages / a for alias after is in that isn't a list, missing or null, on an empty list / says the alias's field is missing, then the list, in the item
 messages / a for alias after is in that isn't a list, missing or null, on an empty list / says the alias's field is null, then the list, in the item
 messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then each item in turn
+messages / a for line over a list of lists whose values spell the alias / a list that holds the alias in its items is printed as the input had it
 messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a semicolon is printed as the input had it
 messages / a for line over two lists, with a sentence on the second item before a walk under the first / the parts follow the items, not the sentences
 messages / a for line over two lists, with a sentence that walks a list of the subject / names each item of the subject's list once, with no item of the for line in front, because the sentence doesn't read the for line's items

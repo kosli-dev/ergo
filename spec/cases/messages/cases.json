@@ -8788,7 +8788,7 @@
                             ],
                             "kind": "list",
                             "message": ".a is 1, which isn't a list or an object",
-                            "name": "a"
+                            "name": ".a"
                           }
                         ],
                         "inputs": [],
@@ -10266,24 +10266,37 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/zs/0/0/k"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/zs/0/0/k"
+                            ],
+                            "name": "z[0].k",
+                            "outcome": "unusable",
+                            "value": "a$z; x"
+                          }
                         ],
-                        "name": "z[].k",
-                        "outcome": "usable",
-                        "value": [
-                          "a$z; x"
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/0/0"
+                        ],
+                        "message": "k is \"a$z; x\", which isn't a number",
+                        "name": "item 1 of z",
+                        "value": {
+                          "k": "a$z; x"
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/zs/0"
                     ],
-                    "message": "item 1 of z: k is \"a$z; x\", which isn't a number",
+                    "message": "",
                     "name": "item 1 of zs",
                     "value": [
                       {
@@ -10797,26 +10810,74 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/things/0/zs/0/0/k/0",
-                          "/things/0/zs/0/0/k/1"
+                        "cause": "unusable",
+                        "failures": [
+                          {
+                            "cause": "unusable",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/things/0/zs/0/0/k/0"
+                                ],
+                                "name": "z[0].k[0]",
+                                "outcome": "unusable",
+                                "value": "$z "
+                              }
+                            ],
+                            "kind": "item",
+                            "locations": [
+                              "/things/0/zs/0/0/k/0"
+                            ],
+                            "message": "item 1 of k is \"$z \", which isn't a number",
+                            "name": "item 1 of k",
+                            "value": "$z "
+                          },
+                          {
+                            "cause": "unusable",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/things/0/zs/0/0/k/1"
+                                ],
+                                "name": "z[0].k[1]",
+                                "outcome": "unusable",
+                                "value": "$z,"
+                              }
+                            ],
+                            "kind": "item",
+                            "locations": [
+                              "/things/0/zs/0/0/k/1"
+                            ],
+                            "message": "item 2 of k is \"$z,\", which isn't a number",
+                            "name": "item 2 of k",
+                            "value": "$z,"
+                          }
                         ],
-                        "name": "z[].k[]",
-                        "outcome": "usable",
-                        "value": [
-                          "$z ",
-                          "$z,"
-                        ]
+                        "inputs": [],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/zs/0/0"
+                        ],
+                        "message": "",
+                        "name": "item 1 of z",
+                        "value": {
+                          "k": [
+                            "$z ",
+                            "$z,"
+                          ]
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/things/0/zs/0"
                     ],
-                    "message": "item 1 of z: item 1 of k is \"$z \", which isn't a number, and item 2 of k is \"$z,\", which isn't a number",
+                    "message": "",
                     "name": "item 1 of zs",
                     "value": [
                       {

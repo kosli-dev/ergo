@@ -478,7 +478,7 @@ _m_for_fail(f) := [_m_isnt(object.get(f, "bare", object.get(f, "said", f.item)),
 	not is_object(object.get(f, "raw", f.value))
 }
 
-_m_for_fail(f) := array.concat([_m_under(object.get(f, "said", f.item), _m_group_text(g)) | some g in _m_for_groups(f)], [_m_free_text(f, x, t) | some x in object.get(f, "failed_items", []); some t in _m_inner_fail(x)]) if {
+_m_for_fail(f) := array.concat([_m_under(object.get(f, "said", f.item), q) | some g in _m_for_groups(f); some q in _m_second_tally_pieces(f, _m_group_text(g))], [_m_free_text(f, x, t) | some x in object.get(f, "failed_items", []); some t in _m_inner_fail(x)]) if {
 	not "msg" in object.keys(f)
 	not _m_bare_item(f)
 	f.failed_assertions != []
@@ -490,6 +490,20 @@ _m_tally_pieces(l, ps) := [q | some p in ps; some q in _m_top_split(p, "; ")] if
 	not "items" in object.keys(l)
 	_m_tally_line(l.assertion)
 } else := ps
+
+_m_second_tally_pieces(f, t) := [_m_releaded(lead, q) | some q in _m_top_split(t, "; ")] if {
+	_m_two_list(f)
+	some l in f.failed_assertions
+	"items" in object.keys(l)
+	_m_tally_line(l.assertion)
+	lead := _m_lead_of(t)
+	lead != ""
+} else := [t]
+
+_m_releaded(lead, q) := concat("", [lead, ": ", q]) if {
+	startswith(q, "item ")
+	not startswith(q, concat("", [lead, ": "]))
+} else := q
 
 _m_tally_line(a) if contains(a, "count of ")
 

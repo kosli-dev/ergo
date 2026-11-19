@@ -27612,7 +27612,25 @@
                     "failures": [
                       {
                         "cause": "unusable",
-                        "failures": [],
+                        "failures": [
+                          {
+                            "cause": "unusable",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/things/0/xs/0/ys/0/w"
+                                ],
+                                "name": "y.w",
+                                "outcome": "unusable",
+                                "value": 1
+                              }
+                            ],
+                            "kind": "list",
+                            "message": "y.w is 1, which isn't a list or an object",
+                            "name": "y.w"
+                          }
+                        ],
                         "inputs": [
                           {
                             "locations": [
@@ -27621,27 +27639,13 @@
                             "name": "x.v",
                             "outcome": "usable",
                             "value": 5
-                          },
-                          {
-                            "locations": [],
-                            "name": "y.w",
-                            "outcome": "unusable",
-                            "value": []
-                          },
-                          {
-                            "locations": [
-                              "/q"
-                            ],
-                            "name": "$input.q",
-                            "outcome": "usable",
-                            "value": 1
                           }
                         ],
                         "kind": "item",
                         "locations": [
                           "/things/0/xs/0/ys/0"
                         ],
-                        "message": "y.w is 1, which isn't a list or an object",
+                        "message": "",
                         "name": "item 1 of x.ys",
                         "value": {
                           "w": 1,
