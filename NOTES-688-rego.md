@@ -24,54 +24,41 @@ Branch `row-parts-688-rego2`, on top of `row-parts-688-rego`. Not finished: a fr
 - B9 for `count of`, `sum of`, `every` and `some`: when a root of an order or time comparison in a `whose` can't be read, each item is judged again with the root replaced by a number or a time (`_root_stand_in`, `_whose_alone`, `_alone_read` in `lines/roots.rego`), and the items it can't read are said after the root and get entries (`ergo/alone_items`).
 - The first Wasm budget is 29 MB, as decided.
 
-## Left (2026-11-19, second builder stopped near its token cap)
+- A `named by` key from outside the items is said only when the row fails with its cause (`tally.whose`), and each item's own problem is said after it (decision 36): `_m_record_shown`, `_m_key_flawed`. An item lists a later read of a condition only when no earlier read of it was missing, `null` or not an object (`_tally_path_skipped`).
+- Params that aren't an object are said once (`$params is [3], which isn't an object`), never as items of `$params` (`_m_params_item`).
+- A `sum of` in an `$applies` row drops its walked read, as the check row does (decision 2).
+- 13 of the 15 unit tests moved to the decided shapes; REFERENCE.md's `$min_subjects` and `any_of` examples are the engine's output.
 
-Spec cases: 178 fail in the Rego engine, 92 of them also in `engines/rust/known-failures.txt`, 86 only in Rego. The list is at the end of this file. 59 cases still in main's shape were filled in from the Rego engine where its rows follow decisions 1-3, B6 and C2 (commit "spec: fill in from the Rego engine ..."). Cases where Rego gives fewer entries than the case, a different `kind`, or a different entry `cause` were left alone.
+## Left (third builder, 2026-11-19)
 
-1. B9 (row_parts group 9, and derived 95-108): a root in a `whose` that can't be read still hides each item's own read in `count of`, `sum of`, `every` and `some`. Where: `_m_tally_dropped` and `_m_whose_undecided` in `messages/walks.rego` (count/sum), and the `root_msgs` branch of `_walk_row` in `lines/walk.rego` (every/some, `failed: []`). The Rust engine checks the item's condition again with the root replaced by a value of the kind the comparison needs (a number for an order, a time for `is before`/`is after`).
-2. D9 for items: an item lists only the reads of its `whose` sides, not the `named by` key it reads from the item (`xs[0].key` in derived 97). See `_tally_item_reads` in `report/parts.rego`. The Rust-filled rows of derived 95-108 also break decision 38 (an item entry whose text is only the root, `art.m is null`) and B2 (an assertion message that repeats its entries): fix those cases to the decided shape once Rego reads the key, and add them to the Rust known failures.
-3. C7 on second lists: a second-list item entry takes the row's cause, not its own (for 262, 263, 306-312, messages 79, sentences 136).
-4. The two-list `count of`/`sum of` message (row_parts group 3, check `ft`): each inner item needs the `for` items in front, as walks have. `_m_tally_pieces` in `messages/for_lines.rego` only splits one-list lines.
-5. D2 plain bugs (a) and (b): `every first of region is 1` and `for: every kids[1234567890123456]` give an `item` entry where the case has a `list` entry (subject_name 24, 57; sentences 315).
-6. A `count of` whose list fails through a `named by` key or a dotted subject field gets no `list` entry (sentences 245-247, subject_name 60, messages 53 and 57, compare 26, messages 27).
-7. for 288/289: the right-side root `$params.os[].name` leaves the assertion's inputs on an empty list. walks 48: the assertion message says `artifact.nums named by key is missing` where decision 20 says `key is missing`. for 227: the wrong field gets the entry.
-8. Unit tests still failing (15 of the 21 found, run `opa test ... --ignore spec_test.rego`): in count_and_sum_test, report_parts_test, parents_test, sentences_test, violations_test, messages_test, walks_test (two still read `failed_items` of `$min_subjects` rows) and the `$applies` tests. Check each new output against a decision before changing the test.
-9. Wasm (the budget part of `.github/wasm-js.cjs` only): 28.1 MB (budget 28, main 28.0), 19.4 (20), 44.4 (45), 112.8 (118), 51.4 (52). The first is still 0.1 MB over. Not tried yet: finding which part of a failed `every tests.ok is true` row grew since main.
-10. Not run yet: the full `opa test`, the strict `opa eval`, `spec-schemas.py`, `check_grammar.py` (needs the venv), coverage, `spec/sweep.py` on main and the branch, `.github/wasm-tests.sh`, and the Rust tests in Docker (the `ergo-rust` image isn't built on this machine, so `known-failures.txt` is sorted but not trimmed). REFERENCE.md's two old-shape JSON examples are not updated.
-11. Rust: list_starts g10 now pins D9 (one input per path an item reads). The Rust engine gives an item's cause to its first input, so every item entry with two or more reads needs checking there.
+Spec cases: 160 fail in the Rego engine (by a script that skips the cases with long numbers), 88 of them also in `engines/rust/known-failures.txt`. The list is at the end of this file.
 
-Ran and passing on this branch: `opa fmt --list`, the three `opa check` commands, `regal lint`, `rego-folders.sh`, `rego-layers.py` (one stale line trimmed), `no-inline-tests.sh`, `spec-placeholder.sh`, `check_rules.py`, `sentences_corpus.py --check`.
+1. Not done: C7 on second-list entries, the two-list `count of`/`sum of` message (row_parts group 3), D2 plain bugs (a) and (b), a `count of` list entry through a `named by` key or a dotted field. These are most of the `for`, `messages`, `sentences` and `list_items` failures.
+2. Two unit tests still fail, both real Rego gaps: `test_a_count_of_a_position_in_params_that_are_an_empty_list_names_the_params` (`count of $params[0]` with params `[]` says `item 1 of $params is missing`, the test wants `$params is [], which isn't an object`) and `test_a_whose_item_that_isnt_an_object_beside_a_key_that_is_missing_or_null_fails_as_not_an_object` with no `k` (Rego says `$input.k is missing; item 1 of rs is "a", which isn't an object` and leaves out `item 2 of rs: zz is missing`; with `k` `null` it is right). The same gap fails derived "a count whose whose reads a named by key from $input.k that is missing".
+3. D10 cases not filled, because Rego doesn't give the D10 shape yet: a root that stops before its last step (`$input.d.m` with `$input.d` missing or `null`: no item entries, the whole message on the assertion), "the root is null and an item's tags mix kinds" (the count says `item 1 of xs: $input.m is null`, decision 38 says the root once with no item), "semicolon and a comma", "the root is 3 and four items", "another root from the params", "params that aren't an object".
+4. Looks undecided, not changed: the walks group "a that key that can't be read, on a list item that isn't an object, names the item and never a field under it" names `$params.k is null` beside a worse `not_an_object` item, while `tally.whose` says a key in a path read against the focus is named only when the row fails with its cause. Making Rego follow `tally.whose` there fails those two cases.
 
 ### Spec cases failing in the Rego engine
 
 - compare / $refs list the path before named by, with its whole value / lists the path before named by with its whole value, where it was read, and the rows don't change
-- (Rust too) derived / sum within a distance of a field / the worse cause wins when both sides fail: absent before null
-- (Rust too) derived / a path plus a count on the left / fails as unusable when the path is text and the list is null
-- derived / a count on the left and a field on the right / fails as the worse cause when both sides fail
-- derived / days elapsed in the whose of a count / fails as absent when an item cannot be decided because its end is missing
-- (Rust too) derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is missing
-- (Rust too) derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is null
-- (Rust too) derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is a number
-- derived / a count whose whose reads a named by key from $input.k that is null / the key is null
+- compare / a failed row quotes its own long numbers / each message shows the row's numbers with every digit
+- compare / a failed row quotes its own long numbers / each message shows the row's numbers with every digit, in the other order
+- compare / a number in the policy and a longer one in the input / compares every digit of the input
+- compare / a number in the policy and a longer one in the input / compares every digit of the input, in the other order
 - (Rust too) derived / a count whose whose reads a named by key from $input.k that is missing / the key is missing
-- derived / a count whose whose reads a named by key from $input.k that isn't text / the key is a number
-- derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a missing key inside the item
-- derived / a count whose whose reads a root with a named by key from the item, problems inside an item in the order the sentence reads them / names a null root and then a null key inside the item
-- derived / a count whose whose reads a field of the subject with a named by key from the item, a null root next to the key / names the null field of the subject and then the missing key inside the item
-- derived / a count whose whose reads a field of the parent with a named by key from the item, a null root next to the key / names the null field of the parent and then the missing key inside the item
-- derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is missing and the first item is null
-- derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is null and the first item's key isn't text
-- derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / a root further back is null and the items have no key
-- derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags mix kinds, so the count says what it says when the root reads
-- derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is missing and five items aren't objects, so the message stops after three problems
-- derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and the item's key and field print with a semicolon and a comma
 - derived / a count whose whose reads a root outside the item through a key the item holds and another root from the params says the other root as before / the root is missing and the param is missing
 - (Rust too) derived / a count whose whose reads a root outside the item through a key the item holds and reads params that aren't an object says the params / the root is null, the first item is null and the second item's key isn't text
-- derived / a count, some or every over a list reached through a list, whose whose reads a root with a named by key from the item, names each item as before / names each item whose field isn't an object when the root is null
-- derived / a count whose whose reads a part of the subject with a named by key from the item says the part once, first / names a null part, not the path past it
-- derived / a count whose whose reads a part of the subject with a named by key from the item says the part once, first / names a missing part, not the path past it
-- derived / a count whose whose reads a part of the subject that is a path, with a named by key from the item, says the part once, first / names the part when the end of its path is null
-- derived / a count whose whose reads a part of the subject that is a path, with a named by key from the item, says the part once, first / names the part when the start of its path is null
+- (Rust too) derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is 3 and four items each have a problem, so the last one is counted
+- derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags mix kinds, so the count says what it says when the root reads
+- derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and the item's key and field print with a semicolon and a comma
+- derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / a root further back is null and the items have no key
+- derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / the root is null and the first item's key isn't text
+- (Rust too) derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is a number
+- (Rust too) derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is missing
+- (Rust too) derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is null
+- (Rust too) derived / a path plus a count on the left / fails as unusable when the path is text and the list is null
+- derived / days elapsed in the whose of a count / fails as absent when an item cannot be decided because its end is missing
+- (Rust too) derived / sum within a distance of a field / the worse cause wins when both sides fail: absent before null
 - distinct / distinct with a phrase that also reads a bare name / it reads the subject's lo, so it reads whatever the dropped copy's lo is: higher
 - distinct / distinct with a phrase that also reads a bare name / it reads the subject's lo, so it reads whatever the dropped copy's lo is: missing
 - distinct / distinct with a phrase that also reads a bare name / it reads the subject's lo, so it reads whatever the dropped copy's lo is: null
@@ -80,145 +67,136 @@ Ran and passing on this branch: `opa fmt --list`, the three `opa check` commands
 - distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 / it reads the subject's lo, so it reads whatever the dropped copy's lo is: missing
 - distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 / it reads the subject's lo, so it reads whatever the dropped copy's lo is: null
 - distinct / distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5 / it reads the subject's lo, so it reads whatever the dropped copy's lo is: text
-- for / every over the subs of the first item that whose kept, with every leaf checked / fails, and the subs under the item whose left out aren't shown
-- for / a walk on a for line whose whose reads $input after the item's alias / lists the alias first, then what the whose reads
-- for / a some walk on a for line whose whose reads $input / lists the alias first, then what the whose reads
-- for / a walk on a for line whose assertion reads $input and whose whose reads the alias / lists the alias first, then $input
-- for / a walk on a for line whose whose reads $input on its left / lists the alias first, then what the whose reads
-- for / a walk over the second item of a for line whose whose reads $input / lists the alias first in the inputs of each second item
-- for / a walk on a for line of a child subject whose whose reads the parent / lists the alias first, then the parent's field
-- for / every on a position of the params with nothing after it, with params as a number / fails as unusable and names the params and what they are
-- (Rust too) for / count of a position of the params, with params as an empty list / fails as unusable and names what it can't read
-- (Rust too) for / a sum of a key of the params, with params as a list / fails as unusable and names the params and what they are
-- (Rust too) for / a count of the params whose field is a value, with a number in the params / fails as unusable and names the params and what they are
-- (Rust too) for / a for line whose sentence counts two subject fields that can't be counted / names each field once, and not again after them, with items
-- (Rust too) for / a for line whose sentence counts two subject fields that can't be counted / names each field once on an empty list
-- for / a for line that reads an alias and a path through it / lists the alias paths first and then the other names, in a failed assertion
-- (Rust too) for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / items that aren't objects fail as unusable and are said once
-- (Rust too) for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 5 items without the name
-- (Rust too) for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 7 items without the name
-- (Rust too) for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 5 items without the name, and items of the line without their own
-- (Rust too) for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with an item of the part without the name
-- (Rust too) for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with names of more than one kind
-- (Rust too) for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with a null part
-- (Rust too) for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item that is null, with an item of the part without the name
-- (Rust too) for / an item's own problem on a for line is said after a $params or $input root of its whose that can't be read / an item without v, with $input.os that is text
-- (Rust too) for / an item's own problem on a for line is said after a parent's root of its whose that can't be read / an item without v, with a parent list that is text
-- (Rust too) for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part leaves every item out
-- (Rust too) for / and N more counts each problem of a part of a subject that is a list once / four items that aren't objects are three shown and one more
-- for / a for line runs the sentences that don't read the alias of an empty first list it tolerates, for each item of the second list / fails each approver that didn't approve when the whose of the first line leaves no commit
 - (Rust too) for / a $params list that a for line walks fails it on an empty list when an item of it can't be read / fails, with an empty rows, when an item of it has no name
 - (Rust too) for / a $params list that a for line walks fails it on an empty list when an item of it is null / fails, with an empty rows
+- (Rust too) for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 5 items without the name
+- (Rust too) for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 5 items without the name, and items of the line without their own
+- (Rust too) for / a count or sum of a name read from outside the item on a for line says how many more of its items can't be read / 7 items without the name
+- for / a for line runs the sentences that don't read the alias of an empty first list it tolerates, for each item of the second list / fails each approver that didn't approve when the whose of the first line leaves no commit
+- for / a for line that reads an alias and a path through it / lists the alias paths first and then the other names, in a failed assertion
+- (Rust too) for / a for line whose sentence counts two subject fields that can't be counted / names each field once on an empty list
+- (Rust too) for / a for line whose sentence counts two subject fields that can't be counted / names each field once, and not again after them, with items
+- (Rust too) for / a name read from outside the item and walked on the right of is in on a for line is said once, with no item / items that aren't objects fail as unusable and are said once
+- (Rust too) for / a part that holds a list is walked in the whose of a for line and in a whose under it / an empty part leaves every item out
+- (Rust too) for / a second for list whose whose reads a root through the first alias that can't be read, and a field its items lack, says the root for each item of the first list, then each item of the second / w.z isn't a number and no item of ys has u
+- for / a some walk on a for line whose whose reads $input / lists the alias first, then what the whose reads
+- for / a walk on a for line of a child subject whose whose reads the parent / lists the alias first, then the parent's field
+- for / a walk on a for line whose assertion reads $input and whose whose reads the alias / lists the alias first, then $input
+- for / a walk on a for line whose whose reads $input after the item's alias / lists the alias first, then what the whose reads
+- for / a walk on a for line whose whose reads $input on its left / lists the alias first, then what the whose reads
+- for / a walk over the second item of a for line whose whose reads $input / lists the alias first in the inputs of each second item
 - (Rust too) for / a whose on the second for item that reads $params text after is in says the root once, with no item of its list / fails as unusable with the root once and then the item that can't be read on its own
 - (Rust too) for / a whose on the second for item that reads a $params object after is in says the root once, with no item of its list / fails as unusable with the root once and then the item that can't be read on its own
 - (Rust too) for / a whose on the second for item with every that reads $input after is in says the root once, with no item of its list / fails as unusable with the root once when it is an object, and then the item that can't be read on its own
-- (Rust too) for / a whose on the second for item with some that reads $input after is in says the root once, with no item of its list / fails as unusable with the root once when it is an object, and then the item that can't be read on its own
 - (Rust too) for / a whose on the second for item with first of that reads $input after is in says the root once, with no item of its list / fails as unusable with the root once when it is an object, and then the item that can't be read on its own
 - (Rust too) for / a whose on the second for item with last of that reads $input after is in says the root once, with no item of its list / fails as unusable with the root once when it is an object, and then the item that can't be read on its own
-- (Rust too) for / a second for list whose whose reads a root through the first alias that can't be read, and a field its items lack, says the root for each item of the first list, then each item of the second / w.z isn't a number and no item of ys has u
+- (Rust too) for / a whose on the second for item with some that reads $input after is in says the root once, with no item of its list / fails as unusable with the root once when it is an object, and then the item that can't be read on its own
+- (Rust too) for / an item's own problem on a for line is said after a $params or $input root of its whose that can't be read / an item without v, with $input.os that is text
+- (Rust too) for / an item's own problem on a for line is said after a parent's root of its whose that can't be read / an item without v, with a parent list that is text
+- (Rust too) for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item that is null, with an item of the part without the name
+- (Rust too) for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with a null part
+- (Rust too) for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with an item of the part without the name
+- (Rust too) for / an item's own problem on a for line is said after a root of its whose that can't be read, even when it fails no worse than the root / an item without v, with names of more than one kind
+- (Rust too) for / and N more counts each problem of a part of a subject that is a list once / four items that aren't objects are three shown and one more
+- (Rust too) for / count of a position of the params, with params as an empty list / fails as unusable and names what it can't read
+- for / every on a position of the params with nothing after it, with params as a number / fails as unusable and names the params and what they are
+- for / every over the subs of the first item that whose kept, with every leaf checked / fails, and the subs under the item whose left out aren't shown
 - (Rust too) in / count of and sum of read the field named like a part and list it with the dot / lists the field with the dot and the part without it, and names the item of the part
-- list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / each item's value is listed with its location, and a part keeps its tag
-- list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / an item with no name is listed as null, at the item
+- list_items / a for line over items that aren't objects, with a sum of or a count of whose named by key is read from the params and isn't text, on an input that is an object / say the key isn't text, and then the item that isn't an object
 - list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / an item whose name is null is listed as null, at the name
+- list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / an item with no name is listed as null, at the item
+- list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / each item's value is listed with its location, and a part keeps its tag
 - list_items / a name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it / a text value among numbers, and a number among patterns
-- list_items / a parent's name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it / a text value among numbers, and a number among patterns
-- list_items / a path from $input with named by on an input that is a list / fails as not_an_object and names the input once
 - (Rust too) list_items / a named by key read from an input that is a list, in a count of, a sum of, a whose, a that, a one-line every or some, a for line, an any_of, a child subject and a from line / the key holds text: every check that reads the key fails as not_an_object and says once that the input isn't an object, and so do the $applies rows and the $min_subjects row of the from line that reads it
+- (Rust too) list_items / a named by key read from an input that is a list, in a count of, a sum of, a whose, a that, a one-line every or some, a for line, an any_of, a child subject and a from line / the key is a number: every check that reads the key fails as not_an_object and says once that the input isn't an object, and so do the $applies rows and the $min_subjects row of the from line that reads it
 - (Rust too) list_items / a named by key read from an input that is a list, in a count of, a sum of, a whose, a that, a one-line every or some, a for line, an any_of, a child subject and a from line / the key is missing: every check that reads the key fails as not_an_object and says once that the input isn't an object, and so do the $applies rows and the $min_subjects row of the from line that reads it
 - (Rust too) list_items / a named by key read from an input that is a list, in a count of, a sum of, a whose, a that, a one-line every or some, a for line, an any_of, a child subject and a from line / the key is null: every check that reads the key fails as not_an_object and says once that the input isn't an object, and so do the $applies rows and the $min_subjects row of the from line that reads it
-- (Rust too) list_items / a named by key read from an input that is a list, in a count of, a sum of, a whose, a that, a one-line every or some, a for line, an any_of, a child subject and a from line / the key is a number: every check that reads the key fails as not_an_object and says once that the input isn't an object, and so do the $applies rows and the $min_subjects row of the from line that reads it
-- list_items / a for line over items that aren't objects, with a sum of or a count of whose named by key is read from the params and isn't text, on an input that is an object / say the key isn't text, and then the item that isn't an object
+- list_items / a parent's name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it / a text value among numbers, and a number among patterns
+- list_items / a path from $input with named by on an input that is a list / fails as not_an_object and names the input once
 - list_items / an any_of option that reads a field of a subject that is a list outside what it reads item by item fails on its own / the option that reads each item decides
-- (Rust too) list_starts / every, some, count of and sum of walk a subject that is a list / an item that isn't an object fails as not_an_object, and a missing field as absent
-- (Rust too) list_starts / a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it / an item that is null is listed as null, at the item, and fails as unusable
-- (Rust too) list_starts / a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it / an item that is a number is listed as null, at the item, and fails as unusable
 - (Rust too) list_starts / a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it / an item that is a list isn't read into, is listed as null, at the item, and fails as unusable
-- messages / a count of over a part that can't be reached / the part is named once
-- messages / two worked-out values that can't be used / the values are joined with a comma and and
+- (Rust too) list_starts / a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it / an item that is a number is listed as null, at the item, and fails as unusable
+- (Rust too) list_starts / a name that walks a subject that is a list, read on the right of a list phrase, is listed as a plain check lists it / an item that is null is listed as null, at the item, and fails as unusable
+- (Rust too) list_starts / every, some, count of and sum of walk a subject that is a list / an item that isn't an object fails as not_an_object, and a missing field as absent
 - messages / a count of a list in a list item of a for alias / the key read from the field names the value
-- messages / a count of a path with a key from a field names the value once / a value that isn't a list or an object is named after the key it was read at
 - messages / a count of a path with a key from a field names the value once / a number is named the same way
+- messages / a count of a path with a key from a field names the value once / a value that isn't a list or an object is named after the key it was read at
 - messages / a count of a path with a key from a field, in a for line, names the value once / a value that isn't a list or an object is named after the key it was read at
-- messages / a for line over two lists / the inner items are named without a dollar sign before the alias
+- messages / a count of over a part that can't be reached / the part is named once
+- (Rust too) messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then each item in turn
+- messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then the inner items
 - messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a colon is printed as the input had it
-- messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a space is printed as the input had it
 - messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a comma is printed as the input had it
 - messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a dot is printed as the input had it
-- messages / a for line over a list of lists whose values spell the alias / an object that holds the alias in a value is printed as the input had it
+- messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a space is printed as the input had it
 - messages / a for line over a list of lists whose values spell the alias / an object that holds the alias in a key is printed as the input had it
+- messages / a for line over a list of lists whose values spell the alias / an object that holds the alias in a value is printed as the input had it
+- messages / a for line over two lists / the inner items are named without a dollar sign before the alias
 - messages / a for line whose alias is named applies and whose value spells it / a value that holds the alias is printed as the input had it
-- messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then the inner items
-- (Rust too) messages / a for item with a whose that reads a part over items that aren't all objects / names the part first, once, then each item in turn
-- (Rust too) messages / a subject read at the position of a list of the input / says which item of the list is missing
-- (Rust too) messages / a subject read at the position of a list of the input / names the list when it is missing
-- (Rust too) messages / a subject read at the position of a list of the input / says what the list is when it isn't a list or an object
-- (Rust too) messages / a subject read from the first item of a list of the input / says the first item is missing when the list is empty
-- (Rust too) messages / a subject read from the first item of a list of the input / says the list is missing
-- (Rust too) messages / a root name after is in inside a relative clause that isn't a list, on an empty list / fails as unusable and names the root, because the list it looks in is read before any item, then the empty list
-- (Rust too) messages / two roots in one relative clause that can't be read / names every root that failed, in the order the sentence reads them
-- (Rust too) messages / a root name after is in inside a relative clause that isn't a list, on a list with items / names the root once, with no item, on a for line too
-- (Rust too) messages / two roots after is in that aren't lists, in one relative clause / names both, in the order the sentence reads them, on a list with items
-- (Rust too) messages / two roots after is in that aren't lists, in one relative clause / names both on an empty list too
-- (Rust too) messages / two roots in one relative clause that fail in different ways / names every root that failed, whatever its cause, in the order the sentence reads them
-- (Rust too) messages / two roots in one relative clause that fail in different ways / names them in front of what the items say when an item fails in a worse way
-- messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that is null, then the list that is missing
 - messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that is missing, then the list that is null
+- messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that is null, then the list that is missing
+- (Rust too) messages / a part that is a list, read in a whose beside a list that can't be read, is said first and then the list, and the row takes the part's cause when it is the worst / a list that is empty
+- (Rust too) messages / a part that is a list, read in a whose beside a list that can't be read, is said first and then the list, and the row takes the part's cause when it is the worst / a list that is missing
+- (Rust too) messages / a part that is a list, read in a whose beside a list that can't be read, is said first and then the list, and the row takes the part's cause when it is the worst / a list that is null
 - messages / a root and the list it is read beside that both can't be read are both said, roots first, with the worst cause / a root that is missing and a list that is null fail as absent
 - (Rust too) messages / a root in a count of beside a list that is missing, when the params aren't an object / says the params, or the root, once, and then the list, and a check that doesn't read the params fails with the worst cause of what it says
 - (Rust too) messages / a root in a whose beside an empty list, when the params aren't an object / says the root, and then the empty list where it fails, and a check that doesn't read the params fails with the worst cause of what it says
-- (Rust too) messages / a root on the right of the phrase that is missing, beside a list that can't be read, is said first and then the list, with the worst cause / a list that is null
-- (Rust too) messages / a root on the right of the phrase that is missing, beside a list that can't be read, is said first and then the list, with the worst cause / a list that is missing
-- (Rust too) messages / a root on the right of the phrase of the wrong type, beside a list that can't be read, is said first and then the list / a list that is missing
-- (Rust too) messages / a root on the right of the phrase of the wrong type, beside a list that can't be read, is said first and then the list / a list that is text
-- (Rust too) messages / a part that is a list, read in a whose beside a list that can't be read, is said first and then the list, and the row takes the part's cause when it is the worst / a list that is missing
-- (Rust too) messages / a part that is a list, read in a whose beside a list that can't be read, is said first and then the list, and the row takes the part's cause when it is the worst / a list that is null
-- (Rust too) messages / a part that is a list, read in a whose beside a list that can't be read, is said first and then the list, and the row takes the part's cause when it is the worst / a list that is empty
+- (Rust too) messages / a root in a whose that is missing, beside a list in a list whose inner lists can't be read, is said first and then each item / an inner list that is null and one that is missing
+- (Rust too) messages / a root name after is in inside a relative clause that isn't a list, on a list with items / names the root once, with no item, on a for line too
+- (Rust too) messages / a root name after is in inside a relative clause that isn't a list, on an empty list / fails as unusable and names the root, because the list it looks in is read before any item, then the empty list
 - (Rust too) messages / a root on the right of the phrase and a root in a whose, both missing, beside a list that can't be read, are all said, then the list / no params and no list
 - (Rust too) messages / a root on the right of the phrase and a root in a whose, both null, beside a list that is null, are all said, then the list / both params and the list null
-- (Rust too) messages / a root in a whose that is missing, beside a list in a list whose inner lists can't be read, is said first and then each item / an inner list that is null and one that is missing
+- (Rust too) messages / a root on the right of the phrase of the wrong type, beside a list that can't be read, is said first and then the list / a list that is missing
+- (Rust too) messages / a root on the right of the phrase of the wrong type, beside a list that can't be read, is said first and then the list / a list that is text
+- (Rust too) messages / a root on the right of the phrase that is missing, beside a list that can't be read, is said first and then the list, with the worst cause / a list that is missing
+- (Rust too) messages / a root on the right of the phrase that is missing, beside a list that can't be read, is said first and then the list, with the worst cause / a list that is null
+- (Rust too) messages / a subject read at the position of a list of the input / names the list when it is missing
+- (Rust too) messages / a subject read at the position of a list of the input / says what the list is when it isn't a list or an object
+- (Rust too) messages / a subject read at the position of a list of the input / says which item of the list is missing
+- (Rust too) messages / a subject read from the first item of a list of the input / says the first item is missing when the list is empty
+- (Rust too) messages / a subject read from the first item of a list of the input / says the list is missing
+- (Rust too) messages / two roots after is in that aren't lists, in one relative clause / names both on an empty list too
+- (Rust too) messages / two roots after is in that aren't lists, in one relative clause / names both, in the order the sentence reads them, on a list with items
+- (Rust too) messages / two roots in one relative clause that can't be read / names every root that failed, in the order the sentence reads them
+- (Rust too) messages / two roots in one relative clause that fail in different ways / names every root that failed, whatever its cause, in the order the sentence reads them
+- (Rust too) messages / two roots in one relative clause that fail in different ways / names them in front of what the items say when an item fails in a worse way
+- messages / two worked-out values that can't be used / the values are joined with a comma and and
+- (Rust too) requirements / a position on the whole input when it is a list / names the position from $input in the expression
 - (Rust too) requirements / subjects from a list / fails min_subjects as value on an empty list
 - (Rust too) requirements / the whole input as the subject / fails min_subjects as null on a null input
-- (Rust too) requirements / a position on the whole input when it is a list / names the position from $input in the expression
 - (Rust too) row_parts / a count of and a sum of on a for line name the items they can't read under the item of the for line / items named through the alias, an inner list that is missing, a sentence that doesn't read the alias, and a second list
-- row_parts / a root in a relative clause that can't be read is said first, and then each item the relative clause can't read, in a count of, a sum of, an every and a some / the root isn't a number, and items whose value is missing, null or not a number
-- row_parts / a root in a relative clause that can't be read is said first, and then each item the relative clause can't read, in a count of, a sum of, an every and a some / the root is null, and an item whose value is null
-- row_parts / a root in a relative clause that can't be read is said first, and then each item the relative clause can't read, in a count of, a sum of, an every and a some / the root is missing, and items whose value is missing or null
 - (Rust too) sentences / a for alias inside an item's scope / an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters
+- sentences / a for line item that reads a null before a named by field / fails as null whatever the field holds, and failed_items names the null, as the item does without the field, whether it reads the first alias or not
+- (Rust too) sentences / a list walked before a named by field / is walked, so a field that's missing, null or not a string decides the cause, but a plain check can't read the list and ends unusable
+- sentences / a root name on the right of some in a from line's condition, read up front / fails the candidate once, with no item named, even when its list is empty
+- sentences / a sum of whose that or whose reads a named by key against the focus / is written wrong naming the key, and a key from the subject or a count of is fine
 - sentences / an any_of of sentences with a param that isn't a list / fails as unusable even when another option passes
 - (Rust too) sentences / every and some walk a list read with named by a field / lists the field right after the walked list
+- (Rust too) sentences / list positions with more than 15 digits / aren't numbers in the policy, so they're written correctly in from, a sentence and a for line
+- sentences / the examples the rules for where a name resolves were decided on / a focus that is missing fails as absent, and one that is null as not_an_object, naming the item and the value
+- sentences / the examples the rules for where a name resolves were decided on / each check reads its names where the rules say, on the pull request of the decision
 - (Rust too) sentences / the path before a named by field that can't be read / decides the cause before the field is read, whatever the field holds
 - (Rust too) sentences / the path before a named by field that can't be read / reads the field when the null is just before it, so the field decides, and a good one ends the path null, as a plain path through null does
-- (Rust too) sentences / a list walked before a named by field / is walked, so a field that's missing, null or not a string decides the cause, but a plain check can't read the list and ends unusable
 - (Rust too) sentences / the path before a named by field that can't be read, in a count, a sum, a plus, an elapsed time, a some and a for line / ends absent when the path is missing, whatever the field holds
 - (Rust too) sentences / the path before a named by field that can't be read, in a count, a sum, a plus, an elapsed time, a some and a for line / ends unusable when the path goes through a string, whatever the field holds
-- sentences / a for line item that reads a null before a named by field / fails as null whatever the field holds, and failed_items names the null, as the item does without the field, whether it reads the first alias or not
-- sentences / the examples the rules for where a name resolves were decided on / each check reads its names where the rules say, on the pull request of the decision
-- sentences / the examples the rules for where a name resolves were decided on / a focus that is missing fails as absent, and one that is null as not_an_object, naming the item and the value
-- sentences / the subject's name named by a key, inside and outside a relative clause / reads each approver's k inside, and is written wrong outside
-- sentences / the subject's name named by a key, inside and outside a relative clause / an approver without k fails as absent, whatever the subject's k
-- sentences / the subject's field read by name inside a relative clause, when it isn't usable / fails as unusable when the field's type differs
-- sentences / a count whose focus is missing for one item and null for another / names every item that failed, whatever its cause
-- sentences / the subject named by a key of each item, inside a relative clause / names the item whose key names a field the subject doesn't have
 - sentences / the subject named by a key of each item, inside a relative clause / names the item that has no key
-- sentences / a sum of whose that or whose reads a named by key against the focus / is written wrong naming the key, and a key from the subject or a count of is fine
-- sentences / a root name on the right of some in a from line's condition, read up front / fails the candidate once, with no item named, even when its list is empty
-- (Rust too) sentences / list positions with more than 15 digits / aren't numbers in the policy, so they're written correctly in from, a sentence and a for line
-- (Rust too) subject_name / every on a position of region / names the item and the list it came from
-- (Rust too) subject_name / the subject name is read in every position of a one-line check on a list subject / a list subject is walked, counted and summed as a field that holds the list would be
+- sentences / the subject named by a key of each item, inside a relative clause / names the item whose key names a field the subject doesn't have
+- sentences / the subject's field read by name inside a relative clause, when it isn't usable / fails as unusable when the field's type differs
+- sentences / the subject's name named by a key, inside and outside a relative clause / an approver without k fails as absent, whatever the subject's k
+- sentences / the subject's name named by a key, inside and outside a relative clause / reads each approver's k inside, and is written wrong outside
 - (Rust too) subject_name / a count of a field named like the subject, written with a dot / a field that isn't a list or an object is said once, as the walk says it
 - subject_name / a count of a field named like the subject, written with a dot / a missing field is named with its dot in the inputs and in the message
 - subject_name / a count whose reads a field named like the subject and a part / an item that isn't an object is named with the dot of the field the whose reads
+- (Rust too) subject_name / every on a position of region / names the item and the list it came from
+- (Rust too) subject_name / the subject name is read in every position of a one-line check on a list subject / a list subject is walked, counted and summed as a field that holds the list would be
 - (Rust too) subjects / a child subject of a from line with named by each of, with a parent that isn't an object / fails min_subjects as not_an_object under each parent, even with min_subjects 0, and gives no subject, though the parents aren't all of one type
 - walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
+- walks / a that clause whose key from $params is missing reads the value before the key on the focus / the focus holds m
 - (Rust too) walks / a walk whose parent path is named by a bare name, read from the subject / fails as absent when the subject has no such field, even when each item has one
 - (Rust too) walks / a walk whose parent path is named by a bare name, read from the subject / fails as absent when the subject has no such field, whatever the parent and the items hold
-- (Rust too) walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that isn't text in the order the sentence reads them / one key is missing and the other isn't text
-- (Rust too) walks / an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that isn't text in the order the sentence reads them / one key is null and the other isn't text
-- walks / a that clause whose key from $params is missing reads the value before the key on the focus / the focus holds m
-- walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name / an item of $input.os is null and $params.z is missing
-- walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name, with a null param / an item of $input.os has no name and $params.z is null
+- (Rust too) walks / a whose key from $params that is missing, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds text
 - (Rust too) walks / a whose key from $params that is null, beside items that fail on their own fields, says the key once and each item's own problem / an item without zz and an item whose m is null
 - (Rust too) walks / a whose key from $params that is null, beside items that fail on their own fields, says the key once and each item's own problem / five mixed items
-- (Rust too) walks / a whose key from $params that is missing, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds text
-- (Rust too) walks / a whose key from $params that is null, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list is missing
 - (Rust too) walks / a whose key from $params that is null, in a walk beside another sentence or option, a for line beside a sentence that doesn't read the alias, and a count of that, is said wherever the walk is said / the list holds text
+- walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name / an item of $input.os is null and $params.z is missing
+- walks / an item of a list a whose reads from $input is a root, said worst cause first and then by name, with a null param / an item of $input.os has no name and $params.z is null
