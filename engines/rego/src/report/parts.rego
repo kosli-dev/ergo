@@ -230,13 +230,16 @@ _for_walk_part(c, subj, req, at, where, i) := _walk_assertion_entry(wrow, at, ob
 	wrow := object.union(_anchored(_alias_unmarked(_keyed_rooted(_for_said(raw), c, subj)), at), {"ergo/subj": subj, "ergo/req": req})
 }
 
-_alias_unmarked(o) := object.union(o, object.filter({
-	"message": _m_aliased(o.message),
-	"inputs": [object.union(x, {"name": _m_aliased(x.name)}) | some x in o.inputs],
-	"failed_items": [object.union(f, object.filter({"item": _m_aliased(f.item), "path": _m_aliased(f.path), "ergo/read": _m_aliased(object.get(f, "ergo/read", ""))}, object.keys(f))) | some f in object.get(o, "failed_items", [])],
-	"ergo/texts": [_m_aliased(t) | some t in object.get(o, "ergo/texts", [])],
-	"ergo/own": [_m_aliased(t) | some t in object.get(o, "ergo/own", [])],
-}, object.keys(o)))
+_alias_unmarked(o) := object.union(o, object.filter(
+	{
+		"message": _m_aliased(o.message),
+		"inputs": [object.union(x, {"name": _m_aliased(x.name)}) | some x in o.inputs],
+		"failed_items": [object.union(f, object.filter({"item": _m_aliased(f.item), "path": _m_aliased(f.path), "ergo/read": _m_aliased(object.get(f, "ergo/read", ""))}, object.keys(f))) | some f in object.get(o, "failed_items", [])],
+		"ergo/texts": [_m_aliased(t) | some t in object.get(o, "ergo/texts", [])],
+		"ergo/own": [_m_aliased(t) | some t in object.get(o, "ergo/own", [])],
+	},
+	object.keys(o),
+))
 
 _for_item_entry(f, l, x, aliases, at, row, where, i) := _leveled_by(
 	object.union(
