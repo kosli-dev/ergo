@@ -388,7 +388,7 @@ _entry(kind, name, cause, inputs, failures, message) := {
 
 _policy_entry(kind, name, cause, inputs, failures, message, locations) := object.union(_entry(kind, name, cause, inputs, failures, message), {"locations": locations})
 
-_row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, [i | some i in _with_key_bases(array.concat(ins, _check_key_ref_entries(where.check, ins, row.cause, row.message)), object.get(row, "ergo/key_bases", []), at); not i.name in names; not _item_input(i, lists); not _tally_own_read(i, where.check)], array.concat(ls, items), _tally_rest_of(row.message, names, texts), [_assertion_at(where, null, 0)])] if {
+_row_failures(row, at, where, ins) := [_policy_entry("assertion", where.check.expression, row.cause, [i | some i in _with_key_bases(array.concat(ins, _check_key_ref_entries(where.check, ins, row.cause, row.message)), object.get(row, "ergo/key_bases", []), at); not i.name in names; not _item_input(i, lists); not _tally_own_read(i, where.check, names, items)], array.concat(ls, items), _tally_rest_of(row.message, names, texts), [_assertion_at(where, null, 0)])] if {
 	not _walks(where.check)
 	not _all_of_run(where.check)
 	not _any_of_run(where.check)
@@ -444,10 +444,18 @@ _tally_item_texts(c, subj, cause, m) := {_m_aliased(r[1]) |
 	is_object(c)
 	mc := object.union(_m_with_sides(_m_walked(c, subj)), {"ergo/row": true})
 	some side in _m_tally_parts(mc)
-	some r in _m_tally_said(subj, side, cause)
+	rs := _m_tally_said(subj, side, cause)
+	some r in rs
 	count(r) == 3
+	not _tally_root_said(r, rs)
 	_tally_record_listed(r[2])
 	_tally_said_in(_m_aliased(r[1]), m)
+}
+
+_tally_root_said(r, rs) if {
+	some x in rs
+	count(x) == 2
+	x[1] == r[1]
 }
 
 _tally_record_listed(src) if _m_positions(src.item.i) != []
@@ -465,14 +473,16 @@ else := concat("; ", [c |
 
 _and_more(q) if regex.match(`^and [0-9]+ more$`, q)
 
-_tally_own_read(i, c) if {
+_tally_own_read(i, c, _, items) if {
+	items != []
 	some side in _m_tally_parts(c)
 	p := side[_basic_form(side)]
 	is_array(p)
 	_m_aliased(i.name) == concat("", [_m_aliased(_input_name(p)), "[]"])
 }
 
-_tally_own_read(i, c) if {
+_tally_own_read(i, c, names, _) if {
+	names != set()
 	i.value == []
 	some side in _m_tally_parts(c)
 	p := side[_basic_form(side)]
@@ -569,7 +579,7 @@ _tallied_entry(e, c, o, at, where, row) := object.union(e, {"inputs": x.inputs, 
 	raw.passed == false
 	wrow := object.union(_anchored(_keyed_rooted(_for_said(raw), c, row["ergo/subj"]), at), {"ergo/subj": row["ergo/subj"], "ergo/req": row["ergo/req"]})
 	x := _walk_assertion_entry(wrow, at, object.union(where, {"check": object.union(c, {"expression": e.name}), "ats": {"": e.locations}}), _with_outcomes(wrow.inputs))
-} else := object.union(e, {"inputs": [i | some i in e.inputs; not i.name in names; not _item_input(i, lists); not _tally_own_read(i, c)], "failures": array.concat(ls, items), "message": _tally_rest_of(e.message, names, texts)}) if {
+} else := object.union(e, {"inputs": [i | some i in e.inputs; not i.name in names; not _item_input(i, lists); not _tally_own_read(i, c, names, items)], "failures": array.concat(ls, items), "message": _tally_rest_of(e.message, names, texts)}) if {
 	not _walks(c)
 	count(_m_tally_parts(c)) > 0
 	subj := row["ergo/subj"]
@@ -622,7 +632,7 @@ _walk_assertion_entry(row, at, where, ins) := _policy_entry(
 	"assertion",
 	where.check.expression,
 	row.cause,
-	_once(array.concat(array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists); not _walked_read(i, wname, entries); not _walked_read(i, concat("", [wname, "[]"]), entries)], _key_flaw_entries(where.check.path)), _walk_cond_ref_entries(_walk_cond_refs(where.check), row.inputs)), _walk_param_entries(where.check, row.inputs))),
+	_once(array.concat(array.concat(array.concat([ins[j] | some j, i in row.inputs; not _item_input(i, lists); not _walked_path_read(i, wname)], _key_flaw_entries(where.check.path)), _walk_cond_ref_entries(_walk_cond_refs(where.check), row.inputs)), _walk_param_entries(where.check, row.inputs))),
 	entries,
 	concat("; ", [m | some m in _once(array.concat(object.get(row, "ergo/own", [row.message]), _root_texts(row, texts))); not m in {e.message | some e in _key_list_parts(row, at)}]),
 	[_assertion_at(where, null, 0)],
@@ -637,10 +647,7 @@ _walked_name(path) := _input_name(path) if is_array(path)
 
 else := ""
 
-_walked_read(i, name, entries) if {
-	entries != []
-	i.name == name
-}
+_walked_path_read(i, name) if replace(i.name, "[]", "") == name
 
 _walk_param_entries(check, inputs) := [x |
 	some x in _with_outcomes(_once([_path_input(null, p) | walk(object.get(check, "check", {}), [_, p]); is_array(p); count(p) > 0; p[0] == "$$params"]))
@@ -1174,8 +1181,10 @@ _tally_item_parts(c, subj, cause, at, m) := _nested_items([x |
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	roots := _dotted_roots([side[f]])
-	some r in _m_tally_said(subj, side, cause)
+	rs := _m_tally_said(subj, side, cause)
+	some r in rs
 	count(r) == 3
+	not _tally_root_said(r, rs)
 	_tally_said_in(_m_aliased(r[1]), m)
 	x := _tally_record_entry(r, side, w, roots, at)
 ])
