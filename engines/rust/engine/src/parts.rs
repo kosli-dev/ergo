@@ -214,7 +214,10 @@ fn item_read(failed: &Value) -> Value {
         "name": failed.get("path").cloned().unwrap_or(Value::Null),
         "value": value,
         "locations": failed.get("locations").cloned().unwrap_or(json!([])),
-        "outcome": item_outcome(failed.get("cause").and_then(Value::as_str).unwrap_or(""), &value),
+        "outcome": failed
+            .get("ergo/outcome")
+            .and_then(Value::as_str)
+            .unwrap_or_else(|| item_outcome(failed.get("cause").and_then(Value::as_str).unwrap_or(""), &value)),
     })
 }
 
@@ -511,6 +514,34 @@ fn nested(entries: Vec<Leveled>, depth: usize) -> Vec<Failure> {
                 });
             }
             _ => {}
+        }
+    }
+    merged_items(out)
+}
+
+fn merged_items(entries: Vec<Failure>) -> Vec<Failure> {
+    let mut out: Vec<Failure> = Vec::new();
+    for entry in entries {
+        let same = out.iter().position(|e| {
+            matches!((e, &entry), (Failure::Item { .. }, Failure::Item { .. }))
+                && e.part().name == entry.part().name
+        });
+        match (same, entry) {
+            (Some(at), Failure::Item { part, .. }) => {
+                if let Failure::Item { part: kept, .. } = &mut out[at] {
+                    kept.cause = Cause::worst([kept.cause, part.cause]).unwrap_or(kept.cause);
+                    if kept.message.is_empty() {
+                        kept.message = part.message;
+                    }
+                    for input in part.inputs {
+                        if !kept.inputs.contains(&input) {
+                            kept.inputs.push(input);
+                        }
+                    }
+                    kept.failures.extend(part.failures);
+                }
+            }
+            (_, entry) => out.push(entry),
         }
     }
     out

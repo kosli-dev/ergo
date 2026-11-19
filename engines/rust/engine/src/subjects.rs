@@ -205,6 +205,8 @@ struct Broken {
     cause: Cause,
     value: Value,
     location: Option<String>,
+    clause: Option<String>,
+    clauses: Vec<String>,
 }
 
 impl Broken {
@@ -218,19 +220,185 @@ impl Broken {
             cause,
             value,
             location,
+            clause: None,
+            clauses: Vec::new(),
         }
     }
 
     fn to_json(&self) -> Value {
         let locations: Vec<String> = self.location.iter().cloned().collect();
-        json!({
+        let mut out = json!({
             "path": self.path,
             "item": self.path,
             "cause": self.cause.name(),
             "value": self.value,
             "locations": locations,
-        })
+            "ergo/text": self.clause.clone().unwrap_or_else(|| self.msg.clone()),
+        });
+        if self.clause.is_some() {
+            out["ergo/outcome"] = json!("usable");
+        }
+        out
     }
+
+    fn said_clauses(&self) -> Vec<String> {
+        if self.clauses.is_empty() {
+            vec![self.msg.clone()]
+        } else {
+            self.clauses.clone()
+        }
+    }
+}
+
+fn read_input(name: String, read: &path::Read, key: bool) -> Value {
+    let outcome = match read.outcome {
+        Outcome::Found if key && !read.value.is_some_and(Value::is_string) => "unusable",
+        Outcome::Found => "usable",
+        Outcome::Absent => "absent",
+        Outcome::Null => "null",
+        Outcome::Unusable => "unusable",
+        Outcome::NotAnObject => "not_an_object",
+    };
+    json!({
+        "name": name,
+        "value": read.value.cloned().unwrap_or(Value::Null),
+        "locations": read.location.iter().map(Location::render).collect::<Vec<_>>(),
+        "outcome": outcome,
+    })
+}
+
+fn from_reads(env: &Env, source: &Source, anc: &[Anc]) -> Vec<Value> {
+    let (Source::Root { path, every, .. } | Source::Child { path, every, .. }) = source;
+    let subject = match (source, anc.last()) {
+        (Source::Child { .. }, Some(parent)) => parent.at.clone(),
+        _ => input_root(env),
+    };
+    let ctx = context(env, subject, anc);
+    let keys: Vec<Value> = path::step_refs(path)
+        .iter()
+        .filter_map(|key| {
+            let read = path::read(key, &ctx);
+            let fine = read.outcome == Outcome::Found && read.value.is_some_and(Value::is_string);
+            (!fine).then(|| read_input(crate::name::name(key), &read, true))
+        })
+        .collect();
+    if !keys.is_empty() || *every {
+        return keys;
+    }
+    let read = path::read(path, &ctx);
+    let name = crate::name::name(path);
+    let name = match source {
+        Source::Root { .. } => name.strip_prefix("$input.").unwrap_or(&name).to_string(),
+        Source::Child { .. } => name,
+    };
+    match read.outcome {
+        Outcome::Found => Vec::new(),
+        _ => vec![read_input(name, &read, false)],
+    }
+}
+
+fn last_index(path: &str) -> Option<(String, u64, String)> {
+    let open = path.rfind('[')?;
+    let close = open + path[open..].find(']')?;
+    let at = path[open + 1..close].parse::<u64>().ok()?;
+    let rest = path[close + 1..].trim_start_matches('.').to_string();
+    Some((path[..open].to_string(), at, rest))
+}
+
+fn item_pointer(location: &str, at: u64, rest: &str) -> Option<String> {
+    let tokens: Vec<&str> = location.split('/').collect();
+    let fields: Vec<&str> = rest.split('.').filter(|f| !f.is_empty()).collect();
+    let wanted = at.to_string();
+    (0..tokens.len())
+        .rev()
+        .find(|k| {
+            tokens[*k] == wanted
+                && tokens[k + 1..].len() <= fields.len()
+                && tokens[k + 1..].iter().zip(&fields).all(|(a, b)| a == b)
+        })
+        .map(|k| tokens[..=k].join("/"))
+}
+
+/// Turns the failed items of a failed `$min_subjects` row into its
+/// `failures`, and puts the read of a list its `from` line can't walk on the
+/// row's inputs too. A passed row gets neither.
+pub fn min_failures(row: &mut Row, input: &Value) {
+    if row.check != "$min_subjects" {
+        return;
+    }
+    let failed = row.failed_items.take();
+    if row.passed() {
+        return;
+    }
+    let Some(Value::Array(failed)) = failed else {
+        return;
+    };
+    let records: Vec<Value> = failed
+        .into_iter()
+        .map(|mut record| {
+            let path = record
+                .get("path")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_string();
+            if path.starts_with("item ") {
+                if record.get("ergo/item").is_none() {
+                    record["ergo/item"] = json!({
+                        "value": record.get("value").cloned().unwrap_or(Value::Null),
+                        "locations": record.get("locations").cloned().unwrap_or(json!([])),
+                    });
+                }
+                return record;
+            }
+            if let Some((list, at, rest)) = last_index(&path) {
+                record["item"] = json!(format!("item {} of {list}", at + 1));
+                let location = record
+                    .get("locations")
+                    .and_then(|l| l.get(0))
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_string();
+                if let Some(pointer) = item_pointer(&location, at, &rest) {
+                    record["ergo/item"] = json!({
+                        "value": input.pointer(&pointer).cloned().unwrap_or(Value::Null),
+                        "locations": [pointer],
+                    });
+                }
+            }
+            record
+        })
+        .collect();
+    let walked = parts::walk_entries(&records);
+    let failures = parts::nest(walked.entries, input);
+    for entry in &failures {
+        if let Failure::List(part) = entry {
+            for read in &part.inputs {
+                let name = read.get("name");
+                if !row.inputs.iter().any(|i| i.get("name") == name) {
+                    row.inputs.push(read.clone());
+                }
+            }
+        }
+    }
+    row.failures = Some(parts::to_json(&failures));
+}
+
+fn clauses_once<'b>(broken: impl Iterator<Item = &'b Broken>) -> Vec<String> {
+    let mut said: Vec<String> = Vec::new();
+    let mut out: Vec<String> = Vec::new();
+    for each in broken {
+        let fresh: Vec<String> = each
+            .said_clauses()
+            .into_iter()
+            .filter(|clause| !said.contains(clause))
+            .collect();
+        if fresh.is_empty() {
+            continue;
+        }
+        said.extend(fresh.iter().cloned());
+        out.push(fresh.join(", "));
+    }
+    out
 }
 
 enum Read<'a> {
@@ -499,23 +667,27 @@ fn type_word(value: &Value) -> &'static str {
 }
 
 struct Note {
-    msg: String,
-    items: Vec<(Vec<walk::Seg>, Value, Location)>,
+    items: Vec<(Vec<walk::Seg>, Value, Location, String)>,
 }
 
 impl Note {
     fn brokens(self, root: &str, child: bool) -> Vec<Broken> {
+        let clauses: Vec<String> = self.items.iter().map(|item| item.3.clone()).collect();
         let mut out: Vec<Broken> = self
             .items
             .into_iter()
-            .map(|(segs, value, at)| Broken {
+            .map(|(segs, value, at, clause)| Broken {
                 rank: 1,
                 path: start_name(&segs, root, child),
                 order: segs,
+                clause: Some(clause),
                 ..Broken::listed(String::new(), Cause::Unusable, value, Some(at.render()))
             })
             .collect();
-        out.push(note_broken(self.msg));
+        out.push(Broken {
+            clauses: clauses.clone(),
+            ..note_broken(clauses.join(", "))
+        });
         out
     }
 }
@@ -527,7 +699,6 @@ fn types_note<'v>(
     plain: bool,
 ) -> Option<Note> {
     let mut seen: Vec<&'static str> = Vec::new();
-    let mut said: Vec<String> = Vec::new();
     let mut items = Vec::new();
     for (segs, value, at) in values {
         if value.is_null() {
@@ -541,14 +712,10 @@ fn types_note<'v>(
             } else {
                 from_item_name(&segs, root, child)
             };
-            said.push(format!("{name} is {word}"));
-            items.push((segs, value.clone(), at));
+            items.push((segs, value.clone(), at, format!("{name} is {word}")));
         }
     }
-    (said.len() > 1).then(|| Note {
-        msg: said.join(", "),
-        items,
-    })
+    (items.len() > 1).then_some(Note { items })
 }
 
 fn root_name(child: bool, anc: &[Anc]) -> String {
@@ -790,29 +957,23 @@ fn fl_read<'a>(e: &Fe<'a>, seg: &walk::Seg) -> Fe<'a> {
 }
 
 fn mixed_note(list: &Fe, other: &Fe, root: &str, child: bool) -> Note {
-    let field = steps_name(&list.segs[list.item..]);
-    let first = from_item_name(&list.segs[..list.item], root, child);
-    let second = from_item_name(&other.segs[..other.item], root, child);
-    let split = |name: &str| -> Option<(String, String)> {
-        let rest = name.strip_prefix("item ")?;
-        let (number, of) = rest.split_once(" of ")?;
-        (!number.is_empty() && number.chars().all(|c| c.is_ascii_digit()))
-            .then(|| (number.to_string(), of.to_string()))
-    };
-    let shown_second = match (split(&first), split(&second)) {
-        (Some((_, a)), Some((number, b))) if a == b && !a.contains(':') => {
-            format!("item {number}")
-        }
-        _ => second,
-    };
+    let first = from_item_name(&list.segs, root, child);
+    let second = from_item_name(&other.segs, root, child);
+    let shown = fv_shown(&other.v);
     Note {
-        msg: format!(
-            "{field} is a list in {first} but {} in {shown_second}",
-            ops::message::print(&fv_shown(&other.v))
-        ),
         items: vec![
-            (list.segs.clone(), fv_shown(&list.v), list.at.clone()),
-            (other.segs.clone(), fv_shown(&other.v), other.at.clone()),
+            (
+                list.segs.clone(),
+                fv_shown(&list.v),
+                list.at.clone(),
+                format!("{first} is a list"),
+            ),
+            (
+                other.segs.clone(),
+                shown.clone(),
+                other.at.clone(),
+                format!("{second} is {}", type_word(&shown)),
+            ),
         ],
     }
 }
@@ -2033,6 +2194,10 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
         Read::Entries { entries, broken } => (entries, broken),
         Read::Failed(cause) => {
             let mut level = failed_level(env, anc, cause, true);
+            let reads = from_reads(env, &lowered.source, anc);
+            for row in &mut level.min_subjects {
+                row.inputs.extend(reads.iter().cloned());
+            }
             if let Some(mut said) = from_message(env, empty, lowered, anc, cause) {
                 if let Some((text, _)) = from_base(env, &lowered.source, anc)
                     && !said.split("; ").any(|p| p == text)
@@ -2066,11 +2231,7 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
     let mut min = min_row(env, in_scope.len() as u64, &locations, read);
     let mut explained = false;
     if !every && env.unreadable.is_empty() && read.is_some() && min.cause != Cause::Satisfied {
-        let said: Vec<String> = broken
-            .iter()
-            .filter(|b| !b.msg.is_empty())
-            .map(|b| b.msg.clone())
-            .collect();
+        let said: Vec<String> = clauses_once(broken.iter().filter(|b| !b.msg.is_empty()));
         if !said.is_empty() {
             min.message = Some(ops::message::joined(said));
             explained = true;
@@ -2112,9 +2273,7 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
             let mut sorted: Vec<&Broken> = broken.iter().filter(|b| !b.msg.is_empty()).collect();
             sorted.sort_by(|a, b| (a.rank, &a.order).cmp(&(b.rank, &b.order)));
             if !sorted.is_empty() {
-                min.message = Some(ops::message::joined(
-                    sorted.iter().map(|b| b.msg.clone()).collect(),
-                ));
+                min.message = Some(clauses_once(sorted.into_iter()).join("; "));
             }
         }
     }
