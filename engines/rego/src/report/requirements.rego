@@ -419,6 +419,13 @@ _ms_path_reads(doc, req) := [object.union(object.remove(i, _input_stash_keys), {
 	p != []
 	_key_flaw_entries(p) == []
 	i := _path_input(doc, p)
+} else := [{"name": "$input", "value": doc, "locations": [""], "outcome": _key_list_outcome(c)}] if {
+	not _every_from(req)
+	c := _ms_target_cause(doc, req)
+	_from_path(req) == []
+	not _chained(req)
+	not _keys_step(req)
+	_m_from_root(req) == "$input"
 } else := []
 
 _ms_entries(doc, req) := [_entry("list", _m_from_root(req), row_cause, [{"name": _ms_read_name(req, _from_keys(req)), "value": null, "locations": [_doc_at], "outcome": _key_list_outcome(row_cause)}], [], text)] if {

@@ -508,6 +508,7 @@ sentences / a named by key on the right of every, after a part, a parent, an ali
 sentences / a named by on the right of every that can't be read / names the key that is null, as the plain check does, when m is null too
 sentences / a root name of the wrong type on the left of a compare inside a relative clause / says its problem once, with no item named, as on the right, even on an empty list
 sentences / a second for item whose whose takes its key from the subject / names pr.k alone, and keeps the first item when the name depends on it
+sentences / a sum of whose that or whose reads a named by key against the focus / is written wrong naming the key, and a key from the subject or a count of is fine
 sentences / an any_of of sentences that read a part / reads the part by its alias in each option
 sentences / an elapsed time is not a value within a number / fails as unusable, absent or null like the elapsed time does
 sentences / an elapsed time is not between two numbers / fails as unusable on times of two kinds or on text that isn't a time
@@ -525,6 +526,8 @@ sentences / the path before a named by field that can't be read / decides the ca
 sentences / the path before a named by field that can't be read / reads the field when the null is just before it, so the field decides, and a good one ends the path null, as a plain path through null does
 sentences / the path before a named by field that can't be read, in a count, a sum, a plus, an elapsed time, a some and a for line / ends absent when the path is missing, whatever the field holds
 sentences / the path before a named by field that can't be read, in a count, a sum, a plus, an elapsed time, a some and a for line / ends unusable when the path goes through a string, whatever the field holds
+sentences / the subject named by a key of each item, inside a relative clause / names the item that has no key
+sentences / the subject's name named by a key, inside and outside a relative clause / an approver without k fails as absent, whatever the subject's k
 subject_name / a check that reads plain, on a plain value, a list and a from line that keeps lists / has the location of the subject itself for its name, one for each item for every and count of the subject name, and where each failed item was read
 subject_name / a count of a field named like the subject, written with a dot / a field that isn't a list or an object is said once, as the walk says it
 subject_name / a field after the subject name inside a whose of a check reads the subject / a field or a position after the subject on the right of a whose reads the subject's field

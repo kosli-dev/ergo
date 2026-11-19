@@ -36687,6 +36687,14 @@
                 "locations": [],
                 "name": "in-scope s count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input",
+                "outcome": "unusable",
+                "value": "1.2.0"
               }
             ],
             "message": "$input is \"1.2.0\", which isn't a list or an object",

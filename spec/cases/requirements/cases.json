@@ -211,6 +211,7 @@
             "check": "$min_subjects",
             "description": "The in-scope subject count is at least 1",
             "expression": "count(matching(t)) >= 1",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -2486,6 +2487,7 @@
             "check": "$min_subjects",
             "description": "The in-scope subject count is at least 1",
             "expression": "count(matching(item 1 of $input)) >= 1",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],

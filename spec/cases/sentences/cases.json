@@ -89616,7 +89616,70 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [],
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/0/username"
+                  ],
+                  "name": "approvers[0].username",
+                  "outcome": "usable",
+                  "value": "bob"
+                },
+                {
+                  "locations": [
+                    "/prs/0/approvers/0"
+                  ],
+                  "name": "approvers[0].k",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/0"
+              ],
+              "message": "k is missing",
+              "name": "item 1 of approvers",
+              "value": {
+                "username": "bob"
+              }
+            },
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/approvers/1/username"
+                  ],
+                  "name": "approvers[1].username",
+                  "outcome": "usable",
+                  "value": "ann"
+                },
+                {
+                  "locations": [
+                    "/prs/0/approvers/1"
+                  ],
+                  "name": "approvers[1].k",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/approvers/1"
+              ],
+              "message": "k is missing",
+              "name": "item 2 of approvers",
+              "value": {
+                "username": "ann"
+              }
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -89651,7 +89714,7 @@
           "locations": [
             "$policy:/requirements/inside/checks/c"
           ],
-          "message": "item 1 of approvers: k is missing; item 2 of approvers: k is missing",
+          "message": "",
           "name": "count of approvers whose username equals pr named by k is 1"
         }
       ],
@@ -93197,7 +93260,39 @@
       "failures": [
         {
           "cause": "absent",
-          "failures": [],
+          "failures": [
+            {
+              "cause": "absent",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/xs/1/v"
+                  ],
+                  "name": "xs[1].v",
+                  "outcome": "usable",
+                  "value": 5
+                },
+                {
+                  "locations": [
+                    "/prs/0/xs/1"
+                  ],
+                  "name": "xs[1].k",
+                  "outcome": "absent",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/xs/1"
+              ],
+              "message": "k is missing",
+              "name": "item 2 of xs",
+              "value": {
+                "v": 5
+              }
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -93232,7 +93327,7 @@
           "locations": [
             "$policy:/requirements/r/checks/count"
           ],
-          "message": "item 2 of xs: k is missing",
+          "message": "",
           "name": "count of xs whose v equals pr named by k is 1"
         }
       ],
@@ -99183,7 +99278,31 @@
       "failures": [
         {
           "cause": "not_an_object",
-          "failures": [],
+          "failures": [
+            {
+              "cause": "not_an_object",
+              "failures": [],
+              "inputs": [
+                {
+                  "locations": [
+                    "/prs/0/xs/0/n"
+                  ],
+                  "name": "xs[0].n.k",
+                  "outcome": "not_an_object",
+                  "value": null
+                }
+              ],
+              "kind": "item",
+              "locations": [
+                "/prs/0/xs/0"
+              ],
+              "message": "n is 1, which isn't an object",
+              "name": "item 1 of xs",
+              "value": {
+                "n": 1
+              }
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -99197,7 +99316,7 @@
           "locations": [
             "$policy:/requirements/count/checks/c"
           ],
-          "message": "item 1 of xs: n is 1, which isn't an object",
+          "message": "",
           "name": "count of xs.n that equals $params.m named by k is 1"
         }
       ],

@@ -16,6 +16,7 @@ _walk_row(check, subj) := object.union(r, {"other_roots": _walk_parts(check, sub
 	ms != []
 	_items_judged_alone(subj, check)
 	raw := _walk_read_row(check, subj)
+	not _walk_list_fails(raw)
 	a := _alone_read(check, subj)
 	ps := _walk_parts(check, subj, a, a)
 } else := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": _with_roots(_walk_parts(check, subj, raw, raw), ms)}) if {

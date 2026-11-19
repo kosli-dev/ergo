@@ -540,6 +540,7 @@ _rooted_row(check, subj, r) := object.union(object.remove(a, ["other_roots"]), {
 	check.op != "for"
 	not _walk_keyed(check)
 	_items_judged_alone(subj, check)
+	not _walk_list_fails(r)
 	flaw := _walk_root_flaw(check, subj)
 	flaw != ""
 	ms := _walk_root_msgs(check, subj)
@@ -627,7 +628,18 @@ _whose_alone(subj, side) := object.union(side, {"whose": [_root_stand_in(c) | so
 
 else := side
 
-_root_stand_in(c) := object.union(c, {f: {"literal": _stand_in_value[c.op]}}) if {
+_root_stand_in(c) := object.union(c, {"cmp": "eq", f: c[g]}) if {
+	c.op == "compare"
+	c.cmp in {"eq", "ne", "in", "includes"}
+	some f in _compare_side_list
+	is_array(c[f])
+	_walk_outside(c[f])
+	not _stand_in_keyed(c[f])
+	some g in _compare_side_list
+	g != f
+	is_array(c[g])
+	not _walk_outside(c[g])
+} else := object.union(c, {f: {"literal": _stand_in_value[c.op]}}) if {
 	c.op in {"compare", "compare_time"}
 	c.cmp in {"gt", "gte", "lt", "lte"}
 	some f in _compare_side_list
@@ -637,7 +649,17 @@ _root_stand_in(c) := object.union(c, {f: {"literal": _stand_in_value[c.op]}}) if
 	g != f
 	is_array(c[g])
 	not _walk_outside(c[g])
+} else := {"op": "compare", "cmp": "eq", "left": c.path, "right": c.path} if {
+	c.op == "in"
+	_is_ref(c.values)
+	is_array(c.path)
+	not _walk_outside(c.path)
 } else := c
+
+_stand_in_keyed(p) if {
+	some step in p
+	_key_step(step)
+}
 
 _stand_in_value := {"compare": 0, "compare_time": "1970-01-01T00:00:00Z"}
 

@@ -25886,7 +25886,54 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/1/xs/0"
+                        ],
+                        "name": "xs[0].w",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/1/xs/0"
+                    ],
+                    "message": "w is missing",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/1/xs/1"
+                        ],
+                        "name": "xs[1].w",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/1/xs/1"
+                    ],
+                    "message": "w is missing",
+                    "name": "item 2 of xs",
+                    "value": {
+                      "v": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -25959,7 +26006,7 @@
                 ]
               }
             ],
-            "message": "pr.z is \"s\", which isn't a list",
+            "message": "pr.z is \"s\", which isn't a list; item 1 of xs: w is missing; item 2 of xs: w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {

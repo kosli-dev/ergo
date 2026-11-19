@@ -552,7 +552,14 @@ _m_whose_undecided(subj, side, e, flaws, roots) := [[_m_focus_state(e, c, cause)
 	some i, c in side.whose
 	cause := _tally_focus_cause(c, e, flaws[i])
 	not cause in _tally_decided_causes
+	not _m_undecided_before(side, e, flaws, i)
 ]
+
+_m_undecided_before(side, e, flaws, i) if {
+	some j, c in side.whose
+	j < i
+	not _tally_focus_cause(c, e, flaws[j]) in _tally_decided_causes
+}
 
 _m_focus_state(e, c, cause) := concat("", ["focus ", cause]) if {
 	e.r != []

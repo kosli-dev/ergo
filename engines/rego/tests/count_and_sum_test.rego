@@ -924,11 +924,11 @@ test_a_whose_list_with_a_key_that_cant_be_read_is_read_before_any_item_so_the_ke
 	every check in [
 		"count of rs whose zz is in m named by $input.k is 1",
 		"count of rs whose zz is in $input.m named by $input.k is 1",
-		"count of rs whose zz is in $input.k is 1",
 	] {
 		_whose_null_row(check) == [["null", "$input.k is null"]]
 		_whose_missing_row(check) == [["absent", "$input.k is missing"]]
 	}
+	_whose_missing_row("count of rs whose zz is in $input.k is 1") == [["absent", "$input.k is missing; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
 	_whose_null_row("count of rs whose zz is in m named by $params.k is 1") == [["null", "$params.k is null"]]
 	_whose_missing_row("count of rs whose zz is in m named by $params.k is 1") == [["absent", "$params.k is missing"]]
 }
@@ -953,7 +953,7 @@ test_a_whose_key_that_isnt_text_fails_each_item_as_unusable if {
 		_whose_number_row(check) == [["unusable", "item 1 of rs: $input.k is 3, which isn't text; item 2 of rs: $input.k is 3, which isn't text"]]
 	}
 	_whose_number_row("count of rs whose zz is m named by $params.k is 1") == [["unusable", "item 1 of rs: $params.k is 3, which isn't text; item 2 of rs: $params.k is 3, which isn't text"]]
-	_whose_number_row("count of rs whose zz is in $input.k is 1") == [["unusable", "$input.k is 3, which isn't a list"]]
+	_whose_number_row("count of rs whose zz is in $input.k is 1") == [["unusable", "$input.k is 3, which isn't a list; item 1 of rs: zz is missing; item 2 of rs: zz is missing"]]
 	_whose_number_row("count of rs whose v is m named by $input.k is 1") == [["unusable", "$input.k is 3, which isn't text; item 1 of rs: m is missing; item 2 of rs: m is missing"]]
 }
 

@@ -2092,7 +2092,7 @@ test_a_root_that_isnt_a_list_after_is_in_fails_before_any_item_is_read if {
 
 test_two_list_roots_of_the_wrong_type_are_both_named_on_a_list_with_items if {
 	rows := _root_rows({"c": "count of xs whose v is in $params.l and whose w is in pr.l is 0"}, {"id": "p", "l": 3, "xs": [{"v": 1, "w": 1}, {}]}, {"l": "s"})
-	rows.c == ["unusable", "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list"]
+	rows.c == ["unusable", "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list; item 2 of xs: v is missing"]
 }
 
 test_every_root_that_failed_is_named_whatever_its_cause if {
