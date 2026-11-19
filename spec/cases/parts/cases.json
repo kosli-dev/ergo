@@ -2758,7 +2758,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -3575,7 +3574,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -3598,7 +3596,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -3621,7 +3618,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [

@@ -72,7 +72,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -184,15 +183,23 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "data.deployments",
-                "locations": [
-                  "/data"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/data"
+                    ],
+                    "name": "data.deployments",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "data.deployments",
-                "value": null
+                "kind": "list",
+                "message": "data.deployments is missing",
+                "name": "data.deployments"
               }
             ],
             "inputs": [
@@ -4056,7 +4063,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -4436,7 +4442,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -5481,7 +5486,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -5517,7 +5522,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -5578,7 +5583,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -5614,7 +5619,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -5665,15 +5670,23 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "$input",
-                "locations": [
-                  ""
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "$input",
-                "value": null
+                "kind": "list",
+                "message": "$input is null",
+                "name": "$input"
               }
             ],
             "inputs": [
@@ -5726,15 +5739,23 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "$input",
-                "locations": [
-                  ""
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "$input",
-                "value": null
+                "kind": "list",
+                "message": "$input is null",
+                "name": "$input"
               }
             ],
             "inputs": [
@@ -5799,7 +5820,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -5835,7 +5856,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -5896,7 +5917,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -5935,7 +5956,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -10175,7 +10196,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -10356,7 +10376,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -10379,7 +10398,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -10535,7 +10554,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -10662,7 +10681,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -10686,7 +10704,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -10911,7 +10928,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -11046,7 +11062,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -11069,7 +11084,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -11191,7 +11206,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -11308,7 +11323,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -11514,7 +11528,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -11707,7 +11721,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -11959,7 +11972,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -11984,7 +11996,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -12233,7 +12245,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -12386,7 +12397,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -12408,7 +12419,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -12477,7 +12488,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -12841,7 +12852,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -13014,7 +13024,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -13136,7 +13145,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -13419,17 +13428,25 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "artifacts.pull_requests",
-                "locations": [
-                  "/artifacts/pull_requests"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/artifacts/pull_requests"
+                    ],
+                    "name": "artifacts.pull_requests",
+                    "outcome": "unusable",
+                    "value": {
+                      "url": "pr/7"
+                    }
+                  }
                 ],
-                "path": "artifacts.pull_requests",
-                "value": {
-                  "url": "pr/7"
-                }
+                "kind": "list",
+                "message": "artifacts.pull_requests is {\"url\": \"pr/7\"}, which isn't a list",
+                "name": "artifacts.pull_requests"
               }
             ],
             "inputs": [
@@ -13634,7 +13651,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -13768,7 +13784,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -13860,7 +13875,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -19257,7 +19271,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -24190,7 +24203,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -24314,7 +24326,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -24406,7 +24417,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -24535,7 +24545,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -24575,7 +24585,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -26977,7 +26987,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -27001,7 +27010,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -27142,7 +27151,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -30648,7 +30657,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -30740,7 +30748,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -32713,7 +32720,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -33409,7 +33416,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -33430,7 +33436,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -33799,7 +33804,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -34040,7 +34044,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -34251,17 +34254,25 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "deps",
-                "locations": [
-                  "/deps"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/deps"
+                    ],
+                    "name": "deps",
+                    "outcome": "unusable",
+                    "value": {
+                      "id": 1
+                    }
+                  }
                 ],
-                "path": "deps",
-                "value": {
-                  "id": 1
-                }
+                "kind": "list",
+                "message": "deps is {\"id\": 1}, which isn't a list",
+                "name": "deps"
               }
             ],
             "inputs": [
@@ -34408,15 +34419,23 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "deps",
-                "locations": [
-                  "/deps"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/deps"
+                    ],
+                    "name": "deps",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
                 ],
-                "path": "deps",
-                "value": 3
+                "kind": "list",
+                "message": "deps is 3, which isn't a list or an object",
+                "name": "deps"
               }
             ],
             "inputs": [
@@ -34585,15 +34604,23 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "deps",
-                "locations": [
-                  "/deps"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/deps"
+                    ],
+                    "name": "deps",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "deps",
-                "value": null
+                "kind": "list",
+                "message": "deps is null",
+                "name": "deps"
               }
             ],
             "inputs": [
@@ -35082,7 +35109,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -35188,24 +35214,50 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "builds[1].version",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/1"
+                    ],
+                    "name": "builds[1].version",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/builds/1"
                 ],
-                "path": "builds[1].version",
-                "value": null
+                "message": "version is missing",
+                "name": "item 2 of builds",
+                "value": {}
               },
               {
                 "cause": "null",
-                "item": "builds[2].version",
-                "locations": [
-                  "/builds/2/version"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/2/version"
+                    ],
+                    "name": "builds[2].version",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "builds[2].version",
-                "value": null
+                "kind": "item",
+                "locations": [
+                  "/builds/2"
+                ],
+                "message": "version is null",
+                "name": "item 3 of builds",
+                "value": {
+                  "version": null
+                }
               }
             ],
             "inputs": [
@@ -35737,7 +35789,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -35985,7 +36036,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -36009,7 +36059,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -36272,15 +36321,23 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "monitors",
-                "locations": [
-                  "/deployments/0"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/deployments/0"
+                    ],
+                    "name": "monitors",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "monitors",
-                "value": null
+                "kind": "list",
+                "message": "monitors is missing",
+                "name": "monitors"
               }
             ],
             "inputs": [
@@ -36304,15 +36361,23 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "monitors",
-                "locations": [
-                  "/deployments/1/monitors"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/deployments/1/monitors"
+                    ],
+                    "name": "monitors",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "monitors",
-                "value": null
+                "kind": "list",
+                "message": "monitors is null",
+                "name": "monitors"
               }
             ],
             "inputs": [
@@ -36336,15 +36401,23 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "monitors",
-                "locations": [
-                  "/deployments/2/monitors"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/deployments/2/monitors"
+                    ],
+                    "name": "monitors",
+                    "outcome": "unusable",
+                    "value": "x"
+                  }
                 ],
-                "path": "monitors",
-                "value": "x"
+                "kind": "list",
+                "message": "monitors is \"x\", which isn't a list or an object",
+                "name": "monitors"
               }
             ],
             "inputs": [
@@ -36368,17 +36441,25 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "monitors",
-                "locations": [
-                  "/deployments/3/monitors"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/deployments/3/monitors"
+                    ],
+                    "name": "monitors",
+                    "outcome": "unusable",
+                    "value": {
+                      "id": "m4"
+                    }
+                  }
                 ],
-                "path": "monitors",
-                "value": {
-                  "id": "m4"
-                }
+                "kind": "list",
+                "message": "monitors is {\"id\": \"m4\"}, which isn't a list",
+                "name": "monitors"
               }
             ],
             "inputs": [
@@ -36768,7 +36849,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -37196,7 +37277,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -37217,14 +37297,26 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "not_an_object",
-                "item": "item 1 of batches",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/batches/0"
+                    ],
+                    "name": "batches[0].owner",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/batches/0"
                 ],
-                "path": "item 1 of batches",
+                "message": "item 1 of batches is [{\"owner\": {\"name\": \"ann\"}}, {\"owner\": {\"name\": \"bob\"}}], which isn't an object",
+                "name": "item 1 of batches",
                 "value": [
                   {
                     "owner": {
@@ -37240,11 +37332,23 @@
               },
               {
                 "cause": "not_an_object",
-                "item": "item 2 of batches",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/batches/1"
+                    ],
+                    "name": "batches[1].owner",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/batches/1"
                 ],
-                "path": "item 2 of batches",
+                "message": "item 2 of batches is [{\"owner\": {\"name\": \"cy\"}}], which isn't an object",
+                "name": "item 2 of batches",
                 "value": [
                   {
                     "owner": {
@@ -37272,7 +37376,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -37307,7 +37410,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -37947,7 +38049,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -39097,32 +39198,68 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0"
+                    ],
+                    "name": "xs[0].n",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is \"a\", which isn't an object",
+                "name": "item 1 of xs",
                 "value": "a"
               },
               {
                 "cause": "unusable",
-                "item": "item 2 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/1"
+                    ],
+                    "name": "xs[1].n",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/1"
                 ],
-                "path": "item 2 of xs",
+                "message": "item 2 of xs is 5, which isn't an object",
+                "name": "item 2 of xs",
                 "value": 5
               },
               {
                 "cause": "unusable",
-                "item": "item 3 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/2"
+                    ],
+                    "name": "xs[2].n",
+                    "outcome": "not_an_object",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/2"
                 ],
-                "path": "item 3 of xs",
+                "message": "item 3 of xs is true, which isn't an object",
+                "name": "item 3 of xs",
                 "value": true
               }
             ],
@@ -39146,24 +39283,52 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "builds[0].version.x",
-                "locations": [
-                  "/builds/0/version"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/0/version"
+                    ],
+                    "name": "builds[0].version.x",
+                    "outcome": "unusable",
+                    "value": null
+                  }
                 ],
-                "path": "builds[0].version.x",
-                "value": null
+                "kind": "item",
+                "locations": [
+                  "/builds/0"
+                ],
+                "message": "version is \"1.0\", which isn't an object",
+                "name": "item 1 of builds",
+                "value": {
+                  "version": "1.0"
+                }
               },
               {
                 "cause": "unusable",
-                "item": "builds[1].version.x",
-                "locations": [
-                  "/builds/1/version"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/1/version"
+                    ],
+                    "name": "builds[1].version.x",
+                    "outcome": "unusable",
+                    "value": null
+                  }
                 ],
-                "path": "builds[1].version.x",
-                "value": null
+                "kind": "item",
+                "locations": [
+                  "/builds/1"
+                ],
+                "message": "version is \"1.1\", which isn't an object",
+                "name": "item 2 of builds",
+                "value": {
+                  "version": "1.1"
+                }
               }
             ],
             "inputs": [
@@ -39225,14 +39390,26 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "xs[0].n",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0"
+                    ],
+                    "name": "xs[0].n",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0"
                 ],
-                "path": "xs[0].n",
+                "message": "n is missing",
+                "name": "item 1 of xs",
                 "value": null
               }
             ],
@@ -39256,24 +39433,50 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "builds[0].version.x",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/0"
+                    ],
+                    "name": "builds[0].version.x",
+                    "outcome": "absent",
+                    "value": null
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/builds/0"
                 ],
-                "path": "builds[0].version.x",
-                "value": null
+                "message": "version.x is missing",
+                "name": "item 1 of builds",
+                "value": {}
               },
               {
                 "cause": "absent",
-                "item": "builds[1].version.x",
-                "locations": [
-                  "/builds/1/version"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/builds/1/version"
+                    ],
+                    "name": "builds[1].version.x",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "builds[1].version.x",
-                "value": null
+                "kind": "item",
+                "locations": [
+                  "/builds/1"
+                ],
+                "message": "version.x is missing",
+                "name": "item 2 of builds",
+                "value": {
+                  "version": null
+                }
               }
             ],
             "inputs": [
@@ -39610,7 +39813,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -39639,7 +39841,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -39661,7 +39863,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -39829,7 +40030,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -39858,17 +40058,25 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "owner",
-                "locations": [
-                  "/batches/1/owner"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/batches/1/owner"
+                    ],
+                    "name": "owner",
+                    "outcome": "unusable",
+                    "value": {
+                      "name": "bob"
+                    }
+                  }
                 ],
-                "path": "owner",
-                "value": {
-                  "name": "bob"
-                }
+                "kind": "list",
+                "message": "owner is {\"name\": \"bob\"}, which isn't a list",
+                "name": "owner"
               }
             ],
             "inputs": [

@@ -22501,7 +22501,54 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rs/0"
+                        ],
+                        "name": "rs[0].zz",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/0"
+                    ],
+                    "message": "zz is missing",
+                    "name": "item 1 of rs",
+                    "value": {
+                      "v": "a"
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/rs/1"
+                        ],
+                        "name": "rs[1].zz",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/rs/1"
+                    ],
+                    "message": "zz is missing",
+                    "name": "item 2 of rs",
+                    "value": {
+                      "v": 4
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -22570,7 +22617,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is missing",
+            "message": "$input.k is missing; item 1 of rs: zz is missing; item 2 of rs: zz is missing",
             "passed": false,
             "requirement": "s",
             "subject": {

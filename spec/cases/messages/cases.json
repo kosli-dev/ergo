@@ -15822,7 +15822,29 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1"
+                        ],
+                        "name": "xs[1].aa",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "aa is missing",
+                    "name": "item 2 of xs",
+                    "value": {}
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -15837,6 +15859,14 @@
                       "/prs/0"
                     ],
                     "name": "pr.z",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.q",
                     "outcome": "absent",
                     "value": null
                   }
@@ -15882,7 +15912,7 @@
                 "value": null
               }
             ],
-            "message": "$params.q is missing; pr.z is missing",
+            "message": "$params.q is missing; pr.z is missing; item 2 of xs: aa is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15896,13 +15926,43 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1"
+                        ],
+                        "name": "xs[1].aa",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "aa is missing",
+                    "name": "item 2 of xs",
+                    "value": {}
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
                       "/prs/0"
                     ],
                     "name": "pr.z",
+                    "outcome": "absent",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.q",
                     "outcome": "absent",
                     "value": null
                   }
@@ -15940,7 +16000,7 @@
                 ]
               }
             ],
-            "message": "$params.q is missing; pr.z is missing",
+            "message": "$params.q is missing; pr.z is missing; item 2 of xs: aa is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -17867,7 +17927,29 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 2 of xs",
+                    "value": {}
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -17884,6 +17966,14 @@
                     "name": "pr.l",
                     "outcome": "unusable",
                     "value": 3
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "unusable",
+                    "value": "s"
                   }
                 ],
                 "kind": "assertion",
@@ -17927,7 +18017,7 @@
                 "value": 3
               }
             ],
-            "message": "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list",
+            "message": "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list; item 2 of xs: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -17941,7 +18031,29 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1"
+                        ],
+                        "name": "xs[1].w",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "w is missing",
+                    "name": "item 2 of xs",
+                    "value": {}
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -17993,7 +18105,7 @@
                 ]
               }
             ],
-            "message": "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list",
+            "message": "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list; item 2 of xs: w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18090,7 +18202,29 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1"
+                        ],
+                        "name": "xs[1].v",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/1"
+                    ],
+                    "message": "v is missing",
+                    "name": "item 2 of xs",
+                    "value": {}
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -18142,7 +18276,7 @@
                 ]
               }
             ],
-            "message": "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list",
+            "message": "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list; item 2 of xs: v is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18672,7 +18806,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "xs[0].w",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "w is missing",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -18688,6 +18846,14 @@
                     "name": "pr.l",
                     "outcome": "unusable",
                     "value": "s"
+                  },
+                  {
+                    "locations": [
+                      "$params:/l"
+                    ],
+                    "name": "$params.l",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
@@ -18727,7 +18893,7 @@
                 "value": "s"
               }
             ],
-            "message": "pr.l is \"s\", which isn't a list; $params.l is null",
+            "message": "pr.l is \"s\", which isn't a list; $params.l is null; item 1 of xs: w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18741,7 +18907,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "xs[0].w",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "w is missing",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -18790,7 +18980,7 @@
                 ]
               }
             ],
-            "message": "pr.l is \"s\", which isn't a list; $params.l is null",
+            "message": "pr.l is \"s\", which isn't a list; $params.l is null; item 1 of xs: w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18875,7 +19065,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "xs[0].w",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/xs/0"
+                    ],
+                    "message": "w is missing",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -18924,7 +19138,7 @@
                 ]
               }
             ],
-            "message": "pr.l is \"s\", which isn't a list; $params.l is null",
+            "message": "pr.l is \"s\", which isn't a list; $params.l is null; item 1 of xs: w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20286,15 +20500,30 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "prs[0].c.z",
-                "locations": [
-                  "/prs/0/c"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/prs/0/c"
+                    ],
+                    "name": "prs[0].c.z",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "prs[0].c.z",
-                "value": null
+                "kind": "item",
+                "locations": [
+                  "/prs/0"
+                ],
+                "message": "c.z is missing",
+                "name": "item 1 of prs",
+                "value": {
+                  "c": null,
+                  "id": "p0"
+                }
               }
             ],
             "inputs": [

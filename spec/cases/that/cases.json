@@ -2069,15 +2069,23 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "ws",
-                "locations": [
-                  ""
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "ws",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "ws",
-                "value": null
+                "kind": "list",
+                "message": "ws is missing",
+                "name": "ws"
               }
             ],
             "inputs": [
@@ -2105,15 +2113,23 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "ws",
-                "locations": [
-                  "/ws"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ws"
+                    ],
+                    "name": "ws",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "ws",
-                "value": null
+                "kind": "list",
+                "message": "ws is null",
+                "name": "ws"
               }
             ],
             "inputs": [

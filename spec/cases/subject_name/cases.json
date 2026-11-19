@@ -5763,7 +5763,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -13324,7 +13323,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -13447,7 +13446,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [

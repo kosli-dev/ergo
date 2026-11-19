@@ -11,7 +11,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -167,7 +166,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -232,7 +230,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -327,7 +324,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -353,15 +350,23 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "sbom.components",
-                "locations": [
-                  "/sbom"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/sbom"
+                    ],
+                    "name": "sbom.components",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "sbom.components",
-                "value": null
+                "kind": "list",
+                "message": "sbom.components is missing",
+                "name": "sbom.components"
               }
             ],
             "inputs": [
@@ -389,15 +394,23 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "sbom.components",
-                "locations": [
-                  "/sbom/components"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/sbom/components"
+                    ],
+                    "name": "sbom.components",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "sbom.components",
-                "value": null
+                "kind": "list",
+                "message": "sbom.components is null",
+                "name": "sbom.components"
               }
             ],
             "inputs": [
@@ -425,15 +438,23 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "sbom.components",
-                "locations": [
-                  "/sbom/components"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/sbom/components"
+                    ],
+                    "name": "sbom.components",
+                    "outcome": "unusable",
+                    "value": "click"
+                  }
                 ],
-                "path": "sbom.components",
-                "value": "click"
+                "kind": "list",
+                "message": "sbom.components is \"click\", which isn't a list or an object",
+                "name": "sbom.components"
               }
             ],
             "inputs": [
@@ -461,7 +482,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -555,7 +575,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -642,7 +661,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -905,7 +923,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -1054,7 +1071,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
