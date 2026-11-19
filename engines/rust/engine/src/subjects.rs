@@ -2223,10 +2223,15 @@ fn walked_roots_run(check: &Check, ctx: &Ctx) -> ops::Ran {
         }
         if again.message.is_none() {
             again.message = Some(match check {
-                Check::Tally(tally) => ops::tally::with_walked_roots(
+                Check::Tally(tally) => ops::tally::with_all_items(
                     tally,
                     ctx,
-                    ops::message::message(check, ctx, &again.verdict),
+                    again.verdict.cause,
+                    ops::tally::with_walked_roots(
+                        tally,
+                        ctx,
+                        ops::message::message(check, ctx, &again.verdict),
+                    ),
                 ),
                 _ => ops::message::message(check, ctx, &again.verdict),
             });
@@ -2237,9 +2242,12 @@ fn walked_roots_run(check: &Check, ctx: &Ctx) -> ops::Ran {
 
 fn default_message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
     match check {
-        Check::Tally(tally) => {
-            ops::tally::with_walked_roots(tally, ctx, ops::message::message(check, ctx, verdict))
-        }
+        Check::Tally(tally) => ops::tally::with_all_items(
+            tally,
+            ctx,
+            verdict.cause,
+            ops::tally::with_walked_roots(tally, ctx, ops::message::message(check, ctx, verdict)),
+        ),
         _ => ops::message::message(check, ctx, verdict),
     }
 }
@@ -2422,6 +2430,7 @@ fn walk_part(
         let lists: Vec<String> = failed
             .iter()
             .map(|f| parts::list_base(f.get("item").and_then(Value::as_str).unwrap_or("")))
+            .chain(ops::walk::first_list_name(walk, ctx))
             .collect();
         let failures = walk_base(walk, ctx, &mut said);
         return Part {
@@ -2452,6 +2461,7 @@ fn walk_part(
     let lists: Vec<String> = failed
         .iter()
         .map(|f| parts::list_base(f.get("item").and_then(Value::as_str).unwrap_or("")))
+        .chain(ops::walk::first_list_name(walk, ctx))
         .collect();
     let mut said: Vec<String> = Vec::new();
     for piece in message.split("; ") {
@@ -2479,6 +2489,61 @@ fn walk_part(
             .chain(keys)
             .collect(),
         failures,
+        message: said.join("; "),
+    }
+}
+
+fn tally_part(
+    name: &str,
+    cause: Cause,
+    inputs: &[Value],
+    message: &str,
+    tally: &ops::tally::Tally,
+    ctx: &Ctx,
+) -> Part {
+    let check = Check::Tally(tally.clone());
+    let lists = tally.counted_lists(ctx, cause);
+    let names: Vec<&str> = lists.iter().map(|(name, _)| name.as_str()).collect();
+    let mut own: Vec<Value> = inputs
+        .iter()
+        .filter(|i| {
+            !i.get("name")
+                .and_then(Value::as_str)
+                .is_some_and(|n| names.contains(&n))
+        })
+        .cloned()
+        .collect();
+    let extra = ops::key_base::entry_inputs(&check, ctx, cause, &own);
+    own.extend(extra);
+    if matches!(cause, Cause::Absent | Cause::Null)
+        && inputs.iter().any(|i| {
+            i.get("name")
+                .and_then(Value::as_str)
+                .is_some_and(|n| n.starts_with("count of ") || n.starts_with("sum of "))
+        })
+    {
+        let more = key_ref_entries(&tally.counted_paths(), ctx, &own);
+        own.extend(more);
+    }
+    let failed: Vec<Value> = lists.into_iter().flat_map(|(_, rich)| rich).collect();
+    let walked = parts::walk_entries(&failed);
+    let mut said: Vec<String> = Vec::new();
+    for piece in message.split("; ") {
+        if !piece.is_empty()
+            && !walked.texts.iter().any(|t| t == piece)
+            && ops::message::cap_note(piece).is_none()
+        {
+            ops::push_new(&mut said, piece.to_string());
+        }
+    }
+    for root in &walked.roots {
+        ops::push_new(&mut said, root.clone());
+    }
+    Part {
+        name: name.to_string(),
+        cause,
+        inputs: own,
+        failures: parts::nest(walked.entries, ctx.input),
         message: said.join("; "),
     }
 }
@@ -2736,6 +2801,10 @@ fn with_failures(
                     ctx,
                 ))
             }
+            Some(Check::Tally(tally)) if tally.counts() => Some(vec![Failure::Assertion {
+                part: tally_part(expression, row.cause, &row.inputs, &message, tally, ctx),
+                locations: at(None, 1),
+            }]),
             Some(check) => Some(vec![Failure::Assertion {
                 part: Part {
                     name: expression.to_string(),

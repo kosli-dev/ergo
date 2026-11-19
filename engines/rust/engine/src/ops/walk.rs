@@ -637,13 +637,23 @@ pub struct Run {
     pub parts: Vec<String>,
 }
 
+/// The name of the first list a walk reads, as its inputs name it, like `xs`
+/// for `every xs.ys.n is 1`.
+pub fn first_list_name(walk: &Walk, ctx: &Ctx) -> Option<String> {
+    let walked = self::walk(&walk.path, &outer(ctx), Options::default());
+    walked
+        .name
+        .split_once("[]")
+        .map(|(base, _)| base.to_string())
+}
+
 fn outer<'a>(ctx: &Ctx<'a>) -> Ctx<'a> {
     let mut outer = ctx.clone();
     outer.aliases.insert(OUTER.to_string(), ctx.subject.clone());
     outer
 }
 
-fn reads_outside(path: &Path) -> bool {
+pub(super) fn reads_outside(path: &Path) -> bool {
     matches!(path.start, Start::Alias(_) | Start::Part(_) | Start::Input)
 }
 
@@ -875,7 +885,7 @@ fn side_read<'a>(
     first.map(|(path, read)| (path, read, true))
 }
 
-fn named_side<'a>(check: &'a Check, ctx: &Ctx<'a>) -> Option<(&'a Path, path::Read<'a>)> {
+pub(super) fn named_side<'a>(check: &'a Check, ctx: &Ctx<'a>) -> Option<(&'a Path, path::Read<'a>)> {
     let sides = check.sides();
     let mut sides = sides.iter().map(|paths| side_read(paths, ctx));
     let left = sides.next().flatten();
@@ -1085,6 +1095,19 @@ pub(super) fn focus_segs<'s>(item: &'s WalkItem, check: &Check) -> &'s [Seg] {
 
 fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
     let mut at = ctx.clone();
+    let whose: Vec<&Check> = walk.whose.iter().collect();
+    let rooted = message::root_flaw(&whose, ctx).is_some();
+    let alones: Vec<Option<Check>> = walk
+        .whose
+        .iter()
+        .map(|check| {
+            if rooted {
+                super::tally::without_roots(check)
+            } else {
+                None
+            }
+        })
+        .collect();
     walked
         .items
         .iter()
@@ -1096,6 +1119,8 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
             let verdicts: Vec<(&Check, Verdict, bool)> = walk
                 .whose
                 .iter()
+                .zip(&alones)
+                .map(|(check, alone)| alone.as_ref().unwrap_or(check))
                 .map(|check| {
                     if focus_lost(item, check) {
                         (check, lost_verdict(item, &at), true)
@@ -1607,6 +1632,18 @@ fn rooted_row(walk: &Walk, ctx: &Ctx, outer_ctx: &Ctx, mut row: Run) -> Run {
                 row.message = Some(message::joined(parts.clone()));
                 row.parts = parts;
             }
+            return row;
+        }
+        if row.verdict.cause == cause
+            && cause.is_failure()
+            && ctx.label.is_some()
+            && !in_a_for_line(ctx)
+            && !row.parts.is_empty()
+            && row.parts.iter().any(|part| part.starts_with("item "))
+        {
+            let parts = message::with_roots(std::mem::take(&mut row.parts), &text);
+            row.message = Some(message::joined(parts.clone()));
+            row.parts = parts;
             return row;
         }
         let UpFront {
