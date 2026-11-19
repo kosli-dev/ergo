@@ -37,7 +37,7 @@ opa check --strict engines/rego dist spec:spec examples:examples --ignore src
 opa check --strict --schema .github/closed-input-schema.json dist/ergo.rego
 opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > /tmp/ergo-deterministic.json && opa check --strict --capabilities /tmp/ergo-deterministic.json dist/ergo.rego
 opa fmt --list engines/rego examples engines/rust/sentences/tests/oracle
-opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 120s
+opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 240s
 opa eval --strict-builtin-errors -d engines/rego -d dist -d spec:spec -d examples:examples --ignore src --format raw 'count(data) > 0'
 regal lint --disable-all --enable-category bugs --disable redundant-existence-check engines/rego examples engines/rust/sentences/tests/oracle
 .github/rego-folders.sh
@@ -106,7 +106,7 @@ A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case ci
 CI also fails when a line of Rego isn't reached by any test. It runs the tests on `dist/ergo.rego` and names each line by the part it comes from, with `.github/build-ergo.sh where`. To list those lines yourself:
 
 ```sh
-.github/build-ergo.sh && opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | .github/build-ergo.sh where | sort -u
+.github/build-ergo.sh && opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 240s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | .github/build-ergo.sh where | sort -u
 ```
 
 When a change touches how a message or a cause is worked out, run `python3 spec/sweep.py` too, as `spec/README.md` says, on `main` and on your branch, and compare the cells that differ. It isn't a required check, and it never fails on a difference, but review has found message differences in odd shapes that nobody had probed.

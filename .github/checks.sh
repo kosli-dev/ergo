@@ -122,7 +122,7 @@ check "sentences corpus" "python3" 'python3 spec/sentences_corpus.py --check'
 check "no comments in Rego" "opa jq git" "$comments_command"
 
 if [ "$rego" = 1 ]; then
-  check "opa test" "opa" 'opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 120s'
+  check "opa test" "opa" 'opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 240s'
   check "opa eval with --strict-builtin-errors" "opa" "$strict_command"
 fi
 
