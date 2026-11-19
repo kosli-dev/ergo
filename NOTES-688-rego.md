@@ -43,6 +43,8 @@ Branch `row-parts-688-rego2`, on top of `row-parts-688-rego`. Not finished: a fr
 
 Spec cases failing in the Rego engine at the end: 121 (messages 38, sentences 16, for 15, derived 14, list_items 12, walks 10, subject_name 5, list_starts 4, distinct 4, subjects 1, row_parts 1, in 1); 69 of them are in `known-failures.txt`.
 
+Checks run by the fourth builder: full `opa test` (unit: `test_a_count_of_a_position_in_params_that_are_an_empty_list_names_the_params` still fails, a known Rego gap; 2 errors are timeouts under the full run that pass alone; the spec tests fail on the cases above), strict `opa eval` `true`, the three `opa check`, `opa fmt`, `regal lint`, `rego-layers.py`, `rego-folders.sh`, `no-inline-tests.sh`, `spec-placeholder.sh`, `check_rules.py`, `sentences_corpus.py --check`, `spec-schemas.py` (3580 cases, 0 problems), `check_grammar.py` (0 disagreements), no comments in Rego: all pass. Coverage: not done, the `--coverage` run stopped with `context deadline exceeded`. Wasm budgets (budget part of `wasm-js.cjs` only): 28.6 (29), 19.6 (20), 44.4 (45), 113.2 (118), 52.2 (52) MB: the fifth is over by 0.2 MB, up from 51.4. Not run: Rust tests and `spec/sweep.py` (no `ergo-rust` image).
+
 What is left, by rule (the biggest first):
 - A root on the right of the phrase (`every es.v is in $params.z`) that is missing or `null` is hidden when the walked list can't be read (messages, 6 cases, D4). `_rooted_row` isn't the path these take; a branch there broke three other cases, so it was taken out.
 - A part that is a list read in a `whose` (`pl.z`, an item of `pl` not an object) doesn't raise the row to `unusable` and its input stays `usable` (messages, 3 cases, D4).
