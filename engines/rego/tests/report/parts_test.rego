@@ -46,3 +46,7 @@ test_a_counted_field_named_by_a_key_the_subject_lacks_is_found_by_the_whole_path
 test_a_from_without_a_path_gives_no_key_reads if {
 	ergo._ms_key_reads({}) == []
 }
+
+test_a_list_named_in_a_message_but_found_in_no_path_keeps_the_input_it_was_read_from if {
+	ergo._tally_list_read("xs", "absent", {}, [{"name": "xs", "value": 1}, {"name": "ys", "value": 2}], []) == [{"name": "xs", "value": 1, "outcome": "absent"}]
+}
