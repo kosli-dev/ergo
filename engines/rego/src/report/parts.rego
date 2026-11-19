@@ -142,7 +142,7 @@ _for_assertion_base(row, at, where, t, i, a) := _policy_entry(
 	_once(array.concat(
 		array.concat(
 			[x | some [_, _, l] in lines; some x in _with_outcomes(object.get(l, "inputs", [])); not _alias_named(x.name, aliases); not _sentence_walked_read(x, where.check.checks[i])],
-			[x | some l in t.free; l.assertion == a; some x in _with_outcomes(_anchored_inputs(l.inputs, at))],
+			[_with_row_part(x, row.inputs) | some l in t.free; l.assertion == a; some x in _with_outcomes(_anchored_inputs(l.inputs, at))],
 		),
 		[x | lines == []; not a in {l.assertion | some l in t.free}; some x in _with_outcomes(row.inputs); _for_sentence_read(x.name, where.check.checks[i]); not _alias_named(x.name, aliases)],
 	)),
@@ -613,7 +613,7 @@ _tallied_entry(e, c, o, at, where, row) := object.union(e, {"inputs": x.inputs, 
 	items := _tally_item_parts(mc, subj, o.cause, at, e.message)
 	texts := _tally_item_texts(mc, subj, o.cause, e.message)
 	count(names) + count(items) > 0
-} else := object.union(e, {"inputs": [i | some i in e.inputs; not _item_input(i, lists)]}) if {
+} else := object.union(e, {"inputs": [i | some i in e.inputs; not _item_input(i, lists); not _tally_own_read(i, c, set(), [])]}) if {
 	not _walks(c)
 	lists := _tally_list_names(c)
 	count(lists) > 0
@@ -680,8 +680,12 @@ _walk_flaw_lists(row, at, check, entries) := [_entry("list", n, cause, [object.u
 ] if {
 	entries == []
 	is_array(check.path)
-	subj := row["ergo/subj"]
+	subj := _flaw_list_subject(row, check.path)
 } else := []
+
+_flaw_list_subject(row, path) := row["ergo/subj"] if _ = path
+
+else := null if path[0] in {"$$input", "$$params"}
 
 _walk_clause_cause(c) := "value" if {
 	not endswith(c, " is missing")
@@ -1326,3 +1330,9 @@ _tally_level_text(text, names) := _entry_text(rest, names[count(names) - 1]) if 
 _item_input_name(p) := _with_dot(_steps_name(p), _dot_kept(p)) if _has_parents
 
 else := _steps_name(p)
+
+_with_row_part(x, ins) := object.union(x, {"part": ps[0]}) if {
+	not x.part
+	ps := [i.part | some i in ins; i.name == x.name; i.part]
+	count(ps) > 0
+} else := x
