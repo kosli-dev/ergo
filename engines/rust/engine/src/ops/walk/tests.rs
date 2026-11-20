@@ -1142,6 +1142,35 @@ fn an_item_says_its_own_patterns_beside_a_root_on_the_left_of_matches_it_cant_re
 }
 
 #[test]
+fn an_item_walks_its_own_list_reached_through_a_list_beside_a_root_on_the_left_it_cant_read() {
+    for sentence in [
+        "every items whose $params.r is in v.w exists",
+        "every items whose $params.r is not in v.w exists",
+        "every items whose $params.r contains all of v.w exists",
+        "every items whose $params.r matches v.w exists",
+    ] {
+        for params in [json!({}), json!({"r": null})] {
+            assert_eq!(
+                own_said(
+                    sentence,
+                    json!([{"v": ["a", "b"]}, {"v": [{"w": "a"}]}]),
+                    params.clone(),
+                    json!({}),
+                ),
+                [
+                    Some((
+                        Cause::Unusable,
+                        "item 1 of items: item 1 of v is \"a\", which isn't an object; item 2 of v is \"b\", which isn't an object".to_string()
+                    )),
+                    None,
+                ],
+                "{sentence} {params}"
+            );
+        }
+    }
+}
+
+#[test]
 fn an_item_says_the_value_before_its_own_list_beside_a_root_on_the_left_it_cant_read() {
     for sentence in [
         "every items whose $params.l contains all of v.w exists",
