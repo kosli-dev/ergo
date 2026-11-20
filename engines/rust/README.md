@@ -18,6 +18,8 @@ It has five crates. The first three, `ergo-policy-sentences`, `ergo-policy-engin
 
 `known-failures.txt` lists the cases the engine fails, one per line, named like in [`spec_test.rego`](../rego/tests/spec_test.rego): the folder, the group's description and the case's description, joined by ` / `. The test fails when a case fails that isn't listed, and when a listed case passes, so the list only shrinks. When a case starts passing, the test names it, and you delete its line.
 
+Most failing cases can't show whether a change moved a report, so the test can also write every report it builds: with `ERGO_DUMP` set to a folder, `cargo test -p ergo-policy-engine --test cases` writes the report of case `n` of a topic to `<folder>/<topic>/<n>.json`. Run it once before a change and once after, into two folders, and `.github/dump-diff.sh <before> <after>` prints each file that differs. A change that should keep every report prints nothing.
+
 ## Running the checks
 
 You don't need Rust installed, only Docker. From the root of the repo, build the image once:
