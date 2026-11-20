@@ -245,6 +245,42 @@ fn root_clauses_say_a_list_from_the_subject_a_count_in_the_item_cant_walk() {
 }
 
 #[test]
+fn root_clauses_say_a_key_from_the_subject_alone_when_the_value_before_it_is_missing() {
+    let tree = ergo_policy_sentences::parse_check(
+        "every xs whose v equals $params.m named by pr.k exists",
+    )
+    .unwrap();
+    let scope = crate::lower::Scope::new().with_subject("pr");
+    let super::Check::Walk(walk) =
+        crate::lower::lower_assertion(&tree.assertions[0], &scope).unwrap()
+    else {
+        panic!("not a walk");
+    };
+    let subject = json!({"id": "t", "xs": [{"v": 1}]});
+    let input = json!({});
+    let params = json!({});
+    let located = crate::path::Located {
+        value: &subject,
+        location: crate::path::Location::input_root().key("s"),
+    };
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: located.clone(),
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::from([(crate::path::OUTER.to_string(), located)]),
+    };
+    let whose: Vec<&super::Check> = walk.whose.iter().collect();
+    let text: Vec<String> = super::root_clauses(&whose, &ctx)
+        .into_iter()
+        .map(|clause| clause.text)
+        .collect();
+    assert_eq!(text, ["pr.k is missing"]);
+}
+
+#[test]
 fn a_clause_an_earlier_sentence_gave_is_left_out_and_the_rest_is_kept() {
     let mut said: Vec<String> = Vec::new();
     assert_eq!(
