@@ -527,6 +527,15 @@ impl Walk {
                 Ignoring::CaseAndSurroundingSpaces.words()
             ));
         }
+        if let Phrase::OneOf {
+            not,
+            list: List::Path(_),
+        } = phrase
+        {
+            let op = if *not { "is not in" } else { "is in" };
+            self.out.insert(format!("\"{op}\" can't take {words} yet"));
+            return;
+        }
         if !takes_ignoring(phrase) {
             let op = match phrase {
                 Phrase::Is {
