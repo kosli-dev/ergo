@@ -643,7 +643,7 @@ _min_subjects_cause(doc, req, _) := _from_cause(doc, req) if {
 	_from_unreadable(req)
 }
 
-_unique_ids_row(doc, raw, refs, req, req_name) := _with_id_faults(_unique_ids_base(raw, refs, req, req_name), _id_fault_places(raw, refs, req), doc, req)
+_unique_ids_row(doc, raw, refs, req, req_name) := _with_id_faults(_unique_ids_base(raw, refs, req, req_name), _id_fault_places(doc, raw, refs, req), doc, req)
 
 _unique_ids_base(raw, refs, req, req_name) := {
 	"requirement": req_name,
@@ -694,18 +694,18 @@ else := array.concat(_id_keys(req), [entry.i]) if "i" in object.keys(entry)
 
 else := _id_keys(req)
 
-_id_fault_places(raw, refs, req) := [p |
+_id_fault_places(doc, raw, refs, req) := [p |
 	some i, entry in raw
 	refs[i].id == null
 	not "key" in object.keys(entry)
-	p := _id_fault_place(entry, req)
+	p := _id_fault_place(entry, req, doc)
 ]
 
 default _id_listed(_) := false
 
 _id_listed(c) if is_number(c[count(c) - 1])
 
-_id_fault_place(entry, req) := {"c": c, "at": at, "cause": cause, "value": null, "text": text, "note": false, "plain": false, "listed": listed, "item_at": entry.at, "ats": object.get(entry, "ats", [entry.at])} if {
+_id_fault_place(entry, req, _) := {"c": c, "at": at, "cause": cause, "value": null, "text": text, "note": false, "plain": false, "listed": listed, "item_at": entry.at, "ats": object.get(entry, "ats", [entry.at])} if {
 	is_object(entry.subject)
 	id := _id_of(req)
 	c := array.concat(_entry_c(entry, req), _plain_keys(id))
@@ -716,7 +716,7 @@ _id_fault_place(entry, req) := {"c": c, "at": at, "cause": cause, "value": null,
 	text := _id_said(req, _entry_c(entry, req), said)
 }
 
-_id_fault_place(entry, req) := {"c": _entry_c(entry, req), "at": entry.at, "cause": "null", "value": null, "text": concat("", [_m_from_item_name(req, _entry_c(entry, req)), " is null"]), "note": false, "plain": false, "listed": _id_listed(_entry_c(entry, req)), "item_at": entry.at, "ats": object.get(entry, "ats", [entry.at])} if {
+_id_fault_place(entry, req, _) := {"c": _entry_c(entry, req), "at": entry.at, "cause": "null", "value": null, "text": concat("", [_m_from_item_name(req, _entry_c(entry, req)), " is null"]), "note": false, "plain": false, "listed": _id_listed(_entry_c(entry, req)), "item_at": entry.at, "ats": object.get(entry, "ats", [entry.at])} if {
 	entry.subject == null
 	_id_listed(_entry_c(entry, req))
 }

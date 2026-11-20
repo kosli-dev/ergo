@@ -19,12 +19,39 @@ test_a_null_id_is_not_an_id_so_it_never_repeats if {
 
 ds_keys(req) := ["ds"] if is_object(req)
 
-place_at(entry, req) := {"c": entry.c} if is_object(req)
+place_at(entry, req, _) := {"c": entry.c} if is_object(req)
+
+id_path(req) := ["id"] if is_object(req)
+
+meta_first(req) := ["meta", 0] if is_object(req)
+
+test_a_subject_in_a_field_of_each_item_without_an_id_is_named_by_its_item if {
+	entry := {"subject": {}, "at": "/xs/0/meta", "c": ["xs", 0, "meta"], "ats": ["/xs/0/meta", "/xs/2/meta"]}
+	p := ergo._id_fault_place(entry, {"subject": "d"}, {"xs": [{"meta": {}}]}) with ergo._id_of as id_path
+	p.listed == true
+	p.text == "item 1 of xs: meta.id is missing"
+	p.name == "xs[0].meta.id"
+	p.item_at == "/xs/0"
+	p.ats == ["/xs/0", "/xs/2"]
+}
+
+test_a_subject_that_is_the_whole_input_without_an_id_is_named_from_the_input if {
+	p := ergo._id_fault_place({"subject": {"x": 1}, "at": "", "c": []}, {"subject": "d"}, {"x": 1}) with ergo._id_of as id_path
+	p.listed == false
+	p.text == "$input.id is missing"
+	p.name == "$input.id"
+}
+
+test_an_id_that_ends_at_a_position_is_named_as_a_check_names_it if {
+	p := ergo._id_fault_place({"subject": {}, "at": "/ds/0", "c": ["ds", 0]}, {"subject": "d"}, {"ds": [{}]}) with ergo._id_of as meta_first
+	p.text == "item 1 of ds: item 1 of meta is missing"
+	p.name == "item 1 of ds[0].meta"
+}
 
 test_subjects_without_an_id_are_named_in_the_order_of_the_subjects_whatever_order_their_ids_are_kept_in if {
 	raw := [{"subject": {}, "at": concat("", ["/ds/", format_int(i, 10)]), "c": ["ds", i]} | some i in numbers.range(0, 11)]
 	refs := {i: {"id": id} | some i, _ in raw; id := _id_or_null(i)}
-	places := ergo._id_fault_places(raw, refs, {"subject": "d"}) with ergo._id_fault_place as place_at
+	places := ergo._id_fault_places({}, raw, refs, {"subject": "d"}) with ergo._id_fault_place as place_at
 	[p.c[1] | some p in places] == [1, 9, 10, 11]
 }
 
