@@ -60,6 +60,20 @@ fn the_cap_counts_leaf_items_not_outer_items() {
 }
 
 #[test]
+fn roots_come_worst_cause_first_then_by_name_and_before_the_list() {
+    let clauses = vec![
+        read(Kind::List, "xs", Cause::Value, "xs is []"),
+        root("za", Cause::Null, "za is null"),
+        root("zc", Cause::Unusable, "zc is \"s\", which isn't a number"),
+        root("zb", Cause::Unusable, "zb is \"s\", which isn't a number"),
+    ];
+    assert_eq!(
+        text(&shown(&clauses)),
+        "zb is \"s\", which isn't a number; zc is \"s\", which isn't a number; za is null; xs is []"
+    );
+}
+
+#[test]
 fn a_root_whose_value_holds_a_semicolon_stays_one_clause() {
     let clauses = vec![
         root("w.z", Cause::Unusable, "w.z is \"p; q\", which isn't a number"),
