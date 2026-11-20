@@ -126,6 +126,7 @@ crate_of() {
 
 : > "$work/pass.txt"
 : > "$work/unrun.txt"
+: > "$work/all.txt"
 rust_count=0
 rego_count=0
 built=0
@@ -166,8 +167,15 @@ while IFS="$tab" read -r kind path name; do
     fi
   fi
   case $status in
-    0) printf -- '- %s %s\n' "$path" "$name" >> "$work/pass.txt" ;;
-    3) printf -- '- %s %s\n' "$path" "$name" >> "$work/unrun.txt" ;;
+    0)
+      printf -- '- %s %s\n' "$path" "$name" >> "$work/pass.txt"
+      printf -- '- %s %s: passes\n' "$path" "$name" >> "$work/all.txt"
+      ;;
+    3)
+      printf -- '- %s %s\n' "$path" "$name" >> "$work/unrun.txt"
+      printf -- '- %s %s: could not run\n' "$path" "$name" >> "$work/all.txt"
+      ;;
+    *) printf -- '- %s %s: fails\n' "$path" "$name" >> "$work/all.txt" ;;
   esac
 done < "$work/new.tsv"
 
@@ -175,17 +183,25 @@ passing=$(wc -l < "$work/pass.txt" | tr -d ' ')
 unrun=$(wc -l < "$work/unrun.txt" | tr -d ' ')
 echo "$heading"
 echo
-if [ "$passing" = 0 ]; then
-  echo "$total new tests ($rust_count Rust, $rego_count Rego), none passes on $base."
-else
-  echo "$total new tests ($rust_count Rust, $rego_count Rego), $passing pass on $base:"
+failing=$((total - passing - unrun))
+echo "$total new tests ($rust_count Rust, $rego_count Rego): $passing pass, $failing fail on the old source (good), $unrun could not run."
+if [ "$passing" != 0 ]; then
+  echo
+  echo "Pass on the old source:"
   cat "$work/pass.txt"
 fi
 if [ "$unrun" != 0 ]; then
   echo
-  echo "Could not run: $unrun"
+  echo "Could not run:"
   cat "$work/unrun.txt"
 fi
+echo
+echo "<details>"
+echo "<summary>Tests checked ($total)</summary>"
+echo
+cat "$work/all.txt"
+echo
+echo "</details>"
 if [ "$moved" != 0 ]; then
   echo
   echo "Left out because the diff also removes a test with the same name: $moved"
