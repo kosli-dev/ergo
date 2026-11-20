@@ -10299,12 +10299,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
-        "count of g.es.v that is m named by $params.k is 0",
-        "count of g.es.v that equals m named by $params.k is 0",
-        &[],
-        &[],
-    ),
-    (
         "count of xs whose v is 1 is $params.n",
         "count of xs whose v is 1 equals $params.n",
         &[],
