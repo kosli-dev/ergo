@@ -1245,6 +1245,14 @@ impl Reading {
         Reading { infos, names }
     }
 
+    /// The subject that `name`'s subjects are read inside, if any.
+    pub fn parent_of(&self, name: &str) -> Option<String> {
+        match self.infos.get(name).map(|info| &info.relation) {
+            Some(Relation::Child(parent)) => Some(parent.clone()),
+            _ => None,
+        }
+    }
+
     pub fn used(&self, name: &str) -> Vec<String> {
         self.walk_back(name, true)
     }

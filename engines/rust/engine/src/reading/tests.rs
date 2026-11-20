@@ -269,6 +269,39 @@ fn a_chain_of_four_subjects_is_written_wrong() {
 }
 
 #[test]
+fn narrowing_a_child_does_not_count_as_a_level_of_a_chain() {
+    let (_, r) = reading(json!({
+        "art": {"from": "arts"}, "b": {"from": "art.bs"}, "nb": {"from": "b whose x exists"},
+        "nnb": {"from": "nb whose y exists"}, "c": {"from": "nnb.cs"}, "d": {"from": "c.ds"}
+    }));
+    assert!(problem_names(&r, "c").is_empty());
+    assert_eq!(
+        texts(&r, "d", "subjects.d.from"),
+        ["a chain of more than three subjects isn't supported yet"]
+    );
+}
+
+#[test]
+fn a_subject_that_narrows_a_child_has_the_childs_parent() {
+    let (_, r) = reading(json!({
+        "art": {"from": "arts"}, "b": {"from": "art.bs"}, "nb": {"from": "b whose x exists"},
+        "nnb": {"from": "nb whose y exists"}, "c": {"from": "nnb.cs"}
+    }));
+    assert_eq!(r.parent_of("nb"), Some("art".to_string()));
+    assert_eq!(r.parent_of("nnb"), Some("art".to_string()));
+    assert_eq!(r.parent_of("c"), Some("nnb".to_string()));
+    assert_eq!(r.parent_of("art"), None);
+    assert_eq!(r.infos["nnb"].scope.parent_names(), ["art"]);
+    assert_eq!(r.infos["c"].scope.parent_names(), ["art", "nnb"]);
+}
+
+#[test]
+fn a_subject_that_narrows_a_root_has_no_parent() {
+    let (_, r) = reading(json!({"art": {"from": "arts"}, "na": {"from": "art whose x exists"}}));
+    assert_eq!(r.parent_of("na"), None);
+}
+
+#[test]
 fn a_blank_subject_name_cannot_start_a_chain() {
     let (_, r) = reading(json!({" ": {"from": "things"}, "b": {"from": "\" \" whose id exists"}}));
     assert_eq!(
