@@ -38,10 +38,3 @@ test_a_root_a_whose_cant_read_has_no_stand_in_after_a_key_or_a_phrase_b9_leaves_
 	includes := {"op": "includes", "path": ["tags"], "value": {"ref": ["$$params", "t"]}}
 	ergo._root_stand_in(includes) == includes
 }
-
-test_a_root_list_of_is_in_ignoring_case_is_said_once_when_an_item_isnt_text if {
-	check := {"op": "in", "path": ["x", "v"], "values": {"ref": ["$$params", "l"]}, "ignoring": "case"}
-	ergo._text_root_kind({}, check, ["$$params", "l"]) == "a list of text" with data.ergo_params as {"l": ["a", 3]}
-	not ergo._text_root_kind({}, check, ["$$params", "l"]) with data.ergo_params as {"l": ["a", null]}
-	ergo._text_root_kind({}, check, ["$$params", "l"]) == "a list" with data.ergo_params as {"l": "a"}
-}

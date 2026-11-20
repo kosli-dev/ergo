@@ -322,12 +322,3 @@ test_ignoring_case_lowers_and_surrounding_spaces_trims_as_opa_does if {
 	ergo._prepared(" in  progress ", "surrounding spaces") == "in  progress"
 	ergo._prepared("  IN Progress ", "case and surrounding spaces") == "in progress"
 }
-
-test_is_in_a_field_ignoring_case_fails_as_unusable_on_a_value_that_isnt_text_even_with_an_empty_list if {
-	every cmp in ["in", "not_in"] {
-		check := {"op": "compare", "left": ["x"], "cmp": cmp, "right": ["ys"], "ignoring": "case"}
-		ergo._list_flaw(check, {"x": 3, "ys": []}) == {"unusable"}
-		ergo._list_flaw(check, {"x": "a", "ys": []}) == set()
-		ergo._list_flaw(check, {"ys": []}) == set()
-	}
-}

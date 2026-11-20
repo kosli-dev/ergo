@@ -514,18 +514,8 @@ fn usable_patterns(patterns: &Value) -> bool {
     }
 }
 
-fn usable_texts(values: &Value) -> bool {
-    match values {
-        Value::Array(items) => items.iter().all(|item| item_cause(item) != Cause::Unusable),
-        _ => false,
-    }
-}
-
 impl In {
     pub fn flawed(&self, ctx: &Ctx) -> bool {
-        if self.ignoring.is_some() {
-            return ref_read(&self.values, ctx).is_some_and(|v| !usable_texts(&v));
-        }
         ref_read(&self.values, ctx).is_some_and(|v| !usable_values(&v, false))
     }
 }
@@ -547,14 +537,6 @@ impl Matches {
     }
 }
 
-fn item_cause(item: &Value) -> Cause {
-    match item {
-        Value::String(_) => Cause::Satisfied,
-        Value::Null => Cause::Null,
-        _ => Cause::Unusable,
-    }
-}
-
 fn in_text(
     check: &In,
     ignoring: super::compare::Ignoring,
@@ -562,20 +544,14 @@ fn in_text(
     outcome: &Outcome,
     found: Option<&Value>,
 ) -> Cause {
-    let left = match left_cause(outcome, found) {
-        Ok(Value::String(text)) => Ok(text),
-        Ok(_) => Err(Cause::Unusable),
-        Err(cause) => Err(cause),
+    let text = match left_cause(outcome, found) {
+        Ok(Value::String(text)) => text,
+        Ok(_) => return Cause::Unusable,
+        Err(cause) => return cause,
     };
-    let worst = Cause::worst(
-        values
-            .iter()
-            .map(item_cause)
-            .chain(left.as_ref().err().copied()),
-    );
-    let (Ok(text), None) = (left, worst) else {
-        return worst.unwrap_or(Cause::Unusable);
-    };
+    if !values.iter().all(Value::is_string) {
+        return Cause::Unusable;
+    }
     let text = ignoring.prepare(&text);
     let hit = values
         .iter()
@@ -901,17 +877,6 @@ pub fn right_paths(check: &super::Check) -> Vec<&Path> {
 
 pub fn ref_faults(check: &super::Check, ctx: &Ctx) -> Vec<String> {
     let faults = match check {
-        super::Check::In(c) if c.ignoring.is_some() => {
-            let items: Vec<String> = text_item_faults(&c.values, ctx)
-                .into_iter()
-                .map(|(_, text)| text)
-                .collect();
-            let mut out = ref_fault(&c.values, ctx, Value::is_array, |_| "a list".to_string());
-            if c.flawed(ctx) && !items.is_empty() {
-                out.push((String::new(), items.join(", and ")));
-            }
-            out
-        }
         super::Check::In(c) => ref_fault(
             &c.values,
             ctx,
@@ -1167,58 +1132,12 @@ fn left_found(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
     }
 }
 
-fn text_item_faults(right: &Right, ctx: &Ctx) -> Vec<(String, String)> {
-    let read = read_right(right, ctx, true);
-    let (Right::Ref(_) | Right::Field(_), Some(Value::Array(items)), Some(list)) =
-        (right, &read.value, read.inputs.first())
-    else {
-        return Vec::new();
-    };
-    items
-        .iter()
-        .enumerate()
-        .filter(|(_, item)| !item.is_string())
-        .map(|(at, item)| {
-            let name = format!("item {} of {}", at + 1, list.name);
-            let text = match item {
-                Value::Null => format!("{name} is null"),
-                _ => super::message::isnt(&name, item, "text"),
-            };
-            (list.name.clone(), text)
-        })
-        .collect()
-}
-
-/// What a check that compares text ignoring case says of each `null` item
-/// of the list it looks in, in list order.
-pub fn null_items(check: &super::Check, ctx: &Ctx) -> Vec<String> {
-    let super::Check::In(
-        check @ In {
-            ignoring: Some(_), ..
-        },
-    ) = check
-    else {
-        return Vec::new();
-    };
-    text_item_faults(&check.values, ctx)
-        .into_iter()
-        .map(|(_, text)| text)
-        .filter(|text| text.ends_with(" is null"))
-        .collect()
-}
-
 fn in_text_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {
-    let mut out = Vec::new();
-    if let Some((name, found)) = left_found(&check.path, ctx)
-        && !found.is_string()
-    {
-        out.push(super::message::fault(&name, &found, "text"));
-    }
-    out.extend(text_item_faults(&check.values, ctx));
-    out.extend(ref_fault(&check.values, ctx, Value::is_array, |_| {
-        "a list".to_string()
-    }));
-    out
+    left_found(&check.path, ctx)
+        .filter(|(_, found)| !found.is_string())
+        .map(|(name, found)| super::message::fault(&name, &found, "text"))
+        .into_iter()
+        .collect()
 }
 
 pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {

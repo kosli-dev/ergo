@@ -68,10 +68,3 @@ test_message_groups_items_by_their_list_in_the_order_the_lists_come_and_then_by_
 	leads := ["item 10 of xs", "item 1 of ys", "item 2 of xs", "item 10 of xs", ""]
 	ergo._m_list_leads(leads) == ["item 2 of xs", "item 10 of xs", "item 1 of ys", ""]
 }
-
-test_a_list_of_is_in_ignoring_case_from_the_params_names_each_item_that_isnt_text_in_list_order if {
-	check := {"op": "in", "path": ["v"], "values": {"ref": ["$$params", "l"]}, "ignoring": "case"}
-	ergo._m_ref_faults_text(check) == ["item 2 of $params.l is null, and item 3 of $params.l is 3, which isn't text"] with data.ergo_params as {"l": ["a", null, 3]}
-	ergo._m_ref_faults_text(check) == ["item 1 of $params.l is 3, which isn't text"] with data.ergo_params as {"l": [3]}
-	ergo._m_ref_faults_text(check) == [] with data.ergo_params as {"l": ["a", "b"]}
-}

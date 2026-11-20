@@ -309,29 +309,10 @@ _list_flaw(leaf, x) := {"value"} if {
 
 _list_flaw(leaf, x) := {"unusable"} if {
 	_list_cmp(leaf)
-	not leaf.ignoring
 	_lstate(leaf, x) == "value"
 	not _lfailed(leaf, x)
 	not _list_right_usable(leaf.cmp, _lvalue(leaf, x))
 }
-
-_list_flaw(leaf, x) := states if {
-	leaf.ignoring
-	_list_cmp(leaf)
-	_lstate(leaf, x) == "value"
-	not _lfailed(leaf, x)
-	states := _text_list_states(_text_item_states(_lvalue(leaf, x)), _text_left_states(leaf, x))
-	count(states) > 0
-}
-
-_text_list_states(items, left) := items | left if count(items) > 0
-
-else := left & {"unusable"}
-
-_text_left_states(leaf, x) := {"unusable"} if {
-	v := _found(x, leaf.left)
-	not is_string(v)
-} else := {s | s := _read_state(x, leaf.left); s != "value"}
 
 _list_flawed(leaf, x) if count(_list_flaw(leaf, x)) > 0
 

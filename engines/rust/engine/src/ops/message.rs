@@ -665,14 +665,7 @@ pub fn option_line_text(
         return said;
     }
     let mut verdict = verdict.clone();
-    let text_list = matches!(
-        line,
-        Check::In(super::lists::In {
-            ignoring: Some(_),
-            ..
-        })
-    );
-    if verdict.cause == Cause::Unusable && line.flawed(ctx) && !text_list {
+    if verdict.cause == Cause::Unusable && line.flawed(ctx) {
         verdict.cause = unflawed_cause(line, ctx);
     }
     message(line, ctx, &verdict)
@@ -850,9 +843,6 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                         .filter(|(cause, _)| *cause == verdict.cause)
                         .map(|(_, text)| text),
                 ));
-                if verdict.cause == Cause::Null {
-                    found.extend(said_all(lists::null_items(check, ctx)));
-                }
                 if let Check::Tally(tally_check) = check {
                     for side in tally::tally_sides(tally_check) {
                         if let TallySide::Derived(derived) = side {

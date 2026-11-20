@@ -697,14 +697,6 @@ _node_param_broken(node) if {
 }
 
 _node_param_broken(node) if {
-	node.op in _membership_ops
-	node.ignoring
-	vals := _wants(node.values)
-	_value_list(vals)
-	"unusable" in _text_item_states(vals)
-}
-
-_node_param_broken(node) if {
 	node.op in _contain_ops
 	_is_ref(node.values)
 	v := _arg(node.values)

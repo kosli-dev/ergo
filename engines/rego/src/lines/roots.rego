@@ -108,7 +108,7 @@ _m_root_texts_all(subj, c) := _once([m |
 
 _m_for_root_text(subj, c, p, st) := f.msg if {
 	f := _tally_root_fault(subj, c, p)
-} else := _m_root_kind_text(subj, c, p, k) if k := _root_kind(subj, c, p)
+} else := _m_isnt(_root_label(p), _root_value(subj, p), k) if k := _root_kind(subj, c, p)
 
 else := _message({"op": "present", "path": _as_subject_part(p)}, subj, st)
 
@@ -207,11 +207,11 @@ _root_state(subj, c, p, lists) := "not_an_object" if {
 	_has_field_step(p)
 } else := _root_list_state(subj, p, lists)
 
-_root_kind(subj, c, p) := k if {
+_root_kind(subj, c, p) := "text" if {
 	c.ignoring
-	k := _text_root_kind(subj, c, p)
+	_side_root(c, p)
+	not is_string(_root_value(subj, p))
 } else := _m_right_kind(cmp, v) if {
-	not c.ignoring
 	some f in _list_argument_keys
 	object.get(c, f, null) == {"ref": p}
 	not _ref_walks(p)
@@ -677,21 +677,4 @@ _alone_read(check, subj) := object.union(a, {
 	a := _walk_read_row(object.union(_whose_alone(subj, check), {"op": "every"}), subj)
 	failed := [f | some f in a.failed; f.cause in _failed_read_states]
 	failed != []
-}
-
-_text_root_kind(subj, c, p) := "a list" if {
-	object.get(c, "values", null) == {"ref": p}
-	not _ref_walks(p)
-	_ref_state(p) == "value"
-	not is_array(_ref_read(p))
-} else := "a list of text" if {
-	object.get(c, "values", null) == {"ref": p}
-	not _ref_walks(p)
-	_ref_state(p) == "value"
-	"unusable" in _text_item_states(_ref_read(p))
-} else := "text" if {
-	c.op == "compare"
-	c.cmp in _equality_cmps
-	_side_root(c, p)
-	not is_string(_root_value(subj, p))
 }

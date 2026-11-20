@@ -61,17 +61,11 @@ _m_parts_marks(raw, key, ns) := {key: [object.union(o, {"inputs": _m_marked(o.in
 	count(names) > 0
 } else := {}
 
-_m_unusable_names(check, subj) := _m_with_text_list_name(check, subj, {s.name |
+_m_unusable_names(check, subj) := {s.name |
 	some f in _m_fault(subj, check)
 	s := _m_shown(subj, f[0])
 	s.state == "value"
-})
-
-_m_with_text_list_name(check, subj, names) := names | {s.name} if {
-	check.ignoring
-	_m_text_item_faults(subj, check) != []
-	s := _m_text_list(subj, check)
-} else := names
+}
 
 _m_marked(inputs, names) := [_m_marked_input(i, names) | some i in inputs]
 
@@ -731,7 +725,7 @@ _m_walked_root_fault(c, shown, x, cause) := _rwalk_text(x, shown) if {
 	k := _m_leaf_needs(c, w.value)
 }
 
-_m_off_right(subj, c) := [_m_root_kind_text(subj, c, p, k) |
+_m_off_right(subj, c) := [_m_isnt(_root_label(p), _root_value(subj, p), k) |
 	some p in _root_reads(c)
 	k := _root_kind(subj, c, p)
 ]
@@ -764,7 +758,7 @@ _m_cond_message(c, item, cause) := concat("; ", array.concat(_m_null_before_key(
 } else := concat(", and ", cs) if {
 	cause == "unusable"
 	wc := _m_walked(c, item)
-	cs := _once(array.concat(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, wc), _m_blocked_early(item, wc)), _m_item_faults(item, wc)), _m_blocked_late(item, wc)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
+	cs := _once(array.concat(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, wc), _m_blocked_early(item, wc)), _m_faults(item, wc)), _m_blocked_late(item, wc)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
 	cs != []
 } else := _m_fallback(c)
 

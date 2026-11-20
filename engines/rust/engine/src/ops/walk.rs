@@ -1346,6 +1346,7 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
                     right: own,
                     cmp: super::compare::Cmp::Eq,
                     within: None,
+                    ignoring: None,
                 }))
             }
             Wanted::All(list) | Wanted::Some(list) => own_list(list),

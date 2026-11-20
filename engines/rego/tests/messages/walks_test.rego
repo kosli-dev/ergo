@@ -84,13 +84,3 @@ test_an_item_two_conditions_cant_read_for_the_same_reason_is_named_once if {
 	])
 	[x[1] | some x in ergo._m_tally_items({"es": [null]}, side)] == ["item 1 of es is null, which isn't an object"]
 }
-
-test_an_item_of_a_whose_ignoring_case_says_only_its_own_problems_and_leaves_the_list_from_the_params_to_the_roots if {
-	c := {"op": "in", "path": ["v"], "values": {"ref": ["$$params", "l"]}, "ignoring": "case"}
-	every l in [[3], ["a", null, 3], ["a", null]] {
-		ergo._m_cond_message(c, {"v": 3}, "unusable") == "v is 3, which isn't text" with data.ergo_params as {"l": l}
-		ergo._m_cond_message(c, {"v": "A"}, "unusable") == "the check is false" with data.ergo_params as {"l": l}
-		ergo._m_cond_message(c, {"v": "A"}, "null") == "the check is false" with data.ergo_params as {"l": l}
-		ergo._m_cond_message(c, {"v": null}, "null") == "v is null" with data.ergo_params as {"l": l}
-	}
-}

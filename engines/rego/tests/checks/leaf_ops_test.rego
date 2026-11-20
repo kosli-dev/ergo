@@ -86,16 +86,12 @@ test_in_ignoring_case_compares_the_prepared_texts if {
 	not_in := object.union(check, {"op": "not_in"})
 	not ergo._leaf_passed(not_in, {"x": "DONE"})
 	ergo._leaf_passed(not_in, {"x": "blocked"})
-	field := {"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"}
-	ergo._leaf_passed(field, {"x": "A", "ys": ["b", "a"]})
-	not ergo._leaf_passed(object.union(field, {"cmp": "not_in"}), {"x": "A", "ys": ["b", "a"]})
 }
 
 test_in_ignoring_case_never_passes_on_a_list_with_a_value_that_isnt_text if {
 	every op in ["in", "not_in"] {
 		every values in [["a", null], ["a", 3], [["a"]]] {
 			not ergo._leaf_passed({"op": op, "path": ["x"], "values": values, "ignoring": "case"}, {"x": "b"})
-			not ergo._leaf_passed({"op": "compare", "left": ["x"], "cmp": op, "right": ["ys"], "ignoring": "case"}, {"x": "b", "ys": values})
 		}
 		not ergo._leaf_passed({"op": op, "path": ["x"], "values": ["a"], "ignoring": "case"}, {"x": 3})
 	}
@@ -107,29 +103,14 @@ test_ignoring_case_fails_as_absent_and_null_on_a_field_that_is_missing_or_null_o
 		{"op": "compare", "left": ["x"], "cmp": "ne", "right": {"literal": "a"}, "ignoring": "case"},
 		{"op": "in", "path": ["x"], "values": ["a"], "ignoring": "case"},
 		{"op": "not_in", "path": ["x"], "values": ["a"], "ignoring": "case"},
-		{"op": "compare", "left": ["x"], "cmp": "in", "right": ["ys"], "ignoring": "case"},
-		{"op": "compare", "left": ["x"], "cmp": "not_in", "right": ["ys"], "ignoring": "case"},
 	]
 	every check in checks {
-		ergo._leaf_cause(check, {"ys": ["a"]}) == "absent"
-		ergo._leaf_cause(check, {"x": null, "ys": ["a"]}) == "null"
+		ergo._leaf_cause(check, {}) == "absent"
+		ergo._leaf_cause(check, {"x": null}) == "null"
 	}
 	every cmp in ["eq", "ne"] {
 		field := {"op": "compare", "left": ["x"], "cmp": cmp, "right": ["y"], "ignoring": "case"}
 		ergo._leaf_cause(field, {"x": "a"}) == "absent"
 		ergo._leaf_cause(field, {"x": "a", "y": null}) == "null"
-	}
-	every cmp in ["in", "not_in"] {
-		list := {"op": "compare", "left": ["x"], "cmp": cmp, "right": ["ys"], "ignoring": "case"}
-		ergo._leaf_cause(list, {"x": "a"}) == "absent"
-		ergo._leaf_cause(list, {"x": "a", "ys": null}) == "null"
-	}
-}
-
-test_in_ignoring_case_fails_as_null_on_a_null_item_of_its_list_and_as_unusable_when_another_isnt_text if {
-	every op in ["in", "not_in"] {
-		ergo._unusable_states({"op": op, "path": ["x"], "values": ["a", null], "ignoring": "case"}, {"x": "a"}) == {"null"}
-		ergo._unusable_states({"op": op, "path": ["x"], "values": ["a", null, 3], "ignoring": "case"}, {"x": "a"}) == {"null", "unusable"}
-		ergo._unusable_states({"op": op, "path": ["x"], "values": ["a"], "ignoring": "case"}, {"x": "a"}) == set()
 	}
 }

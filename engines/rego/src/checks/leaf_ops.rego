@@ -306,7 +306,6 @@ _at_most_max(check, l, subj) if {
 
 _compared(check, l, r, subj) if {
 	not "within" in object.keys(check)
-	not check.ignoring
 	check.cmp in _list_cmps
 	not "max" in object.keys(check)
 	_cmp(check.cmp, l, r, check, subj)
@@ -408,29 +407,12 @@ _orderable(c, v) if {
 	c in _text_cmps
 }
 
-_unusable_states(leaf, x) := s if {
-	leaf.ignoring
-	s := {"unusable" | _unusable(leaf, x)} | _null_text_items(leaf)
-} else := {"unusable" | _unusable(leaf, x)}
-
-_null_text_items(leaf) := {"null" |
-	leaf.op in _membership_ops
-	vals := _wants(leaf.values)
-	is_array(vals)
-	null in vals
-}
+_unusable_states(leaf, x) := {"unusable" | _unusable(leaf, x)}
 
 _unusable(leaf, x) if {
 	leaf.ignoring
 	leaf.op in _membership_ops
 	not is_string(_found(x, leaf.path))
-}
-
-_unusable(leaf, x) if {
-	leaf.ignoring
-	leaf.op in _membership_ops
-	"unusable" in _text_item_states(_wants(leaf.values))
-	_ = x
 }
 
 _unusable(leaf, x) if {

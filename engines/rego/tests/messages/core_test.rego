@@ -55,10 +55,3 @@ test_a_row_says_what_else_it_cant_read_beside_a_key_it_cant_read if {
 	ergo._m_message(row, {}, "absent") == "$params.k is missing, and k is missing" with data.ergo_params as {}
 	ergo._m_unkeyed_said({}, check, "absent") == [] with data.ergo_params as {}
 }
-
-test_a_count_whose_ignoring_case_keeps_the_items_of_its_list_from_the_params_in_list_order if {
-	whose := {"ignoring": "case", "op": "in", "path": ["v"], "values": {"ref": ["$$params[]", "l"]}}
-	check := {"op": "compare", "cmp": "eq", "left": {"count_of": ["xs"], "text": "count of xs whose v is in $params.l ignoring case", "whose": [whose]}, "right": {"literal": 1}}
-	"$params.l" in ergo._m_list_names(check)
-	ergo._m_top_sorted("item 2 of $params.l is null, and item 3 of $params.l is 3, which isn't text", ergo._m_list_names(check)) == "item 2 of $params.l is null, and item 3 of $params.l is 3, which isn't text"
-}
