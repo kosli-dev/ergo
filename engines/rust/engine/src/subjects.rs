@@ -1850,17 +1850,17 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let mut failed_items = None;
     let mut rich: Vec<Value> = Vec::new();
     let mut pieces: Option<Vec<ops::clause::Clause>> = None;
-    let mut said: Vec<String> = Vec::new();
+    let mut said: Vec<Said> = Vec::new();
     let mut texts: Vec<Said> = Vec::new();
     let verdicts: Vec<(&Filter, Verdict)> = filters
         .iter()
         .map(|filter| {
             let ran = ops::run_full(&filter.check, ctx);
+            let mut own = ops::message::ran_said(&ran);
             let mut verdict = ran.verdict;
             failed_items = ran.failed_items.map(Value::Array);
             rich = ran.rich;
             pieces = ran.parts;
-            let mut own = ran.message;
             if unreadable {
                 let keeps_own = verdict.cause.is_failure()
                     && matches!(&filter.check, Check::Walk(w) if walk::walks_nothing(w, ctx))
@@ -1874,7 +1874,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
             if verdict.passed() {
                 texts.push(Vec::new());
             } else {
-                let own = own.map(said_as_text).unwrap_or_else(|| {
+                let own = own.unwrap_or_else(|| {
                     if matches!(verdict.cause, Cause::Absent | Cause::Null) {
                         let mut unlabelled = ctx.clone();
                         unlabelled.label = None;
@@ -1897,7 +1897,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                     )
                     .unwrap_or(own)
                 };
-                said.push(said_text(&own));
+                said.push(own.clone());
                 texts.push(own);
             }
             (filter, verdict)
@@ -1931,16 +1931,16 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
         .iter()
         .flat_map(|(_, v)| v.inputs.iter().cloned())
         .collect();
-    let mut once: Vec<String> = Vec::new();
-    for text in said {
-        ops::push_new(&mut once, text);
+    let mut once: Vec<Said> = Vec::new();
+    for own in said {
+        ops::push_new(&mut once, own);
     }
     let message = if matched {
         None
     } else if once.is_empty() {
         Some(format!("{} doesn't match", ctx.subject_label()))
     } else {
-        Some(once.join("; "))
+        Some(said_text(&once.concat()))
     };
     let checks: Vec<&Check> = filters.iter().map(|f| &f.check).collect();
     let inputs = if matched {
@@ -2378,7 +2378,7 @@ fn check_rows<'a>(
 
 fn walked_roots_run(check: &Check, ctx: &Ctx) -> (ops::Ran, Option<Said>) {
     let ran = ops::run_full(check, ctx);
-    let own = ran.message.clone().map(said_as_text);
+    let own = ops::message::ran_said(&ran);
     if !ran.verdict.passed() {
         return (ran, own);
     }
@@ -2387,17 +2387,13 @@ fn walked_roots_run(check: &Check, ctx: &Ctx) -> (ops::Ran, Option<Said>) {
         if again.verdict.passed() {
             return (ran, own);
         }
-        let said = match again.message.take() {
-            Some(text) => said_as_text(text),
+        let said = match ops::message::ran_said(&again) {
+            Some(said) => said,
             None => default_said(check, ctx, &again.verdict),
         };
         again.message = Some(said_text(&said));
         (again, Some(said))
     })
-}
-
-fn default_message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
-    said_text(&default_said(check, ctx, verdict))
 }
 
 fn default_said(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Said {
@@ -3152,23 +3148,20 @@ fn check_row(
     let mut row = row_of(env.requirement_name, env.requirement, name, cause, inputs);
     row.subject_id = judged.id.clone();
     if cause != Cause::Satisfied {
-        let messages: Vec<String> = checks
+        let mut seen: Vec<ops::clause::Clause> = Vec::new();
+        let once: Vec<Said> = checks
             .iter()
             .zip(&verdicts)
             .zip(&said)
             .filter(|((_, v), _)| !v.passed())
             .map(|((check, v), own)| match own {
-                Some(said) => said_text(said),
-                None => default_message(check, ctx, v),
+                Some(said) => said.clone(),
+                None => default_said(check, ctx, v),
             })
+            .map(|said| ops::message::unsaid_clauses(&said, &mut seen))
+            .filter(|said| !said_text(said).is_empty())
             .collect();
-        let mut said: Vec<String> = Vec::new();
-        let once: Vec<String> = messages
-            .iter()
-            .map(|text| ops::message::unsaid(text, &mut said))
-            .filter(|text| !text.is_empty())
-            .collect();
-        row.message = Some(once.join("; "));
+        row.message = Some(said_text(&once.concat()));
     }
     if plan.items.len() == 1 {
         row.failed_items = failed_items;

@@ -670,16 +670,6 @@ fn unflawed_cause(line: &Check, ctx: &Ctx) -> Cause {
     }
 }
 
-/// What an `any_of` line that didn't pass says, run in its option's `ctx`.
-pub fn option_line_text(
-    line: &Check,
-    ctx: &Ctx,
-    said: Option<String>,
-    verdict: &Verdict,
-) -> String {
-    said_text(&option_line_said(line, ctx, said, verdict))
-}
-
 /// What an `any_of` line that didn't pass says, as its groups of pieces.
 pub fn option_line_said(line: &Check, ctx: &Ctx, said: Option<String>, verdict: &Verdict) -> Said {
     if let Some(said) = said {
@@ -744,31 +734,88 @@ pub fn unsaid(text: &str, said: &mut Vec<String>) -> String {
 /// `said` without the clauses `seen` held before it, adding the ones it keeps
 /// to `seen`.
 pub fn unsaid_clauses(said: &Said, seen: &mut Vec<Clause>) -> Said {
-    let _ = seen;
-    said.clone()
+    let before = seen.len();
+    let mut out: Said = Vec::new();
+    for group in said {
+        let mut kept: Vec<Piece> = Vec::new();
+        for piece in group {
+            let clauses = match piece {
+                Piece::Said(text) if text.is_empty() => continue,
+                Piece::Said(text) => vec![Clause::said(Cause::Value, text.clone())],
+                Piece::Counted(clauses) => clauses.clone(),
+            };
+            let fresh: Vec<Clause> = clauses
+                .into_iter()
+                .filter(|clause| !seen[..before].contains(clause))
+                .collect();
+            if fresh.is_empty() {
+                continue;
+            }
+            seen.extend(fresh.iter().cloned());
+            kept.push(match piece {
+                Piece::Said(_) => piece.clone(),
+                Piece::Counted(_) => Piece::Counted(fresh),
+            });
+        }
+        if !kept.is_empty() {
+            out.push(kept);
+        }
+    }
+    out
+}
+
+/// The groups of pieces `text` holds, cut at `; ` and `, and ` outside quoted
+/// strings, for a message that is only text, like a `for` line's.
+pub fn said_of_text(text: &str) -> Said {
+    split_outside_quotes(text, "; ")
+        .into_iter()
+        .map(|group| {
+            split_outside_quotes(group, ", and ")
+                .into_iter()
+                .filter(|clause| !clause.is_empty())
+                .map(|clause| Piece::Said(clause.to_string()))
+                .collect::<Vec<Piece>>()
+        })
+        .filter(|group| !group.is_empty())
+        .collect()
+}
+
+/// What a run says, as pieces: its clauses when it has them and they make its
+/// message, its message cut into clauses otherwise.
+pub fn ran_said(ran: &super::Ran) -> Option<Said> {
+    let text = ran.message.as_ref()?;
+    match &ran.parts {
+        Some(parts) if !parts.is_empty() && clause::text(&clause::shown(parts)) == *text => {
+            Some(vec![vec![Piece::Counted(parts.clone())]])
+        }
+        _ => Some(said_of_text(text)),
+    }
 }
 
 fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
     let mut parts = Vec::new();
     for (at, option) in any.options.iter().enumerate() {
-        let lines: Vec<String> = option
+        let lines: Vec<Said> = option
             .iter()
             .filter_map(|line| {
                 let ran = run_full(line, ctx);
                 if ran.verdict.passed() {
                     return None;
                 }
-                Some(option_line_text(line, ctx, ran.message, &ran.verdict))
+                Some(
+                    ran_said(&ran)
+                        .unwrap_or_else(|| option_line_said(line, ctx, None, &ran.verdict)),
+                )
             })
             .collect();
         if lines.is_empty() {
             continue;
         }
         let name = any.names.get(at).cloned().unwrap_or_default();
-        let mut said: Vec<String> = Vec::new();
+        let mut seen: Vec<Clause> = Vec::new();
         let once: Vec<String> = lines
             .iter()
-            .map(|line| unsaid(line, &mut said))
+            .map(|line| said_text(&unsaid_clauses(line, &mut seen)))
             .filter(|line| !line.is_empty())
             .collect();
         parts.push(format!("{name}: {}", once.join(", and ")));
