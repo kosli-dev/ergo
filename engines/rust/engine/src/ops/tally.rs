@@ -1420,7 +1420,7 @@ pub fn counted_clauses(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<Vec
     (!said.is_empty()).then_some(said)
 }
 
-fn told(item: &str, cause: Cause, said: &str) -> Clause {
+pub(super) fn told(item: &str, cause: Cause, said: &str) -> Clause {
     match said.strip_prefix("the subject ") {
         Some(rest) => Clause::item(item, cause, format!("{item} {rest}"), Vec::new()),
         None => Clause::item(

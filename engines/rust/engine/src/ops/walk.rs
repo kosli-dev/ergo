@@ -1148,17 +1148,26 @@ pub(super) fn item_own(
             }
         }
     }
+    let mut item = Clause::item(&name, Cause::Satisfied, String::new(), Vec::new());
     if let Some(alone) = stood_in(check, |path| {
         outside(path) || super::key_base::of_path(path, false, &focus).is_some()
     }) {
         let verdict = run_check(&alone, &focus);
         if verdict.cause.is_failure() {
             let text = message::message(&alone, &focus, &verdict);
-            said.insert(own_at.unwrap_or(said.len()), Clause::said(verdict.cause, text));
+            item = super::tally::told(&name, verdict.cause, &text);
         }
     }
-    let cause = Cause::worst(said.iter().map(|clause| clause.cause))?;
-    Some(Clause::item(&name, cause, String::new(), said))
+    let at = own_at.unwrap_or(said.len());
+    item.said.splice(0..0, said.drain(..at));
+    item.said.extend(said);
+    item.cause = Cause::worst(
+        item.said
+            .iter()
+            .map(|clause| clause.cause)
+            .chain([item.cause]),
+    )?;
+    Some(item)
 }
 
 fn stood_in(check: &Check, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
