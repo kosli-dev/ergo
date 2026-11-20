@@ -21,6 +21,7 @@ if [ -n "${PR_FACTS_BASE_DUMP:-}" ]; then
   head_dump=$PR_FACTS_HEAD_DUMP
   base_known=$PR_FACTS_BASE_KNOWN
   head_known=$PR_FACTS_HEAD_KNOWN
+  head_cargo_exit=${PR_FACTS_HEAD_CARGO_EXIT:-0}
 else
   root=$(git -C "$here" rev-parse --show-toplevel)
   export CARGO_TARGET_DIR=${CARGO_TARGET_DIR:-$HOME/.cache/ergo-cargo-target}
@@ -32,10 +33,12 @@ else
   fi
   dump() {
     find "$1/engines/rust" -name '*.rs' -exec touch {} +
-    (cd "$1/engines/rust" && ERGO_DUMP=$2 cargo test -j 4 -p ergo-policy-engine --test cases every_case > /dev/null)
+    dump_exit=0
+    (cd "$1/engines/rust" && ERGO_DUMP=$2 cargo test -j 4 -p ergo-policy-engine --test cases every_case > /dev/null) || dump_exit=$?
   }
   dump "$tree" "$work/base-dump"
   dump "$root" "$work/head-dump"
+  head_cargo_exit=$dump_exit
   base_dump=$work/base-dump
   head_dump=$work/head-dump
   git -C "$root" show "$base:engines/rust/known-failures.txt" > "$work/base-known.txt"
@@ -136,22 +139,6 @@ new_count=$(count_lines "$work/only-head.txt")
 removed_count=$(count_lines "$work/only-base.txt")
 changed_passing=$(count_lines "$work/changed-passing.keys")
 
-echo "## Rust report changes"
-echo
-if [ "$changed_count" = 0 ]; then
-  echo "No case report changed between $base and the working tree."
-else
-  echo "$changed_count case $(plural "$changed_count" report reports) changed between $base and the working tree."
-  echo
-  ranges "$work/changed.sorted"
-  echo
-  echo "Passing cases whose report changed: $changed_passing (information only: a case compares the fields it lists, so a passing case can change a field it doesn't list)."
-fi
-if [ "$new_count" != 0 ] || [ "$removed_count" != 0 ]; then
-  echo
-  echo "Cases only on one side: $new_count new, $removed_count removed."
-fi
-
 awk -F'\t' -v out="$work" '
   FILENAME == ARGV[1] { was[$0] = 1; next }
   FILENAME == ARGV[2] { now[$0] = 1; next }
@@ -177,15 +164,35 @@ list() {
   sed 's/^/- /' "$1"
 }
 
+if [ -s "$work/regress.txt" ]; then
+  echo "CASES THAT PASSED ON $base AND FAIL OR ARE GONE NOW: $(count_lines "$work/regress.txt")"
+  list "$work/regress.txt"
+  echo
+fi
+if [ "$head_cargo_exit" != 0 ]; then
+  echo "cargo test exited with $head_cargo_exit on the working tree."
+  echo
+fi
+echo "## Rust report changes"
+echo
+if [ "$changed_count" = 0 ]; then
+  echo "No case report changed between $base and the working tree."
+else
+  echo "$changed_count case $(plural "$changed_count" report reports) changed between $base and the working tree."
+  echo
+  ranges "$work/changed.sorted"
+  echo
+  echo "Passing cases whose report changed: $changed_passing (information only: a case compares the fields it lists, so a passing case can change a field it doesn't list)."
+fi
+if [ "$new_count" != 0 ] || [ "$removed_count" != 0 ]; then
+  echo
+  echo "Cases only on one side: $new_count new, $removed_count removed."
+fi
+
 echo
 echo "## Known failures"
 echo
 echo "known-failures.txt had $(count_lines "$work/base.known") $(plural "$(count_lines "$work/base.known")" line lines) and has $(count_lines "$work/head.known") now."
-if [ -s "$work/regress.txt" ]; then
-  echo
-  echo "CASES THAT PASSED ON $base AND FAIL OR ARE GONE NOW: $(count_lines "$work/regress.txt")"
-  list "$work/regress.txt"
-fi
 if [ -s "$work/pass.txt" ]; then
   echo
   echo "Pass now, and did not before: $(count_lines "$work/pass.txt")"
