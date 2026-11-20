@@ -71,7 +71,16 @@ impl Ignoring {
     }
 
     pub fn prepare(self, text: &str) -> String {
-        text.to_string()
+        let text = if self.spaces { text.trim() } else { text };
+        if !self.case {
+            return text.to_string();
+        }
+        text.chars()
+            .flat_map(|c| match c {
+                '\u{130}' => 'i'.to_lowercase(),
+                c => c.to_lowercase(),
+            })
+            .collect()
     }
 }
 
@@ -206,6 +215,14 @@ pub fn run(check: &Compare, ctx: &Ctx) -> Verdict {
 }
 
 fn compared(check: &Compare, l: &Value, r: &Value) -> Cause {
+    if let Some(ignoring) = check.ignoring {
+        return match (l, r) {
+            (Value::String(a), Value::String(b)) => {
+                verdict((ignoring.prepare(a) == ignoring.prepare(b)) != (check.cmp == Cmp::Ne))
+            }
+            _ => Cause::Unusable,
+        };
+    }
     if let Some(distance) = &check.within {
         return match (l, r) {
             (Value::Number(a), Value::Number(b)) => within(a, b, distance)
