@@ -2180,6 +2180,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every thing.leaves whose art.k is 1 and whose thing.v is 1",
     ),
     ("every trail.artifacts", "every trail.artifacts"),
+    (
+        "every trail.pull_requests whose state is \"MERGED\"",
+        "every trail.pull_requests whose state is \"MERGED\"",
+    ),
+    ("every trails", "every trails"),
     ("every u.items", "every u.items"),
     ("every zart.releases", "every zart.releases"),
     ("nums", "nums"),
