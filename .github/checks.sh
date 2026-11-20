@@ -120,6 +120,7 @@ check "pr-facts.sh test" "" '.github/pr-facts_test.sh'
 check "spec-placeholder.sh" "git" '.github/spec-placeholder.sh'
 check "spec-placeholder.sh test" "git" '.github/spec-placeholder_test.sh'
 check "spec rules" "python3" 'python3 spec/check_rules.py'
+check "sweep.py test" "python3" 'python3 spec/sweep_test.py'
 check "sentences corpus" "python3" 'python3 spec/sentences_corpus.py --check'
 check "no comments in Rego" "opa jq git" "$comments_command"
 

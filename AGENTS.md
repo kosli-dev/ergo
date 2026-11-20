@@ -51,6 +51,7 @@ python3 .github/rego-layers.py
 .github/spec-placeholder.sh
 .github/spec-placeholder_test.sh
 python3 spec/check_rules.py
+python3 spec/sweep_test.py
 python3 spec/sentences_corpus.py --check
 python3 -m venv /tmp/ergo-venv && /tmp/ergo-venv/bin/pip install --quiet jsonschema==4.26.0 abnf==2.9.0 && /tmp/ergo-venv/bin/python .github/spec-schemas.py
 /tmp/ergo-venv/bin/python spec/check_grammar.py

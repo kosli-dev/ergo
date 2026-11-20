@@ -306,6 +306,8 @@ jobs:
           version: 1.22.0
       - name: Check every rule a case cites exists, and every rule has a case
         run: python3 spec/check_rules.py
+      - name: Check the sweep's list of pairs option
+        run: python3 spec/sweep_test.py
       - name: Check the corpus JSON matches the markdown
         run: python3 spec/sentences_corpus.py --check
       - name: Install the spec checks' Python packages

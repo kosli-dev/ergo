@@ -263,14 +263,85 @@ def differences(rego, rust):
     return found
 
 
+def load_pairs(path):
+    with open(path) as handle:
+        pairs = json.load(handle)
+    built = []
+    names = set()
+    for pair in pairs:
+        if not all(key in pair for key in ("name", "policy", "input")):
+            sys.exit(f"{path}: every pair needs a name, a policy and an input")
+        if pair["name"] in names:
+            sys.exit(f"{path}: two pairs are called {pair['name']}")
+        names.add(pair["name"])
+        built.append({
+            "name": pair["name"],
+            "policy": dict(pair["policy"], ergo_spec=spec_version()),
+            "input": pair["input"],
+            "params": pair.get("params", {}),
+            "want": pair.get("want"),
+        })
+    return built
+
+
+def says(report, want):
+    return any(not r.get("passed") and r.get("message") == want for r in report.get("results", []))
+
+
+def write_cells(built):
+    shutil.rmtree(WORK, ignore_errors=True)
+    for cell in built:
+        folder = os.path.join(WORK, "c", cell["id"])
+        os.makedirs(folder)
+        for name in ("policy", "input", "params"):
+            with open(os.path.join(folder, name + ".json"), "w") as handle:
+                json.dump(cell[name], handle)
+    with open(os.path.join(WORK, "cases.json"), "w") as handle:
+        json.dump({"cases": [{key: cell[key] for key in ("policy", "input", "params")} for cell in built]}, handle)
+
+
+def run_pairs(args):
+    pairs = load_pairs(args.pairs)
+    for i, pair in enumerate(pairs):
+        pair["id"] = str(i)
+    subprocess.run([os.path.join(ROOT, ".github", "build-ergo.sh")], cwd=ROOT, check=True)
+    write_cells(pairs)
+    ids = [pair["id"] for pair in pairs]
+    rego = run_rego(args.opa, ids)
+    version, rust = run_rust(args.rust, ids)
+    print(f"rust engine: {version}")
+    differ = 0
+    for i, pair in enumerate(pairs):
+        found = differences(rego[i], rust[i])
+        differ += bool(found)
+        wanted = ""
+        if pair["want"] is not None:
+            wanted = f" | rego {'says' if says(rego[i], pair['want']) else 'does not say'} it, rust {'says' if says(rust[i], pair['want']) else 'does not say'} it"
+        if not found and not wanted:
+            continue
+        print(f"{pair['name']}{' | engines differ' if found else ''}{wanted}")
+        for where, fields, left, right in found:
+            print(f"  {where} differs in {', '.join(fields)}")
+            for field in fields:
+                print(f"    {field}:")
+                print(f"      rego: {short((left or {}).get(field) if fields != ['entry'] else left)}")
+                print(f"      rust: {short((right or {}).get(field) if fields != ['entry'] else right)}")
+    print(f"{differ} of {len(pairs)} pairs differ")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Run check shapes over a grid of inputs through both engines and print the cells where they differ.")
+    parser.add_argument("--pairs", help="run the policy and input pairs in this JSON file instead of the grid and print the ones where the engines differ, and whether each says the pair's want message")
     parser.add_argument("--shape", action="append", help="run only this shape (repeatable)")
     parser.add_argument("--limit", type=int, default=500, help="most cells to run, spread evenly over the shapes (default 500)")
     parser.add_argument("--opa", default="opa", help="command that runs OPA (default: opa)")
     parser.add_argument("--rust", default="sh -s", help="command that reads a shell script on stdin and runs it from the root of the repo with the ergo command on PATH (default: sh -s)")
     parser.add_argument("--list", action="store_true", help="print the shape names and stop")
     args = parser.parse_args()
+
+    if args.pairs:
+        run_pairs(args)
+        return
 
     with open(os.path.join(ROOT, "spec", "sweep-shapes.json")) as handle:
         shapes = json.load(handle)["shapes"]
