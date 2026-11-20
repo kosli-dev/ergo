@@ -297,6 +297,7 @@ _s_id_part(def) := {} if not is_string(object.get(def, "identified_by", null))
 _s_id_read(text) := {"path": _s_model_path(fl.path)} if {
 	fl := _from_line(text)
 	object.keys(fl) == {"path"}
+	not "start" in object.keys(fl.path)
 	count(_s_from_paths_unsupported({"path": fl.path})) == 0
 } else := {"problems": [`identified_by is a path, like "id" or "build.number"`]}
 

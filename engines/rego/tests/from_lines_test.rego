@@ -38,10 +38,10 @@ test_from_every_input_on_an_input_that_is_not_a_list_fails_and_names_the_input_f
 
 test_a_from_line_with_a_position_on_a_list_input_names_it_from_input_in_expressions if {
 	every from, want in {
-		"every $input[1].commits": ["count(matching(every $input[1].commits)) >= 1", "count(repeated(ids(every $input[1].commits))) == 0"],
-		"$input[1]": ["count(matching(item 2 of $input)) >= 1", "count(repeated(ids(item 2 of $input))) == 0"],
-		"first of $input": ["count(matching(item 1 of $input)) >= 1", "count(repeated(ids(item 1 of $input))) == 0"],
-		"every $input.commits": ["count(matching(every commits)) >= 1", "count(repeated(ids(every commits))) == 0"],
+		"every $input[1].commits": ["count(matching(every $input[1].commits)) >= 1", "count(missing(ids(every $input[1].commits))) + count(repeated(ids(every $input[1].commits))) == 0"],
+		"$input[1]": ["count(matching(item 2 of $input)) >= 1", "count(missing(ids(item 2 of $input))) + count(repeated(ids(item 2 of $input))) == 0"],
+		"first of $input": ["count(matching(item 1 of $input)) >= 1", "count(missing(ids(item 1 of $input))) + count(repeated(ids(item 1 of $input))) == 0"],
+		"every $input.commits": ["count(matching(every commits)) >= 1", "count(missing(ids(every commits))) + count(repeated(ids(every commits))) == 0"],
 	} {
 		req := {"s": object.union(min_subjects_req(1).s, {"from": from})}
 		rep := report([{"commits": [{"id": "a"}]}, {"commits": [{"id": "b"}]}], req)
@@ -339,7 +339,7 @@ test_a_from_line_with_every_reads_one_flat_list_from_every_list_along_its_path i
 	[r.inputs | some r in rep.results; r.check == "$min_subjects"] == [[{"name": "in-scope pull request count", "value": 3, "locations": ["/artifacts/0/pull_requests/0", "/artifacts/0/pull_requests/1", "/artifacts/2/pull_requests/0"]}]]
 	rep.subjects["pull request"].from == "every artifacts.pull_requests"
 	rep.requirements.r.checks["$min_subjects"].expression == "count(matching(every artifacts.pull_requests)) >= 1"
-	rep.requirements.r.checks["$unique_ids"].expression == "count(repeated(ids(every artifacts.pull_requests))) == 0"
+	rep.requirements.r.checks["$unique_ids"].expression == "count(missing(ids(every artifacts.pull_requests))) + count(repeated(ids(every artifacts.pull_requests))) == 0"
 }
 
 test_a_from_line_with_every_lists_no_failed_items_when_every_branch_is_read if {

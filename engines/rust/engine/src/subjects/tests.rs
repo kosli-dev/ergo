@@ -133,16 +133,15 @@ fn a_from_that_reaches_a_list_of_subjects_through_a_param_key() {
 }
 
 #[test]
-fn a_subject_without_a_readable_id_has_a_null_id_and_points_at_where_the_read_stopped() {
+fn a_subject_without_a_readable_id_has_a_null_id_that_never_repeats() {
     let r = run(
         json!({"thing": {"from": "ds", "identified_by": "meta.id"}}),
         json!({"ds": [{"meta": {}}, {"x": 1}]}),
     );
     let unique = &rows(&r, "$unique_ids")[0];
-    assert_eq!(unique["passed"], json!(false));
     assert_eq!(
         input_of(unique, 0),
-        json!({"name": "repeated thing ids", "value": [null], "locations": ["/ds/0/meta", "/ds/1"]})
+        json!({"name": "repeated thing ids", "value": [], "locations": []})
     );
 }
 
@@ -452,7 +451,9 @@ fn a_position_on_a_list_input_is_named_from_dollar_input_in_expressions() {
         );
         assert_eq!(
             checks["$unique_ids"]["expression"],
-            json!(format!("count(repeated(ids({name}))) == 0")),
+            json!(format!(
+                "count(missing(ids({name}))) + count(repeated(ids({name}))) == 0"
+            )),
             "{from}"
         );
     }
@@ -634,7 +635,11 @@ fn a_repeated_parent_id_fails_one_ancestor_row_counting_the_parents_left_out() {
     assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
     assert_eq!(
         r["requirements"]["s"]["checks"]["$unique_ancestor_ids"]["expression"],
-        json!("count(repeated(ids(arts))) == 0")
+        json!("count(missing(ids(arts))) + count(repeated(ids(arts))) == 0")
+    );
+    assert_eq!(
+        r["requirements"]["s"]["checks"]["$unique_ancestor_ids"]["description"],
+        json!("Every art has a unique id")
     );
 }
 
@@ -1898,4 +1903,263 @@ fn an_assertion_with_two_counts_says_no_item_either_count_says() {
             "{sentence}"
         );
     }
+}
+
+fn judged_list(items: &[Value], ids: &[Value]) -> Vec<super::Judged<'static>> {
+    let items: &'static [Value] = Box::leak(items.to_vec().into_boxed_slice());
+    items
+        .iter()
+        .zip(ids)
+        .enumerate()
+        .map(|(at, (item, id))| super::Judged {
+            entry: super::Entry {
+                at: crate::path::Located {
+                    value: item,
+                    location: crate::path::Location::input_root()
+                        .key("ds")
+                        .index(at as u64),
+                },
+                key: None,
+                copies: Vec::new(),
+            },
+            id: id.clone(),
+            id_location: Some(format!("/ds/{at}/id")),
+            applied: None,
+        })
+        .collect()
+}
+
+#[test]
+fn a_null_id_is_not_an_id_so_it_never_repeats() {
+    let judged = judged_list(
+        &[
+            json!({}),
+            json!({"id": null}),
+            json!({"id": "a"}),
+            json!({"id": "a"}),
+        ],
+        &[Value::Null, Value::Null, json!("a"), json!("a")],
+    );
+    let (repeated, locations) = super::repeated_ids(&judged);
+    assert_eq!(repeated, vec![json!("a")]);
+    assert_eq!(locations, ["/ds/2/id", "/ds/3/id"]);
+}
+
+fn unique_row(subjects: Value, input: Value) -> Value {
+    rows(&run(subjects, input), "$unique_ids")[0].clone()
+}
+
+#[test]
+fn a_subject_whose_id_is_missing_or_null_fails_unique_ids_named_by_its_place() {
+    let row = unique_row(
+        json!({"thing": {"from": "ds", "identified_by": "id"}}),
+        json!({"ds": [{"id": "a"}, {"ok": 1}, {"id": null}, {"id": "a"}]}),
+    );
+    assert_eq!(row["cause"], json!("absent"));
+    assert_eq!(
+        row["message"],
+        json!(
+            "repeated thing ids is [\"a\"]; item 2 of ds: id is missing; item 3 of ds: id is null"
+        )
+    );
+    assert_eq!(
+        row["failures"],
+        json!([
+            {"kind": "item", "name": "item 2 of ds", "cause": "absent", "message": "id is missing", "failures": [],
+             "inputs": [{"name": "ds[1].id", "value": null, "locations": ["/ds/1"], "outcome": "absent"}],
+             "value": {"ok": 1}, "locations": ["/ds/1"]},
+            {"kind": "item", "name": "item 3 of ds", "cause": "null", "message": "id is null", "failures": [],
+             "inputs": [{"name": "ds[2].id", "value": null, "locations": ["/ds/2/id"], "outcome": "null"}],
+             "value": {"id": null}, "locations": ["/ds/2"]}
+        ])
+    );
+}
+
+#[test]
+fn a_null_item_is_its_own_id_so_it_fails_unique_ids_with_or_without_identified_by() {
+    for subject in [
+        json!({"from": "ds"}),
+        json!({"from": "ds", "identified_by": "id"}),
+    ] {
+        let row = unique_row(json!({"thing": subject}), json!({"ds": ["a", null]}));
+        assert_eq!(row["cause"], json!("null"));
+        assert_eq!(row["message"], json!("item 2 of ds is null"));
+        assert_eq!(
+            row["failures"][0]["inputs"],
+            json!([{"name": "ds[1]", "value": null, "locations": ["/ds/1"], "outcome": "null"}])
+        );
+    }
+}
+
+#[test]
+fn an_id_read_through_a_field_says_what_stopped_it_as_a_check_would() {
+    let row = unique_row(
+        json!({"thing": {"from": "ds", "identified_by": "meta.id"}}),
+        json!({"ds": [{"meta": 3}, {"meta": null}, {"meta": {}}]}),
+    );
+    assert_eq!(row["cause"], json!("unusable"));
+    assert_eq!(
+        row["message"],
+        json!(
+            "item 1 of ds: meta is 3, which isn't an object; item 2 of ds: meta is null; item 3 of ds: meta.id is missing"
+        )
+    );
+    assert_eq!(row["failures"][1]["cause"], json!("null"));
+}
+
+#[test]
+fn a_subject_picked_by_position_without_an_id_is_an_item() {
+    let row = unique_row(
+        json!({"thing": {"from": "first of ds", "identified_by": "id"}}),
+        json!({"ds": [{}]}),
+    );
+    assert_eq!(row["failures"][0]["kind"], json!("item"));
+    assert_eq!(row["failures"][0]["name"], json!("item 1 of ds"));
+}
+
+#[test]
+fn a_subject_without_an_id_in_a_list_of_lists_sits_under_the_outer_item() {
+    let row = unique_row(
+        json!({"thing": {"from": "every xs.bs", "identified_by": "id"}}),
+        json!({"xs": [{"bs": [{"id": 1}, {"x": 1}]}]}),
+    );
+    assert_eq!(
+        row["message"],
+        json!("item 1 of xs: item 2 of bs: id is missing")
+    );
+    assert_eq!(row["failures"][0]["name"], json!("item 1 of xs"));
+    assert_eq!(row["failures"][0]["locations"], json!(["/xs/0"]));
+    assert_eq!(
+        row["failures"][0]["failures"][0]["name"],
+        json!("item 2 of bs")
+    );
+    assert_eq!(
+        row["failures"][0]["failures"][0]["inputs"][0]["name"],
+        json!("xs[0].bs[1].id")
+    );
+}
+
+#[test]
+fn a_subject_read_through_a_field_of_each_item_without_an_id_is_named_by_its_item() {
+    let row = unique_row(
+        json!({"thing": {"from": "every xs.meta", "identified_by": "id"}}),
+        json!({"xs": [{"meta": {}}, {"meta": {"id": 1}}, {"meta": {}}, {"meta": {"id": null}}, {"meta": {}}]}),
+    );
+    assert_eq!(
+        row["message"],
+        json!(
+            "item 1 of xs: meta.id is missing; item 3 of xs: meta.id is missing; item 4 of xs: meta.id is null; and 1 more"
+        )
+    );
+    assert_eq!(row["inputs"].as_array().map(Vec::len), Some(1));
+    assert_eq!(row["failures"].as_array().map(Vec::len), Some(4));
+    assert_eq!(
+        row["failures"][0],
+        json!({"kind": "item", "name": "item 1 of xs", "cause": "absent", "message": "meta.id is missing", "failures": [],
+               "inputs": [{"name": "xs[0].meta.id", "value": null, "locations": ["/xs/0/meta"], "outcome": "absent"}],
+               "value": {"meta": {}}, "locations": ["/xs/0"]})
+    );
+}
+
+#[test]
+fn copies_of_a_subject_read_through_a_field_of_each_item_list_every_item() {
+    let row = unique_row(
+        json!({"thing": {"from": "every distinct xs.meta", "identified_by": "id"}}),
+        json!({"xs": [{"meta": {}}, {"meta": {"id": 1}}, {"meta": {}}]}),
+    );
+    assert_eq!(row["message"], json!("item 1 of xs: meta.id is missing"));
+    assert_eq!(row["failures"][0]["locations"], json!(["/xs/0", "/xs/2"]));
+}
+
+#[test]
+fn a_subject_that_is_the_whole_input_without_an_id_is_named_from_the_input() {
+    let row = unique_row(
+        json!({"thing": {"from": "$input", "identified_by": "id"}}),
+        json!({"x": 1}),
+    );
+    assert_eq!(row["message"], json!("$input.id is missing"));
+    assert_eq!(
+        input_of(&row, 1),
+        json!({"name": "$input.id", "value": null, "locations": [""], "outcome": "absent"})
+    );
+}
+
+#[test]
+fn a_child_without_an_id_is_named_from_its_parent_without_the_parent_name() {
+    let r = run(
+        chain(),
+        json!({"arts": [{"id": "a1", "live": 1, "prs": [{"id": 1}, {}]}]}),
+    );
+    let row = &rows(&r, "$unique_ids")[0];
+    assert_eq!(row["subject"]["in"], json!({"art": "a1"}));
+    assert_eq!(row["message"], json!("item 2 of prs: id is missing"));
+    assert_eq!(row["failures"][0]["locations"], json!(["/arts/0/prs/1"]));
+}
+
+#[test]
+fn a_parent_without_an_id_fails_the_ancestor_row() {
+    let r = run(
+        chain(),
+        json!({"arts": [{"id": "a1", "live": 1, "prs": [{"id": 1}]}, {"prs": [{"id": 2}]}]}),
+    );
+    let row = &rows(&r, "$unique_ancestor_ids")[0];
+    assert_eq!(row["cause"], json!("absent"));
+    assert_eq!(row["message"], json!("item 2 of arts: id is missing"));
+    assert_eq!(row["failures"][0]["name"], json!("item 2 of arts"));
+}
+
+#[test]
+fn a_subject_outside_a_list_without_an_id_puts_the_read_on_the_row() {
+    let row = unique_row(
+        json!({"thing": {"identified_by": "id"}}),
+        json!({"thing": {"x": 1}}),
+    );
+    assert_eq!(row["cause"], json!("absent"));
+    assert_eq!(row["message"], json!("thing.id is missing"));
+    assert_eq!(row["failures"], json!([]));
+    assert_eq!(
+        input_of(&row, 1),
+        json!({"name": "thing.id", "value": null, "locations": ["/thing"], "outcome": "absent"})
+    );
+}
+
+#[test]
+fn a_subject_out_of_scope_without_an_id_still_fails_unique_ids() {
+    let row = unique_row(
+        json!({"thing": {"from": "ds whose keep exists", "identified_by": "id"}}),
+        json!({"ds": [{"id": 1, "keep": 1}, {}]}),
+    );
+    assert_eq!(row["message"], json!("item 2 of ds: id is missing"));
+}
+
+#[test]
+fn keys_listed_by_named_by_each_of_are_ids_even_when_the_object_lacks_them() {
+    let r = report(
+        &json!({"o": {"a": {"x": 1}}}),
+        &policy(
+            json!({"thing": {"from": "o named by each of $params.k"}}),
+            json!(0),
+        ),
+        &json!({"k": ["a", "b"]}),
+    );
+    assert_eq!(rows(&r, "$unique_ids")[0]["passed"], json!(true));
+}
+
+#[test]
+fn copies_of_a_subject_without_an_id_list_every_copy() {
+    let row = unique_row(
+        json!({"thing": {"from": "every distinct ds"}}),
+        json!({"ds": [null, "a", null]}),
+    );
+    assert_eq!(row["message"], json!("item 1 of ds is null"));
+    assert_eq!(row["failures"][0]["locations"], json!(["/ds/0", "/ds/2"]));
+}
+
+#[test]
+fn ids_of_any_other_value_are_ids() {
+    let row = unique_row(
+        json!({"thing": {"from": "ds", "identified_by": "id"}}),
+        json!({"ds": [{"id": ""}, {"id": 0}, {"id": false}, {"id": {}}, {"id": []}]}),
+    );
+    assert_eq!(row["passed"], json!(true));
 }

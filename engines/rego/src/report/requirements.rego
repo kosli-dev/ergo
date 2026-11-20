@@ -117,8 +117,8 @@ _subject_count_name(req) := concat(" ", ["in-scope", _text(_subject_type_of(req)
 
 _unique_ids_def(req) := {"$unique_ids": _with_refs(
 	{
-		"description": concat("", ["Every ", _text(_subject_type_of(req)), " id is unique"]),
-		"expression": concat("", ["count(repeated(ids(", _from_text(req), "))) == 0"]),
+		"description": _unique_ancestor_description(0, _subject_type_of(req)),
+		"expression": _ids_expression(_from_text(req)),
 	},
 	{"from": _listed_from(req), "id": _id_of(req)},
 )}
@@ -126,7 +126,7 @@ _unique_ids_def(req) := {"$unique_ids": _with_refs(
 _unique_ancestor_ids_def(req) := {"$unique_ancestor_ids": _with_refs(
 	{
 		"description": concat(" and ", [_unique_ancestor_description(i, a) | some i, a in levels]),
-		"expression": concat(" and ", [concat("", ["count(repeated(ids(", _from_text({"subject": a, "checks": {}}), "))) == 0"]) | some a in levels]),
+		"expression": concat(" and ", [_ids_expression(_from_text({"subject": a, "checks": {}})) | some a in levels]),
 	},
 	[{"from": _listed_from({"subject": a, "checks": {}}), "id": _id_of({"subject": a, "checks": {}})} | some a in levels],
 )} if {
@@ -134,9 +134,11 @@ _unique_ancestor_ids_def(req) := {"$unique_ancestor_ids": _with_refs(
 	count(levels) > 0
 } else := {}
 
-_unique_ancestor_description(0, a) := concat("", ["Every ", _text(a), " id is unique"])
+_unique_ancestor_description(0, a) := concat("", ["Every ", _text(a), " has a unique id"])
 
-_unique_ancestor_description(i, a) := concat("", ["every ", _text(a), " id is unique"]) if i > 0
+_unique_ancestor_description(i, a) := concat("", ["every ", _text(a), " has a unique id"]) if i > 0
+
+_ids_expression(f) := concat("", ["count(missing(ids(", f, "))) + count(repeated(ids(", f, "))) == 0"])
 
 _repeated_ids_name(req) := concat(" ", ["repeated", _text(_subject_type_of(req)), "ids"])
 
@@ -499,6 +501,10 @@ _ms_read_name(req, path) := _rooted_steps_name(path, _m_from_root(req)) if path 
 
 else := _m_from_root(req)
 
+_ms_place_name(req, p) := name if name := p.name
+
+else := _ms_read_name(req, p.c)
+
 _ms_flat(req, doc, p, keys) := {"levels": [], "entry": _entry("list", _m_from_item_name(req, p.c), p.cause, [{"name": _ms_list_name(req, p.c, keys), "value": _ms_list_value(doc, p, keys), "locations": [p.at], "outcome": _key_list_outcome(p.cause)}], [], p.text), "key": [0, [], 0]} if {
 	not p.plain
 	ws := [i | some i, _ in p.c; _ms_walked(p.c, keys, i)]
@@ -530,7 +536,7 @@ _ms_item_read(req, p, keys) := {"name": _ms_read_name(req, array.concat(p.c, [k]
 	_ms_walked(p.c, keys, count(p.c) - 1)
 	ks := [x | some x in keys; is_string(x)]
 	k := ks[count([x | some x in p.c; is_string(x)])]
-} else := {"name": _ms_read_name(req, p.c), "value": p.value, "locations": [p.at], "outcome": _ms_read_outcome(p)}
+} else := {"name": _ms_place_name(req, p), "value": p.value, "locations": [p.at], "outcome": _ms_read_outcome(p)}
 
 _ms_read_outcome(p) := "usable" if p.note
 
@@ -559,21 +565,34 @@ _ms_cut(text, p) := substring(text, count(p), -1) if {
 	startswith(text, p)
 } else := text
 
-_ms_tree(req, doc, places, keys) := _ms_group([x | some t in sort([[f.key[0], f.key[1], k] | some k, f in flat]); x := flat[t[2]]]) if {
-	flat := [_ms_flat(req, doc, p, keys) | some p in places]
-}
+_ms_tree(req, doc, places, keys) := _ms_sorted_group([_ms_flat(req, doc, p, keys) | some p in places])
 
-_ms_group(fs) := [_ms_node(fs, k) | some k, f in fs; _ms_first(fs, k)]
+_ms_sorted_group(flat) := _ms_group([x | some t in sort([[f.key[0], f.key[1], k] | some k, f in flat]); x := flat[t[2]]])
+
+_ms_group(fs) := [_ms_node([fs[j] | some j in run]) | some run in _ms_runs(fs)]
 
 _ms_head(f) := f.levels[0].name if count(f.levels) > 0
 
 else := f.entry.name
 
-_ms_first(fs, k) if not _ms_head(fs[k]) in [_ms_head(g) | some g in array.slice(fs, 0, k)]
+_ms_runs(fs) := [runs[x[1]] | some x in sort([[run[0], r] | some r, run in runs])] if {
+	s := sort([[_ms_head(f), k] | some k, f in fs])
+	starts := [i | some i, _ in s; _ms_run_start(s, i)]
+	runs := [[t[1] | some t in array.slice(s, at, _ms_run_end(starts, r, count(s)))] | some r, at in starts]
+}
 
-_ms_node(fs, k) := _ms_join(own, kids, lv) if {
-	h := _ms_head(fs[k])
-	same := [f | some f in fs; _ms_head(f) == h]
+_ms_run_start(_, 0)
+
+_ms_run_start(s, i) if {
+	i > 0
+	s[i - 1][0] != s[i][0]
+}
+
+_ms_run_end(starts, r, n) := starts[r + 1] if r + 1 < count(starts)
+
+else := n
+
+_ms_node(same) := _ms_join(own, kids, lv) if {
 	own := [f.entry | some f in same; count(f.levels) == 0]
 	kids := [{"levels": array.slice(f.levels, 1, count(f.levels)), "entry": f.entry, "key": f.key} | some f in same; count(f.levels) > 0]
 	lv := [f.levels[0] | some f in same; count(f.levels) > 0]
@@ -591,11 +610,9 @@ _ms_join(own, kids, lv) := object.union(own[0], {
 	under := _ms_group2(kids)
 }
 
-_ms_group2(fs) := [_ms_node2(fs, k) | some k, f in fs; _ms_first(fs, k)]
+_ms_group2(fs) := [_ms_node2([fs[j] | some j in run]) | some run in _ms_runs(fs)]
 
-_ms_node2(fs, k) := _ms_join2(own, [f.levels[0] | some f in same; count(f.levels) > 0], [f.entry | some f in same; count(f.levels) > 0]) if {
-	h := _ms_head(fs[k])
-	same := [f | some f in fs; _ms_head(f) == h]
+_ms_node2(same) := _ms_join2(own, [f.levels[0] | some f in same; count(f.levels) > 0], [f.entry | some f in same; count(f.levels) > 0]) if {
 	own := [f.entry | some f in same; count(f.levels) == 0]
 }
 
@@ -630,7 +647,9 @@ _min_subjects_cause(doc, req, _) := _from_cause(doc, req) if {
 	_from_unreadable(req)
 }
 
-_unique_ids_row(raw, refs, req, req_name) := {
+_unique_ids_row(doc, raw, refs, req, req_name) := _with_id_faults(_unique_ids_base(raw, refs, req, req_name), _id_fault_places(doc, raw, refs, req), doc, req)
+
+_unique_ids_base(raw, refs, req, req_name) := {
 	"requirement": req_name,
 	"subject": _req_subject_ref(req),
 	"check": "$unique_ids",
@@ -647,6 +666,116 @@ _unique_ids_row(raw, refs, req, req_name) := {
 	repeated := _repeated_ids(refs)
 }
 
+_with_id_faults(row, [], _, _) := row if row.passed == true
+
+_with_id_faults(row, [], _, _) := object.union(row, {"failures": []}) if row.passed == false
+
+_with_id_faults(row, places, doc, req) := object.union(row, {
+	"passed": false,
+	"cause": _worst_of({p.cause | some p in places} | {row.cause | row.passed == false}),
+	"message": _id_joined(array.concat([_m_is(row.inputs[0].name, row.inputs[0].value) | row.passed == false], [p.text | some p in places])),
+	"inputs": array.concat(row.inputs, [{"name": _ms_place_name(req, p), "value": null, "locations": [p.at], "outcome": p.cause} | some p in places; not p.listed]),
+	"failures": _id_failures(req, doc, places, [k | some k in _id_keys(req); is_string(k)]),
+}) if {
+	places != []
+}
+
+_id_failures(req, doc, places, keys) := _ms_sorted_group([object.union(f, {"entry": _id_copies(f.entry, copies)}) | some p in places; p.listed; f := _ms_flat(req, doc, p, keys)]) if {
+	copies := {p.item_at: p.ats | some p in places; p.listed; count(p.ats) > 1}
+}
+
+_id_joined(texts) := concat("; ", array.concat([m | some m in ms; _m_shown_clause(m, array.slice(leads, 0, 3))], [concat("", ["and ", _literal_text(count(leads) - 3), " more"]) | count(leads) > 3])) if {
+	ms := _sorted_once(texts)
+	leads := _sorted_once([_m_item_lead(m) | some m in ms; startswith(m, "item ")])
+}
+
+_sorted_once(xs) := [xs[i] | some i in sort({t[1] | some k, t in s; _ms_run_start(s, k)})] if s := sort([[x, i] | some i, x in xs])
+
+_id_copies(e, copies) := object.union(e, {"locations": ats}) if ats := copies[e.locations[0]]
+
+else := e
+
+_entry_c(entry, req) := entry.c if "c" in object.keys(entry)
+
+else := array.concat(_id_keys(req), [entry.i]) if "i" in object.keys(entry)
+
+else := _id_keys(req)
+
+_id_fault_places(doc, raw, refs, req) := [p |
+	some i, entry in raw
+	refs[i].id == null
+	not "key" in object.keys(entry)
+	p := _id_fault_place(entry, req, doc)
+]
+
+default _id_listed(_) := false
+
+_id_listed(c) if {
+	some x in c
+	is_number(x)
+}
+
+_id_item_len(c) := max({j | some i, x in c; is_number(x); j := i + 1}) if _id_listed(c)
+
+else := count(c)
+
+_id_tail(c) := array.slice(c, _id_item_len(c), count(c))
+
+_id_item_at(at, n) := at if n == 0
+
+else := concat("/", array.slice(parts, 0, count(parts) - n)) if parts := split(at, "/")
+
+_id_place(entry, req, doc) := {"listed": _id_listed(ec), "item_at": _id_item_at(entry.at, n), "ats": [_id_item_at(a, n) | some a in object.get(entry, "ats", [entry.at])], "item": _tally_read_value(doc, array.slice(ec, 0, _id_item_len(ec)))} if {
+	ec := _entry_c(entry, req)
+	n := count(_id_tail(ec))
+}
+
+_id_present(value, path) := _message({"op": "present", "path": path}, value, _row_cause({"op": "present", "path": path}, value, ""))
+
+_id_fault_place(entry, req, doc) := object.union(object.remove(place, ["item"]), {"c": c, "at": at, "cause": cause, "value": null, "text": text, "note": false, "plain": false, "name": _id_read_name(req, ec, c)}) if {
+	is_object(entry.subject)
+	id := _id_of(req)
+	ec := _entry_c(entry, req)
+	c := array.concat(ec, _plain_keys(id))
+	place := _id_place(entry, req, doc)
+	cause := _read_state(entry.subject, id) with input as _id_input(entry, req)
+	at := _id_stop(entry, req)
+	said := _id_said_on(req, ec, entry.subject, place.item, id, doc) with input as _id_input(entry, req)
+	text := _id_said(req, ec, said)
+}
+
+_id_fault_place(entry, req, doc) := object.union(object.remove(place, ["item"]), {"c": ec, "at": entry.at, "cause": "null", "value": null, "text": text, "note": false, "plain": false}) if {
+	entry.subject == null
+	ec := _entry_c(entry, req)
+	_id_listed(ec)
+	place := _id_place(entry, req, doc)
+	text := concat("", [_m_from_item_name(req, ec), " is null"])
+}
+
+_id_said_on(req, ec, subject, item, id, doc) := _id_present(item, array.concat(_id_tail(ec), id)) if _id_listed(ec)
+
+else := _id_present(subject, array.concat(["$$input"], id)) if {
+	ec == []
+	not _chained(req)
+}
+
+else := _id_present(doc, array.concat(ec, id)) if ec != []
+
+else := _id_present(subject, id)
+
+_id_read_name(req, ec, c) := _input_name(array.concat(["$$input"], c)) if {
+	ec == []
+	not _chained(req)
+}
+
+else := _visible_path_name(_visible(c), _m_from_root(req))
+
+_id_stop(entry, req) := array.concat(_id_locations(entry, req), [entry.at])[0]
+
+_id_said(req, c, said) := concat(": ", [_m_from_item_name(req, array.slice(c, 0, _id_item_len(c))), said]) if _id_listed(c)
+
+else := said
+
 _copied_id_locations(entry, req) := _id_locations(entry, req) if object.get(entry, "ats", null) == null
 
 else := [l | some a in entry.ats; some l in _id_locations(object.union(entry, {"at": a}), req)]
@@ -658,7 +787,9 @@ _id_input(entry, req) := scope if {
 	scope := _scope_of(req, entry.subject) with input as _row_input(entry.at)
 } else := _row_input(entry.at)
 
-_repeated_ids(refs) := [] if count({ref.id | some ref in refs}) == count(refs)
+_repeated_ids(given) := _repeated_of([ref | some ref in given; ref.id != null])
+
+_repeated_of(refs) := [] if count({ref.id | some ref in refs}) == count(refs)
 
 else := _repeated_keys(refs, [x | some x in {ref.id | some ref in refs}; _has_number(x)] != [])
 

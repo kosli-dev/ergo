@@ -9,8 +9,8 @@ use crate::path::{self, Ctx, Located, Location, Outcome, Path, Start, Step};
 use crate::policy::{Policy, Requirement, SubjectName};
 use crate::reading::{Filter, Lowered, Reading, Source};
 use crate::report::{
-    Evaluation, Row, min_subjects_row, no_subjects, row_of, unique_ancestor_ids_row,
-    unique_ids_row, unreadable_params,
+    Evaluation, IdFault, Row, min_subjects_row, no_subjects, row_of, unique_ancestor_ids_row,
+    unique_ids_row, unreadable_params, with_id_faults,
 };
 use crate::value::{self, json_text};
 use serde_json::{Map, Value, json};
@@ -2099,7 +2099,11 @@ fn same_id(a: &Value, b: &Value) -> bool {
 }
 
 fn repeated_ids(judged: &[Judged]) -> (Vec<Value>, Vec<String>) {
-    let mut sorted: Vec<(usize, &Judged)> = judged.iter().enumerate().collect();
+    let mut sorted: Vec<(usize, &Judged)> = judged
+        .iter()
+        .enumerate()
+        .filter(|(_, j)| !j.id.is_null())
+        .collect();
     sorted.sort_by(|a, b| order(&a.1.id, &b.1.id));
     let mut groups: Vec<Vec<(usize, &Judged)>> = Vec::new();
     for item in sorted {
@@ -2135,6 +2139,210 @@ fn repeated_ids(judged: &[Judged]) -> (Vec<Value>, Vec<String>) {
         }
     }
     (ids, locations)
+}
+
+fn segs_below(base: &Located, at: &Location) -> Vec<walk::Seg> {
+    let rest = at
+        .pointer
+        .strip_prefix(base.location.pointer.as_str())
+        .unwrap_or_default();
+    let mut value = Some(base.value);
+    let mut segs = Vec::new();
+    for token in rest.split('/').skip(1) {
+        let key = token.replace("~1", "/").replace("~0", "~");
+        let seg = match (value, key.parse::<u64>()) {
+            (Some(Value::Array(_)), Ok(at)) => walk::Seg::Index(at),
+            _ => walk::Seg::Key(key),
+        };
+        value = match (&seg, value) {
+            (walk::Seg::Index(at), Some(Value::Array(items))) => items.get(*at as usize),
+            (walk::Seg::Key(key), Some(Value::Object(map))) => map.get(key),
+            _ => None,
+        };
+        segs.push(seg);
+    }
+    segs
+}
+
+fn item_chain(segs: &[walk::Seg], root: &str) -> Vec<String> {
+    let mut chain: Vec<String> = Vec::new();
+    let mut keys: Vec<walk::Seg> = Vec::new();
+    for seg in segs {
+        let walk::Seg::Index(at) = seg else {
+            keys.push(seg.clone());
+            continue;
+        };
+        let list = match (keys.is_empty(), chain.is_empty()) {
+            (false, _) => steps_name(&keys),
+            (true, true) => root.to_string(),
+            (true, false) => "it".to_string(),
+        };
+        chain.push(format!("item {} of {list}", at + 1));
+        keys.clear();
+    }
+    chain
+}
+
+fn rooted_name(segs: &[walk::Seg], tail: &[Step], root: &str, child: bool) -> String {
+    let mut steps: Vec<Step> = segs.iter().map(walk::Seg::to_step).collect();
+    steps.extend(tail.iter().cloned());
+    let start = match (segs.first(), child) {
+        (Some(walk::Seg::Index(_)), true) => Start::Alias(root.to_string()),
+        (Some(walk::Seg::Index(_)) | None, false) => Start::Input,
+        _ => Start::Subject,
+    };
+    crate::name::name(&Path { start, steps })
+}
+
+fn present_text(start: Start, steps: Vec<Step>, ctx: &Ctx) -> String {
+    let present = Check::Present(ops::present::Present {
+        path: Path { start, steps },
+        missing: false,
+    });
+    ops::message::message(&present, ctx, &ops::run(&present, ctx))
+}
+
+fn located_below<'a>(base: &Located<'a>, segs: &[walk::Seg]) -> Located<'a> {
+    let mut at = base.clone();
+    for seg in segs {
+        let value = match (seg, at.value) {
+            (walk::Seg::Index(i), Value::Array(items)) => items.get(*i as usize),
+            (walk::Seg::Key(key), Value::Object(map)) => map.get(key),
+            _ => None,
+        };
+        at = Located {
+            value: value.unwrap_or(&Value::Null),
+            location: match seg {
+                walk::Seg::Index(i) => at.location.index(*i),
+                walk::Seg::Key(key) => at.location.key(key),
+            },
+        };
+    }
+    at
+}
+
+fn without_tokens(pointer: &str, n: usize) -> String {
+    let mut out = pointer;
+    for _ in 0..n {
+        out = out.rfind('/').map_or(out, |at| &out[..at]);
+    }
+    out.to_string()
+}
+
+fn id_fault(env: &Env, lowered: &Lowered, judged: &Judged, anc: &[Anc]) -> Option<IdFault> {
+    if !judged.id.is_null() || judged.entry.key.is_some() {
+        return None;
+    }
+    let child = matches!(lowered.source, Source::Child { .. });
+    let base = match (child, anc.last()) {
+        (true, Some(parent)) => parent.at.clone(),
+        _ => input_root(env),
+    };
+    let root = root_name(child, anc);
+    let at = &judged.entry.at;
+    let segs = segs_below(&base, &at.location);
+    let last_index = segs
+        .iter()
+        .rposition(|seg| matches!(seg, walk::Seg::Index(_)));
+    let listed = last_index.is_some();
+    let (item_segs, keys) = segs.split_at(last_index.map_or(segs.len(), |k| k + 1));
+    let key_steps: Vec<Step> = keys.iter().map(walk::Seg::to_step).collect();
+    let item = located_below(&base, item_segs);
+    let item_ctx = context(env, item.clone(), anc);
+    let chain = item_chain(item_segs, &root);
+    let start = if segs.is_empty() && !child {
+        Start::Input
+    } else {
+        Start::Subject
+    };
+    let (cause, path, stop, clause) = if at.value.is_object() {
+        let steps = lowered.id.clone().unwrap_or_default();
+        let ctx = context(env, at.clone(), anc);
+        let read = read_from(
+            &Path {
+                start: Start::Subject,
+                steps: steps.clone(),
+            },
+            &ctx,
+        );
+        let cause = match read.outcome.cause() {
+            Some(Cause::Absent)
+                if ops::message::stops_at_a_null(
+                    &Path {
+                        start: Start::Subject,
+                        steps: steps.clone(),
+                    },
+                    &ctx,
+                ) =>
+            {
+                Cause::Null
+            }
+            Some(cause) => cause,
+            None => Cause::Null,
+        };
+        let stop = read
+            .location
+            .as_ref()
+            .map_or_else(|| at.location.render(), Location::render);
+        let clause = if listed {
+            let mut said = chain.clone();
+            let mut whole = key_steps.clone();
+            whole.extend(steps.iter().cloned());
+            said.push(present_text(Start::Subject, whole, &item_ctx));
+            said.join(": ")
+        } else {
+            let mut whole: Vec<Step> = segs.iter().map(walk::Seg::to_step).collect();
+            whole.extend(steps.iter().cloned());
+            present_text(start, whole, &context(env, base.clone(), anc))
+        };
+        (
+            cause,
+            rooted_name(&segs, &steps, &root, child),
+            stop,
+            clause,
+        )
+    } else {
+        let name = rooted_name(&segs, &[], &root, child);
+        let mut said: Vec<String> = chain.clone();
+        if key_steps.is_empty() {
+            let own = said.pop().unwrap_or_else(|| name.clone());
+            said.push(format!("{own} is null"));
+        } else {
+            said.push(present_text(Start::Subject, key_steps.clone(), &item_ctx));
+        }
+        (Cause::Null, name, at.location.render(), said.join(": "))
+    };
+    let item_name = if listed {
+        rooted_name(item_segs, &[], &root, child)
+    } else {
+        path.clone()
+    };
+    let copies: Vec<String> = judged
+        .entry
+        .at_each()
+        .iter()
+        .map(|each| without_tokens(&each.location.render(), keys.len()))
+        .collect();
+    Some(IdFault {
+        record: json!({
+            "item": item_name,
+            "path": path,
+            "cause": cause.name(),
+            "value": null,
+            "locations": [stop],
+            "ergo/text": clause,
+            "ergo/item": {"value": item.value, "locations": copies},
+        }),
+        cause,
+        listed,
+    })
+}
+
+fn id_faults(env: &Env, lowered: &Lowered, judged: &[Judged], anc: &[Anc]) -> Vec<IdFault> {
+    judged
+        .iter()
+        .filter_map(|j| id_fault(env, lowered, j, anc))
+        .collect()
 }
 
 fn applies_row(env: &Env, judged: &Judged, applied: &Applied, anc: &[Anc]) -> Row {
@@ -2284,11 +2492,15 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
             }
         }
     }
-    let unique = unique_ids_row(
-        env.requirement_name,
-        env.requirement,
-        repeated,
-        &id_locations,
+    let unique = with_id_faults(
+        unique_ids_row(
+            env.requirement_name,
+            env.requirement,
+            repeated,
+            &id_locations,
+        ),
+        &id_faults(env, lowered, &judged, anc),
+        env.input,
     );
     let applies = judged
         .iter()
@@ -3311,7 +3523,14 @@ fn descend<'a>(
     }
     let judged_all = judge(env, lowered, entries, anc);
     let (repeated, id_locations) = repeated_ids(&judged_all);
-    let mut out = vec![ancestor_level(env, parent, repeated, &id_locations, anc)];
+    let mut first = ancestor_level(env, parent, repeated, &id_locations, anc);
+    let faults = id_faults(env, lowered, &judged_all, anc);
+    first.unique_ancestor_ids = first
+        .unique_ancestor_ids
+        .into_iter()
+        .map(|row| with_id_faults(row, &faults, env.input))
+        .collect();
+    let mut out = vec![first];
     for judged in judged_all {
         let mut here = Anc {
             name: parent.clone(),

@@ -171,14 +171,14 @@ _every_from(req) if {
 	m in object.get(data.ergo_subject_sentences, "every", set())
 }
 
-_every_walk(doc, keys) := {"subjects": [{"subject": e.v, "at": _walk_at(w, e)} | some e in w.items; last], "fails": array.concat(array.concat(w.fails, _walk_stop(w)), [object.union(_every_end_fail(e), {"at": _walk_at(w, e)}) | some e in w.items; not last])} if {
+_every_walk(doc, keys) := {"subjects": [{"subject": e.v, "at": _walk_at(w, e), "c": e.c} | some e in w.items; last], "fails": array.concat(array.concat(w.fails, _walk_stop(w)), [object.union(_every_end_fail(e), {"at": _walk_at(w, e)}) | some e in w.items; not last])} if {
 	w := _walk({"c": [], "v": doc, "i": null, "iv": null, "r": [], "a": _doc_at}, keys, true)
 	last := count(keys) in w.walked
 }
 
 _every_end_fail(e) := {"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_value(e.v, e, null)}
 
-_fl_walk(doc, keys) := {"subjects": [{"subject": x, "at": concat("", [base, "/", format_int(i, 10)])} | some i, x in end], "fails": [], "notes": []} if {
+_fl_walk(doc, keys) := {"subjects": [{"subject": x, "at": concat("", [base, "/", format_int(i, 10)]), "i": i} | some i, x in end], "fails": [], "notes": []} if {
 	end := _fl_simple_end(doc, keys)
 	base := _joined(_doc_at, keys)
 } else := _fl_full_walk(doc, keys)
@@ -211,7 +211,7 @@ _fl_full_walk(doc, keys) := r if {
 	r := _fl_result(doc, keys, [l0, l1, l2, l3, l4, l5, l6, l7, l8, l9, l10], l10.next)
 }
 
-_fl_result(doc, keys, levels, ends) := {"subjects": [{"subject": e.v, "at": _joined(_doc_at, e.c)} | some e in kept], "fails": [_fl_at(doc, f) | some f in fails], "notes": [_fl_note_at(doc, n) | some n in array.concat([n | some l in levels; some n in l.notes], _fl_type_note(kept))]} if {
+_fl_result(doc, keys, levels, ends) := {"subjects": [{"subject": e.v, "at": _joined(_doc_at, e.c), "c": e.c} | some e in kept], "fails": [_fl_at(doc, f) | some f in fails], "notes": [_fl_note_at(doc, n) | some n in array.concat([n | some l in levels; some n in l.notes], _fl_type_note(kept))]} if {
 	some l in levels
 	l.lists
 	kept := [e | some e in ends; _fl_kept_end(e)]
@@ -536,6 +536,10 @@ _from_state(doc, req) := "value" if {
 	_is_collection(v)
 }
 
+_id_keys(req) := ks if ks := _from_keys(req)
+
+else := []
+
 _from_keys(req) := ks if {
 	p := _from_path(req)
 	is_array(p)
@@ -587,7 +591,7 @@ _keys_refs(step) := {step.keys.ref} if _is_ref(step.keys)
 
 _listed_subjects(doc, req) := [] if {
 	_fl_met_at(doc, req)
-} else := [{"subject": subj, "at": concat("", [base, "/", format_int(i, 10)])} | some i, subj in coll] if {
+} else := [{"subject": subj, "at": concat("", [base, "/", format_int(i, 10)]), "i": i} | some i, subj in coll] if {
 	coll := _target(doc, req)
 	is_array(coll)
 	base := _pointer(_doc_at, doc, _from_keys(req))

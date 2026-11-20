@@ -100,7 +100,7 @@ test_a_chain_names_its_parent_in_the_expressions_of_the_checks_ergo_adds_as_its_
 	rep := _chain_report(_chain_doc, _chain_subjects, {"c": "approved is true"}, {"name": "web"})
 	[rep.requirements.r.checks["$min_subjects"].expression, rep.requirements.r.checks["$unique_ids"].expression] == [
 		"count(matching(every artifact.pull_requests)) >= 1",
-		"count(repeated(ids(every artifact.pull_requests))) == 0",
+		"count(missing(ids(every artifact.pull_requests))) + count(repeated(ids(every artifact.pull_requests))) == 0",
 	]
 	quoted := {"locked thing": {"from": "trail.artifacts named by $params.name"}, "pull request": {"from": `every "locked thing".pull_requests`, "identified_by": "url"}}
 	_chain_report(_chain_doc, quoted, {"c": "approved is true"}, {"name": "web"}).requirements.r.checks["$min_subjects"].expression == `count(matching(every "locked thing".pull_requests)) >= 1`

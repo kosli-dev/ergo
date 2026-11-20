@@ -4,7 +4,7 @@ import data.ergo
 import rego.v1
 
 test_a_subject_that_is_not_an_object_shows_up_as_a_violation if {
-	[v.check | some v in ergo.violations(report(mixed_subjects, mixed_req))] == ["$min_subjects", "c", "c", "c"]
+	[v.check | some v in ergo.violations(report(mixed_subjects, mixed_req))] == ["$min_subjects", "$unique_ids", "c", "c", "c"]
 }
 
 test_a_subject_that_is_not_an_object_keeps_its_applies_row if {
