@@ -17,7 +17,6 @@ fn ctx<'a>(subject: &'a Value, input: &'a Value, params: Option<&'a Value>) -> C
     Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: subject,
             location: Location::input_root().key("s"),

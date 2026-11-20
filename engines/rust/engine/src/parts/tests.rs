@@ -47,7 +47,6 @@ fn outcome_in(
         aliases: std::collections::BTreeMap::new(),
         label: None,
         item_by_item: checks.iter().any(crate::ops::Check::reads_by_item),
-        in_option: false,
     };
     let read = checks
         .iter()

@@ -57,7 +57,6 @@ fn verdict_on_input(sentence: &str, input: Value) -> Verdict {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -641,7 +640,6 @@ fn run_on(sentence: &str, subject: Value, input_rest: Value, params: Value) -> V
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1209,7 +1207,6 @@ fn failed_items_of(sentence: &str, items: Value, params: Value) -> Vec<Value> {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1372,7 +1369,6 @@ fn ran_with(
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1454,7 +1450,6 @@ fn verdict_in(
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1692,7 +1687,6 @@ fn counted_records(sentence: &str, items: Value, params: Value) -> Vec<Value> {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1848,7 +1842,6 @@ fn cause_and_row_in(sentence: &str, input: Value, params: Value) -> (Cause, Stri
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -1954,7 +1947,6 @@ fn a_count_whose_row_fails_for_params_it_walks_doesnt_say_its_number() {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -2111,7 +2103,6 @@ fn tally_clauses_on(sentence: &str, subject: Value, params: Value) -> Vec<Clause
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -2252,7 +2243,6 @@ fn row_message(sentence: &str, items: Value, params: Value) -> String {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),

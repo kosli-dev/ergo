@@ -53,7 +53,6 @@ fn root_clauses_in(
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: located.clone(),
         input,
         params,
@@ -174,7 +173,6 @@ fn a_count_on_an_input_that_is_a_list_says_the_input_once_and_then_its_items() {
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: located,
         input: &input,
         params: None,
@@ -315,7 +313,6 @@ fn walked_root_clauses_say_a_walked_root_that_holds_values_of_more_than_one_kind
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: crate::path::Located {
             value: &subject,
             location: crate::path::Location::input_root().key("s"),
@@ -346,7 +343,6 @@ fn walked_root_clauses_leave_out_a_list_the_item_holds() {
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: crate::path::Located {
             value: &subject,
             location: crate::path::Location::input_root().key("s"),
@@ -379,7 +375,6 @@ fn root_clauses_say_a_list_from_the_subject_a_count_in_the_item_cant_walk() {
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: located.clone(),
         input: &input,
         params: None,
@@ -415,7 +410,6 @@ fn root_clauses_say_a_key_from_the_subject_alone_when_the_value_before_it_is_mis
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: located.clone(),
         input: &input,
         params: Some(&params),

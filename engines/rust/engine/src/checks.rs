@@ -592,7 +592,6 @@ fn refs_walked_in(
     let ctx = Ctx {
         label: None,
         item_by_item: true,
-        in_option: false,
         subject: Located {
             value: input,
             location: Location::input_root(),

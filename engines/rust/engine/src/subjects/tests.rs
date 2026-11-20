@@ -1843,7 +1843,6 @@ fn tally_assertion(sentence: &str, input: Value, params: Value) -> crate::parts:
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: crate::path::Located {
             value: &input["things"][0],
             location: crate::path::Location::input_root().key("things").index(0),
@@ -1965,7 +1964,6 @@ fn walk_assertion(sentence: &str, input: Value, params: Value) -> crate::parts::
     let ctx = crate::path::Ctx {
         label: Some("thing".to_string()),
         item_by_item: false,
-        in_option: false,
         subject: crate::path::Located {
             value: &input["things"][0],
             location: crate::path::Location::input_root().key("things").index(0),

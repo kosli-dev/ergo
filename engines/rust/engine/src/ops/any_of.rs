@@ -30,10 +30,6 @@ pub struct OptionRun {
 
 /// Runs each option of `check` line by line, for the row's `failures`.
 pub fn option_runs(check: &AnyOf, ctx: &Ctx) -> Vec<OptionRun> {
-    let in_option = Ctx {
-        in_option: true,
-        ..ctx.clone()
-    };
     check
         .options
         .iter()
@@ -43,18 +39,14 @@ pub fn option_runs(check: &AnyOf, ctx: &Ctx) -> Vec<OptionRun> {
             let mut field_missing = false;
             let mut lines = Vec::new();
             for (k, line) in option.iter().enumerate() {
-                let ran = run_full(line, &in_option);
+                let ran = run_full(line, ctx);
                 field_missing |= answers_presence(line, &ran.verdict);
                 causes.push(ran.verdict.cause);
                 if ran.verdict.passed() {
                     continue;
                 }
-                let said = super::message::option_line_said(
-                    line,
-                    &in_option,
-                    ran.message.clone(),
-                    &ran.verdict,
-                );
+                let said =
+                    super::message::option_line_said(line, ctx, ran.message.clone(), &ran.verdict);
                 lines.push(LineRun {
                     check: line.clone(),
                     at: k,
@@ -112,15 +104,11 @@ fn answers_presence(check: &Check, verdict: &Verdict) -> bool {
 pub fn run(check: &AnyOf, ctx: &Ctx) -> Verdict {
     let mut inputs: Vec<Input> = Vec::new();
     let mut options: Vec<Cause> = Vec::new();
-    let in_option = Ctx {
-        in_option: true,
-        ..ctx.clone()
-    };
     for option in &check.options {
         let mut causes = Vec::new();
         let mut field_missing = false;
         for line in option {
-            let ran = run_full(line, &in_option).verdict;
+            let ran = run_full(line, ctx).verdict;
             field_missing |= answers_presence(line, &ran);
             causes.push(ran.cause);
             inputs.extend(ran.inputs);

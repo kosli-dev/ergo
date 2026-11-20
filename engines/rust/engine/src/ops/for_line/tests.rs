@@ -747,7 +747,6 @@ fn for_row_message(for_line: &str, assertion: &str, subject: Value, params: Valu
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: crate::path::Located {
             value: &input["things"][0],
             location: crate::path::Location::input_root().key("things").index(0),

@@ -15,7 +15,6 @@ fn cause_with(subject: Value, order: Order) -> Cause {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
@@ -209,7 +208,6 @@ fn a_written_time_on_the_right_has_no_input() {
     let ctx = Ctx {
         label: None,
         item_by_item: false,
-        in_option: false,
         subject: Located {
             value: &input["things"][0],
             location: Location::input_root().key("things").index(0),
