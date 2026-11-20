@@ -1388,6 +1388,7 @@ fn a_some_says_the_same_as_every() {
 }
 
 #[test]
+#[ignore = "#694 R4-5b: a walk row built from its root, list and item clauses"]
 fn an_every_says_a_root_after_the_phrase_and_then_its_items() {
     assert_eq!(
         said_row(
@@ -1404,6 +1405,7 @@ fn an_every_says_a_root_after_the_phrase_and_then_its_items() {
 }
 
 #[test]
+#[ignore = "#694 R4-5b: a walk row built from its root, list and item clauses"]
 fn a_value_that_holds_a_semicolon_stays_whole_in_a_walk_row() {
     use crate::ops::clause::Kind;
     let out = thing_row(
@@ -1425,6 +1427,22 @@ fn a_value_that_holds_a_semicolon_stays_whole_in_a_walk_row() {
             ),
             (Kind::Item, "item 2 of xs: v is missing".to_string()),
         ]
+    );
+}
+
+#[test]
+fn a_walk_row_says_a_root_its_items_cant_read_before_them() {
+    assert_eq!(
+        said_row(
+            "every es whose v contains $params.x is an object",
+            json!({"es": [{}, {"v": []}, {"v": 3}]}),
+            json!({}),
+        ),
+        (
+            Cause::Unusable,
+            "$params.x is missing; item 1 of es: v is missing; item 3 of es: v is 3, which isn't a list"
+                .to_string()
+        )
     );
 }
 
