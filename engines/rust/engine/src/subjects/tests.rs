@@ -2046,3 +2046,20 @@ fn a_walks_assertion_keeps_a_root_that_holds_a_comma_and_whole() {
     );
     assert_eq!(part.failures.len(), 2);
 }
+
+#[test]
+fn a_walks_assertion_says_an_item_with_several_clauses_once_in_its_entry() {
+    let part = walk_assertion(
+        "every xs.v is in ys.v",
+        json!({"things": [{"xs": [{"v": "a"}], "ys": [{}, 3]}]}),
+        json!({}),
+    );
+    assert_eq!(part.message, "");
+    assert_eq!(
+        entry_messages(&part),
+        [(
+            "item 1 of xs".to_string(),
+            "item 1 of ys: v is missing; item 2 of ys is 3, which isn't an object".to_string()
+        )]
+    );
+}
