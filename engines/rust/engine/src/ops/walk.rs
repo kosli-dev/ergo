@@ -1184,15 +1184,18 @@ pub(super) fn item_own(
                         || path::read(key, &focus).outcome != Outcome::Found))
         })
     };
-    let mut item = Clause::item(&name, Cause::Satisfied, String::new(), Vec::new());
-    if let Some(alone) = stood_in(check, &focus, |path| {
+    let blocked = |path: &Path| {
         outside(path) || root_key(path) || super::key_base::of_path(path, false, &focus).is_some()
-    }) {
+    };
+    let mut item = Clause::item(&name, Cause::Satisfied, String::new(), Vec::new());
+    if let Some(alone) = stood_in(check, &focus, blocked) {
         let verdict = run_check(&alone, &focus);
         if verdict.cause.is_failure() {
             let text = message::message(&alone, &focus, &verdict);
             item = super::tally::told(&name, verdict.cause, &text);
         }
+    } else if let Some(text) = own_list_fault(check, &focus, blocked) {
+        item = super::tally::told(&name, Cause::Unusable, &text);
     }
     let at = own_at.unwrap_or(said.len());
     item.said.splice(0..0, said.drain(..at));
@@ -1204,6 +1207,18 @@ pub(super) fn item_own(
             .chain([item.cause]),
     )?;
     Some(item)
+}
+
+fn own_list_fault(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Option<String> {
+    match check {
+        Check::In(within) => match &within.values {
+            super::lists::Right::Field(list) if !blocked(list) => {
+                super::lists::ref_faults(check, focus).into_iter().next()
+            }
+            _ => None,
+        },
+        _ => None,
+    }
 }
 
 fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
