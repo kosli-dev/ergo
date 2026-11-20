@@ -1207,8 +1207,8 @@ pub(super) fn item_own(
     {
         let text = message::isnt(&name, focus.subject.value, "an object");
         item = Clause::item(&name, Cause::NotAnObject, text, Vec::new());
-    } else if let Some(text) = own_list_fault(check, &focus, blocked) {
-        item = super::tally::told(&name, Cause::Unusable, &text);
+    } else if let Some((cause, text)) = own_list_fault(check, &focus, blocked) {
+        item = super::tally::told(&name, cause, &text);
     }
     let at = own_at.unwrap_or(said.len());
     item.said.splice(0..0, said.drain(..at));
@@ -1222,12 +1222,21 @@ pub(super) fn item_own(
     Some(item)
 }
 
-fn own_list_fault(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Option<String> {
+fn own_list_fault(
+    check: &Check,
+    focus: &Ctx,
+    blocked: impl Fn(&Path) -> bool,
+) -> Option<(Cause, String)> {
     let lists = super::lists::right_paths(check);
     if lists.is_empty() || lists.into_iter().any(blocked) {
         return None;
     }
-    super::lists::ref_faults(check, focus).into_iter().next()
+    super::lists::field_walk_fault(check, focus).or_else(|| {
+        super::lists::ref_faults(check, focus)
+            .into_iter()
+            .next()
+            .map(|text| (Cause::Unusable, text))
+    })
 }
 
 fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
@@ -1264,7 +1273,11 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
         _ => None,
     };
     let own_list = |right: &Right| match right {
-        Right::Field(list) | Right::Ref(list) if !blocked(list) && !mixed(list) => {
+        Right::Field(list) | Right::Ref(list)
+            if !blocked(list)
+                && !mixed(list)
+                && super::lists::walked_in(check, list, focus).is_none() =>
+        {
             Some(Check::Contains(Contains {
                 path: list.clone(),
                 wanted: Wanted::One(Right::Written(Value::Null)),
