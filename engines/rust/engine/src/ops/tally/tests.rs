@@ -1818,3 +1818,17 @@ fn a_count_says_its_roots_then_its_items_then_and_n_more() {
         "$params.min is \"s\", which isn't a number; item 1 of items: v is missing; item 2 of items: v is missing; item 3 of items: v is missing; and 2 more"
     );
 }
+
+#[test]
+fn a_count_in_a_whose_that_cant_be_read_says_its_items_once_with_one_and_n_more() {
+    let clauses = tally_clauses(
+        "count of items whose n is count of $params.pos.name is 2",
+        json!([{"n": 1}, {"n": 2}]),
+        json!({"pos": [{"name": "a"}, {}, {}, {}, {}, {}]}),
+        Cause::Absent,
+    );
+    assert_eq!(
+        clause::text(&clause::shown(&clauses)),
+        "item 2 of $params.pos: name is missing; item 3 of $params.pos: name is missing; item 4 of $params.pos: name is missing; and 2 more"
+    );
+}
