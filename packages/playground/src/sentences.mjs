@@ -397,12 +397,8 @@ const failText = (subject, phrase, nested) => {
   const [type, b] = variant(phrase);
   if (type === "Ignoring") {
     const [inner, ib] = variant(b.phrase);
-    if (inner === "OneOf") {
-      return variant(ib.list)[0] === "Values"
-        ? missingOr(subject, "not a string")
-        : `${subject} is missing, null or not a string, or the list it is compared with is missing, null, not a list, or holds an item that is null or not a string`;
-    }
-    return isValue(ib.operand) ? missingOr(subject, "not a string") : missingOr(withOther(subject, ib.operand), "not a string");
+    if (inner === "OneOf" || isValue(ib.operand)) return missingOr(subject, "not a string");
+    return missingOr(withOther(subject, ib.operand), "not a string");
   }
   if (type === "Is") {
     if (b.within !== null) return missingOr(withOther(subject, b.operand), "not a number");

@@ -6,7 +6,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ### New
 
-- `is`, `equals`, `is equal to`, `is not`, `does not equal`, `is one of`, `is in` and their `not` forms can end with `ignoring case`, `ignoring surrounding spaces` or `ignoring case and surrounding spaces`, as in `ergo.rego` 0.7.0 and spec 0.7 ([text.ignoring](../../spec/semantics.md#text-ignoring-case-and-surrounding-spaces)). `status is one of "in progress", "done" ignoring case and surrounding spaces` passes on `"  IN Progress "`. A value that isn't text fails as `unusable`, on either side and for each item of a list.
+- `is`, `equals`, `is equal to`, `is not`, `does not equal`, and `is one of` and `is not one of` with written values, can end with `ignoring case`, `ignoring surrounding spaces` or `ignoring case and surrounding spaces`, as in `ergo.rego` 0.7.0 and spec 0.7 ([text.ignoring](../../spec/semantics.md#text-ignoring-case-and-surrounding-spaces)). `status is one of "in progress", "done" ignoring case and surrounding spaces` passes on `"  IN Progress "`. A value that isn't text fails as `unusable`, on either side. `is in` and `is one of` with a path, like `type is in $params.states ignoring case`, are written wrong for now, with `"is in" can't take ignoring case yet`, until [#712](https://github.com/kosli-dev/ergo/issues/712) adds them.
 
 ### Changed
 

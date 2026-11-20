@@ -614,22 +614,22 @@ test("a part with a quoted dotted key stands for that key in the aliases", () =>
 });
 
 test("a sentence that ends with ignoring words colours them as words and says how it reads", () => {
-  const line = "x is in $params.l ignoring case and surrounding spaces";
+  const line = 'x is one of "a", "b" ignoring case and surrounding spaces';
   const { tree } = parser.read("check", line);
   assert.deepEqual(pairs(treeTokens("check", tree, line, [], "code")), [
     "field:x",
     "word:is",
-    "word:in",
-    "ref:$params.l",
+    "word:one",
+    "word:of",
+    'string:"a"',
+    'string:"b"',
     "word:ignoring",
     "word:case",
     "word:and",
     "word:surrounding",
     "word:spaces",
   ]);
-  const lines = describe("check", tree);
-  assert.match(lines[0], /^Passes when x is one of \$params\.l, ignoring case and surrounding spaces\. Fails when x is missing, null or not a string, or the list it is compared with/);
-  assert.ok(lines.includes("$params.l is the value of l in the params the report was given."));
+  assert.match(describe("check", tree)[0], /^Passes when x is one of "a", "b", ignoring case and surrounding spaces\. Fails when x is missing, null or not a string\./);
 });
 
 test("ignoring words after is, and in a whose, keep the paths and values they follow", () => {

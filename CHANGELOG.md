@@ -6,7 +6,7 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 ### New
 
-- `is`, `equals`, `is equal to`, `is not`, `does not equal`, `is one of`, `is in` and their `not` forms can end with `ignoring case`, `ignoring surrounding spaces` or `ignoring case and surrounding spaces`, as spec 0.7 says ([text.ignoring](spec/semantics.md#text-ignoring-case-and-surrounding-spaces)). `status is one of "in progress", "done" ignoring case and surrounding spaces` passes on `"  IN Progress "`. `ignoring` is a word of the grammar now, so a field with that name is written `.ignoring`.
+- `is`, `equals`, `is equal to`, `is not`, `does not equal`, and `is one of` and `is not one of` with written values, can end with `ignoring case`, `ignoring surrounding spaces` or `ignoring case and surrounding spaces`, as spec 0.7 says ([text.ignoring](spec/semantics.md#text-ignoring-case-and-surrounding-spaces)). `status is one of "in progress", "done" ignoring case and surrounding spaces` passes on `"  IN Progress "`. `is in` and `is one of` with a path, like `type is in $params.states ignoring case`, are written wrong for now, with `"is in" can't take ignoring case yet`, until [#712](https://github.com/kosli-dev/ergo/issues/712) adds them. `ignoring` is a word of the grammar now, so a field with that name is written `.ignoring`.
 
 ### Changed
 
