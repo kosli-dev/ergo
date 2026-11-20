@@ -25,6 +25,13 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
         .filter(|clause| clause.kind == Kind::Root)
         .cloned()
         .collect();
+    out.sort_by(|a, b| (a.cause, &a.name).cmp(&(b.cause, &b.name)));
+    out.extend(
+        clauses
+            .iter()
+            .filter(|clause| clause.kind == Kind::List)
+            .cloned(),
+    );
     let items: Vec<&Clause> = clauses
         .iter()
         .filter(|clause| clause.kind == Kind::Item)
