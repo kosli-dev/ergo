@@ -2920,7 +2920,7 @@ fn tally_part(
     ctx: &Ctx,
 ) -> Part {
     let check = Check::Tally(tally.clone());
-    let lists = tally.counted_lists(ctx, cause);
+    let lists = tally.counted_lists(ctx);
     let names: Vec<&str> = lists.iter().map(|(name, _)| name.as_str()).collect();
     let mut own: Vec<Value> = inputs
         .iter()

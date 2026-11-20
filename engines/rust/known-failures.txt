@@ -29,7 +29,7 @@ derived / a count whose whose reads a part of the subject with a named by key fr
 derived / a count whose whose reads a root outside the item through a key the item holds and another root from the params says the other root as before / the root is missing and the param is missing
 derived / a count whose whose reads a root outside the item through a key the item holds and reads params that aren't an object says the params / the root is null, the first item is null and the second item's key isn't text
 derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is 3 and four items each have a problem, so the last one is counted
-derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is missing and five items aren't objects, so the message stops after three problems
+derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags and v are of the wrong kind
 derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and an item's tags mix kinds, so the count says what it says when the root reads
 derived / a count whose whose reads a root outside the item through a key the item holds says each item's own problems after the root, and stops after three problems / the root is null and the item's key and field print with a semicolon and a comma
 derived / a count whose whose reads a root outside the item through a key the item holds says the root once and first / a root further back is null and the items have no key
@@ -44,6 +44,7 @@ derived / a count with whose or that reads a named by key from $input that isn't
 derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is a number
 derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is missing
 derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is null
+derived / a count, some or every over a list reached through a list, whose whose reads a root with a named by key from the item, names each item as before / names each item whose field isn't an object when the root is null
 derived / an every or some whose whose reads a part of the subject with a named by key from the item says the part once, first / the part is null and the first item is null
 derived / an every whose whose reads a field of the subject through a key the item holds says the field once and first / the field is null and the first item is null
 derived / count of a list / fails as unusable when the list is a string
@@ -320,7 +321,6 @@ list_items / a part read inside a whose on a subject that is a list, missing, nu
 list_items / a part read inside a whose on a subject that is a list, missing, null or not an object / a part that isn't an object fails as unusable
 list_items / a part that holds a list, walked after matches in a whose, is said once / items that aren't objects fail as unusable and are said once
 list_items / a part that holds a list, walked after matches in a whose, is said once / values that aren't patterns fail as unusable and are said once
-list_items / a path from $input with named by on an input that is a list / fails as not_an_object and names the input once
 list_items / a second for item that starts at an alias holding a list reads each item of it / an empty alias fails as value, and an item that isn't an object as not_an_object
 list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that / an empty alias fails as value
 list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that / an item that isn't an object fails as unusable
@@ -743,13 +743,12 @@ walks / a path whose named by key from $params isn't text and whose value before
 walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is null, with the worst cause
 walks / a path whose named by key from $params isn't text and whose value before the key can't take a key, in a plain check, a count, a sum, an every, a for line and a for line's whose / says the key and then the value before it that is text, with the worst cause
 walks / a that clause whose key from $params is missing reads the value before the key on the focus / the focus has no m
-walks / a that clause whose key from $params is missing reads the value before the key on the focus / the focus holds m
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / one focus has no m and another holds null
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / the focus has no m, and the item has one
 walks / a that clause whose key from $params isn't text reads the value before the key on the focus, not on the item / the focus holds m
-walks / a that key that can't be read, on a list item that isn't an object, names the item and never a field under it / the key is null and the item is text
 walks / a that key that can't be read, on a list item that isn't an object, names the item and never a field under it / the key is null and the items are an object whose focus isn't an object and text
 walks / a that key that isn't text, on a list item that isn't an object, names the item and never a field under it / the focus is an object, so only the key is said
+walks / a that key that isn't text, on a list item that isn't an object, names the item and never a field under it / the item is text
 walks / a walk through a for name, read from a parent on its right side / fails as absent for a name the parent doesn't have
 walks / a walk through a for name, read from a parent on its right side / fails as null for a name that is null
 walks / a walk through a for name, read from a parent on its right side / fails as unusable for a value that can't be compared

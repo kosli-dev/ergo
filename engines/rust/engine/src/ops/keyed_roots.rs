@@ -1,6 +1,4 @@
-use super::compare::Side as Plain;
 use super::lists::{Right, Wanted};
-use super::tally::{Kind, Side, Term};
 use super::walk::{self, Options};
 use super::{Check, message, push_new};
 use crate::cause::Cause;
@@ -22,8 +20,8 @@ struct Keyed<'a> {
     root: &'a Path,
 }
 
-/// Returns the cause and the message of a one-line `every … exists`,
-/// `some … exists` or `count of` compared with a value, whose one `whose`
+/// Returns the cause and the message of a one-line `every … exists` or
+/// `some … exists`, whose one `whose`
 /// clause, like `tags contains $input.m named by key`, reads a path from
 /// outside the item through a key the item holds, when the part before that
 /// key is missing, `null` or not an object. It says that part once, first,
@@ -98,22 +96,6 @@ fn keyed(check: &Check) -> Option<Keyed<'_>> {
                 && matches!(walk.check.as_ref(), Check::Present(present) if !present.missing) =>
         {
             (&walk.path, &walk.whose)
-        }
-        Check::Tally(tally) => {
-            let Side::Derived(derived) = &tally.left else {
-                return None;
-            };
-            if !matches!(tally.right, Some(Side::Plain(Plain::Value(_))))
-                || derived.terms.len() != 1
-            {
-                return None;
-            }
-            match &derived.terms[0] {
-                Term::Counted(counted) if counted.kind == Kind::Count && !counted.distinct => {
-                    (&counted.path, &counted.whose)
-                }
-                _ => return None,
-            }
         }
         _ => return None,
     };
