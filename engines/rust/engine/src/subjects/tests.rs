@@ -1890,3 +1890,38 @@ fn an_assertion_with_two_counts_says_no_item_either_count_says() {
         );
     }
 }
+
+fn judged_list(items: &[Value], ids: &[Value]) -> Vec<super::Judged<'static>> {
+    let items: &'static [Value] = Box::leak(items.to_vec().into_boxed_slice());
+    items
+        .iter()
+        .zip(ids)
+        .enumerate()
+        .map(|(at, (item, id))| super::Judged {
+            entry: super::Entry {
+                at: crate::path::Located {
+                    value: item,
+                    location: crate::path::Location::input_root()
+                        .key("ds")
+                        .index(at as u64),
+                },
+                key: None,
+                copies: Vec::new(),
+            },
+            id: id.clone(),
+            id_location: Some(format!("/ds/{at}/id")),
+            applied: None,
+        })
+        .collect()
+}
+
+#[test]
+fn a_null_id_is_not_an_id_so_it_never_repeats() {
+    let judged = judged_list(
+        &[json!({}), json!({"id": null}), json!({"id": "a"}), json!({"id": "a"})],
+        &[Value::Null, Value::Null, json!("a"), json!("a")],
+    );
+    let (repeated, locations) = super::repeated_ids(&judged);
+    assert_eq!(repeated, vec![json!("a")]);
+    assert_eq!(locations, ["/ds/2/id", "/ds/3/id"]);
+}
