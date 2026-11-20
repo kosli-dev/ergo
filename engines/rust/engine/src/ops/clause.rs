@@ -20,22 +20,17 @@ pub struct Clause {
 const SHOWN_ITEMS: usize = 3;
 
 pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
-    let mut out: Vec<Clause> = clauses
-        .iter()
-        .filter(|clause| clause.kind == Kind::Root)
-        .cloned()
-        .collect();
+    let mut once: Vec<&Clause> = Vec::new();
+    for clause in clauses {
+        if !once.contains(&clause) {
+            once.push(clause);
+        }
+    }
+    let of_kind = |kind: Kind| once.iter().copied().filter(move |clause| clause.kind == kind);
+    let mut out: Vec<Clause> = of_kind(Kind::Root).cloned().collect();
     out.sort_by(|a, b| (a.cause, &a.name).cmp(&(b.cause, &b.name)));
-    out.extend(
-        clauses
-            .iter()
-            .filter(|clause| clause.kind == Kind::List)
-            .cloned(),
-    );
-    let items: Vec<&Clause> = clauses
-        .iter()
-        .filter(|clause| clause.kind == Kind::Item)
-        .collect();
+    out.extend(of_kind(Kind::List).cloned());
+    let items: Vec<&Clause> = of_kind(Kind::Item).collect();
     let leaves: usize = items.iter().map(|item| pieces(item).len()).sum();
     if leaves <= SHOWN_ITEMS {
         out.extend(items.into_iter().cloned());
@@ -67,6 +62,9 @@ pub fn text(clauses: &[Clause]) -> String {
 
 fn pieces(item: &Clause) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
+    if !item.text.is_empty() {
+        out.push(item.text.clone());
+    }
     let mut own: Vec<&str> = Vec::new();
     let flush = |own: &mut Vec<&str>, out: &mut Vec<String>| {
         if !own.is_empty() {
@@ -95,6 +93,12 @@ fn cut(item: &Clause, left: &mut usize) -> Option<Clause> {
         said: Vec::new(),
         ..item.clone()
     };
+    if !item.text.is_empty() {
+        if *left == 0 {
+            kept.text.clear();
+        }
+        *left = left.saturating_sub(1);
+    }
     let mut run_kept: Option<bool> = None;
     for clause in &item.said {
         if clause.kind == Kind::Item {
@@ -111,7 +115,7 @@ fn cut(item: &Clause, left: &mut usize) -> Option<Clause> {
             }
         }
     }
-    (!kept.said.is_empty()).then_some(kept)
+    (!kept.text.is_empty() || !kept.said.is_empty()).then_some(kept)
 }
 
 #[cfg(test)]
