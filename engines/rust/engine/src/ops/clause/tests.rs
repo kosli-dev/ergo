@@ -40,3 +40,21 @@ fn and_n_more_comes_after_the_roots_and_the_lists_in_a_count() {
         "$params.min is \"s\", which isn't a number; item 1 of xs: v is missing; item 2 of xs: v is missing; item 3 of xs: v is missing; and 2 more"
     );
 }
+
+#[test]
+fn the_cap_counts_leaf_items_not_outer_items() {
+    let rs = || {
+        vec![
+            item("item 1 of rs", Cause::Absent, vec![missing("ok")]),
+            item("item 2 of rs", Cause::Absent, vec![missing("ok")]),
+        ]
+    };
+    let clauses = vec![
+        item("item 1 of cs", Cause::Absent, rs()),
+        item("item 2 of cs", Cause::Absent, rs()),
+    ];
+    assert_eq!(
+        text(&shown(&clauses)),
+        "item 1 of cs: item 1 of rs: ok is missing; item 1 of cs: item 2 of rs: ok is missing; item 2 of cs: item 1 of rs: ok is missing; and 1 more"
+    );
+}
