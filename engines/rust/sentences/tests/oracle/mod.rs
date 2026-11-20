@@ -18,6 +18,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("ds whose keep exists", "ds whose keep exists"),
     ("every distinct ds", "every distinct ds"),
+    ("every distinct ws.xs.meta", "every distinct ws.xs.meta"),
     ("every t.cs", "every t.cs"),
     (
         "commits whose merged is true",
