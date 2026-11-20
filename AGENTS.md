@@ -159,6 +159,8 @@ When there's no seam, because the decision is mixed with building text or with t
 
 A red test for a decision that a round won't build stays: `#[ignore = "<decision>"]` in Rust, and `todo_test_<name>` in Rego. OPA skips a `todo_` test and `opa test` exits 2, so a todo test can't land on `main`: turn it on or remove it before the pull request is ready.
 
+When an acceptance test is red, whether a spec case, a pin or a shape a review found, add a smaller unit test first that fails for the same reason, so there is a fast loop, then fix. A new spec case for a fixed shape is red on the old code before the fix is made.
+
 ## No comments
 
 There are no comments in the code or the tests, and it should stay that way.
