@@ -897,3 +897,36 @@ fn an_item_whose_focus_cant_be_read_says_so_whatever_the_key() {
         );
     }
 }
+
+#[test]
+fn an_item_says_its_own_list_beside_a_root_on_the_left_of_is_in_it_cant_read() {
+    let sentence = "every items whose $params.k is in tags exists";
+    let items = json!(["a", {"tags": 1}, {}, {"tags": ["x"]}, {"tags": null}]);
+    let readable = judged(sentence, items.clone(), json!({"k": "x"}));
+    assert_eq!(
+        readable,
+        [
+            Some((
+                Cause::NotAnObject,
+                "item 1 of items is \"a\", which isn't an object".to_string()
+            )),
+            Some((
+                Cause::Unusable,
+                "item 2 of items: tags is 1, which isn't a list".to_string()
+            )),
+            Some((
+                Cause::Absent,
+                "item 3 of items: tags is missing".to_string()
+            )),
+            None,
+            Some((Cause::Null, "item 5 of items: tags is null".to_string())),
+        ]
+    );
+    for params in [json!({}), json!({"k": null})] {
+        assert_eq!(
+            own_said(sentence, items.clone(), params.clone(), json!({})),
+            readable,
+            "{params}"
+        );
+    }
+}
