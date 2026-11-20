@@ -2788,9 +2788,9 @@ fn unrecorded(pieces: &[Piece], recorded: &[String]) -> String {
                 let mut kept: Vec<Clause> = Vec::new();
                 for said in clause::shown(clauses) {
                     let own = match said.kind {
-                        clause::Kind::More(_) => kept
-                            .iter()
-                            .any(|said| said.kind == clause::Kind::Item),
+                        clause::Kind::More(_) => {
+                            kept.iter().any(|said| said.kind == clause::Kind::Item)
+                        }
                         clause::Kind::Item => !items.contains(&said.name.as_str()),
                         clause::Kind::Root | clause::Kind::List => !seen.contains(&said.text),
                     };
