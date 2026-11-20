@@ -87,12 +87,19 @@ build_cmd=${RED_CHECK_BUILD_CMD:-.github/build-ergo.sh}
 
 default_rust() {
   export CARGO_TARGET_DIR=${CARGO_TARGET_DIR:-$HOME/.cache/ergo-cargo-target}
-  export ASDF_RUST_VERSION=1.99.0
-  find "$1/engines/rust" -name '*.rs' -exec touch {} +
   out=$work/cargo.out
   tree_dir=$1
   shift
-  (cd "$tree_dir/engines/rust" && cargo test -j 4 -p "$@" > "$out" 2>&1) || return 1
+  if [ "$touched" = 0 ]; then
+    find "$tree_dir/engines/rust" -name '*.rs' -exec touch {} +
+    toolchain=$tree_dir/engines/rust/rust-toolchain.toml
+    if [ -f "$toolchain" ]; then
+      ASDF_RUST_VERSION=$(sed -n 's/^channel *= *"\(.*\)"/\1/p' "$toolchain")
+      export ASDF_RUST_VERSION
+    fi
+    touched=1
+  fi
+  (cd "$tree_dir/engines/rust" && cargo test -j 4 -p "$@" -- --exact > "$out" 2>&1) || return 1
   if grep -q '[1-9][0-9]* passed' "$out"; then return 0; fi
   return 3
 }
@@ -122,6 +129,7 @@ crate_of() {
 rust_count=0
 rego_count=0
 built=0
+touched=0
 while IFS="$tab" read -r kind path name; do
   if [ "$kind" = rust ]; then
     rust_count=$((rust_count + 1))
