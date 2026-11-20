@@ -336,3 +336,5 @@ _list_right_usable(cmp, r) if {
 }
 
 _leaf_ops := {"range", "excludes", "includes", "in", "equals", "present", "missing", "non_empty_string", "matches_any", "not_matches_any", "compare", "compare_time"}
+
+_prepared(text, _) := text

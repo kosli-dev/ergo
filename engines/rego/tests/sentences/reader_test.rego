@@ -148,3 +148,56 @@ test_brackets_in_a_for_item_that_starts_with_every_some_or_a_position_are_read i
 	"items" in object.keys(ergo._for_line("every t as x, every t[0].u as i"))
 	"items" in object.keys(ergo._for_line("every t as x, first of x.u as i"))
 }
+
+test_ignoring_words_read_after_is_and_is_one_of if {
+	_read(`x is "a" ignoring case`).assertions[0].phrase == {"op": "is", "value": "a", "ignoring": "case"}
+	_read(`x is  "a"  ignoring  case  and  surrounding  spaces`).assertions[0].phrase == {"op": "is", "value": "a", "ignoring": "case and surrounding spaces"}
+	_read(`x is not in $params.l ignoring surrounding spaces`).assertions[0].phrase == {"op": "is not one of", "path": {"start": "params", "steps": ["l"]}, "ignoring": "surrounding spaces"}
+	_printed(`x  is equal to y ignoring   case`) == `x equals y ignoring case`
+	_printed(`x is one of $params.l ignoring case and surrounding spaces`) == `x is in $params.l ignoring case and surrounding spaces`
+	_printed(`every xs whose k is not "a" ignoring case exists`) == `every xs whose k is not "a" ignoring case exists`
+	_printed(`x is "a" followed by y ignoring case`) == `x is "a" followed by y ignoring case`
+}
+
+test_ignoring_words_after_another_phrase_or_in_another_order_are_written_wrong if {
+	_read(`x is "a" ignoring surrounding spaces and case`) == {"problems": [`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`]}
+	every pair in [
+		[`x is at least 3 ignoring case`, "is at least"],
+		[`x is before "2020-01-01" ignoring case`, "is before"],
+		[`x is between 1 and 2 ignoring case`, "is between"],
+		[`x matches "a" ignoring case`, "matches"],
+		[`x is empty ignoring case`, "is empty"],
+		[`x exists ignoring case`, "exists"],
+		[`x is a string ignoring case`, "is a"],
+		[`x is a non-empty string ignoring case`, "is a non-empty string"],
+	] {
+		_read(pair[0]) == {"problems": [concat("", [`"`, pair[1], `" can't take ignoring case`])]}
+	}
+	_read(`x is 1 within 2 ignoring surrounding spaces`) == {"problems": [`"within" can't take ignoring surrounding spaces`]}
+	_read(`x is y plus 1 ignoring case`) == {"problems": [`"ignoring case" can't take a count of, a sum of or a plus`]}
+	_read(`count of xs is "a" ignoring case`) == {"problems": [`"ignoring case" can't follow a count of, a sum of or a plus`]}
+	_read(`x is y ignoring case and y is 1 ignoring surrounding spaces`) == {"problems": [`"ignoring surrounding spaces" takes text`]}
+	every line in [`x is 1 ignoring case`, `x is null ignoring case`, `x is not true ignoring case`, `x is one of "a", 1 ignoring case`, `x is one of "a", null ignoring case`] {
+		`"ignoring case" takes text` in _read(line).problems
+	}
+	_read(`x equals x ignoring case`) == {"problems": ["x is compared with itself"]}
+}
+
+test_ignoring_words_dont_read_after_contains_starts_with_ends_with_or_alphabetically_yet if {
+	every line in [
+		`x contains "a" ignoring case`,
+		`x contains all of "a" ignoring case`,
+		`x starts with "a" ignoring case`,
+		`x does not end with "a" ignoring case`,
+		`x is alphabetically before "a" ignoring case`,
+		`x is "a" ignoring spaces`,
+		`x is "a" ignoring`,
+	] {
+		_read(line) == {"problems": ["doesn't parse"]}
+	}
+}
+
+test_ignoring_is_a_word_of_the_grammar if {
+	_read(`ignoring is 1`) == {"problems": ["ignoring is a word of the grammar: write .ignoring"]}
+	_read(`.ignoring is 1`).assertions[0].path == {"steps": ["ignoring"], "dot": true}
+}
