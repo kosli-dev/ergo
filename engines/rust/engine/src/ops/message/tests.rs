@@ -211,7 +211,12 @@ fn an_option_line_of_is_in_ignoring_case_says_the_list_that_isnt_text_as_the_sen
         }),
     });
     let params = json!({"l": ["a", null, 3, "Q"]});
-    for subject in [json!({"x": " A "}), json!({"x": 3}), json!({}), json!({"x": null})] {
+    for subject in [
+        json!({"x": " A "}),
+        json!({"x": 3}),
+        json!({}),
+        json!({"x": null}),
+    ] {
         let input = json!({"things": [subject]});
         let ctx = crate::path::Ctx {
             label: None,
@@ -229,7 +234,9 @@ fn an_option_line_of_is_in_ignoring_case_says_the_list_that_isnt_text_as_the_sen
         let line = super::option_line_text(&check, &ctx, None, &verdict);
         assert_eq!(line, super::message(&check, &ctx, &verdict), "{subject}");
         assert!(
-            line.contains("item 2 of $params.l is null, and item 3 of $params.l is 3, which isn't text"),
+            line.contains(
+                "item 2 of $params.l is null, and item 3 of $params.l is 3, which isn't text"
+            ),
             "{subject}: {line}"
         );
     }
