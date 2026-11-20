@@ -1188,12 +1188,12 @@ pub(super) fn item_own(
         outside(path) || root_key(path) || super::key_base::of_path(path, false, &focus).is_some()
     };
     let mut item = Clause::item(&name, Cause::Satisfied, String::new(), Vec::new());
-    if let Some(alone) = stood_in(check, &focus, blocked) {
-        let verdict = run_check(&alone, &focus);
-        if verdict.cause.is_failure() {
-            let text = message::message(&alone, &focus, &verdict);
-            item = super::tally::told(&name, verdict.cause, &text);
-        }
+    let alone = stood_in(check, &focus, blocked)
+        .map(|alone| (run_check(&alone, &focus), alone))
+        .filter(|(verdict, _)| verdict.cause.is_failure());
+    if let Some((verdict, alone)) = alone {
+        let text = message::message(&alone, &focus, &verdict);
+        item = super::tally::told(&name, verdict.cause, &text);
     } else if !focus.subject.value.is_object()
         && check
             .paths()
@@ -1223,15 +1223,11 @@ pub(super) fn item_own(
 }
 
 fn own_list_fault(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Option<String> {
-    match check {
-        Check::In(within) => match &within.values {
-            super::lists::Right::Field(list) if !blocked(list) => {
-                super::lists::ref_faults(check, focus).into_iter().next()
-            }
-            _ => None,
-        },
-        _ => None,
+    let lists = super::lists::right_paths(check);
+    if lists.is_empty() || lists.into_iter().any(blocked) {
+        return None;
     }
+    super::lists::ref_faults(check, focus).into_iter().next()
 }
 
 fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
@@ -1261,8 +1257,39 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
             .collect();
         kinds.len() > 1
     };
-    let compare = match check {
-        Check::Compare(compare) => compare,
+    let side_blocked = |side: &Side| side.paths().into_iter().any(&blocked);
+    let own_side = |left: &Side, right: &Side| match (side_blocked(left), side_blocked(right)) {
+        (false, true) => Some(left.clone()),
+        (true, false) => Some(right.clone()),
+        _ => None,
+    };
+    let own_list = |right: &Right| match right {
+        Right::Field(list) | Right::Ref(list) if !blocked(list) && !mixed(list) => {
+            Some(Check::Contains(Contains {
+                path: list.clone(),
+                wanted: Wanted::One(Right::Written(Value::Null)),
+                not: false,
+            }))
+        }
+        _ => None,
+    };
+    match check {
+        Check::Compare(compare) => {
+            let own = own_side(&compare.left, &compare.right)?;
+            Some(Check::Compare(Compare {
+                left: own.clone(),
+                right: own,
+                ..compare.clone()
+            }))
+        }
+        Check::CompareTime(compare) => {
+            let own = own_side(&compare.left, &compare.right)?;
+            Some(Check::CompareTime(super::time::CompareTime {
+                left: own.clone(),
+                right: own,
+                ..compare.clone()
+            }))
+        }
         Check::Contains(contains) if !blocked(&contains.path) => {
             let wanted = match &contains.wanted {
                 _ if mixed(&contains.path) => return None,
@@ -1277,49 +1304,40 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
                 }
                 _ => return None,
             };
-            return Some(Check::Contains(Contains {
+            Some(Check::Contains(Contains {
                 wanted,
                 ..contains.clone()
-            }));
+            }))
         }
+        Check::Contains(contains) => match &contains.wanted {
+            Wanted::One(Right::Field(value)) if !blocked(value) => {
+                let own = Side::Path(value.clone());
+                Some(Check::Compare(Compare {
+                    left: own.clone(),
+                    right: own,
+                    cmp: super::compare::Cmp::Eq,
+                    within: None,
+                }))
+            }
+            Wanted::All(list) | Wanted::Some(list) => own_list(list),
+            Wanted::One(_) => None,
+        },
         Check::In(within) if !blocked(&within.path) && right_blocked(&within.values) => {
-            return Some(Check::In(In {
+            Some(Check::In(In {
                 values: Right::Written(Value::Array(Vec::new())),
                 ..within.clone()
-            }));
+            }))
         }
-        Check::In(within) if !right_blocked(&within.values) => {
-            let (Right::Field(list) | Right::Ref(list)) = &within.values else {
-                return None;
-            };
-            if mixed(list) {
-                return None;
-            }
-            return Some(Check::Contains(Contains {
-                path: list.clone(),
-                wanted: Wanted::One(Right::Written(Value::Null)),
-                not: false,
-            }));
-        }
+        Check::In(within) => own_list(&within.values),
         Check::Matches(matches) if !blocked(&matches.path) && right_blocked(&matches.patterns) => {
-            return Some(Check::Matches(Matches {
+            Some(Check::Matches(Matches {
                 patterns: Right::Written(Value::Array(vec![Value::from("x")])),
                 ..matches.clone()
-            }));
+            }))
         }
-        _ => return None,
-    };
-    let blocked = |side: &Side| side.paths().into_iter().any(&blocked);
-    let own = match (blocked(&compare.left), blocked(&compare.right)) {
-        (false, true) => &compare.left,
-        (true, false) => &compare.right,
-        _ => return None,
-    };
-    Some(Check::Compare(Compare {
-        left: own.clone(),
-        right: own.clone(),
-        ..compare.clone()
-    }))
+        Check::Matches(matches) => own_list(&matches.patterns),
+        _ => None,
+    }
 }
 
 fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {

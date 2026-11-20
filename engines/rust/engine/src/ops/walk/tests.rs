@@ -1057,13 +1057,17 @@ fn an_item_says_its_own_value_beside_a_root_on_the_left_of_contains_it_cant_read
         ),
         (
             "every items whose $params.l contains v.w exists",
-            json!([{}, {"v": null}, {"v": "s"}, {"v": {"w": "b"}}]),
+            json!([{"v": {}}, {"v": null}, {"v": "s"}, {"v": {"w": "b"}}]),
             vec![
                 (Cause::Unusable, "v is \"s\", which isn't an object"),
                 (Cause::Satisfied, ""),
             ],
         ),
     ] {
+        let mut want = absent_null_and(&rest);
+        if sentence.contains("v.w") {
+            want[0] = Some((Cause::Absent, "item 1 of items: v.w is missing".to_string()));
+        }
         assert_eq!(
             own_beside_broken_roots(
                 sentence,
@@ -1071,7 +1075,7 @@ fn an_item_says_its_own_value_beside_a_root_on_the_left_of_contains_it_cant_read
                 json!({"l": ["a"]}),
                 &[json!({}), json!({"l": null})],
             ),
-            absent_null_and(&rest),
+            want,
             "{sentence}"
         );
     }
