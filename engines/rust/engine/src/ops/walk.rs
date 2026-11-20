@@ -1113,22 +1113,59 @@ pub(super) fn item_own(
 ) -> Option<Clause> {
     let focus = focus_ctx(item, outer);
     let name = walked.item_name(focus_segs(item, check));
-    let keyed: Vec<super::key_base::KeyBase> = check
+    let keyed: Vec<Option<super::key_base::KeyBase>> = check
         .paths()
         .into_iter()
-        .filter_map(|path| super::key_base::of_path(path, false, &focus))
+        .map(|path| super::key_base::of_path(path, false, &focus))
         .collect();
-    if keyed.iter().any(|found| found.off_object) {
+    if keyed.iter().flatten().any(|found| found.off_object) {
         let text = message::isnt(&name, focus.subject.value, "an object");
         return Some(Clause::item(&name, Cause::NotAnObject, text, Vec::new()));
     }
-    let said: Vec<Clause> = keyed
-        .into_iter()
-        .filter_map(|found| found.base)
-        .map(|(text, cause, _)| Clause::said(cause, text))
-        .collect();
+    let mut said: Vec<Clause> = Vec::new();
+    let mut own_at = None;
+    for found in keyed {
+        match found {
+            Some(found) => said.extend(
+                found
+                    .base
+                    .map(|(text, cause, _)| Clause::said(cause, text)),
+            ),
+            None => {
+                own_at.get_or_insert(said.len());
+            }
+        }
+    }
+    if let Some(alone) = stood_in(check, |path| {
+        super::key_base::of_path(path, false, &focus).is_some()
+    }) {
+        let verdict = run_check(&alone, &focus);
+        if verdict.cause.is_failure() {
+            let text = message::message(&alone, &focus, &verdict);
+            said.insert(own_at.unwrap_or(said.len()), Clause::said(verdict.cause, text));
+        }
+    }
     let cause = Cause::worst(said.iter().map(|clause| clause.cause))?;
     Some(Clause::item(&name, cause, String::new(), said))
+}
+
+fn stood_in(check: &Check, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
+    use super::compare::{Compare, Side};
+    let Check::Compare(compare) = check else {
+        return None;
+    };
+    let blocked = |side: &Side| side.paths().into_iter().any(&blocked);
+    let own = match (blocked(&compare.left), blocked(&compare.right)) {
+        (false, true) => &compare.left,
+        (true, false) => &compare.right,
+        (false, false) => return Some(check.clone()),
+        (true, true) => return None,
+    };
+    Some(Check::Compare(Compare {
+        left: own.clone(),
+        right: own.clone(),
+        ..compare.clone()
+    }))
 }
 
 fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
