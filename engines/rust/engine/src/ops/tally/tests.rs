@@ -1798,15 +1798,17 @@ fn cause_and_row(sentence: &str, items: Value, params: Value) -> (Cause, String)
 }
 
 #[test]
-fn a_missing_input_key_after_params_that_cant_take_a_key_fails_a_count_or_sum_as_absent_and_says_only_the_key()
- {
+fn a_count_or_sum_says_params_that_cant_take_a_key_and_a_missing_input_key() {
     for sentence in [
         "sum of items.n that is at least $params.q named by $input.k is 1",
         "count of items.n that is at least $params.q named by $input.k is 1",
     ] {
         assert_eq!(
             cause_and_row(sentence, json!([{"n": 1}, {"n": 2}]), json!({"q": "s"})),
-            (Cause::Absent, "$input.k is missing".to_string())
+            (
+                Cause::Unusable,
+                "$params.q is \"s\", which isn't an object; $input.k is missing".to_string()
+            )
         );
     }
 }
@@ -1824,7 +1826,7 @@ fn a_missing_input_key_keeps_the_items_a_count_or_sum_cant_read() {
                 json!({"q": {"a": 1}})
             ),
             (
-                Cause::Absent,
+                Cause::Unusable,
                 "$input.k is missing; item 1 of items: n is \"x\", which isn't a number; item 2 of items: n is null"
                     .to_string()
             )
@@ -1833,20 +1835,20 @@ fn a_missing_input_key_keeps_the_items_a_count_or_sum_cant_read() {
 }
 
 #[test]
-fn a_count_keeps_each_item_beside_a_that_key_from_params_that_is_missing_or_null() {
+fn a_count_says_a_that_key_from_params_that_is_missing_or_null_once_beside_each_item() {
     let sentence = "count of items.v that is m named by $params.k is 0";
     for (items, params, cause, said) in [
         (
             json!([{"v": null}]),
             json!({"k": null}),
-            Cause::Null,
-            "$params.k is null; item 1 of items: v: $params.k is null",
+            Cause::NotAnObject,
+            "$params.k is null; item 1 of items: v is null, which isn't an object",
         ),
         (
             json!([{"v": "s"}, {"v": {}}]),
             json!({}),
-            Cause::Absent,
-            "$params.k is missing; item 1 of items: v: $params.k is missing; item 2 of items: v: $params.k is missing",
+            Cause::NotAnObject,
+            "$params.k is missing; item 1 of items: v is \"s\", which isn't an object; item 2 of items: v: m is missing",
         ),
     ] {
         assert_eq!(
@@ -1898,6 +1900,53 @@ fn a_count_fails_with_the_worst_cause_of_its_that_key_and_its_items() {
     ] {
         assert_eq!(cause_and_row(sentence, items, params).0, cause);
     }
+}
+
+#[test]
+fn a_count_says_each_items_own_reads_beside_a_whose_key_that_isnt_text() {
+    let clauses = tally_clauses(
+        "count of items whose zz is m named by $params.k is 0",
+        json!([{"v": 1}, {"v": 2}]),
+        json!({"k": 3}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        kinds_and_texts(&clauses),
+        [
+            (
+                clause::Kind::Root,
+                "$params.k is 3, which isn't text".to_string()
+            ),
+            (
+                clause::Kind::Item,
+                "item 1 of items: zz is missing, and m is missing".to_string()
+            ),
+            (
+                clause::Kind::Item,
+                "item 2 of items: zz is missing, and m is missing".to_string()
+            ),
+        ]
+    );
+}
+
+#[test]
+fn a_sum_says_the_root_before_an_input_key_and_the_key() {
+    let clauses = tally_clauses(
+        "sum of items.n that is at least $params.q named by $input.k is 1",
+        json!([{"n": 1}, {"n": 2}]),
+        json!({"q": "s"}),
+        Cause::Unusable,
+    );
+    assert_eq!(
+        kinds_and_texts(&clause::shown(&clauses)),
+        [
+            (
+                clause::Kind::Root,
+                "$params.q is \"s\", which isn't an object".to_string()
+            ),
+            (clause::Kind::Root, "$input.k is missing".to_string()),
+        ]
+    );
 }
 
 fn tally_clauses(sentence: &str, items: Value, params: Value, cause: Cause) -> Vec<Clause> {
