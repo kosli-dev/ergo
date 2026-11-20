@@ -606,3 +606,19 @@ fn an_item_whose_value_before_the_key_is_an_object_says_nothing() {
         [None]
     );
 }
+
+#[test]
+fn an_item_says_each_of_its_own_reads_beside_a_key_it_cant_read() {
+    assert_eq!(
+        own_said(
+            "every items whose zz is m named by $params.k exists",
+            json!([{"v": 1}]),
+            json!({"k": 3}),
+            json!({}),
+        ),
+        [Some((
+            Cause::Absent,
+            "item 1 of items: zz is missing, and m is missing".to_string()
+        ))]
+    );
+}
