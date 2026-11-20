@@ -46,7 +46,6 @@ derived / a count, a sum or an add whose sides can't be read in different ways, 
 derived / a count, a sum or an add whose sides can't be read in different ways, with a named by key from $input.k / the key is null
 derived / a count, some or every over a list reached through a list, whose whose reads a root with a named by key from the item, names each item as before / names each item whose field isn't an object when the root is null
 derived / an every or some whose whose reads a part of the subject with a named by key from the item says the part once, first / the part is null and the first item is null
-derived / an every whose whose reads a field of the subject through a key the item holds says the field once and first / the field is null and the first item is null
 derived / count of a list / fails as unusable when the list is a string
 derived / count of a list / fails as unusable when the list is an object
 derived / count of a params value that is not a list / fails as unusable
@@ -381,7 +380,6 @@ messages / a for line over two lists, with a walk under the first item before a 
 messages / a for line whose sentence compares with a param that isn't a list / names the param, then the list that is missing
 messages / a from line whose condition reads through a null / fails the condition as null and names the step, while a from line that walks through it still fails as absent
 messages / a grandparent's part read in a whose on a plain check, next to a list that can't be read / names a part of the wrong type before a list that is text
-messages / a grandparent's part read in a whose on a plain check, next to a list that can't be read / names a part that is null on an empty list
 messages / a key read from a field after a null / decides when the null is just before it, and isn't read when the null is further back
 messages / a key read from a field after a null / names the null step, then the key that can't be read
 messages / a param after the phrase, a root in a whose and the list beside them that can't be read are all said, roots first / with the list empty, said only where it fails on its own
@@ -391,7 +389,6 @@ messages / a param that isn't a list and the list it is read beside that can't b
 messages / a param that isn't a list and the list it is read beside that can't be read are both said, the param first / with the list null
 messages / a parent's part read in a that on a for line / names a part of the wrong type once, before what each item says
 messages / a parent's part read in a that on a plain check, next to a list that can't be read / names a part of the wrong type before a list that is text
-messages / a parent's part read in a that on a plain check, next to a list that can't be read / names a part that is null on an empty list
 messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that has the wrong type, then the list that is text
 messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that is missing, then the list that is null
 messages / a parent's part read in a whose inside an any_of option, next to a list that can't be read / names the part that is null, then the list that is missing
@@ -446,7 +443,6 @@ messages / the roots of one sentence, with a key from $params that is null and n
 messages / two roots after is in that aren't lists, in one relative clause / names both on an empty list too
 messages / two roots after is in that aren't lists, in one relative clause / names both, worst cause first and then by name, on a list with items
 messages / two roots in a whose that fail in different ways, beside a list that can be read, take the worst cause / a root that is null and one that is missing fail as absent
-messages / two roots in one relative clause that can't be read / names every root that failed, worst cause first and then by name
 messages / two roots in one relative clause that fail in different ways / names every root that failed, whatever its cause, worst cause first and then by name
 messages / two roots in one relative clause that fail in different ways / names them in front of what the items say when an item fails in a worse way
 missing / does not exist with a ref step after a field, and the param is null / fails with the ref's cause when the parent field is missing
