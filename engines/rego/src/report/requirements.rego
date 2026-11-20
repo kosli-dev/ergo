@@ -675,11 +675,13 @@ _with_id_faults(row, places, doc, req) := object.union(row, {
 	"cause": _worst_of({p.cause | some p in places} | {row.cause | row.passed == false}),
 	"message": _id_joined(array.concat([_m_is(row.inputs[0].name, row.inputs[0].value) | row.passed == false], [p.text | some p in places])),
 	"inputs": array.concat(row.inputs, [{"name": _ms_place_name(req, p), "value": null, "locations": [p.at], "outcome": p.cause} | some p in places; not p.listed]),
-	"failures": _ms_sorted_group([object.union(f, {"entry": _id_copies(f.entry, copies)}) | some p in places; p.listed; f := _ms_flat(req, doc, p, keys)]),
+	"failures": _id_failures(req, doc, places, [k | some k in _id_keys(req); is_string(k)]),
 }) if {
 	places != []
+}
+
+_id_failures(req, doc, places, keys) := _ms_sorted_group([object.union(f, {"entry": _id_copies(f.entry, copies)}) | some p in places; p.listed; f := _ms_flat(req, doc, p, keys)]) if {
 	copies := {p.item_at: p.ats | some p in places; p.listed; count(p.ats) > 1}
-	keys := [k | some k in _id_keys(req); is_string(k)]
 }
 
 _id_joined(texts) := concat("; ", array.concat([m | some m in ms; _m_shown_clause(m, array.slice(leads, 0, 3))], [concat("", ["and ", _literal_text(count(leads) - 3), " more"]) | count(leads) > 3])) if {

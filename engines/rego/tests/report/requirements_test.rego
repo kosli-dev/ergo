@@ -52,10 +52,12 @@ test_an_id_that_ends_at_a_position_is_named_as_a_check_names_it if {
 }
 
 test_an_id_that_ends_at_a_position_on_a_subject_outside_a_list_is_named_from_where_the_subject_was_read if {
-	missing := ergo._id_fault_place({"subject": {"ok": true}, "at": "/art", "c": ["art"]}, {"subject": "d"}, {"art": {"ok": true}}) with ergo._id_of as meta_first
-	missing.text == "item 1 of art.meta is missing"
-	stopped := ergo._id_fault_place({"subject": {"meta": [null]}, "at": "/art/sub", "c": ["art", "sub"]}, {"subject": "d"}, {"art": {"sub": {"meta": [null]}}}) with ergo._id_of as meta_first
-	stopped.text == "item 1 of art.sub.meta is null"
+	art := {"ok": true}
+	missing := ergo._id_said_on({"subject": "d"}, ["art"], art, art, ["meta", 0], {"art": art})
+	ergo._id_said({"subject": "d"}, ["art"], missing) == "item 1 of art.meta is missing"
+	sub := {"meta": [null]}
+	stopped := ergo._id_said_on({"subject": "d"}, ["art", "sub"], sub, sub, ["meta", 0], {"art": {"sub": sub}})
+	ergo._id_said({"subject": "d"}, ["art", "sub"], stopped) == "item 1 of art.sub.meta is null"
 }
 
 test_subjects_without_an_id_are_named_in_the_order_of_the_subjects_whatever_order_their_ids_are_kept_in if {
@@ -87,17 +89,14 @@ test_ids_that_are_missing_or_null_fail_the_row_after_the_repeated_ids_with_the_w
 	]
 }
 
-ws_xs_meta_keys(req) := ["ws", "xs", "meta"] if is_object(req)
-
 test_distinct_copies_of_a_subject_without_an_id_inside_an_outer_item_keep_every_copy_location if {
-	row := {"check": "$unique_ids", "inputs": [{"name": "repeated d ids", "value": [], "locations": []}], "passed": true, "cause": "satisfied"}
 	place := object.union(id_fault_place(["ws", 0, "xs", 0, "meta", "id"], "/ws/0/xs/0/meta", "absent", "item 1 of ws: item 1 of xs: meta.id is missing"), {"item_at": "/ws/0/xs/0", "ats": ["/ws/0/xs/0", "/ws/0/xs/1"], "name": "ws[0].xs[0].meta.id"})
 	doc := {"ws": [{"xs": [{"meta": {"ok": true}}, {"meta": {"ok": true}}]}]}
-	r := ergo._with_id_faults(row, [place], doc, {"subject": "d"}) with ergo._id_keys as ws_xs_meta_keys
-	r.failures[0].name == "item 1 of ws"
-	r.failures[0].locations == ["/ws/0"]
-	r.failures[0].failures[0].name == "item 1 of xs"
-	r.failures[0].failures[0].locations == ["/ws/0/xs/0", "/ws/0/xs/1"]
+	failures := ergo._id_failures({"subject": "d"}, doc, [place], ["ws", "xs", "meta"])
+	failures[0].name == "item 1 of ws"
+	failures[0].locations == ["/ws/0"]
+	failures[0].failures[0].name == "item 1 of xs"
+	failures[0].failures[0].locations == ["/ws/0/xs/0", "/ws/0/xs/1"]
 }
 
 test_a_unique_ids_row_that_fails_on_a_repeated_id_alone_has_no_failures_to_list if {
