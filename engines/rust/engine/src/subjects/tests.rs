@@ -1856,7 +1856,7 @@ fn a_counts_assertion_message_has_no_item_clause() {
 }
 
 #[test]
-#[ignore = "#694: tally_part gets the row message as text; the count's clauses have to reach it through message::message first"]
+#[ignore = "#694: tally_part gets the row message as text, after key_base::rewrite, keyed_roots::rewritten and message::unsaid, which don't carry the count's clauses yet"]
 fn a_counts_assertion_message_has_no_item_clause_after_a_side_joined_with_and() {
     assert_eq!(
         tally_message(
