@@ -738,7 +738,7 @@ _id_fault_place(entry, req, doc) := object.union(object.remove(place, ["item"]),
 	place := _id_place(entry, req, doc)
 	cause := _read_state(entry.subject, id) with input as _id_input(entry, req)
 	at := _id_stop(entry, req)
-	said := _id_said_on(req, ec, entry.subject, place.item, id, doc) with input as _id_input(entry, req) with data.ergo_document as doc
+	said := _id_said_on(req, ec, entry.subject, place.item, id, doc) with input as _id_input(entry, req)
 	text := _id_said(req, ec, said)
 }
 
