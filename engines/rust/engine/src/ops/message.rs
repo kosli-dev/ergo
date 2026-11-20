@@ -1795,7 +1795,12 @@ fn key_problems(checks: &[&Check], ctx: &Ctx, listed: bool) -> Vec<Clause> {
         let mut own: Vec<Path> = check
             .paths()
             .into_iter()
-            .chain(listed.then(|| super::walk::listed_refs(check)).into_iter().flatten())
+            .chain(
+                listed
+                    .then(|| super::walk::listed_refs(check))
+                    .into_iter()
+                    .flatten(),
+            )
             .flat_map(path::step_refs)
             .collect();
         own.sort_by_key(name::name);

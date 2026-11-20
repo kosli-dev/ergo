@@ -961,7 +961,10 @@ fn an_item_that_isnt_an_object_says_so_beside_a_root_on_the_left_of_contains_or_
             "every items whose $params.l contains v exists",
             json!({"l": ["a"]}),
         ),
-        ("every items whose $params.l matches v exists", json!({"l": "a"})),
+        (
+            "every items whose $params.l matches v exists",
+            json!({"l": "a"}),
+        ),
     ] {
         let items = json!(["s", null]);
         let readable = judged(sentence, items.clone(), readable_params);
