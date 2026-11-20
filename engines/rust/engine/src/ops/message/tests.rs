@@ -102,6 +102,22 @@ fn root_clauses_say_every_key_that_cant_be_read_worst_first_then_by_name() {
 }
 
 #[test]
+fn root_clauses_say_the_value_before_an_item_key_that_cant_take_a_key() {
+    let subject = json!({"id": "t", "xs": [{"tags": ["x"]}]});
+    let input = json!({"m": null});
+    let said = root_clauses_of(
+        "every xs whose tags contains $input.m named by key, if any, exists",
+        &subject,
+        &input,
+        None,
+    );
+    assert_eq!(
+        said,
+        vec![("$input.m".to_string(), "$input.m is null".to_string())]
+    );
+}
+
+#[test]
 fn a_clause_an_earlier_sentence_gave_is_left_out_and_the_rest_is_kept() {
     let mut said: Vec<String> = Vec::new();
     assert_eq!(
