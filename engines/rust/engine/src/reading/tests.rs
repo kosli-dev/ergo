@@ -614,25 +614,26 @@ fn requirement_problems(subjects: Value) -> Problems {
 }
 
 #[test]
-fn a_narrowed_child_with_an_unknown_name_lists_its_own_problem_for_the_requirement() {
+fn a_subject_that_narrows_a_child_with_an_unknown_name_lists_the_childs_problem_for_the_requirement()
+ {
     let problems = requirement_problems(json!({
         "parent": {"from": "things", "identified_by": "id"},
         "mid": {"from": "parent.items whose zz is $foo", "identified_by": "n"},
         "kid": {"from": "mid whose n is 1"}
     }));
     assert!(problems.contains_key("subjects.mid.from"));
-    assert!(problems["subjects.kid.from"].contains(NARROWING_A_CHILD_PROBLEM));
+    assert!(!problems.contains_key("subjects.kid.from"));
 }
 
 #[test]
-fn a_narrowed_child_with_mixed_types_lists_its_own_problem_for_the_requirement() {
+fn a_subject_that_narrows_a_child_with_mixed_types_lists_the_childs_problem_for_the_requirement() {
     let problems = requirement_problems(json!({
         "parent": {"from": "things", "identified_by": "id"},
         "mid": {"from": "parent.items whose n is one of 1, \"a\"", "identified_by": "n"},
         "kid": {"from": "mid whose n is 1"}
     }));
     assert!(problems.contains_key("subjects.mid.from"));
-    assert!(problems.contains_key("subjects.kid.from"));
+    assert!(!problems.contains_key("subjects.kid.from"));
 }
 
 #[test]

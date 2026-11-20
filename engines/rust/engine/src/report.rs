@@ -368,15 +368,10 @@ impl RequirementRead<'_> {
 
     fn filters_text(&self) -> Option<String> {
         let (name, _) = self.policy.subject_of(self.requirement)?;
-        let blocked = self
+        if self
             .extra
-            .get(&field_name(&["subjects", name, "from"]))
-            .is_some_and(|texts| {
-                texts
-                    .iter()
-                    .any(|text| text != crate::reading::NARROWING_A_CHILD_PROBLEM)
-            });
-        if blocked {
+            .contains_key(&field_name(&["subjects", name, "from"]))
+        {
             return None;
         }
         self.reading.filters_text(name)
