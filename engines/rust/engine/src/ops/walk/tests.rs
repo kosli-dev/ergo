@@ -745,6 +745,19 @@ fn an_item_says_its_own_list_beside_a_root_before_its_key_it_cant_read() {
 }
 
 #[test]
+fn an_item_whose_list_mixes_kinds_beside_a_root_it_cant_read_names_no_kind_it_cant_know() {
+    assert_eq!(
+        own_said(
+            "every items whose tags contains $params.m named by key exists",
+            json!([{"key": "a", "tags": ["x", 1]}]),
+            json!({"m": null}),
+            json!({}),
+        ),
+        [None]
+    );
+}
+
+#[test]
 fn an_item_says_its_own_value_beside_a_list_root_before_its_key_it_cant_read() {
     let sentence = "every items whose v is in $params.m named by key exists";
     let items = json!([{"key": "a"}, {"key": "a", "v": null}]);
