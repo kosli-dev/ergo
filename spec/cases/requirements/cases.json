@@ -17173,6 +17173,23 @@
             }
           },
           {
+            "cause": "satisfied",
+            "check": "$unique_ancestor_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated trail ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "merged prs",
+            "subject": {
+              "id": null,
+              "type": "trail"
+            }
+          },
+          {
             "cause": "value",
             "check": "$applies",
             "failures": [
