@@ -3115,18 +3115,6 @@ fn check_row(
             rich = ran.rich;
             pieces = ran.parts;
             let mut verdict = ran.verdict;
-            if env.unreadable.is_empty()
-                && plan.items.len() == 1
-                && !verdict.passed()
-                && let Some((cause, text)) =
-                    ops::keyed_roots::rewritten(check, ctx, verdict.cause, || match &own {
-                        Some(said) => said_text(said),
-                        None => default_message(check, ctx, &verdict),
-                    })
-            {
-                verdict.cause = cause;
-                own = Some(said_as_text(text));
-            }
             if env.unreadable.is_empty() && !verdict.passed() {
                 let said = own
                     .clone()

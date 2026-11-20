@@ -1446,44 +1446,6 @@ impl Tally {
     }
 }
 
-/// The check with each `$params` or `$input` root it compares against
-/// replaced by a value of the kind it needs, so that what an item reads can
-/// be checked on its own when a root can't be read.
-pub fn without_roots(check: &Check) -> Option<Check> {
-    let root = |side: &compare::Side| matches!(side, compare::Side::Path(p) if matches!(p.start, path::Start::Params | path::Start::Input));
-    let fill = |side: &compare::Side, value: &Value| {
-        if root(side) {
-            compare::Side::Value(value.clone())
-        } else {
-            side.clone()
-        }
-    };
-    match check {
-        Check::Compare(c) if root(&c.left) != root(&c.right) => {
-            let value = match c.cmp {
-                Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => Value::from(0),
-                Cmp::Eq | Cmp::Ne => return None,
-                _ => Value::from(""),
-            };
-            Some(Check::Compare(Compare {
-                left: fill(&c.left, &value),
-                right: fill(&c.right, &value),
-                cmp: c.cmp,
-                within: c.within.clone(),
-            }))
-        }
-        Check::CompareTime(c) if root(&c.left) != root(&c.right) => {
-            let value = Value::from("2000-01-01T00:00:00Z");
-            Some(Check::CompareTime(time::CompareTime {
-                left: fill(&c.left, &value),
-                right: fill(&c.right, &value),
-                order: c.order,
-            }))
-        }
-        _ => None,
-    }
-}
-
 pub fn counted_clauses(counted: &Counted, ctx: &Ctx) -> Option<Vec<Clause>> {
     let said = counted_said(counted, ctx).0;
     (!said.is_empty()).then_some(said)

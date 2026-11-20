@@ -676,7 +676,10 @@ fn judged(sentence: &str, items: Value, params: Value) -> Vec<Option<(Cause, Str
     let walked = walk(&walk_check.path, &outer, Options::default());
     judge(&walk_check, &walked, &outer)
         .into_iter()
-        .map(|said| said.failure.map(|failure| (failure.cause, failure.msg)))
+        .map(|said| {
+            said.failure
+                .map(|(failure, _)| (failure.cause, failure.msg))
+        })
         .collect()
 }
 
@@ -1536,5 +1539,30 @@ fn a_root_value_that_holds_an_and_stays_one_clause_in_a_walk_row() {
             ),
             (Kind::Item, "item 2 of xs: v is missing".to_string()),
         ]
+    );
+}
+
+#[test]
+fn a_walk_row_says_the_roots_then_the_lists_own_problem_then_the_items_with_the_worst_cause() {
+    let item = Clause::item(
+        "item 1 of xs",
+        Cause::Absent,
+        String::new(),
+        vec![Clause::said(Cause::Absent, "v is missing".to_string())],
+    );
+    let list = Clause::list("ys", Cause::Value, "ys is []".to_string());
+    let roots = vec![
+        Clause::root("$params.b", Cause::Null, "$params.b is null".to_string()),
+        Clause::root(
+            "$params.a",
+            Cause::Unusable,
+            "$params.a is 3, which isn't text".to_string(),
+        ),
+    ];
+    let (cause, parts) = row_clauses(roots, vec![list], vec![item]);
+    assert_eq!(cause, Cause::Unusable);
+    assert_eq!(
+        clause::text(&clause::shown(&parts)),
+        "$params.a is 3, which isn't text; $params.b is null; ys is []; item 1 of xs: v is missing"
     );
 }
