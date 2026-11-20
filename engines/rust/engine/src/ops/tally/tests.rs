@@ -1903,6 +1903,20 @@ fn a_count_or_a_sum_whose_list_is_missing_null_or_not_a_list_says_it_as_a_list()
     }
 }
 
+#[test]
+fn an_inner_list_a_count_cant_read_is_said_with_its_item_in_list_order() {
+    let clauses = tally_clauses(
+        "count of items.ys whose n is 1 is 9",
+        json!([{"ys": [{"n": 1}, {}]}, {}]),
+        json!({}),
+        Cause::Absent,
+    );
+    assert_eq!(
+        clause::text(&clause::shown(&clauses)),
+        "item 1 of items: item 2 of ys: n is missing; item 2 of items: ys is missing"
+    );
+}
+
 fn row_message(sentence: &str, items: Value, params: Value) -> String {
     let check = lowered(sentence);
     let Check::Tally(tally) = &check else {
