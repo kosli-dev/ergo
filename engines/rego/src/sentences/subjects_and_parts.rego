@@ -104,14 +104,13 @@ _p_lines(subjects) := {name: _from_line(def.from) | some name, def in subjects; 
 
 _p_narrow(subjects, lines) := {name: _s_chain_parent(name, lines, subjects) | some name, _ in subjects}
 
-_p_descend(subjects, lines) := object.union(direct, {name: direct[root] |
+_p_descend(subjects, lines, narrow) := object.union(direct, {name: direct[root] |
 	some name, _ in subjects
 	not name in object.keys(direct)
 	some root in graph.reachable(narrow, [name])
 	root in object.keys(direct)
 }) if {
 	direct := {name: lines[name].path.steps[0] | some name, _ in lines; "path" in object.keys(lines[name]); _s_descends(name, lines[name], subjects)}
-	narrow := _p_narrow(subjects, lines)
 }
 
 _p_parts(subjects) := {"own": own, "effective": {name: _p_merged(name, own, narrow) | some name, _ in subjects}, "problems": _p_problems(subjects, own, narrow, descend), "lines": lines, "narrow": narrow, "descend": descend} if {
@@ -119,7 +118,7 @@ _p_parts(subjects) := {"own": own, "effective": {name: _p_merged(name, own, narr
 	lines := _p_lines(subjects)
 	read := {name: object.get(line, "parsed", line) | some name, line in lines}
 	narrow := _p_narrow(subjects, read)
-	descend := _p_descend(subjects, read)
+	descend := _p_descend(subjects, read, narrow)
 	own := _p_own_reads(subjects)
 }
 
@@ -551,7 +550,7 @@ _s_chains(subjects, reads) := object.union(direct, {name: direct[root] |
 	narrowing := {n: object.get(_s_narrowing_of(reads), n, []) | some n, _ in reads}
 }
 
-_s_narrowing_of(reads) :={name: [parent] | some name, r in reads; parent := _s_narrowed_parent(r); is_string(parent); trim_space(parent) != ""}
+_s_narrowing_of(reads) := {name: [parent] | some name, r in reads; parent := _s_narrowed_parent(r); is_string(parent); trim_space(parent) != ""}
 
 _s_root_line(name, reads, lines) := [lines[m] | some m in graph.reachable({n: object.get(narrowing, n, []) | some n, _ in reads}, [name]); not m in object.keys(narrowing); m in object.keys(lines)][0] if narrowing := _s_narrowing_of(reads)
 
