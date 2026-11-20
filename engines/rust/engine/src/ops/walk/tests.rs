@@ -719,3 +719,24 @@ fn item_own_is_what_any_check_says_when_its_roots_can_be_read() {
         judged(sentence, items, params)
     );
 }
+
+#[test]
+fn an_item_whose_focus_cant_be_read_says_so_whatever_the_key() {
+    let sentence = "every items.v that is m named by $params.k is 1";
+    let items = json!([{}, {"w": 1}]);
+    let readable = judged(sentence, items.clone(), json!({"k": "a"}));
+    assert_eq!(
+        readable,
+        [
+            Some((Cause::Absent, "item 1 of items: v is missing".to_string())),
+            Some((Cause::Absent, "item 2 of items: v is missing".to_string())),
+        ]
+    );
+    for params in [json!({}), json!({"k": "a"}), json!({"k": 3})] {
+        assert_eq!(
+            own_said(sentence, items.clone(), params.clone(), json!({})),
+            readable,
+            "{params}"
+        );
+    }
+}
