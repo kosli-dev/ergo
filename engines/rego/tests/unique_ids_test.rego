@@ -72,10 +72,18 @@ test_a_child_and_a_parent_without_an_id_are_named_from_where_they_were_read if {
 	]
 }
 
-test_the_whole_input_without_an_id_names_the_id_alone if {
+test_the_whole_input_without_an_id_is_named_from_the_input if {
 	r := unique_of({"thing": {"from": "$input", "identified_by": "id"}}, {"x": 1})
-	[r.cause, r.message, r.failures] == ["absent", "id is missing", []]
-	r.inputs[1] == {"name": "id", "value": null, "locations": [""], "outcome": "absent"}
+	[r.cause, r.message, r.failures] == ["absent", "$input.id is missing", []]
+	r.inputs[1] == {"name": "$input.id", "value": null, "locations": [""], "outcome": "absent"}
+}
+
+test_a_subject_read_through_a_field_of_each_item_is_named_by_its_item if {
+	r := unique_of({"thing": {"from": "every xs.meta", "identified_by": "id"}}, {"xs": [{"meta": {}}, {"meta": {"id": 1}}, {"meta": {}}, {"meta": {"id": null}}, {"meta": {}}]})
+	r.message == "item 1 of xs: meta.id is missing; item 3 of xs: meta.id is missing; item 4 of xs: meta.id is null; and 1 more"
+	count(r.inputs) == 1
+	count(r.failures) == 4
+	r.failures[0] == {"kind": "item", "name": "item 1 of xs", "cause": "absent", "message": "meta.id is missing", "failures": [], "inputs": [{"name": "xs[0].meta.id", "value": null, "locations": ["/xs/0/meta"], "outcome": "absent"}], "value": {"meta": {}}, "locations": ["/xs/0"]}
 }
 
 test_an_id_read_through_a_null_field_fails_as_null if {

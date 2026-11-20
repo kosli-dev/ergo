@@ -532,7 +532,7 @@ _ms_item_read(req, p, keys) := {"name": _ms_read_name(req, array.concat(p.c, [k]
 	_ms_walked(p.c, keys, count(p.c) - 1)
 	ks := [x | some x in keys; is_string(x)]
 	k := ks[count([x | some x in p.c; is_string(x)])]
-} else := {"name": _ms_read_name(req, p.c), "value": p.value, "locations": [p.at], "outcome": _ms_read_outcome(p)}
+} else := {"name": object.get(p, "name", _ms_read_name(req, p.c)), "value": p.value, "locations": [p.at], "outcome": _ms_read_outcome(p)}
 
 _ms_read_outcome(p) := "usable" if p.note
 
@@ -670,7 +670,7 @@ _with_id_faults(row, places, doc, req) := object.union(row, {
 	"passed": false,
 	"cause": _worst_of({p.cause | some p in places} | {row.cause | row.passed == false}),
 	"message": _id_joined(array.concat([_m_is(row.inputs[0].name, row.inputs[0].value) | row.passed == false], [p.text | some p in places])),
-	"inputs": array.concat(row.inputs, [{"name": _ms_read_name(req, p.c), "value": null, "locations": [p.at], "outcome": p.cause} | some p in places; not p.listed]),
+	"inputs": array.concat(row.inputs, [{"name": object.get(p, "name", _ms_read_name(req, p.c)), "value": null, "locations": [p.at], "outcome": p.cause} | some p in places; not p.listed]),
 	"failures": [_id_copies(e, copies) | some e in _ms_tree(req, doc, [p | some p in places; p.listed], [k | some k in _id_keys(req); is_string(k)])],
 }) if {
 	places != []
@@ -703,27 +703,71 @@ _id_fault_places(doc, raw, refs, req) := [p |
 
 default _id_listed(_) := false
 
-_id_listed(c) if is_number(c[count(c) - 1])
+_id_listed(c) if {
+	some x in c
+	is_number(x)
+}
 
-_id_fault_place(entry, req, _) := {"c": c, "at": at, "cause": cause, "value": null, "text": text, "note": false, "plain": false, "listed": listed, "item_at": entry.at, "ats": object.get(entry, "ats", [entry.at])} if {
+_id_item_len(c) := max({j | some i, x in c; is_number(x); j := i + 1}) if _id_listed(c)
+
+else := count(c)
+
+_id_tail(c) := array.slice(c, _id_item_len(c), count(c))
+
+_id_item_at(at, n) := at if n == 0
+
+else := concat("/", array.slice(parts, 0, count(parts) - n)) if parts := split(at, "/")
+
+_id_place(entry, req, doc) := {"listed": _id_listed(ec), "item_at": _id_item_at(entry.at, n), "ats": [_id_item_at(a, n) | some a in object.get(entry, "ats", [entry.at])], "item": _tally_read_value(doc, array.slice(ec, 0, _id_item_len(ec)))} if {
+	ec := _entry_c(entry, req)
+	n := count(_id_tail(ec))
+}
+
+_id_present(value, path) := _message({"op": "present", "path": path}, value, _row_cause({"op": "present", "path": path}, value, ""))
+
+_id_fault_place(entry, req, doc) := object.union(object.remove(place, ["item"]), {"c": c, "at": at, "cause": cause, "value": null, "text": text, "note": false, "plain": false, "name": _id_read_name(req, ec, c)}) if {
 	is_object(entry.subject)
 	id := _id_of(req)
-	c := array.concat(_entry_c(entry, req), _plain_keys(id))
+	ec := _entry_c(entry, req)
+	c := array.concat(ec, _plain_keys(id))
+	place := _id_place(entry, req, doc)
 	cause := _read_state(entry.subject, id) with input as _id_input(entry, req)
 	at := _id_stop(entry, req)
-	said := _message({"op": "present", "path": id}, entry.subject, _row_cause({"op": "present", "path": id}, entry.subject, "")) with input as _id_input(entry, req)
-	listed := _id_listed(_entry_c(entry, req))
-	text := _id_said(req, _entry_c(entry, req), said)
+	said := _id_said_on(req, ec, entry.subject, place.item, id) with input as _id_input(entry, req) with data.ergo_document as doc
+	text := _id_said(req, ec, said)
 }
 
-_id_fault_place(entry, req, _) := {"c": _entry_c(entry, req), "at": entry.at, "cause": "null", "value": null, "text": concat("", [_m_from_item_name(req, _entry_c(entry, req)), " is null"]), "note": false, "plain": false, "listed": _id_listed(_entry_c(entry, req)), "item_at": entry.at, "ats": object.get(entry, "ats", [entry.at])} if {
+_id_fault_place(entry, req, doc) := object.union(object.remove(place, ["item"]), {"c": ec, "at": entry.at, "cause": "null", "value": null, "text": text, "note": false, "plain": false}) if {
 	entry.subject == null
-	_id_listed(_entry_c(entry, req))
+	ec := _entry_c(entry, req)
+	_id_listed(ec)
+	place := _id_place(entry, req, doc)
+	text := _id_null_said(req, ec, place.item)
 }
+
+_id_null_said(req, ec, item) := concat("", [_m_from_item_name(req, ec), " is null"]) if _id_tail(ec) == []
+
+else := concat(": ", [_m_from_item_name(req, array.slice(ec, 0, _id_item_len(ec))), _id_present(item, _id_tail(ec))])
+
+_id_said_on(req, ec, subject, item, id) := _id_present(item, array.concat(_id_tail(ec), id)) if _id_listed(ec)
+
+else := _id_present(subject, array.concat(["$$input"], id)) if {
+	ec == []
+	not _chained(req)
+}
+
+else := _id_present(subject, id)
+
+_id_read_name(req, ec, c) := _input_name(array.concat(["$$input"], c)) if {
+	ec == []
+	not _chained(req)
+}
+
+else := _visible_path_name(_visible(c), _m_from_root(req))
 
 _id_stop(entry, req) := array.concat(_id_locations(entry, req), [entry.at])[0]
 
-_id_said(req, c, said) := concat(": ", [_m_from_item_name(req, c), said]) if _id_listed(c)
+_id_said(req, c, said) := concat(": ", [_m_from_item_name(req, array.slice(c, 0, _id_item_len(c))), said]) if _id_listed(c)
 
 else := concat(".", [_ms_read_name(req, c), said]) if c != []
 
