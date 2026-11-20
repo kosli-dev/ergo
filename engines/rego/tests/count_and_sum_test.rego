@@ -15,8 +15,8 @@ test_min_subjects_above_zero_keeps_the_count if {
 	def.expression == "count(matching(items)) >= 1"
 }
 
-test_unique_ids_counts_two_subjects_without_an_id_as_sharing_the_id_null if {
-	unique_ids_row({"repos": [{"owner": "bob"}, {"owner": "carol"}]}, owner_req) == [[{"name": "repeated repo ids", "value": [null], "locations": ["/repos/0", "/repos/1"]}], false, "value"]
+test_unique_ids_fails_for_each_subject_without_an_id_and_they_never_repeat if {
+	unique_ids_row({"repos": [{"owner": "bob"}, {"owner": "carol"}]}, owner_req) == [[{"name": "repeated repo ids", "value": [], "locations": []}], false, "absent"]
 }
 
 test_unique_ids_counts_two_identical_subjects_as_a_clash_without_an_id_path if {
