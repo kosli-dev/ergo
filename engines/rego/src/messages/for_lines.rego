@@ -285,7 +285,15 @@ _m_whose_ref_faults(item) := [_m_isnt(_ref_label(f[0].ref), _ref_shown(f[0].ref)
 	some f in _m_ref_list_fault(c)
 ]
 
-_m_ref_faults_text(check) := [_m_isnt(_ref_label(f[0].ref), _ref_shown(f[0].ref), f[1]) | some f in _m_ref_list_fault(check)]
+_m_ref_faults_text(check) := _m_with_ref_text_items(check, [_m_isnt(_ref_label(f[0].ref), _ref_shown(f[0].ref), f[1]) | some f in _m_ref_list_fault(check)])
+
+_m_with_ref_text_items(check, faults) := array.concat(faults, [concat(", and ", ts)]) if {
+	check.ignoring
+	_is_ref(check.values)
+	_ref_state(check.values.ref) == "value"
+	ts := _m_text_items(_ref_label(check.values.ref), _ref_shown(check.values.ref))
+	ts != []
+} else := faults
 
 _m_for_item(item) := {"op": "present", "path": item.path, "whose": object.get(item, "whose", [])}
 
