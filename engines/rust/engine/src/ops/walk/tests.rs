@@ -568,3 +568,28 @@ fn an_item_says_the_value_before_a_key_it_cant_read_and_not_the_key() {
         ]
     );
 }
+
+#[test]
+fn an_item_whose_focus_isnt_an_object_says_so_whatever_the_key() {
+    for params in [json!({}), json!({"k": null}), json!({"k": 3})] {
+        assert_eq!(
+            own_said(
+                "every items.v that is m named by $params.k is 1",
+                json!([{"v": "s"}, {"v": null}]),
+                params.clone(),
+                json!({}),
+            ),
+            [
+                Some((
+                    Cause::NotAnObject,
+                    "item 1 of items: v is \"s\", which isn't an object".to_string()
+                )),
+                Some((
+                    Cause::NotAnObject,
+                    "item 2 of items: v is null, which isn't an object".to_string()
+                )),
+            ],
+            "{params}"
+        );
+    }
+}
