@@ -677,9 +677,8 @@ else := array.concat(_id_keys(req), [entry.i]) if "i" in object.keys(entry)
 else := _id_keys(req)
 
 _id_fault_places(raw, refs, req) := [p |
-	some i, ref in refs
-	ref.id == null
-	entry := raw[i]
+	some i, entry in raw
+	refs[i].id == null
 	not "key" in object.keys(entry)
 	p := _id_fault_place(entry, req)
 ]
