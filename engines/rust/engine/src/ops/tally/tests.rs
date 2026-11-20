@@ -1358,12 +1358,14 @@ fn a_whose_root_that_cant_be_read_leaves_no_failed_item_when_the_item_reads_fine
     }
 }
 
+type Read = (String, Value, Vec<String>);
+
 fn ran_with(
     scope: &Scope,
     sentence: &str,
     input: Value,
     aliases: &[(&str, Located)],
-) -> (Vec<Value>, Vec<(String, Value, Vec<String>)>) {
+) -> (Vec<Value>, Vec<Read>) {
     let tree = s::parse_check(sentence).unwrap();
     let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
     let ctx = Ctx {
