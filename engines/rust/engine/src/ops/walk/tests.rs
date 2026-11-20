@@ -563,7 +563,10 @@ fn an_item_says_the_value_before_a_key_it_cant_read_and_not_the_key() {
             json!({}),
         ),
         [
-            Some((Cause::Absent, "item 1 of items: v: m is missing".to_string())),
+            Some((
+                Cause::Absent,
+                "item 1 of items: v: m is missing".to_string()
+            )),
             Some((Cause::Null, "item 2 of items: v: m is null".to_string())),
         ]
     );

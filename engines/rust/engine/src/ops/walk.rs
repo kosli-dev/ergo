@@ -1122,7 +1122,11 @@ pub(super) fn item_own(
     }
     let focus = focus_ctx(item, outer);
     let name = walked.item_name(focus_segs(item, check));
-    let paths: Vec<&Path> = check.paths().into_iter().chain(listed_refs(check)).collect();
+    let paths: Vec<&Path> = check
+        .paths()
+        .into_iter()
+        .chain(listed_refs(check))
+        .collect();
     let keyed: Vec<Option<super::key_base::KeyBase>> = paths
         .iter()
         .map(|path| super::key_base::of_path(path, false, &focus))
@@ -1147,11 +1151,9 @@ pub(super) fn item_own(
     let mut own_at = None;
     for (path, found) in paths.into_iter().zip(keyed) {
         match found {
-            Some(found) => said.extend(
-                found
-                    .base
-                    .map(|(text, cause, _)| Clause::said(cause, text)),
-            ),
+            Some(found) => {
+                said.extend(found.base.map(|(text, cause, _)| Clause::said(cause, text)))
+            }
             None if outside(path) => {
                 said.extend(path.steps.iter().filter_map(|step| match step {
                     Step::Field(key) | Step::Ref(key)
@@ -1192,7 +1194,12 @@ pub(super) fn item_own(
 
 fn stood_in(check: &Check, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
     use super::compare::{Compare, Side};
-    if !check.paths().into_iter().chain(listed_refs(check)).any(&blocked) {
+    if !check
+        .paths()
+        .into_iter()
+        .chain(listed_refs(check))
+        .any(&blocked)
+    {
         return Some(check.clone());
     }
     let Check::Compare(compare) = check else {
