@@ -1195,3 +1195,51 @@ fn an_item_says_the_value_before_its_own_list_beside_a_root_on_the_left_it_cant_
         );
     }
 }
+
+#[test]
+fn an_item_whose_focus_cant_take_its_key_says_so_beside_a_map_it_cant_read() {
+    let isnt = |at: usize, text: &str| {
+        Some((
+            Cause::NotAnObject,
+            format!("item {at} of items: {text}, which isn't an object"),
+        ))
+    };
+    for (items, said) in [
+        (
+            json!([{"v": "a"}, {"v": 3}, {"v": null}]),
+            vec![
+                isnt(1, "v is \"a\""),
+                isnt(2, "v is 3"),
+                isnt(3, "v is null"),
+            ],
+        ),
+        (json!([{"v": ["a"]}]), vec![isnt(1, "item 1 of v is \"a\"")]),
+    ] {
+        assert_eq!(
+            own_beside_broken_roots(
+                "every items.v that is $params.m named by k is 1",
+                &items,
+                json!({"m": {"a": 1}}),
+                &[json!({}), json!({"m": null}), json!({"m": "s"})],
+            ),
+            said
+        );
+        for input in [
+            json!({"m": {"a": 1}}),
+            json!({}),
+            json!({"m": null}),
+            json!({"m": "s"}),
+        ] {
+            assert_eq!(
+                own_said(
+                    "every items.v that is $input.m named by k is 1",
+                    items.clone(),
+                    json!({}),
+                    input.clone()
+                ),
+                said,
+                "{input}"
+            );
+        }
+    }
+}
