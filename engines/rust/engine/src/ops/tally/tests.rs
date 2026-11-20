@@ -1993,6 +1993,32 @@ fn a_count_says_a_key_root_it_cant_use_once_first_and_each_item_the_value_before
     ] {
         let clauses = tally_clauses(sentence, items, params, cause);
         assert_eq!(clause::text(&clause::shown(&clauses)), said);
-        assert_eq!(clauses.first().map(|said| said.kind), Some(clause::Kind::Root));
+        assert_eq!(
+            clauses.first().map(|said| said.kind),
+            Some(clause::Kind::Root)
+        );
+    }
+}
+
+#[test]
+fn a_count_whose_focus_isnt_an_object_says_a_null_key_once_and_a_key_of_the_wrong_kind_under_the_item()
+ {
+    let sentence = "count of items.v that is m named by $params.k is 0";
+    for (items, params, cause, said) in [
+        (
+            json!([{"v": 2, "m": {"a": 2}}, "s"]),
+            json!({"k": null}),
+            Cause::NotAnObject,
+            "$params.k is null; item 2 of items is \"s\", which isn't an object",
+        ),
+        (
+            json!([{"v": 1, "m": {"a": 1}}]),
+            json!({"k": 3}),
+            Cause::Unusable,
+            "item 1 of items: v: $params.k is 3, which isn't text",
+        ),
+    ] {
+        let clauses = tally_clauses(sentence, items, params, cause);
+        assert_eq!(clause::text(&clause::shown(&clauses)), said);
     }
 }
