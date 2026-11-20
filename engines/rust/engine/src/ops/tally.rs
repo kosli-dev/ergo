@@ -1609,8 +1609,8 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, _cause: Cause) -> (Vec<Clause>
             return (out, rich);
         }
         if let (path::Start::Params, Some(params)) = (&counted.path.start, outer.params)
+            && params.is_array()
             && !matches!(counted.path.steps.first(), Some(path::Step::Index(_)))
-            && walk::params_unreadable(&outer)
         {
             let text = super::message::isnt("$params", params, "an object");
             out.push(Clause::list("$params", Cause::Unusable, text));
