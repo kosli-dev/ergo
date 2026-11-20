@@ -2022,3 +2022,53 @@ fn a_count_whose_focus_isnt_an_object_says_a_null_key_once_and_a_key_of_the_wron
         assert_eq!(clause::text(&clause::shown(&clauses)), said);
     }
 }
+
+fn cause_and_said(sentence: &str, items: Value, params: Value) -> (Cause, String) {
+    let check = lowered(sentence);
+    let Check::Tally(tally) = &check else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [{"items": items}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    let cause = crate::ops::run(&check, &ctx).cause;
+    let clauses = tally.counted_clauses(&ctx, cause);
+    (cause, clause::text(&clause::shown(&clauses)))
+}
+
+#[test]
+fn a_count_says_a_value_before_a_missing_or_null_key_that_isnt_an_object_and_fails_as_unusable() {
+    let sentence = "count of items.v that is m named by $params.k is 0";
+    for (params, m, said) in [
+        (
+            json!({}),
+            json!("s"),
+            "$params.k is missing; item 1 of items: v: m is \"s\", which isn't an object",
+        ),
+        (
+            json!({"k": null}),
+            json!("s"),
+            "$params.k is null; item 1 of items: v: m is \"s\", which isn't an object",
+        ),
+        (
+            json!({}),
+            json!([1]),
+            "$params.k is missing; item 1 of items: v: m is [1], which isn't an object",
+        ),
+    ] {
+        assert_eq!(
+            cause_and_said(sentence, json!([{"v": {"m": m}}]), params),
+            (Cause::Unusable, said.to_string())
+        );
+    }
+}
