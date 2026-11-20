@@ -321,7 +321,6 @@ list_items / a part read inside a whose on a subject that is a list, missing, nu
 list_items / a part read inside a whose on a subject that is a list, missing, null or not an object / a part that isn't an object fails as unusable
 list_items / a part that holds a list, walked after matches in a whose, is said once / items that aren't objects fail as unusable and are said once
 list_items / a part that holds a list, walked after matches in a whose, is said once / values that aren't patterns fail as unusable and are said once
-list_items / a path from $input with named by on an input that is a list / fails as not_an_object and names the input once
 list_items / a second for item that starts at an alias holding a list reads each item of it / an empty alias fails as value, and an item that isn't an object as not_an_object
 list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that / an empty alias fails as value
 list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that / an item that isn't an object fails as unusable

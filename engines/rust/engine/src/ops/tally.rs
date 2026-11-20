@@ -1548,8 +1548,15 @@ fn item_record<'c>(
             Some(item.end_location.render()),
         ),
         ItemRead::Field(check) => {
-            let (path, read) = walk::named_side_of(check, focus, |path| {
-                !walk::reads_outside(path) && path.start != path::Start::Params
+            let own = |path: &Path| !walk::reads_outside(path) && path.start != path::Start::Params;
+            let (path, read) = walk::named_side_of(check, focus, own).or_else(|| match check {
+                Check::In(within) => match &within.values {
+                    super::lists::Right::Field(list) if own(list) => {
+                        Some((list, path::read(list, focus)))
+                    }
+                    _ => None,
+                },
+                _ => None,
             })?;
             let mut steps: Vec<path::Step> = walk::focus_segs(item, check)
                 .iter()
