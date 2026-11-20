@@ -180,7 +180,7 @@ test_ignoring_words_after_another_phrase_or_in_another_order_are_written_wrong i
 	every line in [`x is 1 ignoring case`, `x is null ignoring case`, `x is not true ignoring case`, `x is one of "a", 1 ignoring case`, `x is one of "a", null ignoring case`] {
 		`"ignoring case" takes text` in _read(line).problems
 	}
-	_read(`x equals x ignoring case`) == {"problems": ["x is compared with itself"]}
+	ergo._s_self_problems(_read(`x equals x ignoring case`).assertions) == {"x is compared with itself"}
 }
 
 test_ignoring_words_dont_read_after_contains_starts_with_ends_with_or_alphabetically_yet if {

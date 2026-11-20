@@ -40,6 +40,7 @@ _s_patterns := {
 	"strings": `"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'`,
 	"string": concat("", [`^(?:`, dq, `|`, sq, `)$`]),
 	"quantified_path": concat("", [`^(?:(?:every|some) +)?`, qpath, `$`]),
+	"ignoring": concat("", [`^(.*\S) +ignoring +(`, ignoring, `)$`]),
 } if {
 	key := `[A-Za-z_][A-Za-z0-9_-]*`
 	dq := `"(?:[^"\\\x00-\x1f]|\\["\\/bfnrt]|\\u[0-9a-fA-F]{4})*"`
@@ -109,7 +110,8 @@ _s_patterns := {
 		["operand", operand],
 		["operand_within", concat("", [operand, `(?:`, roughly, `)*(?: +within +`, num, `)?`])],
 	]
-	phrase := concat("", [`(?:`, concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds]), `)(?:`, roughly, `)*`])
+	ignoring := `case(?: +and +surrounding +spaces)?|surrounding +spaces(?: +and +case)?`
+	phrase := concat("", [`(?:`, concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds]), `)(?:`, roughly, `)*(?: +ignoring +(?:`, ignoring, `))?`])
 	cond := concat("", [`(?:whose +(?:`, derived, `|`, path, `) +|that +)(?:`, phrase, `)`])
 	conds := concat("", [cond, `(?: +and +`, cond, `)*`])
 	from_cond := concat("", [`(?:whose +(?:(?:every|some) +`, qpath, `(?:, +if +any,)?|(?:`, derived, `|`, path, `)) +|that +)(?:`, phrase, `)`])
@@ -120,7 +122,7 @@ _s_patterns := {
 
 _s_words := {
 	"a", "after", "alphabetically", "an", "and", "as", "at", "before", "between", "count", "days", "distinct",
-	"each", "empty", "equal", "every", "false", "first", "hours", "in", "item", "last", "less", "minutes",
+	"each", "empty", "equal", "every", "false", "first", "hours", "ignoring", "in", "item", "last", "less", "minutes",
 	"more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sorted",
 	"sum", "that", "to", "true", "weeks", "whose", "within",
 }
@@ -468,7 +470,19 @@ _s_ref_of(text) := {"steps": [text]} if {
 
 _s_ref_of(text) := {"steps": [text], "bad_name": text} if _s_bad_name(text)
 
-_s_phrase_of(text, pat) := object.union({"op": _s_op_of(pat.phrases[hit[0]], text, hit[1])}, _s_args_of(pat.phrases[hit[0]][3], hit[1], pat)) if {
+_s_phrase_of(text, pat) := object.union(bare, {"ignoring": concat(" ", regex.split(` +`, m[2]))}) if {
+	m := regex.find_all_string_submatch_n(pat.ignoring, text, 1)[0]
+	bare := _s_bare_phrase_of(m[1], pat)
+	not bare.op in _s_text_phrase_ops
+} else := _s_bare_phrase_of(text, pat)
+
+_s_text_phrase_ops := {
+	"contains", "does not contain", "contains all of", "contains none of", "contains some of", "does not contain all of",
+	"starts with", "ends with", "does not start with", "does not end with",
+	"is alphabetically before", "is alphabetically after", "is alphabetically on or before", "is alphabetically on or after",
+}
+
+_s_bare_phrase_of(text, pat) := object.union({"op": _s_op_of(pat.phrases[hit[0]], text, hit[1])}, _s_args_of(pat.phrases[hit[0]][3], hit[1], pat)) if {
 	hits := [[i, m[1]] |
 		some i, ph in pat.phrases
 		m := regex.find_all_string_submatch_n(concat("", [`^(?:`, ph[1], `)(.*)$`]), text, 1)[0]

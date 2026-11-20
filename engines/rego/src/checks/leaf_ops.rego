@@ -119,7 +119,14 @@ _leaf_op_passed("includes", check, subj) if {
 	}
 }
 
+_leaf_op_passed(op, check, subj) if {
+	op in _membership_ops
+	"ignoring" in object.keys(check)
+	_text_compared(op, _value_at(subj, check.path), _wants(check.values), check.ignoring)
+}
+
 _leaf_op_passed("in", check, subj) if {
+	not "ignoring" in object.keys(check)
 	v := _value_at(subj, check.path)
 	v != null
 	vals := _wants(check.values)
@@ -143,6 +150,7 @@ _leaf_op_passed("lacks_type", check, subj) if {
 _json_types := {"list": "array", "string": "string", "number": "number", "boolean": "boolean", "object": "object"}
 
 _leaf_op_passed("not_in", check, subj) if {
+	not "ignoring" in object.keys(check)
 	v := _value_at(subj, check.path)
 	v != null
 	vals := _wants(check.values)
@@ -270,8 +278,14 @@ _right_value(subj, check) := _lvalue(check, subj) if {
 
 _right_value(subj, check) := _simple_value(subj, check.right) if not _list_cmp(check)
 
+_compared(check, l, r, _) if {
+	"ignoring" in object.keys(check)
+	_text_compared(check.cmp, l, r, check.ignoring)
+}
+
 _compared(check, l, r, subj) if {
 	not "within" in object.keys(check)
+	not "ignoring" in object.keys(check)
 	not check.cmp in _list_cmps
 	check.cmp != "outside"
 	_comparable(l, r)
@@ -292,6 +306,7 @@ _at_most_max(check, l, subj) if {
 
 _compared(check, l, r, subj) if {
 	not "within" in object.keys(check)
+	not "ignoring" in object.keys(check)
 	check.cmp in _list_cmps
 	not "max" in object.keys(check)
 	_cmp(check.cmp, l, r, check, subj)
@@ -393,7 +408,37 @@ _orderable(c, v) if {
 	c in _text_cmps
 }
 
-_unusable_states(leaf, x) := {"unusable" | _unusable(leaf, x)}
+_unusable_states(leaf, x) := {"unusable" | _unusable(leaf, x)} | _null_text_items(leaf)
+
+_null_text_items(leaf) := {"null" |
+	leaf.op in _membership_ops
+	"ignoring" in object.keys(leaf)
+	vals := _wants(leaf.values)
+	is_array(vals)
+	null in vals
+}
+
+_unusable(leaf, x) if {
+	leaf.op in _membership_ops
+	"ignoring" in object.keys(leaf)
+	not is_string(_found(x, leaf.path))
+}
+
+_unusable(leaf, x) if {
+	leaf.op in _membership_ops
+	"ignoring" in object.keys(leaf)
+	"unusable" in _text_item_states(_wants(leaf.values))
+	_ = x
+}
+
+_unusable(leaf, x) if {
+	leaf.op == "compare"
+	"ignoring" in object.keys(leaf)
+	leaf.cmp in {"eq", "ne"}
+	l := _simple_found(x, leaf.left)
+	r := _simple_found(x, leaf.right)
+	not _texts([l, r])
+}
 
 _unusable(leaf, x) if {
 	leaf.op in _range_ops
@@ -438,6 +483,7 @@ _unusable(leaf, x) if {
 _unusable(leaf, x) if {
 	leaf.op == "compare"
 	not "within" in object.keys(leaf)
+	not "ignoring" in object.keys(leaf)
 	not leaf.cmp in _list_cmps
 	l := _simple_found(x, leaf.left)
 	r := _simple_found(x, leaf.right)
@@ -454,6 +500,7 @@ _unusable(leaf, x) if {
 
 _unusable(leaf, x) if {
 	leaf.op in _membership_ops
+	not "ignoring" in object.keys(leaf)
 	v := _found(x, leaf.path)
 	vals := _wants(leaf.values)
 	_value_list(vals)

@@ -178,9 +178,13 @@ _s_ref_text(r) := concat("", ["$", r.start, ".", _s_key_text(r.steps[0])]) if "s
 
 _s_ref_text(r) := r.steps[0] if not "start" in object.keys(r)
 
-_s_phrase_text(ph) := concat(" ", [_s_phrase_words(ph), _s_args_text(ph)]) if _s_args_text(ph) != ""
+_s_phrase_text(ph) := concat(" ", [_s_bare_phrase_text(ph), "ignoring", ph.ignoring]) if "ignoring" in object.keys(ph)
 
-_s_phrase_text(ph) := _s_phrase_words(ph) if _s_args_text(ph) == ""
+else := _s_bare_phrase_text(ph)
+
+_s_bare_phrase_text(ph) := concat(" ", [_s_phrase_words(ph), _s_args_text(ph)]) if _s_args_text(ph) != ""
+
+_s_bare_phrase_text(ph) := _s_phrase_words(ph) if _s_args_text(ph) == ""
 
 _s_phrase_words(ph) := "equals" if {
 	ph.op == "is"

@@ -519,6 +519,8 @@ _m_parts_fault(subj, side) := [[p, "text"] | some p in side.join; v := _found(su
 
 _m_side_kind(_, check, _) := "a number" if "within" in object.keys(check)
 
+_m_side_kind(_, check, _) := "text" if "ignoring" in object.keys(check)
+
 _m_side_kind(_, check, _) := "text" if {
 	not "within" in object.keys(check)
 	check.cmp in _text_cmps
@@ -544,6 +546,7 @@ _m_contain_kind(v) := _m_list_of([""]) if {
 
 _m_side_kind(subj, check, side) := _m_kind(o) if {
 	not "within" in object.keys(check)
+	not "ignoring" in object.keys(check)
 	check.cmp in _equality_cmps
 	side == check.left
 	_basic_form(check.left) != "literal"
@@ -552,6 +555,7 @@ _m_side_kind(subj, check, side) := _m_kind(o) if {
 
 _m_side_kind(subj, check, side) := _m_kind(o) if {
 	not "within" in object.keys(check)
+	not "ignoring" in object.keys(check)
 	check.cmp in _equality_cmps
 	side == check.right
 	_basic_form(check.left) == "literal"

@@ -2,7 +2,60 @@ package ergo
 
 import rego.v1
 
-_s_sentence_problems(parsed) := _s_base_problems(parsed) | _s_join_problems(parsed)
+_s_sentence_problems(parsed) := (_s_base_problems(parsed) | _s_join_problems(parsed)) | _s_ignoring_problems(parsed)
+
+_s_ignoring_problems(parsed) := set() if not contains(json.marshal(parsed), `"ignoring":`)
+
+else := ({concat("", [`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	object.get(node, "ignoring", "") == "surrounding spaces and case"
+} | {concat("", [`"`, _s_ignoring_op(node), `" can't take ignoring `, node.ignoring]) |
+	some node in _s_nodes(parsed)
+	_s_ignoring_node(node)
+	not _s_takes_ignoring(node)
+}) | {_s_ignoring_flaw(holder, node) |
+	some holder in _s_nodes(parsed)
+	is_object(holder)
+	node := object.get(holder, "phrase", null)
+	_s_ignoring_node(node)
+	_s_takes_ignoring(node)
+}
+
+_s_ignoring_node(node) if {
+	is_object(node)
+	"op" in object.keys(node)
+	is_string(object.get(node, "ignoring", null))
+}
+
+_s_takes_ignoring(node) if {
+	node.op in {"is", "is not", "is one of", "is not one of"}
+	not "within" in object.keys(node)
+}
+
+_s_ignoring_op(node) := "within" if "within" in object.keys(node)
+
+else := node.op
+
+_s_ignoring_flaw(holder, node) := concat("", [`"ignoring `, node.ignoring, `" can't follow a count of, a sum of or a plus`]) if {
+	"terms" in object.keys(holder)
+} else := concat("", [`"ignoring `, node.ignoring, `" takes text`]) if {
+	_s_not_text_written(node)
+} else := concat("", [`"ignoring `, node.ignoring, `" can't take a count of, a sum of or a plus`]) if {
+	terms := object.get(node, "terms", [])
+	terms != []
+	not _s_one_path(terms)
+}
+
+_s_not_text_written(node) if {
+	"value" in object.keys(node)
+	not is_string(node.value)
+}
+
+_s_not_text_written(node) if {
+	some v in object.get(node, "values", [])
+	not is_string(v)
+}
 
 _s_join_problems(parsed) := set() if not _s_joins(parsed)
 

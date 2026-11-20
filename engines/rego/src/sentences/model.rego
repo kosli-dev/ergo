@@ -590,18 +590,19 @@ _s_plain_model(a) := {"op": "equals", "path": _s_model_path(a.path), "value": a.
 	a.phrase.op == "is"
 	"value" in object.keys(a.phrase)
 	not "within" in object.keys(a.phrase)
+	not "ignoring" in object.keys(a.phrase)
 }
 
-_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "eq", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within"})) if {
+_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "eq", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within", "ignoring"})) if {
 	a.phrase.op == "is"
 	_s_side_given(a.phrase)
 }
 
-_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within"})) if a.phrase.op == "is not"
+_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within", "ignoring"})) if a.phrase.op == "is not"
 
 _s_plain_model(a) := {"op": _s_compare_ops[a.phrase.op][0], "left": _s_model_path(a.path), "cmp": _s_compare_ops[a.phrase.op][1], "right": _s_side(a.phrase)} if a.phrase.op in object.keys(_s_compare_ops)
 
-_s_plain_model(a) := {"op": "in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if {
+_s_plain_model(a) := object.union({"op": "in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)}, object.filter(a.phrase, {"ignoring"})) if {
 	a.phrase.op == "is one of"
 	not _s_field_arg(a.phrase)
 }
@@ -612,7 +613,7 @@ _s_plain_model(a) := {"op": "lacks_type", "path": _s_model_path(a.path), "type":
 
 _s_plain_model(a) := {"op": "not_non_empty_string", "path": _s_model_path(a.path)} if a.phrase.op == "is not a non-empty string"
 
-_s_plain_model(a) := {"op": "not_in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if {
+_s_plain_model(a) := object.union({"op": "not_in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)}, object.filter(a.phrase, {"ignoring"})) if {
 	a.phrase.op == "is not one of"
 	not _s_field_arg(a.phrase)
 }
@@ -647,7 +648,7 @@ _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(
 	not _s_field_arg(a.phrase)
 }
 
-_s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))} if _s_field_arg(a.phrase)
+_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))}, object.filter(a.phrase, {"ignoring"})) if _s_field_arg(a.phrase)
 
 _s_field_arg(ph) if {
 	ph.op in _s_list_ops
@@ -706,6 +707,8 @@ _s_contains_ops := {
 _s_side_given(ph) if "terms" in object.keys(ph)
 
 _s_side_given(ph) if "within" in object.keys(ph)
+
+_s_side_given(ph) if "ignoring" in object.keys(ph)
 
 _s_side_given(ph) if "join" in object.keys(ph)
 
