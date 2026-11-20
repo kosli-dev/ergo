@@ -20299,5 +20299,69 @@
         ]
       }
     ]
+  },
+  {
+    "description": "an id that ends at a position on a subject outside a list",
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "art", "identified_by": "meta[0]"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "ok exists"}}}},
+    "cases": [
+      {
+        "description": "is named from where the subject was read, with its position first",
+        "rules": ["unique_ids"],
+        "input": {"art": {"ok": true}},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$unique_ids",
+            "failures": [],
+            "inputs": [
+              {"locations": [], "name": "repeated d ids", "value": []},
+              {"locations": ["/art"], "name": "item 1 of art.meta", "outcome": "absent", "value": null}
+            ],
+            "message": "item 1 of art.meta is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [{"locations": ["/art/ok"], "name": "ok", "value": true}],
+            "passed": true,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
+          }
+        ]
+      },
+      {
+        "description": "is named the same way when the item at that position is null",
+        "rules": ["unique_ids"],
+        "input": {"art": {"meta": [null], "ok": true}},
+        "requirements": {"r": {"status": "not_met"}},
+        "results": [
+          {
+            "cause": "null",
+            "check": "$unique_ids",
+            "failures": [],
+            "inputs": [
+              {"locations": [], "name": "repeated d ids", "value": []},
+              {"locations": ["/art/meta/0"], "name": "item 1 of art.meta", "outcome": "null", "value": null}
+            ],
+            "message": "item 1 of art.meta is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [{"locations": ["/art/ok"], "name": "ok", "value": true}],
+            "passed": true,
+            "requirement": "r",
+            "subject": {"id": null, "type": "d"}
+          }
+        ]
+      }
+    ]
   }
 ]

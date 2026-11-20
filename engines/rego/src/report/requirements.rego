@@ -737,7 +737,7 @@ _id_fault_place(entry, req, doc) := object.union(object.remove(place, ["item"]),
 	place := _id_place(entry, req, doc)
 	cause := _read_state(entry.subject, id) with input as _id_input(entry, req)
 	at := _id_stop(entry, req)
-	said := _id_said_on(req, ec, entry.subject, place.item, id) with input as _id_input(entry, req) with data.ergo_document as doc
+	said := _id_said_on(req, ec, entry.subject, place.item, id, doc) with input as _id_input(entry, req) with data.ergo_document as doc
 	text := _id_said(req, ec, said)
 }
 
@@ -753,12 +753,14 @@ _id_null_said(req, ec, item) := concat("", [_m_from_item_name(req, ec), " is nul
 
 else := concat(": ", [_m_from_item_name(req, array.slice(ec, 0, _id_item_len(ec))), _id_present(item, _id_tail(ec))])
 
-_id_said_on(req, ec, subject, item, id) := _id_present(item, array.concat(_id_tail(ec), id)) if _id_listed(ec)
+_id_said_on(req, ec, subject, item, id, doc) := _id_present(item, array.concat(_id_tail(ec), id)) if _id_listed(ec)
 
 else := _id_present(subject, array.concat(["$$input"], id)) if {
 	ec == []
 	not _chained(req)
 }
+
+else := _id_present(doc, array.concat(ec, id)) if ec != []
 
 else := _id_present(subject, id)
 
@@ -772,8 +774,6 @@ else := _visible_path_name(_visible(c), _m_from_root(req))
 _id_stop(entry, req) := array.concat(_id_locations(entry, req), [entry.at])[0]
 
 _id_said(req, c, said) := concat(": ", [_m_from_item_name(req, array.slice(c, 0, _id_item_len(c))), said]) if _id_listed(c)
-
-else := concat(".", [_ms_read_name(req, c), said]) if c != []
 
 else := said
 
