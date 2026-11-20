@@ -704,10 +704,7 @@ _id_fault_place(entry, req) := {"c": _entry_c(entry, req), "at": entry.at, "caus
 	_id_listed(_entry_c(entry, req))
 }
 
-_id_stop(entry, req) := ls[0] if {
-	ls := _id_locations(entry, req)
-	count(ls) > 0
-} else := entry.at
+_id_stop(entry, req) := array.concat(_id_locations(entry, req), [entry.at])[0]
 
 _id_said(req, c, said) := concat(": ", [_m_from_item_name(req, c), said]) if _id_listed(c)
 

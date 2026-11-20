@@ -17,7 +17,7 @@ test_a_null_id_is_not_an_id_so_it_never_repeats if {
 	[p[1] | some p in ergo._repeated_ids(refs)] == ["a"]
 }
 
-ds_keys(_) := ["ds"]
+ds_keys(req) := ["ds"] if is_object(req)
 
 id_fault_place(c, at, cause, text) := {"c": c, "at": at, "cause": cause, "value": null, "text": text, "note": false, "plain": false, "listed": true}
 

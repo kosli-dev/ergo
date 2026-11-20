@@ -72,6 +72,12 @@ test_a_child_and_a_parent_without_an_id_are_named_from_where_they_were_read if {
 	]
 }
 
+test_the_whole_input_without_an_id_names_the_id_alone if {
+	r := unique_of({"thing": {"from": "$input", "identified_by": "id"}}, {"x": 1})
+	[r.cause, r.message, r.failures] == ["absent", "id is missing", []]
+	r.inputs[1] == {"name": "id", "value": null, "locations": [""], "outcome": "absent"}
+}
+
 test_an_id_read_through_a_null_field_fails_as_null if {
 	r := unique_of({"thing": {"from": "ds", "identified_by": "meta.id"}}, {"ds": [{"meta": null}]})
 	r.cause == "null"
