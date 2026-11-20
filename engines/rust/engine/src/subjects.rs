@@ -2188,21 +2188,45 @@ fn rooted_name(segs: &[walk::Seg], tail: &[Step], root: &str, child: bool) -> St
     steps.extend(tail.iter().cloned());
     let start = match (segs.first(), child) {
         (Some(walk::Seg::Index(_)), true) => Start::Alias(root.to_string()),
-        (Some(walk::Seg::Index(_)), false) => Start::Input,
+        (Some(walk::Seg::Index(_)) | None, false) => Start::Input,
         _ => Start::Subject,
     };
     crate::name::name(&Path { start, steps })
 }
 
-fn present_text(steps: Vec<Step>, ctx: &Ctx) -> String {
+fn present_text(start: Start, steps: Vec<Step>, ctx: &Ctx) -> String {
     let present = Check::Present(ops::present::Present {
-        path: Path {
-            start: Start::Subject,
-            steps,
-        },
+        path: Path { start, steps },
         missing: false,
     });
     ops::message::message(&present, ctx, &ops::run(&present, ctx))
+}
+
+fn located_below<'a>(base: &Located<'a>, segs: &[walk::Seg]) -> Located<'a> {
+    let mut at = base.clone();
+    for seg in segs {
+        let value = match (seg, at.value) {
+            (walk::Seg::Index(i), Value::Array(items)) => items.get(*i as usize),
+            (walk::Seg::Key(key), Value::Object(map)) => map.get(key),
+            _ => None,
+        };
+        at = Located {
+            value: value.unwrap_or(&Value::Null),
+            location: match seg {
+                walk::Seg::Index(i) => at.location.index(*i),
+                walk::Seg::Key(key) => at.location.key(key),
+            },
+        };
+    }
+    at
+}
+
+fn without_tokens(pointer: &str, n: usize) -> String {
+    let mut out = pointer;
+    for _ in 0..n {
+        out = out.rfind('/').map_or(out, |at| &out[..at]);
+    }
+    out.to_string()
 }
 
 fn id_fault(env: &Env, lowered: &Lowered, judged: &Judged, anc: &[Anc]) -> Option<IdFault> {
@@ -2217,8 +2241,20 @@ fn id_fault(env: &Env, lowered: &Lowered, judged: &Judged, anc: &[Anc]) -> Optio
     let root = root_name(child, anc);
     let at = &judged.entry.at;
     let segs = segs_below(&base, &at.location);
-    let listed = matches!(segs.last(), Some(walk::Seg::Index(_)));
-    let chain = item_chain(&segs, &root);
+    let last_index = segs
+        .iter()
+        .rposition(|seg| matches!(seg, walk::Seg::Index(_)));
+    let listed = last_index.is_some();
+    let (item_segs, keys) = segs.split_at(last_index.map_or(segs.len(), |k| k + 1));
+    let key_steps: Vec<Step> = keys.iter().map(walk::Seg::to_step).collect();
+    let item = located_below(&base, item_segs);
+    let item_ctx = context(env, item.clone(), anc);
+    let chain = item_chain(item_segs, &root);
+    let start = if segs.is_empty() && !child {
+        Start::Input
+    } else {
+        Start::Subject
+    };
     let (cause, path, stop, clause) = if at.value.is_object() {
         let steps = lowered.id.clone().unwrap_or_default();
         let ctx = context(env, at.clone(), anc);
@@ -2250,12 +2286,14 @@ fn id_fault(env: &Env, lowered: &Lowered, judged: &Judged, anc: &[Anc]) -> Optio
             .map_or_else(|| at.location.render(), Location::render);
         let clause = if listed {
             let mut said = chain.clone();
-            said.push(present_text(steps.clone(), &ctx));
+            let mut whole = key_steps.clone();
+            whole.extend(steps.iter().cloned());
+            said.push(present_text(Start::Subject, whole, &item_ctx));
             said.join(": ")
         } else {
             let mut whole: Vec<Step> = segs.iter().map(walk::Seg::to_step).collect();
             whole.extend(steps.iter().cloned());
-            present_text(whole, &context(env, base.clone(), anc))
+            present_text(start, whole, &context(env, base.clone(), anc))
         };
         (
             cause,
@@ -2266,12 +2304,16 @@ fn id_fault(env: &Env, lowered: &Lowered, judged: &Judged, anc: &[Anc]) -> Optio
     } else {
         let name = rooted_name(&segs, &[], &root, child);
         let mut said: Vec<String> = chain.clone();
-        let own = said.pop().unwrap_or_else(|| name.clone());
-        said.push(format!("{own} is null"));
+        if key_steps.is_empty() {
+            let own = said.pop().unwrap_or_else(|| name.clone());
+            said.push(format!("{own} is null"));
+        } else {
+            said.push(present_text(Start::Subject, key_steps.clone(), &item_ctx));
+        }
         (Cause::Null, name, at.location.render(), said.join(": "))
     };
-    let item = if listed {
-        rooted_name(&segs, &[], &root, child)
+    let item_name = if listed {
+        rooted_name(item_segs, &[], &root, child)
     } else {
         path.clone()
     };
@@ -2279,17 +2321,17 @@ fn id_fault(env: &Env, lowered: &Lowered, judged: &Judged, anc: &[Anc]) -> Optio
         .entry
         .at_each()
         .iter()
-        .map(|each| each.location.render())
+        .map(|each| without_tokens(&each.location.render(), keys.len()))
         .collect();
     Some(IdFault {
         record: json!({
-            "item": item,
+            "item": item_name,
             "path": path,
             "cause": cause.name(),
             "value": null,
             "locations": [stop],
             "ergo/text": clause,
-            "ergo/item": {"value": at.value, "locations": copies},
+            "ergo/item": {"value": item.value, "locations": copies},
         }),
         cause,
         listed,
