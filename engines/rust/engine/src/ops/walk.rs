@@ -84,6 +84,7 @@ pub struct Failure {
     pub copies: Vec<String>,
     pub msg: String,
     pub seen: Option<(Value, Location)>,
+    pub outcome: Option<Cause>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -139,6 +140,9 @@ impl Failure {
     pub fn to_rich_json(&self) -> Value {
         let mut entry = self.to_json();
         entry["ergo/text"] = json!(self.msg);
+        if let Some(outcome) = self.outcome {
+            entry["ergo/outcome"] = json!(outcome.name());
+        }
         if let Some((value, location)) = &self.seen {
             let mut places = vec![location.render()];
             places.extend(self.copies.iter().cloned());
@@ -622,6 +626,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
             location: Some(raw.location),
             copies: Vec::new(),
             seen: None,
+            outcome: None,
         })
         .collect();
     failures.sort_by(|a, b| a.order.cmp(&b.order));
@@ -1439,7 +1444,22 @@ fn rooted_failure(
         location: read.and_then(|r| r.location),
         copies: Vec::new(),
         seen: Some((item.item.value.clone(), item.item.location.clone())),
+        outcome: None,
     }
+}
+
+fn before_key<'a>(path: &Path, at: &Ctx<'a>) -> Option<(Path, path::Read<'a>, Cause)> {
+    let found = super::key_base::of_path(path, false, at)?;
+    let cut = path.steps.iter().position(|step| {
+        matches!(step, Step::Ref(key) if super::key_base::key_flaw(key, at).is_some())
+    })?;
+    let before = Path {
+        start: path.start.clone(),
+        steps: path.steps[..cut].to_vec(),
+    };
+    let read = path::read(&before, at);
+    let outcome = Cause::worst([found.key_cause].into_iter().chain(read.outcome.cause()))?;
+    Some((before, read, outcome))
 }
 
 fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
@@ -1484,6 +1504,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     location: Some(item.end_location.clone()),
                     copies: Vec::new(),
                     seen: Some((item.item.value.clone(), item.item.location.clone())),
+                    outcome: None,
                 })
             } else if let Some((check, false, said)) = &own {
                 let check = *check;
@@ -1492,17 +1513,19 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 let named = named_side_of(check, at, |path| {
                     !reads_outside(path) && path.start != Start::Params
                 });
-                let steps: Vec<Step> = named
-                    .as_ref()
-                    .map(|(path, _)| path.steps.clone())
-                    .unwrap_or_default();
+                let (steps, read, outcome) = match named {
+                    Some((path, read)) => match before_key(path, at) {
+                        Some((before, read, outcome)) => (before.steps, Some(read), Some(outcome)),
+                        None => (path.steps.clone(), Some(read), None),
+                    },
+                    None => (Vec::new(), None, None),
+                };
                 let mut order = item_segs.to_vec();
                 order.extend(steps.iter().map(seg_of));
                 let rank = rank_of(&walk.path.start, &order);
                 let mut named_steps: Vec<Step> = item_segs.iter().map(Seg::to_step).collect();
                 named_steps.extend(steps);
                 let name = walked.name_of_steps(named_steps, item.unaliased);
-                let read = named.map(|(_, read)| read);
                 Some(Failure {
                     msg: clause::text(std::slice::from_ref(said)),
                     order,
@@ -1518,6 +1541,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     location: read.and_then(|r| r.location),
                     copies: Vec::new(),
                     seen: Some((item.item.value.clone(), item.item.location.clone())),
+                    outcome,
                 })
             } else if let Some((check, verdict, _)) = first {
                 (super::tally::without_roots(check).is_none()
@@ -1553,6 +1577,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     location: Some(item.end_location.clone()),
                     copies: Vec::new(),
                     seen: Some((item.item.value.clone(), item.item.location.clone())),
+                    outcome: None,
                 })
             } else {
                 None
