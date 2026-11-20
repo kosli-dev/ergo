@@ -501,6 +501,10 @@ _ms_read_name(req, path) := _rooted_steps_name(path, _m_from_root(req)) if path 
 
 else := _m_from_root(req)
 
+_ms_place_name(req, p) := name if name := p.name
+
+else := _ms_read_name(req, p.c)
+
 _ms_flat(req, doc, p, keys) := {"levels": [], "entry": _entry("list", _m_from_item_name(req, p.c), p.cause, [{"name": _ms_list_name(req, p.c, keys), "value": _ms_list_value(doc, p, keys), "locations": [p.at], "outcome": _key_list_outcome(p.cause)}], [], p.text), "key": [0, [], 0]} if {
 	not p.plain
 	ws := [i | some i, _ in p.c; _ms_walked(p.c, keys, i)]
@@ -532,7 +536,7 @@ _ms_item_read(req, p, keys) := {"name": _ms_read_name(req, array.concat(p.c, [k]
 	_ms_walked(p.c, keys, count(p.c) - 1)
 	ks := [x | some x in keys; is_string(x)]
 	k := ks[count([x | some x in p.c; is_string(x)])]
-} else := {"name": object.get(p, "name", _ms_read_name(req, p.c)), "value": p.value, "locations": [p.at], "outcome": _ms_read_outcome(p)}
+} else := {"name": _ms_place_name(req, p), "value": p.value, "locations": [p.at], "outcome": _ms_read_outcome(p)}
 
 _ms_read_outcome(p) := "usable" if p.note
 
@@ -670,7 +674,7 @@ _with_id_faults(row, places, doc, req) := object.union(row, {
 	"passed": false,
 	"cause": _worst_of({p.cause | some p in places} | {row.cause | row.passed == false}),
 	"message": _id_joined(array.concat([_m_is(row.inputs[0].name, row.inputs[0].value) | row.passed == false], [p.text | some p in places])),
-	"inputs": array.concat(row.inputs, [{"name": object.get(p, "name", _ms_read_name(req, p.c)), "value": null, "locations": [p.at], "outcome": p.cause} | some p in places; not p.listed]),
+	"inputs": array.concat(row.inputs, [{"name": _ms_place_name(req, p), "value": null, "locations": [p.at], "outcome": p.cause} | some p in places; not p.listed]),
 	"failures": [_id_copies(e, copies) | some e in _ms_tree(req, doc, [p | some p in places; p.listed], [k | some k in _id_keys(req); is_string(k)])],
 }) if {
 	places != []
