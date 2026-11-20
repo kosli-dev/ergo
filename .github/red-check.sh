@@ -5,6 +5,7 @@ if [ $# -ne 1 ]; then
   exit 2
 fi
 base=$1
+head=${RED_CHECK_HEAD:-HEAD}
 here=$(cd "$(dirname "$0")" && pwd)
 root=$(git -C "$here" rev-parse --show-toplevel)
 work=$(mktemp -d)
@@ -19,8 +20,8 @@ trap cleanup EXIT
 export LC_ALL=C
 tab=$(printf '\t')
 
-git -C "$root" diff -U1 --no-color "$base...HEAD" > "$work/diff.txt"
-git -C "$root" diff --name-only --diff-filter=AM "$base...HEAD" > "$work/changed.txt"
+git -C "$root" diff -U1 --no-color "$base...$head" > "$work/diff.txt"
+git -C "$root" diff --name-only --diff-filter=AM "$base...$head" > "$work/changed.txt"
 
 awk -v added="$work/added.tsv" -v removed="$work/removed.txt" '
   /^\+\+\+ / { file = substr($0, 7); pending = 0; next }
@@ -75,7 +76,7 @@ while read -r path; do
   case $path in
     engines/rust/*/tests.rs | engines/rust/*/tests/* | *_test.rego)
       mkdir -p "$tree/$(dirname "$path")"
-      git -C "$root" show "HEAD:$path" > "$tree/$path"
+      git -C "$root" show "$head:$path" > "$tree/$path"
       ;;
   esac
 done < "$work/changed.txt"
@@ -106,8 +107,8 @@ default_rego() {
 crate_of() {
   dir=$(dirname "$1")
   while [ "$dir" != . ] && [ "$dir" != / ]; do
-    if git -C "$root" cat-file -e "HEAD:$dir/Cargo.toml" 2> /dev/null; then
-      name=$(git -C "$root" show "HEAD:$dir/Cargo.toml" | sed -n '/^\[package\]/,/^\[/{s/^name *= *"\(.*\)"/\1/p;}' | sed -n 1p)
+    if git -C "$root" cat-file -e "$head:$dir/Cargo.toml" 2> /dev/null; then
+      name=$(git -C "$root" show "$head:$dir/Cargo.toml" | sed -n '/^\[package\]/,/^\[/{s/^name *= *"\(.*\)"/\1/p;}' | sed -n 1p)
       printf '%s\t%s\n' "$dir" "$name"
       return 0
     fi
