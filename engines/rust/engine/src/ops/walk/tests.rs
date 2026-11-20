@@ -520,3 +520,51 @@ fn a_walk_through_a_list_inside_a_part_is_named_with_the_full_path() {
     assert_eq!(out.verdict.inputs[0].name, "prs[].rs[].s");
     assert_eq!(out.failed_items[0]["path"], json!("prs[0].rs[0].s"));
 }
+
+fn lowered(sentence: &str) -> Check {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap()
+}
+
+fn own_said(
+    sentence: &str,
+    items: Value,
+    params: Value,
+    input: Value,
+) -> Vec<Option<(Cause, String)>> {
+    let Check::Walk(walk_check) = lowered(sentence) else {
+        panic!("{sentence} is not every or some");
+    };
+    let subject = json!({"items": items});
+    let context = ctx(&subject, &input, Some(&params));
+    let outer = outer(&context);
+    let walked = walk(&walk_check.path, &outer, Options::default());
+    walked
+        .items
+        .iter()
+        .map(|item| {
+            item_own(&walk_check.whose[0], item, &walked, &outer).map(|said| {
+                (
+                    said.cause,
+                    crate::ops::clause::text(std::slice::from_ref(&said)),
+                )
+            })
+        })
+        .collect()
+}
+
+#[test]
+fn an_item_says_the_value_before_a_key_it_cant_read_and_not_the_key() {
+    assert_eq!(
+        own_said(
+            "every items.v that is m named by $params.k is 1",
+            json!([{"v": {}}, {"v": {"m": null}}]),
+            json!({}),
+            json!({}),
+        ),
+        [
+            Some((Cause::Absent, "item 1 of items: v: m is missing".to_string())),
+            Some((Cause::Null, "item 2 of items: v: m is null".to_string())),
+        ]
+    );
+}
