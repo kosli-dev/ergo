@@ -1948,7 +1948,12 @@ fn a_count_of_params_that_arent_an_object_says_them_as_its_list_and_no_item() {
 
 #[test]
 fn a_sum_of_a_key_of_params_that_arent_an_object_says_them_as_its_list() {
-    let clauses = tally_clauses_on("sum of $params.v is 1", json!({}), json!([3]), Cause::Unusable);
+    let clauses = tally_clauses_on(
+        "sum of $params.v is 1",
+        json!({}),
+        json!([3]),
+        Cause::Unusable,
+    );
     assert_eq!(
         kinds_and_texts(&clauses),
         [(
@@ -1960,7 +1965,12 @@ fn a_sum_of_a_key_of_params_that_arent_an_object_says_them_as_its_list() {
 
 #[test]
 fn a_count_of_a_key_of_params_that_are_a_number_says_they_arent_a_list_or_an_object() {
-    let clauses = tally_clauses_on("count of $params.a is 1", json!({}), json!(3), Cause::Unusable);
+    let clauses = tally_clauses_on(
+        "count of $params.a is 1",
+        json!({}),
+        json!(3),
+        Cause::Unusable,
+    );
     assert_eq!(
         kinds_and_texts(&clauses),
         [(

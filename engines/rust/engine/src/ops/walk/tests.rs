@@ -731,7 +731,10 @@ fn an_item_says_its_own_list_beside_a_root_before_its_key_it_cant_read() {
     assert_eq!(
         readable,
         [
-            Some((Cause::Absent, "item 1 of items: tags is missing".to_string())),
+            Some((
+                Cause::Absent,
+                "item 1 of items: tags is missing".to_string()
+            )),
             Some((
                 Cause::Unusable,
                 "item 2 of items: tags is \"x\", which isn't a list".to_string()
@@ -802,7 +805,10 @@ fn an_item_leaves_out_a_key_from_an_input_that_is_a_list() {
             json!({}),
             json!([{"k": "x"}]),
         ),
-        [None, Some((Cause::Absent, "item 2 of items: v is missing".to_string()))]
+        [
+            None,
+            Some((Cause::Absent, "item 2 of items: v is missing".to_string()))
+        ]
     );
 }
 
@@ -834,7 +840,9 @@ fn an_item_that_isnt_an_object_says_so_beside_a_root_from_the_subject_it_cant_re
         .collect();
     assert_eq!(
         said,
-        [Some("item 1 of items is null, which isn't an object".to_string())]
+        [Some(
+            "item 1 of items is null, which isn't an object".to_string()
+        )]
     );
 }
 

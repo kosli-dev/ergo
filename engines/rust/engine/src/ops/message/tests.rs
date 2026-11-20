@@ -148,21 +148,16 @@ fn root_clauses_keep_each_item_of_a_count_a_root_reads() {
     assert_eq!(
         said,
         vec![
-            (
-                "item 2 of $params.pos".to_string(),
-                String::new()
-            ),
-            (
-                "item 3 of $params.pos".to_string(),
-                String::new()
-            ),
+            ("item 2 of $params.pos".to_string(), String::new()),
+            ("item 3 of $params.pos".to_string(), String::new()),
         ]
     );
 }
 
 #[test]
 fn walked_root_clauses_say_a_walked_root_that_holds_values_of_more_than_one_kind() {
-    let super::Check::Walk(walk) = lowered("every items whose v is in $params.os.name exists") else {
+    let super::Check::Walk(walk) = lowered("every items whose v is in $params.os.name exists")
+    else {
         panic!("not a walk");
     };
     let subject = json!({"id": "t", "items": [{"v": "bob"}]});

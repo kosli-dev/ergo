@@ -907,7 +907,11 @@ pub(super) fn named_side_of<'a>(
 ) -> Option<(&'a Path, path::Read<'a>)> {
     let sides = check.sides();
     let mut sides = sides.iter().map(|paths| {
-        let kept: Vec<SidePath> = paths.iter().copied().filter(|side| keep(side.path)).collect();
+        let kept: Vec<SidePath> = paths
+            .iter()
+            .copied()
+            .filter(|side| keep(side.path))
+            .collect();
         side_read(&kept, ctx)
     });
     let left = sides.next().flatten();

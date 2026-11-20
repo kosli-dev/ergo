@@ -600,7 +600,8 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
     let roots = super::message::root_clauses(&whose, &outer);
     if let Some(outcome) = walked.unreadable {
         let own = outcome.cause().unwrap_or(Cause::Unusable);
-        let result = Err(Cause::worst(roots.iter().map(|root| root.cause).chain([own])).unwrap_or(own));
+        let result =
+            Err(Cause::worst(roots.iter().map(|root| root.cause).chain([own])).unwrap_or(own));
         let list = Input {
             name: walked.name,
             value: Value::Array(Vec::new()),
@@ -1620,7 +1621,13 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, _cause: Cause) -> (Vec<Clause>
         let mut found: Vec<(Clause, Vec<walk::Seg>, Option<Value>)> = walked
             .failures
             .iter()
-            .map(|f| (walk_clause(&walked, f), f.order.clone(), Some(f.to_rich_json())))
+            .map(|f| {
+                (
+                    walk_clause(&walked, f),
+                    f.order.clone(),
+                    Some(f.to_rich_json()),
+                )
+            })
             .collect();
         let mut at = outer.clone();
         let mut any_undecided = false;
@@ -1646,7 +1653,9 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, _cause: Cause) -> (Vec<Clause>
                     ItemRead::Field(check)
                 };
                 let record = own_item(&said, &name)
-                    .then(|| item_record(&walked, item, &focus, read, said.cause, &said_text(&said)))
+                    .then(|| {
+                        item_record(&walked, item, &focus, read, said.cause, &said_text(&said))
+                    })
                     .flatten();
                 found.push((said, item.item_segs.clone(), record));
             }
