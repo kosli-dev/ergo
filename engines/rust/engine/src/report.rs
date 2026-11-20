@@ -383,11 +383,7 @@ impl RequirementRead<'_> {
         let mut levels: Vec<String> = Vec::new();
         let mut at = name.to_string();
         while levels.len() < 2 && self.reads_from(&at) {
-            let Some(crate::reading::Relation::Child(parent)) = reading
-                .infos
-                .get(at.as_str())
-                .map(|info| info.relation.clone())
-            else {
+            let Some(parent) = reading.parent_of(&at) else {
                 break;
             };
             levels.insert(0, parent.clone());
