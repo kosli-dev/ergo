@@ -649,6 +649,8 @@ _unique_ids_row(raw, refs, req, req_name) := {
 	repeated := _repeated_ids(refs)
 }
 
+_with_id_faults(row, _, _, _, _) := row
+
 _copied_id_locations(entry, req) := _id_locations(entry, req) if object.get(entry, "ats", null) == null
 
 else := [l | some a in entry.ats; some l in _id_locations(object.union(entry, {"at": a}), req)]
