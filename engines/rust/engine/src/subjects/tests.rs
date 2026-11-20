@@ -1817,3 +1817,54 @@ fn merge_runs_keeps_the_rows_of_the_first_run_whatever_the_length_of_the_others(
     assert_eq!(ids, [json!(1), json!(2)]);
     assert!(super::merge_runs(Vec::new(), &[&long]).is_empty());
 }
+
+fn tally_message(sentence: &str, items: Value, params: Value, message: &str) -> String {
+    let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
+    let crate::ops::Check::Tally(tally) =
+        crate::lower::lower_assertion(&tree.assertions[0], &crate::lower::Scope::new()).unwrap()
+    else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [{"items": items}]});
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: crate::path::Located {
+            value: &input["things"][0],
+            location: crate::path::Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: std::collections::BTreeMap::new(),
+    };
+    let cause = crate::ops::run(&crate::ops::Check::Tally(tally.clone()), &ctx).cause;
+    super::tally_part(sentence, cause, &[], message, &tally, &ctx).message
+}
+
+#[test]
+fn a_counts_assertion_message_has_no_item_clause() {
+    assert_eq!(
+        tally_message(
+            "count of items whose v is at least $params.min is 1",
+            json!([{}, {}, {}, {}, {}]),
+            json!({"min": "s"}),
+            "$params.min is \"s\", which isn't a number; item 1 of items: v is missing; item 2 of items: v is missing; item 3 of items: v is missing; and 2 more",
+        ),
+        "$params.min is \"s\", which isn't a number"
+    );
+}
+
+#[test]
+#[ignore = "#694: tally_part gets the row message as text; the count's clauses have to reach it through message::message first"]
+fn a_counts_assertion_message_has_no_item_clause_after_a_side_joined_with_and() {
+    assert_eq!(
+        tally_message(
+            "count of items whose v is 1 is $params.n",
+            json!([{}, {}, {}, {}]),
+            json!({}),
+            "$params.n is missing, and item 1 of items: v is missing; item 2 of items: v is missing; item 3 of items: v is missing; and 1 more",
+        ),
+        "$params.n is missing"
+    );
+}
