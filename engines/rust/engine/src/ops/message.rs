@@ -1,3 +1,4 @@
+use super::clause::{self, Clause};
 use super::compare::{Cmp, Side, read_side};
 use super::tally::{self, Side as TallySide};
 use super::{Check, Input, Verdict, lists, push_new, read_path, run_full};
@@ -1677,10 +1678,6 @@ pub fn root_flaw_texts(
     root_texts_with(checks, ctx, refs_first, &[], true)
 }
 
-pub fn root_flaw_counted(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
-    root_flaw_ordered(checks, ctx, checks, &[])
-}
-
 pub fn root_flaw_ordered(
     checks: &[&Check],
     ctx: &Ctx,
@@ -1701,8 +1698,21 @@ fn root_flaw_with(
         .map(|(cause, texts)| (cause, texts.join("; ")))
 }
 
+pub fn root_reads_counted(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, Vec<RootRead>)> {
+    root_reads_with(checks, ctx, checks, &[], true)
+}
+
 pub fn key_cause(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
     worst_texts(key_problems(checks, ctx))
+}
+
+pub fn key_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+    let found = key_problems(checks, ctx);
+    let worst = Cause::worst(found.iter().map(|clause| clause.cause));
+    found
+        .into_iter()
+        .filter(|clause| Some(clause.cause) == worst)
+        .collect()
 }
 
 pub fn worse_key_cause(
@@ -1717,7 +1727,7 @@ pub fn worse_key_cause(
     }
 }
 
-fn key_problems(checks: &[&Check], ctx: &Ctx) -> Vec<(Cause, String)> {
+fn key_problems(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
     let mut keys: Vec<Path> = Vec::new();
     for check in checks {
         let mut own: Vec<Path> = check
@@ -1733,26 +1743,31 @@ fn key_problems(checks: &[&Check], ctx: &Ctx) -> Vec<(Cause, String)> {
     keys.iter()
         .filter_map(|key| {
             let read = path::read(key, ctx);
+            let named = name::name(key);
             match (read.outcome.cause(), read.value) {
-                (Some(Cause::NotAnObject), _) => {
-                    Some((Cause::NotAnObject, isnt("$input", ctx.input, "an object")))
-                }
-                (Some(cause), _) => Some((cause, root_text(key, ctx, cause))),
-                (None, Some(value)) if !value.is_string() => {
-                    Some((Cause::Unusable, isnt(&name::name(key), value, "text")))
-                }
+                (Some(Cause::NotAnObject), _) => Some(Clause::root(
+                    "$input",
+                    Cause::NotAnObject,
+                    isnt("$input", ctx.input, "an object"),
+                )),
+                (Some(cause), _) => Some(Clause::root(&named, cause, root_text(key, ctx, cause))),
+                (None, Some(value)) if !value.is_string() => Some(Clause::root(
+                    &named,
+                    Cause::Unusable,
+                    isnt(&named, value, "text"),
+                )),
                 (None, _) => None,
             }
         })
         .collect()
 }
 
-fn worst_texts(found: Vec<(Cause, String)>) -> Option<(Cause, String)> {
-    let worst = Cause::worst(found.iter().map(|(cause, _)| *cause))?;
+fn worst_texts(found: Vec<Clause>) -> Option<(Cause, String)> {
+    let worst = Cause::worst(found.iter().map(|clause| clause.cause))?;
     let mut texts: Vec<String> = Vec::new();
-    for (cause, text) in found {
-        if cause == worst && !texts.contains(&text) {
-            texts.push(text);
+    for clause in found {
+        if clause.cause == worst && !texts.contains(&clause.text) {
+            texts.push(clause.text);
         }
     }
     Some((worst, joined(texts)))
@@ -1846,8 +1861,24 @@ fn root_texts_with(
     keys_left: &[&Check],
     walked_counts: bool,
 ) -> Option<(Cause, Vec<String>)> {
-    let mut found: Vec<(usize, Cause, String, bool)> = Vec::new();
+    root_reads_with(checks, ctx, refs_first, keys_left, walked_counts)
+        .map(|(cause, reads)| (cause, reads.into_iter().map(|(text, _)| text).collect()))
+}
+
+pub type RootRead = (String, Vec<Clause>);
+
+fn root_reads_with(
+    checks: &[&Check],
+    ctx: &Ctx,
+    refs_first: &[&Check],
+    keys_left: &[&Check],
+    walked_counts: bool,
+) -> Option<(Cause, Vec<RootRead>)> {
+    let mut found: Vec<(usize, Cause, String, bool, Vec<Clause>)> = Vec::new();
     let mut refs: Vec<String> = Vec::new();
+    let one = |root: &Path, cause: Cause, text: &str| {
+        vec![Clause::root(&name::name(root), cause, text.to_string())]
+    };
     for (at, check) in checks.iter().enumerate() {
         if matches!(check, Check::Present(_)) {
             continue;
@@ -1889,7 +1920,8 @@ fn root_texts_with(
                         && let Some((cause, text)) = lists::walked_root_fault(check, &root, ctx)
                         && cause != Cause::Value
                     {
-                        found.push((at, cause, text, false));
+                        let said = one(&root, cause, &text);
+                        found.push((at, cause, text, false, said));
                     }
                     continue;
                 }
@@ -1902,20 +1934,23 @@ fn root_texts_with(
                     && (lists::starts_at_a_list(&root, ctx) || lists::walked(&root, ctx).is_some())
                 {
                     if walked_counts && let Check::Tally(tally) = check {
-                        for (cause, text) in super::tally::counted_faults(tally, path, ctx) {
-                            found.push((at, cause, text, false));
+                        for (cause, said) in super::tally::counted_fault_clauses(tally, path, ctx) {
+                            let text = clause::text(&clause::shown(&said));
+                            found.push((at, cause, text, false, said));
                         }
                     }
                     continue;
                 }
                 if counted && let Some((cause, text)) = first_null_step(&root, ctx) {
-                    return Some((cause, vec![text]));
+                    let said = one(&root, cause, &text);
+                    return Some((cause, vec![(text, said)]));
                 }
                 if !is_key
                     && lists::one_rights(check).contains(&&root)
                     && let Some(text) = lists::input_one_fault(check, ctx).into_iter().next()
                 {
-                    found.push((at, Cause::NotAnObject, text, false));
+                    let said = vec![Clause::root("$input", Cause::NotAnObject, text.clone())];
+                    found.push((at, Cause::NotAnObject, text, false, said));
                     continue;
                 }
                 let read = path::read(&root, ctx);
@@ -1928,17 +1963,16 @@ fn root_texts_with(
                     {
                         refs.push(text.clone());
                     }
-                    found.push((at, cause, text, is_key));
+                    let said = one(&root, cause, &text);
+                    found.push((at, cause, text, is_key, said));
                 } else if is_key && let Some(value) = read.value.filter(|value| !value.is_string())
                 {
-                    found.push((
-                        at,
-                        Cause::Unusable,
-                        isnt(&name::name(&root), value, "text"),
-                        true,
-                    ));
+                    let text = isnt(&name::name(&root), value, "text");
+                    let said = one(&root, Cause::Unusable, &text);
+                    found.push((at, Cause::Unusable, text, true, said));
                 } else if !is_key && let Some(text) = root_kind_fault(check, &root, ctx) {
-                    found.push((at, Cause::Unusable, text, false));
+                    let said = one(&root, Cause::Unusable, &text);
+                    found.push((at, Cause::Unusable, text, false, said));
                 }
             }
         }
@@ -1946,32 +1980,43 @@ fn root_texts_with(
     let worst = Cause::worst(
         found
             .iter()
-            .map(|(_, cause, _, _)| *cause)
+            .map(|(_, cause, _, _, _)| *cause)
             .collect::<Vec<_>>(),
     )?;
-    let mut kept: Vec<(String, bool)> = Vec::new();
-    for (at, cause, text, is_key) in &found {
-        let keyed = found.iter().any(|(other, other_cause, _, key)| {
+    let mut kept: Vec<(String, bool, Vec<Clause>)> = Vec::new();
+    for (at, cause, text, is_key, said) in &found {
+        let keyed = found.iter().any(|(other, other_cause, _, key, _)| {
             other == at && *key && (other_cause == cause || *other_cause == Cause::Unusable)
         });
-        if (*is_key || !keyed) && !kept.iter().any(|(said, _)| said == text) {
-            kept.push((text.clone(), *is_key));
+        if (*is_key || !keyed) && !kept.iter().any(|(text_said, _, _)| text_said == text) {
+            kept.push((text.clone(), *is_key, said.clone()));
         }
     }
-    refs.retain(|text| kept.iter().any(|(said, _)| said == text));
+    refs.retain(|text| kept.iter().any(|(said, _, _)| said == text));
     refs.sort();
     let keys = kept
         .iter()
-        .filter(|(text, is_key)| *is_key && !refs.is_empty() && !refs.contains(text))
-        .map(|(text, _)| text.clone());
+        .filter(|(text, is_key, _)| *is_key && !refs.is_empty() && !refs.contains(text))
+        .map(|(text, _, _)| text.clone());
     let mut texts: Vec<String> = Vec::new();
     for text in keys
         .chain(refs.clone())
-        .chain(kept.iter().map(|(text, _)| text.clone()))
+        .chain(kept.iter().map(|(text, _, _)| text.clone()))
     {
         push_new(&mut texts, text);
     }
-    Some((worst, texts))
+    let reads = texts
+        .into_iter()
+        .map(|text| {
+            let said = kept
+                .iter()
+                .find(|(kept_text, _, _)| *kept_text == text)
+                .map(|(_, _, said)| said.clone())
+                .unwrap_or_default();
+            (text, said)
+        })
+        .collect();
+    Some((worst, reads))
 }
 
 pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {

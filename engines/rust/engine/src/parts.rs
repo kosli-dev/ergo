@@ -124,7 +124,7 @@ fn text_of(failed: &Value, key: &str) -> String {
         .to_string()
 }
 
-fn is_item(name: &str) -> bool {
+pub(crate) fn is_item(name: &str) -> bool {
     name.starts_with("item ")
 }
 

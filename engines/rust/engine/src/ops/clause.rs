@@ -17,6 +17,37 @@ pub struct Clause {
     pub said: Vec<Clause>,
 }
 
+impl Clause {
+    pub fn root(name: &str, cause: Cause, text: String) -> Clause {
+        Clause {
+            kind: Kind::Root,
+            name: name.to_string(),
+            cause,
+            text,
+            said: Vec::new(),
+        }
+    }
+
+    pub fn said(cause: Cause, text: String) -> Clause {
+        Clause::root(&text.clone(), cause, text)
+    }
+
+    pub fn list(name: &str, cause: Cause, text: String) -> Clause {
+        Clause {
+            kind: Kind::List,
+            ..Clause::root(name, cause, text)
+        }
+    }
+
+    pub fn item(name: &str, cause: Cause, text: String, said: Vec<Clause>) -> Clause {
+        Clause {
+            kind: Kind::Item,
+            said,
+            ..Clause::root(name, cause, text)
+        }
+    }
+}
+
 const SHOWN_ITEMS: usize = 3;
 
 pub fn shown(clauses: &[Clause]) -> Vec<Clause> {

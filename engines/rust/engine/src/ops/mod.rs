@@ -1,5 +1,4 @@
 pub mod any_of;
-#[cfg(test)]
 pub mod clause;
 pub mod compare;
 pub mod equals;
