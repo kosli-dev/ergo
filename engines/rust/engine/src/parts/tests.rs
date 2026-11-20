@@ -339,7 +339,11 @@ fn walk_entries_read_each_records_clause_kind_and_not_its_text() {
         record("xs", "xs", "absent", "xs: is missing"),
     ];
     let clauses = [
-        Clause::root("$params.min", Cause::Unusable, "$params.min is \"s\"".to_string()),
+        Clause::root(
+            "$params.min",
+            Cause::Unusable,
+            "$params.min is \"s\"".to_string(),
+        ),
         Clause::item(
             "item 2 of xs",
             Cause::Value,
@@ -369,6 +373,9 @@ fn walk_entries_read_each_records_clause_kind_and_not_its_text() {
         .collect();
     assert_eq!(
         said,
-        [(true, "item 2 of xs", "v is 2"), (false, "xs", "is missing")]
+        [
+            (true, "item 2 of xs", "v is 2"),
+            (false, "xs", "is missing")
+        ]
     );
 }

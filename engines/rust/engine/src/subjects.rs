@@ -2648,10 +2648,7 @@ fn said_units(said: &[Vec<Piece>]) -> Vec<Clause> {
     said.iter()
         .flat_map(|group| match group.as_slice() {
             [Piece::Counted(clauses)] => clause::shown(clauses),
-            _ => vec![Clause::said(
-                Cause::Value,
-                ops::message::pieces_text(group),
-            )],
+            _ => vec![Clause::said(Cause::Value, ops::message::pieces_text(group))],
         })
         .filter(|said| !line_of(said).is_empty())
         .collect()
