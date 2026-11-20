@@ -468,7 +468,9 @@ _ref_node_unfit(x, r, _) if {
 	_node_param_broken(x)
 }
 
-_ref_side_kind(x) := "a number" if "within" in object.keys(x)
+_ref_side_kind(x) := "text" if "ignoring" in object.keys(x)
+
+else := "a number" if "within" in object.keys(x)
 
 else := "text" if x.cmp in _text_cmps
 

@@ -65,6 +65,9 @@ _m_unusable_names(check, subj) := {s.name |
 	some f in _m_fault(subj, check)
 	s := _m_shown(subj, f[0])
 	s.state == "value"
+} | {s.name |
+	_m_text_item_faults(subj, check) != []
+	s := _m_text_list(subj, check)
 }
 
 _m_marked(inputs, names) := [_m_marked_input(i, names) | some i in inputs]
@@ -725,7 +728,7 @@ _m_walked_root_fault(c, shown, x, cause) := _rwalk_text(x, shown) if {
 	k := _m_leaf_needs(c, w.value)
 }
 
-_m_off_right(subj, c) := [_m_isnt(_root_label(p), _root_value(subj, p), k) |
+_m_off_right(subj, c) := [_m_root_kind_text(subj, c, p, k) |
 	some p in _root_reads(c)
 	k := _root_kind(subj, c, p)
 ]
