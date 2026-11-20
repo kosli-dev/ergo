@@ -60,6 +60,20 @@ fn the_cap_counts_leaf_items_not_outer_items() {
 }
 
 #[test]
+fn a_root_whose_value_holds_a_semicolon_stays_one_clause() {
+    let clauses = vec![
+        root("w.z", Cause::Unusable, "w.z is \"p; q\", which isn't a number"),
+        item("item 1 of ws", Cause::Absent, vec![missing("w.v")]),
+    ];
+    let shown = shown(&clauses);
+    assert_eq!(shown, clauses);
+    assert_eq!(
+        text(&shown),
+        "w.z is \"p; q\", which isn't a number; item 1 of ws: w.v is missing"
+    );
+}
+
+#[test]
 fn two_clauses_of_one_item_join_with_and() {
     let clauses: Vec<Clause> = (1..=5)
         .map(|n| {
