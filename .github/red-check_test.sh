@@ -26,7 +26,7 @@ printf 'fn main() {}\n\n#[test]\nfn inline_one() {}\n' > "$repo/engines/rust/foo
 git -C "$repo" add -A
 git -C "$repo" commit --quiet -m head
 
-printf '#!/bin/sh\ncase "$4" in red*) exit 1 ;; none*) exit 3 ;; esac\nprintf "%%s\\n" "$2 $3 $4" >> "$RED_CHECK_LOG"\nexit 0\n' > "$dir/rust.sh"
+printf '#!/bin/sh\nshift\nfor a; do name=$a; done\ncase "$name" in red*) exit 1 ;; none*) exit 3 ;; esac\nprintf "%%s\\n" "$*" >> "$RED_CHECK_LOG"\nexit 0\n' > "$dir/rust.sh"
 printf '#!/bin/sh\ncase "$2" in test_red*) exit 1 ;; esac\nprintf "%%s\\n" "$2" >> "$RED_CHECK_LOG"\nexit 0\n' > "$dir/rego.sh"
 chmod +x "$dir/rust.sh" "$dir/rego.sh"
 export RED_CHECK_LOG=$dir/log
@@ -43,10 +43,10 @@ echo "red-check.sh lists the new tests that pass on the old source and skips the
 out=$(run "$base")
 expected="## New tests that already pass on the old source
 
-5 new tests (3 Rust, 2 Rego), 3 pass on $base:
+6 new tests (4 Rust, 2 Rego), 3 pass on $base:
+- engines/rego/tests/x_test.rego test_green_rule
 - engines/rust/foo/src/tests.rs green_one
-- engines/rust/foo/tests/api.rs api_new
-- engines/rego/tests/x_test.rego test_green_rule"
+- engines/rust/foo/tests/api.rs api_new"
 if [ "$out" != "$expected" ]; then
   echo "red-check.sh should print:" >&2
   echo "$expected" >&2
