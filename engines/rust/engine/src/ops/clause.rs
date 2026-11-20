@@ -29,36 +29,82 @@ pub fn shown(clauses: &[Clause]) -> Vec<Clause> {
         .iter()
         .filter(|clause| clause.kind == Kind::Item)
         .collect();
-    out.extend(items.iter().take(SHOWN_ITEMS).map(|item| (*item).clone()));
-    if items.len() > SHOWN_ITEMS {
-        out.push(Clause {
-            kind: Kind::More(items.len() - SHOWN_ITEMS),
-            name: String::new(),
-            cause: Cause::Value,
-            text: String::new(),
-            said: Vec::new(),
-        });
+    let leaves: usize = items.iter().map(|item| pieces(item).len()).sum();
+    if leaves <= SHOWN_ITEMS {
+        out.extend(items.into_iter().cloned());
+        return out;
     }
+    let mut left = SHOWN_ITEMS;
+    out.extend(items.into_iter().filter_map(|item| cut(item, &mut left)));
+    out.push(Clause {
+        kind: Kind::More(leaves - SHOWN_ITEMS),
+        name: String::new(),
+        cause: Cause::Value,
+        text: String::new(),
+        said: Vec::new(),
+    });
     out
 }
 
 pub fn text(clauses: &[Clause]) -> String {
     clauses
         .iter()
-        .map(|clause| match clause.kind {
-            Kind::More(count) => format!("and {count} more"),
-            Kind::Item => format!("{}: {}", clause.name, said_text(&clause.said)),
-            Kind::Root | Kind::List => clause.text.clone(),
+        .flat_map(|clause| match clause.kind {
+            Kind::More(count) => vec![format!("and {count} more")],
+            Kind::Item => pieces(clause),
+            Kind::Root | Kind::List => vec![clause.text.clone()],
         })
         .collect::<Vec<_>>()
         .join("; ")
 }
 
-fn said_text(said: &[Clause]) -> String {
-    said.iter()
-        .map(|clause| clause.text.as_str())
-        .collect::<Vec<_>>()
-        .join(", and ")
+fn pieces(item: &Clause) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    let mut own: Vec<&str> = Vec::new();
+    let flush = |own: &mut Vec<&str>, out: &mut Vec<String>| {
+        if !own.is_empty() {
+            out.push(format!("{}: {}", item.name, own.join(", and ")));
+            own.clear();
+        }
+    };
+    for clause in &item.said {
+        if clause.kind == Kind::Item {
+            flush(&mut own, &mut out);
+            out.extend(
+                pieces(clause)
+                    .into_iter()
+                    .map(|piece| format!("{}: {piece}", item.name)),
+            );
+        } else {
+            own.push(&clause.text);
+        }
+    }
+    flush(&mut own, &mut out);
+    out
+}
+
+fn cut(item: &Clause, left: &mut usize) -> Option<Clause> {
+    let mut kept = Clause {
+        said: Vec::new(),
+        ..item.clone()
+    };
+    let mut run_kept: Option<bool> = None;
+    for clause in &item.said {
+        if clause.kind == Kind::Item {
+            run_kept = None;
+            kept.said.extend(cut(clause, left));
+        } else {
+            let keep = *run_kept.get_or_insert_with(|| {
+                let keep = *left > 0;
+                *left = left.saturating_sub(1);
+                keep
+            });
+            if keep {
+                kept.said.push(clause.clone());
+            }
+        }
+    }
+    (!kept.said.is_empty()).then_some(kept)
 }
 
 #[cfg(test)]
