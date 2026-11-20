@@ -178,8 +178,14 @@ pub fn base_of(path: &Path, ctx: &Ctx) -> Option<(String, String, Cause)> {
     if !super::walk::reads_outside(path) && path.start != path::Start::Params {
         return None;
     }
-    if let Step::Ref(key) = &path.steps[at] {
-        key_flaw(key, ctx)?;
+    match &path.steps[at] {
+        Step::Ref(key) => {
+            key_flaw(key, ctx)?;
+        }
+        Step::Field(key) if !matches!(key.start, path::Start::Subject | path::Start::Own) => {
+            return None;
+        }
+        _ => {}
     }
     let keys: Vec<String> = path.steps[..at]
         .iter()
