@@ -275,14 +275,17 @@ test_a_subject_name_that_isnt_a_string_gives_the_same_report_with_strict_builtin
 	rep.requirements.r.status == "not_met"
 }
 
-test_a_subject_cant_build_on_a_subject_read_from_another_yet if {
-	doc := {"artifacts": [{"fingerprint": "a1", "prs": [{"url": "p1", "ok": true}]}], "prs": [{"url": "elsewhere", "ok": true}]}
-	base := {"artifact": {"from": "artifacts", "identified_by": "fingerprint"}, "pr": {"from": "every artifact.prs", "identified_by": "url"}}
-	every pair in [[{"from": "pr whose ok is true"}, "from"]] {
-		rep := ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": object.union(base, {"okpr": pair[0]}), "requirements": {"r": {"subject": "okpr", "checks": {"c": "url exists"}}}}, {})
-		_from_problems(rep) == [{"name": concat("", ["subjects.okpr.", pair[1]]), "value": ["can't build on a subject read from another subject yet"], "locations": []}]
-		stopped(rep)
-	}
+test_a_subject_that_narrows_a_child_reads_the_childs_subjects_with_their_id_and_in if {
+	doc := {"artifacts": [{"fingerprint": "a1", "prs": [{"url": "p1", "ok": true}, {"url": "p2", "ok": false}]}], "prs": [{"url": "elsewhere", "ok": true}]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "fingerprint"}, "pr": {"from": "every artifact.prs", "identified_by": "url"}, "okpr": {"from": "pr whose ok is true"}}
+	rep := ergo.report(doc, {"ergo_spec": ergo._spec, "subjects": subjects, "requirements": {"r": {"subject": "okpr", "checks": {"c": "url exists"}}}}, {})
+	_from_problems(rep) == []
+	[[r.check, r.subject, r.cause] | some r in rep.results; r.check in {"c", "$applies"}] == [
+		["$applies", {"type": "okpr", "id": "p1", "in": {"artifact": "a1"}}, "satisfied"],
+		["$applies", {"type": "okpr", "id": "p2", "in": {"artifact": "a1"}}, "value"],
+		["c", {"type": "okpr", "id": "p1", "in": {"artifact": "a1"}}, "satisfied"],
+	]
+	rep.requirements.r.status == "met"
 }
 
 test_named_by_a_field_reads_the_key_the_subjects_field_holds if {
