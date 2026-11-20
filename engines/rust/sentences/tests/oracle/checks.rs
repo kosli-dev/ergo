@@ -10333,6 +10333,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every es.v that is m named by $params.k is 1",
+        "every es.v that equals m named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "some es.v that is m named by $params.k is 1",
+        "some es.v that equals m named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
         "every xs whose v is in $input.os.name and whose w is at least $params.z exists",
         "every xs whose v is in $input.os.name and whose w is at least $params.z exists",
         &[],
