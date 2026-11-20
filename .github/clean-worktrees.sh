@@ -17,9 +17,10 @@ here=$(git rev-parse --show-toplevel 2>/dev/null) || {
   exit 1
 }
 records=$(git worktree list --porcelain | awk '
-  /^worktree / { if (path != "") print path "\t" branch; path = substr($0, 10); branch = "" }
+  /^worktree / { if (path != "") print path "\t" locked "\t" branch; path = substr($0, 10); branch = ""; locked = "no" }
+  /^locked/ { locked = "yes" }
   /^branch refs\/heads\// { branch = substr($0, 19) }
-  END { if (path != "") print path "\t" branch }
+  END { if (path != "") print path "\t" locked "\t" branch }
 ')
 main=$(printf '%s\n' "$records" | head -n 1 | cut -f 1)
 tab=$(printf '\t')
@@ -39,7 +40,7 @@ if [ "$yes" = 1 ]; then
 fi
 
 remove_targets() {
-  for target in $(find "$1" -maxdepth 4 -name target -type d -prune 2>/dev/null | sort); do
+  find "$1" -maxdepth 4 -name target -type d -prune 2>/dev/null | sort | while IFS= read -r target; do
     if [ "$yes" = 1 ]; then
       /bin/rm -rf "$target"
       echo "removed target folder $target (build output)"
@@ -49,24 +50,25 @@ remove_targets() {
   done
 }
 
-printf '%s\n' "$records" | while IFS=$tab read -r path branch; do
+printf '%s\n' "$records" | while IFS=$tab read -r path locked branch; do
   case $path in
     "$main"/.claude/worktrees/*) ;;
     *) continue ;;
   esac
   if [ "$path" = "$here" ]; then
     echo "kept: $path (the worktree this script runs in)"
-    remove_targets "$path"
     continue
   fi
   if [ -z "$branch" ]; then
     echo "kept: no branch: $path"
-    remove_targets "$path"
+    continue
+  fi
+  if [ "$locked" = yes ]; then
+    echo "kept: $path (locked)"
     continue
   fi
   if [ -n "$(git -C "$path" status --porcelain --untracked-files=no)" ]; then
     echo "kept: $path (branch $branch has uncommitted tracked changes)"
-    remove_targets "$path"
     continue
   fi
   reason=
@@ -77,7 +79,6 @@ printf '%s\n' "$records" | while IFS=$tab read -r path branch; do
   fi
   if [ -z "$reason" ]; then
     echo "kept: $path (branch $branch is not merged and has no merged or closed pull request)"
-    remove_targets "$path"
     continue
   fi
   remove_targets "$path"
