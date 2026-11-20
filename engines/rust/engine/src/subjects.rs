@@ -2257,7 +2257,12 @@ fn id_fault(env: &Env, lowered: &Lowered, judged: &Judged, anc: &[Anc]) -> Optio
             whole.extend(steps.iter().cloned());
             present_text(whole, &context(env, base.clone(), anc))
         };
-        (cause, rooted_name(&segs, &steps, &root, child), stop, clause)
+        (
+            cause,
+            rooted_name(&segs, &steps, &root, child),
+            stop,
+            clause,
+        )
     } else {
         let name = rooted_name(&segs, &[], &root, child);
         let mut said: Vec<String> = chain.clone();

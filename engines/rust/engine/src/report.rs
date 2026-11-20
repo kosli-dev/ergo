@@ -237,9 +237,11 @@ pub fn with_id_faults(mut row: Row, faults: &[IdFault], input: &Value) -> Row {
         causes.push(row.cause);
         said.extend(row.message.clone());
     }
-    said.extend(faults.iter().filter_map(|fault| {
-        fault.record["ergo/text"].as_str().map(str::to_string)
-    }));
+    said.extend(
+        faults
+            .iter()
+            .filter_map(|fault| fault.record["ergo/text"].as_str().map(str::to_string)),
+    );
     row.cause = Cause::worst(causes).unwrap_or(Cause::Value);
     row.message = Some(crate::ops::message::joined(said));
     let records: Vec<Value> = faults

@@ -1917,7 +1917,12 @@ fn judged_list(items: &[Value], ids: &[Value]) -> Vec<super::Judged<'static>> {
 #[test]
 fn a_null_id_is_not_an_id_so_it_never_repeats() {
     let judged = judged_list(
-        &[json!({}), json!({"id": null}), json!({"id": "a"}), json!({"id": "a"})],
+        &[
+            json!({}),
+            json!({"id": null}),
+            json!({"id": "a"}),
+            json!({"id": "a"}),
+        ],
         &[Value::Null, Value::Null, json!("a"), json!("a")],
     );
     let (repeated, locations) = super::repeated_ids(&judged);
@@ -1938,7 +1943,9 @@ fn a_subject_whose_id_is_missing_or_null_fails_unique_ids_named_by_its_place() {
     assert_eq!(row["cause"], json!("absent"));
     assert_eq!(
         row["message"],
-        json!("repeated thing ids is [\"a\"]; item 2 of ds: id is missing; item 3 of ds: id is null")
+        json!(
+            "repeated thing ids is [\"a\"]; item 2 of ds: id is missing; item 3 of ds: id is null"
+        )
     );
     assert_eq!(
         row["failures"],
@@ -1955,7 +1962,10 @@ fn a_subject_whose_id_is_missing_or_null_fails_unique_ids_named_by_its_place() {
 
 #[test]
 fn a_null_item_is_its_own_id_so_it_fails_unique_ids_with_or_without_identified_by() {
-    for subject in [json!({"from": "ds"}), json!({"from": "ds", "identified_by": "id"})] {
+    for subject in [
+        json!({"from": "ds"}),
+        json!({"from": "ds", "identified_by": "id"}),
+    ] {
         let row = unique_row(json!({"thing": subject}), json!({"ds": ["a", null]}));
         assert_eq!(row["cause"], json!("null"));
         assert_eq!(row["message"], json!("item 2 of ds is null"));
@@ -1975,7 +1985,9 @@ fn an_id_read_through_a_field_says_what_stopped_it_as_a_check_would() {
     assert_eq!(row["cause"], json!("unusable"));
     assert_eq!(
         row["message"],
-        json!("item 1 of ds: meta is 3, which isn't an object; item 2 of ds: meta is null; item 3 of ds: meta.id is missing")
+        json!(
+            "item 1 of ds: meta is 3, which isn't an object; item 2 of ds: meta is null; item 3 of ds: meta.id is missing"
+        )
     );
     assert_eq!(row["failures"][1]["cause"], json!("null"));
 }
@@ -1996,10 +2008,16 @@ fn a_subject_without_an_id_in_a_list_of_lists_sits_under_the_outer_item() {
         json!({"thing": {"from": "every xs.bs", "identified_by": "id"}}),
         json!({"xs": [{"bs": [{"id": 1}, {"x": 1}]}]}),
     );
-    assert_eq!(row["message"], json!("item 1 of xs: item 2 of bs: id is missing"));
+    assert_eq!(
+        row["message"],
+        json!("item 1 of xs: item 2 of bs: id is missing")
+    );
     assert_eq!(row["failures"][0]["name"], json!("item 1 of xs"));
     assert_eq!(row["failures"][0]["locations"], json!(["/xs/0"]));
-    assert_eq!(row["failures"][0]["failures"][0]["name"], json!("item 2 of bs"));
+    assert_eq!(
+        row["failures"][0]["failures"][0]["name"],
+        json!("item 2 of bs")
+    );
     assert_eq!(
         row["failures"][0]["failures"][0]["inputs"][0]["name"],
         json!("xs[0].bs[1].id")
