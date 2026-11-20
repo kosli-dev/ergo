@@ -165,6 +165,36 @@ fn root_clauses_say_a_root_key_and_the_value_before_it_once_and_not_the_ref_they
 }
 
 #[test]
+fn a_count_on_an_input_that_is_a_list_says_the_input_once_and_then_its_items() {
+    let input = json!([{"id": "t", "rs": [{"zz": 1}, "s"]}]);
+    let located = crate::path::Located {
+        value: &input[0],
+        location: crate::path::Location::input_root().index(0),
+    };
+    let ctx = crate::path::Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: located,
+        input: &input,
+        params: None,
+        aliases: std::collections::BTreeMap::new(),
+    };
+    for sentence in [
+        "count of rs whose zz is m named by $input.k is 1",
+        "count of rs whose zz is $input.m named by $input.k is 1",
+    ] {
+        let check = lowered(sentence);
+        let verdict = crate::ops::run(&check, &ctx);
+        assert_eq!(
+            super::pieces_text(&super::pieces(&check, &ctx, &verdict)),
+            r#"$input is [{"id": "t", "rs": [{"zz": 1}, "s"]}], which isn't an object; item 2 of rs is "s", which isn't an object"#,
+            "{sentence}"
+        );
+    }
+}
+
+#[test]
 fn root_clauses_say_the_value_before_an_item_key_that_cant_take_a_key() {
     let subject = json!({"id": "t", "xs": [{"tags": ["x"]}]});
     let input = json!({"m": null});
