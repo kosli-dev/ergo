@@ -46,6 +46,8 @@ python3 .github/rego-layers.py
 .github/rego-layers_test.sh
 .github/no-inline-tests.sh
 .github/no-inline-tests_test.sh
+.github/no-array-data.sh
+.github/no-array-data_test.sh
 .github/dump-diff_test.sh
 .github/pr-facts_test.sh
 .github/pairs-facts_test.sh
@@ -65,7 +67,7 @@ Run them from the repo root. The last three lines use a virtual environment that
 
 `.github/pr-facts_test.sh` tests `.github/pr-facts.sh`, which prints how many Rust case reports a change moved, which known failures it added or removed, and whether a case that passed now fails or is gone; put its output in the body of a pull request that changes Rust reports.
 
-`.github/pairs-facts_test.sh` tests `.github/pairs-facts.sh`, which runs the pairs in `spec/sweep-pairs.json` through both engines and prints how many the engines differ on, how many say their `want`, and which pairs the Rust output of a change moved, first and in capitals any that moved away from Rego or from their `want`; it only informs, and the `pairs-facts` job writes it in the summary of a pull request.
+`.github/pairs-facts_test.sh` tests `.github/pairs-facts.sh`, which runs the pairs in `.github/sweep-pairs.json` through both engines and prints how many the engines differ on, how many say their `want`, and which pairs the Rust output of a change moved, first and in capitals any that moved away from Rego or from their `want`; it only informs, and the `pairs-facts` job writes it in the summary of a pull request.
 
 `opa fmt --list` should print nothing. If it prints file names, run `opa fmt -w` on them.
 
@@ -77,7 +79,7 @@ The `opa eval` command runs every test again with `--strict-builtin-errors`, whi
 
 The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/regal)'s rules for likely bugs, and should say `No violations found`. One of them, `leaked-internal-reference`, fails when a file outside `package ergo` calls a rule whose name starts with `_`. Test files are allowed to. `redundant-existence-check` is off because it flags `_verdict_cause(passed) := "satisfied" if passed`, where `if passed` is what stops a `false` from counting as satisfied. The flags are on the command line and not in `.regal/config.yaml`.
 
-Every OPA command here names the folders it loads, and none of them scans the repo, so the workflow files under `.github`, the workspace under `packages` and the Rust engine's test data under `engines/rust` are never loaded as data. OPA puts a JSON or YAML file at a data path that starts from the folder it was given, so `spec:spec` and `examples:examples` keep the cases at `data.spec` and the examples' inputs at `data.examples`, where the tests read them. `engines/rego` and `dist` hold no data, so they need no prefix. The commands that run Ergo load `dist` and `--ignore src`, so they run the built file and skip the parts, which would define every rule a second time. `--ignore` matches a file or folder name anywhere below the folders given, and `engines/rego/src` is the only folder named `src` there. `opa fmt` and `regal lint` read the parts, not the built file. A new folder with Rego under `engines/rego/src` or `engines/rego/tests` needs nothing more. Any other new folder with Rego has to be added to these commands, to `.github/workflows/test.yml` and to `.github/rego-folders.sh`, which fails in CI when a tracked Rego file is in a folder no command loads.
+Every OPA command here names the folders it loads, and none of them scans the repo, so the workflow files under `.github`, the workspace under `packages` and the Rust engine's test data under `engines/rust` are never loaded as data. OPA puts a JSON or YAML file at a data path that starts from the folder it was given, so `spec:spec` and `examples:examples` keep the cases at `data.spec` and the examples' inputs at `data.examples`, where the tests read them. `engines/rego` and `dist` hold no data, so they need no prefix. The commands that run Ergo load `dist` and `--ignore src`, so they run the built file and skip the parts, which would define every rule a second time. `--ignore` matches a file or folder name anywhere below the folders given, and `engines/rego/src` is the only folder named `src` there. `opa fmt` and `regal lint` read the parts, not the built file. A new folder with Rego under `engines/rego/src` or `engines/rego/tests` needs nothing more. Any other new folder with Rego has to be added to these commands, to `.github/workflows/test.yml` and to `.github/rego-folders.sh`, which fails in CI when a tracked Rego file is in a folder no command loads. `.github/no-array-data.sh` fails when a tracked JSON file directly in `engines/rego`, `spec`, `examples` or `dist` isn't an object, because OPA puts it at the data path of the folder and a list conflicts with the other files there; keep such files in `.github`.
 
 When you change anything under `packages/`, run these too, one at a time:
 

@@ -95,7 +95,7 @@ if os.environ.get("PAIRS_FACTS_RUST"):
     head = read(os.environ["PAIRS_FACTS_RUST"])
     before = read(os.environ["PAIRS_FACTS_BASE_RUST"])
 else:
-    pairs = sweep.load_pairs(os.path.join(root, "spec", "sweep-pairs.json"))
+    pairs = sweep.load_pairs(os.path.join(root, ".github", "sweep-pairs.json"))
     for i, pair in enumerate(pairs):
         pair["id"] = str(i)
     ids = [pair["id"] for pair in pairs]

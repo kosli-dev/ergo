@@ -48,7 +48,7 @@ class PairsTest(unittest.TestCase):
         self.assertFalse(sweep.says({"error": "boom"}, "b"))
 
     def test_the_pairs_in_the_repo_are_valid_and_every_want_is_text(self):
-        pairs = sweep.load_pairs(os.path.join(sweep.ROOT, "spec", "sweep-pairs.json"))
+        pairs = sweep.load_pairs(os.path.join(sweep.ROOT, ".github", "sweep-pairs.json"))
         self.assertGreater(len(pairs), 100)
         for pair in pairs:
             self.assertTrue(pair["want"] is None or isinstance(pair["want"], str), pair["name"])
