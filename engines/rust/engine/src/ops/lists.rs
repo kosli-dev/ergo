@@ -537,6 +537,37 @@ impl Matches {
     }
 }
 
+fn item_cause(item: &Value) -> Cause {
+    match item {
+        Value::String(_) => Cause::Satisfied,
+        Value::Null => Cause::Null,
+        _ => Cause::Unusable,
+    }
+}
+
+fn in_text(
+    check: &In,
+    ignoring: super::compare::Ignoring,
+    values: &[Value],
+    outcome: &Outcome,
+    found: Option<&Value>,
+) -> Cause {
+    let left = match left_cause(outcome, found) {
+        Ok(Value::String(text)) => Ok(text),
+        Ok(_) => Err(Cause::Unusable),
+        Err(cause) => Err(cause),
+    };
+    let worst = Cause::worst(values.iter().map(item_cause).chain(left.as_ref().err().copied()));
+    let (Ok(text), None) = (left, worst) else {
+        return worst.unwrap_or(Cause::Unusable);
+    };
+    let text = ignoring.prepare(&text);
+    let hit = values
+        .iter()
+        .any(|v| v.as_str().is_some_and(|w| ignoring.prepare(w) == text));
+    verdict(hit != check.not)
+}
+
 pub fn run_in(check: &In, ctx: &Ctx) -> Verdict {
     judged(
         &check.path,
@@ -547,6 +578,9 @@ pub fn run_in(check: &In, ctx: &Ctx) -> Verdict {
             let Value::Array(values) = values else {
                 return Cause::Unusable;
             };
+            if let Some(ignoring) = check.ignoring {
+                return in_text(check, ignoring, values, outcome, found);
+            }
             let Ok(kind) = one_type(values.iter()) else {
                 return Cause::Unusable;
             };
@@ -1107,7 +1141,46 @@ fn left_found(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
     }
 }
 
+fn text_item_faults(right: &Right, ctx: &Ctx) -> Vec<(String, String)> {
+    let read = read_right(right, ctx, true);
+    let (Right::Ref(_) | Right::Field(_), Some(Value::Array(items)), Some(list)) =
+        (right, &read.value, read.inputs.first())
+    else {
+        return Vec::new();
+    };
+    items
+        .iter()
+        .enumerate()
+        .filter(|(_, item)| !item.is_string())
+        .map(|(at, item)| {
+            let name = format!("item {} of {}", at + 1, list.name);
+            let text = match item {
+                Value::Null => format!("{name} is null"),
+                _ => super::message::isnt(&name, item, "text"),
+            };
+            (list.name.clone(), text)
+        })
+        .collect()
+}
+
+fn in_text_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {
+    let mut out = Vec::new();
+    if let Some((name, found)) = left_found(&check.path, ctx)
+        && !found.is_string()
+    {
+        out.push(super::message::fault(&name, &found, "text"));
+    }
+    out.extend(text_item_faults(&check.values, ctx));
+    out.extend(ref_fault(&check.values, ctx, Value::is_array, |_| {
+        "a list".to_string()
+    }));
+    out
+}
+
 pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {
+    if check.ignoring.is_some() {
+        return in_text_faults(check, ctx);
+    }
     let mut out = Vec::new();
     if let (Some((name, found)), Some(Value::Array(values))) = (
         left_found(&check.path, ctx),
