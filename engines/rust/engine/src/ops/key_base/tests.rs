@@ -261,7 +261,7 @@ fn a_rewrite_says_a_key_and_a_base_that_hold_a_semicolon_once_each() {
 }
 
 #[test]
-fn a_rewrite_says_each_key_once_when_the_keys_are_joined_with_and() {
+fn a_rewrite_says_each_key_once_in_root_order_when_the_keys_are_joined_with_and() {
     assert_eq!(
         rewritten(
             "count of o named by $params.k plus count of p named by $params.j is 1",
@@ -270,7 +270,7 @@ fn a_rewrite_says_each_key_once_when_the_keys_are_joined_with_and() {
         )
         .as_deref(),
         Some(
-            "$params.k is 3, which isn't text, and $params.j is 4, which isn't text; o is \"s\", which isn't a list or an object; p is missing"
+            "$params.j is 4, which isn't text; $params.k is 3, which isn't text; o is \"s\", which isn't a list or an object; p is missing"
         )
     );
 }

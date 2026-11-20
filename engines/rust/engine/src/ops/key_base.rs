@@ -12,6 +12,7 @@ use serde_json::Value;
 pub struct KeyBase {
     pub path: String,
     pub key: String,
+    pub key_name: String,
     pub base: Option<(String, Cause, Input)>,
     pub off_object: bool,
     pub key_cause: Cause,
@@ -184,7 +185,7 @@ pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
     let Step::Ref(key) = &path.steps[at] else {
         return None;
     };
-    let (key_outcome, text, _) = key_flaw(key, ctx)?;
+    let (key_outcome, text, key_input) = key_flaw(key, ctx)?;
     let keys: Vec<String> = path.steps[..at]
         .iter()
         .map_while(|step| match step {
@@ -200,6 +201,7 @@ pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
     Some(KeyBase {
         path: name::name(path),
         key: text,
+        key_name: key_input.name,
         base,
         off_object: matches!(path.start, path::Start::Subject | path::Start::Own)
             && matches!(path.steps.first(), Some(Step::Key(_)))
@@ -262,67 +264,76 @@ pub fn of_check(check: &Check, ctx: &Ctx) -> Vec<KeyBase> {
     out
 }
 
-/// Says each base after its key in `said`, and gives the worst cause.
+/// Says each key and each base that can't take it as roots of `said`, worst
+/// cause first and then by name, and gives the worst cause.
 pub fn said_with_bases(mut said: Said, cause: Cause, bases: &[KeyBase]) -> (Said, Cause) {
     let mut causes = vec![cause];
-    let mut placed: Vec<Vec<Piece>> = Vec::new();
+    let mut keys: Vec<Clause> = Vec::new();
+    let mut bases_said: Vec<Clause> = Vec::new();
     for kb in bases {
-        let Some((text, base_cause, _)) = &kb.base else {
+        let Some((text, base_cause, input)) = &kb.base else {
             continue;
         };
         causes.push(*base_cause);
-        for group in &mut said {
-            *group = group
-                .drain(..)
-                .filter_map(|piece| without(piece, text))
-                .collect();
-        }
-        said.retain(|group| !group.is_empty());
-        let base = vec![Piece::Said(text.clone())];
-        match said
-            .iter()
-            .position(|group| group.iter().any(|piece| holds(piece, &kb.key)))
-        {
-            Some(at) => {
-                let after = said[at + 1..]
-                    .iter()
-                    .take_while(|group| placed.contains(group))
-                    .count();
-                said.insert(at + 1 + after, base.clone());
-            }
-            None => {
-                said.push(vec![Piece::Said(kb.key.clone())]);
-                said.push(base.clone());
-            }
-        }
-        placed.push(base);
+        keys.push(Clause::root(&kb.key_name, kb.key_cause, kb.key.clone()));
+        bases_said.push(Clause::root(&input.name, *base_cause, text.clone()));
     }
+    let is_root = |texts: &[Clause], text: &str| texts.iter().any(|root| root.text == text);
+    let mut at: Option<usize> = None;
+    let mut counted: Option<(usize, usize)> = None;
+    let mut counted_keys: Vec<String> = Vec::new();
+    for (i, group) in said.iter_mut().enumerate() {
+        for (j, piece) in std::mem::take(group).into_iter().enumerate() {
+            match piece {
+                Piece::Said(text) if is_root(&keys, &text) || is_root(&bases_said, &text) => {
+                    at.get_or_insert(i);
+                }
+                Piece::Counted(clauses) => {
+                    let held: Vec<String> = clauses
+                        .iter()
+                        .filter(|clause| said_alone(clause) && is_root(&keys, &clause.text))
+                        .map(|clause| clause.text.clone())
+                        .collect();
+                    let kept: Vec<Clause> = clauses
+                        .into_iter()
+                        .filter(|clause| !(said_alone(clause) && is_root(&bases_said, &clause.text)))
+                        .collect();
+                    if kept.is_empty() {
+                        at.get_or_insert(i);
+                        continue;
+                    }
+                    if !held.is_empty() {
+                        counted.get_or_insert((i, j));
+                        counted_keys.extend(held);
+                    }
+                    group.push(Piece::Counted(kept));
+                }
+                other => group.push(other),
+            }
+        }
+    }
+    let mut roots = bases_said;
+    if let Some((i, j)) = counted
+        && let Some(Piece::Counted(clauses)) = said[i].get_mut(j)
+    {
+        clauses.extend(roots.drain(..));
+    }
+    roots.extend(
+        keys.into_iter()
+            .filter(|key| !counted_keys.contains(&key.text)),
+    );
+    let groups: Vec<Vec<Piece>> = clause::shown(&roots)
+        .into_iter()
+        .map(|root| vec![Piece::Said(root.text)])
+        .collect();
+    let at = at.unwrap_or(said.len());
+    said.splice(at..at, groups);
+    said.retain(|group| !group.is_empty());
     (said, Cause::worst(causes).unwrap_or(cause))
 }
 
-fn holds(piece: &Piece, text: &str) -> bool {
-    match piece {
-        Piece::Said(said) => said == text,
-        Piece::Counted(clauses) => clauses.iter().any(|clause| said_alone(clause, text)),
-    }
-}
-
-fn said_alone(clause: &Clause, text: &str) -> bool {
-    matches!(clause.kind, clause::Kind::Root | clause::Kind::List) && clause.text == text
-}
-
-fn without(piece: Piece, text: &str) -> Option<Piece> {
-    match piece {
-        Piece::Said(said) if said == text => None,
-        Piece::Counted(clauses) => {
-            let kept: Vec<Clause> = clauses
-                .into_iter()
-                .filter(|clause| !said_alone(clause, text))
-                .collect();
-            (!kept.is_empty()).then_some(Piece::Counted(kept))
-        }
-        other => Some(other),
-    }
+fn said_alone(clause: &Clause) -> bool {
+    matches!(clause.kind, clause::Kind::Root | clause::Kind::List)
 }
 
 fn outcome_of(cause: Cause) -> Outcome {
