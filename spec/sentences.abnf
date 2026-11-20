@@ -57,10 +57,15 @@ operand           = value / field / joined
 joined            = (value / field) 1*(WS "followed" WS "by" WS (value / right-path))
 
 ; Phrases. compare-phrase is the subset a derived value can take.
-phrase            = one-of-phrase / exists-phrase / empty-phrase / type-phrase
-                  / contains-phrase / contains-all-phrase / matches-phrase
-                  / starts-phrase / alphabetical-phrase / time-phrase / compare-phrase
-compare-phrase    = within-phrase / order-phrase / between-phrase / is-phrase
+; ignoring reads after every phrase but the text phrases. syntax.md writes it
+; wrong after a phrase other than is, is not, is one of and is not one of.
+phrase            = (one-of-phrase / exists-phrase / empty-phrase / type-phrase
+                  / matches-phrase / time-phrase) [WS ignoring]
+                  / contains-phrase / contains-all-phrase
+                  / starts-phrase / alphabetical-phrase / compare-phrase
+compare-phrase    = (within-phrase / order-phrase / between-phrase / is-phrase) [WS ignoring]
+ignoring          = "ignoring" WS ("case" [WS "and" WS "surrounding" WS "spaces"]
+                  / "surrounding" WS "spaces" [WS "and" WS "case"])
 
 is-phrase         = ("is" WS "not" / "does" WS "not" WS "equal") WS operand
                   / ("is" WS "equal" WS "to" / "equals" / "is") WS operand
