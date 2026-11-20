@@ -1,0 +1,4845 @@
+[
+ {
+  "name": "count/$params.k=none/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "count/$input.k=none/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "every/$params.k=none/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "every/$input.k=none/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "some/$params.k=none/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "some/$input.k=none/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "count/$params.k=none/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "count/$input.k=none/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "every/$params.k=none/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "every/$input.k=none/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "some/$params.k=none/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "some/$input.k=none/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "count/$params.k=none/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "count/$input.k=none/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "every/$params.k=none/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "every/$input.k=none/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "some/$params.k=none/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "some/$input.k=none/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "count/$params.k=none/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "count/$input.k=none/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "every/$params.k=none/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "every/$input.k=none/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "some/$params.k=none/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "some/$input.k=none/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "count/$params.k=none/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "count/$input.k=none/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "every/$params.k=none/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "every/$input.k=none/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "some/$params.k=none/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "some/$input.k=none/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$input.k is missing; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "count/$params.k=null/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "count/$input.k=null/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "every/$params.k=null/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "every/$input.k=null/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "some/$params.k=null/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "some/$input.k=null/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "count/$params.k=null/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "count/$input.k=null/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "every/$params.k=null/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "every/$input.k=null/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "some/$params.k=null/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "some/$input.k=null/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "count/$params.k=null/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "count/$input.k=null/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "every/$params.k=null/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "every/$input.k=null/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "some/$params.k=null/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "some/$input.k=null/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "count/$params.k=null/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "count/$input.k=null/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "every/$params.k=null/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "every/$input.k=null/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "some/$params.k=null/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "some/$input.k=null/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "count/$params.k=null/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "count/$input.k=null/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "every/$params.k=null/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "every/$input.k=null/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "some/$params.k=null/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "some/$input.k=null/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ],
+   "k": null
+  },
+  "params": {},
+  "want": "$input.k is null; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "count/$params.k=3/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "count/$input.k=3/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "every/$params.k=3/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "every/$input.k=3/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "some/$params.k=3/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "some/$input.k=3/A",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {
+        "m": "s"
+       }
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v: m is \"s\", which isn't an object"
+ },
+ {
+  "name": "count/$params.k=3/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "count/$input.k=3/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "every/$params.k=3/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "every/$input.k=3/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "some/$params.k=3/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "some/$input.k=3/B",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is null"
+ },
+ {
+  "name": "count/$params.k=3/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "count/$input.k=3/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "every/$params.k=3/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "every/$input.k=3/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "some/$params.k=3/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "some/$input.k=3/C",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": "s"
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {
+        "m": null
+       }
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v is \"s\", which isn't an object; item 2 of es: v: m is missing; item 3 of es: v: m is null"
+ },
+ {
+  "name": "count/$params.k=3/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "count/$input.k=3/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "every/$params.k=3/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "every/$input.k=3/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "some/$params.k=3/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "some/$input.k=3/D",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      },
+      {
+       "v": {}
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v: m is missing; item 2 of es: v: m is missing; item 3 of es: v: m is missing; and 1 more"
+ },
+ {
+  "name": "count/$params.k=3/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "count/$input.k=3/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $input.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "every/$params.k=3/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "every/$input.k=3/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "some/$params.k=3/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $params.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "some/$input.k=3/E",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "some es.v that is m named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": null
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {},
+  "want": "$input.k is 3, which isn't text; item 1 of es: v is null, which isn't an object"
+ },
+ {
+  "name": "sum/q=s/rs=ok/$input.k=none",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": 1
+      },
+      {
+       "n": 2
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "q": "s"
+  },
+  "want": "$params.q is \"s\", which isn't an object; $input.k is missing"
+ },
+ {
+  "name": "sum/q=s/rs=ok/$input.k=a",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": 1
+      },
+      {
+       "n": 2
+      }
+     ]
+    }
+   ],
+   "k": "a"
+  },
+  "params": {
+   "q": "s"
+  },
+  "want": "$params.q is \"s\", which isn't an object"
+ },
+ {
+  "name": "sum/q=s/rs=ok/$input.k=3",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": 1
+      },
+      {
+       "n": 2
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {
+   "q": "s"
+  },
+  "want": "$input.k is 3, which isn't text; $params.q is \"s\", which isn't an object"
+ },
+ {
+  "name": "sum/q=s/rs=bad/$input.k=none",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": "x"
+      },
+      {
+       "n": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "q": "s"
+  },
+  "want": "$params.q is \"s\", which isn't an object; $input.k is missing; item 1 of rs: n is \"x\", which isn't a number; item 2 of rs: n is null"
+ },
+ {
+  "name": "sum/q=s/rs=bad/$input.k=a",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": "x"
+      },
+      {
+       "n": null
+      }
+     ]
+    }
+   ],
+   "k": "a"
+  },
+  "params": {
+   "q": "s"
+  }
+ },
+ {
+  "name": "sum/q=s/rs=bad/$input.k=3",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": "x"
+      },
+      {
+       "n": null
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {
+   "q": "s"
+  },
+  "want": "$input.k is 3, which isn't text; $params.q is \"s\", which isn't an object; item 1 of rs: n is \"x\", which isn't a number; item 2 of rs: n is null"
+ },
+ {
+  "name": "sum/q=obj/rs=ok/$input.k=none",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": 1
+      },
+      {
+       "n": 2
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "q": {
+    "a": 1
+   }
+  }
+ },
+ {
+  "name": "sum/q=obj/rs=ok/$input.k=a",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": 1
+      },
+      {
+       "n": 2
+      }
+     ]
+    }
+   ],
+   "k": "a"
+  },
+  "params": {
+   "q": {
+    "a": 1
+   }
+  }
+ },
+ {
+  "name": "sum/q=obj/rs=ok/$input.k=3",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": 1
+      },
+      {
+       "n": 2
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {
+   "q": {
+    "a": 1
+   }
+  },
+  "want": "$input.k is 3, which isn't text"
+ },
+ {
+  "name": "sum/q=obj/rs=bad/$input.k=none",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": "x"
+      },
+      {
+       "n": null
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "q": {
+    "a": 1
+   }
+  },
+  "want": "$input.k is missing; item 1 of rs: n is \"x\", which isn't a number; item 2 of rs: n is null"
+ },
+ {
+  "name": "sum/q=obj/rs=bad/$input.k=a",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": "x"
+      },
+      {
+       "n": null
+      }
+     ]
+    }
+   ],
+   "k": "a"
+  },
+  "params": {
+   "q": {
+    "a": 1
+   }
+  }
+ },
+ {
+  "name": "sum/q=obj/rs=bad/$input.k=3",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "sum of rs.n that is at least $params.q named by $input.k is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "rs": [
+      {
+       "n": "x"
+      },
+      {
+       "n": null
+      }
+     ]
+    }
+   ],
+   "k": 3
+  },
+  "params": {
+   "q": {
+    "a": 1
+   }
+  }
+ },
+ {
+  "name": "for5/none",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "f": {
+       "for": "every gs as g",
+       "assert": "count of g.es.v that is m named by $params.k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of gs: item 1 of g.es: v: m is missing; item 2 of gs: item 1 of g.es: v: m is missing; item 3 of gs: item 1 of g.es: v: m is missing; and 2 more"
+ },
+ {
+  "name": "for2x2/none",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "f": {
+       "for": "every gs as g",
+       "assert": "count of g.es.v that is m named by $params.k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "es": [
+        {
+         "v": {}
+        },
+        {
+         "v": {
+          "m": null
+         }
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": "s"
+        },
+        {
+         "v": {}
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {},
+  "want": "$params.k is missing; item 1 of gs: item 1 of g.es: v: m is missing; item 1 of gs: item 2 of g.es: v: m is null; item 2 of gs: item 1 of g.es: v is \"s\", which isn't an object; and 1 more"
+ },
+ {
+  "name": "for5/null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "f": {
+       "for": "every gs as g",
+       "assert": "count of g.es.v that is m named by $params.k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of gs: item 1 of g.es: v: m is missing; item 2 of gs: item 1 of g.es: v: m is missing; item 3 of gs: item 1 of g.es: v: m is missing; and 2 more"
+ },
+ {
+  "name": "for2x2/null",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "f": {
+       "for": "every gs as g",
+       "assert": "count of g.es.v that is m named by $params.k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "es": [
+        {
+         "v": {}
+        },
+        {
+         "v": {
+          "m": null
+         }
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": "s"
+        },
+        {
+         "v": {}
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of gs: item 1 of g.es: v: m is missing; item 1 of gs: item 2 of g.es: v: m is null; item 2 of gs: item 1 of g.es: v is \"s\", which isn't an object; and 1 more"
+ },
+ {
+  "name": "for5/3",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "f": {
+       "for": "every gs as g",
+       "assert": "count of g.es.v that is m named by $params.k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of gs: item 1 of g.es: v: m is missing; item 2 of gs: item 1 of g.es: v: m is missing; item 3 of gs: item 1 of g.es: v: m is missing; and 2 more"
+ },
+ {
+  "name": "for2x2/3",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "f": {
+       "for": "every gs as g",
+       "assert": "count of g.es.v that is m named by $params.k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "es": [
+        {
+         "v": {}
+        },
+        {
+         "v": {
+          "m": null
+         }
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": "s"
+        },
+        {
+         "v": {}
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of gs: item 1 of g.es: v: m is missing; item 1 of gs: item 2 of g.es: v: m is null; item 2 of gs: item 1 of g.es: v is \"s\", which isn't an object; and 1 more"
+ },
+ {
+  "name": "for5/a",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "f": {
+       "for": "every gs as g",
+       "assert": "count of g.es.v that is m named by $params.k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": {}
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": "a"
+  }
+ },
+ {
+  "name": "for2x2/a",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "f": {
+       "for": "every gs as g",
+       "assert": "count of g.es.v that is m named by $params.k is 0"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "es": [
+        {
+         "v": {}
+        },
+        {
+         "v": {
+          "m": null
+         }
+        }
+       ]
+      },
+      {
+       "es": [
+        {
+         "v": "s"
+        },
+        {
+         "v": {}
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": "a"
+  }
+ },
+ {
+  "name": "for5/sum",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "f": {
+       "for": "every gs as g",
+       "assert": "sum of g.rs.n that is at least $params.q named by $input.k is 1"
+      }
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "gs": [
+      {
+       "rs": [
+        {
+         "n": 1
+        }
+       ]
+      },
+      {
+       "rs": [
+        {
+         "n": 1
+        }
+       ]
+      },
+      {
+       "rs": [
+        {
+         "n": 1
+        }
+       ]
+      },
+      {
+       "rs": [
+        {
+         "n": 1
+        }
+       ]
+      },
+      {
+       "rs": [
+        {
+         "n": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "q": "s"
+  },
+  "want": "$params.q is \"s\", which isn't an object; $input.k is missing"
+ },
+ {
+  "name": "D14/every",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every es whose zz is m named by $params.k exists"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": 1
+      },
+      {
+       "v": 2
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: zz is missing, and m is missing; item 2 of es: zz is missing, and m is missing"
+ },
+ {
+  "name": "D14/count",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es whose zz is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "v": 1
+      },
+      {
+       "v": 2
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  },
+  "want": "$params.k is 3, which isn't text; item 1 of es: zz is missing, and m is missing; item 2 of es: zz is missing, and m is missing"
+ },
+ {
+  "name": "D14/two",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es whose v is 1 and whose zz is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      {
+       "zz": 1
+      }
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": 3
+  }
+ },
+ {
+  "name": "D11",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of es.v that is m named by $params.k is 0"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "es": [
+      "s"
+     ]
+    }
+   ]
+  },
+  "params": {
+   "k": null
+  },
+  "want": "$params.k is null; item 1 of es is \"s\", which isn't an object"
+ },
+ {
+  "name": "D10",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose tags contains $input.m named by key is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "tags": [
+        "x"
+       ]
+      },
+      "s",
+      {
+       "key": 3,
+       "tags": [
+        "x"
+       ]
+      },
+      {
+       "tags": [
+        "x"
+       ]
+      },
+      {
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ],
+   "m": null
+  },
+  "params": {}
+ },
+ {
+  "name": "D10/two",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose tags contains $input.m named by key is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {
+       "tags": [
+        "x"
+       ]
+      },
+      {
+       "tags": [
+        "x"
+       ]
+      }
+     ]
+    }
+   ],
+   "m": null
+  },
+  "params": {},
+  "want": "$input.m is null; item 1 of xs: key is missing; item 2 of xs: key is missing"
+ },
+ {
+  "name": "B9/every xs.v is at least $params.min",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "every xs.v is at least $params.min"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {},
+      {},
+      {},
+      {},
+      {}
+     ]
+    }
+   ]
+  },
+  "params": {
+   "min": "s"
+  }
+ },
+ {
+  "name": "B9/count of xs whose v is at least $params.min is 1",
+  "policy": {
+   "subjects": {
+    "thing": {
+     "from": "things",
+     "identified_by": "id"
+    }
+   },
+   "requirements": {
+    "s": {
+     "subject": "thing",
+     "checks": {
+      "c": "count of xs whose v is at least $params.min is 1"
+     }
+    }
+   }
+  },
+  "input": {
+   "things": [
+    {
+     "id": "t",
+     "xs": [
+      {},
+      {},
+      {},
+      {},
+      {}
+     ]
+    }
+   ]
+  },
+  "params": {
+   "min": "s"
+  }
+ }
+]

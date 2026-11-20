@@ -56,8 +56,16 @@ jobs:
         run: |
           .github/no-inline-tests.sh
           .github/no-inline-tests_test.sh
+      - name: Check no JSON file OPA loads as data is an array
+        run: |
+          .github/no-array-data.sh
+          .github/no-array-data_test.sh
       - name: Check the script that compares two dumps of the Rust engine's reports
         run: .github/dump-diff_test.sh
+      - name: Check the script that lists what a change did to the Rust engine's reports
+        run: .github/pr-facts_test.sh
+      - name: Check the script that lists what a change did to the policy and input pairs
+        run: .github/pairs-facts_test.sh
       - name: Check the script that runs the common checks
         run: .github/checks_test.sh
       - name: Check the release workflow's latest flag, release notes and tag checks
@@ -241,6 +249,50 @@ jobs:
           name: ergo-policy-sentences-wasm-pkg
           path: engines/rust/sentences-wasm/pkg
 
+  rust-report-facts:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install the Rust version in rust-toolchain.toml
+        run: |
+          cd engines/rust
+          rustup toolchain install
+      - name: Write what the change did to the Rust engine's reports in the job summary
+        env:
+          BASE: origin/${{ github.base_ref }}
+        run: .github/pr-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
+
+  pairs-facts:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.22.0
+      - name: Install the Rust version in rust-toolchain.toml
+        run: |
+          cd engines/rust
+          rustup toolchain install
+      - name: Write what the change did to the policy and input pairs in the job summary
+        env:
+          BASE: origin/${{ github.base_ref }}
+        run: |
+          if git diff --quiet "$BASE...HEAD" -- engines/rust engines/rego spec .github/pairs-facts.sh; then
+            echo "No file under engines/rust, engines/rego or spec changed." >> "$GITHUB_STEP_SUMMARY"
+          else
+            .github/pairs-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   playground:
     needs: tests-rust
     runs-on: ubuntu-latest
@@ -287,6 +339,8 @@ jobs:
           version: 1.22.0
       - name: Check every rule a case cites exists, and every rule has a case
         run: python3 spec/check_rules.py
+      - name: Check the sweep's list of pairs option
+        run: python3 spec/sweep_test.py
       - name: Check the corpus JSON matches the markdown
         run: python3 spec/sentences_corpus.py --check
       - name: Install the spec checks' Python packages
