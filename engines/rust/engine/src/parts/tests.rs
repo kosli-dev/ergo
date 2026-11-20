@@ -316,3 +316,51 @@ fn an_item_entry_says_its_clauses_without_its_name() {
         ]
     );
 }
+
+#[test]
+fn walk_entries_read_each_records_clause_kind_and_not_its_text() {
+    use crate::ops::clause::Kind;
+    let records = [
+        record(
+            "item 1 of xs",
+            "xs[0].v",
+            "unusable",
+            "item 1 of xs: v is 1",
+        ),
+        record("item 2 of xs", "xs[1].v", "value", "$params.min is 1"),
+        record("xs", "xs", "absent", "xs: is missing"),
+    ];
+    let clauses = [
+        Clause::root("$params.min", Cause::Unusable, "$params.min is \"s\"".to_string()),
+        Clause::item(
+            "item 2 of xs",
+            Cause::Value,
+            String::new(),
+            vec![Clause::said(Cause::Value, "v is 2".to_string())],
+        ),
+        Clause {
+            said: vec![Clause::said(Cause::Absent, "is missing".to_string())],
+            ..Clause::list("xs", Cause::Absent, "xs: is missing".to_string())
+        },
+    ];
+    let walked = walk_entries(&records, &clauses);
+    let roots: Vec<(Kind, &str)> = walked
+        .roots
+        .iter()
+        .map(|root| (root.kind, root.text.as_str()))
+        .collect();
+    assert_eq!(roots, [(Kind::Root, "$params.min is \"s\"")]);
+    let said: Vec<(bool, &str, &str)> = walked
+        .entries
+        .iter()
+        .map(|entry| match entry {
+            Failure::Item { part, .. } => (true, part.name.as_str(), part.message.as_str()),
+            Failure::List(part) => (false, part.name.as_str(), part.message.as_str()),
+            _ => panic!("an entry that is neither an item nor a list"),
+        })
+        .collect();
+    assert_eq!(
+        said,
+        [(true, "item 2 of xs", "v is 2"), (false, "xs", "is missing")]
+    );
+}
