@@ -1769,6 +1769,93 @@ fn an_item_whose_end_a_sum_cant_add_is_recorded_at_that_end() {
     );
 }
 
+fn cause_and_row(sentence: &str, items: Value, params: Value) -> (Cause, String) {
+    let check = lowered(sentence);
+    let Check::Tally(tally) = &check else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [{"items": items}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    let verdict = crate::ops::run(&check, &ctx);
+    let said = super::row_message(
+        tally,
+        &ctx,
+        verdict.cause,
+        super::super::message::pieces(&check, &ctx, &verdict),
+    );
+    (verdict.cause, said)
+}
+
+#[test]
+fn a_missing_input_key_after_params_that_cant_take_a_key_fails_a_count_or_sum_as_absent_and_says_only_the_key()
+ {
+    for sentence in [
+        "sum of items.n that is at least $params.q named by $input.k is 1",
+        "count of items.n that is at least $params.q named by $input.k is 1",
+    ] {
+        assert_eq!(
+            cause_and_row(sentence, json!([{"n": 1}, {"n": 2}]), json!({"q": "s"})),
+            (Cause::Absent, "$input.k is missing".to_string())
+        );
+    }
+}
+
+#[test]
+fn a_missing_input_key_keeps_the_items_a_count_or_sum_cant_read() {
+    for sentence in [
+        "sum of items.n that is at least $params.q named by $input.k is 1",
+        "count of items.n that is at least $params.q named by $input.k is 1",
+    ] {
+        assert_eq!(
+            cause_and_row(
+                sentence,
+                json!([{"n": "x"}, {"n": null}]),
+                json!({"q": {"a": 1}})
+            ),
+            (
+                Cause::Absent,
+                "$input.k is missing; item 1 of items: n is \"x\", which isn't a number; item 2 of items: n is null"
+                    .to_string()
+            )
+        );
+    }
+}
+
+#[test]
+fn a_count_keeps_each_item_beside_a_that_key_from_params_that_is_missing_or_null() {
+    let sentence = "count of items.v that is m named by $params.k is 0";
+    for (items, params, cause, said) in [
+        (
+            json!([{"v": null}]),
+            json!({"k": null}),
+            Cause::Null,
+            "$params.k is null; item 1 of items: v: $params.k is null",
+        ),
+        (
+            json!([{"v": "s"}, {"v": {}}]),
+            json!({}),
+            Cause::Absent,
+            "$params.k is missing; item 1 of items: v: $params.k is missing; item 2 of items: v: $params.k is missing",
+        ),
+    ] {
+        assert_eq!(
+            cause_and_row(sentence, items, params),
+            (cause, said.to_string())
+        );
+    }
+}
+
 fn tally_clauses(sentence: &str, items: Value, params: Value, cause: Cause) -> Vec<Clause> {
     tally_clauses_on(sentence, json!({"items": items}), params, cause)
 }
