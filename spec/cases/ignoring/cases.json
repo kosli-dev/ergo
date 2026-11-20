@@ -2089,5 +2089,676 @@
         ]
       }
     ]
+  },
+  {
+    "description": "the words after a part joined with followed by, and after a root on the right",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "join": "t is \"a\" followed by u ignoring case and surrounding spaces",
+            "root": "t is $params.w ignoring case and surrounding spaces"
+          }
+        }
+      }
+    },
+    "params": {
+      "w": "ab"
+    },
+    "cases": [
+      {
+        "description": "passes when the field equals a written part and a field joined, once both sides are prepared",
+        "rules": [
+          "text.ignoring",
+          "text.case",
+          "text.surrounding_spaces"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "t": " AB ",
+              "u": "b"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 2
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "in-scope thing count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated thing ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "join",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/t"
+                ],
+                "name": "t",
+                "value": " AB "
+              },
+              {
+                "locations": [
+                  "/things/0/u"
+                ],
+                "name": "u",
+                "value": "b"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "root",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/t"
+                ],
+                "name": "t",
+                "value": " AB "
+              },
+              {
+                "locations": [
+                  "$params:/w"
+                ],
+                "name": "$params.w",
+                "value": "ab"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable naming a part of the join that isn't text",
+        "rules": [
+          "text.ignoring",
+          "text.not_text"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "t": " AB ",
+              "u": 3
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 2
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "in-scope thing count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated thing ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "join",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/t"
+                    ],
+                    "name": "t",
+                    "outcome": "usable",
+                    "value": " AB "
+                  },
+                  {
+                    "locations": [
+                      "/things/0/u"
+                    ],
+                    "name": "u",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/join"
+                ],
+                "message": "u is 3, which isn't text",
+                "name": "t is \"a\" followed by u ignoring case and surrounding spaces"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/t"
+                ],
+                "name": "t",
+                "outcome": "usable",
+                "value": " AB "
+              },
+              {
+                "locations": [
+                  "/things/0/u"
+                ],
+                "name": "u",
+                "outcome": "unusable",
+                "value": 3
+              }
+            ],
+            "message": "u is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "root",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/t"
+                ],
+                "name": "t",
+                "value": " AB "
+              },
+              {
+                "locations": [
+                  "$params:/w"
+                ],
+                "name": "$params.w",
+                "value": "ab"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null naming a part of the join that is null",
+        "rules": [
+          "text.ignoring",
+          "text.not_text"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "t": " AB ",
+              "u": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 2
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "in-scope thing count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated thing ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "join",
+            "failures": [
+              {
+                "cause": "null",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/t"
+                    ],
+                    "name": "t",
+                    "outcome": "usable",
+                    "value": " AB "
+                  },
+                  {
+                    "locations": [
+                      "/things/0/u"
+                    ],
+                    "name": "u",
+                    "outcome": "null",
+                    "value": null
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/join"
+                ],
+                "message": "u is null",
+                "name": "t is \"a\" followed by u ignoring case and surrounding spaces"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/t"
+                ],
+                "name": "t",
+                "outcome": "usable",
+                "value": " AB "
+              },
+              {
+                "locations": [
+                  "/things/0/u"
+                ],
+                "name": "u",
+                "outcome": "null",
+                "value": null
+              }
+            ],
+            "message": "u is null",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "root",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/t"
+                ],
+                "name": "t",
+                "value": " AB "
+              },
+              {
+                "locations": [
+                  "$params:/w"
+                ],
+                "name": "$params.w",
+                "value": "ab"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as value when the prepared sides differ, with the values as they are in the input",
+        "rules": [
+          "text.ignoring",
+          "text.case"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "t": " AC ",
+              "u": "b"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 2
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "in-scope thing count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated thing ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "join",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/t"
+                    ],
+                    "name": "t",
+                    "outcome": "usable",
+                    "value": " AC "
+                  },
+                  {
+                    "locations": [
+                      "/things/0/u"
+                    ],
+                    "name": "u",
+                    "outcome": "usable",
+                    "value": "b"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/join"
+                ],
+                "message": "t is \" AC \", and \"a\" followed by u is \"ab\"",
+                "name": "t is \"a\" followed by u ignoring case and surrounding spaces"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/t"
+                ],
+                "name": "t",
+                "outcome": "usable",
+                "value": " AC "
+              },
+              {
+                "locations": [
+                  "/things/0/u"
+                ],
+                "name": "u",
+                "outcome": "usable",
+                "value": "b"
+              }
+            ],
+            "message": "t is \" AC \", and \"a\" followed by u is \"ab\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "root",
+            "failures": [
+              {
+                "cause": "value",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/t"
+                    ],
+                    "name": "t",
+                    "outcome": "usable",
+                    "value": " AC "
+                  },
+                  {
+                    "locations": [
+                      "$params:/w"
+                    ],
+                    "name": "$params.w",
+                    "outcome": "usable",
+                    "value": "ab"
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/root"
+                ],
+                "message": "t is \" AC \", and $params.w is \"ab\"",
+                "name": "t equals $params.w ignoring case and surrounding spaces"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/t"
+                ],
+                "name": "t",
+                "outcome": "usable",
+                "value": " AC "
+              },
+              {
+                "locations": [
+                  "$params:/w"
+                ],
+                "name": "$params.w",
+                "outcome": "usable",
+                "value": "ab"
+              }
+            ],
+            "message": "t is \" AC \", and $params.w is \"ab\"",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

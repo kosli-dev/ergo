@@ -10349,6 +10349,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "t is \"a\" followed by u ignoring case and surrounding spaces",
+        "t is \"a\" followed by u ignoring case and surrounding spaces",
+        &[],
+        &[],
+    ),
+    (
+        "t is $params.w ignoring case and surrounding spaces",
+        "t equals $params.w ignoring case and surrounding spaces",
+        &[],
+        &[],
+    ),
+    (
         "dotted is \"i\" ignoring case",
         "dotted is \"i\" ignoring case",
         &[],
