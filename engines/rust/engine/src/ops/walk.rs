@@ -1112,14 +1112,22 @@ pub(super) fn item_own(
     outer: &Ctx,
 ) -> Option<Clause> {
     let focus = focus_ctx(item, outer);
-    let said: Vec<Clause> = check
+    let name = walked.item_name(focus_segs(item, check));
+    let keyed: Vec<super::key_base::KeyBase> = check
         .paths()
         .into_iter()
-        .filter_map(|path| super::key_base::of_path(path, false, &focus)?.base)
+        .filter_map(|path| super::key_base::of_path(path, false, &focus))
+        .collect();
+    if keyed.iter().any(|found| found.off_object) {
+        let text = message::isnt(&name, focus.subject.value, "an object");
+        return Some(Clause::item(&name, Cause::NotAnObject, text, Vec::new()));
+    }
+    let said: Vec<Clause> = keyed
+        .into_iter()
+        .filter_map(|found| found.base)
         .map(|(text, cause, _)| Clause::said(cause, text))
         .collect();
     let cause = Cause::worst(said.iter().map(|clause| clause.cause))?;
-    let name = walked.item_name(focus_segs(item, check));
     Some(Clause::item(&name, cause, String::new(), said))
 }
 
