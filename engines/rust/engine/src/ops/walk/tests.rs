@@ -1431,6 +1431,21 @@ fn a_value_that_holds_a_semicolon_stays_whole_in_a_walk_row() {
 }
 
 #[test]
+fn an_every_says_a_key_that_isnt_text_once_beside_an_item_that_says_nothing_of_its_own() {
+    assert_eq!(
+        said_row(
+            "every es.v that is m named by $params.k exists",
+            json!({"es": [{"v": {"m": {"a": 1}}}, {"v": {}}]}),
+            json!({"k": 3}),
+        ),
+        (
+            Cause::Unusable,
+            "$params.k is 3, which isn't text; item 2 of es: v: m is missing".to_string()
+        )
+    );
+}
+
+#[test]
 fn a_walk_row_says_a_root_its_items_cant_read_before_them() {
     assert_eq!(
         said_row(
