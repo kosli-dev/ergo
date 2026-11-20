@@ -740,10 +740,7 @@ _id_input(entry, req) := scope if {
 	scope := _scope_of(req, entry.subject) with input as _row_input(entry.at)
 } else := _row_input(entry.at)
 
-_repeated_ids(given) := _repeated_of([ref | some ref in given; ref.id != null]) if {
-	some ref in given
-	ref.id == null
-} else := _repeated_of(given)
+_repeated_ids(given) := _repeated_of([ref | some ref in given; ref.id != null])
 
 _repeated_of(refs) := [] if count({ref.id | some ref in refs}) == count(refs)
 
