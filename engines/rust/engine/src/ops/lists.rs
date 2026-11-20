@@ -1189,6 +1189,22 @@ fn text_item_faults(right: &Right, ctx: &Ctx) -> Vec<(String, String)> {
         .collect()
 }
 
+/// What a check that compares text ignoring case says of each `null` item
+/// of the list it looks in, in list order.
+pub fn null_items(check: &super::Check, ctx: &Ctx) -> Vec<String> {
+    let super::Check::In(check @ In {
+        ignoring: Some(_), ..
+    }) = check
+    else {
+        return Vec::new();
+    };
+    text_item_faults(&check.values, ctx)
+        .into_iter()
+        .map(|(_, text)| text)
+        .filter(|text| text.ends_with(" is null"))
+        .collect()
+}
+
 fn in_text_faults(check: &In, ctx: &Ctx) -> Vec<(String, String)> {
     let mut out = Vec::new();
     if let Some((name, found)) = left_found(&check.path, ctx)

@@ -843,6 +843,9 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                         .filter(|(cause, _)| *cause == verdict.cause)
                         .map(|(_, text)| text),
                 ));
+                if verdict.cause == Cause::Null {
+                    found.extend(said_all(lists::null_items(check, ctx)));
+                }
                 if let Check::Tally(tally_check) = check {
                     for side in tally::tally_sides(tally_check) {
                         if let TallySide::Derived(derived) = side {
