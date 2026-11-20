@@ -1255,3 +1255,49 @@ fn in_ignoring_case_names_every_value_that_isnt_text_in_list_order() {
     );
     assert_eq!(faults(json!({"x": "a"}), json!(["Bug"])), vec![]);
 }
+
+#[test]
+fn a_list_of_in_ignoring_case_is_flawed_and_said_as_a_root_only_with_a_value_that_isnt_text() {
+    let check = Check::In(In {
+        path: x(),
+        values: states(),
+        not: false,
+        ignoring: Some(BOTH),
+    });
+    let read = |list: Value| {
+        let input = json!({"things": [{"x": "a"}]});
+        let params = json!({ "states": list });
+        let ctx = Ctx {
+            label: None,
+            item_by_item: false,
+            in_option: false,
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: Some(&params),
+            aliases: BTreeMap::new(),
+        };
+        (check.flawed(&ctx), ref_faults(&check, &ctx))
+    };
+    assert_eq!(
+        read(json!(["a", 3, null, false])),
+        (
+            true,
+            vec![
+                "item 2 of $params.states is 3, which isn't text, and item 3 of $params.states is null, and item 4 of $params.states is false, which isn't text"
+                    .to_string()
+            ]
+        )
+    );
+    assert_eq!(read(json!(["a", null])), (false, vec![]));
+    assert_eq!(read(json!(["a", "b"])), (false, vec![]));
+    assert_eq!(
+        read(json!("a")),
+        (
+            true,
+            vec!["$params.states is \"a\", which isn't a list".to_string()]
+        )
+    );
+}
