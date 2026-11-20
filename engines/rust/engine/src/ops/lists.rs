@@ -514,8 +514,18 @@ fn usable_patterns(patterns: &Value) -> bool {
     }
 }
 
+fn usable_texts(values: &Value) -> bool {
+    match values {
+        Value::Array(items) => items.iter().all(|item| item_cause(item) != Cause::Unusable),
+        _ => false,
+    }
+}
+
 impl In {
     pub fn flawed(&self, ctx: &Ctx) -> bool {
+        if self.ignoring.is_some() {
+            return ref_read(&self.values, ctx).is_some_and(|v| !usable_texts(&v));
+        }
         ref_read(&self.values, ctx).is_some_and(|v| !usable_values(&v, false))
     }
 }
@@ -557,7 +567,12 @@ fn in_text(
         Ok(_) => Err(Cause::Unusable),
         Err(cause) => Err(cause),
     };
-    let worst = Cause::worst(values.iter().map(item_cause).chain(left.as_ref().err().copied()));
+    let worst = Cause::worst(
+        values
+            .iter()
+            .map(item_cause)
+            .chain(left.as_ref().err().copied()),
+    );
     let (Ok(text), None) = (left, worst) else {
         return worst.unwrap_or(Cause::Unusable);
     };
@@ -886,6 +901,17 @@ pub fn right_paths(check: &super::Check) -> Vec<&Path> {
 
 pub fn ref_faults(check: &super::Check, ctx: &Ctx) -> Vec<String> {
     let faults = match check {
+        super::Check::In(c) if c.ignoring.is_some() => {
+            let items: Vec<String> = text_item_faults(&c.values, ctx)
+                .into_iter()
+                .map(|(_, text)| text)
+                .collect();
+            let mut out = ref_fault(&c.values, ctx, Value::is_array, |_| "a list".to_string());
+            if c.flawed(ctx) && !items.is_empty() {
+                out.push((String::new(), items.join(", and ")));
+            }
+            out
+        }
         super::Check::In(c) => ref_fault(
             &c.values,
             ctx,
