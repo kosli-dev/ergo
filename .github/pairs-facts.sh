@@ -10,6 +10,7 @@ root=$(git -C "$here" rev-parse --show-toplevel)
 work=$(mktemp -d)
 tree=
 cleanup() {
+  /bin/rm -rf "$root/dist/sweep"
   if [ -n "$tree" ]; then
     git -C "$root" worktree remove --force "$tree" > /dev/null 2>&1 || true
   fi

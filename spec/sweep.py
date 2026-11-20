@@ -305,28 +305,31 @@ def run_pairs(args):
     for i, pair in enumerate(pairs):
         pair["id"] = str(i)
     subprocess.run([os.path.join(ROOT, ".github", "build-ergo.sh")], cwd=ROOT, check=True)
-    write_cells(pairs)
-    ids = [pair["id"] for pair in pairs]
-    rego = run_rego(args.opa, ids)
-    version, rust = run_rust(args.rust, ids)
-    print(f"rust engine: {version}")
-    differ = 0
-    for i, pair in enumerate(pairs):
-        found = differences(rego[i], rust[i])
-        differ += bool(found)
-        wanted = ""
-        if pair["want"] is not None:
-            wanted = f" | rego {'says' if says(rego[i], pair['want']) else 'does not say'} it, rust {'says' if says(rust[i], pair['want']) else 'does not say'} it"
-        if not found and not wanted:
-            continue
-        print(f"{pair['name']}{' | engines differ' if found else ''}{wanted}")
-        for where, fields, left, right in found:
-            print(f"  {where} differs in {', '.join(fields)}")
-            for field in fields:
-                print(f"    {field}:")
-                print(f"      rego: {short((left or {}).get(field) if fields != ['entry'] else left)}")
-                print(f"      rust: {short((right or {}).get(field) if fields != ['entry'] else right)}")
-    print(f"{differ} of {len(pairs)} pairs differ")
+    try:
+        write_cells(pairs)
+        ids = [pair["id"] for pair in pairs]
+        rego = run_rego(args.opa, ids)
+        version, rust = run_rust(args.rust, ids)
+        print(f"rust engine: {version}")
+        differ = 0
+        for i, pair in enumerate(pairs):
+            found = differences(rego[i], rust[i])
+            differ += bool(found)
+            wanted = ""
+            if pair["want"] is not None:
+                wanted = f" | rego {'says' if says(rego[i], pair['want']) else 'does not say'} it, rust {'says' if says(rust[i], pair['want']) else 'does not say'} it"
+            if not found and not wanted:
+                continue
+            print(f"{pair['name']}{' | engines differ' if found else ''}{wanted}")
+            for where, fields, left, right in found:
+                print(f"  {where} differs in {', '.join(fields)}")
+                for field in fields:
+                    print(f"    {field}:")
+                    print(f"      rego: {short((left or {}).get(field) if fields != ['entry'] else left)}")
+                    print(f"      rust: {short((right or {}).get(field) if fields != ['entry'] else right)}")
+        print(f"{differ} of {len(pairs)} pairs differ")
+    finally:
+        shutil.rmtree(WORK, ignore_errors=True)
 
 
 def main():
