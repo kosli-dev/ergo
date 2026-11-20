@@ -238,13 +238,14 @@ fn rewritten(sentence: &str, subject: &Value, params: &Value) -> Option<String> 
     };
     let ctx = ctx(subject, params, &[]);
     let mut verdict = crate::ops::run(&check, &ctx);
-    let said = crate::ops::tally::row_message(
+    let said = crate::ops::tally::row_said(
         tally,
         &ctx,
         verdict.cause,
-        crate::ops::message::pieces(&check, &ctx, &verdict),
+        crate::ops::message::said(&check, &ctx, &verdict),
     );
     rewrite(&check, &ctx, &mut verdict.cause, &mut verdict.inputs, said)
+        .map(|said| crate::ops::message::said_text(&said))
 }
 
 #[test]

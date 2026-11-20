@@ -17,7 +17,7 @@ pub struct LineRun {
     pub text: String,
     pub cause: Cause,
     pub inputs: Vec<Input>,
-    pub said: String,
+    pub said: super::message::Said,
 }
 
 /// What one option of an `any_of` gives, with its lines that didn't pass.
@@ -49,7 +49,7 @@ pub fn option_runs(check: &AnyOf, ctx: &Ctx) -> Vec<OptionRun> {
                 if ran.verdict.passed() {
                     continue;
                 }
-                let said = super::message::option_line_text(
+                let said = super::message::option_line_said(
                     line,
                     &in_option,
                     ran.message.clone(),

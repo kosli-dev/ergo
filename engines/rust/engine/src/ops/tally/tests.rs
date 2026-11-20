@@ -1842,13 +1842,13 @@ fn cause_and_row_in(sentence: &str, input: Value, params: Value) -> (Cause, Stri
         aliases: BTreeMap::new(),
     };
     let verdict = crate::ops::run(&check, &ctx);
-    let said = super::row_message(
+    let said = super::row_said(
         tally,
         &ctx,
         verdict.cause,
-        super::super::message::pieces(&check, &ctx, &verdict),
+        super::super::message::said(&check, &ctx, &verdict),
     );
-    (verdict.cause, said)
+    (verdict.cause, super::super::message::said_text(&said))
 }
 
 #[test]
@@ -1951,9 +1951,10 @@ fn a_count_whose_row_fails_for_params_it_walks_doesnt_say_its_number() {
         cause: Cause::Unusable,
         inputs: crate::ops::run(&check, &ctx).inputs,
     };
-    let pieces = super::super::message::pieces(&check, &ctx, &verdict);
+    let said = super::super::message::said(&check, &ctx, &verdict);
+    let row = super::row_said(tally, &ctx, Cause::Unusable, said);
     assert!(
-        !super::row_message(tally, &ctx, Cause::Unusable, pieces).contains("is 0"),
+        !super::super::message::said_text(&row).contains("is 0"),
         "the count's number isn't said"
     );
 }
@@ -2245,12 +2246,12 @@ fn row_message(sentence: &str, items: Value, params: Value) -> String {
         aliases: BTreeMap::new(),
     };
     let verdict = crate::ops::run(&check, &ctx);
-    with_all_items(
+    super::super::message::said_text(&with_all_items(
         tally,
         &ctx,
         verdict.cause,
-        super::super::message::pieces(&check, &ctx, &verdict),
-    )
+        super::super::message::said(&check, &ctx, &verdict),
+    ))
 }
 
 #[test]

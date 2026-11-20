@@ -439,6 +439,26 @@ pub fn pieces_text(pieces: &[Piece]) -> String {
         .join(", and ")
 }
 
+/// What a check says, as groups of pieces: the pieces of a group are joined
+/// with `, and `, and the groups with `; `.
+pub type Said = Vec<Vec<Piece>>;
+
+/// The message `said` makes.
+#[must_use]
+pub fn said_text(said: &[Vec<Piece>]) -> String {
+    said.iter()
+        .map(|group| pieces_text(group))
+        .filter(|text| !text.is_empty())
+        .collect::<Vec<_>>()
+        .join("; ")
+}
+
+/// A message held as one piece of text.
+#[must_use]
+pub fn said_as_text(text: String) -> Said {
+    vec![vec![Piece::Said(text)]]
+}
+
 fn push_piece(pieces: &mut Vec<Piece>, piece: Piece) {
     let text = piece.text();
     if !pieces.iter().any(|said| said.text() == text) {
@@ -657,14 +677,19 @@ pub fn option_line_text(
     said: Option<String>,
     verdict: &Verdict,
 ) -> String {
+    said_text(&option_line_said(line, ctx, said, verdict))
+}
+
+/// What an `any_of` line that didn't pass says, as its groups of pieces.
+pub fn option_line_said(line: &Check, ctx: &Ctx, said: Option<String>, verdict: &Verdict) -> Said {
     if let Some(said) = said {
-        return said;
+        return said_as_text(said);
     }
     let mut verdict = verdict.clone();
     if verdict.cause == Cause::Unusable && line.flawed(ctx) {
         verdict.cause = unflawed_cause(line, ctx);
     }
-    message(line, ctx, &verdict)
+    self::said(line, ctx, &verdict)
 }
 
 fn split_outside_quotes<'t>(text: &'t str, by: &str) -> Vec<&'t str> {
@@ -778,7 +803,35 @@ pub fn null_key_parts(path: &Path, ctx: &Ctx) -> Vec<String> {
 }
 
 pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
-    pieces_text(&pieces(check, ctx, verdict))
+    said_text(&said(check, ctx, verdict))
+}
+
+/// What `check` says for `verdict`, with each `null` value before a key and
+/// each key it stops at in a group of its own.
+pub fn said(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Said {
+    let parts = null_keys(check, ctx, verdict);
+    if parts.is_empty() {
+        vec![pieces(check, ctx, verdict)]
+    } else {
+        parts
+            .into_iter()
+            .map(|part| vec![Piece::Said(part)])
+            .collect()
+    }
+}
+
+fn null_keys(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
+    if matches!(check, Check::AnyOf(_))
+        || !matches!(verdict.cause, Cause::Absent | Cause::Null | Cause::Unusable)
+    {
+        return Vec::new();
+    }
+    once_of(
+        side_paths(check)
+            .into_iter()
+            .flat_map(|path| null_key_parts(path, ctx))
+            .collect(),
+    )
 }
 
 /// The pieces of the message `check` gives for `verdict`, with what each
@@ -787,16 +840,9 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
     if let Check::AnyOf(any) = check {
         return vec![Piece::Said(any_of_message(any, ctx))];
     }
-    if matches!(verdict.cause, Cause::Absent | Cause::Null | Cause::Unusable) {
-        let parts: Vec<String> = once_of(
-            side_paths(check)
-                .into_iter()
-                .flat_map(|path| null_key_parts(path, ctx))
-                .collect(),
-        );
-        if !parts.is_empty() {
-            return vec![Piece::Said(parts.join("; "))];
-        }
+    let parts = null_keys(check, ctx, verdict);
+    if !parts.is_empty() {
+        return vec![Piece::Said(parts.join("; "))];
     }
     let clauses: Vec<Piece> = match verdict.cause {
         Cause::Value => {
@@ -1847,19 +1893,24 @@ pub fn walked_roots_ahead(
     ctx: &Ctx,
     refs_first: &[&Check],
 ) -> Option<String> {
-    let walked = checks.iter().any(|check| {
+    let message = message?;
+    if !walks_a_root(checks, ctx) {
+        return Some(message);
+    }
+    let roots = ordered_roots(checks, ctx, refs_first);
+    Some(joined(roots_ahead(&message, &roots)))
+}
+
+/// Whether one of `checks` reads a list from outside the item whose values
+/// can't be used.
+pub fn walks_a_root(checks: &[&Check], ctx: &Ctx) -> bool {
+    checks.iter().any(|check| {
         lists::right_paths(check).into_iter().any(|path| {
             reads_from_a_root(path)
                 && lists::walked_root_fault(check, path, ctx)
                     .is_some_and(|(cause, _)| cause != Cause::Value)
         })
-    });
-    let message = message?;
-    if !walked {
-        return Some(message);
-    }
-    let roots = ordered_roots(checks, ctx, refs_first);
-    Some(joined(roots_ahead(&message, &roots)))
+    })
 }
 
 pub fn ordered_roots(checks: &[&Check], ctx: &Ctx, refs_first: &[&Check]) -> Vec<String> {

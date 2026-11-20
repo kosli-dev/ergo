@@ -1,3 +1,5 @@
+use super::clause::{self, Clause};
+use super::message::{Piece, Said};
 use super::{Check, Input, message};
 use crate::cause::Cause;
 use crate::name;
@@ -261,28 +263,66 @@ pub fn of_check(check: &Check, ctx: &Ctx) -> Vec<KeyBase> {
 }
 
 /// Says each base after its key in `said`, and gives the worst cause.
-pub fn said_with_bases(said: &str, cause: Cause, bases: &[KeyBase]) -> (String, Cause) {
-    let mut pieces: Vec<String> = said
-        .split("; ")
-        .filter(|p| !p.is_empty())
-        .map(str::to_string)
-        .collect();
+pub fn said_with_bases(mut said: Said, cause: Cause, bases: &[KeyBase]) -> (Said, Cause) {
     let mut causes = vec![cause];
+    let mut placed: Vec<Vec<Piece>> = Vec::new();
     for kb in bases {
         let Some((text, base_cause, _)) = &kb.base else {
             continue;
         };
         causes.push(*base_cause);
-        pieces.retain(|p| p != text);
-        match pieces.iter().position(|p| *p == kb.key) {
-            Some(at) => pieces.insert(at + 1, text.clone()),
+        for group in &mut said {
+            *group = group
+                .drain(..)
+                .filter_map(|piece| without(piece, text))
+                .collect();
+        }
+        said.retain(|group| !group.is_empty());
+        let base = vec![Piece::Said(text.clone())];
+        match said
+            .iter()
+            .position(|group| group.iter().any(|piece| holds(piece, &kb.key)))
+        {
+            Some(at) => {
+                let after = said[at + 1..]
+                    .iter()
+                    .take_while(|group| placed.contains(group))
+                    .count();
+                said.insert(at + 1 + after, base.clone());
+            }
             None => {
-                pieces.push(kb.key.clone());
-                pieces.push(text.clone());
+                said.push(vec![Piece::Said(kb.key.clone())]);
+                said.push(base.clone());
             }
         }
+        placed.push(base);
     }
-    (pieces.join("; "), Cause::worst(causes).unwrap_or(cause))
+    (said, Cause::worst(causes).unwrap_or(cause))
+}
+
+fn holds(piece: &Piece, text: &str) -> bool {
+    match piece {
+        Piece::Said(said) => said == text,
+        Piece::Counted(clauses) => clauses.iter().any(|clause| said_alone(clause, text)),
+    }
+}
+
+fn said_alone(clause: &Clause, text: &str) -> bool {
+    matches!(clause.kind, clause::Kind::Root | clause::Kind::List) && clause.text == text
+}
+
+fn without(piece: Piece, text: &str) -> Option<Piece> {
+    match piece {
+        Piece::Said(said) if said == text => None,
+        Piece::Counted(clauses) => {
+            let kept: Vec<Clause> = clauses
+                .into_iter()
+                .filter(|clause| !said_alone(clause, text))
+                .collect();
+            (!kept.is_empty()).then_some(Piece::Counted(kept))
+        }
+        other => Some(other),
+    }
 }
 
 fn outcome_of(cause: Cause) -> Outcome {
@@ -315,8 +355,8 @@ pub fn rewrite(
     ctx: &Ctx,
     cause: &mut Cause,
     inputs: &mut [Input],
-    said: String,
-) -> Option<String> {
+    said: Said,
+) -> Option<Said> {
     if !matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
         || matches!(check, Check::Walk(_) | Check::For(_) | Check::AnyOf(_))
     {
@@ -331,7 +371,7 @@ pub fn rewrite(
     if !bases.iter().any(|b| b.base.is_some()) {
         return None;
     }
-    let (text, worst) = said_with_bases(&said, *cause, &bases);
+    let (said, worst) = said_with_bases(said, *cause, &bases);
     *cause = worst;
     for kb in &bases {
         let Some((_, base_cause, _)) = &kb.base else {
@@ -344,7 +384,7 @@ pub fn rewrite(
             input.state = outcome_of(worse);
         }
     }
-    Some(text)
+    Some(said)
 }
 
 /// The key and base inputs a failed plain check's assertion entry adds after
