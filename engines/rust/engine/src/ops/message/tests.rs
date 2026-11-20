@@ -58,7 +58,7 @@ fn root_clauses_say_a_key_and_the_value_before_it() {
 
 #[test]
 fn root_clauses_say_every_key_that_cant_be_read_worst_first_then_by_name() {
-    let subject = json!({"id": "t", "es": [{"zz": "a", "m": "a", "v": "a"}]});
+    let subject = json!({"id": "t", "zz": "a", "m": {"a": "a"}, "v": "a"});
     let input = json!({"j": 3});
     let said = root_clauses_of(
         "every es whose zz is m named by $input.k and whose v is m named by $input.j, if any, exists",

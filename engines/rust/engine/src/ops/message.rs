@@ -2092,11 +2092,23 @@ pub fn root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
     let reads = root_reads_with(checks, ctx, &[], &[], true)
         .map(|(_, reads)| reads)
         .unwrap_or_default();
-    let said: Vec<Clause> = reads
+    let bases = checks
+        .iter()
+        .flat_map(|check| check.paths())
+        .filter_map(|path| {
+            super::key_base::base_of(path, ctx)
+                .map(|(name, text, cause)| Clause::root(&name, cause, text))
+        });
+    let mut said: Vec<Clause> = Vec::new();
+    for clause in key_problems(checks, ctx)
         .into_iter()
-        .flat_map(|(_, said)| said)
-        .chain(key_problems(checks, ctx))
-        .collect();
+        .chain(bases)
+        .chain(reads.into_iter().flat_map(|(_, said)| said))
+    {
+        if !said.iter().any(|found| found.text == clause.text) {
+            said.push(clause);
+        }
+    }
     clause::shown(&said)
 }
 

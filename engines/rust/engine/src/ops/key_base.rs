@@ -167,6 +167,30 @@ pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
     })
 }
 
+/// The value before the first `named by` key of `path` when that key can't be
+/// read and the value can't take a key.
+pub fn base_of(path: &Path, ctx: &Ctx) -> Option<(String, String, Cause)> {
+    let at = path
+        .steps
+        .iter()
+        .position(|step| matches!(step, Step::Ref(_)))?;
+    let Step::Ref(key) = &path.steps[at] else {
+        return None;
+    };
+    key_flaw(key, ctx)?;
+    let keys: Vec<String> = path.steps[..at]
+        .iter()
+        .map_while(|step| match step {
+            Step::Key(k) => Some(k.clone()),
+            _ => None,
+        })
+        .collect();
+    if keys.is_empty() || keys.len() != at {
+        return None;
+    }
+    base_flaw(&path.start, &keys, false, ctx).map(|(text, cause, input)| (input.name, text, cause))
+}
+
 /// The key and base problems of every path `check` reads.
 pub fn of_check(check: &Check, ctx: &Ctx) -> Vec<KeyBase> {
     let counted: Vec<&Path> = match check {
