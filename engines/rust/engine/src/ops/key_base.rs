@@ -54,14 +54,6 @@ fn base_flaw(
     tally: bool,
     ctx: &Ctx,
 ) -> Option<(String, Cause, Input)> {
-    let (mut at, mut location, _) = path::start_of(start, ctx).ok()?;
-    if !at.is_object() {
-        return None;
-    }
-    let full = Path {
-        start: start.clone(),
-        steps: keys.iter().map(|k| Step::Key(k.clone())).collect(),
-    };
     let input = |name: String, state: Outcome, value: Value, location: &path::Location| Input {
         name,
         value,
@@ -70,6 +62,53 @@ fn base_flaw(
         state,
         null_at: None,
         worked: false,
+    };
+    let (mut at, mut location, _) = path::start_of(start, ctx).ok()?;
+    if let path::Start::Part(_) = start {
+        let part = Path {
+            start: start.clone(),
+            steps: Vec::new(),
+        };
+        let read = path::read(&part, ctx);
+        let named = name::name(&part);
+        let place = read.location.clone().unwrap_or_else(|| location.clone());
+        match (read.outcome, read.value) {
+            (Outcome::Found, Some(value)) if value.is_object() => {
+                at = value;
+                location = place;
+            }
+            (Outcome::Absent, _) => {
+                let text = format!("{named} is missing");
+                return Some((
+                    text,
+                    Cause::Absent,
+                    input(named, Outcome::Absent, Value::Null, &place),
+                ));
+            }
+            (Outcome::Null, _) => {
+                let text = format!("{named} is null");
+                return Some((
+                    text,
+                    Cause::Null,
+                    input(named, Outcome::Null, Value::Null, &place),
+                ));
+            }
+            (_, Some(value)) => {
+                return Some((
+                    message::isnt(&named, value, "an object"),
+                    Cause::Unusable,
+                    input(named, Outcome::Unusable, value.clone(), &place),
+                ));
+            }
+            _ => return None,
+        }
+    }
+    if !at.is_object() {
+        return None;
+    }
+    let full = Path {
+        start: start.clone(),
+        steps: keys.iter().map(|k| Step::Key(k.clone())).collect(),
     };
     for (i, key) in keys.iter().enumerate() {
         let here = Path {
