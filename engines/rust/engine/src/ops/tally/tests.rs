@@ -1856,6 +1856,52 @@ fn a_count_keeps_each_item_beside_a_that_key_from_params_that_is_missing_or_null
     }
 }
 
+#[test]
+#[ignore = "#694 R4: a key from outside the items is said once, first, and each item says its own value"]
+fn a_count_says_a_that_key_it_cant_read_once_and_each_item_its_own_value() {
+    let clauses = tally_clauses(
+        "count of items.v that is m named by $params.k is 0",
+        json!([{"v": "s"}, {"v": {}}, {"v": {"m": null}}, {"v": {"m": {}}}]),
+        json!({}),
+        Cause::NotAnObject,
+    );
+    assert_eq!(
+        kinds_and_texts(&clauses),
+        [
+            (clause::Kind::Root, "$params.k is missing".to_string()),
+            (
+                clause::Kind::Item,
+                "item 1 of items: v is \"s\", which isn't an object".to_string()
+            ),
+            (
+                clause::Kind::Item,
+                "item 2 of items: v: m is missing".to_string()
+            ),
+            (
+                clause::Kind::Item,
+                "item 3 of items: v: m is null".to_string()
+            ),
+        ]
+    );
+}
+
+#[test]
+#[ignore = "#694 R4: the row takes the worst cause of the key and of every item"]
+fn a_count_fails_with_the_worst_cause_of_its_that_key_and_its_items() {
+    let sentence = "count of items.v that is m named by $params.k is 0";
+    for (items, params, cause) in [
+        (
+            json!([{"v": "s"}, {"v": {}}]),
+            json!({}),
+            Cause::NotAnObject,
+        ),
+        (json!([{"v": null}]), json!({"k": null}), Cause::NotAnObject),
+        (json!([{"v": {}}]), json!({"k": null}), Cause::Absent),
+    ] {
+        assert_eq!(cause_and_row(sentence, items, params).0, cause);
+    }
+}
+
 fn tally_clauses(sentence: &str, items: Value, params: Value, cause: Cause) -> Vec<Clause> {
     tally_clauses_on(sentence, json!({"items": items}), params, cause)
 }
