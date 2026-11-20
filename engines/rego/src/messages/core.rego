@@ -467,14 +467,16 @@ _m_message(check, subj, "not_an_object") := m if {
 	m := concat(", and ", clauses)
 } else := _m_fallback(check) if is_object(subj)
 
-_m_list_names(check) := _m_with_text_list_names(check, {_input_name(array.slice(p, 0, i)) |
-	some side in _m_tally_parts(check)
+_m_list_names(check) := _m_list_names_of(check, _m_tally_parts(check))
+
+_m_list_names_of(check, parts) := _m_with_text_list_names(check, parts, {_input_name(array.slice(p, 0, i)) |
+	some side in parts
 	p := side[_basic_form(side)]
 	is_array(p)
 	some i in numbers.range(1, count(p))
 })
 
-_m_with_text_list_names(check, names) := names | {_ref_name(check.values.ref)} if {
+_m_with_text_list_names(check, parts, names) := names | {_ref_name(check.values.ref)} if {
 	check.ignoring
 	check.op in _membership_ops
 	_is_ref(check.values)
@@ -482,4 +484,13 @@ _m_with_text_list_names(check, names) := names | {_ref_name(check.values.ref)} i
 	check.ignoring
 	_list_cmp(check)
 	is_array(check.right)
+} else := names | ws if {
+	parts != []
+	ws := {_ref_name(w.values.ref) |
+		some side in parts
+		some w in object.get(side, "whose", [])
+		w.ignoring
+		w.op in _membership_ops
+		_is_ref(w.values)
+	}
 } else := names

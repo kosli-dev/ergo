@@ -280,7 +280,6 @@ _m_picked_none(subj, item) if {
 	_value_at(subj, item.path) == []
 }
 
-
 _m_ref_faults_text(check) := _m_with_ref_text_items(check, [_m_isnt(_ref_label(f[0].ref), _ref_shown(f[0].ref), f[1]) | some f in _m_ref_list_fault(check)])
 
 _m_with_ref_text_items(check, faults) := array.concat(faults, [concat(", and ", ts)]) if {
