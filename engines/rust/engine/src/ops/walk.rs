@@ -1717,6 +1717,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         let mut sorted = fails.clone();
         sorted.sort_by(|a, b| a.rank.cmp(&b.rank));
         sorted_parts = sorted.iter().map(|f| failure_clause(f)).collect();
+        sorted_parts.sort_by_key(|part| part.kind != Kind::Root);
         sorted.iter().map(|f| f.to_json()).collect()
     };
     let tag = path::part_tag(&walk.path, &outer).map(|(name, id)| super::Part { name, id });
