@@ -85,6 +85,7 @@ pub struct Lowered {
 #[derive(Debug, Clone)]
 pub struct Info {
     pub relation: Relation,
+    pub parent: Option<String>,
     pub problems: Problems,
     pub lowered: Option<Lowered>,
     pub from_text: Option<String>,
@@ -378,9 +379,14 @@ impl Raws<'_, '_> {
     }
 
     fn child_parent(&self, name: &str) -> Option<String> {
-        match self.get(name).map(|r| &r.relation) {
-            Some(Relation::Child(parent)) => Some(parent.clone()),
-            _ => None,
+        let mut seen = BTreeSet::new();
+        let mut at = name.to_string();
+        loop {
+            match self.get(&at).map(|r| &r.relation) {
+                Some(Relation::Child(parent)) => return Some(parent.clone()),
+                Some(Relation::Narrows(base)) if seen.insert(at.clone()) => at = base.clone(),
+                _ => return None,
+            }
         }
     }
 
@@ -1225,6 +1231,7 @@ impl Reading {
                 name.clone(),
                 Info {
                     relation: found.relation.clone(),
+                    parent: raws.child_parent(name),
                     problems,
                     lowered,
                     from_text,
@@ -1247,10 +1254,7 @@ impl Reading {
 
     /// The subject that `name`'s subjects are read inside, if any.
     pub fn parent_of(&self, name: &str) -> Option<String> {
-        match self.infos.get(name).map(|info| &info.relation) {
-            Some(Relation::Child(parent)) => Some(parent.clone()),
-            _ => None,
-        }
+        self.infos.get(name).and_then(|info| info.parent.clone())
     }
 
     pub fn used(&self, name: &str) -> Vec<String> {
