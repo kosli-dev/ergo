@@ -747,12 +747,8 @@ _id_fault_place(entry, req, doc) := object.union(object.remove(place, ["item"]),
 	ec := _entry_c(entry, req)
 	_id_listed(ec)
 	place := _id_place(entry, req, doc)
-	text := _id_null_said(req, ec, place.item)
+	text := concat("", [_m_from_item_name(req, ec), " is null"])
 }
-
-_id_null_said(req, ec, item) := concat("", [_m_from_item_name(req, ec), " is null"]) if _id_tail(ec) == []
-
-else := concat(": ", [_m_from_item_name(req, array.slice(ec, 0, _id_item_len(ec))), _id_present(item, _id_tail(ec))])
 
 _id_said_on(req, ec, subject, item, id, doc) := _id_present(item, array.concat(_id_tail(ec), id)) if _id_listed(ec)
 
