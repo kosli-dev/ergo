@@ -1456,47 +1456,6 @@ fn walk_clause(walked: &walk::Walked, failure: &walk::Failure) -> Clause {
     }
 }
 
-fn key_flaw(key: &Path, outer: &Ctx) -> Option<Cause> {
-    let read = path::read(key, outer);
-    read.outcome
-        .cause()
-        .or_else(|| (!read.value.is_some_and(Value::is_string)).then_some(Cause::Unusable))
-}
-
-fn before_unfit_key(check: &Check, focus: &Ctx, outer: &Ctx) -> Option<Vec<(Cause, String)>> {
-    let mut found: Option<Vec<(Cause, String)>> = None;
-    for path in check.paths() {
-        let Some((at, flaw)) = path
-            .steps
-            .iter()
-            .enumerate()
-            .find_map(|(at, step)| match step {
-                path::Step::Ref(key) if path::is_ref(key) => {
-                    key_flaw(key, outer).map(|flaw| (at, flaw))
-                }
-                _ => None,
-            })
-        else {
-            continue;
-        };
-        let said = found.get_or_insert_with(Vec::new);
-        let before = Path {
-            start: path.start.clone(),
-            steps: path.steps[..at].to_vec(),
-        };
-        let read = path::read(&before, focus);
-        match (read.outcome.cause(), read.value) {
-            (Some(cause @ (Cause::Absent | Cause::Null)), _) => {
-                said.push((cause, super::message::root_text(&before, focus, cause)));
-            }
-            (None, Some(value)) if value.is_object() => {}
-            _ if flaw == Cause::Unusable => return None,
-            _ => {}
-        }
-    }
-    found
-}
-
 fn said_text(said: &Clause) -> String {
     clause::text(std::slice::from_ref(said))
 }
@@ -1741,30 +1700,6 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
                 let (verdict, lost) = walk::focus_verdict(check, item, &at, &focus);
                 if verdict.cause.is_failure() {
                     undecided = true;
-                    if !lost
-                        && item.end.is_some()
-                        && !item.rest.is_empty()
-                        && walk::reads_focus(check)
-                        && let Some(before) = before_unfit_key(check, &focus, &outer)
-                    {
-                        for key in super::message::key_clauses(&[check], &outer) {
-                            match found.iter().position(|(_, said)| *said == key) {
-                                Some(at) => {
-                                    always.insert(at);
-                                }
-                                None => {
-                                    always.insert(found.len());
-                                    found.push((key.cause, key));
-                                }
-                            }
-                        }
-                        let named = walked.item_name(walk::focus_segs(item, check));
-                        for (own, text) in before {
-                            always.insert(found.len());
-                            found.push((own, told(&named, own, &text)));
-                        }
-                        continue;
-                    }
                     let said = if lost {
                         vec![told(
                             &name,
