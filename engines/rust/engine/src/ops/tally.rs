@@ -1276,15 +1276,10 @@ pub fn with_all_items(check: &Tally, ctx: &Ctx, cause: Cause, message: String) -
         return message;
     }
     let items: Vec<String> = check
-        .counted_lists(ctx, cause)
-        .into_iter()
-        .flat_map(|(_, rich)| rich)
-        .filter_map(|record| {
-            record
-                .get("ergo/text")
-                .and_then(Value::as_str)
-                .map(str::to_string)
-        })
+        .counted_clauses(ctx, cause)
+        .iter()
+        .filter(|said| said.kind != clause::Kind::Root)
+        .map(said_text)
         .collect();
     if items.is_empty() {
         return message;
@@ -1442,7 +1437,12 @@ fn told(item: &str, cause: Cause, said: &str) -> Clause {
 
 fn walk_clause(failure: &walk::Failure) -> Clause {
     if crate::parts::is_item(&failure.item) {
-        Clause::item(&failure.item, failure.cause, failure.msg.clone(), Vec::new())
+        Clause::item(
+            &failure.item,
+            failure.cause,
+            failure.msg.clone(),
+            Vec::new(),
+        )
     } else {
         Clause::list(&failure.item, failure.cause, failure.msg.clone())
     }
@@ -1598,11 +1598,8 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
                             && !value.is_array()
                             && !value.is_object()
                         {
-                            let text = super::message::isnt(
-                                &walked.name,
-                                value,
-                                "a list or an object",
-                            );
+                            let text =
+                                super::message::isnt(&walked.name, value, "a list or an object");
                             out.push(Clause::list(&walked.name, Cause::Unusable, text));
                         }
                     }
@@ -1765,14 +1762,8 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
                     };
                     if let [one] = said.as_slice()
                         && own_item(one, &name)
-                        && let Some(record) = item_record(
-                            &walked,
-                            item,
-                            &focus,
-                            read,
-                            verdict.cause,
-                            &said_text(one),
-                        )
+                        && let Some(record) =
+                            item_record(&walked, item, &focus, read, verdict.cause, &said_text(one))
                     {
                         items_at.insert(found.len(), item.item_segs.clone());
                         records.push((found.len(), record));
@@ -1831,11 +1822,7 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
                         };
                         Some((
                             c,
-                            told(
-                                &name,
-                                c,
-                                &super::message::stated(&rest, c, end, "a number"),
-                            ),
+                            told(&name, c, &super::message::stated(&rest, c, end, "a number")),
                             end.clone(),
                         ))
                     }
