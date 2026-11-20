@@ -15,7 +15,7 @@ pub struct KeyBase {
     pub key_cause: Cause,
 }
 
-fn key_flaw(key: &Path, ctx: &Ctx) -> Option<(Outcome, String, Input)> {
+pub(super) fn key_flaw(key: &Path, ctx: &Ctx) -> Option<(Outcome, String, Input)> {
     let read = path::read(key, ctx);
     let named = name::name(key);
     let location: Vec<String> = read.location.iter().map(|l| l.render()).collect();
@@ -54,14 +54,6 @@ fn base_flaw(
     tally: bool,
     ctx: &Ctx,
 ) -> Option<(String, Cause, Input)> {
-    let (mut at, mut location, _) = path::start_of(start, ctx).ok()?;
-    if !at.is_object() {
-        return None;
-    }
-    let full = Path {
-        start: start.clone(),
-        steps: keys.iter().map(|k| Step::Key(k.clone())).collect(),
-    };
     let input = |name: String, state: Outcome, value: Value, location: &path::Location| Input {
         name,
         value,
@@ -70,6 +62,53 @@ fn base_flaw(
         state,
         null_at: None,
         worked: false,
+    };
+    let (mut at, mut location, _) = path::start_of(start, ctx).ok()?;
+    if let path::Start::Part(_) = start {
+        let part = Path {
+            start: start.clone(),
+            steps: Vec::new(),
+        };
+        let read = path::read(&part, ctx);
+        let named = name::name(&part);
+        let place = read.location.clone().unwrap_or_else(|| location.clone());
+        match (read.outcome, read.value) {
+            (Outcome::Found, Some(value)) if value.is_object() => {
+                at = value;
+                location = place;
+            }
+            (Outcome::Absent, _) => {
+                let text = format!("{named} is missing");
+                return Some((
+                    text,
+                    Cause::Absent,
+                    input(named, Outcome::Absent, Value::Null, &place),
+                ));
+            }
+            (Outcome::Null, _) => {
+                let text = format!("{named} is null");
+                return Some((
+                    text,
+                    Cause::Null,
+                    input(named, Outcome::Null, Value::Null, &place),
+                ));
+            }
+            (_, Some(value)) => {
+                return Some((
+                    message::isnt(&named, value, "an object"),
+                    Cause::Unusable,
+                    input(named, Outcome::Unusable, value.clone(), &place),
+                ));
+            }
+            _ => return None,
+        }
+    }
+    if !at.is_object() {
+        return None;
+    }
+    let full = Path {
+        start: start.clone(),
+        steps: keys.iter().map(|k| Step::Key(k.clone())).collect(),
     };
     for (i, key) in keys.iter().enumerate() {
         let here = Path {
@@ -165,6 +204,41 @@ pub fn of_path(path: &Path, tally: bool, ctx: &Ctx) -> Option<KeyBase> {
             && path::start_of(&path.start, ctx).is_ok_and(|(value, _, _)| !value.is_object()),
         key_cause: key_outcome.cause().unwrap_or(Cause::Unusable),
     })
+}
+
+/// The value before the first `named by` key of `path`, read from outside the
+/// item, when it can't take a key and the key can't be read or, when
+/// `item_keys` is true, comes from the item.
+pub fn base_of(path: &Path, item_keys: bool, ctx: &Ctx) -> Option<(String, String, Cause)> {
+    let at = path
+        .steps
+        .iter()
+        .position(|step| matches!(step, Step::Ref(_) | Step::Field(_)))?;
+    if !super::walk::reads_outside(path) && path.start != path::Start::Params {
+        return None;
+    }
+    match &path.steps[at] {
+        Step::Ref(key) => {
+            key_flaw(key, ctx)?;
+        }
+        Step::Field(key)
+            if !item_keys || !matches!(key.start, path::Start::Subject | path::Start::Own) =>
+        {
+            return None;
+        }
+        _ => {}
+    }
+    let keys: Vec<String> = path.steps[..at]
+        .iter()
+        .map_while(|step| match step {
+            Step::Key(k) => Some(k.clone()),
+            _ => None,
+        })
+        .collect();
+    if keys.is_empty() || keys.len() != at {
+        return None;
+    }
+    base_flaw(&path.start, &keys, false, ctx).map(|(text, cause, input)| (input.name, text, cause))
 }
 
 /// The key and base problems of every path `check` reads.
@@ -281,7 +355,8 @@ pub fn entry_inputs(
     cause: Cause,
     inputs: &[serde_json::Value],
 ) -> Vec<serde_json::Value> {
-    if !matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
+    let tallied = matches!(check, Check::Tally(_)) && cause == Cause::NotAnObject;
+    if !(tallied || matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable))
         || matches!(check, Check::Walk(_) | Check::For(_) | Check::AnyOf(_))
     {
         return Vec::new();

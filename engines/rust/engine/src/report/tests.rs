@@ -1398,3 +1398,23 @@ fn a_ref_through_a_list_of_params_points_at_where_the_read_stopped() {
         json!([{"name": "item 1 of $params", "value": [1], "locations": ["$params:/0"], "outcome": "usable"}])
     );
 }
+
+#[test]
+fn a_subject_that_narrows_a_child_checks_the_ids_of_the_childs_ancestors() {
+    let policy = Policy::read(&json!({
+        "ergo_spec": crate::SPEC,
+        "subjects": {
+            "art": {"from": "arts"}, "b": {"from": "art.bs"}, "nb": {"from": "b whose x exists"}
+        },
+        "requirements": {"s": {"subject": "nb", "checks": {"c": "x exists"}}}
+    }));
+    let reading = Reading::of(&policy);
+    let read = RequirementRead {
+        reading: &reading,
+        policy: &policy,
+        requirement: &policy.requirements["s"],
+        extra: &Problems::new(),
+    };
+    let def = read.ancestor_def(&json!({}), &json!({})).unwrap();
+    assert!(def.expression.contains("ids(arts)"));
+}

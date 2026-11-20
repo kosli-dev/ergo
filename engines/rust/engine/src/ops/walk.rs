@@ -1,3 +1,4 @@
+use super::clause::Clause;
 use super::message;
 use super::{Check, Input, SidePath, Verdict, read_path, run as run_check};
 use crate::cause::Cause;
@@ -896,12 +897,28 @@ pub(super) fn named_side<'a>(
     check: &'a Check,
     ctx: &Ctx<'a>,
 ) -> Option<(&'a Path, path::Read<'a>)> {
+    named_side_of(check, ctx, |_| true)
+}
+
+pub(super) fn named_side_of<'a>(
+    check: &'a Check,
+    ctx: &Ctx<'a>,
+    keep: impl Fn(&Path) -> bool,
+) -> Option<(&'a Path, path::Read<'a>)> {
     let sides = check.sides();
-    let mut sides = sides.iter().map(|paths| side_read(paths, ctx));
-    let left = sides.next().flatten();
-    let right = sides.next().flatten();
-    let right_alone = left.as_ref().is_none_or(|(_, _, read)| *read)
-        && right.as_ref().is_some_and(|(_, _, read)| !*read);
+    let mut sides = sides.iter().map(|paths| {
+        let kept: Vec<SidePath> = paths
+            .iter()
+            .copied()
+            .filter(|side| keep(side.path))
+            .collect();
+        (kept.is_empty() && !paths.is_empty(), side_read(&kept, ctx))
+    });
+    let (left_left_out, left) = sides.next().unwrap_or((false, None));
+    let right = sides.next().and_then(|(_, read)| read);
+    let right_alone = left_left_out
+        || left.as_ref().is_none_or(|(_, _, read)| *read)
+            && right.as_ref().is_some_and(|(_, _, read)| !*read);
     let (path, read, _) = if right_alone { right } else { left }?;
     Some((path, read))
 }
@@ -1100,6 +1117,255 @@ pub(super) fn focus_segs<'s>(item: &'s WalkItem, check: &Check) -> &'s [Seg] {
         &item.end_segs
     } else {
         &item.item_segs
+    }
+}
+
+pub(super) fn item_own(
+    check: &Check,
+    item: &WalkItem,
+    walked: &Walked,
+    outer: &Ctx,
+) -> Option<Clause> {
+    if focus_lost(item, check) {
+        let mut at = outer.clone();
+        at.subject = item.item.clone();
+        at.label = None;
+        let verdict = lost_verdict(item, &at);
+        let text = message::message(&focus_check(item), &at, &verdict);
+        let name = walked.item_name(&item.item_segs);
+        return Some(super::tally::told(&name, verdict.cause, &text));
+    }
+    let focus = focus_ctx(item, outer);
+    let name = walked.item_name(focus_segs(item, check));
+    let paths: Vec<&Path> = check
+        .paths()
+        .into_iter()
+        .chain(listed_refs(check))
+        .collect();
+    let keyed: Vec<Option<super::key_base::KeyBase>> = paths
+        .iter()
+        .map(|path| super::key_base::of_path(path, false, &focus))
+        .collect();
+    if keyed.iter().flatten().any(|found| found.off_object) {
+        let text = message::isnt(&name, focus.subject.value, "an object");
+        return Some(Clause::item(&name, Cause::NotAnObject, text, Vec::new()));
+    }
+    let rooted = !message::root_clauses(&[check], outer).is_empty()
+        || !message::walked_root_clauses(&[check], outer).is_empty();
+    let outside = |path: &Path| (reads_outside(path) || path.start == Start::Params) && rooted;
+    let mut said: Vec<Clause> = Vec::new();
+    let mut own_at = None;
+    for (path, found) in paths.into_iter().zip(keyed) {
+        match found {
+            Some(found) => {
+                said.extend(found.base.map(|(text, cause, _)| Clause::said(cause, text)))
+            }
+            None if outside(path) => {
+                said.extend(path.steps.iter().filter_map(|step| match step {
+                    Step::Field(key) | Step::Ref(key)
+                        if matches!(key.start, Start::Subject | Start::Own) =>
+                    {
+                        let (outcome, text, _) = super::key_base::key_flaw(key, &focus)?;
+                        Some(Clause::said(outcome.cause()?, text))
+                    }
+                    _ => None,
+                }));
+            }
+            None => {
+                own_at.get_or_insert(said.len());
+            }
+        }
+    }
+    let root_key = |path: &Path| {
+        path.steps.iter().any(|step| {
+            matches!(step, Step::Field(key) | Step::Ref(key)
+                if !matches!(key.start, Start::Subject | Start::Own)
+                    && (super::key_base::key_flaw(key, &focus).is_some()
+                        || path::read(key, &focus).outcome != Outcome::Found))
+        })
+    };
+    let blocked = |path: &Path| {
+        outside(path) || root_key(path) || super::key_base::of_path(path, false, &focus).is_some()
+    };
+    let mut item = Clause::item(&name, Cause::Satisfied, String::new(), Vec::new());
+    let alone = stood_in(check, &focus, blocked)
+        .map(|alone| (run_check(&alone, &focus), alone))
+        .filter(|(verdict, _)| verdict.cause.is_failure());
+    let on_item = |path: &Path| {
+        matches!(path.start, Start::Subject | Start::Own)
+            && matches!(path.steps.first(), Some(Step::Key(_)))
+    };
+    let off_focus = |key_of_root: bool| {
+        !focus.subject.value.is_object()
+            && check
+                .paths()
+                .into_iter()
+                .chain(listed_refs(check))
+                .any(|path| {
+                    let keyed = |step: &Step| {
+                        matches!(step, Step::Field(key) | Step::Ref(key) if on_item(key))
+                    };
+                    if key_of_root {
+                        blocked(path) && path.steps.iter().any(keyed)
+                    } else {
+                        on_item(path) && !blocked(path)
+                    }
+                })
+    };
+    if off_focus(true) || (alone.is_none() && off_focus(false)) {
+        let text = message::isnt(&name, focus.subject.value, "an object");
+        item = Clause::item(&name, Cause::NotAnObject, text, Vec::new());
+    } else if let Some((verdict, alone)) = alone {
+        let text = message::message(&alone, &focus, &verdict);
+        item = super::tally::told(&name, verdict.cause, &text);
+    } else if let Some((cause, text)) = own_list_fault(check, &focus, blocked) {
+        item = super::tally::told(&name, cause, &text);
+    }
+    let at = own_at.unwrap_or(said.len());
+    let after = said.split_off(at);
+    let own = std::mem::take(&mut item.said);
+    for clause in said.into_iter().chain(own).chain(after) {
+        if !item.said.contains(&clause) {
+            item.said.push(clause);
+        }
+    }
+    item.cause = Cause::worst(
+        item.said
+            .iter()
+            .map(|clause| clause.cause)
+            .chain([item.cause]),
+    )?;
+    Some(item)
+}
+
+fn own_list_fault(
+    check: &Check,
+    focus: &Ctx,
+    blocked: impl Fn(&Path) -> bool,
+) -> Option<(Cause, String)> {
+    let lists = super::lists::right_paths(check);
+    if lists.is_empty() || lists.into_iter().any(blocked) {
+        return None;
+    }
+    super::lists::field_walk_fault(check, focus).or_else(|| {
+        super::lists::ref_faults(check, focus)
+            .into_iter()
+            .next()
+            .map(|text| (Cause::Unusable, text))
+    })
+}
+
+fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Option<Check> {
+    use super::compare::{Compare, Side};
+    use super::lists::{Contains, In, Matches, Right, Wanted};
+    if !check
+        .paths()
+        .into_iter()
+        .chain(listed_refs(check))
+        .any(&blocked)
+    {
+        return Some(check.clone());
+    }
+    let right_blocked = |right: &Right| {
+        let mut paths = Vec::new();
+        right.paths(&mut paths);
+        paths.into_iter().any(&blocked)
+    };
+    let mixed = |list: &Path| {
+        let kinds: std::collections::BTreeSet<&str> = path::read(list, focus)
+            .value
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+            .filter(|value| !value.is_null())
+            .map(message::kind)
+            .collect();
+        kinds.len() > 1
+    };
+    let side_blocked = |side: &Side| side.paths().into_iter().any(&blocked);
+    let own_side = |left: &Side, right: &Side| match (side_blocked(left), side_blocked(right)) {
+        (false, true) => Some(left.clone()),
+        (true, false) => Some(right.clone()),
+        _ => None,
+    };
+    let own_list = |right: &Right| match right {
+        Right::Field(list) | Right::Ref(list)
+            if !blocked(list)
+                && !mixed(list)
+                && super::lists::walked_in(check, list, focus).is_none() =>
+        {
+            Some(Check::Contains(Contains {
+                path: list.clone(),
+                wanted: Wanted::One(Right::Written(Value::Null)),
+                not: false,
+            }))
+        }
+        _ => None,
+    };
+    match check {
+        Check::Compare(compare) => {
+            let own = own_side(&compare.left, &compare.right)?;
+            Some(Check::Compare(Compare {
+                left: own.clone(),
+                right: own,
+                ..compare.clone()
+            }))
+        }
+        Check::CompareTime(compare) => {
+            let own = own_side(&compare.left, &compare.right)?;
+            Some(Check::CompareTime(super::time::CompareTime {
+                left: own.clone(),
+                right: own,
+                ..compare.clone()
+            }))
+        }
+        Check::Contains(contains) if !blocked(&contains.path) => {
+            let wanted = match &contains.wanted {
+                _ if mixed(&contains.path) => return None,
+                Wanted::One(right) if right_blocked(right) => {
+                    Wanted::One(Right::Written(Value::Null))
+                }
+                Wanted::All(right) if right_blocked(right) => {
+                    Wanted::All(Right::Written(Value::Array(vec![Value::Null])))
+                }
+                Wanted::Some(right) if right_blocked(right) => {
+                    Wanted::Some(Right::Written(Value::Array(vec![Value::Null])))
+                }
+                _ => return None,
+            };
+            Some(Check::Contains(Contains {
+                wanted,
+                ..contains.clone()
+            }))
+        }
+        Check::Contains(contains) => match &contains.wanted {
+            Wanted::One(Right::Field(value)) if !blocked(value) => {
+                let own = Side::Path(value.clone());
+                Some(Check::Compare(Compare {
+                    left: own.clone(),
+                    right: own,
+                    cmp: super::compare::Cmp::Eq,
+                    within: None,
+                }))
+            }
+            Wanted::All(list) | Wanted::Some(list) => own_list(list),
+            Wanted::One(_) => None,
+        },
+        Check::In(within) if !blocked(&within.path) && right_blocked(&within.values) => {
+            Some(Check::In(In {
+                values: Right::Written(Value::Array(Vec::new())),
+                ..within.clone()
+            }))
+        }
+        Check::In(within) => own_list(&within.values),
+        Check::Matches(matches) if !blocked(&matches.path) && right_blocked(&matches.patterns) => {
+            Some(Check::Matches(Matches {
+                patterns: Right::Written(Value::Array(vec![Value::from("x")])),
+                ..matches.clone()
+            }))
+        }
+        Check::Matches(matches) => own_list(&matches.patterns),
+        _ => None,
     }
 }
 

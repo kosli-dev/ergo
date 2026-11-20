@@ -857,7 +857,7 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                     for side in tally::tally_sides(tally_check) {
                         if let TallySide::Derived(derived) = side {
                             found.extend(
-                                tally::derived_clauses(derived, ctx, verdict.cause)
+                                tally::derived_clauses(derived, ctx)
                                     .into_iter()
                                     .map(Piece::Counted),
                             );
@@ -930,7 +930,7 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                         TallySide::Derived(d) => Some(d),
                         TallySide::Plain(_) => None,
                     })
-                    .flat_map(|d| tally::derived_clauses(d, ctx, Cause::NotAnObject))
+                    .flat_map(|d| tally::derived_clauses(d, ctx))
                     .map(Piece::Counted)
                     .collect(),
                 _ => Vec::new(),
@@ -940,6 +940,12 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                 let mut found: Vec<Piece> = said_all(aliases_blocked(check, ctx)).collect();
                 found.extend(said_all(lists::input_one_fault(check, ctx)));
                 found.extend(said_all(keyed));
+                found.retain(|piece| {
+                    !tallies.iter().any(|tally| match tally {
+                        Piece::Counted(clauses) => clauses.iter().any(|c| c.text == piece.text()),
+                        Piece::Said(_) => false,
+                    })
+                });
                 found.extend(tallies);
                 found
             } else if subject.is_array() && !tallies.is_empty() && !list_read_plainly(check, ctx) {
@@ -1385,7 +1391,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, Piece)> {
                     let tally::Term::Counted(term) = term else {
                         continue;
                     };
-                    if let Some(clauses) = tally::counted_clauses(term, ctx, Cause::Unusable) {
+                    if let Some(clauses) = tally::counted_clauses(term, ctx) {
                         out.push((String::new(), Piece::Counted(clauses)));
                         any = true;
                     } else if let Some(input) = first_input(&term.path, ctx)
@@ -1787,21 +1793,8 @@ fn root_flaw_with(
         .map(|(cause, texts)| (cause, texts.join("; ")))
 }
 
-pub fn root_reads_counted(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, Vec<RootRead>)> {
-    root_reads_with(checks, ctx, checks, &[], true)
-}
-
 pub fn key_cause(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
-    worst_texts(key_problems(checks, ctx))
-}
-
-pub fn key_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
-    let found = key_problems(checks, ctx);
-    let worst = Cause::worst(found.iter().map(|clause| clause.cause));
-    found
-        .into_iter()
-        .filter(|clause| Some(clause.cause) == worst)
-        .collect()
+    worst_texts(key_problems(checks, ctx, false))
 }
 
 pub fn worse_key_cause(
@@ -1816,12 +1809,18 @@ pub fn worse_key_cause(
     }
 }
 
-fn key_problems(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+fn key_problems(checks: &[&Check], ctx: &Ctx, listed: bool) -> Vec<Clause> {
     let mut keys: Vec<Path> = Vec::new();
     for check in checks {
         let mut own: Vec<Path> = check
             .paths()
             .into_iter()
+            .chain(
+                listed
+                    .then(|| super::walk::listed_refs(check))
+                    .into_iter()
+                    .flatten(),
+            )
             .flat_map(path::step_refs)
             .collect();
         own.sort_by_key(name::name);
@@ -2106,6 +2105,118 @@ fn root_reads_with(
         })
         .collect();
     Some((worst, reads))
+}
+
+pub fn walked_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+    checks
+        .iter()
+        .flat_map(|check| {
+            lists::right_paths(check)
+                .into_iter()
+                .filter(|root| {
+                    reads_from_a_root(root) && lists::walked_in(check, root, ctx).is_some()
+                })
+                .filter_map(|root| {
+                    lists::walked_root_fault(check, root, ctx)
+                        .filter(|(cause, _)| *cause != Cause::Value)
+                        .map(|(cause, text)| Clause::root(&name::name(root), cause, text))
+                })
+        })
+        .collect()
+}
+
+pub fn root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+    roots_with(checks, ctx, true)
+}
+
+pub fn side_root_clauses(checks: &[&Check], ctx: &Ctx) -> Vec<Clause> {
+    roots_with(checks, ctx, false)
+}
+
+fn roots_with(checks: &[&Check], ctx: &Ctx, item_keys: bool) -> Vec<Clause> {
+    let reads = root_reads_with(checks, ctx, &[], &[], true)
+        .map(|(_, reads)| reads)
+        .unwrap_or_default();
+    let bases = checks
+        .iter()
+        .flat_map(|check| {
+            check
+                .paths()
+                .into_iter()
+                .chain(super::walk::listed_refs(check))
+        })
+        .filter_map(|path| {
+            super::key_base::base_of(path, item_keys, ctx)
+                .map(|(name, text, cause)| Clause::root(&name, cause, text))
+        });
+    let counted = checks
+        .iter()
+        .filter(|check| matches!(check, Check::Tally(_)))
+        .flat_map(|check| off_item(check, ctx, Cause::Unusable))
+        .map(|text| Clause::said(Cause::Unusable, text));
+    let aliased: Vec<Clause> = checks
+        .iter()
+        .flat_map(|check| {
+            check
+                .paths()
+                .into_iter()
+                .chain(super::walk::listed_refs(check))
+        })
+        .flat_map(|path| path.steps.iter())
+        .filter_map(|step| match step {
+            Step::Field(key) | Step::Ref(key)
+                if matches!(&key.start, Start::Alias(alias)
+                    if alias != path::OUTER && ctx.aliases.contains_key(alias)) =>
+            {
+                let (outcome, text, _) = super::key_base::key_flaw(key, ctx)?;
+                Some(Clause::root(&name::name(key), outcome.cause()?, text))
+            }
+            _ => None,
+        })
+        .collect();
+    let stopped: Vec<String> = checks
+        .iter()
+        .flat_map(|check| {
+            check
+                .paths()
+                .into_iter()
+                .chain(super::walk::listed_refs(check))
+        })
+        .filter(|path| {
+            path::step_refs(path)
+                .iter()
+                .any(|key| super::key_base::key_flaw(key, ctx).is_some())
+        })
+        .map(name::name)
+        .collect();
+    let mut said: Vec<Clause> = Vec::new();
+    for clause in key_problems(checks, ctx, true)
+        .into_iter()
+        .chain(aliased)
+        .chain(bases)
+        .chain(counted)
+        .chain(
+            reads
+                .into_iter()
+                .flat_map(|(_, said)| said)
+                .filter(|clause| !stopped.contains(&clause.name)),
+        )
+    {
+        let root = clause.kind == clause::Kind::Root;
+        if !said
+            .iter()
+            .any(|found| *found == clause || root && found.text == clause.text)
+        {
+            said.push(clause);
+        }
+    }
+    said.sort_by(|a, b| match (a.kind, b.kind) {
+        (clause::Kind::Root, clause::Kind::Root) => (a.cause, &a.name).cmp(&(b.cause, &b.name)),
+        (clause::Kind::Root, _) => std::cmp::Ordering::Less,
+        (_, clause::Kind::Root) => std::cmp::Ordering::Greater,
+        _ => std::cmp::Ordering::Equal,
+    });
+    said
 }
 
 pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {

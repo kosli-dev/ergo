@@ -368,15 +368,10 @@ impl RequirementRead<'_> {
 
     fn filters_text(&self) -> Option<String> {
         let (name, _) = self.policy.subject_of(self.requirement)?;
-        let blocked = self
+        if self
             .extra
-            .get(&field_name(&["subjects", name, "from"]))
-            .is_some_and(|texts| {
-                texts
-                    .iter()
-                    .any(|text| text != crate::reading::NARROWING_A_CHILD_PROBLEM)
-            });
-        if blocked {
+            .contains_key(&field_name(&["subjects", name, "from"]))
+        {
             return None;
         }
         self.reading.filters_text(name)
@@ -388,11 +383,7 @@ impl RequirementRead<'_> {
         let mut levels: Vec<String> = Vec::new();
         let mut at = name.to_string();
         while levels.len() < 2 && self.reads_from(&at) {
-            let Some(crate::reading::Relation::Child(parent)) = reading
-                .infos
-                .get(at.as_str())
-                .map(|info| info.relation.clone())
-            else {
+            let Some(parent) = reading.parent_of(&at) else {
                 break;
             };
             levels.insert(0, parent.clone());
