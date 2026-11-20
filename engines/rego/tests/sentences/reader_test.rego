@@ -161,6 +161,7 @@ test_ignoring_words_after_another_phrase_or_in_another_order_are_written_wrong i
 	_read(`x is "a" ignoring surrounding spaces and case`) == {"problems": [`"ignoring surrounding spaces and case" is written "ignoring case and surrounding spaces"`]}
 	every pair in [
 		[`x is at least 3 ignoring case`, "is at least"],
+		[`x is 1 within 2 ignoring case`, "within"],
 		[`x matches "a" ignoring case`, "matches"],
 		[`x exists ignoring case`, "exists"],
 		[`x is a non-empty string ignoring case`, "is a non-empty string"],
