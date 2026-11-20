@@ -20,7 +20,9 @@ It has five crates. The first three, `ergo-policy-sentences`, `ergo-policy-engin
 
 Most failing cases can't show whether a change moved a report, so the test can also write every report it builds: with `ERGO_DUMP` set to a folder, `cargo test -p ergo-policy-engine --test cases` writes the report of case `n` of a topic to `<folder>/<topic>/<n>.json`. Run it once before a change and once after, into two folders, and `.github/dump-diff.sh <before> <after>` prints each file that differs. A change that should keep every report prints nothing.
 
-To get the numbers a pull request body needs, run `.github/pr-facts.sh [BASE]` (`origin/main` by default). It builds both dumps, with BASE in a temporary worktree and no Docker, and prints how many reports changed and which cases, which cases pass or fail now and did not before, and any case that passed on BASE and changed its report.
+To get the numbers a pull request body needs, run `.github/pr-facts.sh [BASE]` (`origin/main` by default). It builds both dumps, with BASE in a temporary worktree and no Docker, and prints how many reports changed and which cases, which cases pass or fail now and did not before, and, first and in capitals, any case that passed on BASE and fails or is gone now. It pairs cases by their key, and follows a key that was reworded when the topic has the same number of cases on both sides, so it reads right when cases were added, removed or renamed.
+
+`.github/dump-diff.sh` pairs files by case number, so use it when no cases were added or removed, and `.github/pr-facts.sh` when some were.
 
 ## Running the checks
 

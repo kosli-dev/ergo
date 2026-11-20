@@ -61,7 +61,7 @@ Run them from the repo root. The last three lines use a virtual environment that
 
 `.github/dump-diff_test.sh` tests `.github/dump-diff.sh`, which lists the files that differ between two folders.
 
-`.github/pr-facts_test.sh` tests `.github/pr-facts.sh`, which prints how many Rust case reports a change moved, which known failures it added or removed, and whether a passing case changed its report; put its output in the body of a pull request that changes Rust reports.
+`.github/pr-facts_test.sh` tests `.github/pr-facts.sh`, which prints how many Rust case reports a change moved, which known failures it added or removed, and whether a case that passed now fails or is gone; put its output in the body of a pull request that changes Rust reports.
 
 `opa fmt --list` should print nothing. If it prints file names, run `opa fmt -w` on them.
 
