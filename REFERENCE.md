@@ -149,6 +149,41 @@ A few details:
 - Without `from`, a subject reads the input field named like it, so `artifact` reads `artifact`. A subject with nothing under it, `artifact:` alone in YAML, does the same. To check the whole input as one subject, write `from: $input`. When the input is a list, `from: $input` and `from: every $input` make each item a subject, as `from: things` does on a list called `things`, with locations like `/0/x`. When a walk from the input breaks in one item, like `commits` being `5` in the second item for `from: every $input.commits`, `failures` has an entry `item 2 of $input` with the input `$input[1].commits`. When the walk breaks on the input itself, like an object or `null` for `from: every $input`, the place is named `$input`. The expressions of `$min_subjects` and `$unique_ids` name a position on the input from `$input` too, like `count(matching(item 1 of $input)) >= 1` for `from: $input[0]`, and write a `from` that starts with `named by` as it is, like `count(matching(every $input named by $params.k)) >= 1`. A position, like `from: $input[0]` or `from: first of $input`, reads the item at it, and ends `absent` when the list has none. `from: every $input[0]` makes each item of that item a subject. Without `identified_by`, each row repeats the whole subject as its id, so two identical subjects clash.
 - A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, `applies_to` or `of`, or whose `from` or `identified_by` isn't a string or can't be read, or whose `description` isn't a string. The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["doesn't parse"], "locations": []}` or `{"name": "subjects.deployment.from", "value": ["not a string"], "locations": []}` for a list. Each of those requirements gets only its `$well_formed` row, as for a [requirement that's written wrong](#requirements), and a `from` that isn't a string or can't be read is shown as `<invalid from>` in expressions.
 
+When two subjects have the same id, there is no field that lets them through, because the id is how a reader finds a subject in the input. What to write instead depends on why they share one:
+
+- Copies that are exactly the same, like `{"id": "r1", "ok": true}` twice: read them with `every distinct records`. They become one subject, `r1`, whose rows list both locations, and the requirement is met. With `every records` it isn't, and `$unique_ids` says `repeated record ids is ["r1"]`.
+- Values with no id of their own, like test results, work the same way. With `{"builds": [{"id": "b1", "results": [{"status": "pass"}, {"status": "pass"}]}]}`, a `result` subject read from `every build.results` fails `$unique_ids` with `repeated result ids is [{"status": "pass"}]`, and one read from `every distinct build.results` is met, with one subject whose row lists both results. A policy that means "two results" says so with `count of build.results is at least 2`.
+- Records that are snapshots of one thing, like the same pull request in several trails: make each snapshot a parent subject, so the ids only have to be unique inside it. With these trails, where pull request 7 is in all three and the policy only wants the merged ones,
+
+  ```json
+  {"trails": [
+    {"name": "t1", "pull_requests": [{"number": 7, "state": "OPEN"}]},
+    {"name": "t2", "pull_requests": [{"number": 7, "state": "MERGED", "merge_commit": "m1"}, {"number": 9, "state": "OPEN", "merge_commit": "m1"}]},
+    {"name": "t3", "pull_requests": [{"number": 7, "state": "MERGED"}], "labels": ["x"]}
+  ]}
+  ```
+
+  this policy is met, with one `$unique_ids` row for each trail:
+
+  ```yaml
+  subjects:
+    trail:
+      from: every trails
+      identified_by: name
+    pr:
+      from: every trail.pull_requests whose state is "MERGED"
+      identified_by: number
+  requirements:
+    merged prs:
+      subject: pr
+      min_subjects: 0
+      checks:
+        has number: number exists
+  ```
+
+  Reading the same list flat, with `every distinct trails.pull_requests whose state is "MERGED"`, fails `$unique_ids` on `[7]`, because a filter never hides a doubt about identity: the pull request in `t1` is out of scope, and the ones in `t2` and `t3` are in scope and differ.
+- Copies that differ, like `"reason": "audit"` and `"reason": "release"` on the same id: `$unique_ids` fails even with `every distinct`, because Ergo won't pick between two pieces of evidence that disagree. Fix the data or the id.
+
 ### From lines
 
 A `from` line is a path, and `whose` or `that` with conditions joined by `and` keeps the subjects they hold for. Each condition starts with its own `whose` or `that`, so a second one is `and whose` or `and that`, and `and` followed by a bare condition is written wrong. Paths and conditions are written as in [checks](#checks). `identified_by` is a path written the same way:
