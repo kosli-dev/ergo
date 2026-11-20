@@ -619,7 +619,11 @@ fn a_repeated_parent_id_fails_one_ancestor_row_counting_the_parents_left_out() {
     assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
     assert_eq!(
         r["requirements"]["s"]["checks"]["$unique_ancestor_ids"]["expression"],
-        json!("count(repeated(ids(arts))) == 0")
+        json!("count(missing(ids(arts))) + count(repeated(ids(arts))) == 0")
+    );
+    assert_eq!(
+        r["requirements"]["s"]["checks"]["$unique_ancestor_ids"]["description"],
+        json!("Every art has a unique id")
     );
 }
 

@@ -297,8 +297,8 @@ fn a_written_wrong_requirement_still_lists_every_check_and_the_ones_ergo_adds() 
     assert_eq!(
         checks["$unique_ids"],
         json!({
-            "description": "Every thing id is unique",
-            "expression": "count(repeated(ids(things))) == 0",
+            "description": "Every thing has a unique id",
+            "expression": "count(missing(ids(things))) + count(repeated(ids(things))) == 0",
             "meta": {}
         })
     );
@@ -736,7 +736,7 @@ fn a_from_that_is_not_a_string_prints_as_invalid() {
     );
     assert_eq!(
         report["requirements"]["s"]["checks"]["$unique_ids"]["expression"],
-        json!("count(repeated(ids(<invalid from>))) == 0")
+        json!("count(missing(ids(<invalid from>))) + count(repeated(ids(<invalid from>))) == 0")
     );
 }
 
