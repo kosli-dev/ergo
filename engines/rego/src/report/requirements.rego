@@ -565,17 +565,30 @@ _ms_tree(req, doc, places, keys) := _ms_group([x | some t in sort([[f.key[0], f.
 	flat := [_ms_flat(req, doc, p, keys) | some p in places]
 }
 
-_ms_group(fs) := [_ms_node(fs, k) | some k, f in fs; _ms_first(fs, k)]
+_ms_group(fs) := [_ms_node([fs[j] | some j in run]) | some run in _ms_runs(fs)]
 
 _ms_head(f) := f.levels[0].name if count(f.levels) > 0
 
 else := f.entry.name
 
-_ms_first(fs, k) if not _ms_head(fs[k]) in [_ms_head(g) | some g in array.slice(fs, 0, k)]
+_ms_runs(fs) := [runs[x[1]] | some x in sort([[run[0], r] | some r, run in runs])] if {
+	s := sort([[_ms_head(f), k] | some k, f in fs])
+	starts := [i | some i, _ in s; _ms_run_start(s, i)]
+	runs := [[t[1] | some t in array.slice(s, at, _ms_run_end(starts, r, count(s)))] | some r, at in starts]
+}
 
-_ms_node(fs, k) := _ms_join(own, kids, lv) if {
-	h := _ms_head(fs[k])
-	same := [f | some f in fs; _ms_head(f) == h]
+_ms_run_start(_, 0)
+
+_ms_run_start(s, i) if {
+	i > 0
+	s[i - 1][0] != s[i][0]
+}
+
+_ms_run_end(starts, r, n) := starts[r + 1] if r + 1 < count(starts)
+
+else := n
+
+_ms_node(same) := _ms_join(own, kids, lv) if {
 	own := [f.entry | some f in same; count(f.levels) == 0]
 	kids := [{"levels": array.slice(f.levels, 1, count(f.levels)), "entry": f.entry, "key": f.key} | some f in same; count(f.levels) > 0]
 	lv := [f.levels[0] | some f in same; count(f.levels) > 0]
@@ -593,11 +606,9 @@ _ms_join(own, kids, lv) := object.union(own[0], {
 	under := _ms_group2(kids)
 }
 
-_ms_group2(fs) := [_ms_node2(fs, k) | some k, f in fs; _ms_first(fs, k)]
+_ms_group2(fs) := [_ms_node2([fs[j] | some j in run]) | some run in _ms_runs(fs)]
 
-_ms_node2(fs, k) := _ms_join2(own, [f.levels[0] | some f in same; count(f.levels) > 0], [f.entry | some f in same; count(f.levels) > 0]) if {
-	h := _ms_head(fs[k])
-	same := [f | some f in fs; _ms_head(f) == h]
+_ms_node2(same) := _ms_join2(own, [f.levels[0] | some f in same; count(f.levels) > 0], [f.entry | some f in same; count(f.levels) > 0]) if {
 	own := [f.entry | some f in same; count(f.levels) == 0]
 }
 
@@ -660,15 +671,15 @@ _with_id_faults(row, places, doc, req) := object.union(row, {
 	"cause": _worst_of({p.cause | some p in places} | {row.cause | row.passed == false}),
 	"message": _m_joined(array.concat([_m_is(row.inputs[0].name, row.inputs[0].value) | row.passed == false], [p.text | some p in places])),
 	"inputs": array.concat(row.inputs, [{"name": _ms_read_name(req, p.c), "value": null, "locations": [p.at], "outcome": p.cause} | some p in places; not p.listed]),
-	"failures": [_id_copies(e, places) | some e in _ms_tree(req, doc, [p | some p in places; p.listed], [k | some k in _id_keys(req); is_string(k)])],
-}) if places != []
+	"failures": [_id_copies(e, copies) | some e in _ms_tree(req, doc, [p | some p in places; p.listed], [k | some k in _id_keys(req); is_string(k)])],
+}) if {
+	places != []
+	copies := {p.item_at: p.ats | some p in places; p.listed; count(p.ats) > 1}
+}
 
-_id_copies(e, places) := object.union(e, {"locations": p.ats}) if {
-	some p in places
-	p.listed
-	object.get(p, "item_at", null) == e.locations[0]
-	count(object.get(p, "ats", [])) > 1
-} else := e
+_id_copies(e, copies) := object.union(e, {"locations": ats}) if ats := copies[e.locations[0]]
+
+else := e
 
 _entry_c(entry, req) := entry.c if "c" in object.keys(entry)
 
