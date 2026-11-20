@@ -25,11 +25,21 @@ fn outcome_of(
     params: Option<&Value>,
     name: &str,
 ) -> Option<&'static str> {
+    outcome_in(sentences, input, input, params, name)
+}
+
+fn outcome_in(
+    sentences: &[&str],
+    subject: &Value,
+    input: &Value,
+    params: Option<&Value>,
+    name: &str,
+) -> Option<&'static str> {
     let checks: Vec<crate::ops::Check> = sentences.iter().map(|s| lowered(s)).collect();
     let all: Vec<&crate::ops::Check> = checks.iter().collect();
     let ctx = crate::path::Ctx {
         subject: crate::path::Located {
-            value: input,
+            value: subject,
             location: crate::path::Location::input_root(),
         },
         input,
@@ -133,6 +143,56 @@ fn a_walked_root_with_an_item_the_walk_cant_read_is_unusable() {
             None,
             "$input.os[].name"
         ),
+        Some("unusable")
+    );
+}
+
+#[test]
+fn a_side_stays_usable_when_the_check_fails_on_the_other_side_before_using_it() {
+    assert_eq!(
+        outcome_of(&["l contains w"], &json!({"l": "a"}), None, "l"),
+        Some("usable")
+    );
+}
+
+#[test]
+fn a_walked_list_that_starts_at_the_input_is_unusable_when_an_item_isnt_an_object() {
+    assert_eq!(
+        outcome_in(
+            &["id is in $input.id"],
+            &json!({"id": "a"}),
+            &json!([{"id": "a"}, 1]),
+            None,
+            "$input[].id"
+        ),
+        Some("unusable")
+    );
+}
+
+#[test]
+fn a_walked_field_of_the_subject_stays_usable_when_an_item_isnt_an_object() {
+    assert_eq!(
+        outcome_of(
+            &["x is in os.name"],
+            &json!({"x": "bob", "os": [{"name": "bob"}, 3]}),
+            None,
+            "os[].name"
+        ),
+        Some("usable")
+    );
+}
+
+#[test]
+fn a_value_whose_name_ends_a_clause_about_another_value_stays_usable() {
+    let subject = json!({"id": "a"});
+    let input = json!([{"id": "a"}]);
+    let sentences = ["id is in $input[0].id"];
+    assert_eq!(
+        outcome_in(&sentences, &subject, &input, None, "id"),
+        Some("usable")
+    );
+    assert_eq!(
+        outcome_in(&sentences, &subject, &input, None, "$input[0].id"),
         Some("unusable")
     );
 }
