@@ -437,7 +437,9 @@ fn a_position_on_a_list_input_is_named_from_dollar_input_in_expressions() {
         );
         assert_eq!(
             checks["$unique_ids"]["expression"],
-            json!(format!("count(repeated(ids({name}))) == 0")),
+            json!(format!(
+                "count(missing(ids({name}))) + count(repeated(ids({name}))) == 0"
+            )),
             "{from}"
         );
     }

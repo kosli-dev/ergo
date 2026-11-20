@@ -406,14 +406,16 @@ impl RequirementRead<'_> {
         let mut refs: Vec<Value> = Vec::new();
         for (at, level) in levels.iter().enumerate() {
             let every = if at == 0 { "Every" } else { "every" };
-            descriptions.push(format!("{every} {level} id is unique"));
+            descriptions.push(format!("{every} {level} has a unique id"));
             let from = if self.reads_from(level) {
                 refs.extend(source_refs_read(reading, level, input, params));
                 reading.infos[level].from_text.clone().unwrap_or_default()
             } else {
                 INVALID_FROM.to_string()
             };
-            expressions.push(format!("count(repeated(ids({from}))) == 0"));
+            expressions.push(format!(
+                "count(missing(ids({from}))) + count(repeated(ids({from}))) == 0"
+            ));
         }
         refs.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
         refs.dedup();
@@ -515,8 +517,8 @@ pub fn check_defs(
     min_def.refs.clone_from(&from_refs);
     defs.insert("$min_subjects".to_string(), min_def);
     let mut unique_def = CheckDef::added(
-        format!("Every {kind} id is unique"),
-        format!("count(repeated(ids({from}))) == 0"),
+        format!("Every {kind} has a unique id"),
+        format!("count(missing(ids({from}))) + count(repeated(ids({from}))) == 0"),
     );
     unique_def.refs = from_refs;
     defs.insert("$unique_ids".to_string(), unique_def);
