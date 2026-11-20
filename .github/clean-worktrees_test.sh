@@ -24,17 +24,30 @@ git worktree add --quiet --detach "$wt/detached"
 git worktree add --quiet -b target-branch "$wt/withtarget"
 git -C "$wt/withtarget" commit --quiet --allow-empty -m work
 mkdir -p "$wt/withtarget/engines/rust/target/debug" "$wt/merged/target"
+git worktree add --quiet -b space-branch "$wt/sp ace"
+mkdir -p "$wt/sp ace/target"
+git worktree add --quiet -b locked-branch "$wt/locked"
+mkdir -p "$wt/locked/target"
+git worktree lock "$wt/locked"
+git worktree add --quiet -b feat/slash "$wt/slash"
+git -C "$wt/slash" commit --quiet --allow-empty -m work
+git worktree add --quiet -b failing-branch "$wt/failing"
+git -C "$wt/failing" commit --quiet --allow-empty -m work
+mkdir -p "$wt/failing/target"
 echo x > "$wt/withtarget/engines/rust/target/debug/out"
 git worktree add --quiet -b closed-branch "$wt/closed"
 git -C "$wt/closed" commit --quiet --allow-empty -m work
 git worktree add --quiet -b untracked-branch "$wt/untracked"
 echo new > "$wt/untracked/scratch.txt"
 
-printf '#!/bin/sh\ncase "$1" in closed-branch) echo CLOSED;; target-branch) echo OPEN;; open-branch) echo OPEN;; esac\n' > "$dir/pr-state"
+printf '#!/bin/sh\ncase "$1" in closed-branch) echo CLOSED;; feat/slash) echo MERGED;; target-branch) echo OPEN;; open-branch) echo OPEN;; esac\n' > "$dir/pr-state"
 chmod +x "$dir/pr-state"
 
+printf '#!/bin/sh\ncase "$1" in failing-branch) exit 1;; *) "%s/pr-state" "$1";; esac\n' "$dir" > "$dir/pr-state-failing"
+chmod +x "$dir/pr-state-failing"
+
 run() {
-  CLEAN_WORKTREES_BASE=main CLEAN_WORKTREES_PR_STATE_CMD="$dir/pr-state" sh "$script" "$@"
+  CLEAN_WORKTREES_BASE=main CLEAN_WORKTREES_PR_STATE_CMD="$dir/pr-state-failing" sh "$script" "$@"
 }
 
 expect_in() {
@@ -68,8 +81,25 @@ expect_in "would remove worktree $wt/closed" "$out"
 expect_in "kept: $wt/open" "$out"
 expect_in "kept: $wt/dirty" "$out"
 expect_in "kept: no branch: $wt/detached" "$out"
-expect_in "would remove target folder $wt/withtarget/engines/rust/target" "$out"
-for name in merged open dirty detached withtarget closed untracked; do
+expect_in "kept: $wt/withtarget" "$out"
+expect_in "would remove target folder $wt/merged/target" "$out"
+case $out in
+  *"target folder $wt/withtarget"*)
+    echo "target folders of kept worktrees should not be listed, got: $out" >&2
+    exit 1
+    ;;
+esac
+expect_in "would remove worktree $wt/slash" "$out"
+expect_in "kept: $wt/failing" "$out"
+expect_in "kept: $wt/locked (locked)" "$out"
+count=$(printf '%s\n' "$out" | grep -cF "would remove target folder $wt/sp ace/target" || true)
+if [ "$count" != 1 ]; then
+  echo "expected the target folder of \"sp ace\" once, got $count in: $out" >&2
+  exit 1
+fi
+expect_in "would remove worktree $wt/sp ace" "$out"
+expect_exists "$wt/locked/target"
+for name in merged open dirty detached withtarget closed untracked "sp ace" locked slash failing; do
   expect_exists "$wt/$name"
 done
 expect_exists "$wt/withtarget/engines/rust/target/debug/out"
@@ -80,14 +110,17 @@ expect_in "removed worktree $wt/merged" "$out"
 expect_gone "$wt/merged"
 expect_gone "$wt/closed"
 expect_exists "$wt/untracked/scratch.txt"
-expect_gone "$wt/withtarget/engines/rust/target"
-for name in open dirty detached withtarget; do
+expect_gone "$wt/sp ace"
+expect_gone "$wt/slash"
+expect_exists "$wt/withtarget/engines/rust/target/debug/out"
+expect_exists "$wt/locked/target"
+for name in open dirty detached withtarget locked failing; do
   expect_exists "$wt/$name"
 done
 expect_exists "$wt/dirty/file.txt"
 
 echo "clean-worktrees.sh never deletes a branch"
-for branch in merged-branch open-branch dirty-branch target-branch closed-branch untracked-branch main; do
+for branch in merged-branch open-branch dirty-branch target-branch closed-branch untracked-branch space-branch locked-branch feat/slash failing-branch main; do
   git show-ref --verify --quiet "refs/heads/$branch" || {
     echo "branch $branch should still exist" >&2
     exit 1
