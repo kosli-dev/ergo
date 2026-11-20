@@ -14,18 +14,16 @@ fn root_clauses_of(
     root_clauses_in(
         &crate::lower::Scope::new(),
         sentence,
-        subject,
-        input,
-        params,
+        (subject, input, params),
+        &[],
     )
 }
 
 fn root_clauses_in(
     scope: &crate::lower::Scope,
     sentence: &str,
-    subject: &Value,
-    input: &Value,
-    params: Option<&Value>,
+    (subject, input, params): (&Value, &Value, Option<&Value>),
+    aliases: &[(&str, &Value)],
 ) -> Vec<(String, String)> {
     let tree = ergo_policy_sentences::parse_check(sentence).unwrap();
     let whole = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
@@ -41,6 +39,17 @@ fn root_clauses_in(
         value: subject,
         location: crate::path::Location::input_root().key("s"),
     };
+    let mut named =
+        std::collections::BTreeMap::from([(crate::path::OUTER.to_string(), located.clone())]);
+    for (name, value) in aliases {
+        named.insert(
+            (*name).to_string(),
+            crate::path::Located {
+                value,
+                location: crate::path::Location::input_root().key(name),
+            },
+        );
+    }
     let ctx = crate::path::Ctx {
         label: None,
         item_by_item: false,
@@ -48,7 +57,7 @@ fn root_clauses_in(
         subject: located.clone(),
         input,
         params,
-        aliases: std::collections::BTreeMap::from([(crate::path::OUTER.to_string(), located)]),
+        aliases: named,
     };
     super::root_clauses(&inside, &ctx)
         .into_iter()
@@ -158,14 +167,36 @@ fn root_clauses_say_a_part_before_an_item_key_that_cant_take_a_key_by_the_parts_
         let text: Vec<String> = root_clauses_in(
             &scope,
             "every xs whose tags contains cov.m named by key, if any, exists",
-            &subject,
-            &input,
-            None,
+            (&subject, &input, None),
+            &[],
         )
         .into_iter()
         .map(|(_, text)| text)
         .collect();
         assert_eq!(text, [said], "{part:?}");
+    }
+}
+
+#[test]
+fn root_clauses_say_a_for_alias_that_is_a_key_and_cant_be_read() {
+    let scope = crate::lower::Scope::new().with_for_alias("k");
+    let subject = json!({"id": "t", "es": [{"zz": 1}]});
+    let input = json!({});
+    for (alias, said) in [
+        (json!(3), vec!["k is 3, which isn't text"]),
+        (json!(null), vec!["k is null"]),
+        (json!("a"), vec![]),
+    ] {
+        let text: Vec<String> = root_clauses_in(
+            &scope,
+            "every es whose zz is m named by k, if any, exists",
+            (&subject, &input, None),
+            &[("k", &alias)],
+        )
+        .into_iter()
+        .map(|(_, text)| text)
+        .collect();
+        assert_eq!(text, said, "{alias}");
     }
 }
 
