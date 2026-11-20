@@ -289,7 +289,6 @@ list_items / a for line and a one-line every beside a check with a named by key 
 list_items / a for line and a one-line every beside a check with a named by key that can't be read, missing, on an input that is a list / the plain check and the every and for line that read a key from $input fail as not_an_object, and the for lines that read a key from $params fail as before
 list_items / a for line and a one-line every beside a check with a named by key that can't be read, null, on an input that is a list / the plain check and the every and for line that read a key from $input fail as not_an_object, and the for lines that read a key from $params fail as before
 list_items / a for line over items that aren't objects, with a sum of or a count of whose named by key is read from the params and isn't text, on an input that is an object / say the key isn't text, and then the item that isn't an object
-list_items / a list in the middle of a name on the right of a list phrase after every is read item by item / an item with no field fails as absent, and one that isn't an object as unusable
 list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / an item whose name is null is listed as null, at the name
 list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / an item with no name is listed as null, at the item
 list_items / a list in the middle of a name, or a part that holds a list, read on the right of a list phrase, is listed as a plain check lists it / each item's value is listed with its location, and a part keeps its tag
@@ -300,7 +299,6 @@ list_items / a missing $params name and a walked part in one whose are each name
 list_items / a missing $params name and a walked part in one whose are each named, with the $params name first only in a count / the part holds more than one kind of value
 list_items / a name of a subject that is a list, walked on the right of is in, is said once / names of more than one kind fail as unusable and are said once, beside an item's own problem
 list_items / a name read from outside the item and walked on the right of is in is said once, with no item / a list of names of more than one kind fails as unusable and is said once
-list_items / a name read from outside the item and walked on the right of is in is said once, with no item / items that aren't objects fail as unusable and are said once
 list_items / a name read from outside the item that reads fine leaves a value of the wrong type to the item that holds it / a text value among numbers, and a number among patterns
 list_items / a named by key read from an input that is a list, in a count of or a sum of with whose, that or plus, when the params aren't an object / say once that the input isn't an object, then once that the params aren't, and nothing about the items
 list_items / a named by key read from an input that is a list, in a count of, a sum of, a whose, a that, a one-line every or some, a for line, an any_of, a child subject and a from line / the key holds text: every check that reads the key fails as not_an_object and says once that the input isn't an object, and so do the $applies rows and the $min_subjects row of the from line that reads it
@@ -316,7 +314,6 @@ list_items / a part at the start of a path on a subject that is a list, missing,
 list_items / a part read inside a whose on a subject that is a list, missing, null or not an object / a missing field fails as absent and names the item of the subject once
 list_items / a part read inside a whose on a subject that is a list, missing, null or not an object / a null field fails as null
 list_items / a part read inside a whose on a subject that is a list, missing, null or not an object / a part that isn't an object fails as unusable
-list_items / a part that holds a list, walked after matches in a whose, is said once / items that aren't objects fail as unusable and are said once
 list_items / a part that holds a list, walked after matches in a whose, is said once / values that aren't patterns fail as unusable and are said once
 list_items / a second for item that starts at an alias holding a list reads each item of it / an empty alias fails as value, and an item that isn't an object as not_an_object
 list_items / an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that / an empty alias fails as value

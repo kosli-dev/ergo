@@ -281,7 +281,7 @@ fn an_item_entry_says_its_clauses_without_its_name() {
         (list.kind, list.said[0].text.as_str()),
         (Kind::List, "is missing")
     );
-    let walked = walk_entries(&[
+    let records = [
         record(
             "item 1 of xs",
             "xs[0].v",
@@ -296,8 +296,16 @@ fn an_item_entry_says_its_clauses_without_its_name() {
             "$params.min is \"s\"",
         ),
         record("xs", "xs", "absent", "xs: is missing"),
-    ]);
-    assert_eq!(walked.roots, ["$params.min is \"s\""]);
+    ];
+    let walked = walk_entries(&records, &record_clauses(&records));
+    assert_eq!(
+        walked.roots,
+        [Clause::root(
+            "item 2 of xs",
+            Cause::Unusable,
+            "$params.min is \"s\"".to_string()
+        )]
+    );
     let said: Vec<(&str, &str)> = walked
         .entries
         .iter()

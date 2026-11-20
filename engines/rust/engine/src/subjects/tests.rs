@@ -1977,7 +1977,7 @@ fn walk_assertion(sentence: &str, input: Value, params: Value) -> crate::parts::
         sentence,
         run.verdict.cause,
         &[],
-        run.message.as_deref().unwrap_or_default(),
+        &[vec![crate::ops::message::Piece::Counted(run.parts.clone())]],
         &run.failed_items,
         &run.rich,
         Some(&run.parts),

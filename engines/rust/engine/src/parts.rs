@@ -183,15 +183,16 @@ pub fn said_clause(name: &str, cause: Cause, text: &str) -> Clause {
     }
 }
 
-fn entry_said(clause: &Clause) -> String {
-    match clause.kind {
-        Kind::Root => String::new(),
+fn entry_said(clause: &Clause) -> Option<Clause> {
+    let said = match clause.kind {
+        Kind::Root | Kind::More(_) => return None,
         _ => clause
             .said
             .first()
-            .map_or(&clause.text, |said| &said.text)
-            .clone(),
-    }
+            .cloned()
+            .unwrap_or_else(|| Clause::said(clause.cause, clause.text.clone())),
+    };
+    (!said.text.is_empty()).then_some(said)
 }
 
 fn item_outcome(cause: &str, value: &Value) -> &'static str {
@@ -223,31 +224,39 @@ fn item_read(failed: &Value) -> Value {
 /// read outside the items.
 pub struct Walked {
     pub entries: Vec<Failure>,
-    pub roots: Vec<String>,
+    pub roots: Vec<Clause>,
     pub texts: Vec<String>,
 }
 
-/// Builds the item and list entries of a walk from its failed items.
-pub fn walk_entries(failed_items: &[Value]) -> Walked {
+/// The clause each failed item's text is, as `said_clause` reads it.
+pub fn record_clauses(failed_items: &[Value]) -> Vec<Clause> {
+    failed_items
+        .iter()
+        .map(|f| {
+            let cause = Cause::from_name(f.get("cause").and_then(Value::as_str).unwrap_or(""));
+            said_clause(
+                &text_of(f, "item"),
+                cause.unwrap_or(Cause::Value),
+                &text_of(f, "ergo/text"),
+            )
+        })
+        .collect()
+}
+
+/// Builds the item and list entries of a walk from its failed items and the
+/// clause each one says.
+pub fn walk_entries(failed_items: &[Value], clauses: &[Clause]) -> Walked {
     let texts: Vec<String> = failed_items
         .iter()
         .map(|f| text_of(f, "ergo/text"))
         .collect();
     let items: Vec<String> = failed_items.iter().map(|f| text_of(f, "item")).collect();
-    let clauses: Vec<Clause> = failed_items
-        .iter()
-        .zip(items.iter().zip(&texts))
-        .map(|(f, (item, text))| {
-            let cause = Cause::from_name(f.get("cause").and_then(Value::as_str).unwrap_or(""));
-            said_clause(item, cause.unwrap_or(Cause::Value), text)
-        })
-        .collect();
-    let roots: Vec<String> = clauses
+    let roots: Vec<Clause> = clauses
         .iter()
         .filter(|clause| clause.kind == Kind::Root && !clause.text.is_empty())
-        .map(|clause| clause.text.clone())
+        .cloned()
         .collect();
-    let owned: Vec<String> = clauses.iter().map(entry_said).collect();
+    let owned: Vec<Option<Clause>> = clauses.iter().map(entry_said).collect();
     let mut entries = Vec::new();
     let mut done: Vec<&str> = Vec::new();
     for (k, name) in items.iter().enumerate() {
@@ -256,9 +265,16 @@ pub fn walk_entries(failed_items: &[Value]) -> Walked {
         }
         done.push(name);
         let same: Vec<usize> = (0..items.len()).filter(|j| &items[*j] == name).collect();
-        if same.iter().all(|j| owned[*j].is_empty()) {
+        let mut said: Vec<Clause> = Vec::new();
+        for own in same.iter().filter_map(|j| owned[*j].as_ref()) {
+            if !said.iter().any(|s| s.text == own.text) {
+                said.push(own.clone());
+            }
+        }
+        if said.is_empty() {
             continue;
         }
+        let item = same.iter().any(|j| clauses[*j].kind != Kind::List);
         let causes = same.iter().filter_map(|j| {
             Cause::from_name(
                 failed_items[*j]
@@ -272,27 +288,21 @@ pub fn walk_entries(failed_items: &[Value]) -> Walked {
             .iter()
             .map(|j| {
                 let mut read = item_read(&failed_items[*j]);
-                if text_of(&failed_items[*j], "path") == *name && is_item(name) {
+                if text_of(&failed_items[*j], "path") == *name && item {
                     read["name"] = json!(position_name(name));
                 }
                 read
             })
             .collect();
-        let mut said: Vec<String> = Vec::new();
-        for j in &same {
-            if !owned[*j].is_empty() {
-                crate::ops::push_new(&mut said, owned[*j].clone());
-            }
-        }
         let part = Part {
             name: name.clone(),
             cause,
             inputs,
             failures: Vec::new(),
-            message: said.join("; "),
+            message: crate::ops::clause::text(&said),
         };
         let first = &failed_items[k];
-        entries.push(if is_item(name) {
+        entries.push(if item {
             let seen = first
                 .get("ergo/item")
                 .filter(|s| s.is_object())
