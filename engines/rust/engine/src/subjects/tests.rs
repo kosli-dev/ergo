@@ -118,16 +118,15 @@ fn a_from_that_reaches_a_list_of_subjects_through_a_param_key() {
 }
 
 #[test]
-fn a_subject_without_a_readable_id_has_a_null_id_and_points_at_where_the_read_stopped() {
+fn a_subject_without_a_readable_id_has_a_null_id_that_never_repeats() {
     let r = run(
         json!({"thing": {"from": "ds", "identified_by": "meta.id"}}),
         json!({"ds": [{"meta": {}}, {"x": 1}]}),
     );
     let unique = &rows(&r, "$unique_ids")[0];
-    assert_eq!(unique["passed"], json!(false));
     assert_eq!(
         input_of(unique, 0),
-        json!({"name": "repeated thing ids", "value": [null], "locations": ["/ds/0/meta", "/ds/1"]})
+        json!({"name": "repeated thing ids", "value": [], "locations": []})
     );
 }
 

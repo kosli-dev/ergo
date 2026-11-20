@@ -2099,7 +2099,11 @@ fn same_id(a: &Value, b: &Value) -> bool {
 }
 
 fn repeated_ids(judged: &[Judged]) -> (Vec<Value>, Vec<String>) {
-    let mut sorted: Vec<(usize, &Judged)> = judged.iter().enumerate().collect();
+    let mut sorted: Vec<(usize, &Judged)> = judged
+        .iter()
+        .enumerate()
+        .filter(|(_, j)| !j.id.is_null())
+        .collect();
     sorted.sort_by(|a, b| order(&a.1.id, &b.1.id));
     let mut groups: Vec<Vec<(usize, &Judged)>> = Vec::new();
     for item in sorted {
