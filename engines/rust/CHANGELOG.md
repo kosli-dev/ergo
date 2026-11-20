@@ -24,6 +24,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A `named by` key that can't be read is said once before the items, with each item's own problem after it, and a count whose two sides fail in different ways takes an item with its missing end as the spec decides.
 
+- A `count of` or `sum of` says each root of its `whose` or `that` that can't be read once, first, and then what each item says on its own, without the root, and fails with the worst cause of all of them ([problems.all_said](../../spec/semantics.md#which-problems-a-message-says)). With no `k` in the params and `es` holding `[{"v": "s"}, {"v": {}}]`, `count of es.v that is m named by $params.k is 0` says `$params.k is missing; item 1 of es: v is "s", which isn't an object; item 2 of es: v: m is missing` and fails as `not_an_object`, where it said the key inside each item and failed as `absent`. With `$params.q` holding `"s"` and no `k` in the input, `sum of rs.n that is at least $params.q named by $input.k is 1` says `$params.q is "s", which isn't an object; $input.k is missing` and fails as `unusable`. A key that isn't text is said once, before items that say only their own reads, like `$params.k is 3, which isn't text; item 1 of es: zz is missing, and m is missing` (D14 of #688), and a root before a key the item holds, like `$input.m` in `$input.m named by key`, is said once with the item saying only its key (D10). The assertion of such a count says only its roots, and each item is an `item` entry under it.
+
 - The Rust engine does not yet say every item on a `from` line without `every` (D8 of #688), and the shapes that `spec/OPEN.md` lists under "Left for a later PR" keep the old message. Their cases are in `known-failures.txt`.
 
 ### Fixed
