@@ -292,12 +292,22 @@ _m_holder(step) := "a list" if is_number(step)
 
 _m_holder(step) := "an object" if not is_number(step)
 
-_m_faults(subj, check) := _m_with_text_item_faults(subj, check, [_m_isnt(s.name, s.value, kind) |
+_m_faults(subj, check) := _m_with_text_item_faults(subj, check, _m_faults_of(subj, check))
+
+_m_item_faults(item, check) := _m_with_item_list_faults(item, check, _m_faults_of(item, check))
+
+_m_with_item_list_faults(item, check, faults) := array.concat(faults, ts) if {
+	check.ignoring
+	not _is_ref(object.get(check, "values", null))
+	ts := _m_text_item_faults(item, check)
+} else := faults
+
+_m_faults_of(subj, check) := [_m_isnt(s.name, s.value, kind) |
 	some f in _m_fault(subj, check)
 	s := _m_shown(subj, f[0])
 	s.state == "value"
 	kind := f[1]
-])
+]
 
 _m_with_text_item_faults(subj, check, faults) := array.concat(faults, ts) if {
 	check.ignoring
