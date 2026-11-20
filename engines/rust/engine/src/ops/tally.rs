@@ -649,14 +649,21 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         at.subject = item.item.clone();
         at.label = None;
         let focus = walk::focus_ctx(item, &outer);
-        let verdicts: Vec<Cause> = counted
-            .whose
-            .iter()
-            .map(|check| walk::focus_verdict(check, item, &at, &focus).0.cause)
-            .collect();
+        let mut verdicts: Vec<Cause> = Vec::new();
+        let mut before_key: Vec<Cause> = Vec::new();
+        for check in &counted.whose {
+            let (verdict, lost) = walk::focus_verdict(check, item, &at, &focus);
+            if verdict.cause.is_failure()
+                && let Some(said) = said_before_key(check, item, lost, &focus, &outer)
+            {
+                before_key.extend(said.into_iter().map(|(cause, _)| cause));
+            }
+            verdicts.push(verdict.cause);
+        }
         let undecided = verdicts.iter().filter(|cause| cause.is_failure()).copied();
         let before = causes.len();
         causes.extend(undecided);
+        causes.extend(before_key);
         if causes.len() > before || verdicts.contains(&Cause::Value) {
             continue;
         }
@@ -1490,11 +1497,30 @@ fn before_unfit_key(check: &Check, focus: &Ctx, outer: &Ctx) -> Option<Vec<(Caus
                 said.push((cause, super::message::root_text(&before, focus, cause)));
             }
             (None, Some(value)) if value.is_object() => {}
+            (None, Some(value)) => {
+                said.push((
+                    Cause::Unusable,
+                    super::message::isnt(&name::name(&before), value, "an object"),
+                ));
+            }
             _ if flaw == Cause::Unusable => return None,
             _ => {}
         }
     }
     found
+}
+
+fn said_before_key(
+    check: &Check,
+    item: &walk::WalkItem,
+    lost: bool,
+    focus: &Ctx,
+    outer: &Ctx,
+) -> Option<Vec<(Cause, String)>> {
+    if lost || item.end.is_none() || item.rest.is_empty() || !walk::reads_focus(check) {
+        return None;
+    }
+    before_unfit_key(check, focus, outer)
 }
 
 fn said_text(said: &Clause) -> String {
@@ -1741,12 +1767,7 @@ pub fn counted_said(counted: &Counted, ctx: &Ctx, cause: Cause) -> (Vec<Clause>,
                 let (verdict, lost) = walk::focus_verdict(check, item, &at, &focus);
                 if verdict.cause.is_failure() {
                     undecided = true;
-                    if !lost
-                        && item.end.is_some()
-                        && !item.rest.is_empty()
-                        && walk::reads_focus(check)
-                        && let Some(before) = before_unfit_key(check, &focus, &outer)
-                    {
+                    if let Some(before) = said_before_key(check, item, lost, &focus, &outer) {
                         for key in super::message::key_clauses(&[check], &outer) {
                             match found.iter().position(|(_, said)| *said == key) {
                                 Some(at) => {
