@@ -477,7 +477,7 @@ pub struct Ran {
     pub failed_items: Option<Vec<Value>>,
     pub rich: Vec<Value>,
     pub message: Option<String>,
-    pub parts: Option<Vec<String>>,
+    pub parts: Option<Vec<clause::Clause>>,
 }
 
 thread_local! {

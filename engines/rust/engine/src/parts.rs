@@ -1,5 +1,6 @@
 use crate::cause::Cause;
 use crate::ops::Input;
+use crate::ops::clause::{Clause, Kind};
 use crate::path::Outcome;
 use serde_json::{Map, Value, json};
 
@@ -163,15 +164,34 @@ pub fn position_name(item: &str) -> String {
     format!("{list}[{at}]")
 }
 
-fn entry_text(text: &str, name: &str) -> String {
-    match text.strip_prefix(&format!("{name}: ")) {
-        Some(rest) => rest.to_string(),
-        None => text.to_string(),
+/// The clause a failed item's text is: an item with what it says without its
+/// name, a root read outside the items, or a list that failed while walking.
+pub fn said_clause(name: &str, cause: Cause, text: &str) -> Clause {
+    let entry = text.strip_prefix(&format!("{name}: ")).unwrap_or(text);
+    if !is_item(name) {
+        Clause {
+            said: vec![Clause::said(cause, entry.to_string())],
+            ..Clause::list(name, cause, text.to_string())
+        }
+    } else if text.is_empty() || !is_item(text) {
+        Clause::root(name, cause, text.to_string())
+    } else if entry.len() < text.len() {
+        let said = vec![Clause::said(cause, entry.to_string())];
+        Clause::item(name, cause, String::new(), said)
+    } else {
+        Clause::item(name, cause, text.to_string(), Vec::new())
     }
 }
 
-fn root_text(item: &str, text: &str) -> bool {
-    !text.is_empty() && is_item(item) && !is_item(text)
+fn entry_said(clause: &Clause) -> String {
+    match clause.kind {
+        Kind::Root => String::new(),
+        _ => clause
+            .said
+            .first()
+            .map_or(&clause.text, |said| &said.text)
+            .clone(),
+    }
 }
 
 fn item_outcome(cause: &str, value: &Value) -> &'static str {
@@ -214,23 +234,20 @@ pub fn walk_entries(failed_items: &[Value]) -> Walked {
         .map(|f| text_of(f, "ergo/text"))
         .collect();
     let items: Vec<String> = failed_items.iter().map(|f| text_of(f, "item")).collect();
-    let roots: Vec<String> = items
+    let clauses: Vec<Clause> = failed_items
         .iter()
-        .zip(&texts)
-        .filter(|(item, text)| root_text(item, text))
-        .map(|(_, text)| text.clone())
-        .collect();
-    let owned: Vec<String> = items
-        .iter()
-        .zip(&texts)
-        .map(|(item, text)| {
-            if roots.is_empty() || !root_text(item, text) {
-                text.clone()
-            } else {
-                String::new()
-            }
+        .zip(items.iter().zip(&texts))
+        .map(|(f, (item, text))| {
+            let cause = Cause::from_name(f.get("cause").and_then(Value::as_str).unwrap_or(""));
+            said_clause(item, cause.unwrap_or(Cause::Value), text)
         })
         .collect();
+    let roots: Vec<String> = clauses
+        .iter()
+        .filter(|clause| clause.kind == Kind::Root && !clause.text.is_empty())
+        .map(|clause| clause.text.clone())
+        .collect();
+    let owned: Vec<String> = clauses.iter().map(entry_said).collect();
     let mut entries = Vec::new();
     let mut done: Vec<&str> = Vec::new();
     for (k, name) in items.iter().enumerate() {
@@ -264,7 +281,7 @@ pub fn walk_entries(failed_items: &[Value]) -> Walked {
         let mut said: Vec<String> = Vec::new();
         for j in &same {
             if !owned[*j].is_empty() {
-                crate::ops::push_new(&mut said, entry_text(&owned[*j], name));
+                crate::ops::push_new(&mut said, owned[*j].clone());
             }
         }
         let part = Part {
@@ -431,7 +448,9 @@ fn levels_of(entry: Failure, input: &Value) -> Leveled {
     } else if let Some(rest) = text.strip_prefix(&outer).filter(|_| said.len() > 1) {
         rest.to_string()
     } else {
-        entry_text(&text, &leaf)
+        text.strip_prefix(&format!("{leaf}: "))
+            .unwrap_or(&text)
+            .to_string()
     };
     let mut entry = entry;
     match &mut entry {

@@ -1279,7 +1279,10 @@ fn a_walk_row_keeps_roots_and_items_apart() {
     );
     let kinds: Vec<Kind> = out.parts.iter().map(|part| part.kind).collect();
     assert_eq!(kinds, [Kind::Root, Kind::Root, Kind::Item]);
-    assert_eq!(out.parts[0].text, "$params.min is \"s\", which isn't a number");
+    assert_eq!(
+        out.parts[0].text,
+        "$params.min is \"s\", which isn't a number"
+    );
     assert_eq!(out.parts[2].name, "item 3 of xs");
     assert_eq!(out.parts[2].said[0].text, "v is missing");
     assert_eq!(

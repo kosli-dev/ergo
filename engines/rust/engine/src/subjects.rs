@@ -1850,7 +1850,7 @@ fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
 fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let mut failed_items = None;
     let mut rich: Vec<Value> = Vec::new();
-    let mut pieces: Option<Vec<String>> = None;
+    let mut pieces: Option<Vec<ops::clause::Clause>> = None;
     let mut said: Vec<String> = Vec::new();
     let mut texts: Vec<Said> = Vec::new();
     let verdicts: Vec<(&Filter, Verdict)> = filters
@@ -2411,7 +2411,7 @@ fn default_said(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Said {
 
 struct RanItems {
     rich: Vec<Value>,
-    pieces: Option<Vec<String>>,
+    pieces: Option<Vec<ops::clause::Clause>>,
     checks: Vec<Check>,
     verdicts: Vec<Verdict>,
     said: Vec<Option<Said>>,
@@ -2543,7 +2543,7 @@ fn walk_part(
     message: &str,
     failed: &[Value],
     rich: &[Value],
-    pieces: Option<&[String]>,
+    pieces: Option<&[ops::clause::Clause]>,
     walk: &ops::walk::Walk,
     ctx: &Ctx,
     roots: bool,
@@ -2580,7 +2580,8 @@ fn walk_part(
                     .is_some_and(|t| p.iter().any(|piece| piece == t))
             })
     };
-    if let Some(pieces) = pieces.filter(|p| p.len() != failed.len() && !all_said(p)) {
+    let lines = pieces.map(ops::clause::lines);
+    if let Some(pieces) = lines.filter(|p| p.len() != failed.len() && !all_said(p)) {
         let capped = message
             .split("; ")
             .any(|piece| ops::message::cap_note(piece).is_some());
@@ -3096,7 +3097,7 @@ fn check_row(
     };
     let mut failed_items = None;
     let mut rich: Vec<Value> = Vec::new();
-    let mut pieces: Option<Vec<String>> = None;
+    let mut pieces: Option<Vec<ops::clause::Clause>> = None;
     let mut said: Vec<Option<Said>> = Vec::new();
     let checks: Vec<Check> = plan
         .items

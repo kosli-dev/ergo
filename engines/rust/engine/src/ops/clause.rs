@@ -95,6 +95,14 @@ pub fn text(clauses: &[Clause]) -> String {
         .join("; ")
 }
 
+/// The text each clause gives on its own, the way it reads in a row.
+pub fn lines(clauses: &[Clause]) -> Vec<String> {
+    clauses
+        .iter()
+        .map(|clause| text(std::slice::from_ref(clause)))
+        .collect()
+}
+
 fn pieces(item: &Clause) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     if !item.text.is_empty() {

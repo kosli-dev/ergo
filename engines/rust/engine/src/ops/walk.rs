@@ -1,4 +1,4 @@
-use super::clause::Clause;
+use super::clause::{self, Clause, Kind};
 use super::message;
 use super::{Check, Input, SidePath, Verdict, read_path, run as run_check};
 use crate::cause::Cause;
@@ -635,7 +635,7 @@ pub struct Run {
     pub failed_items: Vec<Value>,
     pub rich: Vec<Value>,
     pub message: Option<String>,
-    pub parts: Vec<String>,
+    pub parts: Vec<Clause>,
 }
 
 /// The name of the first list a walk reads, as its inputs name it, like `xs`
@@ -1643,7 +1643,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         inputs.dedup();
         with_fields(&mut inputs, &walked.name, &walk.path, ctx);
         let mut cause = outcome.cause().unwrap_or(Cause::Unusable);
-        let parts: Vec<String> = if walked.failures.is_empty() {
+        let texts: Vec<String> = if walked.failures.is_empty() {
             let keyed = super::key_base::of_path(&walk.path, true, &outer).is_some();
             let said = match cause {
                 Cause::Absent => Some(format!("{} is missing", walked.name)),
@@ -1689,11 +1689,19 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         } else {
             walked.failures.iter().map(|f| f.msg.clone()).collect()
         };
+        let parts: Vec<Clause> = if walked.failures.is_empty() {
+            texts
+                .iter()
+                .map(|text| Clause::said(cause, text.clone()))
+                .collect()
+        } else {
+            walked.failures.iter().map(failure_clause).collect()
+        };
         return Run {
             verdict: Verdict { cause, inputs },
             failed_items: walked.failures.iter().map(Failure::to_json).collect(),
             rich: walked.failures.iter().map(Failure::to_rich_json).collect(),
-            message: Some(message::joined(parts.clone())),
+            message: Some(message::joined(texts)),
             parts,
         };
     }
@@ -1706,14 +1714,14 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     let mut fails: Vec<&Failure> = walked.failures.iter().collect();
     fails.extend(judged.iter().filter_map(|j| j.failure.as_ref()));
     let cause = cause_of(walk, &walked, &judged, &fails);
-    let mut sorted_msgs: Vec<String> = Vec::new();
+    let mut sorted_parts: Vec<Clause> = Vec::new();
     let rich: Vec<Value> = fails.iter().map(|f| f.to_rich_json()).collect();
     let failed_items = if cause == Cause::Satisfied {
         Vec::new()
     } else {
         let mut sorted = fails.clone();
         sorted.sort_by(|a, b| a.rank.cmp(&b.rank));
-        sorted_msgs = sorted.iter().map(|f| f.msg.clone()).collect();
+        sorted_parts = sorted.iter().map(|f| failure_clause(f)).collect();
         sorted.iter().map(|f| f.to_json()).collect()
     };
     let tag = path::part_tag(&walk.path, &outer).map(|(name, id)| super::Part { name, id });
@@ -1734,18 +1742,22 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     inputs.sort_by(|a, b| a.name.cmp(&b.name));
     inputs.dedup();
     with_fields(&mut inputs, &walked.name, &walk.path, ctx);
-    let parts: Vec<String> = if cause == Cause::Satisfied {
+    let parts: Vec<Clause> = if cause == Cause::Satisfied {
         Vec::new()
-    } else if sorted_msgs.is_empty() {
-        vec![first_list(&walk.path, &outer)]
+    } else if sorted_parts.is_empty() {
+        vec![Clause::list(
+            &walked.name,
+            cause,
+            first_list(&walk.path, &outer),
+        )]
     } else {
-        sorted_msgs
+        sorted_parts
     };
     Run {
         verdict: Verdict { cause, inputs },
         failed_items,
         rich,
-        message: (!parts.is_empty()).then(|| message::joined(parts.clone())),
+        message: (!parts.is_empty()).then(|| message::joined(clause::lines(&parts))),
         parts,
     }
 }
@@ -1829,10 +1841,9 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
                 ctx.subject.value,
                 "an object",
             )),
-            parts: vec![message::isnt(
-                ctx.subject_label(),
-                ctx.subject.value,
-                "an object",
+            parts: vec![Clause::said(
+                Cause::NotAnObject,
+                message::isnt(ctx.subject_label(), ctx.subject.value, "an object"),
             )],
         };
     }
@@ -1849,7 +1860,7 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
         if let Some((cause, text)) = message::root_flaw(&whose, &outer_ctx) {
             row.verdict.cause = Cause::worst([cause, row.verdict.cause]).unwrap_or(cause);
             row.message = Some(message::joined(message::with_roots(
-                row.parts.clone(),
+                clause::lines(&row.parts),
                 &text,
             )));
             return row;
@@ -1864,22 +1875,21 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
             && !message::blocked_of(&walk.path, &outer_ctx).is_empty();
         if !blocked && let Some((_, roots)) = list_beside_roots(walk, &outer_ctx) {
             let mut said = faults;
-            said.extend(std::mem::take(&mut row.parts));
-            row.parts = roots_then(roots, said);
-            row.message = Some(message::joined(row.parts.clone()));
+            said.extend(clause::lines(&std::mem::take(&mut row.parts)));
+            say(&mut row, roots_then(roots, said));
             return row;
         }
-        row.parts = faults;
         let whose: Vec<&Check> = walk.whose.iter().collect();
-        if let Some((_, text)) = message::root_flaw(&whose, &outer_ctx) {
-            row.parts = message::with_roots(std::mem::take(&mut row.parts), &text);
-        }
-        row.message = Some(message::joined(row.parts.clone()));
+        let texts = match message::root_flaw(&whose, &outer_ctx) {
+            Some((_, text)) => message::with_roots(faults, &text),
+            None => faults,
+        };
+        say(&mut row, texts);
         return row;
     }
     let outer_ctx = outer(ctx);
     let raw_cause = row.verdict.cause;
-    let raw_parts = row.parts.clone();
+    let raw_parts = clause::lines(&row.parts);
     let beside = if raw_cause == Cause::Satisfied {
         None
     } else {
@@ -1888,10 +1898,21 @@ fn run_rows(walk: &Walk, ctx: &Ctx) -> Run {
     let mut row = rooted_row(walk, ctx, &outer_ctx, row);
     if let Some((cause, roots)) = beside {
         row.verdict.cause = Cause::worst([cause, raw_cause]).unwrap_or(cause);
-        row.parts = roots_then(roots, raw_parts);
-        row.message = Some(message::joined(row.parts.clone()));
+        say(&mut row, roots_then(roots, raw_parts));
     }
     row
+}
+
+fn say(row: &mut Run, texts: Vec<String>) {
+    row.message = Some(message::joined(texts.clone()));
+    row.parts = texts
+        .into_iter()
+        .map(|text| Clause::said(row.verdict.cause, text))
+        .collect();
+}
+
+fn failure_clause(failure: &Failure) -> Clause {
+    crate::parts::said_clause(&failure.item, failure.cause, &failure.msg)
 }
 
 fn rooted_row(walk: &Walk, ctx: &Ctx, outer_ctx: &Ctx, mut row: Run) -> Run {
@@ -1922,9 +1943,8 @@ fn rooted_row(walk: &Walk, ctx: &Ctx, outer_ctx: &Ctx, mut row: Run) -> Run {
                 row.verdict.cause = Cause::worst([cause, row.verdict.cause]).unwrap_or(cause);
             }
             if ctx.label.is_some() && !in_a_for_line(ctx) && !row.parts.is_empty() {
-                let parts = message::with_roots(std::mem::take(&mut row.parts), &text);
-                row.message = Some(message::joined(parts.clone()));
-                row.parts = parts;
+                let parts = message::with_roots(clause::lines(&row.parts), &text);
+                say(&mut row, parts);
             }
             return row;
         }
@@ -1933,11 +1953,10 @@ fn rooted_row(walk: &Walk, ctx: &Ctx, outer_ctx: &Ctx, mut row: Run) -> Run {
             && ctx.label.is_some()
             && !in_a_for_line(ctx)
             && !row.parts.is_empty()
-            && row.parts.iter().any(|part| part.starts_with("item "))
+            && row.parts.iter().any(|part| part.kind == Kind::Item)
         {
-            let parts = message::with_roots(std::mem::take(&mut row.parts), &text);
-            row.message = Some(message::joined(parts.clone()));
-            row.parts = parts;
+            let parts = message::with_roots(clause::lines(&row.parts), &text);
+            say(&mut row, parts);
             return row;
         }
         let UpFront {
@@ -1952,7 +1971,7 @@ fn rooted_row(walk: &Walk, ctx: &Ctx, outer_ctx: &Ctx, mut row: Run) -> Run {
             None,
         );
         if let Some(message) = message {
-            row.parts = vec![message.clone()];
+            row.parts = vec![Clause::said(cause, message.clone())];
             row.message = Some(message);
         }
         row.verdict.cause = cause;
