@@ -1902,3 +1902,42 @@ fn a_count_or_a_sum_whose_list_is_missing_null_or_not_a_list_says_it_as_a_list()
         }
     }
 }
+
+fn row_message(sentence: &str, items: Value, params: Value) -> String {
+    let check = lowered(sentence);
+    let Check::Tally(tally) = &check else {
+        panic!("{sentence} is not a count or a sum");
+    };
+    let input = json!({"things": [{"items": items}]});
+    let ctx = Ctx {
+        label: None,
+        item_by_item: false,
+        in_option: false,
+        subject: Located {
+            value: &input["things"][0],
+            location: Location::input_root().key("things").index(0),
+        },
+        input: &input,
+        params: Some(&params),
+        aliases: BTreeMap::new(),
+    };
+    let verdict = crate::ops::run(&check, &ctx);
+    with_all_items(
+        tally,
+        &ctx,
+        verdict.cause,
+        super::super::message::message(&check, &ctx, &verdict),
+    )
+}
+
+#[test]
+fn a_count_after_a_side_says_three_items_and_then_and_n_more() {
+    assert_eq!(
+        row_message(
+            "count of items whose v is 1 is $params.n",
+            json!([{}, {}, {}, {}]),
+            json!({}),
+        ),
+        "$params.n is missing, and item 1 of items: v is missing; item 2 of items: v is missing; item 3 of items: v is missing; and 1 more"
+    );
+}
