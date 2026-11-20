@@ -1,5 +1,6 @@
 use super::clause::{self, Clause};
 use super::compare::{self, Cmp, Compare};
+use super::message::Piece;
 use super::time::{self, NANOS_PER_SECOND, SECONDS_PER_DAY, Time};
 use super::walk::{self, Options};
 use super::{Check, Input, Part, SidePath, Verdict, push_new, read_path, verdict};
@@ -1271,52 +1272,73 @@ pub(super) fn counted_fault_clauses(
 
 /// The message of a `count of` or `sum of` row with every item it can't
 /// read said after the rest, in list order.
-pub fn with_all_items(check: &Tally, ctx: &Ctx, cause: Cause, message: String) -> String {
-    if !check.counts() || !cause.is_failure() {
-        return message;
-    }
-    let items: Vec<String> = check
-        .counted_clauses(ctx, cause)
-        .iter()
-        .filter(|said| said.kind != clause::Kind::Root)
-        .map(said_text)
-        .collect();
+pub fn with_all_items(check: &Tally, ctx: &Ctx, cause: Cause, said: Vec<Piece>) -> String {
+    let items: Vec<Clause> = if check.counts() && cause.is_failure() {
+        check
+            .counted_clauses(ctx, cause)
+            .into_iter()
+            .filter(|clause| clause.kind != clause::Kind::Root)
+            .collect()
+    } else {
+        Vec::new()
+    };
     if items.is_empty() {
-        return message;
+        return super::message::pieces_text(&said);
     }
-    let mut parts: Vec<String> = message
-        .split("; ")
-        .filter(|piece| {
-            !piece.is_empty()
-                && !piece.starts_with("item ")
-                && super::message::cap_note(piece).is_none()
-                && !items.iter().any(|item| item == piece)
-        })
-        .map(str::to_string)
-        .collect();
+    let mut own: Vec<String> = Vec::new();
+    let mut counted: Vec<Clause> = Vec::new();
+    let mut at: Option<usize> = None;
+    for piece in said {
+        match piece {
+            Piece::Said(text) => own.push(text),
+            Piece::Counted(clauses) => {
+                at.get_or_insert(own.len());
+                counted.extend(
+                    clauses
+                        .into_iter()
+                        .filter(|clause| clause.kind == clause::Kind::Root),
+                );
+            }
+        }
+    }
     let from_params = check
         .counted_paths()
         .iter()
         .any(|path| path.start == path::Start::Params && path.steps.is_empty());
-    if from_params
-        && let Some(params) =
-            super::message::params_that_arent_an_object(&Check::Tally(check.clone()), ctx)
-        && !parts.contains(&params)
-    {
-        parts.insert(0, params);
-    }
-    for item in items {
-        if !parts
-            .iter()
-            .any(|part| part.split(", and ").any(|p| p == item))
-        {
-            parts.push(item);
+    let params = from_params
+        .then(|| super::message::params_that_arent_an_object(&Check::Tally(check.clone()), ctx))
+        .flatten()
+        .filter(|params| {
+            !own.contains(params) && !counted.iter().any(|clause| clause.text == *params)
+        });
+    counted.extend(items);
+    let listed = clause::text(&clause::shown(&counted));
+    let text = match at {
+        Some(at) => {
+            own.insert(at, listed);
+            own.join(", and ")
         }
+        None if own.is_empty() => listed,
+        None => format!("{}; {listed}", own.join(", and ")),
+    };
+    match params {
+        Some(params) => format!("{params}; {text}"),
+        None => text,
     }
-    super::message::joined(parts)
 }
 
-pub fn with_walked_roots(check: &Tally, ctx: &Ctx, message: String) -> String {
+/// The message of a `count of` or `sum of` row: the check's own pieces,
+/// with the roots its whose reads first when a walked root can't be read,
+/// or else with every item it can't read.
+pub fn row_message(check: &Tally, ctx: &Ctx, cause: Cause, said: Vec<Piece>) -> String {
+    let text = super::message::pieces_text(&said);
+    match with_walked_roots(check, ctx, text.clone()) {
+        rooted if rooted != text => rooted,
+        _ => with_all_items(check, ctx, cause, said),
+    }
+}
+
+fn with_walked_roots(check: &Tally, ctx: &Ctx, message: String) -> String {
     let outer = outer_ctx(ctx);
     let whose: Vec<&Check> = tally_sides(check)
         .into_iter()
@@ -1352,12 +1374,12 @@ pub fn tally_sides(check: &Tally) -> Vec<&Side> {
         .collect()
 }
 
-pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> {
+pub fn derived_clauses(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<Vec<Clause>> {
     derived
         .terms
         .iter()
         .filter_map(|term| match term {
-            Term::Counted(counted) => counted_text(counted, ctx, cause),
+            Term::Counted(counted) => counted_clauses(counted, ctx, cause),
             _ => None,
         })
         .collect()
@@ -1418,9 +1440,9 @@ pub fn without_roots(check: &Check) -> Option<Check> {
     }
 }
 
-pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String> {
+pub fn counted_clauses(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<Vec<Clause>> {
     let said = counted_said(counted, ctx, cause).0;
-    (!said.is_empty()).then(|| clause::text(&clause::shown(&said)))
+    (!said.is_empty()).then_some(said)
 }
 
 fn told(item: &str, cause: Cause, said: &str) -> Clause {

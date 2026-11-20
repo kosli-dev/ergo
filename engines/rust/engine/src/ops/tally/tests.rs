@@ -1926,7 +1926,7 @@ fn row_message(sentence: &str, items: Value, params: Value) -> String {
         tally,
         &ctx,
         verdict.cause,
-        super::super::message::message(&check, &ctx, &verdict),
+        super::super::message::pieces(&check, &ctx, &verdict),
     )
 }
 

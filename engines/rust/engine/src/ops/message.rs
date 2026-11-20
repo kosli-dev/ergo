@@ -411,6 +411,45 @@ fn params_position_fault(check: &Check, ctx: &Ctx) -> Vec<String> {
 
 pub const FALLBACK: &str = "the check is false";
 
+/// One part of a check's message: a text, or what a `count of` or `sum of`
+/// says, as its clauses.
+#[derive(Debug, Clone, PartialEq)]
+pub enum Piece {
+    Said(String),
+    Counted(Vec<Clause>),
+}
+
+impl Piece {
+    #[must_use]
+    pub fn text(&self) -> String {
+        match self {
+            Piece::Said(text) => text.clone(),
+            Piece::Counted(clauses) => clause::text(&clause::shown(clauses)),
+        }
+    }
+}
+
+/// The message the pieces make, joined with `, and `.
+#[must_use]
+pub fn pieces_text(pieces: &[Piece]) -> String {
+    pieces
+        .iter()
+        .map(Piece::text)
+        .collect::<Vec<_>>()
+        .join(", and ")
+}
+
+fn push_piece(pieces: &mut Vec<Piece>, piece: Piece) {
+    let text = piece.text();
+    if !pieces.iter().any(|said| said.text() == text) {
+        pieces.push(piece);
+    }
+}
+
+fn said_all(texts: impl IntoIterator<Item = String>) -> impl Iterator<Item = Piece> {
+    texts.into_iter().map(Piece::Said)
+}
+
 pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
     let read = path::read(path, ctx);
     if read.outcome != Outcome::Unusable
@@ -531,7 +570,10 @@ fn faults(check: &Check, ctx: &Ctx) -> Vec<(String, String)> {
         (Check::Contains(c), _) => lists::contains_faults(c, ctx),
         (Check::Matches(c), _) => lists::matches_faults(c, ctx),
         (Check::Compare(compare), _) => compare_faults(compare, ctx),
-        (Check::Tally(tally), _) => tally_faults(tally, ctx),
+        (Check::Tally(tally), _) => tally_faults(tally, ctx)
+            .into_iter()
+            .map(|(name, piece)| (name, piece.text()))
+            .collect(),
         (Check::CompareTime(time_check), _) => time_faults(time_check, ctx),
         _ => Vec::new(),
     }
@@ -736,8 +778,14 @@ pub fn null_key_parts(path: &Path, ctx: &Ctx) -> Vec<String> {
 }
 
 pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
+    pieces_text(&pieces(check, ctx, verdict))
+}
+
+/// The pieces of the message `check` gives for `verdict`, with what each
+/// `count of` or `sum of` says kept as its clauses.
+pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
     if let Check::AnyOf(any) = check {
-        return any_of_message(any, ctx);
+        return vec![Piece::Said(any_of_message(any, ctx))];
     }
     if matches!(verdict.cause, Cause::Absent | Cause::Null | Cause::Unusable) {
         let parts: Vec<String> = once_of(
@@ -747,10 +795,10 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                 .collect(),
         );
         if !parts.is_empty() {
-            return parts.join("; ");
+            return vec![Piece::Said(parts.join("; "))];
         }
     }
-    let clauses: Vec<String> = match verdict.cause {
+    let clauses: Vec<Piece> = match verdict.cause {
         Cause::Value => {
             let mut said: Vec<String> = sources(check, ctx, verdict)
                 .iter()
@@ -761,7 +809,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                     .filter(|(cause, _)| *cause == Cause::Value)
                     .map(|(_, text)| text),
             );
-            said
+            said_all(said).collect()
         }
         Cause::Absent | Cause::Null => {
             let want = state_of(verdict.cause).unwrap_or(Outcome::Absent);
@@ -774,66 +822,78 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                     .filter(|path| reads_from_a_root(path))
                     .map(name::name)
                     .collect();
-                let mut found: Vec<String> = sources(check, ctx, verdict)
-                    .iter()
-                    .filter(|i| {
-                        i.state == want
-                            || ctx.label.is_some()
-                                && !roots.contains(&i.name)
-                                && matches!(i.state, Outcome::Absent | Outcome::Null)
-                    })
-                    .map(|i| format!("{} is {}", i.stopped_at(), state_word(i.state)))
-                    .collect();
-                found.extend(
+                let mut found: Vec<Piece> = said_all(
+                    sources(check, ctx, verdict)
+                        .iter()
+                        .filter(|i| {
+                            i.state == want
+                                || ctx.label.is_some()
+                                    && !roots.contains(&i.name)
+                                    && matches!(i.state, Outcome::Absent | Outcome::Null)
+                        })
+                        .map(|i| format!("{} is {}", i.stopped_at(), state_word(i.state))),
+                )
+                .collect();
+                found.extend(said_all(
                     lists::walk_fault(check, ctx)
                         .filter(|(cause, _)| *cause == verdict.cause)
                         .map(|(_, text)| text),
-                );
+                ));
                 if let Check::Tally(tally_check) = check {
                     for side in tally::tally_sides(tally_check) {
                         if let TallySide::Derived(derived) = side {
-                            found.extend(tally::counted_texts(derived, ctx, verdict.cause));
+                            found.extend(
+                                tally::derived_clauses(derived, ctx, verdict.cause)
+                                    .into_iter()
+                                    .map(Piece::Counted),
+                            );
                         }
                     }
                 }
                 found
             } else {
-                keys
+                said_all(keys).collect()
             }
         }
         Cause::Unusable => {
-            let mut all = key_faults(check, ctx);
-            all.extend(blocked(check, ctx, false));
-            all.extend(params_position_fault(check, ctx));
-            all.extend(faults(check, ctx).into_iter().map(|(_, text)| text));
-            all.extend(blocked(check, ctx, true));
-            all.extend(
+            let mut all: Vec<Piece> = said_all(key_faults(check, ctx)).collect();
+            all.extend(said_all(blocked(check, ctx, false)));
+            all.extend(said_all(params_position_fault(check, ctx)));
+            match check {
+                Check::Tally(tally_check) => {
+                    all.extend(tally_faults(tally_check, ctx).into_iter().map(|(_, p)| p));
+                }
+                _ => all.extend(said_all(faults(check, ctx).into_iter().map(|(_, t)| t))),
+            }
+            all.extend(said_all(blocked(check, ctx, true)));
+            all.extend(said_all(
                 lists::walk_fault(check, ctx)
                     .filter(|(cause, _)| *cause == Cause::Unusable)
                     .map(|(_, text)| text),
-            );
+            ));
             let input_key = lists::input_key_fault(check, ctx);
             if matches!(check, Check::Tally(_))
                 && !input_key.is_empty()
                 && let Some(params) = params_that_arent_an_object(check, ctx)
             {
-                all.extend(input_key);
-                all.push(params);
+                all.extend(said_all(input_key));
+                all.push(Piece::Said(params));
             }
             let digits = " needs more than 15 digits";
+            let digits_only = |piece: &Piece| piece.text().ends_with(digits);
             if let Check::Tally(tally_check) = check
-                && all.iter().all(|c| c.ends_with(digits))
+                && all.iter().all(digits_only)
             {
-                all.extend(refs_blocked(tally_check, ctx));
+                all.extend(said_all(refs_blocked(tally_check, ctx)));
             }
-            let others = all.iter().any(|c| !c.ends_with(digits))
+            let others = all.iter().any(|piece| !digits_only(piece))
                 || params_that_arent_an_object(check, ctx).is_some();
             let mut once = Vec::new();
-            for clause in all {
-                if others && clause.ends_with(digits) {
+            for piece in all {
+                if others && digits_only(&piece) {
                     continue;
                 }
-                push_new(&mut once, clause);
+                push_piece(&mut once, piece);
             }
             if once.is_empty()
                 && ctx.params.is_none_or(|p| p.is_object() || p.is_null())
@@ -841,7 +901,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
             {
                 for side in tally::tally_sides(t) {
                     if let TallySide::Derived(derived) = side {
-                        push_new(&mut once, format!("{}{digits}", derived.text));
+                        push_piece(&mut once, Piece::Said(format!("{}{digits}", derived.text)));
                     }
                 }
             }
@@ -849,45 +909,46 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
         }
         Cause::NotAnObject => {
             let subject = ctx.subject.value;
-            let tallies: Vec<String> = match check {
+            let tallies: Vec<Piece> = match check {
                 Check::Tally(t) => tally::tally_sides(t)
                     .into_iter()
                     .filter_map(|side| match side {
                         TallySide::Derived(d) => Some(d),
                         TallySide::Plain(_) => None,
                     })
-                    .flat_map(|d| tally::counted_texts(d, ctx, Cause::NotAnObject))
+                    .flat_map(|d| tally::derived_clauses(d, ctx, Cause::NotAnObject))
+                    .map(Piece::Counted)
                     .collect(),
                 _ => Vec::new(),
             };
             let keyed = lists::input_key_fault(check, ctx);
             if subject.is_object() {
-                let mut found = aliases_blocked(check, ctx);
-                found.extend(lists::input_one_fault(check, ctx));
-                found.extend(keyed);
+                let mut found: Vec<Piece> = said_all(aliases_blocked(check, ctx)).collect();
+                found.extend(said_all(lists::input_one_fault(check, ctx)));
+                found.extend(said_all(keyed));
                 found.extend(tallies);
                 found
             } else if subject.is_array() && !tallies.is_empty() && !list_read_plainly(check, ctx) {
                 tallies
             } else if !keyed.is_empty() {
-                keyed
+                said_all(keyed).collect()
             } else {
-                vec![isnt(ctx.subject_label(), subject, "an object")]
+                vec![Piece::Said(isnt(ctx.subject_label(), subject, "an object"))]
             }
         }
         _ => Vec::new(),
     };
-    let mut once: Vec<String> = Vec::new();
-    for clause in clauses {
-        push_new(&mut once, clause);
+    let mut once: Vec<Piece> = Vec::new();
+    for piece in clauses {
+        push_piece(&mut once, piece);
     }
     if once.is_empty() && verdict.cause == Cause::Unusable {
-        once.extend(params_that_arent_an_object(check, ctx));
+        once.extend(said_all(params_that_arent_an_object(check, ctx)));
     }
     if once.is_empty() {
-        FALLBACK.to_string()
+        vec![Piece::Said(FALLBACK.to_string())]
     } else {
-        once.join(", and ")
+        once
     }
 }
 
@@ -1259,8 +1320,12 @@ fn tally_side_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, String)> {
     out
 }
 
-fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, String)> {
-    let mut out = tally_side_faults(check, ctx);
+fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, Piece)> {
+    let said = |(name, text): (String, String)| (name, Piece::Said(text));
+    let mut out: Vec<(String, Piece)> = tally_side_faults(check, ctx)
+        .into_iter()
+        .map(said)
+        .collect();
     for side in tally::tally_sides(check) {
         match side {
             TallySide::Derived(derived) => {
@@ -1274,7 +1339,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, String)> {
                         if part.state == Outcome::Found
                             && super::time::read_time(&part.value).is_none()
                         {
-                            out.push(fault(&part.name, &part.value, "a time"));
+                            out.push(said(fault(&part.name, &part.value, "a time")));
                             any = true;
                         }
                     }
@@ -1285,11 +1350,11 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, String)> {
                         )
                         && std::mem::discriminant(&x) != std::mem::discriminant(&y)
                     {
-                        out.push(fault(
+                        out.push(said(fault(
                             &a.name,
                             &a.value,
                             &format!("a time written like {}", print(&b.value)),
-                        ));
+                        )));
                         any = true;
                     }
                 }
@@ -1298,7 +1363,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, String)> {
                         && input.state == Outcome::Found
                         && !input.value.is_number()
                     {
-                        out.push(fault(&input.name, &input.value, "a number"));
+                        out.push(said(fault(&input.name, &input.value, "a number")));
                         any = true;
                     }
                 }
@@ -1306,15 +1371,19 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, String)> {
                     let tally::Term::Counted(term) = term else {
                         continue;
                     };
-                    if let Some(said) = tally::counted_text(term, ctx, Cause::Unusable) {
-                        out.push((String::new(), said));
+                    if let Some(clauses) = tally::counted_clauses(term, ctx, Cause::Unusable) {
+                        out.push((String::new(), Piece::Counted(clauses)));
                         any = true;
                     } else if let Some(input) = first_input(&term.path, ctx)
                         && input.state == Outcome::Found
                         && !input.value.is_array()
                         && !input.value.is_object()
                     {
-                        out.push(fault(&input.name, &input.value, "a list or an object"));
+                        out.push(said(fault(
+                            &input.name,
+                            &input.value,
+                            "a list or an object",
+                        )));
                         any = true;
                     }
                 }
@@ -1322,10 +1391,10 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, String)> {
                     first_input(path, ctx).is_none_or(|input| input.state == Outcome::Found)
                 });
                 if !any && all_found && tally::derived_value(derived, ctx).is_err() {
-                    out.push((
+                    out.push(said((
                         derived.text.clone(),
                         format!("{} needs more than 15 digits", derived.text),
-                    ));
+                    )));
                 }
             }
             TallySide::Plain(_) => {}

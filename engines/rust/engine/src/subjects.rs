@@ -2386,19 +2386,7 @@ fn walked_roots_run(check: &Check, ctx: &Ctx) -> ops::Ran {
             return ran;
         }
         if again.message.is_none() {
-            again.message = Some(match check {
-                Check::Tally(tally) => ops::tally::with_all_items(
-                    tally,
-                    ctx,
-                    again.verdict.cause,
-                    ops::tally::with_walked_roots(
-                        tally,
-                        ctx,
-                        ops::message::message(check, ctx, &again.verdict),
-                    ),
-                ),
-                _ => ops::message::message(check, ctx, &again.verdict),
-            });
+            again.message = Some(default_message(check, ctx, &again.verdict));
         }
         again
     })
@@ -2406,11 +2394,11 @@ fn walked_roots_run(check: &Check, ctx: &Ctx) -> ops::Ran {
 
 fn default_message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
     match check {
-        Check::Tally(tally) => ops::tally::with_all_items(
+        Check::Tally(tally) => ops::tally::row_message(
             tally,
             ctx,
             verdict.cause,
-            ops::tally::with_walked_roots(tally, ctx, ops::message::message(check, ctx, verdict)),
+            ops::message::pieces(check, ctx, verdict),
         ),
         _ => ops::message::message(check, ctx, verdict),
     }
