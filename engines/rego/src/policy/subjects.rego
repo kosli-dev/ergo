@@ -48,12 +48,7 @@ _resolved_def(members) := {"def": def, "filter_owners": owners} if {
 	)
 } else := {}
 
-_root_field("from", _, r, members) := "<built on a subject read from another subject>" if {
-	count(members) > 1
-	r in object.keys(object.get(data.ergo_subject_sentences, "chains", {}))
-} else := v if {
-	v := _raw_subject(r).from
-}
+_root_field("from", _, r, _) := _raw_subject(r).from
 
 _root_field("identified_by", v, _, _) := v
 

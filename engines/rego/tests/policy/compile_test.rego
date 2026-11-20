@@ -61,8 +61,8 @@ test_narrowing_a_child_does_not_count_as_a_level_of_a_chain if {
 
 test_a_subject_that_narrows_a_child_resolves_to_the_childs_path_and_both_conditions if {
 	rd := ergo._read({"subjects": narrowed_chain_subjects, "requirements": {}})
-	rd.resolved.nb.problems == []
+	rd.resolved.nb.problems == set()
 	rd.resolved.nb.def.from == rd.resolved.b.def.from
 	count(rd.resolved.nb.def.applies_to) == 2
-	rd.resolved.nnb.problems == []
+	rd.resolved.nnb.problems == set()
 }
