@@ -926,6 +926,12 @@ pub fn pieces(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Piece> {
                 let mut found: Vec<Piece> = said_all(aliases_blocked(check, ctx)).collect();
                 found.extend(said_all(lists::input_one_fault(check, ctx)));
                 found.extend(said_all(keyed));
+                found.retain(|piece| {
+                    !tallies.iter().any(|tally| match tally {
+                        Piece::Counted(clauses) => clauses.iter().any(|c| c.text == piece.text()),
+                        Piece::Said(_) => false,
+                    })
+                });
                 found.extend(tallies);
                 found
             } else if subject.is_array() && !tallies.is_empty() && !list_read_plainly(check, ctx) {
