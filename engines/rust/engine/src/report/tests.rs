@@ -1420,10 +1420,9 @@ fn id_fault(item: &str, path: &str, cause: Cause, text: &str, at: &str) -> IdFau
             "cause": cause.name(),
             "value": null,
             "locations": [at],
-            "ergo/text": text,
+            "ergo/text": format!("{item}: {text}"),
             "ergo/item": {"value": {"ok": true}, "locations": [at]},
         }),
-        clause: format!("{item}: {text}"),
         cause,
         listed: true,
     }
@@ -1470,7 +1469,7 @@ fn a_subject_outside_any_list_puts_its_id_read_on_the_row_and_has_no_entry() {
     let row = unique_ids_row("s", &thing_requirement(), Vec::new(), &[]);
     let mut fault = id_fault("thing.id", "thing.id", Cause::Absent, "thing.id is missing", "/thing");
     fault.listed = false;
-    fault.clause = "thing.id is missing".to_string();
+    fault.record["ergo/text"] = json!("thing.id is missing");
     let row = with_id_faults(row, &[fault], &json!({}));
     assert_eq!(row.cause, Cause::Absent);
     assert_eq!(row.message.as_deref(), Some("thing.id is missing"));
