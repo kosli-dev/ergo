@@ -4,6 +4,10 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 ## 0.7.0
 
+### New
+
+- `is`, `equals`, `is equal to`, `is not`, `does not equal`, `is one of`, `is in` and their `not` forms can end with `ignoring case`, `ignoring surrounding spaces` or `ignoring case and surrounding spaces`, as spec 0.7 says ([text.ignoring](spec/semantics.md#text-ignoring-case-and-surrounding-spaces)). `status is one of "in progress", "done" ignoring case and surrounding spaces` passes on `"  IN Progress "`. `ignoring` is a word of the grammar now, so a field with that name is written `.ignoring`.
+
 ### Changed
 
 - A `count of` or a `sum of` names every item it can't read, in list order, whatever its cause, after the roots, and each item is an `item` entry under its assertion, as spec 0.7 says ([message.items](spec/semantics.md#messages), [row.parts](spec/semantics.md#what-a-row-shows)). With `xs` holding `[{"v": null}, {}]`, `sum of xs.v is 5` says `item 1 of xs: v is null; item 2 of xs: v is missing`, where it said `item 2 of xs: v is missing`. The assertion keeps the count or the sum and no longer lists the walked list, and a `list` entry holds the list's own read with where it stopped.

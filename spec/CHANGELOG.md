@@ -4,6 +4,10 @@ Each version says whether reports changed, so that anyone who only stores report
 
 ## 0.7
 
+### New
+
+- `is`, `equals`, `is equal to`, `is not`, `does not equal`, `is one of`, `is in` and their `not` forms can end with `ignoring case`, `ignoring surrounding spaces` or `ignoring case and surrounding spaces` ([sentence.phrase.ignoring](syntax.md#phrases), [text.ignoring](semantics.md#text-ignoring-case-and-surrounding-spaces), [text.case](semantics.md#text-ignoring-case-and-surrounding-spaces), [text.surrounding_spaces](semantics.md#text-ignoring-case-and-surrounding-spaces), [text.not_text](semantics.md#text-ignoring-case-and-surrounding-spaces)). Both sides are lowercased one code point at a time, as OPA's `lower` does, or trimmed of Unicode white space at either end, as OPA's `trim_space` does, before they are compared, and messages show the values as they are in the input. A value that isn't text fails as `unusable`, on either side and for each item of a list. Another phrase with the words, or the words in another order, is written wrong. `ignoring` joins the words a bare first key can't be ([sentence.words](syntax.md#words-a-field-cant-be-called)), so a field called `ignoring` is written `.ignoring`, and a sentence that started with it no longer reads. Reports of existing policies don't change, apart from such a sentence.
+
 ### Changed
 
 - A `count of` or a `sum of` names every item it can't read, in list order, whatever its cause, and each is an `item` entry under its assertion in `failures`, where only the items of the worst cause were named and none had an entry ([message.items](semantics.md#messages), [row.parts](semantics.md#what-a-row-shows)). With `xs` holding `[{"v": null}, {}]`, `sum of xs.v is 5` fails as `absent` with `item 1 of xs: v is null; item 2 of xs: v is missing`, where it said `item 2 of xs: v is missing`. An item the count left out, or that only changed the sum, has no entry. Reports change in the message and in `failures` for such checks, and the cause stays the worst.
