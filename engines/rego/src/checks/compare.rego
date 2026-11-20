@@ -367,9 +367,9 @@ _text_cmp("eq", a, b) if a == b
 
 _text_cmp("ne", a, b) if a != b
 
-_text_cmp("in", a, list) if a in list
+_text_cmp("in", a, b) if a in b
 
-_text_cmp("not_in", a, list) if not a in list
+_text_cmp("not_in", a, b) if not a in b
 
 _texts(vs) if {
 	every v in vs {
@@ -390,11 +390,3 @@ _text_compared(cmp, l, r, ignoring) if {
 	_texts(r)
 	_text_cmp(cmp, _prepared(l, ignoring), {_prepared(v, ignoring) | some v in r})
 }
-
-_text_item_states(r) := {"unusable"} if not is_array(r)
-
-else := {_text_item_state(v) | some v in r; not is_string(v)}
-
-_text_item_state(v) := "null" if v == null
-
-else := "unusable"

@@ -695,9 +695,3 @@ _text_root_kind(subj, c, p) := "a list" if {
 	_side_root(c, p)
 	not is_string(_root_value(subj, p))
 }
-
-_m_root_kind_text(subj, c, p, k) := concat(", and ", ts) if {
-	"ignoring" in object.keys(c)
-	ts := _m_text_items(_root_label(p), _root_value(subj, p))
-	ts != []
-} else := _m_isnt(_root_label(p), _root_value(subj, p), k)

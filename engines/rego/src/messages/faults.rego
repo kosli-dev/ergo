@@ -624,3 +624,9 @@ _m_side_kind(subj, check, side) := _m_kind(o) if {
 }
 
 _m_fits_kind(v, k) if _m_kind(v) == k
+
+_m_root_kind_text(subj, c, p, k) := concat(", and ", ts) if {
+	"ignoring" in object.keys(c)
+	ts := _m_text_items(_root_label(p), _root_value(subj, p))
+	ts != []
+} else := _m_isnt(_root_label(p), _root_value(subj, p), k)

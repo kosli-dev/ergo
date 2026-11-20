@@ -135,3 +135,11 @@ _reserved_name_markers := {"$params", "$input"}
 _reserved_ref_roots := {"$$params", "$$input"}
 
 _input_and_params_walk_roots := {"$$input", "$$input[]", "$$params", "$$params[]"}
+
+_text_item_states(r) := {"unusable"} if not is_array(r)
+
+else := {_text_item_state(v) | some v in r; not is_string(v)}
+
+_text_item_state(v) := "null" if v == null
+
+else := "unusable"

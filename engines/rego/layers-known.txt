@@ -114,7 +114,7 @@ _m_cond_walked_texts -> _list_phrase
 _m_cond_walked_texts -> _m_walked_root_text
 _m_fallback -> _written_expression
 _m_for_item_name -> _m_item_name
-_m_for_root_text -> _m_isnt
+_m_for_root_text -> _m_root_kind_text
 _m_for_root_text -> _message
 _m_from_message -> _chained
 _m_from_root -> _chained
