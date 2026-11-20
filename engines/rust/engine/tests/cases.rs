@@ -260,12 +260,25 @@ fn dump(c: &Case, report: &Value) {
     let Some(root) = std::env::var_os("ERGO_DUMP") else {
         return;
     };
-    let folder = Path::new(&root).join(&c.topic);
+    write_dump(Path::new(&root), c, report);
+}
+
+fn write_dump(root: &Path, c: &Case, report: &Value) {
+    let folder = root.join(&c.topic);
     fs::create_dir_all(&folder)
         .unwrap_or_else(|e| panic!("can't create {}: {e}", folder.display()));
     let file = folder.join(format!("{}.json", c.number));
     let text = format!("{}\n", serde_json::to_string_pretty(report).unwrap());
     fs::write(&file, text).unwrap_or_else(|e| panic!("can't write {}: {e}", file.display()));
+    let index = folder.join("index.txt");
+    let line = format!("{}\t{}\n", c.number, c.id);
+    let mut lines = if c.number == 1 {
+        String::new()
+    } else {
+        fs::read_to_string(&index).unwrap_or_default()
+    };
+    lines.push_str(&line);
+    fs::write(&index, lines).unwrap_or_else(|e| panic!("can't write {}: {e}", index.display()));
 }
 
 fn describe(c: &Case, report: &Value) -> String {
@@ -545,6 +558,39 @@ fn a_failure_is_described_with_its_id_and_both_reports() {
         describe(&case, &json!({"description": ""})),
         "topic / group / case\nexpected:\n{\n  \"report\": {\n    \"description\": \"nope\"\n  }\n}\nactual:\n{\n  \"description\": \"\"\n}"
     );
+}
+
+#[test]
+fn a_dump_writes_each_report_and_an_index_of_the_cases_of_a_topic() {
+    let root = std::env::temp_dir().join(format!("ergo-dump-test-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    for (number, id) in [(1, "topic / group / first"), (2, "topic / group / second")] {
+        let case = Case {
+            id: id.to_string(),
+            topic: "topic".to_string(),
+            number,
+            group: json!({}),
+            case: json!({}),
+        };
+        write_dump(&root, &case, &json!({"n": number}));
+    }
+    let index = fs::read_to_string(root.join("topic/index.txt")).unwrap();
+    assert_eq!(
+        index,
+        "1\ttopic / group / first\n2\ttopic / group / second\n"
+    );
+    assert!(root.join("topic/2.json").is_file());
+    let case = Case {
+        id: "topic / group / only".to_string(),
+        topic: "topic".to_string(),
+        number: 1,
+        group: json!({}),
+        case: json!({}),
+    };
+    write_dump(&root, &case, &json!({}));
+    let index = fs::read_to_string(root.join("topic/index.txt")).unwrap();
+    assert_eq!(index, "1\ttopic / group / only\n");
+    fs::remove_dir_all(&root).unwrap();
 }
 
 #[test]

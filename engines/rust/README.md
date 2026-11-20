@@ -20,6 +20,8 @@ It has five crates. The first three, `ergo-policy-sentences`, `ergo-policy-engin
 
 Most failing cases can't show whether a change moved a report, so the test can also write every report it builds: with `ERGO_DUMP` set to a folder, `cargo test -p ergo-policy-engine --test cases` writes the report of case `n` of a topic to `<folder>/<topic>/<n>.json`. Run it once before a change and once after, into two folders, and `.github/dump-diff.sh <before> <after>` prints each file that differs. A change that should keep every report prints nothing.
 
+To get the numbers a pull request body needs, run `.github/pr-facts.sh [BASE]` (`origin/main` by default). It builds both dumps, with BASE in a temporary worktree and no Docker, and prints how many reports changed and which cases, which cases pass or fail now and did not before, and any case that passed on BASE and changed its report.
+
 ## Running the checks
 
 You don't need Rust installed, only Docker. From the root of the repo, build the image once:

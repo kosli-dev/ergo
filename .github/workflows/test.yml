@@ -58,6 +58,8 @@ jobs:
           .github/no-inline-tests_test.sh
       - name: Check the script that compares two dumps of the Rust engine's reports
         run: .github/dump-diff_test.sh
+      - name: Check the script that lists what a change did to the Rust engine's reports
+        run: .github/pr-facts_test.sh
       - name: Check the script that runs the common checks
         run: .github/checks_test.sh
       - name: Check the release workflow's latest flag, release notes and tag checks
@@ -240,6 +242,23 @@ jobs:
         with:
           name: ergo-policy-sentences-wasm-pkg
           path: engines/rust/sentences-wasm/pkg
+
+  rust-report-facts:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install the Rust version in rust-toolchain.toml
+        run: |
+          cd engines/rust
+          rustup toolchain install
+      - name: Write what the change did to the Rust engine's reports in the job summary
+        env:
+          BASE: origin/${{ github.base_ref }}
+        run: .github/pr-facts.sh "$BASE" >> "$GITHUB_STEP_SUMMARY"
 
   playground:
     needs: tests-rust

@@ -47,6 +47,7 @@ python3 .github/rego-layers.py
 .github/no-inline-tests.sh
 .github/no-inline-tests_test.sh
 .github/dump-diff_test.sh
+.github/pr-facts_test.sh
 .github/spec-placeholder.sh
 .github/spec-placeholder_test.sh
 python3 spec/check_rules.py
@@ -59,6 +60,8 @@ python3 -m venv /tmp/ergo-venv && /tmp/ergo-venv/bin/pip install --quiet jsonsch
 Run them from the repo root. The last three lines use a virtual environment that holds `jsonschema` and `abnf`, and the last one the Docker image that [`engines/rust/README.md`](engines/rust/README.md) builds; it's outside the repo, because some Pythons, like Homebrew's, refuse `pip install` outside one.
 
 `.github/dump-diff_test.sh` tests `.github/dump-diff.sh`, which lists the files that differ between two folders.
+
+`.github/pr-facts_test.sh` tests `.github/pr-facts.sh`, which prints how many Rust case reports a change moved, which known failures it added or removed, and whether a passing case changed its report; put its output in the body of a pull request that changes Rust reports.
 
 `opa fmt --list` should print nothing. If it prints file names, run `opa fmt -w` on them.
 
