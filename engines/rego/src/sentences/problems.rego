@@ -231,7 +231,7 @@ _s_derived_term(t) if {
 	object.keys(t) & _term_tally_keys != set()
 }
 
-_s_bad_name(name) if name in _s_words
+_s_bad_name(name) if _s_word(name)
 
 _s_bad_name(name) if name in _reserved_names
 

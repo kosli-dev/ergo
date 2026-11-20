@@ -221,3 +221,10 @@ test_ignoring_is_a_word_of_the_grammar if {
 	_read(`ignoring is 1`) == {"problems": ["ignoring is a word of the grammar: write .ignoring"]}
 	_read(`.ignoring is 1`).assertions[0].path == {"steps": ["ignoring"], "dot": true}
 }
+
+test_ignoring_is_a_word_kept_out_of_the_set_of_words_because_a_bigger_set_costs_wasm_memory_on_every_read if {
+	ergo._s_word("ignoring")
+	ergo._s_word("every")
+	not ergo._s_word("status")
+	not "ignoring" in ergo._s_words
+}

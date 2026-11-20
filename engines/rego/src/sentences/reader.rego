@@ -131,9 +131,13 @@ _s_pattern_set(tail) := {
 	for_item := concat("", [`(?:(?:every|some) +)?`, qpath, `(?: +`, conds, `)?(?: +sorted +by +`, path, `(?: +alphabetically)?)?(?:, +if +any,)? +as +`, key])
 }
 
+_s_word(key) if key in _s_words
+
+_s_word("ignoring")
+
 _s_words := {
 	"a", "after", "alphabetically", "an", "and", "as", "at", "before", "between", "count", "days", "distinct",
-	"each", "empty", "equal", "every", "false", "first", "hours", "ignoring", "in", "item", "last", "less", "minutes",
+	"each", "empty", "equal", "every", "false", "first", "hours", "in", "item", "last", "less", "minutes",
 	"more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sorted",
 	"sum", "that", "to", "true", "weeks", "whose", "within",
 }
@@ -428,11 +432,11 @@ _s_start_of(key, steps) := {"start": key, "steps": steps} if {
 }
 
 _s_start_of(key, steps) := {"steps": array.concat([key], steps), "bare_word": key} if {
-	key in _s_words
+	_s_word(key)
 }
 
 _s_start_of(key, steps) := {"steps": array.concat([_s_key_of(key)], steps)} if {
-	not key in _s_words
+	not _s_word(key)
 	not startswith(key, "$")
 	not startswith(key, ".")
 }

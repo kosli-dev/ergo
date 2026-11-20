@@ -590,7 +590,7 @@ _s_plain_model(a) := {"op": "equals", "path": _s_model_path(a.path), "value": a.
 	a.phrase.op == "is"
 	"value" in object.keys(a.phrase)
 	not "within" in object.keys(a.phrase)
-	not "ignoring" in object.keys(a.phrase)
+	not a.phrase.ignoring
 }
 
 _s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "eq", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within", "ignoring"})) if {
@@ -708,7 +708,7 @@ _s_side_given(ph) if "terms" in object.keys(ph)
 
 _s_side_given(ph) if "within" in object.keys(ph)
 
-_s_side_given(ph) if "ignoring" in object.keys(ph)
+_s_side_given(ph) if ph.ignoring
 
 _s_side_given(ph) if "join" in object.keys(ph)
 
