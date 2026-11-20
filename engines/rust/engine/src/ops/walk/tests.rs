@@ -727,7 +727,7 @@ fn item_own_is_what_any_check_says_when_its_roots_can_be_read() {
 fn an_item_says_its_own_list_beside_a_root_before_its_key_it_cant_read() {
     let sentence = "every items whose tags contains $params.m named by key exists";
     let items = json!([{"key": "a"}, {"key": "a", "tags": "x"}]);
-    let readable = judged(sentence, items.clone(), json!({"m": {"a": "x"}}));
+    let readable = judged(sentence, items.clone(), json!({"m": {"a": ["x"]}}));
     assert_eq!(
         readable,
         [
@@ -759,6 +759,24 @@ fn an_item_says_its_own_value_beside_a_list_root_before_its_key_it_cant_read() {
     assert_eq!(
         own_said(sentence, items, json!({"m": null}), json!({})),
         readable
+    );
+}
+
+#[test]
+fn an_item_says_its_own_text_beside_a_pattern_root_before_its_key_it_cant_read() {
+    let sentence = "every items whose v matches $params.m named by key exists";
+    let items = json!([{"key": "a", "v": 4}, {"key": "a", "v": "y"}]);
+    let readable = judged(sentence, items.clone(), json!({"m": {"a": ["x"]}}));
+    assert_eq!(
+        readable[0],
+        Some((
+            Cause::Unusable,
+            "item 1 of items: v is 4, which isn't text".to_string()
+        ))
+    );
+    assert_eq!(
+        own_said(sentence, items, json!({"m": null}), json!({})),
+        [readable[0].clone(), None]
     );
 }
 
