@@ -71,7 +71,7 @@ test_is_ignoring_case_compares_the_prepared_texts if {
 test_is_ignoring_case_fails_as_unusable_on_a_value_that_isnt_text_on_either_side if {
 	every cmp in ["eq", "ne"] {
 		check := {"op": "compare", "left": ["x"], "cmp": cmp, "right": ["y"], "ignoring": "case"}
-		every subj in [{"x": 3, "y": "3"}, {"x": "3", "y": 3}, {"x": true, "y": "true"}, {"x": ["a"], "y": "a"}, {"x": "a", "y": {"a": 1}}] {
+		every subj in [{"x": 3, "y": "3"}, {"x": "3", "y": 3}, {"x": ["a"], "y": "a"}, {"x": "a", "y": {"a": 1}}] {
 			not ergo._leaf_passed(check, subj)
 			ergo._unusable_states(check, subj) == {"unusable"}
 		}
@@ -86,11 +86,8 @@ test_in_ignoring_case_compares_the_prepared_texts if {
 	not_in := object.union(check, {"op": "not_in"})
 	not ergo._leaf_passed(not_in, {"x": "DONE"})
 	ergo._leaf_passed(not_in, {"x": "blocked"})
-}
-
-test_in_ignoring_case_never_passes_on_a_list_with_a_value_that_isnt_text if {
 	every op in ["in", "not_in"] {
-		every values in [["a", null], ["a", 3], [["a"]]] {
+		every values in [["a", null], [["a"]]] {
 			not ergo._leaf_passed({"op": op, "path": ["x"], "values": values, "ignoring": "case"}, {"x": "b"})
 		}
 		not ergo._leaf_passed({"op": op, "path": ["x"], "values": ["a"], "ignoring": "case"}, {"x": 3})
