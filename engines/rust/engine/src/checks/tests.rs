@@ -661,3 +661,26 @@ fn a_param_a_for_line_sentence_looks_in_is_unfit_when_it_isnt_a_list() {
     let ctx = ctx_of(&subject, &params);
     assert!(ref_unfit(&[&check], &param("q"), &json!("s"), &ctx));
 }
+
+#[test]
+fn a_param_is_ignoring_case_compares_with_is_unfit_when_it_isnt_text() {
+    for sentence in [
+        "m.v is $params.q ignoring case",
+        "$params.q is not \"a\" ignoring case",
+    ] {
+        let check = first_check(one(
+            json!({"c": {"for": "every xs as m", "assert": sentence}}),
+        ));
+        let subject = json!({"xs": [{"v": "a"}]});
+        let params = json!({"q": 3});
+        let ctx = ctx_of(&subject, &params);
+        assert!(
+            ref_unfit(&[&check], &param("q"), &json!(3), &ctx),
+            "{sentence}"
+        );
+        assert!(
+            !ref_unfit(&[&check], &param("q"), &json!("A"), &ctx),
+            "{sentence}"
+        );
+    }
+}
