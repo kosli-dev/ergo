@@ -2087,3 +2087,44 @@ fn a_count_fails_as_absent_when_a_null_key_meets_a_missing_value_before_it() {
         )
     );
 }
+
+#[test]
+fn a_count_says_a_key_of_the_wrong_kind_under_each_item_when_one_focus_isnt_an_object_and_once_first_otherwise()
+ {
+    let sentence = "count of items.v that is m named by $params.k is 0";
+    for (first, said) in [
+        (
+            json!("s"),
+            "item 1 of items: v: $params.k is 3, which isn't text; item 2 of items: v: $params.k is 3, which isn't text; item 3 of items: v: $params.k is 3, which isn't text",
+        ),
+        (
+            json!({"m": [1]}),
+            "$params.k is 3, which isn't text; item 1 of items: v: m is [1], which isn't an object; item 2 of items: v: m is missing; item 3 of items: v: m is null",
+        ),
+    ] {
+        assert_eq!(
+            cause_and_said(
+                sentence,
+                json!([{"v": first}, {"v": {}}, {"v": {"m": null}}]),
+                json!({"k": 3}),
+            ),
+            (Cause::Unusable, said.to_string())
+        );
+    }
+}
+
+#[test]
+fn a_count_says_the_values_before_a_missing_key_in_list_order_beside_an_item_without_a_focus() {
+    assert_eq!(
+        cause_and_said(
+            "count of items.v that is m named by $params.k is 0",
+            json!([{}, {"v": {}}]),
+            json!({}),
+        ),
+        (
+            Cause::Absent,
+            "$params.k is missing; item 1 of items: v is missing; item 2 of items: v: m is missing"
+                .to_string()
+        )
+    );
+}
