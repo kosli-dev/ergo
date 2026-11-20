@@ -41,6 +41,18 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every release.artifacts.signatures",
         "every release.artifacts.signatures",
     ),
+    (
+        "every things whose count of xs.v is 9",
+        "every things whose count of xs.v is 9",
+    ),
+    (
+        "every things whose every xs.ys.n is 1 and whose z is 3",
+        "every things whose every xs.ys.n is 1 and whose z is 3",
+    ),
+    (
+        "every things whose sum of xs.v is 5 and whose z is 3",
+        "every things whose sum of xs.v is 5 and whose z is 3",
+    ),
     ("every ws that is not empty", "every ws that is not empty"),
     ("c whose type is \"library\"", "c whose type is \"library\""),
     ("c.licenses", "c.licenses"),

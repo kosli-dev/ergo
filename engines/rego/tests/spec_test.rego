@@ -43,7 +43,7 @@ _case_names(topic) := {concat(" / ", [topic, group.description, c.description]) 
 
 test_every_known_difference_names_a_case if known_differences - union({_case_names(topic) | some topic, _ in data.spec.cases}) == set()
 
-_tested_topics := {"any_of", "compare", "compare_time", "contains", "deep_walks", "derived", "distinct", "equals", "for", "in", "list_items", "list_starts", "messages", "missing", "non_empty_string", "parts", "patterns", "present", "range", "requirements", "sentences", "subject_name", "subjects", "that", "walks"}
+_tested_topics := {"any_of", "compare", "compare_time", "contains", "deep_walks", "derived", "distinct", "equals", "for", "in", "list_items", "list_starts", "messages", "missing", "non_empty_string", "parts", "patterns", "present", "range", "requirements", "row_parts", "sentences", "subject_name", "subjects", "that", "walks"}
 
 test_every_folder_of_cases_has_a_test_of_its_own if {t | some t, _ in data.spec.cases} == _tested_topics
 
@@ -295,6 +295,11 @@ test_the_range_cases_pass if {
 	_compiled_differences("range") == set()
 }
 
+test_the_row_parts_cases_pass if {
+	_topic_failures("row_parts") == _known_in("row_parts")
+	_compiled_differences("row_parts") == set()
+}
+
 test_the_requirements_cases_pass if {
 	_topic_failures("requirements") == _known_in("requirements")
 	_compiled_differences("requirements") == set()
@@ -462,13 +467,29 @@ test_the_for_cases_pass_compiled_part_19_of_20 if _differences_compiled("for", _
 
 test_the_for_cases_pass_compiled_part_20_of_20 if _differences_compiled("for", _case_part("for", 19, 20)) == set()
 
-test_the_walks_cases_pass_part_1_of_2 if _part_passes("walks", 0, 2)
+test_the_walks_cases_pass_part_1_of_6 if _case_part_passes("walks", 0, 6)
 
-test_the_walks_cases_pass_part_2_of_2 if _part_passes("walks", 1, 2)
+test_the_walks_cases_pass_compiled_part_1_of_6 if _differences_compiled("walks", _case_part("walks", 0, 6)) == set()
 
-test_the_walks_cases_pass_compiled_part_1_of_2 if _differences_compiled("walks", _part("walks", 0, 2)) == set()
+test_the_walks_cases_pass_part_2_of_6 if _case_part_passes("walks", 1, 6)
 
-test_the_walks_cases_pass_compiled_part_2_of_2 if _differences_compiled("walks", _part("walks", 1, 2)) == set()
+test_the_walks_cases_pass_compiled_part_2_of_6 if _differences_compiled("walks", _case_part("walks", 1, 6)) == set()
+
+test_the_walks_cases_pass_part_3_of_6 if _case_part_passes("walks", 2, 6)
+
+test_the_walks_cases_pass_compiled_part_3_of_6 if _differences_compiled("walks", _case_part("walks", 2, 6)) == set()
+
+test_the_walks_cases_pass_part_4_of_6 if _case_part_passes("walks", 3, 6)
+
+test_the_walks_cases_pass_compiled_part_4_of_6 if _differences_compiled("walks", _case_part("walks", 3, 6)) == set()
+
+test_the_walks_cases_pass_part_5_of_6 if _case_part_passes("walks", 4, 6)
+
+test_the_walks_cases_pass_compiled_part_5_of_6 if _differences_compiled("walks", _case_part("walks", 4, 6)) == set()
+
+test_the_walks_cases_pass_part_6_of_6 if _case_part_passes("walks", 5, 6)
+
+test_the_walks_cases_pass_compiled_part_6_of_6 if _differences_compiled("walks", _case_part("walks", 5, 6)) == set()
 
 test_a_case_with_the_wrong_rows_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{

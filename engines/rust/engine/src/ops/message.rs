@@ -1063,11 +1063,22 @@ pub fn joined(parts: Vec<String>) -> String {
             fresh.push(true);
         }
     }
-    if once.len() + hidden <= 3 {
+    let items = once.iter().filter(|part| part.starts_with("item ")).count();
+    let counted = if items == 0 { once.len() } else { items };
+    if counted + hidden <= 3 {
         once.join("; ")
     } else {
-        let more = once.len() + hidden - 3;
-        let mut shown: Vec<String> = once.into_iter().take(3).collect();
+        let more = counted + hidden - 3;
+        let mut left = 3;
+        let mut shown: Vec<String> = Vec::new();
+        for part in once {
+            if items > 0 && !part.starts_with("item ") {
+                shown.push(part);
+            } else if left > 0 {
+                left -= 1;
+                shown.push(part);
+            }
+        }
         shown.push(format!("and {more} more"));
         shown.join("; ")
     }

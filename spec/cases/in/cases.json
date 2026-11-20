@@ -6524,6 +6524,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -6708,11 +6709,20 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope thing count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.k",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "in-scope thing count is 0",
@@ -9108,10 +9118,15 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/repos/0/deps"
+                        ],
                         "name": "deps",
                         "outcome": "unusable",
-                        "value": []
+                        "value": {
+                          "n": 2,
+                          "name": "click"
+                        }
                       }
                     ],
                     "kind": "list",
@@ -9198,10 +9213,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/repos/0"
+                        ],
                         "name": "deps",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -12596,7 +12613,50 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/repos/0/lock/pkgs/1"
+                        ],
+                        "name": "lock.pkgs[1].n",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/lock/pkgs/1"
+                    ],
+                    "message": "n is missing",
+                    "name": "item 2 of .lock.pkgs",
+                    "value": {}
+                  },
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/repos/0/lock/pkgs/2"
+                        ],
+                        "name": "lock.pkgs[2].n",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/repos/0/lock/pkgs/2"
+                    ],
+                    "message": "item 3 of .lock.pkgs is \"t\", which isn't an object",
+                    "name": "item 3 of .lock.pkgs",
+                    "value": "t"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -12626,7 +12686,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/sum"
                 ],
-                "message": "item 3 of .lock.pkgs is \"t\", which isn't an object",
+                "message": "",
                 "name": "sum of .lock.pkgs.n is 1"
               }
             ],
@@ -12655,7 +12715,7 @@
                 ]
               }
             ],
-            "message": "item 3 of .lock.pkgs is \"t\", which isn't an object",
+            "message": "item 2 of .lock.pkgs: n is missing; item 3 of .lock.pkgs is \"t\", which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -12878,16 +12938,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/repos/0"
+                        ],
                         "name": "xs",
                         "outcome": "absent",
-                        "value": []
-                      },
-                      {
-                        "locations": [],
-                        "name": "xs",
-                        "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -12946,7 +13002,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/repos/0"
+                        ],
+                        "name": "xs",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "xs is missing",
                     "name": "xs"
@@ -12962,18 +13027,6 @@
                     "locations": [],
                     "name": "sum of xs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.n",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.n",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -13024,16 +13077,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/repos/0/xs"
+                        ],
                         "name": "xs",
                         "outcome": "null",
-                        "value": []
-                      },
-                      {
-                        "locations": [],
-                        "name": "xs",
-                        "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -13092,7 +13141,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/repos/0/xs"
+                        ],
+                        "name": "xs",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "xs is null",
                     "name": "xs"
@@ -13108,18 +13166,6 @@
                     "locations": [],
                     "name": "sum of xs.n",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.n",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
-                    "locations": [],
-                    "name": "xs.n",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -17484,16 +17530,6 @@
                     "name": "$input.l",
                     "outcome": "unusable",
                     "value": "s"
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0/n"
-                    ],
-                    "name": "xs[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -17857,16 +17893,6 @@
                     "name": "$input.p",
                     "outcome": "unusable",
                     "value": 3
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0/s"
-                    ],
-                    "name": "xs[].s",
-                    "outcome": "usable",
-                    "value": [
-                      "ab"
-                    ]
                   }
                 ],
                 "kind": "assertion",

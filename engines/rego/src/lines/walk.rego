@@ -6,6 +6,19 @@ _walk_row(check, subj) := object.union(r, {"other_roots": _walk_parts(check, sub
 	r := _key_item_row(check, subj)
 } else := object.union(r, {"cause": _worst_of(_key_item_flaws(check) | {r.cause}), "other_roots": _walk_parts(check, subj, {"ergo/key_texts": true}, r)}) if {
 	r := _key_list_fail_row(check, subj)
+} else := object.union(raw, {"cause": "unusable", "failed": a.failed, "root_msgs": _with_roots(ps, ms), "ergo/alone_items": [p | some p in ps; not p in ms]}) if {
+	_walk_flawed(check)
+	not _unreadable_input
+	not _walk_keyed(check)
+	_m_walk_blocked(subj, check) == []
+	_walk_root_flaw(check, subj) != ""
+	ms := _walk_root_msgs(check, subj)
+	ms != []
+	_items_judged_alone(subj, check)
+	raw := _walk_read_row(check, subj)
+	not _walk_list_fails(raw)
+	a := _alone_read(check, subj)
+	ps := _walk_parts(check, subj, a, a)
 } else := object.union(r, {"cause": "unusable", "failed": [], "root_msgs": _with_roots(_walk_parts(check, subj, raw, raw), ms)}) if {
 	_walk_flawed(check)
 	not _unreadable_input

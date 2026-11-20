@@ -145,8 +145,9 @@ fn a_walk_in_an_any_of_option_lists_the_params_it_reads_on_its_assertion() {
     assert_eq!(
         assertion["inputs"],
         json!([
-            {"locations": ["/things/0/ids/0/v"], "name": "ids[].v", "outcome": "usable", "value": ["c"]},
             {"locations": ["$params:/allowed"], "name": "$params.allowed", "outcome": "usable", "value": ["a", "b"]}
         ])
     );
+    assert_eq!(assertion["failures"][0]["name"], "item 1 of ids");
+    assert_eq!(assertion["failures"][0]["inputs"][0]["name"], "ids[0].v");
 }

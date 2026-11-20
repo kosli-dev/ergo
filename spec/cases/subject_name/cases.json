@@ -1693,14 +1693,7 @@
                     "name": "region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/e"
@@ -1750,14 +1743,7 @@
                     "name": "region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/s"
@@ -1807,14 +1793,7 @@
                     "name": "region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/e"
@@ -1864,14 +1843,7 @@
                     "name": "region"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "region",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/allowed/checks/s"
@@ -2017,7 +1989,50 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/1/0"
+                        ],
+                        "name": "region[0]",
+                        "outcome": "unusable",
+                        "value": "a"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/1/0"
+                    ],
+                    "message": "item 1 of region is \"a\", which isn't a number",
+                    "name": "item 1 of region",
+                    "value": "a"
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/1/1"
+                        ],
+                        "name": "region[1]",
+                        "outcome": "unusable",
+                        "value": "b"
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/1/1"
+                    ],
+                    "message": "item 2 of region is \"b\", which isn't a number",
+                    "name": "item 2 of region",
+                    "value": "b"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -2032,7 +2047,7 @@
                 "locations": [
                   "$policy:/requirements/allowed/checks/t"
                 ],
-                "message": "item 1 of region is \"a\", which isn't a number; item 2 of region is \"b\", which isn't a number",
+                "message": "",
                 "name": "sum of region is 3"
               }
             ],
@@ -2187,10 +2202,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/3"
+                        ],
                         "name": "region",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -2246,10 +2263,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/3"
+                        ],
                         "name": "region",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -2305,10 +2324,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/4"
+                        ],
                         "name": "region",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "s"
                       }
                     ],
                     "kind": "list",
@@ -2364,10 +2385,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/4"
+                        ],
                         "name": "region",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "s"
                       }
                     ],
                     "kind": "list",
@@ -2884,7 +2907,7 @@
                 "locations": [
                   "$policy:/requirements/allowed/checks/c/any_of/num"
                 ],
-                "message": "region is null",
+                "message": "",
                 "name": "num"
               },
               {
@@ -2936,7 +2959,7 @@
                 "locations": [
                   "$policy:/requirements/allowed/checks/c/any_of/str"
                 ],
-                "message": "region is null",
+                "message": "",
                 "name": "str"
               }
             ],
@@ -4457,7 +4480,50 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/lists/0/0"
+                        ],
+                        "name": "list[0].plain",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/lists/0/0"
+                    ],
+                    "message": "item 1 of list is 1, which isn't an object",
+                    "name": "item 1 of list",
+                    "value": 1
+                  },
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/lists/0/1"
+                        ],
+                        "name": "list[1].plain",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/lists/0/1"
+                    ],
+                    "message": "item 2 of list is 2, which isn't an object",
+                    "name": "item 2 of list",
+                    "value": 2
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -4484,7 +4550,7 @@
                 "locations": [
                   "$policy:/requirements/l/checks/size"
                 ],
-                "message": "item 1 of list is 1, which isn't an object; item 2 of list is 2, which isn't an object",
+                "message": "",
                 "name": "count of plain is 2"
               }
             ],
@@ -5458,10 +5524,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/2"
+                        ],
                         "name": "region",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "a"
                       }
                     ],
                     "kind": "list",
@@ -5533,16 +5601,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/xs/2"
+                        ],
                         "name": "region",
                         "outcome": "unusable",
-                        "value": []
-                      },
-                      {
-                        "locations": [],
-                        "name": "region",
-                        "outcome": "unusable",
-                        "value": []
+                        "value": "a"
                       }
                     ],
                     "kind": "list",
@@ -5785,7 +5849,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -7749,7 +7812,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/xs/1/0"
+                        ],
+                        "name": "region[0].ws",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/xs/1/0"
+                    ],
+                    "message": "ws is missing",
+                    "name": "item 1 of region",
+                    "value": {
+                      "y": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -7781,7 +7868,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/b"
                 ],
-                "message": "item 1 of region: ws is missing",
+                "message": "",
                 "name": "count of ws whose x equals region[0].y is 1"
               }
             ],
@@ -10100,7 +10187,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/2"
+                        ],
+                        "name": "ys[2].s",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/2"
+                    ],
+                    "message": ".s is missing",
+                    "name": "item 3 of ys",
+                    "value": {
+                      "k": 3
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10116,7 +10227,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 3 of ys: .s is missing",
+                "message": "",
                 "name": "count of ys whose count of s is 1 is 1"
               }
             ],
@@ -10172,7 +10283,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/2"
+                        ],
+                        "name": "item 1 of ys[2].s",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/2"
+                    ],
+                    "message": "item 1 of .s is missing",
+                    "name": "item 3 of ys",
+                    "value": {
+                      "k": 3
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10188,7 +10323,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/d"
                 ],
-                "message": "item 3 of ys: item 1 of .s is missing",
+                "message": "",
                 "name": "count of ys whose item 1 of s is 1 is 1"
               }
             ],
@@ -11780,14 +11915,30 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0"
+                    ],
+                    "name": "xs[0]",
+                    "outcome": "usable",
+                    "value": {
+                      "first": 1,
+                      "item": 1,
+                      "k": 1
+                    }
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is an object",
+                "name": "item 1 of xs",
                 "value": {
                   "first": 1,
                   "item": 1,
@@ -11796,11 +11947,23 @@
               },
               {
                 "cause": "unusable",
-                "item": "item 4 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/3"
+                    ],
+                    "name": "xs[3]",
+                    "outcome": "usable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/3"
                 ],
-                "path": "item 4 of xs",
+                "message": "item 4 of xs is text",
+                "name": "item 4 of xs",
                 "value": "a"
               }
             ],
@@ -12043,14 +12206,30 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0"
+                    ],
+                    "name": "xs[0]",
+                    "outcome": "usable",
+                    "value": {
+                      "first": 1,
+                      "item": 1,
+                      "k": 1
+                    }
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is an object",
+                "name": "item 1 of xs",
                 "value": {
                   "first": 1,
                   "item": 1,
@@ -12059,11 +12238,23 @@
               },
               {
                 "cause": "unusable",
-                "item": "item 4 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/3"
+                    ],
+                    "name": "xs[3]",
+                    "outcome": "usable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/3"
                 ],
-                "path": "item 4 of xs",
+                "message": "item 4 of xs is text",
+                "name": "item 4 of xs",
                 "value": "a"
               }
             ],
@@ -12805,14 +12996,31 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0"
+                    ],
+                    "name": "xs[0]",
+                    "outcome": "usable",
+                    "value": {
+                      "item": [
+                        1
+                      ],
+                      "k": 1
+                    }
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is an object",
+                "name": "item 1 of xs",
                 "value": {
                   "item": [
                     1
@@ -12822,11 +13030,23 @@
               },
               {
                 "cause": "unusable",
-                "item": "item 4 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/3"
+                    ],
+                    "name": "xs[3]",
+                    "outcome": "usable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/3"
                 ],
-                "path": "item 4 of xs",
+                "message": "item 4 of xs is text",
+                "name": "item 4 of xs",
                 "value": "a"
               }
             ],
@@ -13115,23 +13335,49 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/0"
+                    ],
+                    "name": "xs[0]",
+                    "outcome": "usable",
+                    "value": "a"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/0"
                 ],
-                "path": "item 1 of xs",
+                "message": "item 1 of xs is text",
+                "name": "item 1 of xs",
                 "value": "a"
               },
               {
                 "cause": "unusable",
-                "item": "item 2 of xs",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/xs/1"
+                    ],
+                    "name": "xs[1]",
+                    "outcome": "usable",
+                    "value": [
+                      1
+                    ]
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/xs/1"
                 ],
-                "path": "item 2 of xs",
+                "message": "item 2 of xs is a list",
+                "name": "item 2 of xs",
                 "value": [
                   1
                 ]
@@ -13181,14 +13427,7 @@
                     "name": "item"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "item",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c"
@@ -13334,7 +13573,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -13457,7 +13696,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -13586,14 +13824,7 @@
                     "name": ".rel"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": ".rel",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/subjects/rel/from"
@@ -13785,7 +14016,54 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].\"a<b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "message": ".\"a<b\" is missing",
+                    "name": "item 1 of ys",
+                    "value": {
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].\"a<b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "message": ".\"a<b\" is missing",
+                    "name": "item 2 of ys",
+                    "value": {
+                      "v": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -13800,7 +14078,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 1 of ys: .\"a<b\" is missing; item 2 of ys: .\"a<b\" is missing",
+                "message": "",
                 "name": "count of ys whose \"a<b\" is 1 is 1"
               }
             ],
@@ -13911,7 +14189,54 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].\"a\\\"b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "message": ".\"a\\\"b\" is missing",
+                    "name": "item 1 of ys",
+                    "value": {
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].\"a\\\"b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "message": ".\"a\\\"b\" is missing",
+                    "name": "item 2 of ys",
+                    "value": {
+                      "v": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -13926,7 +14251,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 1 of ys: .\"a\\\"b\" is missing; item 2 of ys: .\"a\\\"b\" is missing",
+                "message": "",
                 "name": "count of ys whose \"a\\\"b\" is 1 is 1"
               }
             ],
@@ -14037,7 +14362,54 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/0"
+                        ],
+                        "name": "ys[0].\"a\\\\b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/0"
+                    ],
+                    "message": ".\"a\\\\b\" is missing",
+                    "name": "item 1 of ys",
+                    "value": {
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ys/1"
+                        ],
+                        "name": "ys[1].\"a\\\\b\"",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/ys/1"
+                    ],
+                    "message": ".\"a\\\\b\" is missing",
+                    "name": "item 2 of ys",
+                    "value": {
+                      "v": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -14052,7 +14424,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 1 of ys: .\"a\\\\b\" is missing; item 2 of ys: .\"a\\\\b\" is missing",
+                "message": "",
                 "name": "count of ys whose \"a\\\\b\" is 1 is 1"
               }
             ],

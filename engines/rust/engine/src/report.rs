@@ -834,7 +834,10 @@ pub fn assemble_with(
                 .or_insert_with(|| read.subject_entry(subject_name));
         }
         well_formed_rows.push(well_formed);
-        min_rows.extend(evaluation.min_subjects);
+        min_rows.extend(evaluation.min_subjects.into_iter().map(|mut row| {
+            crate::subjects::min_failures(&mut row, input);
+            row
+        }));
         unique_rows.extend(evaluation.unique_ids);
         ancestor_rows.extend(evaluation.unique_ancestor_ids);
         applies_rows.extend(evaluation.applies);

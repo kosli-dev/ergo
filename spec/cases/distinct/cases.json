@@ -11,7 +11,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -167,7 +166,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -232,7 +230,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -327,7 +324,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -353,15 +350,23 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "sbom.components",
-                "locations": [
-                  "/sbom"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/sbom"
+                    ],
+                    "name": "sbom.components",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "sbom.components",
-                "value": null
+                "kind": "list",
+                "message": "sbom.components is missing",
+                "name": "sbom.components"
               }
             ],
             "inputs": [
@@ -369,6 +374,14 @@
                 "locations": [],
                 "name": "in-scope c count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/sbom"
+                ],
+                "name": "sbom.components",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "sbom.components is missing",
@@ -389,15 +402,23 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "sbom.components",
-                "locations": [
-                  "/sbom/components"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/sbom/components"
+                    ],
+                    "name": "sbom.components",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "sbom.components",
-                "value": null
+                "kind": "list",
+                "message": "sbom.components is null",
+                "name": "sbom.components"
               }
             ],
             "inputs": [
@@ -405,6 +426,14 @@
                 "locations": [],
                 "name": "in-scope c count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/sbom/components"
+                ],
+                "name": "sbom.components",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "sbom.components is null",
@@ -425,15 +454,23 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "sbom.components",
-                "locations": [
-                  "/sbom/components"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/sbom/components"
+                    ],
+                    "name": "sbom.components",
+                    "outcome": "unusable",
+                    "value": "click"
+                  }
                 ],
-                "path": "sbom.components",
-                "value": "click"
+                "kind": "list",
+                "message": "sbom.components is \"click\", which isn't a list or an object",
+                "name": "sbom.components"
               }
             ],
             "inputs": [
@@ -441,6 +478,14 @@
                 "locations": [],
                 "name": "in-scope c count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/sbom/components"
+                ],
+                "name": "sbom.components",
+                "outcome": "unusable",
+                "value": "click"
               }
             ],
             "message": "sbom.components is \"click\", which isn't a list or an object",
@@ -461,7 +506,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -555,7 +599,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -642,7 +685,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -905,7 +947,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -1054,7 +1095,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -1273,7 +1313,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/commits/1"
+                        ],
+                        "name": "commits[1].author",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/commits/1"
+                    ],
+                    "message": "author is missing",
+                    "name": "item 2 of commits",
+                    "value": {
+                      "x": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -1289,7 +1353,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 2 of commits: author is missing",
+                "message": "",
                 "name": "count of distinct commits.author is at least 2"
               }
             ],
@@ -1408,7 +1472,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/commits"
+                        ],
+                        "name": "commits",
+                        "outcome": "unusable",
+                        "value": "ann"
+                      }
+                    ],
                     "kind": "list",
                     "message": "commits is \"ann\", which isn't a list or an object",
                     "name": "commits"
@@ -1419,12 +1492,6 @@
                     "locations": [],
                     "name": "count of distinct commits.author",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "commits.author",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -1475,7 +1542,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s"
+                        ],
+                        "name": "commits",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "commits is missing",
                     "name": "commits"
@@ -1486,12 +1562,6 @@
                     "locations": [],
                     "name": "count of distinct commits.author",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "commits.author",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -1540,7 +1610,16 @@
                   {
                     "cause": "null",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/commits"
+                        ],
+                        "name": "commits",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "commits is null",
                     "name": "commits"
@@ -1551,12 +1630,6 @@
                     "locations": [],
                     "name": "count of distinct commits.author",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "commits.author",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -1726,7 +1799,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/commits/0"
+                        ],
+                        "name": "commits[0].author",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/commits/0"
+                    ],
+                    "message": "item 1 of commits is \"ann\", which isn't an object",
+                    "name": "item 1 of commits",
+                    "value": "ann"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -1741,7 +1836,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 1 of commits is \"ann\", which isn't an object",
+                "message": "",
                 "name": "count of distinct commits.author is at least 2"
               }
             ],
@@ -1876,7 +1971,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/commits/1"
+                        ],
+                        "name": "commits[1].verified",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/commits/1"
+                    ],
+                    "message": "verified is missing",
+                    "name": "item 2 of commits",
+                    "value": {
+                      "author": "ann"
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -1891,7 +2010,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 2 of commits: verified is missing",
+                "message": "",
                 "name": "count of distinct commits whose verified is true is 2"
               }
             ],
@@ -2012,7 +2131,31 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/stages/1/usd"
+                        ],
+                        "name": "stages[1].usd",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/stages/1"
+                    ],
+                    "message": "usd is null",
+                    "name": "item 2 of stages",
+                    "value": {
+                      "usd": null
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -2027,7 +2170,7 @@
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "item 2 of stages: usd is null",
+                "message": "",
                 "name": "sum of distinct stages.usd is 3.5"
               }
             ],
@@ -3877,7 +4020,34 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/xs/0/k",
+                          "/s/xs/1/k"
+                        ],
+                        "name": "xs[0].k",
+                        "outcome": "absent",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/xs/0",
+                      "/s/xs/1"
+                    ],
+                    "message": "lo is missing",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": 5,
+                      "lo": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -3886,25 +4056,13 @@
                     "name": "lo",
                     "outcome": "absent",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/s/xs/0/k",
-                      "/s/xs/1/k"
-                    ],
-                    "name": "xs[].k",
-                    "outcome": "usable",
-                    "value": [
-                      5,
-                      5
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/lines/assert/1"
                 ],
-                "message": "lo is missing",
+                "message": "",
                 "name": "every distinct xs.k equals lo"
               }
             ],
@@ -4284,7 +4442,34 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/xs/0/k",
+                          "/s/xs/1/k"
+                        ],
+                        "name": "xs[0].k",
+                        "outcome": "absent",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/xs/0",
+                      "/s/xs/1"
+                    ],
+                    "message": "lo is missing",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": 5,
+                      "lo": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -4293,25 +4478,13 @@
                     "name": "lo",
                     "outcome": "absent",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/s/xs/0/k",
-                      "/s/xs/1/k"
-                    ],
-                    "name": "xs[].k",
-                    "outcome": "usable",
-                    "value": [
-                      5,
-                      5
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/lines/assert/1"
                 ],
-                "message": "lo is missing",
+                "message": "",
                 "name": "every distinct xs.k equals lo"
               }
             ],
@@ -4691,7 +4864,34 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/xs/0/k",
+                          "/s/xs/1/k"
+                        ],
+                        "name": "xs[0].k",
+                        "outcome": "absent",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/xs/0",
+                      "/s/xs/1"
+                    ],
+                    "message": "lo is missing",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": 5,
+                      "lo": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -4700,25 +4900,13 @@
                     "name": "lo",
                     "outcome": "absent",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/s/xs/0/k",
-                      "/s/xs/1/k"
-                    ],
-                    "name": "xs[].k",
-                    "outcome": "usable",
-                    "value": [
-                      5,
-                      5
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/lines/assert/1"
                 ],
-                "message": "lo is missing",
+                "message": "",
                 "name": "every distinct xs.k equals lo"
               }
             ],
@@ -5101,7 +5289,34 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/s/xs/0/k",
+                          "/s/xs/1/k"
+                        ],
+                        "name": "xs[0].k",
+                        "outcome": "absent",
+                        "value": 5
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/s/xs/0",
+                      "/s/xs/1"
+                    ],
+                    "message": "lo is missing",
+                    "name": "item 1 of xs",
+                    "value": {
+                      "k": 5,
+                      "lo": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -5110,25 +5325,13 @@
                     "name": "lo",
                     "outcome": "absent",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/s/xs/0/k",
-                      "/s/xs/1/k"
-                    ],
-                    "name": "xs[].k",
-                    "outcome": "usable",
-                    "value": [
-                      5,
-                      5
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/lines/assert/1"
                 ],
-                "message": "lo is missing",
+                "message": "",
                 "name": "every distinct xs.k equals lo"
               }
             ],
@@ -8194,26 +8397,68 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/0/k"
+                            ],
+                            "name": "t.fs[0].k.lo",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
                         ],
-                        "name": "t.fs[].k",
-                        "outcome": "usable",
-                        "value": [
-                          5,
-                          5
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/0"
+                        ],
+                        "message": "k is 5, which isn't an object",
+                        "name": "item 1 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "lo": 1,
+                          "ok": [
+                            1
+                          ]
+                        }
+                      },
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/1/k"
+                            ],
+                            "name": "t.fs[1].k.lo",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/1"
+                        ],
+                        "message": "k is 5, which isn't an object",
+                        "name": "item 2 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "lo": 9,
+                          "ok": [
+                            1
+                          ]
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of t.fs: k is 5, which isn't an object; item 2 of t.fs: k is 5, which isn't an object",
+                    "message": "",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -8445,26 +8690,67 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/0/k"
+                            ],
+                            "name": "t.fs[0].k.lo",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
                         ],
-                        "name": "t.fs[].k",
-                        "outcome": "usable",
-                        "value": [
-                          5,
-                          5
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/0"
+                        ],
+                        "message": "k is 5, which isn't an object",
+                        "name": "item 1 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "lo": 1,
+                          "ok": [
+                            1
+                          ]
+                        }
+                      },
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/1/k"
+                            ],
+                            "name": "t.fs[1].k.lo",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/1"
+                        ],
+                        "message": "k is 5, which isn't an object",
+                        "name": "item 2 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "ok": [
+                            1
+                          ]
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of t.fs: k is 5, which isn't an object; item 2 of t.fs: k is 5, which isn't an object",
+                    "message": "",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -8696,26 +8982,68 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/0/k"
+                            ],
+                            "name": "t.fs[0].k.lo",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
                         ],
-                        "name": "t.fs[].k",
-                        "outcome": "usable",
-                        "value": [
-                          5,
-                          5
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/0"
+                        ],
+                        "message": "k is 5, which isn't an object",
+                        "name": "item 1 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "lo": 1,
+                          "ok": [
+                            1
+                          ]
+                        }
+                      },
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/1/k"
+                            ],
+                            "name": "t.fs[1].k.lo",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/1"
+                        ],
+                        "message": "k is 5, which isn't an object",
+                        "name": "item 2 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "lo": null,
+                          "ok": [
+                            1
+                          ]
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of t.fs: k is 5, which isn't an object; item 2 of t.fs: k is 5, which isn't an object",
+                    "message": "",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -8950,26 +9278,68 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/0/k"
+                            ],
+                            "name": "t.fs[0].k.lo",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
                         ],
-                        "name": "t.fs[].k",
-                        "outcome": "usable",
-                        "value": [
-                          5,
-                          5
-                        ]
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/0"
+                        ],
+                        "message": "k is 5, which isn't an object",
+                        "name": "item 1 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "lo": 1,
+                          "ok": [
+                            1
+                          ]
+                        }
+                      },
+                      {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/1/k"
+                            ],
+                            "name": "t.fs[1].k.lo",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/1"
+                        ],
+                        "message": "k is 5, which isn't an object",
+                        "name": "item 2 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "lo": "x",
+                          "ok": [
+                            1
+                          ]
+                        }
                       }
                     ],
+                    "inputs": [],
                     "kind": "item",
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of t.fs: k is 5, which isn't an object; item 2 of t.fs: k is 5, which isn't an object",
+                    "message": "",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -9408,20 +9778,36 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/0/k",
+                              "/s/ts/0/fs/1/k"
+                            ],
+                            "name": "t.fs[0].k",
+                            "outcome": "unusable",
+                            "value": 5
+                          }
                         ],
-                        "name": "t.fs[].k",
-                        "outcome": "usable",
-                        "value": [
-                          5,
-                          5
-                        ]
-                      },
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/0",
+                          "/s/ts/0/fs/1"
+                        ],
+                        "message": "k is 5, which isn't text",
+                        "name": "item 1 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "lo": 9,
+                          "ok": []
+                        }
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "/s/ts/0/pats"
@@ -9437,7 +9823,7 @@
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of t.fs: k is 5, which isn't text",
+                    "message": "",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -9550,20 +9936,36 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [
-                          "/s/ts/0/fs/0/k",
-                          "/s/ts/0/fs/1/k"
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/s/ts/0/fs/0/k",
+                              "/s/ts/0/fs/1/k"
+                            ],
+                            "name": "t.fs[0].k",
+                            "outcome": "usable",
+                            "value": 5
+                          }
                         ],
-                        "name": "t.fs[].k",
-                        "outcome": "usable",
-                        "value": [
-                          5,
-                          5
-                        ]
-                      },
+                        "kind": "item",
+                        "locations": [
+                          "/s/ts/0/fs/0",
+                          "/s/ts/0/fs/1"
+                        ],
+                        "message": "k is 5, and t.ok is [5]",
+                        "name": "item 1 of t.fs",
+                        "value": {
+                          "k": 5,
+                          "lo": 9,
+                          "ok": []
+                        }
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "/s/ts/0/ok"
@@ -9579,7 +9981,7 @@
                     "locations": [
                       "/s/ts/0"
                     ],
-                    "message": "item 1 of t.fs: k is 5, and t.ok is [5]",
+                    "message": "",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [

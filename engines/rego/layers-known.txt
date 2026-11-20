@@ -40,15 +40,12 @@ _filter_eval -> _row_inputs
 _filter_eval -> _with_key_fields
 _first_seen -> _starts_group
 _fk_text -> _s_key_text
-_fl_fail_name -> _chained
-_fl_fail_name -> _m_from_root
 _fl_fail_text -> _m_from_item_name
 _fl_fail_text -> _m_isnt
 _fl_fail_text -> _m_named_fail
 _fl_list_name -> _m_from_root
 _fl_many_names -> _chained
 _fl_named_start -> _chained
-_fl_note_text -> _m_from_item_name
 _fl_parent_unread -> _chained
 _fl_type_name -> _m_from_item_name
 _fl_type_name -> _m_from_root

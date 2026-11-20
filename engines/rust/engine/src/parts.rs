@@ -214,7 +214,10 @@ fn item_read(failed: &Value) -> Value {
         "name": failed.get("path").cloned().unwrap_or(Value::Null),
         "value": value,
         "locations": failed.get("locations").cloned().unwrap_or(json!([])),
-        "outcome": item_outcome(failed.get("cause").and_then(Value::as_str).unwrap_or(""), &value),
+        "outcome": failed
+            .get("ergo/outcome")
+            .and_then(Value::as_str)
+            .unwrap_or_else(|| item_outcome(failed.get("cause").and_then(Value::as_str).unwrap_or(""), &value)),
     })
 }
 
@@ -401,14 +404,34 @@ fn levels_of(entry: Failure, input: &Value) -> Leveled {
         cut = cut.saturating_sub(1);
     }
     let stopped_short = matches!(&entry, Failure::List(part) if part.cause == Cause::Absent);
-    let mut ends = vec![0usize; m];
-    for j in (0..m).rev() {
-        if !(stopped_short && j == m - 1) {
-            cut = cut.saturating_sub(fields[j + 1].split('.').filter(|f| !f.is_empty()).count());
+    let count = |field: &str| field.split('.').filter(|f| !f.is_empty()).count();
+    let ends_with = |last: usize| {
+        let mut cut = cut;
+        let mut ends = vec![0usize; m];
+        for j in (0..m).rev() {
+            cut = cut.saturating_sub(if j == m - 1 {
+                last
+            } else {
+                count(&fields[j + 1])
+            });
+            ends[j] = cut;
+            cut = cut.saturating_sub(1);
         }
-        ends[j] = cut;
-        cut = cut.saturating_sub(1);
-    }
+        ends
+    };
+    let fits = |ends: &[usize]| {
+        ends.iter().zip(&idx).all(|(end, at)| {
+            end.checked_sub(1)
+                .and_then(|k| tokens.get(k))
+                .is_some_and(|token| *token == at.to_string())
+        })
+    };
+    let full = count(&fields[m]);
+    let ends = (0..=full)
+        .rev()
+        .map(ends_with)
+        .find(|ends| fits(ends))
+        .unwrap_or_else(|| ends_with(if stopped_short { 0 } else { full }));
     let levels: Vec<Level> = (0..m)
         .map(|j| {
             let pointer = tokens[..ends[j].min(tokens.len())].join("/");
@@ -491,6 +514,34 @@ fn nested(entries: Vec<Leveled>, depth: usize) -> Vec<Failure> {
                 });
             }
             _ => {}
+        }
+    }
+    merged_items(out)
+}
+
+fn merged_items(entries: Vec<Failure>) -> Vec<Failure> {
+    let mut out: Vec<Failure> = Vec::new();
+    for entry in entries {
+        let same = out.iter().position(|e| {
+            matches!((e, &entry), (Failure::Item { .. }, Failure::Item { .. }))
+                && e.part().name == entry.part().name
+        });
+        match (same, entry) {
+            (Some(at), Failure::Item { part, .. }) => {
+                if let Failure::Item { part: kept, .. } = &mut out[at] {
+                    kept.cause = Cause::worst([kept.cause, part.cause]).unwrap_or(kept.cause);
+                    if kept.message.is_empty() {
+                        kept.message = part.message;
+                    }
+                    for input in part.inputs {
+                        if !kept.inputs.contains(&input) {
+                            kept.inputs.push(input);
+                        }
+                    }
+                    kept.failures.extend(part.failures);
+                }
+            }
+            (_, entry) => out.push(entry),
         }
     }
     out

@@ -139,7 +139,29 @@
           "failures": [
             {
               "cause": "not_an_object",
-              "failures": [],
+              "failures": [
+                {
+                  "cause": "not_an_object",
+                  "failures": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/items/0"
+                      ],
+                      "name": "items[0].x",
+                      "outcome": "not_an_object",
+                      "value": null
+                    }
+                  ],
+                  "kind": "item",
+                  "locations": [
+                    "/things/0/items/0"
+                  ],
+                  "message": "item 1 of items is null, which isn't an object",
+                  "name": "item 1 of items",
+                  "value": null
+                }
+              ],
               "inputs": [
                 {
                   "locations": [
@@ -147,23 +169,13 @@
                   ],
                   "name": "sum of items.x",
                   "value": null
-                },
-                {
-                  "locations": [
-                    "/things/0/items/0"
-                  ],
-                  "name": "items[].x",
-                  "outcome": "usable",
-                  "value": [
-                    null
-                  ]
                 }
               ],
               "kind": "assertion",
               "locations": [
                 "$policy:/requirements/r/checks/c"
               ],
-              "message": "item 1 of items is null, which isn't an object",
+              "message": "",
               "name": "sum of items.x is 1"
             }
           ],

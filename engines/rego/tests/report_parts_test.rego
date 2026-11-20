@@ -76,8 +76,8 @@ test_a_failed_sentence_of_an_assert_list_names_its_own_policy_location if {
 test_an_any_of_row_lists_its_options_sorted_by_name_with_their_assertions_under_them if {
 	rows := _parts_results({"things": [{"id": "a", "x": 1, "y": 3}]}, {"any_of": {"b": "x is 2", "a": ["x is 1 and y is 2", "y exists"]}}, {})
 	[_shape(f) | some f in rows[0].failures] == [
-		{"kind": "option", "name": "a", "cause": "value", "message": "y is 3", "failures": [{"kind": "assertion", "name": "y is 2", "cause": "value", "message": "y is 3", "failures": []}]},
-		{"kind": "option", "name": "b", "cause": "value", "message": "x is 1", "failures": [{"kind": "assertion", "name": "x is 2", "cause": "value", "message": "x is 1", "failures": []}]},
+		{"kind": "option", "name": "a", "cause": "value", "message": "", "failures": [{"kind": "assertion", "name": "y is 2", "cause": "value", "message": "y is 3", "failures": []}]},
+		{"kind": "option", "name": "b", "cause": "value", "message": "", "failures": [{"kind": "assertion", "name": "x is 2", "cause": "value", "message": "x is 1", "failures": []}]},
 	]
 }
 
@@ -212,7 +212,7 @@ _copied_policy(checks) := {
 test_a_failed_item_of_a_child_of_a_distinct_parent_lists_where_it_sits_under_every_copy if {
 	component := {"name": "a", "licenses": [{"id": "MIT", "ok": true, "gs": [{"ns": ["bad"]}]}, 5]}
 	rep := ergo.report({"sbom": {"components": [component, component]}}, _copied_policy({"g": "every gs.ns is \"fine\""}), {})
-	[[f.item, f.locations] | some r in rep.results; r.check == "$min_subjects"; some f in r.failed_items] == [
+	[[f.name, f.locations] | some r in rep.results; r.check == "$min_subjects"; some f in r.failures] == [
 		["item 1 of licenses", ["/sbom/components/0/licenses/0", "/sbom/components/1/licenses/0"]],
 		["item 2 of licenses", ["/sbom/components/0/licenses/1", "/sbom/components/1/licenses/1"]],
 	]

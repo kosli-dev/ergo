@@ -357,20 +357,14 @@ _fl_type_name(req, n, path) := _visible_path_name(_visible(path), _m_from_root(r
 
 else := _m_from_item_name(req, path)
 
-_fl_note_text(req, n) := concat("", [_fl_field_name(n.list), " is a list in ", a, " but ", _literal_text(n.other.v), " in ", _fl_other_item(a, b)]) if {
+_fl_note_text(req, n) := concat(", ", [cs[t[1]] | some t in sort([[it.path, k] | some k, it in n.items])]) if {
 	"list" in object.keys(n)
-	a := _m_from_item_name(req, n.list.i)
-	b := _m_from_item_name(req, n.other.i)
+	cs := _fl_note_clauses(req, n)
 }
 
-_fl_field_name(e) := _plain_steps_name(array.slice(e.c, count(e.i), count(e.c)))
+_fl_note_clauses(req, n) := [concat("", [_fl_type_name(req, n, t[1]), " is ", t[0]]) | some t in n.types] if "types" in object.keys(n)
 
-_fl_other_item(a, b) := concat("", ["item ", mb[1]]) if {
-	ma := regex.find_all_string_submatch_n(`^item [0-9]+ of (.+)$`, a, 1)[0]
-	mb := regex.find_all_string_submatch_n(`^item ([0-9]+) of (.+)$`, b, 1)[0]
-	ma[1] == mb[2]
-	not contains(ma[1], ":")
-} else := b
+_fl_note_clauses(req, n) := [concat("", [_fl_type_name(req, {}, n.list.c), " is a list"]), concat("", [_fl_type_name(req, {}, n.other.c), " is ", _fl_type(n.other.v)])] if "list" in object.keys(n)
 
 _fl_key_names(req) := count([k | some k in _from_keys(req); is_string(k)])
 
@@ -458,13 +452,6 @@ _fl_plain_typed(doc, req) := n if {
 	[n] := _fl_plain_types(doc, req)
 }
 
-_fl_failed(doc, req) := array.concat(w.fails, [f | some n in w.notes; some f in n.items]) if w := _fl_broken(doc, _from_keys(req))
-
-_fl_items(req, fails) := [x |
-	some p in sort({f.path | some f in fails})
-	some x in {{"path": _fl_fail_name(req, f.path), "item": _fl_fail_name(req, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} | some f in fails; f.path == p}
-]
-
 _fl_fail_text(req, f) := _m_isnt(_m_from_item_name(req, f.why.path), f.why.value, f.why.kind) if is_object(object.get(f, "why", null))
 
 else := _m_named_fail(object.union(f, {"path": _m_from_item_name(req, f.path)}))
@@ -479,11 +466,6 @@ _fl_typed_only(doc, req) if {
 	_walkable(doc)
 	_fl_broken(doc, _from_keys(req)).fails == []
 }
-
-_fl_fail_name(req, path) := _visible_path_name(_visible(path), _m_from_root(req)) if {
-	path != []
-	_chained(req)
-} else := _input_path_name(path)
 
 _fl_parent_unread(doc, req) if {
 	_chained(req)

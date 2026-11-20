@@ -296,14 +296,29 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "item 1 of releases.tags",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/tags/0"
+                    ],
+                    "name": "releases.tags[0]",
+                    "outcome": "usable",
+                    "value": [
+                      "v1",
+                      "latest"
+                    ]
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/releases/tags/0"
                 ],
-                "path": "item 1 of releases.tags",
+                "message": "item 1 of releases.tags is a list",
+                "name": "item 1 of releases.tags",
                 "value": [
                   "v1",
                   "latest"
@@ -311,11 +326,23 @@
               },
               {
                 "cause": "unusable",
-                "item": "item 3 of releases.tags",
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/releases/tags/2"
+                    ],
+                    "name": "releases.tags[2]",
+                    "outcome": "usable",
+                    "value": "broken"
+                  }
+                ],
+                "kind": "item",
                 "locations": [
                   "/releases/tags/2"
                 ],
-                "path": "item 3 of releases.tags",
+                "message": "item 3 of releases.tags is text",
+                "name": "item 3 of releases.tags",
                 "value": "broken"
               }
             ],
@@ -2069,15 +2096,23 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "ws",
-                "locations": [
-                  ""
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "ws",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "ws",
-                "value": null
+                "kind": "list",
+                "message": "ws is missing",
+                "name": "ws"
               }
             ],
             "inputs": [
@@ -2085,6 +2120,14 @@
                 "locations": [],
                 "name": "in-scope w count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "ws",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "ws is missing",
@@ -2105,15 +2148,23 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "ws",
-                "locations": [
-                  "/ws"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/ws"
+                    ],
+                    "name": "ws",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "ws",
-                "value": null
+                "kind": "list",
+                "message": "ws is null",
+                "name": "ws"
               }
             ],
             "inputs": [
@@ -2121,6 +2172,14 @@
                 "locations": [],
                 "name": "in-scope w count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/ws"
+                ],
+                "name": "ws",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "ws is null",
@@ -2169,14 +2228,7 @@
                     "name": "ws"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "ws",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c"
@@ -2233,14 +2285,7 @@
                     "name": "ws"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "ws",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c"

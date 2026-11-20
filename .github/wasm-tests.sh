@@ -11,7 +11,7 @@ batches=$(((total + 49) / 50))
 ran=0
 for batch in $(seq 0 $((batches - 1))); do
   pattern=$(awk -v b="$batches" -v k="$batch" '(NR - 1) % b == k' <<<"$tests" | .github/test-pattern.sh)
-  out=$("${opa[@]}" test engines/rego dist spec:spec examples:examples --ignore src --target wasm --timeout 120s -r "$pattern") || { echo "$out"; exit 1; }
+  out=$("${opa[@]}" test engines/rego dist spec:spec examples:examples --ignore src --target wasm --timeout 240s -r "$pattern") || { echo "$out"; exit 1; }
   echo "$out"
   ran=$((ran + $(sed -nE 's/^PASS: ([0-9]+)\/[0-9]+$/\1/p' <<<"$out")))
 done

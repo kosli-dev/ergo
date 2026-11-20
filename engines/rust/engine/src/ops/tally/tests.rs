@@ -1342,31 +1342,15 @@ fn a_whose_with_an_elapsed_side_names_its_first_path_that_was_not_read() {
 }
 
 #[test]
-fn a_whose_names_a_param_or_input_by_its_own_path_and_not_under_the_item() {
-    let on_right = failed_items_of(
+fn a_whose_root_that_cant_be_read_leaves_no_failed_item_when_the_item_reads_fine() {
+    for sentence in [
         "every items whose lo is at least $params.min exists",
-        json!([{"lo": 1, "s": "ok"}]),
-        json!({}),
-    );
-    assert_eq!(
-        named(&on_right),
-        [("$params.min", &json!(null), &json!("$params:"))]
-    );
-    let on_left = failed_items_of(
         "every items whose $params.min is at most lo exists",
-        json!([{"lo": 1, "s": "ok"}]),
-        json!({}),
-    );
-    assert_eq!(
-        named(&on_left),
-        [("$params.min", &json!(null), &json!("$params:"))]
-    );
-    let input = failed_items_of(
         "every items whose lo is at least $input.min exists",
-        json!([{"lo": 1, "s": "ok"}]),
-        json!({}),
-    );
-    assert_eq!(named(&input), [("$input.min", &json!(null), &json!(""))]);
+    ] {
+        let failed = failed_items_of(sentence, json!([{"lo": 1, "s": "ok"}]), json!({}));
+        assert!(failed.is_empty(), "{sentence}");
+    }
 }
 
 fn failed_items_with(

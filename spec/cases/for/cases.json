@@ -10302,7 +10302,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -18230,24 +18229,35 @@
                     "failures": [
                       {
                         "cause": "value",
-                        "failures": [],
-                        "inputs": [
+                        "failures": [
                           {
+                            "cause": "value",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/things/0/deep/0/subs/1/leaves/0"
+                                ],
+                                "name": "y.leaves[0]",
+                                "outcome": "usable",
+                                "value": 9
+                              }
+                            ],
+                            "kind": "item",
                             "locations": [
                               "/things/0/deep/0/subs/1/leaves/0"
                             ],
-                            "name": "y.leaves[]",
-                            "outcome": "usable",
-                            "value": [
-                              9
-                            ]
+                            "message": "item 1 of y.leaves is 9",
+                            "name": "item 1 of y.leaves",
+                            "value": 9
                           }
                         ],
+                        "inputs": [],
                         "kind": "item",
                         "locations": [
                           "/things/0/deep/0/subs/1"
                         ],
-                        "message": "item 1 of y.leaves is 9",
+                        "message": "",
                         "name": "item 2 of z.subs",
                         "value": {
                           "leaves": [
@@ -18908,22 +18918,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/items/0",
-                      "/things/0/items/1"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "w": 1
-                      },
-                      {
-                        "w": 2
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/things/0/meta/w"
                     ],
                     "name": "pa.w",
@@ -19028,22 +19022,6 @@
                     ],
                     "name": "count of items whose w equals artifact.w",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/artifacts/0/prs/0/items/0",
-                      "/artifacts/0/prs/0/items/1"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "w": 1
-                      },
-                      {
-                        "w": 2
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -20204,7 +20182,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -25559,7 +25536,29 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/xs/0/tags/0"
+                            ],
+                            "name": "x.tags[0]",
+                            "outcome": "usable",
+                            "value": "t"
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/xs/0/tags/0"
+                        ],
+                        "message": "item 1 of x.tags is \"t\", and x.nums is [\"u\"]",
+                        "name": "item 1 of x.tags",
+                        "value": "t"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -25570,23 +25569,13 @@
                         "value": [
                           "u"
                         ]
-                      },
-                      {
-                        "locations": [
-                          "/things/0/xs/0/tags/0"
-                        ],
-                        "name": "x.tags[]",
-                        "outcome": "usable",
-                        "value": [
-                          "t"
-                        ]
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "item 1 of x.tags is \"t\", and x.nums is [\"u\"]",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "nums": [
@@ -25744,18 +25733,6 @@
                   },
                   {
                     "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/things/0/m"
                     ],
                     "name": "m",
@@ -25836,7 +25813,31 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rows/0/n"
+                            ],
+                            "name": "rows[0].n",
+                            "outcome": "usable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/rows/0"
+                        ],
+                        "message": "n is 1, and x.v is 5",
+                        "name": "item 1 of rows",
+                        "value": {
+                          "n": 1
+                        }
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -25851,7 +25852,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "item 1 of rows: n is 1, and x.v is 5",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "nums": [
@@ -25864,18 +25865,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/rows/0/n"
-                    ],
-                    "name": "rows[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/walk/assert"
@@ -26953,7 +26943,30 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rows"
+                            ],
+                            "name": "rows",
+                            "outcome": "usable",
+                            "value": [
+                              {
+                                "n": 1,
+                                "z": 2
+                              }
+                            ]
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                        "name": "rows"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -26968,7 +26981,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "v": 5,
@@ -26984,19 +26997,6 @@
                     "name": "$input.q",
                     "outcome": "usable",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "z": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -27113,7 +27113,30 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rows"
+                            ],
+                            "name": "rows",
+                            "outcome": "usable",
+                            "value": [
+                              {
+                                "n": 1,
+                                "z": 2
+                              }
+                            ]
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                        "name": "rows"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -27128,7 +27151,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "v": 5,
@@ -27144,19 +27167,6 @@
                     "name": "$input.q",
                     "outcome": "usable",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "z": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -27273,7 +27283,30 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rows"
+                            ],
+                            "name": "rows",
+                            "outcome": "usable",
+                            "value": [
+                              {
+                                "n": 1,
+                                "z": 2
+                              }
+                            ]
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                        "name": "rows"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -27288,7 +27321,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "v": 5,
@@ -27304,19 +27337,6 @@
                     "name": "$input.k",
                     "outcome": "usable",
                     "value": 100
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "z": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -27433,7 +27453,30 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/rows"
+                            ],
+                            "name": "rows",
+                            "outcome": "usable",
+                            "value": [
+                              {
+                                "n": 1,
+                                "z": 2
+                              }
+                            ]
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                        "name": "rows"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -27448,7 +27491,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "rows is [{\"n\": 1, \"z\": 2}]",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "v": 5,
@@ -27464,19 +27507,6 @@
                     "name": "$input.q",
                     "outcome": "usable",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/things/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "z": 2
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -27593,7 +27623,25 @@
                     "failures": [
                       {
                         "cause": "unusable",
-                        "failures": [],
+                        "failures": [
+                          {
+                            "cause": "unusable",
+                            "failures": [],
+                            "inputs": [
+                              {
+                                "locations": [
+                                  "/things/0/xs/0/ys/0/w"
+                                ],
+                                "name": "y.w",
+                                "outcome": "unusable",
+                                "value": 1
+                              }
+                            ],
+                            "kind": "list",
+                            "message": "y.w is 1, which isn't a list or an object",
+                            "name": "y.w"
+                          }
+                        ],
                         "inputs": [
                           {
                             "locations": [
@@ -27602,27 +27650,13 @@
                             "name": "x.v",
                             "outcome": "usable",
                             "value": 5
-                          },
-                          {
-                            "locations": [],
-                            "name": "y.w",
-                            "outcome": "unusable",
-                            "value": []
-                          },
-                          {
-                            "locations": [
-                              "/q"
-                            ],
-                            "name": "$input.q",
-                            "outcome": "usable",
-                            "value": 1
                           }
                         ],
                         "kind": "item",
                         "locations": [
                           "/things/0/xs/0/ys/0"
                         ],
-                        "message": "y.w is 1, which isn't a list or an object",
+                        "message": "",
                         "name": "item 1 of x.ys",
                         "value": {
                           "w": 1,
@@ -27795,19 +27829,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/ts/0/kids/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1,
-                        "z": 2
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/ts/0/x"
                     ],
                     "name": "t.x",
@@ -27959,7 +27980,32 @@
                 "failures": [
                   {
                     "cause": "value",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/#rows/0/n"
+                            ],
+                            "name": "\"#rows\"[0].n",
+                            "outcome": "usable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "item",
+                        "locations": [
+                          "/things/0/#rows/0"
+                        ],
+                        "message": "n is 1, and x.v is 5",
+                        "name": "item 1 of \"#rows\"",
+                        "value": {
+                          "n": 1,
+                          "z": 2
+                        }
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -27974,7 +28020,7 @@
                     "locations": [
                       "/things/0/xs/0"
                     ],
-                    "message": "item 1 of \"#rows\": n is 1, and x.v is 5",
+                    "message": "",
                     "name": "item 1 of xs",
                     "value": {
                       "v": 5,
@@ -27982,18 +28028,7 @@
                     }
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/#rows/0/n"
-                    ],
-                    "name": "\"#rows\"[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c/assert"
@@ -38050,7 +38085,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is 3, which isn't a list or an object",
                     "name": "$params"
@@ -38061,12 +38105,6 @@
                     "locations": [],
                     "name": "count of $params.a",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.a",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -38122,7 +38160,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is \"s\", which isn't a list or an object",
                     "name": "$params"
@@ -38133,12 +38180,6 @@
                     "locations": [],
                     "name": "count of $params.a",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.a",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -38194,7 +38235,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": true
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is true, which isn't a list or an object",
                     "name": "$params"
@@ -38205,12 +38255,6 @@
                     "locations": [],
                     "name": "count of $params.a",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.a",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -38266,7 +38310,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": false
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is false, which isn't a list or an object",
                     "name": "$params"
@@ -38277,12 +38330,6 @@
                     "locations": [],
                     "name": "count of $params.a",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.a",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -38338,7 +38385,16 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is [], which isn't an object",
                     "name": "$params"
@@ -38400,20 +38456,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params.a",
-                    "outcome": "unusable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is 3, which isn't an object",
+                    "name": "$params"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is 3, which isn't an object",
+                "message": "",
                 "name": "every $params.a is 1"
               }
             ],
@@ -38453,20 +38520,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params.a",
-                    "outcome": "unusable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is \"s\", which isn't an object",
+                    "name": "$params"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is \"s\", which isn't an object",
+                "message": "",
                 "name": "every $params.a is 1"
               }
             ],
@@ -38506,20 +38584,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params.a",
-                    "outcome": "unusable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": true
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is true, which isn't an object",
+                    "name": "$params"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is true, which isn't an object",
+                "message": "",
                 "name": "every $params.a is 1"
               }
             ],
@@ -38559,20 +38648,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params.a",
-                    "outcome": "unusable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": false
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is false, which isn't an object",
+                    "name": "$params"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is false, which isn't an object",
+                "message": "",
                 "name": "every $params.a is 1"
               }
             ],
@@ -38612,20 +38712,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params[].a",
-                    "outcome": "usable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is [], which isn't an object",
+                    "name": "$params"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is [], which isn't an object",
+                "message": "",
                 "name": "every $params.a is 1"
               }
             ],
@@ -38887,14 +38998,7 @@
                     "name": "$params"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.a",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -38958,14 +39062,7 @@
                     "name": "$params"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params[0].a",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -39014,7 +39111,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is missing",
                     "name": "$params"
@@ -39025,12 +39131,6 @@
                     "locations": [],
                     "name": "count of $params.a",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.a",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -39088,10 +39188,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:"
+                        ],
                         "name": "$params",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -39155,20 +39257,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params[0].a",
-                    "outcome": "unusable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is 3, which isn't a list",
+                    "name": "$params"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is 3, which isn't a list",
+                "message": "",
                 "name": "every $params[0].a is 1"
               }
             ],
@@ -39208,20 +39321,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params[0].a",
-                    "outcome": "unusable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is \"s\", which isn't a list",
+                    "name": "$params"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is \"s\", which isn't a list",
+                "message": "",
                 "name": "every $params[0].a is 1"
               }
             ],
@@ -39261,20 +39385,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params[0].a",
-                    "outcome": "unusable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": true
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is true, which isn't a list",
+                    "name": "$params"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is true, which isn't a list",
+                "message": "",
                 "name": "every $params[0].a is 1"
               }
             ],
@@ -39314,20 +39449,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params[0].a",
-                    "outcome": "unusable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": false
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is false, which isn't a list",
+                    "name": "$params"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is false, which isn't a list",
+                "message": "",
                 "name": "every $params[0].a is 1"
               }
             ],
@@ -39367,20 +39513,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params[0].a",
-                    "outcome": "unusable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is 3, which isn't a list",
+                    "name": "$params"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is 3, which isn't a list",
+                "message": "",
                 "name": "some $params[0].a is 1"
               }
             ],
@@ -39420,7 +39577,25 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params is 3, which isn't a list",
+                    "name": "$params"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -39433,7 +39608,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "$params is 3, which isn't a list",
+                "message": "",
                 "name": "every item 1 of $params is 1"
               }
             ],
@@ -39475,12 +39650,21 @@
                 "cause": "unusable",
                 "failures": [
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "item 1 of $params",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
-                    "message": "$params is [], which isn't an object",
-                    "name": "$params"
+                    "message": "item 1 of $params is missing",
+                    "name": "item 1 of $params"
                   }
                 ],
                 "inputs": [
@@ -39517,7 +39701,7 @@
                 "value": []
               }
             ],
-            "message": "$params is [], which isn't an object",
+            "message": "item 1 of $params is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -40010,20 +40194,7 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/ws/0"
-                    ],
-                    "name": "ws[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "x": 1
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -40224,7 +40395,18 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": [
+                          3
+                        ]
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is [3], which isn't an object",
                     "name": "$params"
@@ -40298,7 +40480,18 @@
                   {
                     "cause": "unusable",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "unusable",
+                        "value": [
+                          3
+                        ]
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is [3], which isn't an object",
                     "name": "$params"
@@ -40368,7 +40561,40 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "$params:/0/v"
+                            ],
+                            "name": "$params[0].v",
+                            "outcome": "unusable",
+                            "value": 1
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "v is 1, which isn't a list or an object",
+                        "name": "v"
+                      }
+                    ],
+                    "inputs": [],
+                    "kind": "item",
+                    "locations": [
+                      "$params:/0"
+                    ],
+                    "message": "",
+                    "name": "item 1 of $params",
+                    "value": {
+                      "v": 1
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -40386,7 +40612,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 1 of $params: v is 1, which isn't a list or an object",
+                "message": "",
                 "name": "count of $params[0].v is 1"
               }
             ],
@@ -42718,25 +42944,37 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0"
+                        ],
+                        "name": "z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is missing",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_z/assert"
                 ],
-                "message": "z is missing",
+                "message": "",
                 "name": "count of z is 1"
               }
             ],
@@ -42862,25 +43100,37 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0"
+                        ],
+                        "name": "z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is missing",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_z/assert"
                 ],
-                "message": "z is missing",
+                "message": "",
                 "name": "sum of z is 3"
               }
             ],
@@ -42924,25 +43174,37 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is null",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_z/assert"
                 ],
-                "message": "z is null",
+                "message": "",
                 "name": "count of z is 1"
               }
             ],
@@ -43068,25 +43330,37 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is null",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_z/assert"
                 ],
-                "message": "z is null",
+                "message": "",
                 "name": "sum of z is 3"
               }
             ],
@@ -43130,25 +43404,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is \"s\", which isn't a list or an object",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_z/assert"
                 ],
-                "message": "z is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of z is 1"
               }
             ],
@@ -43258,25 +43544,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is \"s\", which isn't a list or an object",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_z/assert"
                 ],
-                "message": "z is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "sum of z is 3"
               }
             ],
@@ -43320,25 +43618,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is 3, which isn't a list or an object",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_z/assert"
                 ],
-                "message": "z is 3, which isn't a list or an object",
+                "message": "",
                 "name": "count of z is 1"
               }
             ],
@@ -43464,25 +43774,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is 3, which isn't a list or an object",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_z/assert"
                 ],
-                "message": "z is 3, which isn't a list or an object",
+                "message": "",
                 "name": "sum of z is 3"
               }
             ],
@@ -43526,25 +43848,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is {\"a\": 1}, which isn't a list",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_z/assert"
                 ],
-                "message": "z is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "count of z is 1"
               }
             ],
@@ -43676,25 +44012,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is {\"a\": 1}, which isn't a list",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_z/assert"
                 ],
-                "message": "z is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "sum of z is 3"
               }
             ],
@@ -43744,25 +44094,37 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0"
+                        ],
+                        "name": "z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is missing",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_z/assert"
                 ],
-                "message": "z is missing",
+                "message": "",
                 "name": "count of z is 1"
               }
             ],
@@ -43945,25 +44307,37 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0"
+                        ],
+                        "name": "z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is missing",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_z/assert"
                 ],
-                "message": "z is missing",
+                "message": "",
                 "name": "sum of z is 3"
               }
             ],
@@ -44023,25 +44397,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is 3, which isn't a list or an object",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_z/assert"
                 ],
-                "message": "z is 3, which isn't a list or an object",
+                "message": "",
                 "name": "count of z is 1"
               }
             ],
@@ -44224,25 +44610,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is 3, which isn't a list or an object",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_z/assert"
                 ],
-                "message": "z is 3, which isn't a list or an object",
+                "message": "",
                 "name": "sum of z is 3"
               }
             ],
@@ -44302,25 +44700,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is {\"a\": 1}, which isn't a list",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_z/assert"
                 ],
-                "message": "z is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "count of z is 1"
               }
             ],
@@ -44511,25 +44923,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is {\"a\": 1}, which isn't a list",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_z/assert"
                 ],
-                "message": "z is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "sum of z is 3"
               }
             ],
@@ -44589,25 +45015,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is 3, which isn't a list or an object",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_z/assert"
                 ],
-                "message": "z is 3, which isn't a list or an object",
+                "message": "",
                 "name": "count of z is 1"
               },
               {
@@ -44784,25 +45222,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is 3, which isn't a list or an object",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_z/assert"
                 ],
-                "message": "z is 3, which isn't a list or an object",
+                "message": "",
                 "name": "sum of z is 3"
               },
               {
@@ -44863,25 +45313,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is {\"a\": 1}, which isn't a list",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_z/assert"
                 ],
-                "message": "z is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "count of z is 1"
               },
               {
@@ -45064,25 +45528,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/z"
+                        ],
+                        "name": "z",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "z is {\"a\": 1}, which isn't a list",
+                    "name": "z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_z/assert"
                 ],
-                "message": "z is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "sum of z is 3"
               },
               {
@@ -45150,25 +45628,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/top/q"
+                        ],
+                        "name": "$input.top.q",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$input.top.q is \"s\", which isn't a list or an object",
+                    "name": "$input.top.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $input.top.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$input.top.q",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_i/assert"
                 ],
-                "message": "$input.top.q is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of $input.top.q is 1"
               }
             ],
@@ -45205,25 +45695,41 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/c/z"
+                        ],
+                        "name": "pl.z",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "pl.z is \"s\", which isn't a list or an object",
+                    "name": "pl.z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of pl.z",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "pl.z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_p/assert"
                 ],
-                "message": "pl.z is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of pl.z is 1"
               }
             ],
@@ -45325,6 +45831,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": "s"
                   }
                 ],
@@ -45419,25 +45929,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/q"
+                        ],
+                        "name": "$params.q",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is \"s\", which isn't a list or an object",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_q/assert"
                 ],
-                "message": "$params.q is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "sum of $params.q is 3"
               }
             ],
@@ -45481,25 +46003,37 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/top"
+                        ],
+                        "name": "$input.top.q",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$input.top.q is missing",
+                    "name": "$input.top.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $input.top.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$input.top.q",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_i/assert"
                 ],
-                "message": "$input.top.q is missing",
+                "message": "",
                 "name": "count of $input.top.q is 1"
               }
             ],
@@ -45536,25 +46070,41 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/c/z"
+                        ],
+                        "name": "pl.z",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "pl.z is null",
+                    "name": "pl.z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of pl.z",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "pl.z",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_p/assert"
                 ],
-                "message": "pl.z is null",
+                "message": "",
                 "name": "count of pl.z is 1"
               }
             ],
@@ -45656,6 +46206,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": null
                   }
                 ],
@@ -45750,25 +46304,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/q"
+                        ],
+                        "name": "$params.q",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is \"s\", which isn't a list or an object",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_q/assert"
                 ],
-                "message": "$params.q is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "sum of $params.q is 3"
               }
             ],
@@ -45812,25 +46378,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/top/q"
+                        ],
+                        "name": "$input.top.q",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$input.top.q is {\"a\": 1}, which isn't a list",
+                    "name": "$input.top.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $input.top.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$input.top.q",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_i/assert"
                 ],
-                "message": "$input.top.q is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "count of $input.top.q is 1"
               }
             ],
@@ -45867,25 +46447,43 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/c/z"
+                        ],
+                        "name": "pl.z",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "pl.z is {\"a\": 1}, which isn't a list",
+                    "name": "pl.z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of pl.z",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "pl.z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_p/assert"
                 ],
-                "message": "pl.z is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "count of pl.z is 1"
               }
             ],
@@ -45991,6 +46589,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": {
                       "a": 1
                     }
@@ -46089,25 +46691,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/q"
+                        ],
+                        "name": "$params.q",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is \"s\", which isn't a list or an object",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_q/assert"
                 ],
-                "message": "$params.q is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "sum of $params.q is 3"
               }
             ],
@@ -51726,6 +52340,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": "s"
                   }
                 ],
@@ -51779,6 +52397,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": "s"
                   }
                 ],
@@ -52672,6 +53294,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": null
                   }
                 ],
@@ -52725,6 +53351,10 @@
                     ],
                     "name": "pl.z",
                     "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": null
                   }
                 ],
@@ -53704,25 +54334,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/w"
+                        ],
+                        "name": "w",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "w is \"s\", which isn't a list or an object",
+                    "name": "w"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of w whose z is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "w",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_whose/assert"
                 ],
-                "message": "w is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of w whose z is 1 is 1"
               }
             ],
@@ -53759,25 +54401,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/w"
+                        ],
+                        "name": "w",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "w is \"s\", which isn't a list or an object",
+                    "name": "w"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of w.z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "w.z",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_wz/assert"
                 ],
-                "message": "w is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of w.z is 1"
               }
             ],
@@ -53814,25 +54468,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/w"
+                        ],
+                        "name": "w",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "w is \"s\", which isn't a list or an object",
+                    "name": "w"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of w.z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "w.z",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_wz/assert"
                 ],
-                "message": "w is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "sum of w.z is 1"
               }
             ],
@@ -53876,25 +54542,37 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/w"
+                        ],
+                        "name": "w",
+                        "outcome": "unusable",
+                        "value": {}
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "w is {}, which isn't a list",
+                    "name": "w"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of w whose z is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "w",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_whose/assert"
                 ],
-                "message": "w is {}, which isn't a list",
+                "message": "",
                 "name": "count of w whose z is 1 is 1"
               }
             ],
@@ -53931,25 +54609,37 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/w"
+                        ],
+                        "name": "w.z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "w.z is missing",
+                    "name": "w.z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of w.z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "w.z",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_wz/assert"
                 ],
-                "message": "w.z is missing",
+                "message": "",
                 "name": "count of w.z is 1"
               }
             ],
@@ -53986,25 +54676,37 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/w"
+                        ],
+                        "name": "w.z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "w.z is missing",
+                    "name": "w.z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of w.z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "w.z",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_wz/assert"
                 ],
-                "message": "w.z is missing",
+                "message": "",
                 "name": "sum of w.z is 1"
               }
             ],
@@ -54156,25 +54858,41 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/w"
+                        ],
+                        "name": "w",
+                        "outcome": "unusable",
+                        "value": {
+                          "z": {
+                            "a": 1
+                          }
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "w is {\"z\": {\"a\": 1}}, which isn't a list",
+                    "name": "w"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of w whose z is 1",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "w",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_whose/assert"
                 ],
-                "message": "w is {\"z\": {\"a\": 1}}, which isn't a list",
+                "message": "",
                 "name": "count of w whose z is 1 is 1"
               }
             ],
@@ -54211,25 +54929,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/w/z"
+                        ],
+                        "name": "w.z",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "w.z is {\"a\": 1}, which isn't a list",
+                    "name": "w.z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of w.z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "w.z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_wz/assert"
                 ],
-                "message": "w.z is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "count of w.z is 1"
               }
             ],
@@ -54266,25 +54998,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/w/z"
+                        ],
+                        "name": "w.z",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "w.z is {\"a\": 1}, which isn't a list",
+                    "name": "w.z"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of w.z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "w.z",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_wz/assert"
                 ],
-                "message": "w.z is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "sum of w.z is 1"
               }
             ],
@@ -54406,25 +55152,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/q"
+                        ],
+                        "name": "$params.q",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is {\"a\": 1}, which isn't a list",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_q/assert"
                 ],
-                "message": "$params.q is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "count of $params.q is 1"
               }
             ],
@@ -54461,25 +55221,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/q"
+                        ],
+                        "name": "$params.q",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is {\"a\": 1}, which isn't a list",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_q/assert"
                 ],
-                "message": "$params.q is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "sum of $params.q is 1"
               }
             ],
@@ -54604,25 +55378,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/q"
+                        ],
+                        "name": "$params.q",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is {\"a\": 1}, which isn't a list",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/count_q/assert"
                 ],
-                "message": "$params.q is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "count of $params.q is 1"
               }
             ],
@@ -54669,25 +55457,39 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/q"
+                        ],
+                        "name": "$params.q",
+                        "outcome": "unusable",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.q is {\"a\": 1}, which isn't a list",
+                    "name": "$params.q"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "sum of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/sum_q/assert"
                 ],
-                "message": "$params.q is {\"a\": 1}, which isn't a list",
+                "message": "",
                 "name": "sum of $params.q is 1"
               }
             ],
@@ -54747,7 +55549,42 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/za"
+                        ],
+                        "name": "za",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "za is 3, which isn't a list or an object",
+                    "name": "za"
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/zb"
+                        ],
+                        "name": "zb",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zb is \"s\", which isn't a list or an object",
+                    "name": "zb"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -54756,27 +55593,15 @@
                   },
                   {
                     "locations": [],
-                    "name": "zb",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
-                    "locations": [],
                     "name": "count of za",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "za",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/both/assert"
                 ],
-                "message": "za is 3, which isn't a list or an object; zb is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of zb equals count of za"
               }
             ],
@@ -54834,7 +55659,42 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/za"
+                        ],
+                        "name": "za",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "za is 3, which isn't a list or an object",
+                    "name": "za"
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/zb"
+                        ],
+                        "name": "zb",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zb is \"s\", which isn't a list or an object",
+                    "name": "zb"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -54843,27 +55703,15 @@
                   },
                   {
                     "locations": [],
-                    "name": "zb",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
-                    "locations": [],
                     "name": "count of za",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "za",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/both_if_any/assert"
                 ],
-                "message": "za is 3, which isn't a list or an object; zb is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of zb equals count of za"
               }
             ],
@@ -54928,7 +55776,42 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/za"
+                        ],
+                        "name": "za",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "za is 3, which isn't a list or an object",
+                    "name": "za"
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/zb"
+                        ],
+                        "name": "zb",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zb is \"s\", which isn't a list or an object",
+                    "name": "zb"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -54937,27 +55820,15 @@
                   },
                   {
                     "locations": [],
-                    "name": "zb",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
-                    "locations": [],
                     "name": "count of za",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "za",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/both/assert"
                 ],
-                "message": "za is 3, which isn't a list or an object; zb is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of zb equals count of za"
               },
               {
@@ -55022,7 +55893,42 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/za"
+                        ],
+                        "name": "za",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "za is 3, which isn't a list or an object",
+                    "name": "za"
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/zb"
+                        ],
+                        "name": "zb",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "zb is \"s\", which isn't a list or an object",
+                    "name": "zb"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -55031,27 +55937,15 @@
                   },
                   {
                     "locations": [],
-                    "name": "zb",
-                    "outcome": "unusable",
-                    "value": []
-                  },
-                  {
-                    "locations": [],
                     "name": "count of za",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "za",
-                    "outcome": "unusable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/both_if_any/assert"
                 ],
-                "message": "za is 3, which isn't a list or an object; zb is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "count of zb equals count of za"
               }
             ],
@@ -55584,22 +56478,6 @@
                   },
                   {
                     "locations": [
-                      "/prs/0/xs/0",
-                      "/prs/0/xs/1"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      },
-                      {
-                        "v": 2
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/prs/0/p"
                     ],
                     "name": "p",
@@ -55884,24 +56762,7 @@
                     "value": "b"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/artifacts/0/prs/0/rows/0",
-                      "/artifacts/0/prs/0/rows/1"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 1
-                      },
-                      {
-                        "n": 2
-                      }
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c/assert"
@@ -56834,7 +57695,31 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
+                    "failures": [
+                      {
+                        "cause": "unusable",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ts/0"
+                            ],
+                            "name": "\u0002ok",
+                            "outcome": "unusable",
+                            "value": {
+                              "fs": [
+                                {
+                                  "k": 1
+                                }
+                              ]
+                            }
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "ok is {\"fs\": [{\"k\": 1}]}, which isn't a list",
+                        "name": "ok"
+                      }
+                    ],
                     "inputs": [
                       {
                         "locations": [
@@ -56849,23 +57734,13 @@
                             }
                           ]
                         }
-                      },
-                      {
-                        "locations": [
-                          "/things/0/ts/0/fs/0/k"
-                        ],
-                        "name": "ok.fs[].k",
-                        "outcome": "usable",
-                        "value": [
-                          1
-                        ]
                       }
                     ],
                     "kind": "item",
                     "locations": [
                       "/things/0/ts/0"
                     ],
-                    "message": "ok is {\"fs\": [{\"k\": 1}]}, which isn't a list",
+                    "message": "",
                     "name": "item 1 of ts",
                     "value": {
                       "fs": [
@@ -61518,23 +62393,6 @@
                   },
                   {
                     "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1,
-                        "ys": [
-                          {
-                            "v": 1
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/prs/0/c/0/z"
                     ],
                     "name": "pl[].z",
@@ -61876,23 +62734,6 @@
                   },
                   {
                     "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1,
-                        "ys": [
-                          {
-                            "v": 1
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/prs/0/c"
                     ],
                     "name": "pl.z",
@@ -61991,17 +62832,15 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/prs/0/c"
                     ],
                     "name": "pl.z",
                     "outcome": "null",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": null
                   }
                 ],
@@ -62108,23 +62947,6 @@
                   },
                   {
                     "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1,
-                        "ys": [
-                          {
-                            "v": 1
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/prs/0/c"
                     ],
                     "name": "pl.z",
@@ -62223,17 +63045,15 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/prs/0/c"
                     ],
                     "name": "pl.z",
                     "outcome": "unusable",
+                    "part": {
+                      "id": null,
+                      "name": "pl"
+                    },
                     "value": null
                   }
                 ],
@@ -62341,23 +63161,6 @@
                     ],
                     "name": "count of xs whose v is in pl.z",
                     "value": 1
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1,
-                        "ys": [
-                          {
-                            "v": 1
-                          }
-                        ]
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -62553,23 +63356,6 @@
                     ],
                     "name": "count of xs whose v is in pl.z",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1,
-                        "ys": [
-                          {
-                            "v": 1
-                          }
-                        ]
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -63808,12 +64594,6 @@
                     "locations": [],
                     "name": "count of $input.lst.z",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "$input.lst[].z",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -63874,16 +64654,6 @@
                       "name": "pl"
                     },
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "pl[].z",
-                    "outcome": "usable",
-                    "part": {
-                      "id": null,
-                      "name": "pl"
-                    },
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -63949,7 +64719,29 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/lst/1"
+                        ],
+                        "name": "$input.lst[1].z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/lst/1"
+                    ],
+                    "message": "z is missing",
+                    "name": "item 2 of $input.lst",
+                    "value": {}
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -63958,25 +64750,13 @@
                     ],
                     "name": "count of $input.lst.z",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/lst/0/z",
-                      "/lst/1"
-                    ],
-                    "name": "$input.lst[].z",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/input/assert"
                 ],
-                "message": "item 2 of $input.lst: z is missing",
+                "message": "",
                 "name": "count of $input.lst.z is 2"
               }
             ],
@@ -64028,7 +64808,29 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/c/1"
+                        ],
+                        "name": "pl[1].z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/prs/0/c/1"
+                    ],
+                    "message": "z is missing",
+                    "name": "item 2 of pl",
+                    "value": {}
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -64041,29 +64843,13 @@
                       "name": "pl"
                     },
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/c/0/z",
-                      "/prs/0/c/1"
-                    ],
-                    "name": "pl[].z",
-                    "outcome": "usable",
-                    "part": {
-                      "id": null,
-                      "name": "pl"
-                    },
-                    "value": [
-                      1,
-                      null
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/part/assert"
                 ],
-                "message": "item 2 of pl: z is missing",
+                "message": "",
                 "name": "count of pl.z is 2"
               }
             ],
@@ -64130,25 +64916,54 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          ""
+                        ],
+                        "name": "$input.lst.z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$input.lst.z is missing",
+                    "name": "$input.lst.z"
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          ""
+                        ],
+                        "name": "$input.lst",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$input.lst is missing",
+                    "name": "$input.lst"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of $input.lst.z",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$input.lst.z",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/input/assert"
                 ],
-                "message": "$input.lst.z is missing; $input.lst is missing",
+                "message": "",
                 "name": "count of $input.lst.z is 2"
               }
             ],
@@ -64191,7 +65006,25 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/c"
+                        ],
+                        "name": "pl",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "pl is null",
+                    "name": "pl"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
@@ -64201,23 +65034,13 @@
                       "name": "pl"
                     },
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "pl.z",
-                    "outcome": "null",
-                    "part": {
-                      "id": null,
-                      "name": "pl"
-                    },
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/part/assert"
                 ],
-                "message": "pl is null",
+                "message": "",
                 "name": "count of pl.z is 2"
               }
             ],
@@ -70911,7 +71734,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -71100,7 +71923,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -71327,12 +72150,60 @@
             }
           },
           {
-            "cause": "null",
+            "cause": "not_an_object",
             "check": "plain",
             "failures": [
               {
-                "cause": "null",
-                "failures": [],
+                "cause": "not_an_object",
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ws/0/n"
+                        ],
+                        "name": "ws[0].n.v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/ws/0"
+                    ],
+                    "message": "n is 2, which isn't an object",
+                    "name": "item 1 of ws",
+                    "value": {
+                      "n": 2,
+                      "v": "bob"
+                    }
+                  },
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/cs/0/ws/1/n"
+                        ],
+                        "name": "ws[1].n.v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/cs/0/ws/1"
+                    ],
+                    "message": "n is 2, which isn't an object",
+                    "name": "item 2 of ws",
+                    "value": {
+                      "n": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -71381,7 +72252,7 @@
                 ]
               }
             ],
-            "message": "pos is null",
+            "message": "pos is null; item 1 of ws: n is 2, which isn't an object; item 2 of ws: n is 2, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -72541,7 +73412,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -72741,7 +73612,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -73663,7 +74534,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -73747,7 +74618,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -73852,7 +74723,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -73997,7 +74868,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -74411,33 +75282,19 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "pl[].z",
-                    "outcome": "usable",
-                    "part": {
-                      "id": null,
-                      "name": "pl"
-                    },
-                    "value": []
-                  },
-                  {
                     "locations": [
-                      "/prs/0/xs/0"
+                      "/prs/0/c"
                     ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      }
-                    ]
+                    "name": "pl.z",
+                    "outcome": "unusable",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/some_exists/assert"
                 ],
-                "message": "xs is [{\"v\": 1}]",
+                "message": "pl is [], which isn't an object",
                 "name": "some xs whose v is in pl.z exists"
               }
             ],
@@ -74638,23 +75495,7 @@
                     ],
                     "name": "pl.z",
                     "outcome": "absent",
-                    "part": {
-                      "id": null,
-                      "name": "pl"
-                    },
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -74864,23 +75705,7 @@
                     ],
                     "name": "pl.z",
                     "outcome": "null",
-                    "part": {
-                      "id": null,
-                      "name": "pl"
-                    },
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -75090,23 +75915,7 @@
                     ],
                     "name": "pl.z",
                     "outcome": "unusable",
-                    "part": {
-                      "id": null,
-                      "name": "pl"
-                    },
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/prs/0/xs/0"
-                    ],
-                    "name": "xs[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "v": 1
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
@@ -78263,12 +79072,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/objs/0/os/0/k",
                       "/objs/0/os/1"
@@ -78354,12 +79157,6 @@
                     "locations": [],
                     "name": "count of rows whose n equals count of $input.lst.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -78735,12 +79532,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/objs/0/os/0/k",
                       "/objs/0/os/1"
@@ -78826,12 +79617,6 @@
                     "locations": [],
                     "name": "count of rows whose n equals count of $input.lst.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -79207,12 +79992,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/objs/0/os/0",
                       "/objs/0/os/1"
@@ -79298,12 +80077,6 @@
                     "locations": [],
                     "name": "count of rows whose n equals count of $input.lst.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -79523,18 +80296,6 @@
                   },
                   {
                     "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "/objs/0/os/0/k",
                       "/objs/0/os/1"
                     ],
@@ -79629,18 +80390,6 @@
                     ],
                     "name": "count of rows whose n equals count of $input.lst.k",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/objs/0/rows/0"
-                    ],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "n": 2
-                      }
-                    ]
                   },
                   {
                     "locations": [
@@ -92307,12 +93056,6 @@
                     "locations": [],
                     "name": "count of labels",
                     "value": 0
-                  },
-                  {
-                    "locations": [],
-                    "name": "labels[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -93122,25 +93865,37 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pull_requests/0/labels"
+                        ],
+                        "name": "labels",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "labels is null",
+                    "name": "labels"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [],
                     "name": "count of labels",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "labels",
-                    "outcome": "null",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/count/assert"
                 ],
-                "message": "labels is null",
+                "message": "",
                 "name": "count of labels is at least 1"
               }
             ],
@@ -95286,12 +96041,6 @@
                     "value": null
                   },
                   {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/cs/0/os/0/name",
                       "/cs/0/os/1"
@@ -95457,12 +96206,6 @@
                     "locations": [],
                     "name": "count of rows whose v is in c.os.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -95632,12 +96375,6 @@
                     "locations": [],
                     "name": "count of rows whose v is in c.os.name",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -97048,14 +97785,7 @@
               {
                 "cause": "absent",
                 "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every/assert"
@@ -97219,14 +97949,7 @@
               {
                 "cause": "unusable",
                 "failures": [],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/every/assert"
@@ -98114,26 +98837,35 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/q/1"
+                        ],
+                        "name": "$params.q[1]",
+                        "outcome": "usable",
+                        "value": 2
+                      }
+                    ],
+                    "kind": "item",
                     "locations": [
-                      "$params:/q/0",
                       "$params:/q/1"
                     ],
-                    "name": "$params.q[]",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
+                    "message": "item 2 of $params.q is 2",
+                    "name": "item 2 of $params.q",
+                    "value": 2
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c/assert"
                 ],
-                "message": "item 2 of $params.q is 2",
+                "message": "",
                 "name": "every $params.q is 1"
               }
             ],
@@ -98864,20 +99596,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params.z",
-                    "outcome": "absent",
-                    "value": []
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params.z",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.z is missing",
+                    "name": "$params.z"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/missing/assert"
                 ],
-                "message": "$params.z is missing",
+                "message": "",
                 "name": "every $params.z is 1"
               }
             ],
@@ -98918,20 +99661,31 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params.n",
-                    "outcome": "null",
-                    "value": []
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/n"
+                        ],
+                        "name": "$params.n",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.n is null",
+                    "name": "$params.n"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/null/assert"
                 ],
-                "message": "$params.n is null",
+                "message": "",
                 "name": "every $params.n is 1"
               }
             ],
@@ -98972,20 +99726,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params.w",
-                    "outcome": "unusable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/w"
+                        ],
+                        "name": "$params.w",
+                        "outcome": "unusable",
+                        "value": 3
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.w is 3, which isn't a list or an object",
+                    "name": "$params.w"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/number/assert"
                 ],
-                "message": "$params.w is 3, which isn't a list or an object",
+                "message": "",
                 "name": "every $params.w is 1"
               }
             ],
@@ -99026,20 +99791,31 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params.n",
-                    "outcome": "null",
-                    "value": []
+                    "cause": "null",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/n"
+                        ],
+                        "name": "$params.n",
+                        "outcome": "null",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.n is null",
+                    "name": "$params.n"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/some/assert"
                 ],
-                "message": "$params.n is null",
+                "message": "",
                 "name": "some $params.n is 1"
               }
             ],
@@ -99080,20 +99856,31 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "$params.l",
-                    "outcome": "unusable",
-                    "value": []
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/l"
+                        ],
+                        "name": "$params.l",
+                        "outcome": "unusable",
+                        "value": "s"
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "$params.l is \"s\", which isn't a list or an object",
+                    "name": "$params.l"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/text/assert"
                 ],
-                "message": "$params.l is \"s\", which isn't a list or an object",
+                "message": "",
                 "name": "every $params.l is 1"
               }
             ],
@@ -101530,7 +102317,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -101836,7 +102623,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -102149,7 +102936,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -102472,7 +103259,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -102769,7 +103556,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -103051,7 +103838,7 @@
                 "name": "ws"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [],
                 "inputs": [
                   {
@@ -103204,10 +103991,10 @@
                 "name": "y.n exists"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -103230,7 +104017,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -103319,10 +104106,10 @@
                 "name": "y.n exists"
               },
               {
-                "cause": "unusable",
+                "cause": "absent",
                 "failures": [
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {
@@ -103345,7 +104132,7 @@
                     }
                   },
                   {
-                    "cause": "unusable",
+                    "cause": "absent",
                     "failures": [],
                     "inputs": [
                       {

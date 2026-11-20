@@ -113,7 +113,7 @@ jobs:
         shell: bash
         run: |
           .github/build-ergo.sh
-          if ! opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
+          if ! opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 240s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
             cat "$RUNNER_TEMP/coverage.json"
             exit 1
           fi

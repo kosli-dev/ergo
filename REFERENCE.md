@@ -146,7 +146,7 @@ A few details:
 - If `identified_by` doesn't lead anywhere, the subject's id is `null`. Its rows are still there. A subject whose `from` uses `named by each of` takes its key as its id, so it can't have an `identified_by`.
 - No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that its conditions leave out, and `null` is an id like any other, so two subjects without one clash. A requirement on a [child subject](#from-lines) checks the ids of its parent and grandparent in the same way, on `$unique_ancestor_ids` rows.
 - An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
-- Without `from`, a subject reads the input field named like it, so `artifact` reads `artifact`. A subject with nothing under it, `artifact:` alone in YAML, does the same. To check the whole input as one subject, write `from: $input`. When the input is a list, `from: $input` and `from: every $input` make each item a subject, as `from: things` does on a list called `things`, with locations like `/0/x`. When a walk from the input breaks in one item, like `commits` being `5` in the second item for `from: every $input.commits`, `failed_items` names the place `$input[1].commits`. When the walk breaks on the input itself, like an object or `null` for `from: every $input`, the place is named `$input`. The expressions of `$min_subjects` and `$unique_ids` name a position on the input from `$input` too, like `count(matching(item 1 of $input)) >= 1` for `from: $input[0]`, and write a `from` that starts with `named by` as it is, like `count(matching(every $input named by $params.k)) >= 1`. A position, like `from: $input[0]` or `from: first of $input`, reads the item at it, and ends `absent` when the list has none. `from: every $input[0]` makes each item of that item a subject. Without `identified_by`, each row repeats the whole subject as its id, so two identical subjects clash.
+- Without `from`, a subject reads the input field named like it, so `artifact` reads `artifact`. A subject with nothing under it, `artifact:` alone in YAML, does the same. To check the whole input as one subject, write `from: $input`. When the input is a list, `from: $input` and `from: every $input` make each item a subject, as `from: things` does on a list called `things`, with locations like `/0/x`. When a walk from the input breaks in one item, like `commits` being `5` in the second item for `from: every $input.commits`, `failures` has an entry `item 2 of $input` with the input `$input[1].commits`. When the walk breaks on the input itself, like an object or `null` for `from: every $input`, the place is named `$input`. The expressions of `$min_subjects` and `$unique_ids` name a position on the input from `$input` too, like `count(matching(item 1 of $input)) >= 1` for `from: $input[0]`, and write a `from` that starts with `named by` as it is, like `count(matching(every $input named by $params.k)) >= 1`. A position, like `from: $input[0]` or `from: first of $input`, reads the item at it, and ends `absent` when the list has none. `from: every $input[0]` makes each item of that item a subject. Without `identified_by`, each row repeats the whole subject as its id, so two identical subjects clash.
 - A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, `applies_to` or `of`, or whose `from` or `identified_by` isn't a string or can't be read, or whose `description` isn't a string. The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["doesn't parse"], "locations": []}` or `{"name": "subjects.deployment.from", "value": ["not a string"], "locations": []}` for a list. Each of those requirements gets only its `$well_formed` row, as for a [requirement that's written wrong](#requirements), and a `from` that isn't a string or can't be read is shown as `<invalid from>` in expressions.
 
 ### From lines
@@ -385,7 +385,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 - A `from` line that's another subject's name, with or without a `whose`, narrows that subject (a position after the name, like `p[1]` or `first of p`, doesn't narrow it: the subject reads that position inside each `p`, and fails `$min_subjects` as `unusable` when a `p` is an object), as in [a subject built on another](#a-subject-built-on-another): `critical defect` with `from: defect whose severity is "critical"` keeps the defects that pass `defect`'s conditions and its own. A name with a space goes in quotes, so the whole line goes in single quotes in YAML: `from: '"critical defect" whose team is "b"'`. It takes its id from the subject it narrows, so an `identified_by` of its own is written wrong, with `not allowed on a subject that narrows another`. When that subject is read with `every`, the narrowing subject takes its flat list of subjects and filters it, and its `$min_subjects` expression starts with `every` too.
 - A `from` line with one name, like `deployments` or `.deployments`, gives each item of a list as a subject. A line with more than one name needs `every` to read a list, wherever the list is: `$input`, another subject's name, each field and each key a `named by` reads count as names, and a position like `[0]` or `first of` doesn't. So `$input.deployments`, `build.tests`, `build named by $params.k` and `builds[0].tests` need `every` when the value they reach is a list, and `builds[0].tests[0]` doesn't. Without it, `$min_subjects` fails as `unusable` and says what to write, like `trails is a list: write every trails.r.prs to read each item`. The data decides whether a value is a list, so the line isn't written wrong.
 - A `from` line that ends at text, a number or true or false gives that value as one subject, and a check reads it by the subject's name: with `{"version": "1.2.0"}`, `version` with `from: version` is a subject, and `version is "1.2.0"` passes. An input that is itself text still fails `$min_subjects` as `unusable`.
-- All the subjects a `from` line gives must be of one type: objects, lists, text, numbers, or true or false. `from: tags` on `{"tags": ["a", {"x": 1}]}` fails `$min_subjects` as `unusable`, even with `min_subjects: 0`, with `item 1 of tags is text, item 2 of tags is an object`, and both are still subjects and are checked. The row's `failed_items` lists the values the message names, `item 1 of tags` and `item 2 of tags`. An item that is `null` is a subject too and doesn't count as a type. Only that line's `$min_subjects` fails: a child subject read from it is still read under each parent, so with `d` from `ds` and `m` from `d.m`, `{"ds": [{"m": {"up": false}}, "x"]}` gives `m` under the first `d`, and `d is "x", which isn't an object` under the second.
+- All the subjects a `from` line gives must be of one type: objects, lists, text, numbers, or true or false. `from: tags` on `{"tags": ["a", {"x": 1}]}` fails `$min_subjects` as `unusable`, even with `min_subjects: 0`, with `item 1 of tags is text, item 2 of tags is an object`, and both are still subjects and are checked. The row's `failures` has an entry for each value the message names, `item 1 of tags` and `item 2 of tags`. An item that is `null` is a subject too and doesn't count as a type. Only that line's `$min_subjects` fails: a child subject read from it is still read under each parent, so with `d` from `ds` and `m` from `d.m`, `{"ds": [{"m": {"up": false}}, "x"]}` gives `m` under the first `d`, and `d is "x", which isn't an object` under the second.
 - A `from` line that starts at another subject's name and goes on reads the rest of its path from that subject. With `{"params": {"artifact_name": "web"}}` and this input:
 
   ```json
@@ -563,7 +563,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   {
     "cause": "absent",
     "check": "$min_subjects",
-    "failed_items": [{"cause": "absent", "item": "artifacts[2].pull_requests", "locations": ["/artifacts/2"], "path": "artifacts[2].pull_requests", "value": null}],
+    "failures": [{"cause": "absent", "failures": [], "inputs": [{"locations": ["/artifacts/2"], "name": "artifacts[2].pull_requests", "outcome": "absent", "value": null}], "kind": "item", "locations": ["/artifacts/2"], "message": "pull_requests is missing", "name": "item 3 of artifacts", "value": {"fingerprint": "sha-3"}}],
     "inputs": [{"locations": ["/artifacts/0/pull_requests/0", "/artifacts/0/pull_requests/1"], "name": "in-scope pull request count", "value": 2}],
     "message": "item 3 of artifacts: pull_requests is missing",
     "passed": false,
@@ -576,9 +576,9 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 
   - Unlike a [child subject](#from-lines), these pull requests don't belong to an artifact. Their rows have no `in`, they're counted once, and their ids must be unique across all of them. A check can't read the artifact.
   - An empty list, like `sha-2`'s, adds nothing and fails nothing.
-  - A list that's missing, like `sha-3`'s, or `null` fails `$min_subjects` with the worst cause found, even with `min_subjects: 0`. The row's `failed_items` says where, and the pull requests that could be read are still checked. So does a path with no list along it: `every deps` on `{"deps": {"id": 1}}` fails with `deps is {"id": 1}, which isn't a list`.
+  - A list that's missing, like `sha-3`'s, or `null` fails `$min_subjects` with the worst cause found, even with `min_subjects: 0`. The row's `failures` says where, and the pull requests that could be read are still checked. So does a path with no list along it: `every deps` on `{"deps": {"id": 1}}` fails with `deps is {"id": 1}, which isn't a list`.
   - A value at the end can be an object, text, a number or true or false: `every builds.version` on `{"builds": [{"version": "1.0"}, {"version": "1.1"}]}` gives `"1.0"` and `"1.1"`.
-  - A name `every` reads as a list in one item must be a list in all of them. `every builds.tags` on `{"builds": [{"tags": ["a", "b"]}, {"tags": "c"}]}` gives `a`, `b` and `c`, and `$min_subjects` fails as `unusable` with `tags is a list in item 1 of builds but "c" in item 2`, and lists `builds[0].tags` and `builds[1].tags` in `failed_items`. A policy that expects both shapes can say so with a subject for each, like `listed build` with `from: build whose tags is a list` and `tag` with `from: every "listed build".tags`.
+  - A name `every` reads as a list in one item must be a list in all of them. `every builds.tags` on `{"builds": [{"tags": ["a", "b"]}, {"tags": "c"}]}` gives `a`, `b` and `c`, and `$min_subjects` fails as `unusable` with `item 1 of builds: tags is a list, item 2 of builds: tags is text`, and its `failures` has an entry for `item 1 of builds` and one for `item 2 of builds`, each with the `tags` it read. A policy that expects both shapes can say so with a subject for each, like `listed build` with `from: build whose tags is a list` and `tag` with `from: every "listed build".tags`.
   - A list directly inside a list is an item like any other, and `every` doesn't read into it. With `{"batches": [[{"owner": {"name": "ann"}}], [{"owner": {"name": "cy"}}]]}`, `every batches` gives two subjects, each a list, and `every batches.owner` fails as `not_an_object`, because a list has no `owner`. A subject for each level, `batch` and `every batch.owner`, reads the owners. Text, a number or true or false where a name is read fails as `unusable` instead, with the message a check gives: `every builds.version.x` on `{"builds": [{"version": "1.0"}]}` says `item 1 of builds: version is "1.0", which isn't an object`.
   - `every` can start at another subject's name, like `every artifact.pull_requests`, which reads the pull requests of each artifact, with the artifact under `in`, as a [child subject](#from-lines) does. `every` can't go with `named by each of`, which is written wrong. A path that starts with a dot, like `every .artifact.p`, reads the input field.
 - `every distinct` makes one subject of items that are exactly the same, which SBOM tools often write twice. With this input:
@@ -622,7 +622,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   - Copies are merged before the `whose` is read, so they get one `$applies` row, and the rows of a child subject, like `from: every component.licenses`, list the location under every copy too. A path that starts at `$input`, like `version is $input.sbom.components[2].version`, lists only the location it names.
   - `distinct` goes after `every` on a `from` line. Without `every`, like `from: distinct sbom.components`, it is written wrong.
 - A `from` or `identified_by` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"], "locations": []}`.
-- A `from` that can't be read fails `$min_subjects`, and its `message` says where the read stopped: `item 2 of things is missing`, or `things is 5, which isn't a list or an object`. A child subject names the path inside its parent, without the parent's name, like `ws is missing` or `item 1 of ws is missing`. When the read stops before its first step, the message names `$input`, like `$input is null`, or the parent, like `artifact is null`, `artifact is "x", which isn't an object` or `item 1 of artifact is missing` for a child of `artifact`.
+- A `from` that can't be read fails `$min_subjects`, and its `message` says where the read stopped: `item 2 of things is missing`, or `things is 5, which isn't a list or an object`. A child subject names the path inside its parent, without the parent's name, like `ws is missing` or `item 1 of ws is missing`. When the read stops before its first step, the message names `$input`, like `$input is null`, or the parent, like `artifact is null`, `artifact is "x", which isn't an object` or `item 1 of artifact is missing` for a child of `artifact`. The row's `inputs` hold the read after the count, and a `named by` key that can't be read too. With `every`, the list that can't be read is also a `list` entry in `failures`, named as the message names it.
 
 ### A subject built on another
 
@@ -1444,16 +1444,26 @@ click passes on `declared` and prometheus-client on `known`. leftpad fails both,
       "failures": [
         {
           "cause": "value",
-          "failures": [],
+          "failures": [
+            {
+              "cause": "value",
+              "failures": [],
+              "kind": "item",
+              "locations": ["/components/2/licenses/0"],
+              "message": "license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+              "name": "item 1 of licenses",
+              "value": {"license": {"id": "WTFPL"}}
+            }
+          ],
           "kind": "assertion",
           "locations": ["$policy:/requirements/licences/checks/licence_allowed/any_of/declared"],
-          "message": "item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+          "message": "",
           "name": "some licenses.license.id is in $params.allowed_licenses"
         }
       ],
       "kind": "option",
       "locations": ["$policy:/requirements/licences/checks/licence_allowed/any_of/declared"],
-      "message": "item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]",
+      "message": "",
       "name": "declared"
     },
     {
@@ -1478,7 +1488,7 @@ click passes on `declared` and prometheus-client on `known`. leftpad fails both,
       ],
       "kind": "option",
       "locations": ["$policy:/requirements/licences/checks/licence_allowed/any_of/known"],
-      "message": "licenses is [{\"license\": {\"id\": \"WTFPL\"}}], and $params.known_package_licenses named by name is missing",
+      "message": "",
       "name": "known"
     }
   ],
@@ -1487,7 +1497,7 @@ click passes on `declared` and prometheus-client on `known`. leftpad fails both,
 }
 ```
 
-The row reads every field the options read, once each. Its cause is the first, in the order of [causes](#causes), among the options, and an option's cause is the first among its sentences. Here `known` fails as `absent`, because the params have no licence for leftpad. An option with an `exists` sentence whose field is missing fails as `value` instead. `failures` has an `option` entry for each option that failed, by name, and under it an `assertion` entry for each of its sentences that failed, so a tool can see which option failed on which value. The row above leaves out `requirement`, `subject` and its own `inputs`, which are the entries the options read, once each. The check's `expression` is `one of: declared(some licenses.license.id is in $params.allowed_licenses) | known(licenses does not exist and $params.known_package_licenses named by name is in $params.allowed_licenses)`, with the options sorted by name.
+The row reads every field the options read, once each. Its cause is the first, in the order of [causes](#causes), among the options, and an option's cause is the first among its sentences. Here `known` fails as `absent`, because the params have no licence for leftpad. An option with an `exists` sentence whose field is missing fails as `value` instead. `failures` has an `option` entry for each option that failed, by name, and under it an `assertion` entry for each of its sentences that failed, so a tool can see which option failed on which value. A sentence that walks a list holds an `item` entry for each item that failed, as it does on its own. An option's own `message` is `""`, because the entries under it say everything. The row above leaves out `requirement`, `subject` and its own `inputs`, which are the entries the options read, once each. The check's `expression` is `one of: declared(some licenses.license.id is in $params.allowed_licenses) | known(licenses does not exist and $params.known_package_licenses named by name is in $params.allowed_licenses)`, with the options sorted by name.
 
 An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_of` that isn't an object, an empty one, an empty option, or an option that isn't a sentence or a list of them is written wrong, with `invalid any_of`, `empty any_of`, `empty option <name>` or `invalid option <name>`. A problem with a sentence starts with its option's name, and with the line's number when the option has more than one, like `option known: line 2: doesn't parse` or `option fast: values of mixed types`.
 
@@ -2306,7 +2316,7 @@ Several of these rules depend on how a number was written, not only on its value
 }
 ```
 
-Passing and failing rows have the same fields, and a failing row also has a [`message`](#messages). A failed row also has `failures`, with one entry for each part that failed, as [Finding the evidence for a failed row](#finding-the-evidence-for-a-failed-row) shows, and each of its inputs that reads a path has an `outcome`. The `$min_subjects` row of a subject whose `from` line has [`every`](#from-lines) has `failed_items` instead of `failures` for now. The rows in the examples of this page leave out `failures` and the `outcome` of inputs when the example isn't about them. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
+Passing and failing rows have the same fields, and a failing row also has a [`message`](#messages). A failed row also has `failures`, with one entry for each part that failed, as [Finding the evidence for a failed row](#finding-the-evidence-for-a-failed-row) shows, and each of its inputs that reads a path has an `outcome`. The rows in the examples of this page leave out `failures` and the `outcome` of inputs when the example isn't about them. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
 
 ### Messages
 
@@ -2470,7 +2480,7 @@ and the check's `$refs` entry is `{"locations": ["$params:/regions"], "name": "$
 
 A failed row says why in two places: its `message`, for a person, and its `failures`, for a tool that builds audit evidence. To find the evidence for a failed row, read `failures` from the entry down:
 
-1. Each entry is a part that failed: an `option` of an `any_of`, an `assertion` (a sentence), an `item` of a list that was walked, or a `list` that couldn't be walked. The entries under it are what failed inside it, and an entry with `failures` `[]` is a place where the check really failed. For now, a list walked inside an `any_of` option or an `assert` list has no `item` entries under its assertion, so its items show only in the message ([#688](https://github.com/kosli-dev/ergo/issues/688)).
+1. Each entry is a part that failed: an `option` of an `any_of`, an `assertion` (a sentence), an `item` of a list that was walked, or a `list` that couldn't be walked. The entries under it are what failed inside it, and an entry with `failures` `[]` is a place where the check really failed. An entry whose text all comes from the entries under it, like an option, has the `message` `""`.
 2. An entry's `inputs` are what that part read, each with its `name`, `value`, `locations` and `outcome`. `locations` are where, as [Where a value was read](#where-a-value-was-read) says, and `outcome` says which input to blame: `absent` and `null` are evidence that isn't there, `unusable` is a value of the wrong kind for the check, and `usable` is a value that was fine.
 3. An `item` has `value`, the item, and `locations`, where it sits in the input.
 4. Each input sits on the entry that read it: a name from outside the items, like `$params.min`, on the `assertion`, once, what was read inside an item on that `item`, and a list's own read on its `list` entry. On a `for` line, what the line reads itself, like a key after `named by` in its `whose`, is in the row's own `inputs`. A `count of` or `sum of` whose list can't be walked, like `count of o is 1` with `o` holding `"s"`, has a `list` entry `o` under its assertion, with the input `o` and the `outcome` `unusable`.
@@ -2527,7 +2537,7 @@ the row of `payments.approve` for `expires` is below. It leaves out `requirement
       "inputs": [],
       "kind": "option",
       "locations": ["$policy:/requirements/fresh/checks/expires/any_of/approved exception"],
-      "message": "exception.approved_by is missing",
+      "message": "",
       "name": "approved exception"
     },
     {
@@ -2558,7 +2568,7 @@ the row of `payments.approve` for `expires` is below. It leaves out `requirement
       "inputs": [],
       "kind": "option",
       "locations": ["$policy:/requirements/fresh/checks/expires/any_of/expires"],
-      "message": "expires_at is missing",
+      "message": "",
       "name": "expires"
     }
   ],
@@ -2571,7 +2581,7 @@ the row of `payments.approve` for `expires` is below. It leaves out `requirement
 }
 ```
 
-Its `failures` has one `option` entry for each option, and each has an `assertion` entry for every sentence that failed. Each entry's `message` is what the row's message says about that part, without the option's name in front, so the two sentences of `expires` both say `expires_at is missing`, and the row says it once. The `expires` option failed because `expires_at` is `absent` (`outcome`) on the grant at `/grants/0`, and the `approved exception` option because `exception.approved_by` is. `$input.as_of` is `usable`: it read fine, and the check couldn't use it only because the other side was missing. `$policy:/requirements/fresh/checks/expires/any_of/expires/1` is the second sentence of the `expires` option, not a value from the input. The row's own `inputs` list what all the options read, once each.
+Its `failures` has one `option` entry for each option, and each has an `assertion` entry for every sentence that failed. Each assertion's `message` is what the row's message says about that sentence, without the option's name in front, so the two sentences of `expires` both say `expires_at is missing`, and the row says it once. An option's own `message` is `""`, because its sentences say everything. The `expires` option failed because `expires_at` is `absent` (`outcome`) on the grant at `/grants/0`, and the `approved exception` option because `exception.approved_by` is. `$input.as_of` is `usable`: it read fine, and the check couldn't use it only because the other side was missing. `$policy:/requirements/fresh/checks/expires/any_of/expires/1` is the second sentence of the `expires` option, not a value from the input. The row's own `inputs` list what all the options read, once each.
 
 ### Subjects in the report
 
@@ -2847,7 +2857,7 @@ The violations are the rows of the report that are real problems, each with its 
 ]
 ```
 
-A violation keeps its row's `failures`, and one of the `$min_subjects` row of a subject read with `every` its `failed_items`. A violation that's an `$applies` row keeps the `failures` of its row too.
+A violation keeps its row's `failures`, the `$min_subjects` row of a subject read with `every` included. A violation that's an `$applies` row keeps the `failures` of its row too.
 
 It leaves out:
 

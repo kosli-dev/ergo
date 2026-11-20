@@ -2758,7 +2758,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -2854,10 +2853,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/rounds/0/items/0/cov"
+                        ],
                         "name": "cov",
                         "outcome": "unusable",
-                        "value": []
+                        "value": 1
                       }
                     ],
                     "kind": "list",
@@ -3573,7 +3574,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -3596,7 +3596,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -3619,7 +3618,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -3937,10 +3935,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/rounds/0/items/0/cov"
+                        ],
                         "name": "cov",
                         "outcome": "unusable",
-                        "value": []
+                        "value": 1
                       }
                     ],
                     "kind": "list",
@@ -9241,29 +9241,38 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/kids/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
                       {
-                        "hi": 1,
-                        "lo": 5,
-                        "status": "ok",
-                        "w": 1
+                        "locations": [
+                          "/kids/0/items"
+                        ],
+                        "name": "items",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "hi": 1,
+                            "lo": 5,
+                            "status": "ok",
+                            "w": 1
+                          }
+                        ]
                       }
-                    ]
+                    ],
+                    "kind": "list",
+                    "message": "items is [{\"hi\": 1, \"lo\": 5, \"status\": \"ok\", \"w\": 1}]",
+                    "name": "items"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "items is [{\"hi\": 1, \"lo\": 5, \"status\": \"ok\", \"w\": 1}]",
+                "message": "",
                 "name": "every items whose lo is at least $params.w plus hi exists"
               }
             ],
@@ -9422,7 +9431,30 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/fams/0/kids/0/items"
+                        ],
+                        "name": "items",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "lo": 2,
+                            "status": "ok"
+                          }
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9442,26 +9474,13 @@
                       1,
                       1
                     ]
-                  },
-                  {
-                    "locations": [
-                      "/fams/0/kids/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "lo": 2,
-                        "status": "ok"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/c"
                 ],
-                "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                "message": "",
                 "name": "every items whose lo is at least count of fam.pr.xs exists"
               }
             ],
@@ -9516,7 +9535,30 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/fams/0/kids/0/items"
+                        ],
+                        "name": "items",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "lo": 2,
+                            "status": "ok"
+                          }
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9536,26 +9578,13 @@
                       1,
                       1
                     ]
-                  },
-                  {
-                    "locations": [
-                      "/fams/0/kids/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "lo": 2,
-                        "status": "ok"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/d"
                 ],
-                "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                "message": "",
                 "name": "every items whose lo is at least 1 plus count of fam.pr.xs exists"
               }
             ],
@@ -9610,7 +9639,30 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/fams/0/kids/0/items"
+                        ],
+                        "name": "items",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "lo": 2,
+                            "status": "ok"
+                          }
+                        ]
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                    "name": "items"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -9630,26 +9682,13 @@
                       1,
                       1
                     ]
-                  },
-                  {
-                    "locations": [
-                      "/fams/0/kids/0/items/0"
-                    ],
-                    "name": "items[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "lo": 2,
-                        "status": "ok"
-                      }
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/r/checks/e"
                 ],
-                "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
+                "message": "",
                 "name": "every items whose lo is at least sum of fam.pr.xs exists"
               }
             ],

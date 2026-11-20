@@ -114,6 +114,82 @@ fn without_roots(message: &str, roots: &[String], moved: &mut Vec<String>) -> St
         .join("; ")
 }
 
+fn said_by(entry: &Failure, lead: &[String], out: &mut Vec<String>) {
+    let part = entry.part();
+    let mut here = lead.to_vec();
+    if let Failure::Item { .. } = entry {
+        here.push(part.name.clone());
+    }
+    if !part.message.is_empty() {
+        let mut names = here.clone();
+        if matches!(entry, Failure::Item { .. }) && part.message.starts_with(&part.name) {
+            names.pop();
+        }
+        names.push(part.message.clone());
+        out.push(names.join(": "));
+    }
+    for kid in &part.failures {
+        said_by(kid, &here, out);
+    }
+}
+
+fn walked_under(
+    line: &For,
+    sentence: &Check,
+    f: &Value,
+    l: &Value,
+    aliases: &[&str],
+    ctx: &Ctx,
+) -> Option<Failure> {
+    let walks = match sentence {
+        Check::Walk(_) => true,
+        Check::Tally(tally) => tally.counts(),
+        _ => false,
+    };
+    if !walks || line.items.len() != 1 || l.get("items").is_some() {
+        return None;
+    }
+    let value = f.get("value")?;
+    let place = strings(f, "locations").first().cloned()?;
+    let mut at = ctx.clone();
+    at.aliases.insert(
+        line.items[0].alias.clone(),
+        crate::path::Located {
+            value,
+            location: crate::path::Location {
+                root: ctx.subject.location.root,
+                pointer: place,
+            },
+        },
+    );
+    let cause = cause_of(l);
+    let part = crate::subjects::sentence_part(
+        sentence,
+        &text(l, "assertion"),
+        cause,
+        list(l, "inputs"),
+        "",
+        &at,
+        true,
+    );
+    if part.failures.is_empty() {
+        return None;
+    }
+    let inputs = part
+        .inputs
+        .into_iter()
+        .filter(|x| alias_named(&text(x, "name"), aliases))
+        .collect();
+    Some(item(
+        text(f, "item"),
+        cause,
+        inputs,
+        part.failures,
+        String::new(),
+        f,
+    ))
+}
+
 fn line_item(
     f: &Value,
     l: &Value,
@@ -530,10 +606,29 @@ pub fn for_failures(
                         ops::push_new(&mut inputs, x);
                     }
                 }
-                if frees[i].is_none()
-                    && let Some(entry) = line_item(f, &l, &aliases, &roots, &mut moved)
-                {
-                    items.push(entry);
+                if frees[i].is_none() {
+                    let nested = walked_under(line, &sentence.check, f, &l, &aliases, ctx);
+                    let made = line_item(f, &l, &aliases, &roots, &mut moved);
+                    let same = |n: &Failure| {
+                        made.as_ref().is_some_and(|m| {
+                            let mut said: Vec<String> = Vec::new();
+                            for kid in &n.part().failures {
+                                said_by(kid, &[], &mut said);
+                            }
+                            let mut want: Vec<String> = m
+                                .part()
+                                .message
+                                .split("; ")
+                                .filter(|p| !p.is_empty() && ops::message::cap_note(p).is_none())
+                                .map(str::to_string)
+                                .collect();
+                            want.dedup();
+                            !want.is_empty() && want.iter().all(|w| said.contains(w))
+                        })
+                    };
+                    if let Some(entry) = nested.filter(same).or(made) {
+                        items.push(entry);
+                    }
                 }
             }
         }

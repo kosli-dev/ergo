@@ -633,7 +633,7 @@ test_each_input_of_a_subject_in_a_list_says_where_in_the_input_it_was_read if {
 
 test_a_walk_on_a_missing_list_has_no_values_and_its_failed_item_says_where_it_stopped if {
 	rows := _walk_rows({"c": "every prs.title is \"x\""}, {"things": [{"id": 1, "x": {}}]}, {})
-	rows[0][3] == [_assertion("every prs.title is \"x\"", "absent", ["$policy:/requirements/s/checks/c"], [_seen("prs.title", [], [], "absent")], "", [_list("prs", "absent", [_seen("prs", null, ["/things/0"], "absent")], "prs is missing")])]
+	rows[0][3] == [_assertion("every prs.title is \"x\"", "absent", ["$policy:/requirements/s/checks/c"], [], "", [_list("prs", "absent", [_seen("prs", null, ["/things/0"], "absent")], "prs is missing")])]
 	inputs := _sentence_rows({"c": "every prs.title is \"x\""}, {"things": [{"id": 1, "x": {}}]}, {})
 	inputs[0][3] == [_seen("prs.title", [], [], "absent")]
 }

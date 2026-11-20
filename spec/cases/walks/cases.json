@@ -284,14 +284,7 @@
                     "name": "commits"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "commits.signed",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -348,14 +341,7 @@
                     "name": "commits"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "commits.signed",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -412,14 +398,7 @@
                     "name": "commits"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "commits.signed",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -476,14 +455,7 @@
                     "name": "commits.signed"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "commits.signed",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -1499,14 +1471,7 @@
                     "name": "pull_requests"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "pull_requests.commits.signed",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -2666,14 +2631,7 @@
                     "name": "pull_requests"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "pull_requests.commits.signed",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -2998,14 +2956,7 @@
                     "name": "approvers"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "approvers.state",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -3062,14 +3013,7 @@
                     "name": "approvers"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "approvers.state",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -3126,14 +3070,7 @@
                     "name": "approvers"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "approvers.state",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -3711,21 +3648,31 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/releases/0/approvers/0"
-                    ],
-                    "name": "approvers[]",
-                    "outcome": "usable",
-                    "value": [
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
                       {
-                        "state": "CHANGES",
-                        "username": "ann"
+                        "locations": [
+                          "/releases/0/approvers"
+                        ],
+                        "name": "approvers",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "state": "CHANGES",
+                            "username": "ann"
+                          }
+                        ]
                       }
-                    ]
-                  },
+                    ],
+                    "kind": "list",
+                    "message": "approvers is [{\"state\": \"CHANGES\", \"username\": \"ann\"}]",
+                    "name": "approvers"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:/staff"
@@ -3748,7 +3695,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "approvers is [{\"state\": \"CHANGES\", \"username\": \"ann\"}]",
+                "message": "",
                 "name": "some approvers whose state is \"APPROVED\" is in $params.staff"
               }
             ],
@@ -4437,21 +4384,31 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/releases/0/approvers/0"
-                    ],
-                    "name": "approvers[]",
-                    "outcome": "usable",
-                    "value": [
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
                       {
-                        "state": "CHANGES",
-                        "username": "ann"
+                        "locations": [
+                          "/releases/0/approvers"
+                        ],
+                        "name": "approvers",
+                        "outcome": "usable",
+                        "value": [
+                          {
+                            "state": "CHANGES",
+                            "username": "ann"
+                          }
+                        ]
                       }
-                    ]
-                  },
+                    ],
+                    "kind": "list",
+                    "message": "approvers is [{\"state\": \"CHANGES\", \"username\": \"ann\"}]",
+                    "name": "approvers"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:/staff"
@@ -4474,7 +4431,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "approvers is [{\"state\": \"CHANGES\", \"username\": \"ann\"}]",
+                "message": "",
                 "name": "every approvers whose state is \"APPROVED\" is in $params.staff"
               }
             ],
@@ -4609,12 +4566,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "approvers",
-                    "outcome": "absent",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "$params:/staff"
@@ -4932,12 +4883,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "approvers",
-                    "outcome": "absent",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "$params:/staff"
@@ -7263,26 +7208,37 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/releases/0/commits/0/signed",
-                      "/releases/0/commits/1/signed"
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/signed"
+                        ],
+                        "name": "commits[1].signed",
+                        "outcome": "usable",
+                        "value": false
+                      }
                     ],
-                    "name": "commits[].signed",
-                    "outcome": "usable",
-                    "value": [
-                      true,
-                      false
-                    ]
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/commits/1"
+                    ],
+                    "message": "signed is false",
+                    "name": "item 2 of commits",
+                    "value": {
+                      "signed": false
+                    }
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c#1"
                 ],
-                "message": "item 2 of commits: signed is false",
+                "message": "",
                 "name": "every commits.signed is true"
               }
             ],
@@ -7350,24 +7306,38 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/releases/0/items/0/price"
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/items/0/price"
+                        ],
+                        "name": "items[0].price",
+                        "outcome": "usable",
+                        "value": 1
+                      }
                     ],
-                    "name": "items[].price",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/items/0"
+                    ],
+                    "message": "price is 1",
+                    "name": "item 1 of items",
+                    "value": {
+                      "kind": "a",
+                      "price": 1
+                    }
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/w#1"
                 ],
-                "message": "item 1 of items: price is 1",
+                "message": "",
                 "name": "every items.price is at least 2"
               }
             ],
@@ -7578,20 +7548,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "commits.signed",
-                    "outcome": "absent",
-                    "value": []
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0"
+                        ],
+                        "name": "commits",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "commits is missing",
+                    "name": "commits"
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c#1"
                 ],
-                "message": "commits is missing",
+                "message": "",
                 "name": "every commits.signed is true"
               },
               {
@@ -7665,24 +7646,37 @@
               },
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/releases/0/approvers/0/state"
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/approvers/0/state"
+                        ],
+                        "name": "approvers[0].state",
+                        "outcome": "usable",
+                        "value": "CHANGES"
+                      }
                     ],
-                    "name": "approvers[].state",
-                    "outcome": "usable",
-                    "value": [
-                      "CHANGES"
-                    ]
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/approvers/0"
+                    ],
+                    "message": "state is \"CHANGES\"",
+                    "name": "item 1 of approvers",
+                    "value": {
+                      "state": "CHANGES"
+                    }
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/d#2"
                 ],
-                "message": "item 1 of approvers: state is \"CHANGES\"",
+                "message": "",
                 "name": "some approvers.state is \"APPROVED\""
               }
             ],
@@ -7720,24 +7714,38 @@
             "failures": [
               {
                 "cause": "value",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [
-                      "/releases/0/items/0/price"
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/items/0/price"
+                        ],
+                        "name": "items[0].price",
+                        "outcome": "usable",
+                        "value": 1
+                      }
                     ],
-                    "name": "items[].price",
-                    "outcome": "usable",
-                    "value": [
-                      1
-                    ]
+                    "kind": "item",
+                    "locations": [
+                      "/releases/0/items/0"
+                    ],
+                    "message": "price is 1",
+                    "name": "item 1 of items",
+                    "value": {
+                      "kind": "a",
+                      "price": 1
+                    }
                   }
                 ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/w#1"
                 ],
-                "message": "item 1 of items: price is 1",
+                "message": "",
                 "name": "every items.price is at least 2"
               },
               {
@@ -7813,16 +7821,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/things/0/xs/0/v"
-                    ],
-                    "name": "xs[].v",
-                    "outcome": "usable",
-                    "value": [
-                      2
-                    ]
-                  },
-                  {
-                    "locations": [
                       "$params:/l"
                     ],
                     "name": "$params.l",
@@ -7866,12 +7864,6 @@
                 "cause": "absent",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "xs named by $params.k",
-                    "outcome": "absent",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "$params:"
@@ -8112,14 +8104,7 @@
                     "name": "pull_requests"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "pull_requests.commits.signed",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -8176,14 +8161,7 @@
                     "name": "pull_requests"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "pull_requests.commits.signed",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -8248,14 +8226,7 @@
                     "name": "x.y"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "x.y",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -8662,14 +8633,7 @@
                     "name": "pull_requests"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "pull_requests.title",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/c"
@@ -10563,20 +10527,7 @@
                     "value": "k2"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/trail/artifacts/0/prs/0/rows/0/n",
-                      "/trail/artifacts/0/prs/0/rows/1/n"
-                    ],
-                    "name": "rows[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/walk/assert"
@@ -10706,20 +10657,7 @@
                     "value": null
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/trail/artifacts/0/prs/0/rows/0/n",
-                      "/trail/artifacts/0/prs/0/rows/1/n"
-                    ],
-                    "name": "rows[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/walk/assert"
@@ -10848,20 +10786,7 @@
                     "value": "k1"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [
-                      "/trail/artifacts/0/prs/0/rows/0/n",
-                      "/trail/artifacts/0/prs/0/rows/1/n"
-                    ],
-                    "name": "rows[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/walk/assert"
@@ -11001,9 +10926,7 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [
-                      "/trail/artifacts/0/nums"
-                    ],
+                    "locations": [],
                     "name": "artifact.nums named by key",
                     "outcome": "absent",
                     "value": null
@@ -11015,25 +10938,13 @@
                     "name": "key",
                     "outcome": "absent",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/trail/artifacts/0/prs/0/rows/0/n",
-                      "/trail/artifacts/0/prs/0/rows/1/n"
-                    ],
-                    "name": "rows[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/for/assert"
                 ],
-                "message": "key is missing",
+                "message": "artifact.nums named by key is missing",
                 "name": "some rows.n is at least artifact.nums named by key"
               }
             ],
@@ -11218,9 +11129,7 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [
-                      "/trail/artifacts/0/nums"
-                    ],
+                    "locations": [],
                     "name": "artifact.nums named by key",
                     "outcome": "absent",
                     "value": null
@@ -11232,25 +11141,13 @@
                     "name": "key",
                     "outcome": "absent",
                     "value": null
-                  },
-                  {
-                    "locations": [
-                      "/trail/artifacts/0/prs/0/rows/0/n",
-                      "/trail/artifacts/0/prs/0/rows/1/n"
-                    ],
-                    "name": "rows[].n",
-                    "outcome": "usable",
-                    "value": [
-                      1,
-                      2
-                    ]
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/for/assert"
                 ],
-                "message": "key is missing",
+                "message": "artifact.nums named by key is missing",
                 "name": "some rows.n is at least artifact.nums named by key"
               }
             ],
@@ -12512,12 +12409,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -12583,12 +12474,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -12831,12 +12716,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -12902,12 +12781,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -13152,12 +13025,6 @@
                       "bob",
                       3
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -13223,12 +13090,6 @@
                       "bob",
                       3
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -13598,12 +13459,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -13664,12 +13519,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -13766,12 +13615,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -13832,12 +13675,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -13936,12 +13773,6 @@
                       "bob",
                       3
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -14002,12 +13833,6 @@
                       "bob",
                       3
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -14951,12 +14776,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -15014,12 +14833,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -15104,12 +14917,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -15167,12 +14974,6 @@
                       "bob",
                       null
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -15259,12 +15060,6 @@
                       "bob",
                       3
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -15322,12 +15117,6 @@
                       "bob",
                       3
                     ]
-                  },
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -15511,12 +15300,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:/os/0/name",
                       "$params:/os/1"
@@ -15561,12 +15344,6 @@
                 "cause": "absent",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "$params:/os/0/name",
@@ -15671,12 +15448,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:/os/0/name",
                       "$params:/os/1"
@@ -15721,12 +15492,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "rows[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "$params:/os/0/name",
@@ -15829,12 +15594,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "rows[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "$params:/os/0/name",
@@ -16176,12 +15935,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       ""
                     ],
@@ -16296,12 +16049,6 @@
                 "cause": "absent",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -16426,12 +16173,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -16546,12 +16287,6 @@
                 "cause": "null",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -16676,12 +16411,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -16819,12 +16548,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -16949,12 +16672,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -17092,12 +16809,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -17222,12 +16933,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -17366,12 +17071,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/m"
                     ],
@@ -17494,12 +17193,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/k"
@@ -17638,12 +17331,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -17775,12 +17462,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:"
                     ],
@@ -17867,12 +17548,6 @@
                 "cause": "absent",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -18004,12 +17679,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:/k"
                     ],
@@ -18096,12 +17765,6 @@
                 "cause": "null",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -18233,12 +17896,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -18337,12 +17994,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/m"
                     ],
@@ -18400,12 +18051,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -18453,12 +18098,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       ""
@@ -18547,12 +18186,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/m"
                     ],
@@ -18610,12 +18243,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       ""
                     ],
@@ -18663,12 +18290,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/k"
@@ -18757,12 +18378,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/m"
                     ],
@@ -18820,12 +18435,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/k"
                     ],
@@ -18879,12 +18488,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -18949,12 +18552,6 @@
                 "cause": "absent",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -19081,12 +18678,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/m"
                     ],
@@ -19151,12 +18742,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/things/0/m"
                     ],
@@ -19210,7 +18795,7 @@
     ]
   },
   {
-    "description": "an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that isn't text in the order the sentence reads them",
+    "description": "an every, a some, a for item or a count whose whose reads two named by keys on an empty list fails with the worse cause, and names each key that can't be read, worst cause first",
     "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"every": "every es whose zz is m named by $input.k and whose v is m named by $input.j, if any, exists", "some": "some es whose zz is m named by $input.k and whose v is m named by $input.j exists", "for": {"for": "every es whose zz is m named by $input.k and whose v is m named by $input.j as e", "assert": "e.v is 2"}, "count": "count of es whose zz is m named by $input.k and whose v is m named by $input.j is 0", "right": "every es whose zz is m named by $input.k, if any, is m named by $input.j"}}}},
     "cases": [
       {
@@ -19252,7 +18837,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is missing",
                 "name": "count of es whose zz equals m named by $input.k and whose v equals m named by $input.j is 0"
               }
             ],
@@ -19269,7 +18854,7 @@
                 "value": []
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19285,12 +18870,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/j"
@@ -19312,7 +18891,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/every"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is missing",
                 "name": "every es whose zz equals m named by $input.k and whose v equals m named by $input.j, if any, exists"
               }
             ],
@@ -19324,7 +18903,7 @@
                 "value": []
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19389,7 +18968,7 @@
                 "value": 3
               }
             ],
-            "message": "$input.j is 3, which isn't text; es is []",
+            "message": "$input.j is 3, which isn't text; $input.k is missing; es is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19405,12 +18984,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -19440,7 +19013,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/right"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is missing",
                 "name": "every es whose zz equals m named by $input.k, if any, equals m named by $input.j"
               }
             ],
@@ -19460,7 +19033,7 @@
                 "value": null
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19576,7 +19149,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is null",
                 "name": "count of es whose zz equals m named by $input.k and whose v equals m named by $input.j is 0"
               }
             ],
@@ -19593,7 +19166,7 @@
                 "value": []
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19609,12 +19182,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/j"
@@ -19636,7 +19203,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/every"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is null",
                 "name": "every es whose zz equals m named by $input.k and whose v equals m named by $input.j, if any, exists"
               }
             ],
@@ -19648,7 +19215,7 @@
                 "value": []
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19713,7 +19280,7 @@
                 "value": 3
               }
             ],
-            "message": "$input.j is 3, which isn't text; es is []",
+            "message": "$input.j is 3, which isn't text; $input.k is null; es is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19729,12 +19296,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -19764,7 +19325,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/right"
                 ],
-                "message": "$input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is null",
                 "name": "every es whose zz equals m named by $input.k, if any, equals m named by $input.j"
               }
             ],
@@ -19784,7 +19345,7 @@
                 "value": null
               }
             ],
-            "message": "$input.j is 3, which isn't text",
+            "message": "$input.j is 3, which isn't text; $input.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -19934,12 +19495,6 @@
                 "failures": [],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "/j"
                     ],
@@ -19992,7 +19547,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/for/assert"
                 ],
-                "message": "$input.k is 3, which isn't text; $input.j is 3, which isn't text",
+                "message": "$input.j is 3, which isn't text; $input.k is 3, which isn't text",
                 "name": "e.v is 2"
               },
               {
@@ -20037,7 +19592,7 @@
                 "value": 3
               }
             ],
-            "message": "$input.k is 3, which isn't text; $input.j is 3, which isn't text; es is []",
+            "message": "$input.j is 3, which isn't text; $input.k is 3, which isn't text; es is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -20053,12 +19608,6 @@
                 "cause": "unusable",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "/things/0/m"
@@ -20208,10 +19757,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0"
+                        ],
                         "name": "es",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -20290,10 +19841,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/es"
+                        ],
                         "name": "es",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -20372,10 +19925,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/es"
+                        ],
                         "name": "es",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "s"
                       }
                     ],
                     "kind": "list",
@@ -20898,12 +20453,6 @@
                   "failures": [],
                   "inputs": [
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -20979,12 +20528,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:"
@@ -21063,12 +20606,6 @@
                   ],
                   "inputs": [
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -21146,12 +20683,6 @@
                   ],
                   "inputs": [
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -21228,12 +20759,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:"
@@ -21316,12 +20841,6 @@
                   "cause": "absent",
                   "failures": [],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:"
@@ -21518,12 +21037,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -21593,12 +21106,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -21662,12 +21169,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:"
@@ -21937,12 +21438,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -22012,12 +21507,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -22081,12 +21570,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:"
@@ -22358,12 +21841,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -22433,12 +21910,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -22502,12 +21973,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:"
@@ -22820,12 +22285,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -22895,12 +22354,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -22964,12 +22417,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:/k"
@@ -23239,12 +22686,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "null",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -23314,12 +22755,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "null",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -23383,12 +22818,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "null",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:/k"
@@ -23660,12 +23089,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -23735,12 +23158,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -23804,12 +23221,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:/k"
@@ -24122,12 +23533,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -24197,12 +23602,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -24266,12 +23665,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:/k"
@@ -24541,12 +23934,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -24616,12 +24003,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -24685,12 +24066,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:/k"
@@ -24962,12 +24337,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -25037,12 +24406,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:/k"
                       ],
@@ -25106,12 +24469,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:/k"
@@ -25392,12 +24749,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -25461,12 +24812,6 @@
                     }
                   ],
                   "inputs": [
-                    {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
                     {
                       "locations": [
                         "$params:"
@@ -25806,12 +25151,6 @@
                   ],
                   "inputs": [
                     {
-                      "locations": [],
-                      "name": "n.o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -25874,12 +25213,6 @@
                       "locations": [],
                       "name": "count of n.o named by $params.k",
                       "value": null
-                    },
-                    {
-                      "locations": [],
-                      "name": "n.o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
                     },
                     {
                       "locations": [
@@ -26744,26 +26077,6 @@
                   "inputs": [
                     {
                       "locations": [
-                        "/things/0/xs/0",
-                        "/things/0/xs/1"
-                      ],
-                      "name": "xs[]",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "m": {},
-                          "v": 1
-                        },
-                        {
-                          "m": {
-                            "a": 1
-                          },
-                          "v": 1
-                        }
-                      ]
-                    },
-                    {
-                      "locations": [
                         "$params:/k"
                       ],
                       "name": "$params.k",
@@ -26905,10 +26218,12 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [],
+                          "locations": [
+                            "/things/0"
+                          ],
                           "name": "o",
                           "outcome": "absent",
-                          "value": []
+                          "value": null
                         }
                       ],
                       "kind": "list",
@@ -26984,12 +26299,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -27039,10 +26348,12 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [],
+                          "locations": [
+                            "/things/0"
+                          ],
                           "name": "o",
                           "outcome": "absent",
-                          "value": []
+                          "value": null
                         }
                       ],
                       "kind": "list",
@@ -27098,10 +26409,12 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [],
+                          "locations": [
+                            "/things/0"
+                          ],
                           "name": "o",
                           "outcome": "absent",
-                          "value": []
+                          "value": null
                         }
                       ],
                       "kind": "list",
@@ -27174,10 +26487,12 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [],
+                          "locations": [
+                            "/things/0/o"
+                          ],
                           "name": "o",
                           "outcome": "null",
-                          "value": []
+                          "value": null
                         }
                       ],
                       "kind": "list",
@@ -27253,12 +26568,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "absent",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -27308,10 +26617,12 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [],
+                          "locations": [
+                            "/things/0/o"
+                          ],
                           "name": "o",
                           "outcome": "null",
-                          "value": []
+                          "value": null
                         }
                       ],
                       "kind": "list",
@@ -27367,10 +26678,12 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [],
+                          "locations": [
+                            "/things/0/o"
+                          ],
                           "name": "o",
                           "outcome": "null",
-                          "value": []
+                          "value": null
                         }
                       ],
                       "kind": "list",
@@ -27443,10 +26756,12 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [],
+                          "locations": [
+                            "/things/0/o"
+                          ],
                           "name": "o",
                           "outcome": "unusable",
-                          "value": []
+                          "value": "s"
                         }
                       ],
                       "kind": "list",
@@ -27522,12 +26837,6 @@
                       "value": null
                     },
                     {
-                      "locations": [],
-                      "name": "o named by $params.k",
-                      "outcome": "unusable",
-                      "value": []
-                    },
-                    {
                       "locations": [
                         "$params:"
                       ],
@@ -27577,10 +26886,12 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [],
+                          "locations": [
+                            "/things/0/o"
+                          ],
                           "name": "o",
                           "outcome": "unusable",
-                          "value": []
+                          "value": "s"
                         }
                       ],
                       "kind": "list",
@@ -27636,10 +26947,12 @@
                       "failures": [],
                       "inputs": [
                         {
-                          "locations": [],
+                          "locations": [
+                            "/things/0/o"
+                          ],
                           "name": "o",
                           "outcome": "unusable",
-                          "value": []
+                          "value": "s"
                         }
                       ],
                       "kind": "list",
@@ -28165,20 +27478,6 @@
                   "inputs": [
                     {
                       "locations": [
-                        "/things/0/es/0/v"
-                      ],
-                      "name": "es[].v",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "m": {
-                            "a": 1
-                          }
-                        }
-                      ]
-                    },
-                    {
-                      "locations": [
                         "$params:/k"
                       ],
                       "name": "$params.k",
@@ -28683,20 +27982,6 @@
                   "cause": "absent",
                   "failures": [],
                   "inputs": [
-                    {
-                      "locations": [
-                        "/things/0/es/0/v"
-                      ],
-                      "name": "es[].v",
-                      "outcome": "usable",
-                      "value": [
-                        {
-                          "m": {
-                            "a": 1
-                          }
-                        }
-                      ]
-                    },
                     {
                       "locations": [
                         "$params:"
@@ -29499,7 +28784,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -29521,7 +28828,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$params.k is null; item 1 of es is \"s\", which isn't an object",
+                "message": "$params.k is null",
                 "name": "count of es.v that equals m named by $params.k is 0"
               }
             ],
@@ -29652,7 +28959,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "item 2 of es is \"s\", which isn't an object",
+                    "name": "item 2 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -29675,7 +29004,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "$params.k is null; item 2 of es is \"s\", which isn't an object",
+                "message": "$params.k is null",
                 "name": "count of es.v that equals m named by $params.k is 0"
               }
             ],
@@ -29830,7 +29159,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -29844,7 +29195,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "item 1 of es is \"s\", which isn't an object",
+                "message": "",
                 "name": "count of es.v that equals m named by $params.k is 0"
               }
             ],
@@ -30041,20 +29392,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/things/0/es/0/v"
-                    ],
-                    "name": "es[].v",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "m": {
-                          "a": 1
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "$params:/k"
                     ],
                     "name": "$params.k",
@@ -30214,7 +29551,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/any_of/any_of/a"
                 ],
-                "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 2 more",
+                "message": "",
                 "name": "a"
               },
               {
@@ -30246,7 +29583,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/any_of/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -31091,7 +30428,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/any_of/any_of/a"
                 ],
-                "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 1 more",
+                "message": "",
                 "name": "a"
               },
               {
@@ -31123,7 +30460,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/any_of/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -31866,7 +31203,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/any_of/any_of/a"
                 ],
-                "message": "$params.k is 3, which isn't text; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing",
+                "message": "",
                 "name": "a"
               },
               {
@@ -31898,7 +31235,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/any_of/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -32591,7 +31928,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/any_of/any_of/a"
                 ],
-                "message": "$params.k is missing; item 1 of es: m is missing; item 2 of es: m is missing; item 3 of es: m is missing; and 2 more",
+                "message": "",
                 "name": "a"
               },
               {
@@ -32623,7 +31960,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/any_of/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -33454,10 +32791,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0"
+                        ],
                         "name": "es",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -33535,12 +32874,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "absent",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "$params:/k"
@@ -33647,12 +32980,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:/k"
                     ],
@@ -33715,10 +33042,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/es"
+                        ],
                         "name": "es",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -33796,12 +33125,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "null",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "$params:/k"
@@ -33907,12 +33230,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "null",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "$params:/k"
@@ -34248,10 +33565,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0"
+                        ],
                         "name": "es",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -34329,12 +33648,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "absent",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "$params:"
@@ -34441,12 +33754,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "absent",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:"
                     ],
@@ -34509,10 +33816,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0/es"
+                        ],
                         "name": "es",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -34590,12 +33899,6 @@
                   }
                 ],
                 "inputs": [
-                  {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "null",
-                    "value": []
-                  },
                   {
                     "locations": [
                       "$params:"
@@ -34702,12 +34005,6 @@
                 ],
                 "inputs": [
                   {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "null",
-                    "value": []
-                  },
-                  {
                     "locations": [
                       "$params:"
                     ],
@@ -34802,7 +34099,54 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": {
+                      "v": 1
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].zz",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 2 of es",
+                    "value": {
+                      "v": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -34825,7 +34169,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "item 1 of es: $params.k is 3, which isn't text; item 2 of es: $params.k is 3, which isn't text",
+                "message": "",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               }
             ],
@@ -35206,7 +34550,153 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0/zz"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "usable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0/m"
+                        ],
+                        "name": "es[0].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": {
+                      "m": {
+                        "a": 2
+                      },
+                      "v": 2,
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1/zz"
+                        ],
+                        "name": "es[1].zz",
+                        "outcome": "usable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 2 of es",
+                    "value": {
+                      "v": 2,
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].zz",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/2"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 3 of es",
+                    "value": {
+                      "v": {
+                        "m": null
+                      }
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/3/zz"
+                        ],
+                        "name": "es[3].zz",
+                        "outcome": "usable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/3/m"
+                        ],
+                        "name": "es[3].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/3"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 4 of es",
+                    "value": {
+                      "m": null,
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/4"
+                        ],
+                        "name": "es[4].zz",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/4"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 5 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -35232,7 +34722,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "item 1 of es: $params.k is 3, which isn't text; item 2 of es: $params.k is 3, which isn't text; item 3 of es: $params.k is 3, which isn't text; and 2 more",
+                "message": "",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               }
             ],
@@ -35855,6 +35345,314 @@
     ]
   },
   {
+    "description": "a whose key from $params that isn't text, read by a later condition than one an item can't decide, is said after that condition's problem",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "count": "count of es whose v is 1 and whose zz is m named by $params.k is 0"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 3
+    },
+    "cases": [
+      {
+        "description": "an item without v says that v is missing and then the key",
+        "rules": [
+          "tally.whose",
+          "message.items",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "es": [
+                {
+                  "zz": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "absent",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0/zz"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "usable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "v is missing; $params.k is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": {
+                      "zz": 2
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "name": "count of es whose v is 1 and whose zz equals m named by $params.k",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/count"
+                ],
+                "message": "",
+                "name": "count of es whose v is 1 and whose zz equals m named by $params.k is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "count of es whose v is 1 and whose zz equals m named by $params.k",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "zz": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of es: v is missing; item 1 of es: $params.k is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "two whose keys from $params, the second one not text, beside an item that fails the first condition, say both problems",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "count": "count of es whose zz is m named by $params.k and whose v is m named by $params.j is 0"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": "a",
+      "j": 3
+    },
+    "cases": [
+      {
+        "description": "an item without m says that m named by the first key is missing and then the second key",
+        "rules": [
+          "tally.whose",
+          "message.items",
+          "row.parts"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "es": [
+                {
+                  "zz": 2,
+                  "v": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "count",
+            "failures": [
+              {
+                "cause": "unusable",
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0/zz"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "usable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0/v"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "usable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].m named by $params.j",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "m named by $params.k is missing; $params.j is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": {
+                      "v": 2,
+                      "zz": 2
+                    }
+                  }
+                ],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "name": "count of es whose zz equals m named by $params.k and whose v equals m named by $params.j",
+                    "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/j"
+                    ],
+                    "name": "$params.j",
+                    "outcome": "unusable",
+                    "value": 3
+                  }
+                ],
+                "kind": "assertion",
+                "locations": [
+                  "$policy:/requirements/s/checks/count"
+                ],
+                "message": "",
+                "name": "count of es whose zz equals m named by $params.k and whose v equals m named by $params.j is 0"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "count of es whose zz equals m named by $params.k and whose v equals m named by $params.j",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/es/0"
+                ],
+                "name": "es[]",
+                "outcome": "usable",
+                "value": [
+                  {
+                    "v": 2,
+                    "zz": 2
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of es: m named by $params.k is missing; item 1 of es: $params.j is 3, which isn't text",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a whose key from $params that is null, beside items that fail on their own fields, says the key once and each item's own problem",
     "policy": {
       "ergo_spec": "{{spec}}",
@@ -35913,7 +35711,31 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "zz is missing",
+                    "name": "item 1 of es",
+                    "value": {
+                      "v": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -35936,7 +35758,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "item 1 of es: zz is missing",
+                "message": "$params.k is null",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               }
             ],
@@ -35967,7 +35789,7 @@
                 ]
               }
             ],
-            "message": "item 1 of es: zz is missing",
+            "message": "$params.k is null; item 1 of es: zz is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -36268,7 +36090,86 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/1/zz"
+                        ],
+                        "name": "es[1].zz",
+                        "outcome": "usable",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/things/0/es/1"
+                        ],
+                        "name": "es[1].m named by $params.k",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/1"
+                    ],
+                    "message": "the check is false",
+                    "name": "item 2 of es",
+                    "value": {
+                      "v": 2,
+                      "zz": 2
+                    }
+                  },
+                  {
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/2"
+                        ],
+                        "name": "es[2].zz",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/2"
+                    ],
+                    "message": "zz is missing",
+                    "name": "item 3 of es",
+                    "value": {
+                      "v": {
+                        "m": null
+                      }
+                    }
+                  },
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/4"
+                        ],
+                        "name": "es[4].zz",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/4"
+                    ],
+                    "message": "item 5 of es is \"s\", which isn't an object",
+                    "name": "item 5 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -36280,13 +36181,21 @@
                     ],
                     "name": "count of es whose zz equals m named by $params.k",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/count"
                 ],
-                "message": "item 5 of es is \"s\", which isn't an object",
+                "message": "$params.k is null",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               }
             ],
@@ -36337,7 +36246,7 @@
                 ]
               }
             ],
-            "message": "item 5 of es is \"s\", which isn't an object",
+            "message": "$params.k is null; item 2 of es: the check is false; item 3 of es: zz is missing; item 5 of es is \"s\", which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -36963,22 +36872,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/things/0/es/0"
-                    ],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "m": {
-                          "a": 1
-                        },
-                        "v": 1,
-                        "zz": 2
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "$params:"
                     ],
                     "name": "$params.k",
@@ -37215,22 +37108,6 @@
                     "inputs": [
                       {
                         "locations": [
-                          "/things/0/es/0"
-                        ],
-                        "name": "es[]",
-                        "outcome": "usable",
-                        "value": [
-                          {
-                            "m": {
-                              "a": 1
-                            },
-                            "v": 1,
-                            "zz": 2
-                          }
-                        ]
-                      },
-                      {
-                        "locations": [
                           "$params:"
                         ],
                         "name": "$params.k",
@@ -37251,7 +37128,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "$params.k is missing",
+                "message": "",
                 "name": "a"
               },
               {
@@ -37283,7 +37160,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -37352,10 +37229,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0"
+                        ],
                         "name": "es",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -37441,14 +37320,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:"
@@ -37462,7 +37353,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_every/assert/0"
                 ],
-                "message": "$params.k is missing; es is missing",
+                "message": "$params.k is missing",
                 "name": "every es whose zz equals m named by $params.k exists"
               },
               {
@@ -37520,7 +37411,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "es is missing",
                     "name": "es"
@@ -37531,12 +37431,6 @@
                     "locations": [],
                     "name": "count of es.v that equals m named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es.v",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -37687,14 +37581,26 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [],
-                        "name": "es",
-                        "outcome": "absent",
-                        "value": []
-                      },
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0"
+                            ],
+                            "name": "es",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "es is missing",
+                        "name": "es"
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "$params:"
@@ -37708,7 +37614,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/option_some/any_of/a/0"
                     ],
-                    "message": "$params.k is missing; es is missing",
+                    "message": "$params.k is missing",
                     "name": "some es whose zz equals m named by $params.k exists"
                   }
                 ],
@@ -37717,7 +37623,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "$params.k is missing; es is missing",
+                "message": "",
                 "name": "a"
               },
               {
@@ -37749,7 +37655,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -37882,14 +37788,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is []",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:"
@@ -37903,7 +37821,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_every/assert/0"
                 ],
-                "message": "$params.k is missing; es is []",
+                "message": "$params.k is missing",
                 "name": "every es whose zz equals m named by $params.k exists"
               },
               {
@@ -38113,14 +38031,26 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [],
-                        "name": "es[]",
-                        "outcome": "usable",
-                        "value": []
-                      },
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es"
+                            ],
+                            "name": "es",
+                            "outcome": "usable",
+                            "value": []
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "es is []",
+                        "name": "es"
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "$params:"
@@ -38134,7 +38064,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/option_some/any_of/a/0"
                     ],
-                    "message": "$params.k is missing; es is []",
+                    "message": "$params.k is missing",
                     "name": "some es whose zz equals m named by $params.k exists"
                   }
                 ],
@@ -38143,7 +38073,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "$params.k is missing; es is []",
+                "message": "",
                 "name": "a"
               },
               {
@@ -38175,7 +38105,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -38231,7 +38161,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -38239,13 +38191,21 @@
                     ],
                     "name": "count of es whose zz equals m named by $params.k",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "absent",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/assert_count/assert/0"
                 ],
-                "message": "item 1 of es is \"s\", which isn't an object",
+                "message": "$params.k is missing",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               },
               {
@@ -38296,7 +38256,7 @@
                 "value": null
               }
             ],
-            "message": "item 1 of es is \"s\", which isn't an object; ys is missing",
+            "message": "$params.k is missing; item 1 of es is \"s\", which isn't an object; ys is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -38310,18 +38270,30 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
                     "locations": [
                       "/things/0/es/0"
                     ],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": [
-                      "s"
-                    ]
-                  },
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:"
@@ -38335,7 +38307,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_every/assert/0"
                 ],
-                "message": "$params.k is missing; item 1 of es is \"s\", which isn't an object",
+                "message": "$params.k is missing",
                 "name": "every es whose zz equals m named by $params.k exists"
               },
               {
@@ -38393,7 +38365,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -38415,7 +38409,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_that/assert/0"
                 ],
-                "message": "$params.k is missing; item 1 of es is \"s\", which isn't an object",
+                "message": "$params.k is missing",
                 "name": "count of es.v that equals m named by $params.k is 0"
               },
               {
@@ -38556,18 +38550,30 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/0"
+                            ],
+                            "name": "es[0].zz",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
                           "/things/0/es/0"
                         ],
-                        "name": "es[]",
-                        "outcome": "usable",
-                        "value": [
-                          "s"
-                        ]
-                      },
+                        "message": "item 1 of es is \"s\", which isn't an object",
+                        "name": "item 1 of es",
+                        "value": "s"
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "$params:"
@@ -38581,7 +38587,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/option_some/any_of/a/0"
                     ],
-                    "message": "$params.k is missing; item 1 of es is \"s\", which isn't an object",
+                    "message": "$params.k is missing",
                     "name": "some es whose zz equals m named by $params.k exists"
                   }
                 ],
@@ -38590,7 +38596,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "$params.k is missing; item 1 of es is \"s\", which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -38622,7 +38628,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -38842,22 +38848,6 @@
                 "cause": "null",
                 "failures": [],
                 "inputs": [
-                  {
-                    "locations": [
-                      "/things/0/es/0"
-                    ],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "m": {
-                          "a": 1
-                        },
-                        "v": 1,
-                        "zz": 2
-                      }
-                    ]
-                  },
                   {
                     "locations": [
                       "$params:/k"
@@ -39096,22 +39086,6 @@
                     "inputs": [
                       {
                         "locations": [
-                          "/things/0/es/0"
-                        ],
-                        "name": "es[]",
-                        "outcome": "usable",
-                        "value": [
-                          {
-                            "m": {
-                              "a": 1
-                            },
-                            "v": 1,
-                            "zz": 2
-                          }
-                        ]
-                      },
-                      {
-                        "locations": [
                           "$params:/k"
                         ],
                         "name": "$params.k",
@@ -39132,7 +39106,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "$params.k is null",
+                "message": "",
                 "name": "a"
               },
               {
@@ -39164,7 +39138,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -39233,10 +39207,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0"
+                        ],
                         "name": "es",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -39263,7 +39239,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_count/assert/0"
                 ],
-                "message": "",
+                "message": "$params.k is null",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               },
               {
@@ -39308,7 +39284,7 @@
                 "value": null
               }
             ],
-            "message": "es is missing; ys is missing",
+            "message": "$params.k is null; es is missing; ys is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -39322,14 +39298,26 @@
             "failures": [
               {
                 "cause": "absent",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:/k"
@@ -39343,7 +39331,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_every/assert/0"
                 ],
-                "message": "$params.k is null; es is missing",
+                "message": "$params.k is null",
                 "name": "every es whose zz equals m named by $params.k exists"
               },
               {
@@ -39401,7 +39389,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "es is missing",
                     "name": "es"
@@ -39412,12 +39409,6 @@
                     "locations": [],
                     "name": "count of es.v that equals m named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es.v",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -39432,7 +39423,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_that/assert/0"
                 ],
-                "message": "",
+                "message": "$params.k is null",
                 "name": "count of es.v that equals m named by $params.k is 0"
               },
               {
@@ -39477,7 +39468,7 @@
                 "value": null
               }
             ],
-            "message": "es is missing; ys is missing",
+            "message": "$params.k is null; es is missing; ys is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -39568,14 +39559,26 @@
                 "failures": [
                   {
                     "cause": "absent",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [],
-                        "name": "es",
-                        "outcome": "absent",
-                        "value": []
-                      },
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0"
+                            ],
+                            "name": "es",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "es is missing",
+                        "name": "es"
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "$params:/k"
@@ -39589,7 +39592,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/option_some/any_of/a/0"
                     ],
-                    "message": "$params.k is null; es is missing",
+                    "message": "$params.k is null",
                     "name": "some es whose zz equals m named by $params.k exists"
                   }
                 ],
@@ -39598,7 +39601,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "$params.k is null; es is missing",
+                "message": "",
                 "name": "a"
               },
               {
@@ -39630,7 +39633,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -39763,14 +39766,26 @@
             "failures": [
               {
                 "cause": "null",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is []",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:/k"
@@ -39784,7 +39799,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_every/assert/0"
                 ],
-                "message": "$params.k is null; es is []",
+                "message": "$params.k is null",
                 "name": "every es whose zz equals m named by $params.k exists"
               },
               {
@@ -39994,14 +40009,26 @@
                 "failures": [
                   {
                     "cause": "null",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [],
-                        "name": "es[]",
-                        "outcome": "usable",
-                        "value": []
-                      },
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es"
+                            ],
+                            "name": "es",
+                            "outcome": "usable",
+                            "value": []
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "es is []",
+                        "name": "es"
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "$params:/k"
@@ -40015,7 +40042,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/option_some/any_of/a/0"
                     ],
-                    "message": "$params.k is null; es is []",
+                    "message": "$params.k is null",
                     "name": "some es whose zz equals m named by $params.k exists"
                   }
                 ],
@@ -40024,7 +40051,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "$params.k is null; es is []",
+                "message": "",
                 "name": "a"
               },
               {
@@ -40056,7 +40083,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -40112,7 +40139,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -40120,13 +40169,21 @@
                     ],
                     "name": "count of es whose zz equals m named by $params.k",
                     "value": null
+                  },
+                  {
+                    "locations": [
+                      "$params:/k"
+                    ],
+                    "name": "$params.k",
+                    "outcome": "null",
+                    "value": null
                   }
                 ],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/assert_count/assert/0"
                 ],
-                "message": "item 1 of es is \"s\", which isn't an object",
+                "message": "$params.k is null",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               },
               {
@@ -40177,7 +40234,7 @@
                 "value": null
               }
             ],
-            "message": "item 1 of es is \"s\", which isn't an object; ys is missing",
+            "message": "$params.k is null; item 1 of es is \"s\", which isn't an object; ys is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -40191,18 +40248,30 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
                     "locations": [
                       "/things/0/es/0"
                     ],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": [
-                      "s"
-                    ]
-                  },
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:/k"
@@ -40216,7 +40285,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_every/assert/0"
                 ],
-                "message": "$params.k is null; item 1 of es is \"s\", which isn't an object",
+                "message": "$params.k is null",
                 "name": "every es whose zz equals m named by $params.k exists"
               },
               {
@@ -40274,7 +40343,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -40296,7 +40387,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_that/assert/0"
                 ],
-                "message": "$params.k is null; item 1 of es is \"s\", which isn't an object",
+                "message": "$params.k is null",
                 "name": "count of es.v that equals m named by $params.k is 0"
               },
               {
@@ -40437,18 +40528,30 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/0"
+                            ],
+                            "name": "es[0].zz",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
                           "/things/0/es/0"
                         ],
-                        "name": "es[]",
-                        "outcome": "usable",
-                        "value": [
-                          "s"
-                        ]
-                      },
+                        "message": "item 1 of es is \"s\", which isn't an object",
+                        "name": "item 1 of es",
+                        "value": "s"
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "$params:/k"
@@ -40462,7 +40565,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/option_some/any_of/a/0"
                     ],
-                    "message": "$params.k is null; item 1 of es is \"s\", which isn't an object",
+                    "message": "$params.k is null",
                     "name": "some es whose zz equals m named by $params.k exists"
                   }
                 ],
@@ -40471,7 +40574,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "$params.k is null; item 1 of es is \"s\", which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -40503,7 +40606,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -40725,22 +40828,6 @@
                 "inputs": [
                   {
                     "locations": [
-                      "/things/0/es/0"
-                    ],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": [
-                      {
-                        "m": {
-                          "a": 1
-                        },
-                        "v": 1,
-                        "zz": 2
-                      }
-                    ]
-                  },
-                  {
-                    "locations": [
                       "$params:/k"
                     ],
                     "name": "$params.k",
@@ -40816,7 +40903,35 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0/v"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "unusable",
+                        "value": 1
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "v: $params.k is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": {
+                      "m": {
+                        "a": 1
+                      },
+                      "v": 1,
+                      "zz": 2
+                    }
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -40838,7 +40953,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_that/assert/0"
                 ],
-                "message": "item 1 of es: v: $params.k is 3, which isn't text",
+                "message": "",
                 "name": "count of es.v that equals m named by $params.k is 0"
               },
               {
@@ -40977,22 +41092,6 @@
                     "inputs": [
                       {
                         "locations": [
-                          "/things/0/es/0"
-                        ],
-                        "name": "es[]",
-                        "outcome": "usable",
-                        "value": [
-                          {
-                            "m": {
-                              "a": 1
-                            },
-                            "v": 1,
-                            "zz": 2
-                          }
-                        ]
-                      },
-                      {
-                        "locations": [
                           "$params:/k"
                         ],
                         "name": "$params.k",
@@ -41013,7 +41112,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "$params.k is 3, which isn't text",
+                "message": "",
                 "name": "a"
               },
               {
@@ -41045,7 +41144,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -41114,10 +41213,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "/things/0"
+                        ],
                         "name": "es",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -41203,14 +41304,26 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "es",
-                    "outcome": "absent",
-                    "value": []
-                  },
+                    "cause": "absent",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is missing",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:/k"
@@ -41224,7 +41337,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_every/assert/0"
                 ],
-                "message": "$params.k is 3, which isn't text; es is missing",
+                "message": "$params.k is 3, which isn't text",
                 "name": "every es whose zz equals m named by $params.k exists"
               },
               {
@@ -41282,7 +41395,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "es",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "es is missing",
                     "name": "es"
@@ -41293,12 +41415,6 @@
                     "locations": [],
                     "name": "count of es.v that equals m named by $params.k",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "es.v",
-                    "outcome": "absent",
-                    "value": []
                   },
                   {
                     "locations": [
@@ -41449,14 +41565,26 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [],
-                        "name": "es",
-                        "outcome": "absent",
-                        "value": []
-                      },
+                        "cause": "absent",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0"
+                            ],
+                            "name": "es",
+                            "outcome": "absent",
+                            "value": null
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "es is missing",
+                        "name": "es"
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "$params:/k"
@@ -41470,7 +41598,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/option_some/any_of/a/0"
                     ],
-                    "message": "$params.k is 3, which isn't text; es is missing",
+                    "message": "$params.k is 3, which isn't text",
                     "name": "some es whose zz equals m named by $params.k exists"
                   }
                 ],
@@ -41479,7 +41607,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "$params.k is 3, which isn't text; es is missing",
+                "message": "",
                 "name": "a"
               },
               {
@@ -41511,7 +41639,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -41644,14 +41772,26 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
-                    "locations": [],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": []
-                  },
+                    "cause": "value",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es"
+                        ],
+                        "name": "es",
+                        "outcome": "usable",
+                        "value": []
+                      }
+                    ],
+                    "kind": "list",
+                    "message": "es is []",
+                    "name": "es"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:/k"
@@ -41665,7 +41805,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_every/assert/0"
                 ],
-                "message": "$params.k is 3, which isn't text; es is []",
+                "message": "$params.k is 3, which isn't text",
                 "name": "every es whose zz equals m named by $params.k exists"
               },
               {
@@ -41875,14 +42015,26 @@
                 "failures": [
                   {
                     "cause": "unusable",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
-                        "locations": [],
-                        "name": "es[]",
-                        "outcome": "usable",
-                        "value": []
-                      },
+                        "cause": "value",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es"
+                            ],
+                            "name": "es",
+                            "outcome": "usable",
+                            "value": []
+                          }
+                        ],
+                        "kind": "list",
+                        "message": "es is []",
+                        "name": "es"
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "$params:/k"
@@ -41896,7 +42048,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/option_some/any_of/a/0"
                     ],
-                    "message": "$params.k is 3, which isn't text; es is []",
+                    "message": "$params.k is 3, which isn't text",
                     "name": "some es whose zz equals m named by $params.k exists"
                   }
                 ],
@@ -41905,7 +42057,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "$params.k is 3, which isn't text; es is []",
+                "message": "",
                 "name": "a"
               },
               {
@@ -41937,7 +42089,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -41993,7 +42145,29 @@
             "failures": [
               {
                 "cause": "unusable",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "$params.k is 3, which isn't text",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -42015,7 +42189,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_count/assert/0"
                 ],
-                "message": "item 1 of es: $params.k is 3, which isn't text",
+                "message": "",
                 "name": "count of es whose zz equals m named by $params.k is 0"
               },
               {
@@ -42080,18 +42254,30 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
-                "inputs": [
+                "failures": [
                   {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].zz",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
                     "locations": [
                       "/things/0/es/0"
                     ],
-                    "name": "es[]",
-                    "outcome": "usable",
-                    "value": [
-                      "s"
-                    ]
-                  },
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
+                "inputs": [
                   {
                     "locations": [
                       "$params:/k"
@@ -42105,7 +42291,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_every/assert/0"
                 ],
-                "message": "item 1 of es is \"s\", which isn't an object",
+                "message": "",
                 "name": "every es whose zz equals m named by $params.k exists"
               },
               {
@@ -42163,7 +42349,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/es/0"
+                        ],
+                        "name": "es[0].v",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/things/0/es/0"
+                    ],
+                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "name": "item 1 of es",
+                    "value": "s"
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -42177,7 +42385,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/assert_that/assert/0"
                 ],
-                "message": "item 1 of es is \"s\", which isn't an object",
+                "message": "",
                 "name": "count of es.v that equals m named by $params.k is 0"
               },
               {
@@ -42318,18 +42526,30 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/es/0"
+                            ],
+                            "name": "es[0].zz",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
                           "/things/0/es/0"
                         ],
-                        "name": "es[]",
-                        "outcome": "usable",
-                        "value": [
-                          "s"
-                        ]
-                      },
+                        "message": "item 1 of es is \"s\", which isn't an object",
+                        "name": "item 1 of es",
+                        "value": "s"
+                      }
+                    ],
+                    "inputs": [
                       {
                         "locations": [
                           "$params:/k"
@@ -42343,7 +42563,7 @@
                     "locations": [
                       "$policy:/requirements/s/checks/option_some/any_of/a/0"
                     ],
-                    "message": "item 1 of es is \"s\", which isn't an object",
+                    "message": "",
                     "name": "some es whose zz equals m named by $params.k exists"
                   }
                 ],
@@ -42352,7 +42572,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/a"
                 ],
-                "message": "item 1 of es is \"s\", which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -42384,7 +42604,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/option_some/any_of/b"
                 ],
-                "message": "ys is missing",
+                "message": "",
                 "name": "b"
               }
             ],

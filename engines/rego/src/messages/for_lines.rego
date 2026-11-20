@@ -478,13 +478,36 @@ _m_for_fail(f) := [_m_isnt(object.get(f, "bare", object.get(f, "said", f.item)),
 	not is_object(object.get(f, "raw", f.value))
 }
 
-_m_for_fail(f) := array.concat([_m_under(object.get(f, "said", f.item), _m_group_text(g)) | some g in _m_for_groups(f)], [_m_free_text(f, x, t) | some x in object.get(f, "failed_items", []); some t in _m_inner_fail(x)]) if {
+_m_for_fail(f) := array.concat([_m_under(object.get(f, "said", f.item), q) | some g in _m_for_groups(f); some q in _m_second_tally_pieces(f, _m_group_text(g))], [_m_free_text(f, x, t) | some x in object.get(f, "failed_items", []); some t in _m_inner_fail(x)]) if {
 	not "msg" in object.keys(f)
 	not _m_bare_item(f)
 	f.failed_assertions != []
 }
 
-_m_for_groups(f) := _m_groups(_once([q | some ps in lines; some p in ps; q := _m_unskipped(p, object.get(f, "skip", [])); q != ""]), _m_two_list(f)) if lines := [_m_line_msg(l, f) | some l in f.failed_assertions]
+_m_for_groups(f) := _m_groups(_once([q | some ps in lines; some p in ps; q := _m_unskipped(p, object.get(f, "skip", [])); q != ""]), _m_two_list(f)) if lines := [_m_tally_pieces(l, _m_line_msg(l, f)) | some l in f.failed_assertions]
+
+_m_tally_pieces(l, ps) := [q | some p in ps; some q in _m_top_split(p, "; ")] if {
+	not "items" in object.keys(l)
+	_m_tally_line(l.assertion)
+} else := ps
+
+_m_second_tally_pieces(f, t) := [_m_releaded(lead, q) | some q in _m_top_split(t, "; ")] if {
+	_m_two_list(f)
+	some l in f.failed_assertions
+	"items" in object.keys(l)
+	_m_tally_line(l.assertion)
+	lead := _m_lead_of(t)
+	lead != ""
+} else := [t]
+
+_m_releaded(lead, q) := concat("", [lead, ": ", q]) if {
+	startswith(q, "item ")
+	not startswith(q, concat("", [lead, ": "]))
+} else := q
+
+_m_tally_line(a) if contains(a, "count of ")
+
+_m_tally_line(a) if contains(a, "sum of ")
 
 _m_unskipped(p, skip) := p if skip == []
 
@@ -547,7 +570,15 @@ _m_grouped(texts, ls, _) := [texts] if count(_m_leads(ls)) == 0
 
 _m_grouped(texts, ls, true) := [[texts[j] | some j, l in ls; _m_in_group(l, lead, k, true)] | some k, lead in _m_pair_leads(ls)] if count(_m_leads(ls)) > 0
 
-_m_grouped(texts, ls, false) := [[texts[j] | some j, l in ls; l == lead] | some lead in _m_all_leads(ls)] if count(_m_leads(ls)) > 0
+_m_grouped(texts, ls, false) := [[texts[j] | some j, l in ls; l == lead] | some lead in _m_list_leads(ls)] if count(_m_leads(ls)) > 0
+
+_m_list_leads(ls) := [x[3] | some x in sort([[_m_list_at(ls, l), _m_lead_n(l), i, l] | some i, l in ls; not l in array.slice(ls, 0, i)])]
+
+_m_list_at(ls, l) := min({i | some i, k in ls; _m_lead_list(k) == _m_lead_list(l)})
+
+_m_lead_list(l) := substring(l, indexof(l, " of ") + 4, -1) if startswith(l, "item ")
+
+else := l
 
 _m_leads(ls) := [l | some i, l in ls; l != ""; not l in array.slice(ls, 0, i)]
 
@@ -557,8 +588,6 @@ _m_lead_n(l) := to_number(tok) if {
 	tok := split(substring(l, 5, -1), " ")[0]
 	regex.match(`^[0-9]+$`, tok)
 } else := 0
-
-_m_all_leads(ls) := [l | some i, l in ls; not l in array.slice(ls, 0, i)]
 
 _m_in_group(l, lead, _, _) if l == lead
 
@@ -856,15 +885,22 @@ _m_from_message(doc, req, false, cause) := {"message": m} if {
 } else := {"message": m} if {
 	_every_from(req)
 	w := _fl_broken(doc, _from_keys(req))
-	ms := array.concat([_fl_fail_text(req, f) | some p in sort({f.path | some f in w.fails}); some f in w.fails; f.path == p], [_fl_note_text(req, n) | some n in w.notes])
+	ms := array.concat([_fl_fail_text(req, f) | some p in sort({f.path | some f in w.fails}); some f in w.fails; f.path == p], _fl_notes_once([_fl_note_text(req, n) | some n in w.notes]))
 	count(ms) > 0
-	m := _m_joined(ms)
+	m := concat("; ", _once(ms))
 } else := {"message": m} if {
 	not _every_from(req)
 	fails := _every_walk(doc, _from_keys(req)).fails
 	count(fails) > 0
 	m := _m_joined([_m_named_fail(object.union(f, {"path": _m_from_item_name(req, f.path)})) | some p in sort({f.path | some f in fails}); some f in fails; f.path == p])
 } else := {}
+
+_fl_notes_once(ts) := [t |
+	some k, x in ts
+	before := {c | some j, y in ts; j < k; some c in split(y, ", ")}
+	t := concat(", ", [c | some c in split(x, ", "); not c in before])
+	t != ""
+]
 
 _m_from_root(req) := data.ergo_subject_sentences.chains[req.subject] if _chained(req)
 

@@ -234,7 +234,7 @@ _parent_min_subjects_row(req, name, "none") := object.union(
 		"passed": _min_subjects_of(req) == 0,
 		"cause": _verdict_cause(_min_subjects_of(req) == 0),
 	},
-	_every_no_items(req),
+	_no_items(_min_subjects_of(req) == 0),
 )
 
 _parent_min_subjects_row(req, name, cause) := object.union(
@@ -246,9 +246,9 @@ _parent_min_subjects_row(req, name, cause) := object.union(
 		"passed": false,
 		"cause": cause,
 	},
-	_every_no_items(req),
+	_no_items(false),
 ) if cause != "none"
 
-_every_no_items(req) := {"failed_items": []} if _every_from(req)
+_no_items(true) := {}
 
-else := {}
+_no_items(false) := {"failures": []}

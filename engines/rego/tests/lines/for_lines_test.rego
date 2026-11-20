@@ -23,3 +23,8 @@ test_a_second_for_roots_problem_is_added_to_the_row_in_every_state_the_row_can_b
 	ergo._for_second_rooted({"cause": "value", "failed": [{"failed_assertions": [1]}]}, xs) == {"cause": "absent", "failed": [], "root_msgs": ["m"]}
 	ergo._for_second_rooted({"cause": "unusable", "failed": [{"failed_assertions": [1]}]}, xs) == {"cause": "unusable", "failed": [{"failed_assertions": [1]}], "other_roots": ["m"]}
 }
+
+test_a_root_said_once_is_not_said_again_under_an_item_and_its_count_of_more_goes_with_it if {
+	ergo._for_deduped("item 2 of pos: name is missing; item 1 of ms: item 2 of pos: name is missing; item 1 of ms: and 2 more") == "item 2 of pos: name is missing"
+	ergo._for_deduped("item 1 of ms: v is missing; item 1 of ms: and 2 more") == "item 1 of ms: v is missing; item 1 of ms: and 2 more"
+}

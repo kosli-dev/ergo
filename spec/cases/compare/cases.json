@@ -5345,10 +5345,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:"
+                        ],
                         "name": "$params.q",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -5404,10 +5406,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:"
+                        ],
                         "name": "$params.q",
                         "outcome": "absent",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -5476,14 +5480,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/i"
@@ -5533,14 +5530,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/j"
@@ -5747,7 +5737,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o1"
                 ],
-                "message": "$params.x.y is missing",
+                "message": "",
                 "name": "o1"
               },
               {
@@ -5787,7 +5777,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o2"
                 ],
-                "message": "$input.z is missing",
+                "message": "",
                 "name": "o2"
               }
             ],
@@ -6555,10 +6545,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:/q"
+                        ],
                         "name": "$params.q",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -6614,10 +6606,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:/q"
+                        ],
                         "name": "$params.q",
                         "outcome": "null",
-                        "value": []
+                        "value": null
                       }
                     ],
                     "kind": "list",
@@ -6686,14 +6680,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/i"
@@ -6743,14 +6730,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "null",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/j"
@@ -6957,7 +6937,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o1"
                 ],
-                "message": "$params.x.y is null",
+                "message": "",
                 "name": "o1"
               },
               {
@@ -6997,7 +6977,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o2"
                 ],
-                "message": "$input.z is null",
+                "message": "",
                 "name": "o2"
               }
             ],
@@ -7771,10 +7751,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:/q"
+                        ],
                         "name": "$params.q",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "s"
                       }
                     ],
                     "kind": "list",
@@ -7830,10 +7812,12 @@
                     "failures": [],
                     "inputs": [
                       {
-                        "locations": [],
+                        "locations": [
+                          "$params:/q"
+                        ],
                         "name": "$params.q",
                         "outcome": "unusable",
-                        "value": []
+                        "value": "s"
                       }
                     ],
                     "kind": "list",
@@ -7902,14 +7886,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/i"
@@ -7959,14 +7936,7 @@
                     "name": "$params.q"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "unusable",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/j"
@@ -8151,7 +8121,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o1"
                 ],
-                "message": "$params.x is 5, which isn't an object",
+                "message": "",
                 "name": "o1"
               },
               {
@@ -8193,7 +8163,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/n/any_of/o2"
                 ],
-                "message": "v is 1, which isn't a list",
+                "message": "",
                 "name": "o2"
               }
             ],
@@ -8925,7 +8895,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is missing",
                     "name": "$params"
@@ -8936,12 +8915,6 @@
                     "locations": [],
                     "name": "count of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -8983,7 +8956,16 @@
                   {
                     "cause": "absent",
                     "failures": [],
-                    "inputs": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "outcome": "absent",
+                        "value": null
+                      }
+                    ],
                     "kind": "list",
                     "message": "$params is missing",
                     "name": "$params"
@@ -8994,12 +8976,6 @@
                     "locations": [],
                     "name": "sum of $params.q",
                     "value": null
-                  },
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
                   }
                 ],
                 "kind": "assertion",
@@ -9056,14 +9032,7 @@
                     "name": "$params"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/i"
@@ -9113,14 +9082,7 @@
                     "name": "$params"
                   }
                 ],
-                "inputs": [
-                  {
-                    "locations": [],
-                    "name": "$params.q",
-                    "outcome": "absent",
-                    "value": []
-                  }
-                ],
+                "inputs": [],
                 "kind": "assertion",
                 "locations": [
                   "$policy:/requirements/s/checks/j"
@@ -10827,7 +10789,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/objs/1"
+                        ],
+                        "name": "$params.objs[1].n",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "$params:/objs/1"
+                    ],
+                    "message": "item 2 of $params.objs is 3, which isn't an object",
+                    "name": "item 2 of $params.objs",
+                    "value": 3
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10842,7 +10826,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "count of $params.objs.n is 2"
               }
             ],
@@ -10882,7 +10866,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/objs/1"
+                        ],
+                        "name": "$params.objs[1].n",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "$params:/objs/1"
+                    ],
+                    "message": "item 2 of $params.objs is 3, which isn't an object",
+                    "name": "item 2 of $params.objs",
+                    "value": 3
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -10897,7 +10903,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "sum of $params.objs.n is 3"
               }
             ],
@@ -11090,7 +11096,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/g/any_of/a"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -11098,26 +11104,35 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "$params:/objs/1"
+                            ],
+                            "name": "$params.objs[1].x",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
-                          "$params:/objs/0/x",
                           "$params:/objs/1"
                         ],
-                        "name": "$params.objs[].x",
-                        "outcome": "unusable",
-                        "value": [
-                          "y",
-                          null
-                        ]
+                        "message": "item 2 of $params.objs is 3, which isn't an object",
+                        "name": "item 2 of $params.objs",
+                        "value": 3
                       }
                     ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/s/checks/g/any_of/b"
                     ],
-                    "message": "item 2 of $params.objs is 3, which isn't an object",
+                    "message": "",
                     "name": "every $params.objs.x is \"y\""
                   }
                 ],
@@ -11126,7 +11141,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/g/any_of/b"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -11201,7 +11216,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/h/any_of/a"
                 ],
-                "message": "$params.objs is [{\"n\": 1, \"x\": \"y\"}, 3], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -11245,7 +11260,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/h/any_of/b"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -11539,7 +11554,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/objs/1"
+                        ],
+                        "name": "$params.objs[1].n",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "$params:/objs/1"
+                    ],
+                    "message": "item 2 of $params.objs is 3, which isn't an object",
+                    "name": "item 2 of $params.objs",
+                    "value": 3
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -11554,7 +11591,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/c"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "count of $params.objs.n is 2"
               }
             ],
@@ -11595,7 +11632,29 @@
             "failures": [
               {
                 "cause": "not_an_object",
-                "failures": [],
+                "failures": [
+                  {
+                    "cause": "not_an_object",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:/objs/1"
+                        ],
+                        "name": "$params.objs[1].n",
+                        "outcome": "not_an_object",
+                        "value": null
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "$params:/objs/1"
+                    ],
+                    "message": "item 2 of $params.objs is 3, which isn't an object",
+                    "name": "item 2 of $params.objs",
+                    "value": 3
+                  }
+                ],
                 "inputs": [
                   {
                     "locations": [
@@ -11610,7 +11669,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/d"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "sum of $params.objs.n is 3"
               }
             ],
@@ -11806,7 +11865,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/g/any_of/a"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -11814,26 +11873,35 @@
                 "failures": [
                   {
                     "cause": "not_an_object",
-                    "failures": [],
-                    "inputs": [
+                    "failures": [
                       {
+                        "cause": "not_an_object",
+                        "failures": [],
+                        "inputs": [
+                          {
+                            "locations": [
+                              "$params:/objs/1"
+                            ],
+                            "name": "$params.objs[1].x",
+                            "outcome": "not_an_object",
+                            "value": null
+                          }
+                        ],
+                        "kind": "item",
                         "locations": [
-                          "$params:/objs/0/x",
                           "$params:/objs/1"
                         ],
-                        "name": "$params.objs[].x",
-                        "outcome": "unusable",
-                        "value": [
-                          "y",
-                          null
-                        ]
+                        "message": "item 2 of $params.objs is 3, which isn't an object",
+                        "name": "item 2 of $params.objs",
+                        "value": 3
                       }
                     ],
+                    "inputs": [],
                     "kind": "assertion",
                     "locations": [
                       "$policy:/requirements/s/checks/g/any_of/b"
                     ],
-                    "message": "item 2 of $params.objs is 3, which isn't an object",
+                    "message": "",
                     "name": "every $params.objs.x is \"y\""
                   }
                 ],
@@ -11842,7 +11910,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/g/any_of/b"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -11918,7 +11986,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/h/any_of/a"
                 ],
-                "message": "$params.objs is [{\"n\": 1, \"x\": \"y\"}, 3], which isn't an object",
+                "message": "",
                 "name": "a"
               },
               {
@@ -11962,7 +12030,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/h/any_of/b"
                 ],
-                "message": "item 2 of $params.objs is 3, which isn't an object",
+                "message": "",
                 "name": "b"
               }
             ],
@@ -12144,423 +12212,7 @@
     ]
   },
   {"description": "$refs list the path before named by, with its whole value", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}, "picked": {"from": "things whose v is $params.m named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is $params.m named by k", "b": "v is $input.m named by k", "c": "$params.m named by k exists", "d": {"for": "every items as it", "assert": "it.w is $params.m named by k"}, "e": {"any_of": {"o1": "v is $params.m named by k", "o2": "v is 1"}}, "f": "count of $params.m named by k is 1", "g": "tags contains $params.m named by k", "h": "v is in $params.m named by k", "i": "v is $input.m named by $params.a"}}, "t": {"subject": "picked", "checks": {"c": "v exists"}}}}, "params": {"m": {"x": "a", "y": "b"}, "a": "x"}, "cases": [
-      {"description": "lists the path before named by with its whole value, where it was read, and the rows don't change", "rules": ["value.refs", "location.refs"], "input": {"things": [{"id": "t1", "v": "a", "k": "x", "tags": ["a"], "items": [{"w": "a"}]}], "m": {"x": "a", "y": "b"}}, "results": [
-        {
-          "cause": "satisfied",
-          "check": "$applies",
-          "inputs": [
-            {
-              "locations": [
-                "$params:/m/x"
-              ],
-              "name": "$params.m named by k",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "/things/0/k"
-              ],
-              "name": "k",
-              "value": "x"
-            },
-            {
-              "locations": [
-                "/things/0/v"
-              ],
-              "name": "v",
-              "value": "a"
-            }
-          ],
-          "passed": true,
-          "requirement": "t",
-          "subject": {
-            "id": "t1",
-            "type": "picked"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "a",
-          "inputs": [
-            {
-              "locations": [
-                "/things/0/v"
-              ],
-              "name": "v",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "$params:/m/x"
-              ],
-              "name": "$params.m named by k",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "/things/0/k"
-              ],
-              "name": "k",
-              "value": "x"
-            }
-          ],
-          "passed": true,
-          "requirement": "s",
-          "subject": {
-            "id": "t1",
-            "type": "thing"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "b",
-          "inputs": [
-            {
-              "locations": [
-                "/things/0/v"
-              ],
-              "name": "v",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "/m/x"
-              ],
-              "name": "$input.m named by k",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "/things/0/k"
-              ],
-              "name": "k",
-              "value": "x"
-            }
-          ],
-          "passed": true,
-          "requirement": "s",
-          "subject": {
-            "id": "t1",
-            "type": "thing"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "c",
-          "inputs": [
-            {
-              "locations": [
-                "$params:/m/x"
-              ],
-              "name": "$params.m named by k",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "/things/0/k"
-              ],
-              "name": "k",
-              "value": "x"
-            }
-          ],
-          "passed": true,
-          "requirement": "s",
-          "subject": {
-            "id": "t1",
-            "type": "thing"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "d",
-          "inputs": [
-            {
-              "locations": [
-                "$params:/m/x"
-              ],
-              "name": "$params.m named by k",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "/things/0/items/0"
-              ],
-              "name": "items[]",
-              "value": [
-                {
-                  "w": "a"
-                }
-              ]
-            },
-            {
-              "locations": [
-                "/things/0/k"
-              ],
-              "name": "k",
-              "value": "x"
-            }
-          ],
-          "passed": true,
-          "requirement": "s",
-          "subject": {
-            "id": "t1",
-            "type": "thing"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "e",
-          "inputs": [
-            {
-              "locations": [
-                "$params:/m/x"
-              ],
-              "name": "$params.m named by k",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "/things/0/k"
-              ],
-              "name": "k",
-              "value": "x"
-            },
-            {
-              "locations": [
-                "/things/0/v"
-              ],
-              "name": "v",
-              "value": "a"
-            }
-          ],
-          "passed": true,
-          "requirement": "s",
-          "subject": {
-            "id": "t1",
-            "type": "thing"
-          }
-        },
-        {
-          "cause": "unusable",
-          "check": "f",
-          "failures": [
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [],
-                  "name": "count of $params.m named by k",
-                  "value": null
-                },
-                {
-                  "locations": [],
-                  "name": "$params.m named by k",
-                  "outcome": "usable",
-                  "value": []
-                },
-                {
-                  "locations": [
-                    "/things/0/k"
-                  ],
-                  "name": "k",
-                  "outcome": "usable",
-                  "value": "x"
-                }
-              ],
-              "kind": "assertion",
-              "locations": [
-                "$policy:/requirements/s/checks/f"
-              ],
-              "message": "$params.m.x is \"a\", which isn't a list or an object",
-              "name": "count of $params.m named by k is 1"
-            }
-          ],
-          "inputs": [
-            {
-              "locations": [],
-              "name": "count of $params.m named by k",
-              "value": null
-            },
-            {
-              "locations": [],
-              "name": "$params.m named by k",
-              "outcome": "usable",
-              "value": []
-            },
-            {
-              "locations": [
-                "/things/0/k"
-              ],
-              "name": "k",
-              "outcome": "usable",
-              "value": "x"
-            }
-          ],
-          "message": "$params.m.x is \"a\", which isn't a list or an object",
-          "passed": false,
-          "requirement": "s",
-          "subject": {
-            "id": "t1",
-            "type": "thing"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "g",
-          "inputs": [
-            {
-              "locations": [
-                "/things/0/tags"
-              ],
-              "name": "tags",
-              "value": [
-                "a"
-              ]
-            },
-            {
-              "locations": [
-                "$params:/m/x"
-              ],
-              "name": "$params.m named by k",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "/things/0/k"
-              ],
-              "name": "k",
-              "value": "x"
-            }
-          ],
-          "passed": true,
-          "requirement": "s",
-          "subject": {
-            "id": "t1",
-            "type": "thing"
-          }
-        },
-        {
-          "cause": "unusable",
-          "check": "h",
-          "failures": [
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/things/0/v"
-                  ],
-                  "name": "v",
-                  "outcome": "usable",
-                  "value": "a"
-                },
-                {
-                  "locations": [
-                    "$params:/m/x"
-                  ],
-                  "name": "$params.m named by k",
-                  "outcome": "unusable",
-                  "value": "a"
-                },
-                {
-                  "locations": [
-                    "/things/0/k"
-                  ],
-                  "name": "k",
-                  "outcome": "usable",
-                  "value": "x"
-                }
-              ],
-              "kind": "assertion",
-              "locations": [
-                "$policy:/requirements/s/checks/h"
-              ],
-              "message": "$params.m named by k is \"a\", which isn't a list",
-              "name": "v is in $params.m named by k"
-            }
-          ],
-          "inputs": [
-            {
-              "locations": [
-                "/things/0/v"
-              ],
-              "name": "v",
-              "outcome": "usable",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "$params:/m/x"
-              ],
-              "name": "$params.m named by k",
-              "outcome": "unusable",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "/things/0/k"
-              ],
-              "name": "k",
-              "outcome": "usable",
-              "value": "x"
-            }
-          ],
-          "message": "$params.m named by k is \"a\", which isn't a list",
-          "passed": false,
-          "requirement": "s",
-          "subject": {
-            "id": "t1",
-            "type": "thing"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "i",
-          "inputs": [
-            {
-              "locations": [
-                "/things/0/v"
-              ],
-              "name": "v",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "/m/x"
-              ],
-              "name": "$input.m named by $params.a",
-              "value": "a"
-            }
-          ],
-          "passed": true,
-          "requirement": "s",
-          "subject": {
-            "id": "t1",
-            "type": "thing"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "c",
-          "inputs": [
-            {
-              "locations": [
-                "/things/0/v"
-              ],
-              "name": "v",
-              "value": "a"
-            }
-          ],
-          "passed": true,
-          "requirement": "t",
-          "subject": {
-            "id": "t1",
-            "type": "picked"
-          }
-        }
-      ], "refs": {
+      {"description": "lists the path before named by with its whole value, where it was read, and the rows don't change", "rules": ["value.refs", "location.refs"], "input": {"things": [{"id": "t1", "v": "a", "k": "x", "tags": ["a"], "items": [{"w": "a"}]}], "m": {"x": "a", "y": "b"}}, "results": [{"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["/things/0/v"], "name": "v", "value": "a"}], "passed": true, "requirement": "t", "subject": {"id": "t1", "type": "picked"}}, {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/m/x"], "name": "$input.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/items/0"], "name": "items[]", "value": [{"w": "a"}]}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}, {"locations": ["/things/0/v"], "name": "v", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "f", "failures": [{"cause": "unusable", "failures": [{"cause": "unusable", "failures": [], "inputs": [{"locations": ["$params:/m/x"], "name": "$params.m.x", "outcome": "unusable", "value": "a"}], "kind": "list", "message": "$params.m.x is \"a\", which isn't a list or an object", "name": "$params.m.x"}], "inputs": [{"locations": [], "name": "count of $params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "outcome": "usable", "value": "x"}], "kind": "assertion", "locations": ["$policy:/requirements/s/checks/f"], "message": "", "name": "count of $params.m named by k is 1"}], "inputs": [{"locations": [], "name": "count of $params.m named by k", "value": null}, {"locations": [], "name": "$params.m named by k", "outcome": "usable", "value": []}, {"locations": ["/things/0/k"], "name": "k", "outcome": "usable", "value": "x"}], "message": "$params.m.x is \"a\", which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "g", "inputs": [{"locations": ["/things/0/tags"], "name": "tags", "value": ["a"]}, {"locations": ["$params:/m/x"], "name": "$params.m named by k", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "value": "x"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "h", "failures": [{"cause": "unusable", "failures": [], "inputs": [{"locations": ["/things/0/v"], "name": "v", "outcome": "usable", "value": "a"}, {"locations": ["$params:/m/x"], "name": "$params.m named by k", "outcome": "unusable", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "outcome": "usable", "value": "x"}], "kind": "assertion", "locations": ["$policy:/requirements/s/checks/h"], "message": "$params.m named by k is \"a\", which isn't a list", "name": "v is in $params.m named by k"}], "inputs": [{"locations": ["/things/0/v"], "name": "v", "outcome": "usable", "value": "a"}, {"locations": ["$params:/m/x"], "name": "$params.m named by k", "outcome": "unusable", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "outcome": "usable", "value": "x"}], "message": "$params.m named by k is \"a\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "i", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/m/x"], "name": "$input.m named by $params.a", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}], "passed": true, "requirement": "t", "subject": {"id": "t1", "type": "picked"}}], "refs": {
         "s": {
           "a": [
             {
@@ -12692,172 +12344,7 @@
           "$applies": [],
           "c": []
         }
-      }, "violations": [
-        {
-          "cause": "unusable",
-          "check": "f",
-          "description": "",
-          "expression": "count of $params.m named by k is 1",
-          "failures": [
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [],
-                  "name": "count of $params.m named by k",
-                  "value": null
-                },
-                {
-                  "locations": [],
-                  "name": "$params.m named by k",
-                  "outcome": "usable",
-                  "value": []
-                },
-                {
-                  "locations": [
-                    "/things/0/k"
-                  ],
-                  "name": "k",
-                  "outcome": "usable",
-                  "value": "x"
-                }
-              ],
-              "kind": "assertion",
-              "locations": [
-                "$policy:/requirements/s/checks/f"
-              ],
-              "message": "$params.m.x is \"a\", which isn't a list or an object",
-              "name": "count of $params.m named by k is 1"
-            }
-          ],
-          "inputs": [
-            {
-              "locations": [],
-              "name": "count of $params.m named by k",
-              "value": null
-            },
-            {
-              "locations": [],
-              "name": "$params.m named by k",
-              "outcome": "usable",
-              "value": []
-            },
-            {
-              "locations": [
-                "/things/0/k"
-              ],
-              "name": "k",
-              "outcome": "usable",
-              "value": "x"
-            },
-            {
-              "locations": [
-                "$params:/m"
-              ],
-              "name": "$params.m",
-              "outcome": "usable",
-              "value": {
-                "x": "a",
-                "y": "b"
-              }
-            }
-          ],
-          "message": "$params.m.x is \"a\", which isn't a list or an object",
-          "requirement": "s",
-          "subject": {
-            "id": "t1",
-            "type": "thing"
-          }
-        },
-        {
-          "cause": "unusable",
-          "check": "h",
-          "description": "",
-          "expression": "v is in $params.m named by k",
-          "failures": [
-            {
-              "cause": "unusable",
-              "failures": [],
-              "inputs": [
-                {
-                  "locations": [
-                    "/things/0/v"
-                  ],
-                  "name": "v",
-                  "outcome": "usable",
-                  "value": "a"
-                },
-                {
-                  "locations": [
-                    "$params:/m/x"
-                  ],
-                  "name": "$params.m named by k",
-                  "outcome": "unusable",
-                  "value": "a"
-                },
-                {
-                  "locations": [
-                    "/things/0/k"
-                  ],
-                  "name": "k",
-                  "outcome": "usable",
-                  "value": "x"
-                }
-              ],
-              "kind": "assertion",
-              "locations": [
-                "$policy:/requirements/s/checks/h"
-              ],
-              "message": "$params.m named by k is \"a\", which isn't a list",
-              "name": "v is in $params.m named by k"
-            }
-          ],
-          "inputs": [
-            {
-              "locations": [
-                "/things/0/v"
-              ],
-              "name": "v",
-              "outcome": "usable",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "$params:/m/x"
-              ],
-              "name": "$params.m named by k",
-              "outcome": "unusable",
-              "value": "a"
-            },
-            {
-              "locations": [
-                "/things/0/k"
-              ],
-              "name": "k",
-              "outcome": "usable",
-              "value": "x"
-            },
-            {
-              "locations": [
-                "$params:/m"
-              ],
-              "name": "$params.m",
-              "outcome": "usable",
-              "value": {
-                "x": "a",
-                "y": "b"
-              }
-            }
-          ],
-          "message": "$params.m named by k is \"a\", which isn't a list",
-          "requirement": "s",
-          "subject": {
-            "id": "t1",
-            "type": "thing"
-          }
-        }
-      ]}
+      }, "violations": [{"cause": "unusable", "check": "f", "description": "", "expression": "count of $params.m named by k is 1", "failures": [{"cause": "unusable", "failures": [{"cause": "unusable", "failures": [], "inputs": [{"locations": ["$params:/m/x"], "name": "$params.m.x", "outcome": "unusable", "value": "a"}], "kind": "list", "message": "$params.m.x is \"a\", which isn't a list or an object", "name": "$params.m.x"}], "inputs": [{"locations": [], "name": "count of $params.m named by k", "value": null}, {"locations": ["/things/0/k"], "name": "k", "outcome": "usable", "value": "x"}], "kind": "assertion", "locations": ["$policy:/requirements/s/checks/f"], "message": "", "name": "count of $params.m named by k is 1"}], "inputs": [{"locations": [], "name": "count of $params.m named by k", "value": null}, {"locations": [], "name": "$params.m named by k", "outcome": "usable", "value": []}, {"locations": ["/things/0/k"], "name": "k", "outcome": "usable", "value": "x"}, {"locations": ["$params:/m"], "name": "$params.m", "outcome": "usable", "value": {"x": "a", "y": "b"}}], "message": "$params.m.x is \"a\", which isn't a list or an object", "requirement": "s", "subject": {"id": "t1", "type": "thing"}}, {"cause": "unusable", "check": "h", "description": "", "expression": "v is in $params.m named by k", "failures": [{"cause": "unusable", "failures": [], "inputs": [{"locations": ["/things/0/v"], "name": "v", "outcome": "usable", "value": "a"}, {"locations": ["$params:/m/x"], "name": "$params.m named by k", "outcome": "unusable", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "outcome": "usable", "value": "x"}], "kind": "assertion", "locations": ["$policy:/requirements/s/checks/h"], "message": "$params.m named by k is \"a\", which isn't a list", "name": "v is in $params.m named by k"}], "inputs": [{"locations": ["/things/0/v"], "name": "v", "outcome": "usable", "value": "a"}, {"locations": ["$params:/m/x"], "name": "$params.m named by k", "outcome": "unusable", "value": "a"}, {"locations": ["/things/0/k"], "name": "k", "outcome": "usable", "value": "x"}, {"locations": ["$params:/m"], "name": "$params.m", "outcome": "usable", "value": {"x": "a", "y": "b"}}], "message": "$params.m named by k is \"a\", which isn't a list", "requirement": "s", "subject": {"id": "t1", "type": "thing"}}]}
   ]},
   {"description": "$refs list the path before named by, when it is missing", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}, "picked": {"from": "things whose v is $params.m named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is $params.m named by k", "b": "v is $input.m named by k", "c": "$params.m named by k exists", "d": {"for": "every items as it", "assert": "it.w is $params.m named by k"}, "e": {"any_of": {"o1": "v is $params.m named by k", "o2": "v is 1"}}, "f": "count of $params.m named by k is 1", "g": "tags contains $params.m named by k", "h": "v is in $params.m named by k", "i": "v is $input.m named by $params.a"}}, "t": {"subject": "picked", "checks": {"c": "v exists"}}}}, "params": {}, "cases": [
       {"description": "lists the path before named by with null and where the read stopped, and the rows don't change", "rules": ["value.refs", "location.refs"], "input": {"things": [{"id": "t1", "v": "a", "k": "x", "tags": ["a"], "items": [{"w": "a"}]}], "m": {"x": "a", "y": "b"}}, "results": [
@@ -13223,7 +12710,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o1"
               ],
-              "message": "$params.m named by k is missing",
+              "message": "",
               "name": "o1"
             },
             {
@@ -13255,7 +12742,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o2"
               ],
-              "message": "v is \"a\", which isn't a number",
+              "message": "",
               "name": "o2"
             }
           ],
@@ -13303,7 +12790,16 @@
                 {
                   "cause": "absent",
                   "failures": [],
-                  "inputs": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:"
+                      ],
+                      "name": "$params.m",
+                      "outcome": "absent",
+                      "value": null
+                    }
+                  ],
                   "kind": "list",
                   "message": "$params.m is missing",
                   "name": "$params.m"
@@ -13314,12 +12810,6 @@
                   "locations": [],
                   "name": "count of $params.m named by k",
                   "value": null
-                },
-                {
-                  "locations": [],
-                  "name": "$params.m named by k",
-                  "outcome": "absent",
-                  "value": []
                 },
                 {
                   "locations": [
@@ -14065,7 +13555,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o1"
               ],
-              "message": "$params.m is null",
+              "message": "",
               "name": "o1"
             },
             {
@@ -14097,7 +13587,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o2"
               ],
-              "message": "v is \"a\", which isn't a number",
+              "message": "",
               "name": "o2"
             }
           ],
@@ -14145,7 +13635,16 @@
                 {
                   "cause": "null",
                   "failures": [],
-                  "inputs": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:/m"
+                      ],
+                      "name": "$params.m",
+                      "outcome": "null",
+                      "value": null
+                    }
+                  ],
                   "kind": "list",
                   "message": "$params.m is null",
                   "name": "$params.m"
@@ -14156,12 +13655,6 @@
                   "locations": [],
                   "name": "count of $params.m named by k",
                   "value": null
-                },
-                {
-                  "locations": [],
-                  "name": "$params.m named by k",
-                  "outcome": "null",
-                  "value": []
                 },
                 {
                   "locations": [
@@ -14907,7 +14400,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o1"
               ],
-              "message": "$params.m is 3, which isn't an object",
+              "message": "",
               "name": "o1"
             },
             {
@@ -14939,7 +14432,7 @@
               "locations": [
                 "$policy:/requirements/s/checks/e/any_of/o2"
               ],
-              "message": "v is \"a\", which isn't a number",
+              "message": "",
               "name": "o2"
             }
           ],
@@ -14987,7 +14480,16 @@
                 {
                   "cause": "unusable",
                   "failures": [],
-                  "inputs": [],
+                  "inputs": [
+                    {
+                      "locations": [
+                        "$params:/m"
+                      ],
+                      "name": "$params.m",
+                      "outcome": "unusable",
+                      "value": 3
+                    }
+                  ],
                   "kind": "list",
                   "message": "$params.m is 3, which isn't a list or an object",
                   "name": "$params.m"
@@ -14998,12 +14500,6 @@
                   "locations": [],
                   "name": "count of $params.m named by k",
                   "value": null
-                },
-                {
-                  "locations": [],
-                  "name": "$params.m named by k",
-                  "outcome": "usable",
-                  "value": []
                 },
                 {
                   "locations": [
@@ -15454,7 +14950,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/k_is_m"
                 ],
-                "message": "$input.k is missing",
+                "message": "$input.k is missing, and k is missing",
                 "name": "k equals m named by $input.k"
               }
             ],
@@ -15476,7 +14972,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is missing",
+            "message": "$input.k is missing, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15594,7 +15090,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/m_is_k"
                 ],
-                "message": "$input.k is missing",
+                "message": "$input.k is missing, and k is missing",
                 "name": "m named by $input.k equals k"
               }
             ],
@@ -15616,7 +15112,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is missing",
+            "message": "$input.k is missing, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15661,7 +15157,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/zz_is_m"
                 ],
-                "message": "$input.k is missing",
+                "message": "$input.k is missing, and zz.y is missing",
                 "name": "zz.y equals m named by $input.k"
               }
             ],
@@ -15683,7 +15179,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is missing",
+            "message": "$input.k is missing, and zz.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16062,7 +15558,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/k_is_m"
                 ],
-                "message": "$input.k is 3, which isn't text",
+                "message": "$input.k is 3, which isn't text, and k is missing",
                 "name": "k equals m named by $input.k"
               }
             ],
@@ -16084,7 +15580,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16202,7 +15698,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/m_is_k"
                 ],
-                "message": "$input.k is 3, which isn't text",
+                "message": "$input.k is 3, which isn't text, and k is missing",
                 "name": "m named by $input.k equals k"
               }
             ],
@@ -16224,7 +15720,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16269,7 +15765,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/zz_is_m"
                 ],
-                "message": "$input.k is 3, which isn't text",
+                "message": "$input.k is 3, which isn't text, and zz.y is missing",
                 "name": "zz.y equals m named by $input.k"
               }
             ],
@@ -16291,7 +15787,7 @@
                 "value": null
               }
             ],
-            "message": "$input.k is 3, which isn't text",
+            "message": "$input.k is 3, which isn't text, and zz.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16372,7 +15868,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/k_is_m"
                 ],
-                "message": "$params.k is missing",
+                "message": "$params.k is missing, and k is missing",
                 "name": "k equals m named by $params.k"
               }
             ],
@@ -16394,7 +15890,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is missing",
+            "message": "$params.k is missing, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16512,7 +16008,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/m_is_k"
                 ],
-                "message": "$params.k is missing",
+                "message": "$params.k is missing, and k is missing",
                 "name": "m named by $params.k equals k"
               }
             ],
@@ -16534,7 +16030,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is missing",
+            "message": "$params.k is missing, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16579,7 +16075,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/zz_is_m"
                 ],
-                "message": "$params.k is missing",
+                "message": "$params.k is missing, and zz.y is missing",
                 "name": "zz.y equals m named by $params.k"
               }
             ],
@@ -16601,7 +16097,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is missing",
+            "message": "$params.k is missing, and zz.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16994,7 +16490,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/k_is_m"
                 ],
-                "message": "$params.k is 3, which isn't text",
+                "message": "$params.k is 3, which isn't text, and k is missing",
                 "name": "k equals m named by $params.k"
               }
             ],
@@ -17016,7 +16512,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is 3, which isn't text",
+            "message": "$params.k is 3, which isn't text, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17134,7 +16630,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/m_is_k"
                 ],
-                "message": "$params.k is 3, which isn't text",
+                "message": "$params.k is 3, which isn't text, and k is missing",
                 "name": "m named by $params.k equals k"
               }
             ],
@@ -17156,7 +16652,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is 3, which isn't text",
+            "message": "$params.k is 3, which isn't text, and k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17201,7 +16697,7 @@
                 "locations": [
                   "$policy:/requirements/s/checks/zz_is_m"
                 ],
-                "message": "$params.k is 3, which isn't text",
+                "message": "$params.k is 3, which isn't text, and zz.y is missing",
                 "name": "zz.y equals m named by $params.k"
               }
             ],
@@ -17223,7 +16719,7 @@
                 "value": null
               }
             ],
-            "message": "$params.k is 3, which isn't text",
+            "message": "$params.k is 3, which isn't text, and zz.y is missing",
             "passed": false,
             "requirement": "s",
             "subject": {

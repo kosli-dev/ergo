@@ -188,6 +188,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -210,6 +211,7 @@
             "check": "$min_subjects",
             "description": "The in-scope subject count is at least 1",
             "expression": "count(matching(t)) >= 1",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -235,11 +237,20 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "t",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "t is missing",
@@ -260,11 +271,20 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/t"
+                ],
+                "name": "t",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "t is null",
@@ -528,11 +548,20 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "t",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "t is missing",
@@ -659,11 +688,20 @@
           {
             "cause": "null",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$input is null",
@@ -856,6 +894,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -888,7 +927,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -975,7 +1013,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -1062,7 +1099,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -1088,17 +1125,25 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "$input",
-                "locations": [
-                  ""
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input",
+                    "outcome": "unusable",
+                    "value": {
+                      "x": 1
+                    }
+                  }
                 ],
-                "path": "$input",
-                "value": {
-                  "x": 1
-                }
+                "kind": "list",
+                "message": "$input is {\"x\": 1}, which isn't a list",
+                "name": "$input"
               }
             ],
             "inputs": [
@@ -1106,6 +1151,16 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input",
+                "outcome": "unusable",
+                "value": {
+                  "x": 1
+                }
               }
             ],
             "message": "$input is {\"x\": 1}, which isn't a list",
@@ -1143,15 +1198,23 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "$input",
-                "locations": [
-                  ""
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "$input",
-                "value": null
+                "kind": "list",
+                "message": "$input is null",
+                "name": "$input"
               }
             ],
             "inputs": [
@@ -1159,6 +1222,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "$input is null",
@@ -1196,15 +1267,23 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "$input",
-                "locations": [
-                  ""
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      ""
+                    ],
+                    "name": "$input",
+                    "outcome": "unusable",
+                    "value": "x"
+                  }
                 ],
-                "path": "$input",
-                "value": "x"
+                "kind": "list",
+                "message": "$input is \"x\", which isn't a list or an object",
+                "name": "$input"
               }
             ],
             "inputs": [
@@ -1212,6 +1291,14 @@
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input",
+                "outcome": "unusable",
+                "value": "x"
               }
             ],
             "message": "$input is \"x\", which isn't a list or an object",
@@ -1279,7 +1366,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -1376,7 +1462,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -1473,7 +1558,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -1570,12 +1654,22 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope s count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": {
+                  "x": "a"
+                }
               }
             ],
             "message": "$params.k is {\"x\": \"a\"}, which isn't text",
@@ -1643,11 +1737,22 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope s count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "$params:/k"
+                ],
+                "name": "$params.k",
+                "outcome": "unusable",
+                "value": [
+                  "a"
+                ]
               }
             ],
             "message": "$params.k is [\"a\"], which isn't text",
@@ -1691,7 +1796,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -1750,45 +1854,95 @@
       },
       {
         "description": "says when a name read as a list in one item isn't one in another, and still checks what it read",
-        "rules": ["subjects.every.broken"],
+        "rules": [
+          "subjects.every.broken",
+          "message.join"
+        ],
         "input": [{"commits": [{"x": 1}]}, {"commits": 5}],
         "results": [
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "$input[0].commits",
-                "locations": [
-                  "/0/commits"
-                ],
-                "path": "$input[0].commits",
-                "value": [
+                "failures": [
                   {
-                    "x": 1
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/0/commits/0"
+                        ],
+                        "name": "$input[0].commits[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "x": 1
+                        }
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/0/commits/0"
+                    ],
+                    "message": "item 1 of commits is an object",
+                    "name": "item 1 of commits",
+                    "value": {
+                      "x": 1
+                    }
                   }
-                ]
-              },
-              {
-                "cause": "unusable",
-                "item": "item 1 of $input[0].commits",
-                "locations": [
-                  "/0/commits/0"
                 ],
-                "path": "item 1 of $input[0].commits",
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/commits"
+                    ],
+                    "name": "$input[0].commits",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "x": 1
+                      }
+                    ]
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/0"
+                ],
+                "message": "commits is a list",
+                "name": "item 1 of $input",
                 "value": {
-                  "x": 1
+                  "commits": [
+                    {
+                      "x": 1
+                    }
+                  ]
                 }
               },
               {
                 "cause": "unusable",
-                "item": "$input[1].commits",
-                "locations": [
-                  "/1/commits"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/1/commits"
+                    ],
+                    "name": "$input[1].commits",
+                    "outcome": "usable",
+                    "value": 5
+                  }
                 ],
-                "path": "$input[1].commits",
-                "value": 5
+                "kind": "item",
+                "locations": [
+                  "/1"
+                ],
+                "message": "commits is a number",
+                "name": "item 2 of $input",
+                "value": {
+                  "commits": 5
+                }
               }
             ],
             "inputs": [
@@ -1801,7 +1955,7 @@
                 "value": 2
               }
             ],
-            "message": "commits is a list in item 1 of $input but 5 in item 2; item 1 of $input: item 1 of commits is an object, item 2 of $input: commits is a number",
+            "message": "item 1 of $input: commits is a list, item 2 of $input: commits is a number; item 1 of $input: item 1 of commits is an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1906,7 +2060,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -1965,45 +2118,95 @@
       },
       {
         "description": "says when a name read as a list in one item isn't one in another, and still checks what it read",
-        "rules": ["subjects.every.broken"],
+        "rules": [
+          "subjects.every.broken",
+          "message.join"
+        ],
         "input": [{"commits": [{"x": 1}]}, {"commits": 5}],
         "results": [
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "unusable",
-                "item": "$input[0].commits",
-                "locations": [
-                  "/0/commits"
-                ],
-                "path": "$input[0].commits",
-                "value": [
+                "failures": [
                   {
-                    "x": 1
+                    "cause": "unusable",
+                    "failures": [],
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/0/commits/0"
+                        ],
+                        "name": "$input[0].commits[0]",
+                        "outcome": "usable",
+                        "value": {
+                          "x": 1
+                        }
+                      }
+                    ],
+                    "kind": "item",
+                    "locations": [
+                      "/0/commits/0"
+                    ],
+                    "message": "item 1 of commits is an object",
+                    "name": "item 1 of commits",
+                    "value": {
+                      "x": 1
+                    }
                   }
-                ]
-              },
-              {
-                "cause": "unusable",
-                "item": "item 1 of $input[0].commits",
-                "locations": [
-                  "/0/commits/0"
                 ],
-                "path": "item 1 of $input[0].commits",
+                "inputs": [
+                  {
+                    "locations": [
+                      "/0/commits"
+                    ],
+                    "name": "$input[0].commits",
+                    "outcome": "usable",
+                    "value": [
+                      {
+                        "x": 1
+                      }
+                    ]
+                  }
+                ],
+                "kind": "item",
+                "locations": [
+                  "/0"
+                ],
+                "message": "commits is a list",
+                "name": "item 1 of $input",
                 "value": {
-                  "x": 1
+                  "commits": [
+                    {
+                      "x": 1
+                    }
+                  ]
                 }
               },
               {
                 "cause": "unusable",
-                "item": "$input[1].commits",
-                "locations": [
-                  "/1/commits"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/1/commits"
+                    ],
+                    "name": "$input[1].commits",
+                    "outcome": "usable",
+                    "value": 5
+                  }
                 ],
-                "path": "$input[1].commits",
-                "value": 5
+                "kind": "item",
+                "locations": [
+                  "/1"
+                ],
+                "message": "commits is a number",
+                "name": "item 2 of $input",
+                "value": {
+                  "commits": 5
+                }
               }
             ],
             "inputs": [
@@ -2016,7 +2219,7 @@
                 "value": 2
               }
             ],
-            "message": "commits is a list in item 1 of $input but 5 in item 2; item 1 of $input: item 1 of commits is an object, item 2 of $input: commits is a number",
+            "message": "item 1 of $input: commits is a list, item 2 of $input: commits is a number; item 1 of $input: item 1 of commits is an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2185,11 +2388,20 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 1 of $input",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of $input is missing",
@@ -2227,11 +2439,20 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 1 of $input",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of $input is missing",
@@ -2266,11 +2487,20 @@
             "check": "$min_subjects",
             "description": "The in-scope subject count is at least 1",
             "expression": "count(matching(item 1 of $input)) >= 1",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 1 of $input",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of $input is missing",
@@ -2296,11 +2526,20 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 6 of $input",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 6 of $input is missing",
@@ -3088,11 +3327,20 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "item 1 of $input",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "item 1 of $input is missing",
@@ -3136,11 +3384,20 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope subject count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "commits",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "$input is a list: write every $input.commits to read each item",
@@ -3456,11 +3713,24 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope q count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/0/commits"
+                ],
+                "name": "p.commits",
+                "outcome": "unusable",
+                "value": [
+                  {
+                    "x": 1
+                  }
+                ]
               }
             ],
             "message": "commits is a list: write every p.commits to read each item",
@@ -3483,11 +3753,20 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
                 "name": "in-scope q count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/1"
+                ],
+                "name": "p.commits",
+                "outcome": "not_an_object",
+                "value": null
               }
             ],
             "message": "p is 5, which isn't an object",
@@ -3564,6 +3843,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -4718,6 +4998,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -11053,6 +11334,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -11106,6 +11388,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -11159,6 +11442,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -11212,6 +11496,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -11537,7 +11822,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -11561,7 +11845,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -11817,7 +12100,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -11841,7 +12123,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -12197,7 +12478,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -12221,7 +12501,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -12452,7 +12731,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -12475,7 +12753,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -12967,7 +13244,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -12990,7 +13266,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -13271,7 +13546,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -13373,7 +13647,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -13396,7 +13669,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -13484,7 +13757,7 @@
             "check": "$min_subjects",
             "description": "The in-scope pull request count is at least 1",
             "expression": "count(matching(every commit.pull_requests)) >= 1",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -13541,7 +13814,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -13564,7 +13836,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [],
@@ -13678,7 +13949,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -13701,7 +13971,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [],
@@ -13887,7 +14156,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [],
@@ -13908,7 +14176,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [],
@@ -14000,7 +14267,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -14023,15 +14289,23 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "pull_requests",
-                "locations": [
-                  "/commits/1"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/commits/1"
+                    ],
+                    "name": "pull_requests",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "pull_requests",
-                "value": null
+                "kind": "list",
+                "message": "pull_requests is missing",
+                "name": "pull_requests"
               }
             ],
             "inputs": [
@@ -14039,6 +14313,14 @@
                 "locations": [],
                 "name": "in-scope pull request count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/commits/1"
+                ],
+                "name": "pull_requests",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "pull_requests is missing",
@@ -14121,15 +14403,23 @@
             "check": "$min_subjects",
             "description": "The pull request list can be read",
             "expression": "every commit.pull_requests can be read",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "absent",
-                "item": "pull_requests",
-                "locations": [
-                  "/commits/1"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/commits/1"
+                    ],
+                    "name": "pull_requests",
+                    "outcome": "absent",
+                    "value": null
+                  }
                 ],
-                "path": "pull_requests",
-                "value": null
+                "kind": "list",
+                "message": "pull_requests is missing",
+                "name": "pull_requests"
               }
             ],
             "inputs": [
@@ -14137,6 +14427,14 @@
                 "locations": [],
                 "name": "in-scope pull request count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/commits/1"
+                ],
+                "name": "pull_requests",
+                "outcome": "absent",
+                "value": null
               }
             ],
             "message": "pull_requests is missing",
@@ -14182,7 +14480,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -14205,15 +14502,23 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "pull_requests",
-                "locations": [
-                  "/commits/1/pull_requests"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/commits/1/pull_requests"
+                    ],
+                    "name": "pull_requests",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "pull_requests",
-                "value": null
+                "kind": "list",
+                "message": "pull_requests is null",
+                "name": "pull_requests"
               }
             ],
             "inputs": [
@@ -14221,6 +14526,14 @@
                 "locations": [],
                 "name": "in-scope pull request count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/commits/1/pull_requests"
+                ],
+                "name": "pull_requests",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "pull_requests is null",
@@ -14303,15 +14616,23 @@
             "check": "$min_subjects",
             "description": "The pull request list can be read",
             "expression": "every commit.pull_requests can be read",
-            "failed_items": [
+            "failures": [
               {
                 "cause": "null",
-                "item": "pull_requests",
-                "locations": [
-                  "/commits/1/pull_requests"
+                "failures": [],
+                "inputs": [
+                  {
+                    "locations": [
+                      "/commits/1/pull_requests"
+                    ],
+                    "name": "pull_requests",
+                    "outcome": "null",
+                    "value": null
+                  }
                 ],
-                "path": "pull_requests",
-                "value": null
+                "kind": "list",
+                "message": "pull_requests is null",
+                "name": "pull_requests"
               }
             ],
             "inputs": [
@@ -14319,6 +14640,14 @@
                 "locations": [],
                 "name": "in-scope pull request count",
                 "value": 0
+              },
+              {
+                "locations": [
+                  "/commits/1/pull_requests"
+                ],
+                "name": "pull_requests",
+                "outcome": "null",
+                "value": null
               }
             ],
             "message": "pull_requests is null",
@@ -14370,7 +14699,7 @@
           {
             "cause": "value",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -14487,7 +14816,7 @@
             "check": "$min_subjects",
             "description": "The in-scope pull request count is at least 3",
             "expression": "count(matching(every commit.pull_requests)) >= 3",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [
@@ -14547,7 +14876,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -14572,7 +14900,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -14974,7 +15301,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -14998,7 +15324,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -15022,7 +15347,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -15336,7 +15660,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -15360,7 +15683,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -15597,7 +15919,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -16391,7 +16712,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -16435,7 +16756,7 @@
           {
             "cause": "null",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -16479,7 +16800,7 @@
           {
             "cause": "not_an_object",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -16889,7 +17210,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -16913,7 +17233,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -16937,7 +17256,6 @@
           {
             "cause": "satisfied",
             "check": "$min_subjects",
-            "failed_items": [],
             "inputs": [
               {
                 "locations": [
@@ -16961,7 +17279,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -16983,7 +17301,7 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -17305,7 +17623,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
@@ -17352,7 +17670,7 @@
           {
             "cause": "absent",
             "check": "$min_subjects",
-            "failed_items": [],
+            "failures": [],
             "inputs": [
               {
                 "locations": [],
