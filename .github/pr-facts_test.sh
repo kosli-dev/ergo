@@ -5,26 +5,31 @@ dir=$(mktemp -d)
 trap 'rm -rf "$dir"' EXIT
 a=$dir/a
 b=$dir/b
-mkdir -p "$a/t" "$a/u" "$b/t" "$b/u"
+mkdir -p "$a/t" "$a/u" "$a/w" "$b/t" "$b/u"
 
 printf '1\tt / g / a\n2\tt / g / b\n3\tt / g / c\n4\tt / g / d\n5\tt / g / e\n' > "$a/t/index.txt"
 cp "$a/t/index.txt" "$b/t/index.txt"
-printf '1\tu / g / x\n2\tu / g / f\n' > "$a/u/index.txt"
-printf '1\tu / g / x\n2\tu / g / f2\n' > "$b/u/index.txt"
+printf '1\tu / g / x\n2\tu / g / f\n3\tu / g / h\n' > "$a/u/index.txt"
+printf '1\tu / g / x\n2\tu / g / f2\n3\tu / g / h2\n' > "$b/u/index.txt"
+printf '1\tw / g / v\n2\tw / g / k\n' > "$a/w/index.txt"
 for n in 1 2 3 4 5; do
   printf '{"n":%s}\n' "$n" > "$a/t/$n.json"
   cp "$a/t/$n.json" "$b/t/$n.json"
 done
-printf '{"n":1}\n' > "$a/u/1.json"
-printf '{"n":2}\n' > "$a/u/2.json"
-cp "$a/u/1.json" "$b/u/1.json"
-cp "$a/u/2.json" "$b/u/2.json"
+for n in 1 2 3; do
+  printf '{"n":%s}\n' "$n" > "$a/u/$n.json"
+  cp "$a/u/$n.json" "$b/u/$n.json"
+done
+for n in 1 2; do
+  printf '{"n":%s}\n' "$n" > "$a/w/$n.json"
+done
 for n in 1 2 3 4; do
   printf '{"n":%s,"new":true}\n' "$n" > "$b/t/$n.json"
 done
 printf '{"n":1,"new":true}\n' > "$b/u/1.json"
+printf '{"n":3,"new":true}\n' > "$b/u/3.json"
 
-printf 't / g / b\nt / g / c\nu / g / f\n' > "$dir/known-a.txt"
+printf 't / g / b\nt / g / c\nu / g / f\nw / g / k\n' > "$dir/known-a.txt"
 printf 't / g / c\nt / g / d\nu / g / f2\n' > "$dir/known-b.txt"
 
 run() {
@@ -45,22 +50,25 @@ expect() {
   fi
 }
 
-echo "pr-facts.sh counts changed reports, joins runs, lists known-failures changes and flags changed passing cases"
+echo "pr-facts.sh counts changed reports, follows renamed keys, and puts cases that stopped passing first"
 expect "## Rust report changes
 
-5 case reports changed between base and the working tree.
+6 case reports changed between base and the working tree.
 
 - t 1-4
-- u 1
+- u 1, 3
 
-Cases only on one side: 1 new, 1 removed.
+Passing cases whose report changed: 4 (information only: a case compares the fields it lists, so a passing case can change a field it doesn't list).
+
+Cases only on one side: 0 new, 2 removed.
 
 ## Known failures
 
-known-failures.txt had 3 lines and has 3 now.
+known-failures.txt had 4 lines and has 3 now.
 
-CASES THAT PASSED ON base AND FAIL NOW: 1
+CASES THAT PASSED ON base AND FAIL OR ARE GONE NOW: 2
 - t / g / d
+- w / g / v (gone)
 
 Pass now, and did not before: 1
 - t / g / b
@@ -68,16 +76,12 @@ Pass now, and did not before: 1
 Fail now, and did not before: 1
 - t / g / d
 
-Renamed keys: 1
+Renamed keys: 2
 - u / g / f -> u / g / f2
+- u / g / h -> u / g / h2
 
-## Passing cases that changed
-
-3 cases passed on base and changed their report. That is a problem.
-
-- t 1: t / g / a
-- t 4: t / g / d
-- u 1: u / g / x"
+Removed from known-failures.txt because the case is gone: 1
+- w / g / k"
 
 echo "pr-facts.sh says so when nothing changed"
 /bin/rm -rf "$b"
@@ -89,13 +93,9 @@ No case report changed between base and the working tree.
 
 ## Known failures
 
-known-failures.txt had 3 lines and has 3 now.
+known-failures.txt had 4 lines and has 4 now.
 
-No case started or stopped passing.
-
-## Passing cases that changed
-
-None. No case that passed on base changed its report."
+No case started or stopped passing."
 
 echo "pr-facts.sh counts cases that only one side has"
 printf '6\tt / g / z\n' >> "$b/t/index.txt"
