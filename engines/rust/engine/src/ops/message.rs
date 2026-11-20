@@ -110,6 +110,21 @@ pub fn isnt(name: &str, value: &Value, kind: &str) -> String {
     format!("{name} is {}, which isn't {kind}", print(value))
 }
 
+/// A value a check can't use, as the name it was read by and what the
+/// check says of it, like `("x", "x is \"1\", which isn't a number")`.
+pub fn fault(name: &str, value: &Value, kind: &str) -> (String, String) {
+    (name.to_string(), isnt(name, value, kind))
+}
+
+/// The names of the values `check` can't use, which its message says when
+/// it fails as `unusable`.
+pub(crate) fn unfit_names(check: &Check, ctx: &Ctx) -> Vec<String> {
+    faults(check, ctx)
+        .into_iter()
+        .map(|(name, _)| name)
+        .collect()
+}
+
 fn state_word(state: Outcome) -> &'static str {
     match state {
         Outcome::Absent => "missing",
@@ -191,12 +206,8 @@ fn key_steps(path: &Path) -> impl Iterator<Item = &Path> {
     })
 }
 
-/// The names of the values `check` compares or tests, not the keys it reads
+/// The paths of the values `check` compares or tests, not the keys it reads
 /// on the way.
-pub fn side_names(check: &Check) -> Vec<String> {
-    side_paths(check).into_iter().map(name::name).collect()
-}
-
 fn side_paths(check: &Check) -> Vec<&Path> {
     match check {
         Check::Compare(c) => c.left.paths().into_iter().chain(c.right.paths()).collect(),
@@ -498,22 +509,22 @@ fn blocked_along(path: &Path, ctx: &Ctx) -> Vec<String> {
     Vec::new()
 }
 
-fn faults(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
+fn faults(check: &Check, ctx: &Ctx) -> Vec<(String, String)> {
     let input = single_path(check).and_then(|p| first_input(p, ctx));
     let found = input.as_ref().is_some_and(|i| i.state == Outcome::Found);
     match (check, &input) {
         (Check::Range(_), Some(i)) if found && !i.value.is_number() => {
-            vec![isnt(&i.name, &i.value, "a number")]
+            vec![fault(&i.name, &i.value, "a number")]
         }
         (Check::Empty(_), Some(i)) if found && !i.value.is_string() && !i.value.is_array() => {
-            vec![isnt(&i.name, &i.value, "text or a list")]
+            vec![fault(&i.name, &i.value, "text or a list")]
         }
         (Check::Equals(equals), Some(i))
             if found
                 && !equals.value.is_null()
                 && crate::value::type_name(&i.value) != crate::value::type_name(&equals.value) =>
         {
-            vec![isnt(&i.name, &i.value, kind(&equals.value))]
+            vec![fault(&i.name, &i.value, kind(&equals.value))]
         }
         (Check::In(c), _) => lists::in_faults(c, ctx),
         (Check::Contains(c), _) => lists::contains_faults(c, ctx),
@@ -521,14 +532,11 @@ fn faults(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
         (Check::Compare(compare), _) => compare_faults(compare, ctx),
         (Check::Tally(tally), _) => tally_faults(tally, ctx),
         (Check::CompareTime(time_check), _) => time_faults(time_check, ctx),
-        _ => {
-            let _ = verdict;
-            Vec::new()
-        }
+        _ => Vec::new(),
     }
 }
 
-fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<String> {
+fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<(String, String)> {
     let mut out = Vec::new();
     let reads = [
         (&compare.left, read_side(&compare.left, ctx)),
@@ -560,7 +568,7 @@ fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<String> {
                     && first.state == Outcome::Found
                     && !first.value.is_string()
                 {
-                    out.push(isnt(&first.name, &first.value, "text"));
+                    out.push(fault(&first.name, &first.value, "text"));
                 }
             }
         }
@@ -582,7 +590,7 @@ fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<String> {
             None => continue,
         };
         if kind(value) != want {
-            out.push(isnt(&first.name, value, want));
+            out.push(fault(&first.name, value, want));
         }
     }
     out
@@ -796,7 +804,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
             let mut all = key_faults(check, ctx);
             all.extend(blocked(check, ctx, false));
             all.extend(params_position_fault(check, ctx));
-            all.extend(faults(check, ctx, verdict));
+            all.extend(faults(check, ctx).into_iter().map(|(_, text)| text));
             all.extend(blocked(check, ctx, true));
             all.extend(
                 lists::walk_fault(check, ctx)
@@ -1199,7 +1207,7 @@ fn tally_side_value(side: &TallySide, ctx: &Ctx) -> Option<(String, Value, bool)
     }
 }
 
-fn tally_side_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
+fn tally_side_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, String)> {
     let sides = tally::tally_sides(check);
     let values: Vec<Option<(String, Value, bool)>> = sides
         .iter()
@@ -1244,13 +1252,13 @@ fn tally_side_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
         if let Some(want) = want
             && kind(value) != want
         {
-            out.push(isnt(name, value, want));
+            out.push(fault(name, value, want));
         }
     }
     out
 }
 
-fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
+fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<(String, String)> {
     let mut out = tally_side_faults(check, ctx);
     for side in tally::tally_sides(check) {
         match side {
@@ -1265,7 +1273,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                         if part.state == Outcome::Found
                             && super::time::read_time(&part.value).is_none()
                         {
-                            out.push(isnt(&part.name, &part.value, "a time"));
+                            out.push(fault(&part.name, &part.value, "a time"));
                             any = true;
                         }
                     }
@@ -1276,7 +1284,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                         )
                         && std::mem::discriminant(&x) != std::mem::discriminant(&y)
                     {
-                        out.push(isnt(
+                        out.push(fault(
                             &a.name,
                             &a.value,
                             &format!("a time written like {}", print(&b.value)),
@@ -1289,7 +1297,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                         && input.state == Outcome::Found
                         && !input.value.is_number()
                     {
-                        out.push(isnt(&input.name, &input.value, "a number"));
+                        out.push(fault(&input.name, &input.value, "a number"));
                         any = true;
                     }
                 }
@@ -1298,14 +1306,14 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                         continue;
                     };
                     if let Some(said) = tally::counted_text(term, ctx, Cause::Unusable) {
-                        out.push(said);
+                        out.push((String::new(), said));
                         any = true;
                     } else if let Some(input) = first_input(&term.path, ctx)
                         && input.state == Outcome::Found
                         && !input.value.is_array()
                         && !input.value.is_object()
                     {
-                        out.push(isnt(&input.name, &input.value, "a list or an object"));
+                        out.push(fault(&input.name, &input.value, "a list or an object"));
                         any = true;
                     }
                 }
@@ -1313,7 +1321,10 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                     first_input(path, ctx).is_none_or(|input| input.state == Outcome::Found)
                 });
                 if !any && all_found && tally::derived_value(derived, ctx).is_err() {
-                    out.push(format!("{} needs more than 15 digits", derived.text));
+                    out.push((
+                        derived.text.clone(),
+                        format!("{} needs more than 15 digits", derived.text),
+                    ));
                 }
             }
             TallySide::Plain(_) => {}
@@ -1322,7 +1333,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
     out
 }
 
-fn time_faults(check: &super::time::CompareTime, ctx: &Ctx) -> Vec<String> {
+fn time_faults(check: &super::time::CompareTime, ctx: &Ctx) -> Vec<(String, String)> {
     let reads = [
         (&check.left, read_side(&check.left, ctx)),
         (&check.right, read_side(&check.right, ctx)),
@@ -1337,7 +1348,7 @@ fn time_faults(check: &super::time::CompareTime, ctx: &Ctx) -> Vec<String> {
         };
         let time = super::time::read_time(value);
         if time.is_none() {
-            out.push(isnt(&first.name, value, "a time"));
+            out.push(fault(&first.name, value, "a time"));
         }
         times.push(time);
     }
@@ -1351,7 +1362,7 @@ fn time_faults(check: &super::time::CompareTime, ctx: &Ctx) -> Vec<String> {
             reads[1].1.value.as_ref(),
         )
     {
-        out.push(isnt(
+        out.push(fault(
             &first.name,
             left,
             &format!("a time written like {}", print(right)),

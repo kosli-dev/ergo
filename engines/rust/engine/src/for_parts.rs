@@ -482,12 +482,16 @@ pub fn for_failures(
                 Some(text) if matches!(sentence.check, Check::Walk(_)) => text,
                 _ => ops::message::message(&sentence.check, ctx, &ran.verdict),
             };
-            let sides = ops::message::side_names(&sentence.check);
             let inputs = ran
                 .verdict
                 .inputs
                 .iter()
-                .map(|input| crate::parts::with_outcome(input, &said, &sides))
+                .map(|input| {
+                    crate::parts::with_outcome(
+                        input,
+                        crate::checks::input_unfit(&[&sentence.check], input, ctx),
+                    )
+                })
                 .collect();
             Some((ran.verdict.cause, said, inputs))
         })
@@ -735,7 +739,7 @@ pub fn for_failures(
             Failure::List(Part {
                 name: input.name.clone(),
                 cause,
-                inputs: vec![crate::parts::with_outcome(&input, &text, &[])],
+                inputs: vec![crate::parts::with_outcome(&input, false)],
                 failures: Vec::new(),
                 message: text,
             }),

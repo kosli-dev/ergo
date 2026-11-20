@@ -28,6 +28,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ### Fixed
 
+- An input's `outcome` is `unusable` when the check says it can't use that value, and the Rust engine no longer works it out from the words of the message, as spec 0.7 says ([row.parts](../../spec/semantics.md#what-a-row-shows)). With a subject holding `{"z": "s", "xs": [{"v": 1}, {"v": 2}]}`, `for: every xs as m` with `z is at least 1` says `z is "s", which isn't a number` and gives `z` the outcome `unusable`, where it was `usable`. A walked list that starts at the input, like `$input[].id` in `id is in $input.id` on `[{"id": "a"}, 1]`, is `unusable` too. And a value whose name ends a clause about something else is no longer `unusable` by mistake: for a subject called `my w` with `from: items whose kind is "a" and that is not empty`, on `{"items": [{"kind": "a"}, "x"]}`, the `$applies` row of `"x"` says `my w is "x", which isn't an object` about the `kind` it can't read, and gives `my w` the outcome `usable`, as `that is not empty` can use `"x"`.
+
 - A `sum of` or a `plus` that fails as `unusable` only because it needs more than 15 digits says so, like `sum of items.x needs more than 15 digits`, as `ergo.rego` does, where Rust said `sum of items.x is 0 is false`.
 
 - A `from` line's condition that holds but fails as `unusable` because the params aren't an object says `env is "prod" is false` in its `failures` entry, as `ergo.rego` does, where Rust said `the check is false`.

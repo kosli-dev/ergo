@@ -83,20 +83,15 @@ pub fn to_json(failures: &[Failure]) -> Value {
 }
 
 /// The word an input's `outcome` says, or `None` for an input that doesn't
-/// read a path. `message` is what the check says, which names an input whose
-/// value the check can't use, and `sides` names the values the check uses.
-pub fn outcome(input: &Input, message: &str, sides: &[String]) -> Option<&'static str> {
+/// read a path. `unfit` says whether the check can't use the value it read,
+/// as [`crate::checks::input_unfit`] works it out.
+pub fn outcome(input: &Input, unfit: bool) -> Option<&'static str> {
     if input.worked {
         return None;
     }
     match input.state {
         Outcome::Found if input.value.is_null() => None,
-        Outcome::Found
-            if (sides.contains(&input.name) || walked_root(&input.name))
-                && unfit(&input.name, &input.value, message) =>
-        {
-            Some("unusable")
-        }
+        Outcome::Found if unfit => Some("unusable"),
         Outcome::Found => Some("usable"),
         Outcome::Null => Some("null"),
         Outcome::Absent => Some("absent"),
@@ -105,28 +100,10 @@ pub fn outcome(input: &Input, message: &str, sides: &[String]) -> Option<&'stati
     }
 }
 
-fn walked_root(name: &str) -> bool {
-    (name.starts_with("$params.") || name.starts_with("$input.")) && name.contains("[]")
-}
-
-fn unfit(name: &str, value: &Value, message: &str) -> bool {
-    let said = format!("{}, which ", crate::ops::message::is(name, value));
-    if message.contains(&said) {
-        return true;
-    }
-    match name.split_once("[]") {
-        Some((list, _)) => {
-            message.contains(&format!(" of {list} is ")) && message.contains(", which ")
-                || message.contains(&format!("{list} are of more than one"))
-        }
-        None => false,
-    }
-}
-
 /// An input as a failed row shows it, with its `outcome`.
-pub fn with_outcome(input: &Input, message: &str, sides: &[String]) -> Value {
+pub fn with_outcome(input: &Input, unfit: bool) -> Value {
     let mut entry = input.to_json();
-    if let (Some(word), Some(map)) = (outcome(input, message, sides), entry.as_object_mut()) {
+    if let (Some(word), Some(map)) = (outcome(input, unfit), entry.as_object_mut()) {
         map.insert("outcome".to_string(), json!(word));
     }
     entry

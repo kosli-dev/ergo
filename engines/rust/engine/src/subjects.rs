@@ -1945,7 +1945,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let inputs = if matched {
         merged_inputs(read)
     } else {
-        outcomes(&read, message.as_deref().unwrap_or_default(), true, &checks)
+        outcomes(&read, true, &checks, ctx)
     };
     let failed_items = if filters.len() == 1 {
         failed_items
@@ -1967,7 +1967,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
                         &f.check,
                         &f.text,
                         v.cause,
-                        outcomes(&v.inputs, text, false, &[&f.check]),
+                        outcomes(&v.inputs, false, &[&f.check], ctx),
                         text,
                         ctx,
                         false,
@@ -2425,11 +2425,7 @@ struct RanItems {
     item_by_item: bool,
 }
 
-fn outcomes(inputs: &[Input], message: &str, merged: bool, checks: &[&Check]) -> Vec<Value> {
-    let sides: Vec<String> = checks
-        .iter()
-        .flat_map(|check| ops::message::side_names(check))
-        .collect();
+fn outcomes(inputs: &[Input], merged: bool, checks: &[&Check], ctx: &Ctx) -> Vec<Value> {
     let inputs = if merged {
         merge_inputs(inputs.to_vec())
     } else {
@@ -2437,7 +2433,10 @@ fn outcomes(inputs: &[Input], message: &str, merged: bool, checks: &[&Check]) ->
     };
     let mut kept: Vec<Value> = Vec::new();
     for input in &inputs {
-        ops::push_new(&mut kept, parts::with_outcome(input, message, &sides));
+        ops::push_new(
+            &mut kept,
+            parts::with_outcome(input, crate::checks::input_unfit(checks, input, ctx)),
+        );
     }
     kept
 }
@@ -2462,7 +2461,7 @@ fn key_ref_entries(paths: &[&Path], ctx: &Ctx, inputs: &[Value]) -> Vec<Value> {
             {
                 continue;
             }
-            ops::push_new(&mut found, parts::with_outcome(&input, "", &[]));
+            ops::push_new(&mut found, parts::with_outcome(&input, false));
         }
     }
     found.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
@@ -2485,7 +2484,7 @@ pub(crate) fn root_inputs(paths: &[&Path], check: &Check, ctx: &Ctx) -> Vec<Valu
         let Some(input) = ops::read_path(path, ctx).inputs.into_iter().next() else {
             continue;
         };
-        let mut entry = parts::with_outcome(&input, "", &[]);
+        let mut entry = parts::with_outcome(&input, false);
         match input.state {
             Outcome::Found if crate::checks::ref_unfit(&[check], path, &input.value, ctx) => {
                 entry["outcome"] = json!("unusable");
@@ -2511,7 +2510,7 @@ fn walk_base(walk: &ops::walk::Walk, ctx: &Ctx, said: &mut Vec<String>) -> Vec<F
     vec![Failure::List(Part {
         name: input.name.clone(),
         cause,
-        inputs: vec![parts::with_outcome(&input, &text, &[])],
+        inputs: vec![parts::with_outcome(&input, false)],
         failures: Vec::new(),
         message: text,
     })]
@@ -2533,7 +2532,7 @@ fn push_params_refs(check: &Check, ctx: &Ctx, inputs: &[Value], keys: &mut Vec<V
         let Some(input) = ops::read_path(&reference, ctx).inputs.into_iter().next() else {
             continue;
         };
-        let mut entry = parts::with_outcome(&input, "", &[]);
+        let mut entry = parts::with_outcome(&input, false);
         if input.state == Outcome::Found
             && crate::checks::ref_unfit(&[check], &reference, &input.value, ctx)
         {
@@ -2847,7 +2846,7 @@ fn with_failures(
         .flat_map(|v| v.inputs.iter().cloned())
         .collect();
     let all: Vec<&Check> = ran.checks.iter().collect();
-    row.inputs = outcomes(&read, &message, plan.all_of, &all);
+    row.inputs = outcomes(&read, plan.all_of, &all, ctx);
     if matches!(ran.checks.first(), Some(Check::For(_))) {
         let worked: Vec<&str> = read
             .iter()
@@ -2886,7 +2885,7 @@ fn with_failures(
                     let said = own
                         .clone()
                         .unwrap_or_else(|| default_message(check, ctx, v));
-                    let mut inputs = outcomes(&v.inputs, &said, false, &[check]);
+                    let mut inputs = outcomes(&v.inputs, false, &[check], ctx);
                     let extra = ops::key_base::entry_inputs(check, ctx, v.cause, &inputs);
                     inputs.extend(extra);
                     Failure::Assertion {
@@ -2914,12 +2913,8 @@ fn with_failures(
                                     .iter()
                                     .map(|line| Failure::Assertion {
                                         part: {
-                                            let mut inputs = outcomes(
-                                                &line.inputs,
-                                                &line.said,
-                                                false,
-                                                &[&line.check],
-                                            );
+                                            let mut inputs =
+                                                outcomes(&line.inputs, false, &[&line.check], ctx);
                                             if matches!(line.check, Check::Walk(_)) {
                                                 let mut refs = Vec::new();
                                                 push_params_refs(

@@ -1549,12 +1549,16 @@ impl For {
                     }
                     _ => vec![text.clone()],
                 };
-                let sides = super::message::side_names(&sentence.check);
                 let inputs: Vec<Value> =
                     reading_order(&sentence.check, &verdict.inputs, &self.alias_names())
                         .iter()
                         .filter(|input| !self.keyed_alias_input(&sentence.check, input))
-                        .map(|input| crate::parts::with_outcome(input, &text, &sides))
+                        .map(|input| {
+                            crate::parts::with_outcome(
+                                input,
+                                crate::checks::input_unfit(&[&sentence.check], input, ctx),
+                            )
+                        })
                         .collect();
                 sfails.push(Sfail {
                     own,
