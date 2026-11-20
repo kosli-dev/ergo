@@ -47,6 +47,20 @@ fn a_key_of_the_wrong_kind_is_still_usable_because_the_check_uses_only_what_it_n
 }
 
 #[test]
+#[ignore = "694: the outcome of an input comes from the check, not from the words of the message"]
+fn a_walked_root_stays_usable_when_another_clause_of_the_message_says_which_isnt() {
+    let xs = read("$input.xs[]", json!([3]), Outcome::Found);
+    assert_eq!(
+        outcome(
+            &xs,
+            "item 1 of $input.xs is 3; $params.q is \"s\", which isn't a number",
+            &[]
+        ),
+        Some("usable")
+    );
+}
+
+#[test]
 fn a_worked_out_number_has_no_outcome() {
     let mut count = read("count of xs", json!(2), Outcome::Found);
     count.worked = true;
