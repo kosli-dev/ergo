@@ -99,8 +99,9 @@ default_rust() {
     fi
     touched=1
   fi
-  (cd "$tree_dir/engines/rust" && cargo test -j 4 -p "$@" -- --exact > "$out" 2>&1) || return 1
-  if grep -q '[1-9][0-9]* passed' "$out"; then return 0; fi
+  for test_name; do :; done
+  (cd "$tree_dir/engines/rust" && cargo test -j 4 -p "$@" > "$out" 2>&1) || return 1
+  if grep -q "^test \(.*::\)\{0,1\}$test_name \.\.\. ok\$" "$out"; then return 0; fi
   return 3
 }
 

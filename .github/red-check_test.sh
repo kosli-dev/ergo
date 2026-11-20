@@ -137,7 +137,7 @@ else
   echo "opa is not on PATH, skipping the real Rego test"
 fi
 
-echo "red-check.sh runs cargo with the pinned Rust version, an exact test name and one touch per source"
+echo "red-check.sh runs cargo with the pinned Rust version, the test run by its own name and one touch per source"
 fake=$dir/fake
 mkdir -p "$fake/bin" "$fake/repo/.github" "$fake/repo/engines/rust/foo/src"
 cp "$here/red-check.sh" "$fake/repo/.github/red-check.sh"
