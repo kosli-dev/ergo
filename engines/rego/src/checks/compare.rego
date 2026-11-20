@@ -320,10 +320,13 @@ _list_flaw(leaf, x) := states if {
 	_list_cmp(leaf)
 	_lstate(leaf, x) == "value"
 	not _lfailed(leaf, x)
-	items := _text_item_states(_lvalue(leaf, x))
-	count(items) > 0
-	states := items | _text_left_states(leaf, x)
+	states := _text_list_states(_text_item_states(_lvalue(leaf, x)), _text_left_states(leaf, x))
+	count(states) > 0
 }
+
+_text_list_states(items, left) := items | left if count(items) > 0
+
+else := left & {"unusable"}
 
 _text_left_states(leaf, x) := {"unusable"} if {
 	v := _found(x, leaf.left)
