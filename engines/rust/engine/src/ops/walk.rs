@@ -1212,7 +1212,11 @@ fn stood_in(check: &Check, focus: &Ctx, blocked: impl Fn(&Path) -> bool) -> Opti
     {
         return Some(check.clone());
     }
-    let right_blocked = |right: &Right| right.ref_paths().into_iter().any(&blocked);
+    let right_blocked = |right: &Right| {
+        let mut paths = Vec::new();
+        right.paths(&mut paths);
+        paths.into_iter().any(&blocked)
+    };
     let compare = match check {
         Check::Compare(compare) => compare,
         Check::Contains(contains) if !blocked(&contains.path) => {
